@@ -40,53 +40,53 @@ import java.util.List;
  */
 public class Submissions extends AbstractDSpaceTransformer
 {
-	/** General Language Strings */
-    protected static final Message T_title = 
+    /** General Language Strings */
+    protected static final Message T_title =
         message("xmlui.Submission.Submissions.title");
-    protected static final Message T_dspace_home = 
-        message("xmlui.general.dspace_home"); 
-    protected static final Message T_trail = 
+    protected static final Message T_dspace_home =
+        message("xmlui.general.dspace_home");
+    protected static final Message T_trail =
         message("xmlui.Submission.Submissions.trail");
-    protected static final Message T_head = 
+    protected static final Message T_head =
         message("xmlui.Submission.Submissions.head");
-    protected static final Message T_untitled = 
+    protected static final Message T_untitled =
         message("xmlui.Submission.Submissions.untitled");
-    protected static final Message T_email = 
+    protected static final Message T_email =
         message("xmlui.Submission.Submissions.email");
 
     // used by the unfinished submissions section
-    protected static final Message T_s_head1 = 
-        message("xmlui.Submission.Submissions.submit_head1"); 
-    protected static final Message T_s_info1a = 
-        message("xmlui.Submission.Submissions.submit_info1a"); 
-    protected static final Message T_s_info1b = 
-        message("xmlui.Submission.Submissions.submit_info1b"); 
-    protected static final Message T_s_info1c = 
-        message("xmlui.Submission.Submissions.submit_info1c"); 
-    protected static final Message T_s_head2 = 
-        message("xmlui.Submission.Submissions.submit_head2"); 
-    protected static final Message T_s_info2a = 
-        message("xmlui.Submission.Submissions.submit_info2a"); 
-    protected static final Message T_s_info2b = 
-        message("xmlui.Submission.Submissions.submit_info2b"); 
-    protected static final Message T_s_info2c = 
-        message("xmlui.Submission.Submissions.submit_info2c"); 
-    protected static final Message T_s_column1 = 
-        message("xmlui.Submission.Submissions.submit_column1"); 
-    protected static final Message T_s_column2 = 
-        message("xmlui.Submission.Submissions.submit_column2"); 
-    protected static final Message T_s_column3 = 
-        message("xmlui.Submission.Submissions.submit_column3"); 
-    protected static final Message T_s_column4 = 
-        message("xmlui.Submission.Submissions.submit_column4"); 
-    protected static final Message T_s_head3 = 
-        message("xmlui.Submission.Submissions.submit_head3"); 
-    protected static final Message T_s_info3 = 
-        message("xmlui.Submission.Submissions.submit_info3"); 
-    protected static final Message T_s_head4 = 
-        message("xmlui.Submission.Submissions.submit_head4"); 
-    protected static final Message T_s_submit_remove = 
-        message("xmlui.Submission.Submissions.submit_submit_remove"); 
+    protected static final Message T_s_head1 =
+        message("xmlui.Submission.Submissions.submit_head1");
+    protected static final Message T_s_info1a =
+        message("xmlui.Submission.Submissions.submit_info1a");
+    protected static final Message T_s_info1b =
+        message("xmlui.Submission.Submissions.submit_info1b");
+    protected static final Message T_s_info1c =
+        message("xmlui.Submission.Submissions.submit_info1c");
+    protected static final Message T_s_head2 =
+        message("xmlui.Submission.Submissions.submit_head2");
+    protected static final Message T_s_info2a =
+        message("xmlui.Submission.Submissions.submit_info2a");
+    protected static final Message T_s_info2b =
+        message("xmlui.Submission.Submissions.submit_info2b");
+    protected static final Message T_s_info2c =
+        message("xmlui.Submission.Submissions.submit_info2c");
+    protected static final Message T_s_column1 =
+        message("xmlui.Submission.Submissions.submit_column1");
+    protected static final Message T_s_column2 =
+        message("xmlui.Submission.Submissions.submit_column2");
+    protected static final Message T_s_column3 =
+        message("xmlui.Submission.Submissions.submit_column3");
+    protected static final Message T_s_column4 =
+        message("xmlui.Submission.Submissions.submit_column4");
+    protected static final Message T_s_head3 =
+        message("xmlui.Submission.Submissions.submit_head3");
+    protected static final Message T_s_info3 =
+        message("xmlui.Submission.Submissions.submit_info3");
+    protected static final Message T_s_head4 =
+        message("xmlui.Submission.Submissions.submit_head4");
+    protected static final Message T_s_submit_remove =
+        message("xmlui.Submission.Submissions.submit_submit_remove");
 
     // Used in the completed submissions section
     protected static final Message T_c_head =
@@ -110,19 +110,20 @@ public class Submissions extends AbstractDSpaceTransformer
     protected SupervisedItemService supervisedItemService = ContentServiceFactory.getInstance().getSupervisedItemService();
 
     @Override
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-	WingException, UIException, SQLException, IOException,
-	AuthorizeException
-	{
-            pageMeta.addMetadata("title").addContent(T_title);
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        pageMeta.addMetadata("title").addContent(T_title);
 
-            pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-            pageMeta.addTrailLink(null,T_trail);
-	}
+        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+        pageMeta.addTrailLink(null,T_trail);
+    }
 
     @Override
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         boolean displayAll = false;
@@ -143,37 +144,38 @@ public class Submissions extends AbstractDSpaceTransformer
     }
 
     /**
-     * If the user has any workflow tasks, either assigned to them or in an 
+     * If the user has any workflow tasks, either assigned to them or in an
      * available pool of tasks, then build two tables listing each of these queues.
-     * 
+     *
      * If the user doesn't have any workflows then don't do anything.
-     * 
+     *
      * @param division The division to add the two queues too.
      */
-    private void addWorkflowTasksDiv(Division division) throws SQLException, WingException, AuthorizeException, IOException {
-    	division.addDivision("workflow-tasks");
-        }
+    private void addWorkflowTasksDiv(Division division)
+        throws SQLException, WingException, AuthorizeException, IOException
+    {
+        division.addDivision("workflow-tasks");
+    }
 
     /**
-     * There are two options:  the user has some unfinished submissions 
+     * There are two options:  the user has some unfinished submissions
      * or the user does not.
-     * 
-     * If the user does not, then we just display a simple paragraph 
+     *
+     * If the user does not, then we just display a simple paragraph
      * explaining that the user may submit new items to dspace.
-     * 
-     * If the user does have unfinished submissions then a table is 
+     *
+     * If the user does have unfinished submissions then a table is
      * presented listing all the unfinished submissions that this user has.
-     * 
+     *
      */
     private void addUnfinishedSubmissions(Division division) throws SQLException, WingException
     {
-
         // User's WorkflowItems
-    	List<WorkspaceItem> unfinishedItems = workspaceItemService.findByEPerson(context, context.getCurrentUser());
-    	List<WorkspaceItem> supervisedItems = supervisedItemService.findbyEPerson(context, context.getCurrentUser());
+        List<WorkspaceItem> unfinishedItems = workspaceItemService.findByEPerson(context, context.getCurrentUser());
+        List<WorkspaceItem> supervisedItems = supervisedItemService.findbyEPerson(context, context.getCurrentUser());
 
-    	if (unfinishedItems.size() <= 0 && supervisedItems.size() <= 0)
-    	{
+        if (unfinishedItems.size() <= 0 && supervisedItems.size() <= 0)
+        {
             List<Collection> collections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
 
             if (collections.size() > 0)
@@ -187,28 +189,28 @@ public class Submissions extends AbstractDSpaceTransformer
                 secondP.addContent(T_s_info1c);
                 return;
             }
-    	}
+        }
 
-    	Division unfinished = division.addDivision("unfinished-submisions");
-    	unfinished.setHead(T_s_head2);
-    	Para p = unfinished.addPara();
-    	p.addContent(T_s_info2a);
-    	p.addHighlight("bold").addXref(contextPath+"/submit",T_s_info2b);
-    	p.addContent(T_s_info2c);
+        Division unfinished = division.addDivision("unfinished-submisions");
+        unfinished.setHead(T_s_head2);
+        Para p = unfinished.addPara();
+        p.addContent(T_s_info2a);
+        p.addHighlight("bold").addXref(contextPath+"/submit",T_s_info2b);
+        p.addContent(T_s_info2c);
 
-    	// Calculate the number of rows.
-    	// Each list pluss the top header and bottom row for the button.
-    	int rows = unfinishedItems.size() + supervisedItems.size() + 2;
-    	if (supervisedItems.size() > 0 && unfinishedItems.size() > 0)
+        // Calculate the number of rows.
+        // Each list pluss the top header and bottom row for the button.
+        int rows = unfinishedItems.size() + supervisedItems.size() + 2;
+        if (supervisedItems.size() > 0 && unfinishedItems.size() > 0)
         {
             rows++; // Authoring heading row
         }
-    	if (supervisedItems.size() > 0)
+        if (supervisedItems.size() > 0)
         {
             rows++; // Supervising heading row
         }
 
-    	Table table = unfinished.addTable("unfinished-submissions",rows,5);
+        Table table = unfinished.addTable("unfinished-submissions",rows,5);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_s_column1);
         header.addCellContent(T_s_column2);
@@ -223,7 +225,7 @@ public class Submissions extends AbstractDSpaceTransformer
 
         if (unfinishedItems.size() > 0)
         {
-            for (WorkspaceItem workspaceItem : unfinishedItems) 
+            for (WorkspaceItem workspaceItem : unfinishedItems)
             {
                 String title = workspaceItem.getItem().getName();
                 EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
@@ -252,7 +254,7 @@ public class Submissions extends AbstractDSpaceTransformer
                 cell.addContent(T_email);
                 cell.addXref("mailto:"+submitterEmail,submitterName);
             }
-        } 
+        }
         else
         {
             header = table.addRow();
@@ -265,7 +267,7 @@ public class Submissions extends AbstractDSpaceTransformer
             header.addCell(null,Cell.ROLE_HEADER,0,5,null).addContent(T_s_head4);
         }
 
-        for (WorkspaceItem workspaceItem : supervisedItems) 
+        for (WorkspaceItem workspaceItem : supervisedItems)
         {
 
             String title = workspaceItem.getItem().getName();
@@ -310,7 +312,7 @@ public class Submissions extends AbstractDSpaceTransformer
 
     /**
      * This section lists all the submissions that this user has submitted which are currently under review.
-     * 
+     *
      * If the user has none, this nothing is displayed.
      */
     private void addSubmissionsInWorkflowDiv(Division division)
@@ -321,11 +323,11 @@ public class Submissions extends AbstractDSpaceTransformer
 
     /**
      * Show the user's completed submissions.
-     * 
+     *
      * If the user has no completed submissions, display nothing.
      * If 'displayAll' is true, then display all user's archived submissions.
      * Otherwise, default to only displaying 50 archived submissions.
-     * 
+     *
      * @param division div to put archived submissions in
      * @param displayAll whether to display all or just a limited number.
      */
@@ -337,7 +339,7 @@ public class Submissions extends AbstractDSpaceTransformer
 
         Integer limit;
 
-        if(displayAll) {
+        if (displayAll) {
             limit = -1;
         } else {
             //Set a default limit of 50
@@ -346,7 +348,7 @@ public class Submissions extends AbstractDSpaceTransformer
         Iterator<Item> subs = itemService.findBySubmitterDateSorted(context, context.getCurrentUser(), limit);
 
         //NOTE: notice we are adding each item to this list in *reverse* order...
-        // this is a very basic attempt at making more recent submissions float 
+        // this is a very basic attempt at making more recent submissions float
         // up to the top of the list (findBySubmitter() doesn't guarrantee
         // chronological order, but tends to return older items near top of the list)
         while (subs.hasNext())
@@ -356,7 +358,9 @@ public class Submissions extends AbstractDSpaceTransformer
 
         // No tasks, so don't show the table.
         if (!(subList.size() > 0))
+        {
             return;
+        }
 
         Division completedSubmissions = division.addDivision("completed-submissions");
         completedSubmissions.setHead(T_c_head);
@@ -370,7 +374,7 @@ public class Submissions extends AbstractDSpaceTransformer
         header.addCellContent(T_c_column3); // COLLECTION NAME (LINKED)
 
         //Limit to showing just 50 archived submissions, unless overridden
-        //(This is a saftey measure for Admins who may have submitted 
+        //(This is a saftey measure for Admins who may have submitted
         // thousands of items under their account via bulk ingest tools, etc.)
         int count = 0;
 
@@ -380,8 +384,10 @@ public class Submissions extends AbstractDSpaceTransformer
         {
             count++;
             //exit loop if we've gone over our limit of submissions to display
-            if(count>limit && !displayAll)
+            if (count>limit && !displayAll)
+            {
                 break;
+            }
 
             Item published = i.next();
             String collUrl = contextPath+"/handle/"+published.getOwningCollection().getHandle();
@@ -409,7 +415,9 @@ public class Submissions extends AbstractDSpaceTransformer
             {
                 String displayTitle = titles.get(0).getValue();
                 if (displayTitle.length() > 50)
+                {
                     displayTitle = displayTitle.substring(0,50)+ " ...";
+                }
                 row.addCell().addXref(itemUrl,displayTitle);
             }
             else
@@ -417,15 +425,14 @@ public class Submissions extends AbstractDSpaceTransformer
 
             // Owning Collection
             row.addCell().addXref(collUrl,collectionName);
-        }//end while
+        } //end while
 
         //Display limit text & link to allow user to override this default limit
-        if(!displayAll && count == limit)
+        if (!displayAll && count == limit)
         {
             Para limitedList = completedSubmissions.addPara();
             limitedList.addContent(T_c_limit);
             limitedList.addXref(contextPath + "/submissions?all", T_c_displayall);
-        }    
+        }
     }
-
 }

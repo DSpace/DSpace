@@ -25,9 +25,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 /**
- * Unauthenticate the current user. There is no way this action will fail, 
+ * Unauthenticate the current user. There is no way this action will fail,
  * so any components inside the action will be executed.
- * 
+ *
  * <p>This action will always send an HTTP redirect to the DSpace home page.
  *
  * <p>Example:
@@ -35,13 +35,13 @@ import org.dspace.eperson.EPerson;
  * <pre>
  * {@code
  * <map:action name="UnAuthenticateAction" src="org.dspace.app.xmlui.eperson.UnAuthenticateAction"/>
- * 
+ *
  * <map:act type="UnAuthenticateAction">
  *   <map:serialize type="xml"/>
  * </map:act>
  * }
  * </pre>
- * 
+ *
  * @author Scott Phillips
  */
 
@@ -50,7 +50,7 @@ public class UnAuthenticateAction extends AbstractAction
 
     /**
      * Logout the current user.
-     * 
+     *
      * @param redirector redirector.
      * @param resolver source resolver.
      * @param objectModel
@@ -62,36 +62,39 @@ public class UnAuthenticateAction extends AbstractAction
      */
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
-            String source, Parameters parameters) throws Exception
+        String source, Parameters parameters)
+        throws Exception
     {
-        
+
         Context context = ContextUtil.obtainContext(objectModel);
-        final HttpServletRequest httpRequest = 
+        final HttpServletRequest httpRequest =
             (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-        final HttpServletResponse httpResponse = 
+        final HttpServletResponse httpResponse =
             (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
         EPerson eperson = context.getCurrentUser();
-        
+
         // Actually log the user out.
         AuthenticationUtil.logOut(context,httpRequest);
-        
+
         // Set the user as logged in for the rest of this request so that the cache does not get spoiled.
         context.setCurrentUser(eperson);
-        
+
         // Forward the user to the home page.
-        if((DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
-				StringBuffer location = new StringBuffer("http://");
-				location.append(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname")).append(
-						httpRequest.getContextPath());
-				httpResponse.sendRedirect(location.toString());
-			
-		}
-        else{
-        	httpResponse.sendRedirect(httpRequest.getContextPath());
+        if ((DSpaceServicesFactory.getInstance().getConfigurationService()
+            .getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure()))
+        {
+            StringBuffer location = new StringBuffer("http://");
+            location.append(DSpaceServicesFactory.getInstance()
+                .getConfigurationService().getProperty("dspace.hostname"))
+                .append(httpRequest.getContextPath());
+            httpResponse.sendRedirect(location.toString());
         }
-        
+        else
+        {
+            httpResponse.sendRedirect(httpRequest.getContextPath());
+        }
+
         return new HashMap();
     }
-
 }

@@ -22,7 +22,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * A class representing a set of metadata about the page being generated.
- * 
+ *
  * @author Scott Phillips
  */
 public class PageMeta extends AbstractWingElement implements
@@ -35,9 +35,9 @@ public class PageMeta extends AbstractWingElement implements
     private boolean merged = false;
 
 
-    /** 
-     * A page meta may hold two types of elements, trails or 
-     * metadata. Each of these types are separated so that 
+    /**
+     * A page meta may hold two types of elements, trails or
+     * metadata. Each of these types are separated so that
      * we can search through each time as we merge documents.
      */
     private List<Metadata> metadatum = new ArrayList<>();
@@ -45,34 +45,36 @@ public class PageMeta extends AbstractWingElement implements
 
     /**
      * Construct a new pageMeta
-     * 
+     *
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
-    protected PageMeta(WingContext context) throws WingException
+    protected PageMeta(WingContext context)
+        throws WingException
     {
         super(context);
     }
 
     /**
-	 * Add metadata about this page.
-	 * 
-	 * @param element
-	 *            (Required) The metadata element.
-	 * @param qualifier
-	 *            (May be null) The metadata qualifier.
-	 * @param language
-	 *            (May be null) The metadata language
-	 * @param allowMultiple
-	 *            (Required) determine if multiple metadata elements with the same
-	 *            element, qualifier and language are allowed.
-	 * @return A new metadata
+     * Add metadata about this page.
+     *
+     * @param element
+     *            (Required) The metadata element.
+     * @param qualifier
+     *            (May be null) The metadata qualifier.
+     * @param language
+     *            (May be null) The metadata language
+     * @param allowMultiple
+     *            (Required) determine if multiple metadata elements with the same
+     *            element, qualifier and language are allowed.
+     * @return A new metadata
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
-	 */
+     */
     public Metadata addMetadata(String element, String qualifier,
-            String language, boolean allowMultiple) throws WingException
+        String language, boolean allowMultiple)
+        throws WingException
     {
         Metadata metadata = new Metadata(context, element, qualifier, language, allowMultiple);
         metadatum.add(metadata);
@@ -80,26 +82,26 @@ public class PageMeta extends AbstractWingElement implements
     }
 
     /**
-	 * Add metadata about this page.
-	 * 
-	 * @param element
-	 *            (Required) The metadata element.
-	 * @param qualifier
-	 *            (May be null) The metadata qualifier.
-	 * @param language
-	 *            (May be null) The metadata language
-	 * @return A new metadata
+     * Add metadata about this page.
+     *
+     * @param element
+     *            (Required) The metadata element.
+     * @param qualifier
+     *            (May be null) The metadata qualifier.
+     * @param language
+     *            (May be null) The metadata language
+     * @return A new metadata
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
-	 */
+     */
     public Metadata addMetadata(String element, String qualifier, String language)
-            throws WingException
+        throws WingException
     {
         return addMetadata(element, qualifier, language, false);
     }
-    
+
     /**
      * Add metadata about this page.
-     * 
+     *
      * @param element
      *            (Required) The metadata element.
      * @param qualifier
@@ -108,27 +110,28 @@ public class PageMeta extends AbstractWingElement implements
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Metadata addMetadata(String element, String qualifier)
-            throws WingException
+        throws WingException
     {
         return addMetadata(element, qualifier, null, false);
     }
 
     /**
      * Add metadata about this page.
-     * 
+     *
      * @param element
      *            (Required) The metadata element.
      * @return A new metadata
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
-    public Metadata addMetadata(String element) throws WingException
+    public Metadata addMetadata(String element)
+        throws WingException
     {
         return addMetadata(element, null, null, false);
     }
 
     /**
      * Add a new trail to the page.
-     * 
+     *
      * @param target
      *            (May be null) Target URL for this trail item.
      * @param rend
@@ -137,7 +140,7 @@ public class PageMeta extends AbstractWingElement implements
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Trail addTrail(String target, String rend)
-            throws WingException
+       throws WingException
     {
         Trail trail = new Trail(context, target, rend);
         trails.add(trail);
@@ -146,19 +149,19 @@ public class PageMeta extends AbstractWingElement implements
 
     /**
      * Add a new trail to the page without a link or render attribute.
-     * 
+     *
      * @return a new trail
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public Trail addTrail()
-            throws WingException
+        throws WingException
     {
         return addTrail(null,null);
     }
-    
+
     /**
      * Add a new trail link to the page.
-     * 
+     *
      * @param target
      *            (May be null) The Target URL for this trail item.
      * @param characters
@@ -166,7 +169,7 @@ public class PageMeta extends AbstractWingElement implements
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addTrailLink(String target, String characters)
-            throws WingException
+       throws WingException
     {
         Trail trail = addTrail(target, null);
         trail.addContent(characters);
@@ -174,7 +177,7 @@ public class PageMeta extends AbstractWingElement implements
 
     /**
      * Add a new trail link to the page.
-     * 
+     *
      * @param target
      *            (May be null) The Target URL for this trail item.
      * @param message
@@ -183,7 +186,7 @@ public class PageMeta extends AbstractWingElement implements
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     public void addTrailLink(String target, Message message)
-            throws WingException
+        throws WingException
     {
         Trail trail = addTrail(target, null);
         trail.addContent(message);
@@ -191,7 +194,7 @@ public class PageMeta extends AbstractWingElement implements
 
     /**
      * Determine if the given SAX event is a PageMeta element.
-     * 
+     *
      * @param namespace
      *            The element's name space
      * @param localName
@@ -204,7 +207,8 @@ public class PageMeta extends AbstractWingElement implements
      */
     @Override
     public boolean mergeEqual(String namespace, String localName, String qName,
-            Attributes attributes) throws SAXException, WingException
+        Attributes attributes)
+        throws SAXException, WingException
     {
 
         if (!WingConstants.DRI.URI.equals(namespace))
@@ -231,44 +235,44 @@ public class PageMeta extends AbstractWingElement implements
      */
     @Override
     public WingMergeableElement mergeChild(String namespace, String localName,
-            String qName, Attributes attributes) throws SAXException,
-            WingException
+        String qName, Attributes attributes)
+        throws SAXException, WingException
     {
-    	// We don't merge our children but we do have one special optimization, 
-    	// if some metadata or trail is already in the document then we do not add 
-    	// our own trail or metadata for that particular item.
-    	if (WingConstants.DRI.URI.equals(namespace) && Trail.E_TRAIL.equals(localName))
-    	{
+        // We don't merge our children but we do have one special optimization,
+        // if some metadata or trail is already in the document then we do not add
+        // our own trail or metadata for that particular item.
+        if (WingConstants.DRI.URI.equals(namespace) && Trail.E_TRAIL.equals(localName))
+        {
             for (Trail trail : trails)
             {
                 trail.dispose();
             }
-    		trails.clear();
-    	}
-    	
-    	if (WingConstants.DRI.URI.equals(namespace) && Metadata.E_METADATA.equals(localName))
-    	{
-    		String element = attributes.getValue(Metadata.A_ELEMENT);
-    		String qualifier = attributes.getValue(Metadata.A_QUALIFIER);
-    		String language = attributes.getValue(Metadata.A_LANGUAGE);
-    		
-    		List<Metadata> remove = new ArrayList<>();
-    		for (Metadata metadata : metadatum)
-    		{
-    			if (metadata.equals(element,qualifier,language) && !metadata.allowMultiple())
-    			{
-    				remove.add(metadata);
-    			}
-    		}
-    		
-    		// Remove all the metadata elements we found.
-    		for (Metadata metadata : remove)
-    		{
-    			metadata.dispose();
-    			metadatum.remove(metadata);
-    		}
-    	}
-    	
+            trails.clear();
+        }
+
+        if (WingConstants.DRI.URI.equals(namespace) && Metadata.E_METADATA.equals(localName))
+        {
+            String element = attributes.getValue(Metadata.A_ELEMENT);
+            String qualifier = attributes.getValue(Metadata.A_QUALIFIER);
+            String language = attributes.getValue(Metadata.A_LANGUAGE);
+
+            List<Metadata> remove = new ArrayList<>();
+            for (Metadata metadata : metadatum)
+            {
+                if (metadata.equals(element,qualifier,language) && !metadata.allowMultiple())
+                {
+                    remove.add(metadata);
+                }
+            }
+
+            // Remove all the metadata elements we found.
+            for (Metadata metadata : remove)
+            {
+                metadata.dispose();
+                metadatum.remove(metadata);
+            }
+        }
+
         return null;
     }
 
@@ -276,8 +280,8 @@ public class PageMeta extends AbstractWingElement implements
      * Inform this element that it is being merged with an existing element.
      */
     @Override
-    public Attributes merge(Attributes attributes) throws SAXException,
-            WingException
+    public Attributes merge(Attributes attributes)
+        throws SAXException, WingException
     {
         this.merged = true;
         return attributes;
@@ -285,20 +289,21 @@ public class PageMeta extends AbstractWingElement implements
 
     /**
      * Translate this element into SAX events.
-     * 
+     *
      * @param contentHandler
      *            (Required) The registered contentHandler where SAX events
      *            should be routed too.
      * @param lexicalHandler
-     *            (Required) The registered lexicalHandler where lexical 
+     *            (Required) The registered lexicalHandler where lexical
      *            events (such as CDATA, DTD, etc) should be routed too.
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
      *            to determine the correct prefix for a given namespace URI.
      */
     @Override
-    public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler, 
-            NamespaceSupport namespaces) throws SAXException
+    public void toSAX(ContentHandler contentHandler, LexicalHandler lexicalHandler,
+        NamespaceSupport namespaces)
+        throws SAXException
     {
         if (!merged)
         {
@@ -309,7 +314,7 @@ public class PageMeta extends AbstractWingElement implements
         {
             metadata.toSAX(contentHandler, lexicalHandler, namespaces);
         }
-        
+
         for (Trail trail : trails)
         {
             trail.toSAX(contentHandler, lexicalHandler, namespaces);
@@ -324,21 +329,21 @@ public class PageMeta extends AbstractWingElement implements
     @Override
     public void dispose()
     {
-    	for (Metadata metadata : metadatum)
+        for (Metadata metadata : metadatum)
         {
             metadata.dispose();
         }
-    	
-    	for (Trail trail : trails)
+
+        for (Trail trail : trails)
         {
             trail.dispose();
         }
-    	
-    	trails.clear();
-    	trails = null;
-    	metadatum.clear();
-    	metadatum = null;
-    	
+
+        trails.clear();
+        trails = null;
+        metadatum.clear();
+        metadatum = null;
+
         super.dispose();
     }
 }

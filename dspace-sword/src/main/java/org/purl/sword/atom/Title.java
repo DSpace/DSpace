@@ -19,26 +19,26 @@ import org.purl.sword.base.XmlName;
 public class Title extends TextConstruct
 {
 
-	/**
-	 * Local name part of the element. 
-	 */
+    /**
+     * Local name part of the element. 
+     */
     @Deprecated
-	public static final String ELEMENT_NAME = "title";
+    public static final String ELEMENT_NAME = "title";
 
     /**
      * XML Name representation. 
      */
     private static final XmlName XML_NAME = new XmlName(Namespaces.PREFIX_ATOM,
-            "title", Namespaces.NS_ATOM);
+        "title", Namespaces.NS_ATOM);
 
-	/** 
-	 * Create a new instance and set the prefix to 
-	 * 'atom' and the local name to 'title'.  
-	 */
-	public Title()
-	{
-		super(XML_NAME);
-	}
+    /** 
+     * Create a new instance and set the prefix to 
+     * 'atom' and the local name to 'title'.  
+     */
+    public Title()
+    {
+        super(XML_NAME);
+    }
 
     public static XmlName elementName()
     {

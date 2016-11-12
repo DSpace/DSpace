@@ -25,269 +25,265 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 
 /**
- * This is a wrapper class that translates a Cocoon request object back 
- * into an HttpServletRequest object. The main purpose of this class is to 
- * support form encoding in libraries that require a real HttpServletRequest 
- * object. If they are given the real request object then any parameters they 
- * obtain from it will not take into account the form encoding. Thus this 
- * method, by proxing everything back through the cocoon object will not 
- * be hindered by this problem.  
- * 
- * 
+ * This is a wrapper class that translates a Cocoon request object back
+ * into an HttpServletRequest object. The main purpose of this class is to
+ * support form encoding in libraries that require a real HttpServletRequest
+ * object. If they are given the real request object then any parameters they
+ * obtain from it will not take into account the form encoding. Thus this
+ * method, by proxing everything back through the cocoon object will not
+ * be hindered by this problem.
+ *
+ *
  * Some methods are unsupported, see below for a list.
  * getCookies(),getInputStream(),getParameterMap(),getReader(),
  * getRealPath(String arg0),getRequestDispatcher(String arg0)
- * 
+ *
  * @author Scott Phillips
  */
 
 public class HttpServletRequestCocoonWrapper implements HttpServletRequest{
 
-	private Request cocoonRequest;
-	// private HttpServletRequest realRequest;
-	
-	public HttpServletRequestCocoonWrapper(Map objectModel) {
-		
-		// Get the two requests objects the cocoon one, and the real request object as a fall back.
-		this.cocoonRequest = ObjectModelHelper.getRequest(objectModel);
-		
-		// If the real request is needed in the future to fall back to when the
-		// cocoon request object doesn't support those methods use the following line.
-		// this.realRequest = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-	}
-	
-	public String getAuthType() {
-		return this.cocoonRequest.getAuthType();
-	}
+    private Request cocoonRequest;
+    // private HttpServletRequest realRequest;
 
-	public String getContextPath() {
-		return this.cocoonRequest.getContextPath();
-	}
+    public HttpServletRequestCocoonWrapper(Map objectModel) {
 
-	public Cookie[] getCookies() {
-		throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support cookies.");
-	}
+        // Get the two requests objects the cocoon one, and the real request object as a fall back.
+        this.cocoonRequest = ObjectModelHelper.getRequest(objectModel);
 
-	public long getDateHeader(String arg0) {
-		return this.cocoonRequest.getDateHeader(arg0);
-	}
+        // If the real request is needed in the future to fall back to when the
+        // cocoon request object doesn't support those methods use the following line.
+        // this.realRequest = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
+    }
 
-	public String getHeader(String arg0) {
-		return this.cocoonRequest.getHeader(arg0);
-	}
+    public String getAuthType() {
+        return this.cocoonRequest.getAuthType();
+    }
 
-	public Enumeration getHeaderNames() {
-		return this.cocoonRequest.getHeaderNames();
-	}
+    public String getContextPath() {
+        return this.cocoonRequest.getContextPath();
+    }
 
-	public Enumeration getHeaders(String arg0) {
-		return this.cocoonRequest.getHeaders(arg0);
-	}
+    public Cookie[] getCookies() {
+        throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support cookies.");
+    }
 
-	public int getIntHeader(String arg0) {
-		Enumeration e = getHeaders(arg0);
-		if (e.hasMoreElements())
-		{
-			Object v = e.nextElement();
-			if (v instanceof String)
-			{
-				try {
-					return Integer.valueOf((String)v);
-				} catch (NumberFormatException nfe)
-				{
-					// do nothing
-				}
-			}
-		}
-		return -1;
-	}
+    public long getDateHeader(String arg0) {
+        return this.cocoonRequest.getDateHeader(arg0);
+    }
 
-	public String getMethod() {
-		return this.cocoonRequest.getMethod();
-	}
+    public String getHeader(String arg0) {
+        return this.cocoonRequest.getHeader(arg0);
+    }
 
-	public String getPathInfo() {
-		return this.cocoonRequest.getPathInfo();
-	}
+    public Enumeration getHeaderNames() {
+        return this.cocoonRequest.getHeaderNames();
+    }
 
-	public String getPathTranslated() {
-		return this.cocoonRequest.getPathTranslated();
-	}
+    public Enumeration getHeaders(String arg0) {
+        return this.cocoonRequest.getHeaders(arg0);
+    }
 
-	public String getQueryString() {
-		return this.cocoonRequest.getQueryString();
-	}
+    public int getIntHeader(String arg0) {
+        Enumeration e = getHeaders(arg0);
+        if (e.hasMoreElements())
+        {
+            Object v = e.nextElement();
+            if (v instanceof String)
+            {
+                try {
+                    return Integer.valueOf((String)v);
+                } catch (NumberFormatException nfe)
+                {
+                    // do nothing
+                }
+            }
+        }
+        return -1;
+    }
 
-	public String getRemoteUser() {
-		return this.cocoonRequest.getRemoteUser();
-	}
+    public String getMethod() {
+        return this.cocoonRequest.getMethod();
+    }
 
-	public String getRequestURI() {
-		return this.cocoonRequest.getRequestURI();
-	}
+    public String getPathInfo() {
+        return this.cocoonRequest.getPathInfo();
+    }
 
-	public StringBuffer getRequestURL() {
-		return new StringBuffer(this.cocoonRequest.getRequestURI());
-	}
+    public String getPathTranslated() {
+        return this.cocoonRequest.getPathTranslated();
+    }
 
-	public String getRequestedSessionId() {
-		return this.cocoonRequest.getRequestedSessionId();
-	}
+    public String getQueryString() {
+        return this.cocoonRequest.getQueryString();
+    }
 
-	public String getServletPath() {
-		return this.cocoonRequest.getServletPath();
-	}
+    public String getRemoteUser() {
+        return this.cocoonRequest.getRemoteUser();
+    }
 
-	public HttpSession getSession() {
-		return (HttpSession) this.cocoonRequest.getSession();
-	}
+    public String getRequestURI() {
+        return this.cocoonRequest.getRequestURI();
+    }
 
-	public HttpSession getSession(boolean arg0) {
-		return (HttpSession) this.cocoonRequest.getSession(arg0);
-	}
+    public StringBuffer getRequestURL() {
+        return new StringBuffer(this.cocoonRequest.getRequestURI());
+    }
 
-	public Principal getUserPrincipal() {
-		return this.cocoonRequest.getUserPrincipal();
-	}
+    public String getRequestedSessionId() {
+        return this.cocoonRequest.getRequestedSessionId();
+    }
 
-	public boolean isRequestedSessionIdFromCookie() {
-		return this.cocoonRequest.isRequestedSessionIdFromCookie();
-	}
+    public String getServletPath() {
+        return this.cocoonRequest.getServletPath();
+    }
 
-	public boolean isRequestedSessionIdFromURL() {
-		return this.cocoonRequest.isRequestedSessionIdFromURL();
-	}
+    public HttpSession getSession() {
+        return (HttpSession) this.cocoonRequest.getSession();
+    }
 
-	public boolean isRequestedSessionIdFromUrl() {
-		return this.cocoonRequest.isRequestedSessionIdFromURL();
-	}
+    public HttpSession getSession(boolean arg0) {
+        return (HttpSession) this.cocoonRequest.getSession(arg0);
+    }
 
-	public boolean isRequestedSessionIdValid() {
-		return this.cocoonRequest.isRequestedSessionIdValid();
-	}
+    public Principal getUserPrincipal() {
+        return this.cocoonRequest.getUserPrincipal();
+    }
 
-	public boolean isUserInRole(String arg0) {
-		return this.cocoonRequest.isUserInRole(arg0);
-	}
+    public boolean isRequestedSessionIdFromCookie() {
+        return this.cocoonRequest.isRequestedSessionIdFromCookie();
+    }
 
-	public Object getAttribute(String arg0) {
-		return this.cocoonRequest.getAttribute(arg0);
-	}
+    public boolean isRequestedSessionIdFromURL() {
+        return this.cocoonRequest.isRequestedSessionIdFromURL();
+    }
 
-	public Enumeration getAttributeNames() {
-		return this.cocoonRequest.getAttributeNames();
-	}
+    public boolean isRequestedSessionIdFromUrl() {
+        return this.cocoonRequest.isRequestedSessionIdFromURL();
+    }
 
-	public String getCharacterEncoding() {
-		return this.cocoonRequest.getCharacterEncoding();
-	}
+    public boolean isRequestedSessionIdValid() {
+        return this.cocoonRequest.isRequestedSessionIdValid();
+    }
 
-	public int getContentLength() {
-		return this.cocoonRequest.getContentLength();
-	}
+    public boolean isUserInRole(String arg0) {
+        return this.cocoonRequest.isUserInRole(arg0);
+    }
 
-	public String getContentType() {
-		return this.cocoonRequest.getContentType();
-	}
+    public Object getAttribute(String arg0) {
+        return this.cocoonRequest.getAttribute(arg0);
+    }
 
-	public ServletInputStream getInputStream() throws IOException {
-		throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getInputStream().");
-	}
+    public Enumeration getAttributeNames() {
+        return this.cocoonRequest.getAttributeNames();
+    }
 
-	public Locale getLocale() {
-		return this.cocoonRequest.getLocale();
-	}
+    public String getCharacterEncoding() {
+        return this.cocoonRequest.getCharacterEncoding();
+    }
 
-	public Enumeration getLocales() {
-		return this.cocoonRequest.getLocales();
-	}
+    public int getContentLength() {
+        return this.cocoonRequest.getContentLength();
+    }
 
-	public String getParameter(String arg0) {
-		return this.cocoonRequest.getParameter(arg0);
-	}
+    public String getContentType() {
+        return this.cocoonRequest.getContentType();
+    }
 
-	public Map getParameterMap() {
-		throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getParameterMap().");
-	}
+    public ServletInputStream getInputStream() throws IOException {
+        throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getInputStream().");
+    }
 
-	public Enumeration getParameterNames() {
-		return this.cocoonRequest.getParameterNames();
-	}
+    public Locale getLocale() {
+        return this.cocoonRequest.getLocale();
+    }
 
-	public String[] getParameterValues(String arg0) {
-		return this.cocoonRequest.getParameterValues(arg0);
-	}
+    public Enumeration getLocales() {
+        return this.cocoonRequest.getLocales();
+    }
 
-	public String getProtocol() {
-		return this.cocoonRequest.getProtocol();
-	}
+    public String getParameter(String arg0) {
+        return this.cocoonRequest.getParameter(arg0);
+    }
 
-	public BufferedReader getReader() throws IOException {
-		throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getReader().");
-	}
+    public Map getParameterMap() {
+        throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getParameterMap().");
+    }
 
-	public String getRealPath(String arg0) {
-		throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getRealPath().");
-	}
+    public Enumeration getParameterNames() {
+        return this.cocoonRequest.getParameterNames();
+    }
 
-	public String getRemoteAddr() {
-		return this.cocoonRequest.getRemoteAddr();
-	}
+    public String[] getParameterValues(String arg0) {
+        return this.cocoonRequest.getParameterValues(arg0);
+    }
 
-	public String getRemoteHost() {
-		return this.cocoonRequest.getRemoteHost();
-	}
+    public String getProtocol() {
+        return this.cocoonRequest.getProtocol();
+    }
 
-	public RequestDispatcher getRequestDispatcher(String arg0) {
-		throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getRequestDispatcher(arg0).");
-	}
+    public BufferedReader getReader() throws IOException {
+        throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getReader().");
+    }
 
-	public String getScheme() {
-		return this.cocoonRequest.getScheme();
-	}
+    public String getRealPath(String arg0) {
+        throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getRealPath().");
+    }
 
-	public String getServerName() {
-		return this.cocoonRequest.getServerName();
-	}
+    public String getRemoteAddr() {
+        return this.cocoonRequest.getRemoteAddr();
+    }
 
-	public int getServerPort() {
-		return this.cocoonRequest.getServerPort();
-	}
+    public String getRemoteHost() {
+        return this.cocoonRequest.getRemoteHost();
+    }
 
-	public boolean isSecure() {
-		return this.cocoonRequest.isSecure();
-	}
+    public RequestDispatcher getRequestDispatcher(String arg0) {
+        throw new UnsupportedOperationException("HttpRequestCocoonWrapper does not support getRequestDispatcher(arg0).");
+    }
 
-	public void removeAttribute(String arg0) {
-		this.cocoonRequest.removeAttribute(arg0);
-	}
+    public String getScheme() {
+        return this.cocoonRequest.getScheme();
+    }
 
-	public void setAttribute(String arg0, Object arg1) {
-		this.cocoonRequest.setAttribute(arg0, arg1);
-	}
+    public String getServerName() {
+        return this.cocoonRequest.getServerName();
+    }
 
-	public void setCharacterEncoding(String arg0)
-			throws UnsupportedEncodingException {
-		this.cocoonRequest.setCharacterEncoding(arg0);
-	}
+    public int getServerPort() {
+        return this.cocoonRequest.getServerPort();
+    }
 
-	public int getRemotePort() {
-		return this.cocoonRequest.getRemotePort();
-	}
+    public boolean isSecure() {
+        return this.cocoonRequest.isSecure();
+    }
 
-	public String getLocalName() {
-		return this.cocoonRequest.getLocalName();
-	}
+    public void removeAttribute(String arg0) {
+        this.cocoonRequest.removeAttribute(arg0);
+    }
 
-	public String getLocalAddr() {
-		return this.cocoonRequest.getLocalAddr();
-	}
+    public void setAttribute(String arg0, Object arg1) {
+        this.cocoonRequest.setAttribute(arg0, arg1);
+    }
 
-	public int getLocalPort() {
-		return this.cocoonRequest.getLocalPort();
-	}
-	
-	
-	
+    public void setCharacterEncoding(String arg0)
+            throws UnsupportedEncodingException {
+        this.cocoonRequest.setCharacterEncoding(arg0);
+    }
 
+    public int getRemotePort() {
+        return this.cocoonRequest.getRemotePort();
+    }
+
+    public String getLocalName() {
+        return this.cocoonRequest.getLocalName();
+    }
+
+    public String getLocalAddr() {
+        return this.cocoonRequest.getLocalAddr();
+    }
+
+    public int getLocalPort() {
+        return this.cocoonRequest.getLocalPort();
+    }
 }

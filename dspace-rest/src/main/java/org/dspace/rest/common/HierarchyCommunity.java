@@ -16,31 +16,31 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "community")
 public class HierarchyCommunity extends HierarchyObject
 {
-	private List<HierarchyCommunity> communities = new ArrayList<HierarchyCommunity>();
-	private List<HierarchyCollection> collections = new ArrayList<HierarchyCollection>();
+    private List<HierarchyCommunity> communities = new ArrayList<HierarchyCommunity>();
+    private List<HierarchyCollection> collections = new ArrayList<HierarchyCollection>();
 
     public HierarchyCommunity(){
     }
-    
+
     public HierarchyCommunity(String id, String name, String handle){
-    	super(id, name, handle);
+        super(id, name, handle);
     }
-	
+
     @XmlElement(name = "community")
     public List<HierarchyCommunity> getCommunities() {
-		return communities;
-	}
+        return communities;
+    }
 
-	public void setCommunities(List<HierarchyCommunity> communities) {
-		this.communities = communities;
-	}
+    public void setCommunities(List<HierarchyCommunity> communities) {
+        this.communities = communities;
+    }
 
-	@XmlElement(name = "collection")
+    @XmlElement(name = "collection")
     public List<HierarchyCollection> getCollections() {
-		return collections;
-	}
+        return collections;
+    }
 
-	public void setCollections(List<HierarchyCollection> collections) {
-		this.collections = collections;
-	}
+    public void setCollections(List<HierarchyCollection> collections) {
+        this.collections = collections;
+    }
 }

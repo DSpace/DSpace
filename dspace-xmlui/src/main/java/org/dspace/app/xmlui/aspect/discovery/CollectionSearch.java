@@ -47,7 +47,7 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
         message("xmlui.general.go");
 
     public static final Message T_untitled =
-    	message("xmlui.general.untitled");
+        message("xmlui.general.untitled");
 
     /**
      Might implement browse links to activate views into search instead...
@@ -64,7 +64,7 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
         message("xmlui.ArtifactBrowser.CollectionViewer.browse_dates");
 
     private static final Message T_advanced_search_link=
-    	message("xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link");
+        message("xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link");
     */
 
     /** Cached validity object */
@@ -104,48 +104,47 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
      */
     public SourceValidity getValidity()
     {
-    	if (this.validity == null)
-    	{
+        if (this.validity == null)
+        {
             Collection collection = null;
-	        try
-	        {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            try
+            {
+                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-	            if (dso == null)
+                if (dso == null)
                 {
                     return null;
                 }
 
-	            if (!(dso instanceof Collection))
+                if (!(dso instanceof Collection))
                 {
                     return null;
                 }
 
-	            collection = (Collection) dso;
+                collection = (Collection) dso;
 
-	            DSpaceValidity validity = new DSpaceValidity();
+                DSpaceValidity validity = new DSpaceValidity();
 
-	            // Add the actual collection;
-	            validity.add(context, collection);
+                // Add the actual collection;
+                validity.add(context, collection);
 
-	            this.validity = validity.complete();
-	        }
-	        catch (Exception e)
-	        {
-	            // Just ignore all errors and return an invalid cache.
-	        }
-            
-    	}
-    	return this.validity;
+                this.validity = validity.complete();
+            }
+            catch (Exception e)
+            {
+                // Just ignore all errors and return an invalid cache.
+            }
+        }
+        return this.validity;
     }
 
 
     /**
      * Add a page title and trail links.
      */
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
@@ -171,30 +170,31 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
 
         // Add RSS links if available
         String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
-		if ( formats != null )
-		{
-			for (String format : formats)
-			{
-				// Remove the protocol number, i.e. just list 'rss' or' atom'
-				String[] parts = format.split("_");
-				if (parts.length < 1)
+        if ( formats != null )
+        {
+            for (String format : formats)
+            {
+                // Remove the protocol number, i.e. just list 'rss' or' atom'
+                String[] parts = format.split("_");
+                if (parts.length < 1)
                 {
                     continue;
                 }
 
-				String feedFormat = parts[0].trim()+"+xml";
+                String feedFormat = parts[0].trim()+"+xml";
 
-				String feedURL = contextPath+"/feed/"+format.trim()+"/"+collection.getHandle();
-				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
-			}
-		}
+                String feedURL = contextPath+"/feed/"+format.trim()+"/"+collection.getHandle();
+                pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
+            }
+        }
     }
 
     /**
      * Display a single collection
      */
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))

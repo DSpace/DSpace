@@ -52,17 +52,16 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     /** Language Strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-    
 
-    public static final Message T_untitled = 
-    	message("xmlui.general.untitled");
+    public static final Message T_untitled =
+        message("xmlui.general.untitled");
 
     private static final Message T_head_sub_communities =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities");
-    
+
     private static final Message T_head_sub_collections =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections");
-    
+
 
     /** Cached validity object */
     private SourceValidity validity;
@@ -75,16 +74,17 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-        try {
+        try
+        {
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-            
+
             if (dso == null)
             {
                 return "0";  // no item, something is wrong
             }
-            
+
             return HashUtil.hash(dso.getHandle());
-        } 
+        }
         catch (SQLException sqle)
         {
             // Ignore all errors and just return that the component is not cachable.
@@ -94,85 +94,90 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
     /**
      * Generate the cache validity object.
-     * 
-     * This validity object includes the community being viewed, all 
-     * sub-communites (one level deep), all sub-collections, and 
+     *
+     * This validity object includes the community being viewed, all
+     * sub-communites (one level deep), all sub-collections, and
      * recently submitted items.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
         if (this.validity == null)
-    	{
+        {
             Community community = null;
-	        try {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-	            
-	            if (dso == null)
+            try {
+                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+
+                if (dso == null)
                 {
                     return null;
                 }
-	            
-	            if (!(dso instanceof Community))
+
+                if (!(dso instanceof Community))
                 {
                     return null;
                 }
-	            
-	            community = (Community) dso;
-	            
-	            DSpaceValidity validity = new DSpaceValidity();
-	            validity.add(context, community);
-	            
-	            List<Community> subCommunities = community.getSubcommunities();
-	            List<Collection> collections = community.getCollections();
-	            // Sub communities
-	            for (Community subCommunity : subCommunities)
-	            {
-	                validity.add(context, subCommunity);
-	                
-	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
-	                if (showCount)
-	        		{
-	                    try {	
-	                    	int size = new ItemCounter(context).getCount(subCommunity);
-	                    	validity.add("size:"+size);
-	                    } catch(ItemCountException e) { /* ignore */ }
-	        		}
-	            }
-	            // Sub collections
-	            for (Collection collection : collections)
-	            {
-	                validity.add(context, collection);
-	                
-	                // Include the item count in the validity, only if the value is shown.
-	                boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
-	                if (showCount)
-	        		{
-	                    try {
-	                    	int size = new ItemCounter(context).getCount(collection);
-	                    	validity.add("size:"+size);
-	                    } catch(ItemCountException e) { /* ignore */ }
-	        		}
-	            }
 
-	            this.validity = validity.complete();
-	        } 
-	        catch (Exception e)
-	        {
-	            // Ignore all errors and invalidate the cache.
-	        }
+                community = (Community) dso;
 
-    	}
+                DSpaceValidity validity = new DSpaceValidity();
+                validity.add(context, community);
+
+                List<Community> subCommunities = community.getSubcommunities();
+                List<Collection> collections = community.getCollections();
+                // Sub communities
+                for (Community subCommunity : subCommunities)
+                {
+                    validity.add(context, subCommunity);
+
+                    // Include the item count in the validity, only if the value is shown.
+                    boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
+                    if (showCount)
+                    {
+                        try {
+                            int size = new ItemCounter(context).getCount(subCommunity);
+                            validity.add("size:"+size);
+                        } catch(ItemCountException e) { /* ignore */ }
+                    }
+                }
+                // Sub collections
+                for (Collection collection : collections)
+                {
+                    validity.add(context, collection);
+
+                    // Include the item count in the validity, only if the value is shown.
+                    boolean showCount = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.strengths.show");
+                    if (showCount)
+                    {
+                        try
+                        {
+                            int size = new ItemCounter(context).getCount(collection);
+                            validity.add("size:"+size);
+                        }
+                        catch(ItemCountException e)
+                        {
+                            /* ignore */
+                        }
+                    }
+                }
+
+                this.validity = validity.complete();
+            }
+            catch (Exception e)
+            {
+                // Ignore all errors and invalidate the cache.
+            }
+
+        }
         return this.validity;
     }
-    
-    
+
+
     /**
      * Add the community's title and trail links to the page's metadata
      */
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Community))
@@ -196,34 +201,36 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         // Add the trail back to the repository root.
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(context, community, pageMeta,contextPath);
-        
+
         // Add RSS links if available
         String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
-		if ( formats != null )
-		{
-			for (String format : formats)
-			{
-				// Remove the protocol number, i.e. just list 'rss' or' atom'
-				String[] parts = format.split("_");
-				if (parts.length < 1)
+        if ( formats != null )
+        {
+            for (String format : formats)
+            {
+                // Remove the protocol number, i.e. just list 'rss' or' atom'
+                String[] parts = format.split("_");
+                if (parts.length < 1)
                 {
                     continue;
                 }
-				
-				String feedFormat = parts[0].trim()+"+xml";
-					
-				String feedURL = contextPath+"/feed/"+format.trim()+"/"+community.getHandle();
-				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
-			}
-		}
+
+                String feedFormat = parts[0].trim()+"+xml";
+
+                String feedURL = contextPath+"/feed/"+format.trim()+"/"+community.getHandle();
+                pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
+            }
+        }
     }
+
 
     /**
      * Display a single community (and reference any sub communites or
      * collections)
      */
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -257,17 +264,17 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         // Add main reference:
         {
-        	Division viewer = home.addDivision("community-view","secondary");
-        	
+            Division viewer = home.addDivision("community-view","secondary");
+
             ReferenceSet referenceSet = viewer.addReferenceSet("community-view",
-                    ReferenceSet.TYPE_DETAIL_VIEW);
+                ReferenceSet.TYPE_DETAIL_VIEW);
             Reference communityInclude = referenceSet.addReference(community);
 
             // If the community has any children communities also reference them.
             if (subCommunities != null && subCommunities.size() > 0)
             {
                 ReferenceSet communityReferenceSet = communityInclude
-                        .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
+                    .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
 
                 communityReferenceSet.setHead(T_head_sub_communities);
 
@@ -280,10 +287,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             if (collections != null && collections.size() > 0)
             {
                 ReferenceSet communityReferenceSet = communityInclude
-                        .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
+                    .addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
 
                 communityReferenceSet.setHead(T_head_sub_collections);
-                       
 
                 // Subcollections
                 for (Collection collection : collections)
@@ -294,7 +300,6 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             }
         } // main reference
     }
-    
 
 
     /**
@@ -306,6 +311,4 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         this.validity = null;
         super.recycle();
     }
-
-
 }

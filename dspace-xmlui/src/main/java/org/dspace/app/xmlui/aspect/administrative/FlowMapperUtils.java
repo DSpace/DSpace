@@ -28,40 +28,39 @@ import org.dspace.core.Context;
  *
  * @author Scott Phillips
  */
-public class FlowMapperUtils 
+public class FlowMapperUtils
 {
 
-	/** Language Strings */
-	private static final Message T_map_items = new Message("default","xmlui.administrative.FlowMapperUtils.map_items");
-	private static final Message T_unmaped_items = new Message("default","xmlui.administrative.FlowMapperUtils.unmaped_items");	
+    /** Language Strings */
+    private static final Message T_map_items = new Message("default","xmlui.administrative.FlowMapperUtils.map_items");
+    private static final Message T_unmaped_items = new Message("default","xmlui.administrative.FlowMapperUtils.unmaped_items");
 
-	protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-	protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected static final CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
 
-
-	/**
-	 * Map the given items into this collection
-	 * 
-	 * @param context The current DSpace content
-	 * @param collectionID The collection to map items into.
-	 * @param itemIDs The items to map.
-	 * @return Flow result
+    /**
+     * Map the given items into this collection
+     *
+     * @param context The current DSpace content
+     * @param collectionID The collection to map items into.
+     * @param itemIDs The items to map.
+     * @return Flow result
      * @throws java.sql.SQLException passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
      * @throws org.dspace.app.xmlui.utils.UIException passed through.
      * @throws java.io.IOException passed through.
-	 */
-	public static FlowResult processMapItems(Context context, UUID collectionID, String[] itemIDs)
-            throws SQLException, AuthorizeException, UIException, IOException
-	{
-		FlowResult result = new FlowResult();
-		result.setContinue(false);
+     */
+    public static FlowResult processMapItems(Context context, UUID collectionID, String[] itemIDs)
+        throws SQLException, AuthorizeException, UIException, IOException
+    {
+        FlowResult result = new FlowResult();
+        result.setContinue(false);
 
-		Collection toCollection = collectionService.find(context,collectionID);
+        Collection toCollection = collectionService.find(context,collectionID);
 
-		for (String itemID : itemIDs)
+        for (String itemID : itemIDs)
         {
             Item item = itemService.find(context, UUID.fromString(itemID));
 
@@ -74,36 +73,36 @@ public class FlowMapperUtils
                 }
             }
         }
-		
 
-		result.setContinue(true);
-		result.setOutcome(true);
-		result.setMessage(T_map_items);
-		
-		return result;
-	}
-	
-	/**
-	 * Unmap the given items from this collection
-	 * 
-	 * @param context The DSpace context
-	 * @param collectionID The collection to unmap these items from.
-	 * @param itemIDs The items to be unmapped.
-	 * @return A flow result
+
+        result.setContinue(true);
+        result.setOutcome(true);
+        result.setMessage(T_map_items);
+
+        return result;
+    }
+
+    /**
+     * Unmap the given items from this collection
+     *
+     * @param context The DSpace context
+     * @param collectionID The collection to unmap these items from.
+     * @param itemIDs The items to be unmapped.
+     * @return A flow result
      * @throws java.sql.SQLException passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
      * @throws org.dspace.app.xmlui.utils.UIException passed through.
      * @throws java.io.IOException passed through.
-	 */
-	public static FlowResult processUnmapItems(Context context, UUID collectionID, String[] itemIDs)
-            throws SQLException, AuthorizeException, UIException, IOException
-	{
-		FlowResult result = new FlowResult();
-		result.setContinue(false);
+     */
+    public static FlowResult processUnmapItems(Context context, UUID collectionID, String[] itemIDs)
+        throws SQLException, AuthorizeException, UIException, IOException
+    {
+        FlowResult result = new FlowResult();
+        result.setContinue(false);
 
-		Collection toCollection = collectionService.find(context,collectionID);
-		
-		for (String itemID : itemIDs)
+        Collection toCollection = collectionService.find(context,collectionID);
+
+        for (String itemID : itemIDs)
         {
             Item item = itemService.find(context, UUID.fromString(itemID));
 
@@ -117,11 +116,10 @@ public class FlowMapperUtils
             }
         }
 
-		result.setContinue(true);
-		result.setOutcome(true);
-		result.setMessage(T_unmaped_items);
-		
-		return result;
-	}
-	
+        result.setContinue(true);
+        result.setOutcome(true);
+        result.setMessage(T_unmaped_items);
+
+        return result;
+    }
 }

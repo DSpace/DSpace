@@ -54,7 +54,8 @@ public class ContextUtil
      * @return a context object
      * @throws java.sql.SQLException passed through.
      */
-    public static Context obtainContext(Map objectModel) throws SQLException
+    public static Context obtainContext(Map objectModel)
+        throws SQLException
     {
         return obtainContext(ObjectModelHelper.getRequest(objectModel));
     }
@@ -66,13 +67,13 @@ public class ContextUtil
      * @return True if a context has previously been created, false otherwise.
      */
     public static boolean isContextAvailable(Map objectModel) {
-    	Request request = ObjectModelHelper.getRequest(objectModel);
-    	Object object = request.getAttribute(DSPACE_CONTEXT);
-    	
-    	if (object instanceof Context)
-    		return true;
-    	else
-    		return false;
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        Object object = request.getAttribute(DSPACE_CONTEXT);
+        
+        if (object instanceof Context)
+            return true;
+        else
+            return false;
     }
     
     /**
@@ -85,7 +86,8 @@ public class ContextUtil
      * @return a context object
      * @throws java.sql.SQLException passed through.
      */
-    public static Context obtainContext(HttpServletRequest request) throws SQLException
+    public static Context obtainContext(HttpServletRequest request)
+        throws SQLException
     {
         Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
@@ -114,17 +116,17 @@ public class ContextUtil
             if (useProxies == null) {
                 useProxies = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("useProxies", false);
             }
-            if(useProxies && request.getHeader("X-Forwarded-For") != null)
+            if (useProxies && request.getHeader("X-Forwarded-For") != null)
             {
                 /* This header is a comma delimited list */
-	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+                for (String xfip : request.getHeader("X-Forwarded-For").split(","))
                 {
-                    if(!request.getHeader("X-Forwarded-For").contains(ip))
+                    if (!request.getHeader("X-Forwarded-For").contains(ip))
                     {
                         ip = xfip.trim();
                     }
                 }
-	        }
+            }
             context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
@@ -141,21 +143,22 @@ public class ContextUtil
      *            The request object 
      * @throws javax.servlet.ServletException on failure.
      */
-    public static void completeContext(HttpServletRequest request) throws ServletException
+    public static void completeContext(HttpServletRequest request)
+        throws ServletException
     {
-    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+        Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
-    	if (context != null && context.isValid())
-    	{
-   			try
-			{
-				context.complete();
-			}
-			catch (SQLException e)
-			{
-				throw new ServletException(e);
-			}
-    	}
+        if (context != null && context.isValid())
+        {
+               try
+            {
+                context.complete();
+            }
+            catch (SQLException e)
+            {
+                throw new ServletException(e);
+            }
+        }
     }
 
     /**
@@ -163,14 +166,13 @@ public class ContextUtil
      *
      * @param request the request to be aborted.
      */
-	public static void abortContext(HttpServletRequest request)
-	{
-    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+    public static void abortContext(HttpServletRequest request)
+    {
+        Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
-    	if (context != null && context.isValid())
-    	{
-   			context.abort();
-    	}
-	}
-
+        if (context != null && context.isValid())
+        {
+               context.abort();
+        }
+    }
 }

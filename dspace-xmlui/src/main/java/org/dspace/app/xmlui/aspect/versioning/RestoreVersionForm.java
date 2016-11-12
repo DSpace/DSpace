@@ -28,62 +28,68 @@ import java.sql.SQLException;
  */
 public class RestoreVersionForm extends AbstractDSpaceTransformer
 {
-      /** Language strings */
-	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
-	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
+    /** Language strings */
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
 
-	private static final Message T_title = message("xmlui.aspect.versioning.RestoreVersionForm.title");
-	private static final Message T_trail = message("xmlui.aspect.versioning.RestoreVersionForm.trail");
-	private static final Message T_head1 = message("xmlui.aspect.versioning.RestoreVersionForm.head1");
-	private static final Message T_para1 = message("xmlui.aspect.versioning.RestoreVersionForm.para1");
-	private static final Message T_column1 = message("xmlui.aspect.versioning.RestoreVersionForm.column1");
-	private static final Message T_column2 = message("xmlui.aspect.versioning.RestoreVersionForm.column2");
-	private static final Message T_column3 = message("xmlui.aspect.versioning.RestoreVersionForm.column3");
+    private static final Message T_title = message("xmlui.aspect.versioning.RestoreVersionForm.title");
+    private static final Message T_trail = message("xmlui.aspect.versioning.RestoreVersionForm.trail");
+    private static final Message T_head1 = message("xmlui.aspect.versioning.RestoreVersionForm.head1");
+    private static final Message T_para1 = message("xmlui.aspect.versioning.RestoreVersionForm.para1");
+    private static final Message T_column1 = message("xmlui.aspect.versioning.RestoreVersionForm.column1");
+    private static final Message T_column2 = message("xmlui.aspect.versioning.RestoreVersionForm.column2");
+    private static final Message T_column3 = message("xmlui.aspect.versioning.RestoreVersionForm.column3");
     private static final Message T_column4 = message("xmlui.aspect.versioning.RestoreVersionForm.column4");
 
     private static final Message T_submit_restore = message("xmlui.aspect.versioning.RestoreVersionForm.restore");
-	private static final Message T_submit_cancel = message("xmlui.general.cancel");
+    private static final Message T_submit_cancel = message("xmlui.general.cancel");
 
     protected VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
 
-	public void addPageMeta(PageMeta pageMeta) throws WingException
+    public void addPageMeta(PageMeta pageMeta)
+        throws WingException
     {
-		pageMeta.addMetadata("title").addContent(T_title);
+        pageMeta.addMetadata("title").addContent(T_title);
 
-		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-		pageMeta.addTrailLink(contextPath + "/admin/item",T_item_trail);
-		pageMeta.addTrail().addContent(T_trail);
-	}
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        pageMeta.addTrailLink(contextPath + "/admin/item",T_item_trail);
+        pageMeta.addTrail().addContent(T_trail);
+    }
 
-	public void addBody(Body body) throws WingException, AuthorizeException, SQLException
+    public void addBody(Body body)
+        throws WingException, AuthorizeException, SQLException
     {
-    	Division main = createMainDivision(body);
-		createTable(main);
+        Division main = createMainDivision(body);
+        createTable(main);
         addButtons(main);
-		main.addHidden("versioning-continue").setValue(knot.getId());
-	}
+        main.addHidden("versioning-continue").setValue(knot.getId());
+    }
 
 
-    private Division createMainDivision(Body body) throws WingException
+    private Division createMainDivision(Body body)
+        throws WingException
     {
-        Division main = body.addInteractiveDivision("restore-version", contextPath+"/item/versionhistory", Division.METHOD_POST, "restore version");
-		main.setHead(T_head1);
-		main.addPara(T_para1);
+        Division main = body.addInteractiveDivision("restore-version",
+            contextPath + "/item/versionhistory", Division.METHOD_POST,
+            "restore version");
+        main.setHead(T_head1);
+        main.addPara(T_para1);
         return main;
     }
 
 
-    private void createTable(Division main) throws WingException, SQLException
+    private void createTable(Division main)
+        throws WingException, SQLException
     {
         // Get all our parameters
-		String id = parameters.getParameter("versionID", null);
+        String id = parameters.getParameter("versionID", null);
 
         Table table = main.addTable("version", 1, 1);
 
-		Row header = table.addRow(Row.ROLE_HEADER);
-		header.addCellContent(T_column1);
-		header.addCellContent(T_column2);
-		header.addCellContent(T_column3);
+        Row header = table.addRow(Row.ROLE_HEADER);
+        header.addCellContent(T_column1);
+        header.addCellContent(T_column2);
+        header.addCellContent(T_column3);
         header.addCellContent(T_column4);
 
         Version version = versioningService.getVersion(context, Integer.parseInt(id));
@@ -101,11 +107,11 @@ public class RestoreVersionForm extends AbstractDSpaceTransformer
         addComposite.addTextArea("summary");
     }
 
-    private void addButtons(Division main) throws WingException
+    private void addButtons(Division main)
+        throws WingException
     {
         Para buttons = main.addPara();
-		buttons.addButton("submit_restore").setValue(T_submit_restore);
-		buttons.addButton("submit_cancel").setValue(T_submit_cancel);
+        buttons.addButton("submit_restore").setValue(T_submit_restore);
+        buttons.addButton("submit_cancel").setValue(T_submit_cancel);
     }
 }
-

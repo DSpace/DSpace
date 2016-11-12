@@ -60,14 +60,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_show_version_history= message("xmlui.aspect.versioning.VersioningNavigation.context_show_version_history");
 
     /** Cached validity object */
-	private SourceValidity validity;
+    private SourceValidity validity;
 
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
 
-	 /**
+     /**
      * Generate the unique cache key.
      *
      * @return The generated key hashes the src
@@ -82,8 +82,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // succeded or failed. So we don't know whether to cache this
         // under the user's specific cache or under the anonymous user.
         if (request.getParameter("login_email")    != null ||
-             request.getParameter("login_password") != null ||
-               request.getParameter("login_realm")    != null )
+            request.getParameter("login_password") != null ||
+            request.getParameter("login_realm")    != null )
         {
             return "0";
         }
@@ -91,10 +91,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         String key;
         if (context.getCurrentUser() != null)
         {
-        	key = context.getCurrentUser().getEmail();
+            key = context.getCurrentUser().getEmail();
         }
         else
-        	key = "anonymous";
+        {
+            key = "anonymous";
+        }
 
         return HashUtil.hash(key);
     }
@@ -107,48 +109,52 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
      */
     public SourceValidity getValidity()
     {
-    	if (this.validity == null)
-    	{
-    		// Only use the DSpaceValidity object is someone is logged in.
-    		if (context.getCurrentUser() != null)
-    		{
-		        try {
-		            DSpaceValidity validity = new DSpaceValidity();
+        if (this.validity == null)
+        {
+            // Only use the DSpaceValidity object is someone is logged in.
+            if (context.getCurrentUser() != null)
+            {
+                try
+                {
+                    DSpaceValidity validity = new DSpaceValidity();
 
-		            validity.add(context, eperson);
+                    validity.add(context, eperson);
 
-		            java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
-		            for (Group group : groups)
-		            {
-		            	validity.add(context, group);
-		            }
+                    java.util.List<Group> groups = groupService.allMemberGroups(
+                        context, eperson);
+                    for (Group group : groups)
+                    {
+                        validity.add(context, group);
+                    }
 
                     DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-                    if(dso != null)
+                    if (dso != null)
                     {
                         validity.add(context, dso);
                     }
 
-		            this.validity = validity.complete();
-		        }
-		        catch (SQLException sqle)
-		        {
-		            // Just ignore it and return invalid.
-		        }
-    		}
-    		else
-    		{
-    			this.validity = NOPValidity.SHARED_INSTANCE;
-    		}
-    	}
-    	return this.validity;
+                    this.validity = validity.complete();
+                }
+                catch (SQLException sqle)
+                {
+                    // Just ignore it and return invalid.
+                }
+            }
+            else
+            {
+                this.validity = NOPValidity.SHARED_INSTANCE;
+            }
+        }
+        return this.validity;
     }
 
-    public void addOptions(Options options) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException {
-    	/* Create skeleton menu structure to ensure consistent order between aspects,
-    	 * even if they are never used
-    	 */
+    public void addOptions(Options options)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        /* Create skeleton menu structure to ensure consistent order between aspects,
+         * even if they are never used
+         */
         options.addList("browse");
         options.addList("account");
 
@@ -159,7 +165,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
 
-        if(dso==null)
+        if (dso==null)
         {
             // case: internal-item http://localhost:8100/internal-item?itemID=3085
             // case: admin         http://localhost:8100/admin/item?itemID=3340
@@ -167,33 +173,38 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             dso = getItemById();
         }
 
-    	if (dso != null && dso.getType() == Constants.ITEM)
+        if (dso != null && dso.getType() == Constants.ITEM)
         {
-    		Item item = (Item) dso;
-            if(authorizeService.isAdmin(this.context, item.getOwningCollection()))
+            Item item = (Item) dso;
+            if (authorizeService.isAdmin(this.context, item.getOwningCollection()))
             {
                 boolean headAdded=false;
-                if(versionHistoryService.isLastVersion(this.context, item) && item.isArchived())
+                if (versionHistoryService.isLastVersion(this.context, item) && item.isArchived())
                 {
                     context.setHead(T_context_head);
                     headAdded=true;
-                    context.addItem().addXref(contextPath+"/item/version?itemID="+item.getID(), T_context_create_version);
+                    context.addItem().addXref(contextPath
+                        + "/item/version?itemID=" + item.getID(),
+                        T_context_create_version);
                 }
 
-                if(versionHistoryService.hasVersionHistory(this.context, item))
+                if (versionHistoryService.hasVersionHistory(this.context, item))
                 {
-                    if(!headAdded)
+                    if (!headAdded)
                     {
                         context.setHead(T_context_head);
                     }
-                    context.addItem().addXref(contextPath+"/item/versionhistory?itemID="+item.getID(), T_context_show_version_history);
+                    context.addItem().addXref(contextPath
+                        + "/item/versionhistory?itemID=" + item.getID(),
+                        T_context_show_version_history);
                 }
             }
-    	}
+        }
     }
 
 
-    private Item getItemById() throws SQLException
+    private Item getItemById()
+        throws SQLException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         Item item = null;
@@ -213,5 +224,4 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         this.validity = null;
         super.recycle();
     }
-
 }

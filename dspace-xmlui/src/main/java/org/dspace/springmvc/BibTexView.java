@@ -36,13 +36,13 @@ import java.util.StringTokenizer;
 
 public class BibTexView implements View {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BibTexView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexView.class);
     private static final String EOL = "\r\n";
 
-    private String resourceIdentifier=null;
-    
+    private String resourceIdentifier = null;
+
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    
+
 
     public String getContentType() {
 
@@ -71,22 +71,22 @@ public class BibTexView implements View {
     }
 
     private void write(HttpServletResponse aResponse, String aContent, String aFileName) throws IOException {
-		aResponse.setContentType("text/plain;charset=utf-8");
-		aResponse.setContentLength(aContent.length());
-		aResponse.setHeader("Content-Disposition", "attachment; filename=\""
-				+ aFileName + "\"");
+        aResponse.setContentType("text/plain;charset=utf-8");
+        aResponse.setContentLength(aContent.length());
+        aResponse.setHeader("Content-Disposition", "attachment; filename=\""
+                + aFileName + "\"");
 
-		// It's all over but the writing...
-		PrintWriter writer = aResponse.getWriter();
-		writer.print(aContent);
-		writer.close();
-	}
+        // It's all over but the writing...
+        PrintWriter writer = aResponse.getWriter();
+        writer.print(aContent);
+        writer.close();
+    }
 
 
     private String getFileName(DSpaceObject item)
     {
         String fileName = resourceIdentifier;
-        if(resourceIdentifier.lastIndexOf("/") !=-1)
+        if (resourceIdentifier.lastIndexOf("/") != -1)
         {
             fileName = resourceIdentifier.replaceAll("/", "_") + ".bib";
         }
@@ -96,43 +96,43 @@ public class BibTexView implements View {
 
 
     private String getBibTex(Item item, String resourceIdentifier) {
-		// No standardized format for data so using 'misc' for now
-		StringBuilder builder = new StringBuilder("@misc{");
+        // No standardized format for data so using 'misc' for now
+        StringBuilder builder = new StringBuilder("@misc{");
 
-		String[] authors = getAuthors(item);
-		String year = getYear(item);
+        String[] authors = getAuthors(item);
+        String year = getYear(item);
         String title = getMetadataValue(item, "dc.title");
 
-		builder.append(resourceIdentifier).append(',').append(EOL);
+        builder.append(resourceIdentifier).append(',').append(EOL);
 
-		if (title != null) {
-			builder.append("  title = {").append(title).append("},");
-			builder.append(EOL);
-		}
+        if (title != null) {
+            builder.append("  title = {").append(title).append("},");
+            builder.append(EOL);
+        }
 
-		if (authors.length > 0) {
-			builder.append("  author = {");
+        if (authors.length > 0) {
+            builder.append("  author = {");
 
-			// Bibtex needs the comma... do we want full names here?
-			for (int index = 0; index < authors.length; index++) {
-				if (index + 1 >= authors.length) { // last one
-					builder.append(authors[index].replace(" ", ", "));
-				}
-				else if (index + 1 < authors.length) { // not last one
-					builder.append(authors[index].replace(" ", ", "));
-					builder.append(" and ");
-				}
-			}
+            // Bibtex needs the comma... do we want full names here?
+            for (int index = 0; index < authors.length; index++) {
+                if (index + 1 >= authors.length) { // last one
+                    builder.append(authors[index].replace(" ", ", "));
+                }
+                else if (index + 1 < authors.length) { // not last one
+                    builder.append(authors[index].replace(" ", ", "));
+                    builder.append(" and ");
+                }
+            }
 
-			builder.append("},").append(EOL);
-		}
+            builder.append("},").append(EOL);
+        }
 
-		if (year != null) {
-			builder.append("  year = {").append(year).append("},").append(EOL);
-		}
+        if (year != null) {
+            builder.append("  year = {").append(year).append("},").append(EOL);
+        }
 
-		return builder.append("}").append(EOL).toString();
-	}
+        return builder.append("}").append(EOL).toString();
+    }
 
     private String getMetadataValue(Item item, String metadatafield)
     {
@@ -215,5 +215,4 @@ public class BibTexView implements View {
         }
         return authors;
     }
-
 }

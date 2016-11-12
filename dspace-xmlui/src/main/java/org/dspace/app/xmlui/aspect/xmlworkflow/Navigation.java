@@ -46,12 +46,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_xmlworkflow_overview = message("xmlui.XMLWorkflow.Navigation.xmlworkflow_overview");
 
     /** Cached validity object */
-	private SourceValidity validity;
+    private SourceValidity validity;
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
 
-	 /**
+     /**
      * Generate the unique cache key.
      *
      * @return The generated key hashes the src
@@ -88,45 +88,47 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
      */
     public SourceValidity getValidity()
     {
-    	if (this.validity == null)
-    	{
-    		// Only use the DSpaceValidity object is someone is logged in.
-    		if (context.getCurrentUser() != null)
-    		{
-		        try {
-		            DSpaceValidity validity = new DSpaceValidity();
+        if (this.validity == null)
+        {
+            // Only use the DSpaceValidity object is someone is logged in.
+            if (context.getCurrentUser() != null)
+            {
+                try
+                {
+                    DSpaceValidity validity = new DSpaceValidity();
 
-		            validity.add(context, eperson);
+                    validity.add(context, eperson);
 
-		            java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
-		            for (Group group : groups)
-		            {
-		            	validity.add(context, group);
-		            }
+                    java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
+                    for (Group group : groups)
+                    {
+                        validity.add(context, group);
+                    }
 
-		            this.validity = validity.complete();
-		        }
-		        catch (SQLException sqle)
-		        {
-		            // Just ignore it and return invalid.
-		        }
-    		}
-    		else
-    		{
-    			this.validity = NOPValidity.SHARED_INSTANCE;
-    		}
-    	}
-    	return this.validity;
+                    this.validity = validity.complete();
+                }
+                catch (SQLException sqle)
+                {
+                    // Just ignore it and return invalid.
+                }
+            }
+            else
+            {
+                this.validity = NOPValidity.SHARED_INSTANCE;
+            }
+        }
+        return this.validity;
     }
 
 
 
-    public void addOptions(Options options) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addOptions(Options options)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
-    	/* Create skeleton menu structure to ensure consistent order between aspects,
-    	 * even if they are never used
-    	 */
+        /* Create skeleton menu structure to ensure consistent order between aspects,
+         * even if they are never used
+         */
         List admin = options.addList("administrative");
 
         //Check if a system administrator
@@ -136,7 +138,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         // System Administrator options!
         if (isSystemAdmin)
         {
-	        admin.addItemXref(contextPath+ "/admin/xmlworkflowoverview", T_xmlworkflow_overview);
+            admin.addItemXref(contextPath+ "/admin/xmlworkflowoverview", T_xmlworkflow_overview);
         }
     }
 
@@ -148,5 +150,4 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         this.validity = null;
         super.recycle();
     }
-
 }

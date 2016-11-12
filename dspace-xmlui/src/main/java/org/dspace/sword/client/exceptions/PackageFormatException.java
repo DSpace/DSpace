@@ -17,24 +17,24 @@ package org.dspace.sword.client.exceptions;
 public class PackageFormatException extends Exception
 {
 
-	public PackageFormatException()
-	{
-		super();
-	}
+    public PackageFormatException()
+    {
+        super();
+    }
 
-	public PackageFormatException(String arg0, Throwable arg1)
-	{
-		super(arg0, arg1);
-	}
+    public PackageFormatException(String arg0, Throwable arg1)
+    {
+        super(arg0, arg1);
+    }
 
-	public PackageFormatException(String arg0)
-	{
-		super(arg0);
-	}
+    public PackageFormatException(String arg0)
+    {
+        super(arg0);
+    }
 
-	public PackageFormatException(Throwable arg0)
-	{
-		super(arg0);
-	}
+    public PackageFormatException(Throwable arg0)
+    {
+        super(arg0);
+    }
 
 }

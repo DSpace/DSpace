@@ -14,26 +14,26 @@ import javax.xml.bind.annotation.XmlValue;
 
 @XmlType
 public class CheckSum{
-	String checkSumAlgorithm;
-	String value;
-	
-	public CheckSum(){}
+    String checkSumAlgorithm;
+    String value;
 
-	@XmlAttribute(name="checkSumAlgorithm")
-	public String getCheckSumAlgorith() {
-		return checkSumAlgorithm;
-	}
+    public CheckSum(){}
 
-	public void setCheckSumAlgorith(String checkSumAlgorith) {
-		this.checkSumAlgorithm = checkSumAlgorith;
-	}
+    @XmlAttribute(name="checkSumAlgorithm")
+    public String getCheckSumAlgorith() {
+        return checkSumAlgorithm;
+    }
 
-	@XmlValue
-	public String getValue() {
-		return value;
-	}
+    public void setCheckSumAlgorith(String checkSumAlgorith) {
+        this.checkSumAlgorithm = checkSumAlgorith;
+    }
 
-	public void setValue(String value) {
-		this.value = value;
-	}
+    @XmlValue
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }
