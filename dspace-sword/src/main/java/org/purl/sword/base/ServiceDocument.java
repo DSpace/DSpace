@@ -134,7 +134,7 @@ public class ServiceDocument {
      * dispose of any previous Service object associated with this object.
      *
      * @param xml The XML string.
-     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationProperties FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException
      *     If there was a problem unmarshalling the data. This might be
@@ -181,7 +181,7 @@ public class ServiceDocument {
      * @param element
      *     element to unmarshall.
      * @param validationProperties
-     *     UNKNOWN.  PLEASE DOCUMENT.
+     *     FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException
      *     If there was a problem unmarshalling the data. This might be

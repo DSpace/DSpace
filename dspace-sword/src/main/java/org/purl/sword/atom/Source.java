@@ -95,7 +95,7 @@ public class Source extends XmlElement implements SwordElementInterface
     /**
      * 
      * @param source the element to unmarshall.
-     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationProperties FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException If there was an error unmarshalling the data. 
      */

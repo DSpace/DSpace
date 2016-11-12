@@ -91,7 +91,7 @@ public class DiscoverUtility
      * @param scope
      *     DSpace object
      * @param enableFacet
-     *     UNKNOWN.  PLEASE DOCUMENT.
+     *     FIXME: PLEASE DOCUMENT.
      * @return the query.
      */
     public static DiscoverQuery getDiscoverQuery(Context context,
@@ -128,7 +128,7 @@ public class DiscoverUtility
      * @param scope
      *     DSpace object
      * @param enableFacet
-     *     UNKNOWN.  PLEASE DOCUMENT.
+     *     FIXME: PLEASE DOCUMENT.
      * @return the query.
      */
     public static DiscoverQuery getTagCloudDiscoverQuery(Context context,

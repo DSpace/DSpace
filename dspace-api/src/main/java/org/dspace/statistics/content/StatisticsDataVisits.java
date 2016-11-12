@@ -491,7 +491,7 @@ public class StatisticsDataVisits extends StatisticsData
      * @param value
      *     UUID (or legacy record ID) of the DSO in question.
      * @param datasetQuery
-     *     unknown, PLEASE DOCUMENT.
+     *     FIXME: PLEASE DOCUMENT.
      * @param context
      *     The relevant DSpace Context.
      * @return the name of the given DSO

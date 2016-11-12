@@ -199,7 +199,7 @@ public class DepositResponse
      * Unmarshall the specified XML data into a SWORD error document. 
      * 
      * @param xml The XML data as a string. 
-     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationContext FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException If there was an error unmarshalling the data. 
      */

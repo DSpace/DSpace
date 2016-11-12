@@ -156,7 +156,7 @@ public class Author extends XmlElement implements SwordElementInterface
      * is a XOM element.
      *
      * @param author The element to unmarshall.
-     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationProperties FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws org.purl.sword.base.UnmarshallException passed through
      */

@@ -212,7 +212,7 @@ public class Generator extends XmlElement implements SwordElementInterface
  
     /**
      *
-     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationContext FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info.
      */
     @Override
@@ -225,7 +225,7 @@ public class Generator extends XmlElement implements SwordElementInterface
      * 
      * @param existing add results to this.
      * @param attributeItems add these too.
-     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationContext FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      */
     public SwordValidationInfo validate(List<SwordValidationInfo> existing,

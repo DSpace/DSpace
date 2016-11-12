@@ -62,7 +62,7 @@ implements SwordElementInterface
      * is an area that can be improved in a future implementation, if necessary. 
      * 
      * @param element The text element.
-     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationProperties FIXME: PLEASE DOCUMENT.
      * @return object representing the text element
      * @throws UnmarshallException If the specified element is not of
      *                             the correct type, where the localname is used
@@ -141,8 +141,8 @@ implements SwordElementInterface
     /**
      *
      * @param existing add results to this.
-     * @param attributeItems UNKNOWN.  PLEASE DOCUMENT.
-     * @param validationContext UNKNOWN.  PLEASE DOCUMENT.
+     * @param attributeItems FIXME: PLEASE DOCUMENT.
+     * @param validationContext FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      */
     protected SwordValidationInfo validate(List<SwordValidationInfo> existing,

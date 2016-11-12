@@ -353,8 +353,8 @@ public class SwordValidationInfo {
 
     /**
      * 
-     * @param elementItems UNKNOWN.  PLEASE DOCUMENT.
-     * @param attributeItems UNKNOWN.  PLEASE DOCUMENT.
+     * @param elementItems FIXME: PLEASE DOCUMENT.
+     * @param attributeItems FIXME: PLEASE DOCUMENT.
      */
     public void addUnmarshallValidationInfo(
             List<SwordValidationInfo> elementItems,

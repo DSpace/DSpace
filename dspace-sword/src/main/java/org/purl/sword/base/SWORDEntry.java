@@ -267,7 +267,7 @@ public class SWORDEntry extends Entry
      * extensions that exist in the element. 
      * 
      * @param entry The entry to parse. 
-     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
+     * @param validationProperties FIXME: PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException If the entry is not an atom:entry 
      *              or if there is an exception extracting the data. 
