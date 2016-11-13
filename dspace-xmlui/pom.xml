@@ -162,6 +162,12 @@
         <dependency>
             <groupId>org.swordapp</groupId>
             <artifactId>sword-common</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<groupId>javax.servlet</groupId>
+  					<artifactId>servlet-api</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Explicitly Specify Latest Version of Spring -->
@@ -229,7 +235,7 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 

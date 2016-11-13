@@ -26,12 +26,15 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 
 /**
  * This is a wrapper class that translates a Cocoon request object back 
@@ -50,16 +53,16 @@ import org.apache.cocoon.environment.Request;
  * @author Scott Phillips
  */
 
-public class HttpServletRequestCocoonWrapper implements HttpServletRequest{
+public class HttpServletRequestCocoonWrapper extends HttpServletRequestWrapper
+{
 
 	private Request cocoonRequest;
 	// private HttpServletRequest realRequest;
 	
 	public HttpServletRequestCocoonWrapper(Map objectModel) {
-		
-		// Get the two requests objects the cocoon one, and the real request object as a fall back.
-		this.cocoonRequest = ObjectModelHelper.getRequest(objectModel);
-		
+	    super((HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT));	    
+	    // Get the two requests objects the cocoon one, and the real request object as a fall back.
+        this.cocoonRequest = ObjectModelHelper.getRequest(objectModel);
 		// If the real request is needed in the future to fall back to when the
 		// cocoon request object doesn't support those methods use the following line.
 		// this.realRequest = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
@@ -295,81 +298,5 @@ public class HttpServletRequestCocoonWrapper implements HttpServletRequest{
 	public int getLocalPort() {
 		return this.cocoonRequest.getLocalPort();
 	}
-
-	@Override
-	public ServletContext getServletContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AsyncContext startAsync() throws IllegalStateException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AsyncContext startAsync(ServletRequest servletRequest, ServletResponse servletResponse)
-			throws IllegalStateException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isAsyncStarted() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAsyncSupported() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public AsyncContext getAsyncContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public DispatcherType getDispatcherType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void login(String username, String password) throws ServletException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void logout() throws ServletException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Collection<Part> getParts() throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Part getPart(String name) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
-	
 
 }

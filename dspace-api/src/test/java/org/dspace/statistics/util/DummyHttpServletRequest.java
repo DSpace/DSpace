@@ -19,6 +19,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -26,14 +27,25 @@ import javax.servlet.http.HttpSession;
  *
  * @author mwood
  */
-class DummyHttpServletRequest implements HttpServletRequest
+class DummyHttpServletRequest extends HttpServletRequestWrapper
 {
+
     private String agent = null;
 
     private String address = null;
 
     private String remoteHost = null;
+    
+    public DummyHttpServletRequest()
+    {
+        this(null);
+    }
 
+    public DummyHttpServletRequest(HttpServletRequest request)
+    {
+        super(request);
+    }
+    
     public void setAgent(String agent)
     {
         this.agent = agent;
