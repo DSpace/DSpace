@@ -609,7 +609,7 @@ public class UIUtil extends Util
      * @param dso The DSpaceObject to mark (it can be a BrowseItem or an Item)
      * @param markType the type of the mark.
      * @return (X)HTML markup
-     * @throws JspException
+     * @throws JspException on a database error.
      */
     public static String getMarkingMarkup(HttpServletRequest hrq, DSpaceObject dso, String markType)
             throws JspException

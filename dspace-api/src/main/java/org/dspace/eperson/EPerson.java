@@ -104,8 +104,8 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     /**
      * Return true if this object equals obj, false otherwise.
      * 
-     * @param obj
-     * @return true if ResourcePolicy objects are equal
+     * @param obj another EPerson.
+     * @return true if EPerson objects are equal in ID, email, and full name
      */
     @Override
     public boolean equals(Object obj)

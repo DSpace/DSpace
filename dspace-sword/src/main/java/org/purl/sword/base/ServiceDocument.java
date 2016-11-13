@@ -129,9 +129,12 @@ public class ServiceDocument {
     }
 
     /**
-     * 
-     * @param xml
-     * @param validationProperties
+     * Convert the specified XML string into a set of objects used within the
+     * service. A new Service object will be created and stored. This will
+     * dispose of any previous Service object associated with this object.
+     *
+     * @param xml The XML string.
+     * @param validationProperties UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException
      *     If there was a problem unmarshalling the data. This might be
@@ -156,7 +159,7 @@ public class ServiceDocument {
 
     /**
      * Unmarshall the specified element. This version does not generate any
-     * valiation information.
+     * validation information.
      *
      * @param element
      *     element to unmarshall
@@ -176,7 +179,9 @@ public class ServiceDocument {
      * information.
      * 
      * @param element
+     *     element to unmarshall.
      * @param validationProperties
+     *     UNKNOWN.  PLEASE DOCUMENT.
      * @return SWORD validation info
      * @throws UnmarshallException
      *     If there was a problem unmarshalling the data. This might be

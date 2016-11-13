@@ -127,7 +127,7 @@ public class LegacyPluginServiceImpl implements PluginService
      *
      * @param interfaceClass interface Class object
      * @return instance of plugin
-     * @throws PluginConfigurationError
+     * @throws PluginConfigurationError if no matching singleton plugin is configured.
      */
     @Override
     public Object getSinglePlugin(Class interfaceClass)

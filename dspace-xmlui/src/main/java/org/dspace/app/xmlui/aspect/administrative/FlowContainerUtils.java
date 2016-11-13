@@ -586,10 +586,11 @@ public class FlowContainerUtils
 	/**
 	 * Look up the id of a group authorized for one of the given roles. If no group is currently 
 	 * authorized to perform this role then a new group will be created and assigned the role.
+     * THIS DOCUMENTATION IS WRONG.  PLEASE FIX IT.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param collection The collection.
-	 * @return The id of the group associated with that particular role or -1
+	 * @return The Group associated with that particular role or -1
      * @throws java.sql.SQLException passed through.
      * @throws org.dspace.authorize.AuthorizeException passed through.
 	 */
@@ -624,6 +625,15 @@ public class FlowContainerUtils
 	}
 
 	/**
+	 * Look up the id of a group authorized for one of the given roles. If no group is currently
+	 * authorized to perform this role then a new group will be created and assigned the role.
+     * THIS DOCUMENTATION IS WRONG.  PLEASE FIX IT.
+	 *
+     * @param context DSpace context.
+     * @param collectionID The Collection whose roles will be searched.
+     * @return the UUID of the matching group.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
 	 * @see #getCollectionDefaultRead(Context, Collection)
      */
 	public static UUID getCollectionDefaultRead(final Context context, final UUID collectionID) throws SQLException, AuthorizeException {

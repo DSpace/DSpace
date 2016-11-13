@@ -489,9 +489,9 @@ public class StatisticsDataVisits extends StatisticsData
      * Gets the name of the DSO (example for collection: ((Collection) dso).getname();
      *
      * @param value
-     *     
+     *     UUID (or legacy record ID) of the DSO in question.
      * @param datasetQuery
-     *     
+     *     unknown, PLEASE DOCUMENT.
      * @param context
      *     The relevant DSpace Context.
      * @return the name of the given DSO

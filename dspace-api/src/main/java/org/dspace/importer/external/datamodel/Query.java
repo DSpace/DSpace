@@ -56,9 +56,10 @@ public class Query {
 
     /**
      * Retrieve a parameter as a certain given class
-     * @param key  the key to retrieve the parameter from
-     * @param clazz  The classtype to retrieve. (If no parameter with that class is found, a <tt>null</tt> value is returned
-     * @return 
+     * @param <T> the type of parameter returned.
+     * @param key the key to retrieve the parameter from
+     * @param clazz the type to retrieve. (If no parameter with that class is found, a <tt>null</tt> value is returned.)
+     * @return the selected parameter, or null.
      */
     public <T> T getParameterAsClass(String key, Class<T> clazz) {
         Collection c=parameters.getCollection(key);

@@ -307,6 +307,7 @@ public class SwordAuthenticator
      * @throws DSpaceSwordException
      *     can be thrown by the internals of the DSpace SWORD implementation
      * @throws SwordError
+     *     never.
      */
     public boolean canSubmit(SwordContext swordContext, DSpaceObject dso,
             VerboseDescription msg)

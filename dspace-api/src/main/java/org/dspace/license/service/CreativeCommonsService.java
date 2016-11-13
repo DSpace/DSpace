@@ -133,8 +133,8 @@ public interface CreativeCommonsService {
      * Get a few license-specific properties. We expect these to be cached at
      * least per server run.
      *
-     * @param fieldId
-     * @return 
+     * @param fieldId name of the property.
+     * @return its value.
      */
     public LicenseMetadataValue getCCField(String fieldId);
     

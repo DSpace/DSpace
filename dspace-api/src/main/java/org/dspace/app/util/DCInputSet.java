@@ -120,7 +120,7 @@ public class DCInputSet
      * Does the current input set define the named field?
      * Scan through every field in every page of the input set
      *
-     * @param fieldName
+     * @param fieldName selects the field.
      * @return true if the current set has the named field
      */
     public boolean isFieldPresent(String fieldName)

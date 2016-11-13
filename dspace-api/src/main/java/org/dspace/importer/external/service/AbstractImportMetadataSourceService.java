@@ -40,8 +40,11 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Ab
 	}
 
     /**
-     * Set the {@link GenerateQueryService} used to create a {@link org.dspace.importer.external.datamodel.Query} for a DSpace {@link org.dspace.content.Item}
-     * @param generateQueryForItem
+     * Set the {@link GenerateQueryService} used to create a
+     * {@link org.dspace.importer.external.datamodel.Query} for a DSpace
+     * {@link org.dspace.content.Item}.
+     *
+     * @param generateQueryForItem the query generator to be used.
      */
     @Autowired
 	public void setGenerateQueryForItem(GenerateQueryService generateQueryForItem) {
@@ -58,7 +61,7 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Ab
 
     /**
      * Sets the MetadataFieldMapping to base the mapping of RecordType and
-     * @param metadataFieldMapping
+     * @param metadataFieldMapping the map to be used.
      */
 	@Required
 	public void setMetadataFieldMapping(
@@ -68,7 +71,7 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Ab
 
     /**
      *  Return an ImportRecord constructed from the results in a RecordType
-     * @param recordType The recordtype to retrieve the DCValueMapping from
+     * @param recordType The record type to retrieve the DCValueMapping from
      * @return An {@link ImportRecord}, This is based on the results retrieved from the recordTypeMapping
      */
 	public ImportRecord transformSourceRecords(RecordType recordType){

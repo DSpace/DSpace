@@ -214,7 +214,7 @@ public class WorkflowUtils extends Util{
      * @param collection
      *     the target collection
      * @param roleId
-     *     
+     *     the role to be linked.
      * @param group
      *     group of EPersons
      * @throws AuthorizeException

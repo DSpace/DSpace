@@ -39,8 +39,8 @@ public class ItemFilterSet {
      * Construct a set of Item Filters identified by a list string.
      * 
      * @param filterList
-     *     Comma separated list of filter names to include
-     *     @see org.dspace.rest.common#ItemFilter.ALL to retrieve all filters
+     *     Comma separated list of filter names to include.
+     *     Use {@link org.dspace.rest.common.ItemFilter#ALL} to retrieve all filters.
      * @param reportItems
      *     If true, return item details.  If false, return only counts of items.
      */

@@ -63,7 +63,7 @@ public class XMLUtil
      * @param xsltFilename
      *            the filename of the stylesheet
      * @return the transformed xml document
-     * @throws Exception
+     * @throws Exception passed through.
      */
     public static Document transformDocument(Document xmlDocument,
             String xsltFilename) throws Exception
@@ -82,7 +82,7 @@ public class XMLUtil
      * @param xsltFilename
      *            the filename of the stylesheet
      * @return the transformed xml document
-     * @throws Exception
+     * @throws Exception passed through.
      */
     public static Document transformDocument(Document xmlDocument, Map<String, String> parameters, String xsltFilename) throws Exception
     {
@@ -116,18 +116,18 @@ public class XMLUtil
     }
 
     /**
-     * Applies a stylesheet (that receives parameters) to a given xml document.
+     * Applies a stylesheet (that receives parameters) to a given XML document.
      * The resulting XML document is converted to a string after transformation.
      * 
      * @param xmlDocument
-     *            the xml document to be transformed
+     *            the XML document to be transformed
      * @param parameters
      *            the hashtable with the parameters to be passed to the
      *            stylesheet
      * @param xsltFilename
      *            the filename of the stylesheet
-     * @return the transformed xml document as a string
-     * @throws Exception
+     * @return the transformed XML document as a string
+     * @throws Exception passed through.
      */
     public static String transformDocumentAsString(Document xmlDocument, Map<String, String> parameters, String xsltFilename) throws Exception
     {
@@ -155,14 +155,14 @@ public class XMLUtil
     }
 
     /**
-     * Applies a stylesheet to a given xml document.
+     * Applies a stylesheet to a given XML document.
      * 
      * @param xmlDocument
-     *            the xml document to be transformed
+     *            the XML document to be transformed
      * @param xsltFilename
      *            the filename of the stylesheet
-     * @return the transformed xml document
-     * @throws Exception
+     * @return the transformed XML document
+     * @throws Exception passed through.
      */
     public static String transformDocumentAsString(Document xmlDocument,
             String xsltFilename) throws Exception

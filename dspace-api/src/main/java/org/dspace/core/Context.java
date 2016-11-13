@@ -631,9 +631,7 @@ public class Context
 
 
     /**
-     * Returns the size of the cache of all object that have been read from the database so far. A larger number
-     * means that more memory is consumed by the cache. This also has a negative impact on the query performance. In
-     * that case you should consider clearing the cache (see {@link Context#clearCache() clearCache}).
+     * Returns the size of the cache of all object that have been read from the database so far.
      *
      * @return connection cache size
      * @throws SQLException When connecting to the active cache fails.

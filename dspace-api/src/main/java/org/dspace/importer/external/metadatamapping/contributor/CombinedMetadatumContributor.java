@@ -50,7 +50,7 @@ public class CombinedMetadatumContributor<T> implements MetadataContributor<T> {
     /**
      * Set the metadatafieldMapping used in the transforming of a record to actual metadata
      *
-     * @param metadataFieldMapping
+     * @param metadataFieldMapping the new mapping.
      */
     @Override
     public void setMetadataFieldMapping(MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping) {

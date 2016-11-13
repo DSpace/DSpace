@@ -152,7 +152,7 @@ public class CiNiiService
      *     maximun number of results returned
      * @param appId
      *     registered application identifier for the API
-     * @return
+     * @return matching NAIDs
      * @throws IOException
      *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws HttpException

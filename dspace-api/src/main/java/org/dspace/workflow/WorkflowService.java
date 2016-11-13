@@ -26,6 +26,7 @@ import java.util.List;
  * are required to have.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> some implementation of workflow item.
  */
 public interface WorkflowService<T extends WorkflowItem> {
 
@@ -60,7 +61,7 @@ public interface WorkflowService<T extends WorkflowItem> {
      *     The relevant DSpace Context.
      * @param wsi
      *     workspace item
-     * @return 
+     * @return the resulting workflow item.
      * @throws SQLException
      *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException

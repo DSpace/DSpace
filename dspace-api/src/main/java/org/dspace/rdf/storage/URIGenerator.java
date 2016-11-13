@@ -16,8 +16,7 @@ import org.dspace.core.Context;
 
 /**
  * Please use 
- * {@link org.dspace.rdf.RDFUtil#generateIdentifier(Context, DSpaceObject)} and
- * {@link org.dspace.rdf.RDFUtil#generateGraphURI(Context, DSpaceObject)} to 
+ * {@link org.dspace.rdf.RDFUtil#generateIdentifier(Context, DSpaceObject)} to 
  * get URIs for RDF data.
  * Please note that URIs can be generated for DSpaceObjects of the 
  * type SITE, COMMUNITY, COLLECTION or ITEM only. Currently dspace-rdf 

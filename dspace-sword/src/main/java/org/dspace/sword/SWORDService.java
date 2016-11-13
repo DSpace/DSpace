@@ -25,11 +25,11 @@ import org.purl.sword.base.Deposit;
  * @author Richard Jones
  *
  * This class represents the actual sword service provided by dspace.  It
- * is the central location for the authentcated contexts, the installation
- * specific configuration, and the url management.
+ * is the central location for the authenticated contexts, the installation
+ * specific configuration, and the URL management.
  *
- * It is ubiquotous in the sword implementation, and all related
- * information and services should be retrived via this api
+ * It is ubiquitous in the sword implementation, and all related
+ * information and services should be retrieved via this API.
  *
  */
 public class SWORDService
@@ -158,7 +158,7 @@ public class SWORDService
      * @param original
      *     is original?
      * @return the most appropriate filename for the incoming deposit
-     * @throws DSpaceSWORDException
+     * @throws DSpaceSWORDException on database error.
      */
     public String getFilename(Context context, Deposit deposit,
             boolean original)

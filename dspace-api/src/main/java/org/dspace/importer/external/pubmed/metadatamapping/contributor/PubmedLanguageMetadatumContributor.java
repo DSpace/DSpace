@@ -45,7 +45,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
      * Initialize the PubmedLanguageMetadatumContributor class using a {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} and a language -{@link org.dspace.importer.external.metadatamapping.contributor.MetadataContributor}
      *
      * @param field {@link org.dspace.importer.external.metadatamapping.MetadataFieldConfig} used in mapping
-     * @param language
+     * @param language the language.
      */
     public PubmedLanguageMetadatumContributor(MetadataFieldConfig field, MetadataContributor language) {
         this();
@@ -56,7 +56,7 @@ public class PubmedLanguageMetadatumContributor<T> implements MetadataContributo
     /**
      * Set the metadatafieldMapping used in the transforming of a record to actual metadata
      *
-     * @param metadataFieldMapping
+     * @param metadataFieldMapping the new mapping.
      */
     @Override
     public void setMetadataFieldMapping(MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping) {

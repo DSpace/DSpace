@@ -199,6 +199,7 @@ public class SwordUrlManager
      * @throws DSpaceSwordException
      *     can be thrown by the internals of the DSpace SWORD implementation
      * @throws SwordError
+     *     if a proper URL cannot be calculated.
      */
     // FIXME: we need to generalise this to DSpaceObjects, so that we can support
     // Communities, Collections and Items separately

@@ -36,13 +36,15 @@ public class SwordIngesterFactory
      *
      * @param context
      *     The relevant DSpace Context.
-     * @param deposit        the original deposit request
+     * @param deposit
+     *     The original deposit request
      * @param dso
      *     target DSpace object
      * @return SWORDIngester object
      * @throws DSpaceSwordException
      *     can be thrown by the internals of the DSpace SWORD implementation
      * @throws SwordError
+     *     if no suitable ingester is configured.
      */
     public static SwordContentIngester getContentInstance(Context context,
             Deposit deposit, DSpaceObject dso)
