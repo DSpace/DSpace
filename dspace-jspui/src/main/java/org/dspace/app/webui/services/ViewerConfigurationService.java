@@ -19,8 +19,7 @@ public class ViewerConfigurationService {
 	private Map<String,JSPViewer> mapViewers = new HashMap<String,JSPViewer>();
 
 	public Map<String, JSPViewer> getMapViewers() {
-		List<JSPViewer> viewers = new DSpace().getServiceManager().getServicesByType(JSPViewer.class);
-		Map<String, JSPViewer> mapViewers = new HashMap<String, JSPViewer>();
+		List<JSPViewer> viewers = new DSpace().getServiceManager().getServicesByType(JSPViewer.class);		
 		for (JSPViewer jspviewer : viewers) {
 			mapViewers.put(jspviewer.getViewJSP(), jspviewer);
 		}
