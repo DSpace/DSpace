@@ -49,10 +49,10 @@ import org.dspace.eperson.service.GroupService;
 import org.xml.sax.SAXException;
 
 /**
- * 
- * Create the navigation options for everything in the administrative aspects. This includes 
+ *
+ * Create the navigation options for everything in the administrative aspects. This includes
  * Epeople, group, item, access control, and registry management.
- * 
+ *
  * @author Scott Phillips
  * @author Afonso Araujo Neto (internationalization)
  * @author Alexey Maslov
@@ -60,68 +60,68 @@ import org.xml.sax.SAXException;
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private static final Message T_context_head 				= message("xmlui.administrative.Navigation.context_head");
-    private static final Message T_context_edit_item 			= message("xmlui.administrative.Navigation.context_edit_item");
-    private static final Message T_context_edit_collection 		= message("xmlui.administrative.Navigation.context_edit_collection");
-    private static final Message T_context_item_mapper 			= message("xmlui.administrative.Navigation.context_item_mapper");
-    private static final Message T_context_edit_community 		= message("xmlui.administrative.Navigation.context_edit_community");
-    private static final Message T_context_create_collection 	= message("xmlui.administrative.Navigation.context_create_collection");
-    private static final Message T_context_create_subcommunity 	= message("xmlui.administrative.Navigation.context_create_subcommunity");
-    private static final Message T_context_create_community 	= message("xmlui.administrative.Navigation.context_create_community");
-    private static final Message T_context_export_metadata      = message("xmlui.administrative.Navigation.context_export_metadata");
-    private static final Message T_administrative_batch_import      = message("xmlui.administrative.Navigation.administrative_batch_import");
-    private static final Message T_administrative_import_metadata       = message("xmlui.administrative.Navigation.administrative_import_metadata");
-    private static final Message T_administrative_head 				= message("xmlui.administrative.Navigation.administrative_head");
-    private static final Message T_administrative_access_control 	= message("xmlui.administrative.Navigation.administrative_access_control");
-    private static final Message T_administrative_people 			= message("xmlui.administrative.Navigation.administrative_people");
-    private static final Message T_administrative_groups 			= message("xmlui.administrative.Navigation.administrative_groups");
-    private static final Message T_administrative_authorizations 	= message("xmlui.administrative.Navigation.administrative_authorizations");
-    private static final Message T_administrative_registries 		= message("xmlui.administrative.Navigation.administrative_registries");
-    private static final Message T_administrative_metadata 			= message("xmlui.administrative.Navigation.administrative_metadata");
-    private static final Message T_administrative_format 			= message("xmlui.administrative.Navigation.administrative_format");
-    private static final Message T_administrative_content           = message("xmlui.administrative.Navigation.administrative_content");
-    private static final Message T_administrative_items 			= message("xmlui.administrative.Navigation.administrative_items");
-    private static final Message T_administrative_withdrawn  		= message("xmlui.administrative.Navigation.administrative_withdrawn");
-    private static final Message T_administrative_private  		= message("xmlui.administrative.Navigation.administrative_private");
-    private static final Message T_administrative_control_panel 	= message("xmlui.administrative.Navigation.administrative_control_panel");
-    private static final Message T_administrative_curation              = message("xmlui.administrative.Navigation.administrative_curation");
-    
-    private static final Message T_statistics            	        = message("xmlui.administrative.Navigation.statistics");
+    private static final Message T_context_head                   = message("xmlui.administrative.Navigation.context_head");
+    private static final Message T_context_edit_item              = message("xmlui.administrative.Navigation.context_edit_item");
+    private static final Message T_context_edit_collection        = message("xmlui.administrative.Navigation.context_edit_collection");
+    private static final Message T_context_item_mapper            = message("xmlui.administrative.Navigation.context_item_mapper");
+    private static final Message T_context_edit_community         = message("xmlui.administrative.Navigation.context_edit_community");
+    private static final Message T_context_create_collection      = message("xmlui.administrative.Navigation.context_create_collection");
+    private static final Message T_context_create_subcommunity    = message("xmlui.administrative.Navigation.context_create_subcommunity");
+    private static final Message T_context_create_community       = message("xmlui.administrative.Navigation.context_create_community");
+    private static final Message T_context_export_metadata        = message("xmlui.administrative.Navigation.context_export_metadata");
+    private static final Message T_administrative_batch_import    = message("xmlui.administrative.Navigation.administrative_batch_import");
+    private static final Message T_administrative_import_metadata = message("xmlui.administrative.Navigation.administrative_import_metadata");
+    private static final Message T_administrative_head            = message("xmlui.administrative.Navigation.administrative_head");
+    private static final Message T_administrative_access_control  = message("xmlui.administrative.Navigation.administrative_access_control");
+    private static final Message T_administrative_people          = message("xmlui.administrative.Navigation.administrative_people");
+    private static final Message T_administrative_groups          = message("xmlui.administrative.Navigation.administrative_groups");
+    private static final Message T_administrative_authorizations  = message("xmlui.administrative.Navigation.administrative_authorizations");
+    private static final Message T_administrative_registries      = message("xmlui.administrative.Navigation.administrative_registries");
+    private static final Message T_administrative_metadata        = message("xmlui.administrative.Navigation.administrative_metadata");
+    private static final Message T_administrative_format          = message("xmlui.administrative.Navigation.administrative_format");
+    private static final Message T_administrative_content         = message("xmlui.administrative.Navigation.administrative_content");
+    private static final Message T_administrative_items           = message("xmlui.administrative.Navigation.administrative_items");
+    private static final Message T_administrative_withdrawn       = message("xmlui.administrative.Navigation.administrative_withdrawn");
+    private static final Message T_administrative_private         = message("xmlui.administrative.Navigation.administrative_private");
+    private static final Message T_administrative_control_panel   = message("xmlui.administrative.Navigation.administrative_control_panel");
+    private static final Message T_administrative_curation        = message("xmlui.administrative.Navigation.administrative_curation");
 
-    private static final Message T_context_export_item 				= message("xmlui.administrative.Navigation.context_export_item");
-    private static final Message T_context_export_collection 		= message("xmlui.administrative.Navigation.context_export_collection");
-    private static final Message T_context_export_community 		= message("xmlui.administrative.Navigation.context_export_community");
-    private static final Message T_account_export			 		= message("xmlui.administrative.Navigation.account_export");
+    private static final Message T_statistics                     = message("xmlui.administrative.Navigation.statistics");
 
-    private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
+    private static final Message T_context_export_item            = message("xmlui.administrative.Navigation.context_export_item");
+    private static final Message T_context_export_collection      = message("xmlui.administrative.Navigation.context_export_collection");
+    private static final Message T_context_export_community       = message("xmlui.administrative.Navigation.context_export_community");
+    private static final Message T_account_export                 = message("xmlui.administrative.Navigation.account_export");
+
+    private static final Message T_my_account                     = message("xmlui.EPerson.Navigation.my_account");
 
     /** Cached validity object */
-	private SourceValidity validity;
-	
-	/** exports available for download */
-	java.util.List<String> availableExports = null;
+    private SourceValidity validity;
+
+    /** exports available for download */
+    java.util.List<String> availableExports = null;
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    
+
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-   	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected ItemExportService itemExportService = ItemExportServiceFactory.getInstance().getItemExportService();
 
-	 /**
+     /**
      * Generate the unique cache key.
      *
      * @return The generated key hashes the src
      */
-    public Serializable getKey() 
+    public Serializable getKey()
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
-        
-        // Special case, don't cache anything if the user is logging 
+
+        // Special case, don't cache anything if the user is logging
         // in. The problem occures because of timming, this cache key
-        // is generated before we know whether the operation has 
-        // succeeded or failed. So we don't know whether to cache this 
+        // is generated before we know whether the operation has
+        // succeeded or failed. So we don't know whether to cache this
         // under the user's specific cache or under the anonymous user.
         if (request.getParameter("login_email")    != null ||
             request.getParameter("login_password") != null ||
@@ -135,7 +135,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             return HashUtil.hash("anonymous");
         }
 
-        if (availableExports != null && availableExports.size()>0) {
+        if (availableExports != null && availableExports.size()>0)
+        {
             StringBuilder key = new StringBuilder(context.getCurrentUser().getEmail());
             for(String fileName : availableExports){
                 key.append(":").append(fileName);
@@ -146,49 +147,51 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         return HashUtil.hash(context.getCurrentUser().getEmail());
     }
-	
+
     /**
      * Generate the validity object.
      *
      * @return The generated validity object or <code>null</code> if the
      *         component is currently not cacheable.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
-    	if (this.validity == null)
-    	{
-    		// Only use the DSpaceValidity object is someone is logged in.
-    		if (context.getCurrentUser() != null)
-    		{
-		        try {
-		            DSpaceValidity validity = new DSpaceValidity();
-		            
-		            validity.add(context, eperson);
-		            
-		            java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
-		            for (Group group : groups)
-		            {
-		            	validity.add(context, group);
-		            }
-		            
-		            this.validity = validity.complete();
-		        } 
-		        catch (SQLException sqle)
-		        {
-		            // Just ignore it and return invalid.
-		        }
-    		}
-    		else
-    		{
-    			this.validity = NOPValidity.SHARED_INSTANCE;
-    		}
-    	}
-    	return this.validity;
+        if (this.validity == null)
+        {
+            // Only use the DSpaceValidity object is someone is logged in.
+            if (context.getCurrentUser() != null)
+            {
+                try {
+                    DSpaceValidity validity = new DSpaceValidity();
+
+                    validity.add(context, eperson);
+
+                    java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
+                    for (Group group : groups)
+                    {
+                        validity.add(context, group);
+                    }
+
+                    this.validity = validity.complete();
+                }
+                catch (SQLException sqle)
+                {
+                    // Just ignore it and return invalid.
+                }
+            }
+            else
+            {
+                this.validity = NOPValidity.SHARED_INSTANCE;
+            }
+        }
+        return this.validity;
     }
-	
-    
-    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
-    	super.setup(resolver, objectModel, src, parameters);
+
+
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters)
+        throws ProcessingException, SAXException, IOException
+    {
+        super.setup(resolver, objectModel, src, parameters);
         availableExports = null;
         if (context.getCurrentUser() != null)
         {
@@ -202,24 +205,24 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
     }
-    
-    
-    
-    
-    public void addOptions(Options options) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+
+
+    public void addOptions(Options options)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
-    	/* Create skeleton menu structure to ensure consistent order between aspects,
-    	 * even if they are never used 
-    	 */
+        /* Create skeleton menu structure to ensure consistent order between aspects,
+         * even if they are never used
+         */
         options.addList("browse");
         List account = options.addList("account");
         List context = options.addList("context");
         List admin = options.addList("administrative");
-        account.setHead(T_my_account);	        
-        
+        account.setHead(T_my_account);
+
         // My Account options
-        if(availableExports!=null && availableExports.size()>0){
+        if (availableExports!=null && availableExports.size()>0)
+        {
             account.addItem().addXref(contextPath+"/admin/export", T_account_export);
         }
 
@@ -228,70 +231,70 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         // Context Administrative options
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-    	if (dso instanceof Item)
-    	{
-    		Item item = (Item) dso;
-    		if (itemService.canEdit(this.context, item))
-    		{
-                    context.setHead(T_context_head);
-                    context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
-                    if (authorizeService.isAdmin(this.context, dso))
-                    {
-                        context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
-                        context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
-                    }
+        if (dso instanceof Item)
+        {
+            Item item = (Item) dso;
+            if (itemService.canEdit(this.context, item))
+            {
+                context.setHead(T_context_head);
+                context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
+                if (authorizeService.isAdmin(this.context, dso))
+                {
+                    context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
+                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
                 }
-    	}
-    	else if (dso instanceof Collection)
-    	{
-    		Collection collection = (Collection) dso;
-    		
-    		// can they admin this collection?
+            }
+        }
+        else if (dso instanceof Collection)
+        {
+            Collection collection = (Collection) dso;
+
+            // can they admin this collection?
             if (collectionService.canEditBoolean(this.context, collection, true))
             {
-            	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
-            	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper); 
-            	if (authorizeService.isAdmin(this.context, dso))
+                context.setHead(T_context_head);
+                context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);
+                context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);
+                if (authorizeService.isAdmin(this.context, dso))
                 {
                     context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
                     context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
                 }
             }
-    	}
-    	else if (dso instanceof Community)
-    	{
-    		Community community = (Community) dso;
-    		
-    		// can they admin this collection?
+        }
+        else if (dso instanceof Community)
+        {
+            Community community = (Community) dso;
+
+            // can they admin this collection?
             if (communityService.canEditBoolean(this.context, community))
             {
-            	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community); 
-            	if (authorizeService.isAdmin(this.context, dso))
+                context.setHead(T_context_head);
+                context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community);
+                if (authorizeService.isAdmin(this.context, dso))
                 {
                     context.addItem().addXref(contextPath + "/admin/export?communityID=" + community.getID(), T_context_export_community);
                 }
                 context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
             }
-            
+
             // can they add to this community?
             if (authorizeService.authorizeActionBoolean(this.context, community, Constants.ADD))
             {
-            	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
-                context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);      
+                context.setHead(T_context_head);
+                context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
+                context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);
             }
-    	}
-    	
-    	if (isSystemAdmin && ("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)))
-    	{
+        }
+
+        if (isSystemAdmin && ("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)))
+        {
             // Only System administrators can create top-level communities
             context.setHead(T_context_head);
             context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
-    	}
-        
-        
+        }
+
+
         // System Administrator options!
         if (isSystemAdmin)
         {
@@ -326,67 +329,68 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             admin.addItemXref(contextPath+ "/admin/curate", T_administrative_curation);
         }
     }
-    
-    
-    public int addContextualOptions(List context) throws SQLException, WingException
+
+
+    public int addContextualOptions(List context)
+        throws SQLException, WingException
     {
-    	// How many options were added.
-    	int options = 0;
-    	
-    	DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-    	
-    	if (dso instanceof Item)
-    	{
-    		Item item = (Item) dso;
-    		if (itemService.canEdit(this.context, item))
-    		{   			
-    			context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
-    			options++;
-    		}
-    	}
-    	else if (dso instanceof Collection)
-    	{
-    		Collection collection = (Collection) dso;
-    		
-    		
-    		// can they admin this collection?
+        // How many options were added.
+        int options = 0;
+
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+
+        if (dso instanceof Item)
+        {
+            Item item = (Item) dso;
+            if (itemService.canEdit(this.context, item))
+            {
+                context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
+                options++;
+            }
+        }
+        else if (dso instanceof Collection)
+        {
+            Collection collection = (Collection) dso;
+
+
+            // can they admin this collection?
             if (authorizeService.authorizeActionBoolean(this.context, collection, Constants.ADMIN))
-            {            	
-            	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);
-            	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);            	
-            	options++;
+            {
+                context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);
+                context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);
+                options++;
             }
-    	}
-    	else if (dso instanceof Community)
-    	{
-    		Community community = (Community) dso;
-    		
-    		// can they admin this collection?
+        }
+        else if (dso instanceof Community)
+        {
+            Community community = (Community) dso;
+
+            // can they admin this collection?
             if (communityService.canEditBoolean(this.context, community))
-            {           	
-            	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community);
-            	options++;
+            {
+                context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community);
+                options++;
             }
-            
+
             // can they add to this community?
             if (authorizeService.authorizeActionBoolean(this.context, community, Constants.ADD))
-            {        	
-            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);         	
-            	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);
-            	options++;
+            {
+                context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
+                context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);
+                options++;
             }
-    	}
-    	
-    	if (("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)) && authorizeService.isAdmin(this.context))
-    	{
+        }
+
+        if (("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)) && authorizeService.isAdmin(this.context))
+        {
             context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
             options++;
-    	}
-    	
-    	return options;
+        }
+
+        return options;
     }
-    
-    
+
+
     /**
      * recycle
      */
@@ -396,5 +400,4 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         this.availableExports = null;
         super.recycle();
     }
-    
 }

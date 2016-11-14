@@ -39,6 +39,10 @@ public class Groomer
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     /**
      * Command line tool for "grooming" the EPerson collection.
+     *
+     * @param argv the command line arguments given
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     static public void main(String[] argv)
             throws SQLException

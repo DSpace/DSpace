@@ -15,14 +15,14 @@ package org.purl.sword.base;
 public class AtomDocumentResponse extends DepositResponse
 {
 
-  /**
-    * Create a new response with the specified http code. 
-    * 
-    * @param httpResponse Response code. 
-    */
-   public AtomDocumentResponse(int httpResponse) 
-   {
-      super(httpResponse);
-   }
+   /**
+     * Create a new response with the specified http code. 
+     * 
+     * @param httpResponse Response code. 
+     */
+    public AtomDocumentResponse(int httpResponse) 
+    {
+        super(httpResponse);
+    }
 
 }

@@ -27,24 +27,24 @@ import java.util.List;
 /**
  * @author Richard Jones
  *
- * Class responsible for constructing and de-constructing sword url space
- * urls
+ * Class responsible for constructing and de-constructing SWORD URL space
+ * URLs
  */
 public class SwordUrlManager
 {
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
+    protected ItemService itemService =
+        ContentServiceFactory.getInstance().getItemService();
 
-    protected BitstreamService bitstreamService = ContentServiceFactory
-            .getInstance().getBitstreamService();
+    protected BitstreamService bitstreamService =
+        ContentServiceFactory.getInstance().getBitstreamService();
 
-    protected HandleService handleService = HandleServiceFactory.getInstance()
-            .getHandleService();
+    protected HandleService handleService =
+        HandleServiceFactory.getInstance().getHandleService();
 
-    /** the sword configuration */
+    /** the SWORD configuration */
     private SwordConfigurationDSpace config;
 
-    /** the active dspace context */
+    /** the active DSpace context */
     private Context context;
 
     public SwordUrlManager(SwordConfigurationDSpace config, Context context)
@@ -59,8 +59,10 @@ public class SwordUrlManager
      * unless configuration changes are made to DSpace
      *
      * @param collection
+     *     target collection
      * @return The Deposit URL
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getDepositLocation(Collection collection)
             throws DSpaceSwordException
@@ -74,8 +76,10 @@ public class SwordUrlManager
      * unless configuration changes are made to DSpace
      *
      * @param community
+     *     target community
      * @return The Deposit URL
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getDepositLocation(Community community)
             throws DSpaceSwordException
@@ -94,25 +98,25 @@ public class SwordUrlManager
         if (sUrl == null || "".equals(sUrl))
         {
             String dspaceUrl = ConfigurationManager
-                    .getProperty("dspace.baseUrl");
+                .getProperty("dspace.baseUrl");
             if (dspaceUrl == null || "".equals(dspaceUrl))
             {
                 throw new DSpaceSwordException(
-                        "Unable to construct service document urls, due to missing/invalid " +
-                                "config in sword2.url and/or dspace.baseUrl");
+                    "Unable to construct service document urls, due to missing/invalid " +
+                    "config in sword2.url and/or dspace.baseUrl");
             }
 
             try
             {
                 URL url = new URL(dspaceUrl);
                 sUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(),
-                        "/swordv2").toString();
+                    "/swordv2").toString();
             }
             catch (MalformedURLException e)
             {
                 throw new DSpaceSwordException(
-                        "Unable to construct service document urls, due to invalid dspace.baseUrl " +
-                                e.getMessage(), e);
+                    "Unable to construct service document urls, due to invalid dspace.baseUrl " +
+                    e.getMessage(), e);
             }
         }
         return sUrl;
@@ -143,7 +147,7 @@ public class SwordUrlManager
             else
             {
                 throw new SwordError(DSpaceUriRegistry.BAD_URL,
-                        "The item URL is invalid");
+                    "The item URL is invalid");
             }
 
             String iid = location.substring(cBaseUrl.length());
@@ -165,7 +169,7 @@ public class SwordUrlManager
         {
             // log.error("Caught exception:", e);
             throw new DSpaceSwordException(
-                    "There was a problem resolving the item", e);
+                "There was a problem resolving the item", e);
         }
     }
 
@@ -193,6 +197,9 @@ public class SwordUrlManager
      * @param location    the URL to resolve to a collection
      * @return The collection to which the url resolves
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SwordError
+     *     if a proper URL cannot be calculated.
      */
     // FIXME: we need to generalise this to DSpaceObjects, so that we can support
     // Communities, Collections and Items separately
@@ -205,7 +212,7 @@ public class SwordUrlManager
             if (baseUrl.length() == location.length())
             {
                 throw new SwordError(DSpaceUriRegistry.BAD_URL,
-                        "The deposit URL is incomplete");
+                    "The deposit URL is incomplete");
             }
             String handle = location.substring(baseUrl.length());
             if (handle.startsWith("/"))
@@ -215,7 +222,7 @@ public class SwordUrlManager
             if ("".equals(handle))
             {
                 throw new SwordError(DSpaceUriRegistry.BAD_URL,
-                        "The deposit URL is incomplete");
+                    "The deposit URL is incomplete");
             }
 
             DSpaceObject dso = handleService.resolveToObject(context, handle);
@@ -227,7 +234,7 @@ public class SwordUrlManager
             if (!(dso instanceof Collection))
             {
                 throw new SwordError(DSpaceUriRegistry.BAD_URL,
-                        "The deposit URL does not resolve to a valid collection");
+                    "The deposit URL does not resolve to a valid collection");
             }
 
             return (Collection) dso;
@@ -236,7 +243,7 @@ public class SwordUrlManager
         {
             // log.error("Caught exception:", e);
             throw new DSpaceSwordException(
-                    "There was a problem resolving the collection", e);
+                "There was a problem resolving the collection", e);
         }
     }
 
@@ -246,7 +253,10 @@ public class SwordUrlManager
      * entries.
      *
      * @param community
+     *     target community
+     * @return service document URL
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String constructSubServiceUrl(Community community)
             throws DSpaceSwordException
@@ -262,7 +272,10 @@ public class SwordUrlManager
      * entries.
      *
      * @param collection
+     *     target collection
+     * @return service document URL
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String constructSubServiceUrl(Collection collection)
             throws DSpaceSwordException
@@ -276,9 +289,14 @@ public class SwordUrlManager
      * Extract a DSpaceObject from the given URL.  If this method is unable to
      * locate a meaningful and appropriate DSpace object it will throw the
      * appropriate SWORD error.
+     *
      * @param url
+     *     URL to get DSpace object from
+     * @return DSpace object from URL
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      * @throws SwordError
+     *     SWORD error per SWORD spec
      */
     public DSpaceObject extractDSpaceObject(String url)
             throws DSpaceSwordException, SwordError
@@ -315,14 +333,14 @@ public class SwordUrlManager
                 else
                 {
                     throw new SwordError(DSpaceUriRegistry.BAD_URL,
-                            "Service Document request does not refer to a DSpace Collection or Community");
+                        "Service Document request does not refer to a DSpace Collection or Community");
                 }
             }
             else
             {
                 throw new SwordError(DSpaceUriRegistry.BAD_URL,
-                        "Unable to recognise URL as a valid service document: " +
-                                url);
+                    "Unable to recognise URL as a valid service document: " +
+                    url);
             }
         }
         catch (SQLException e)
@@ -334,35 +352,37 @@ public class SwordUrlManager
     /**
      * Get the base URL for service document requests.
      *
+     * @return service document base URL
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getBaseServiceDocumentUrl()
             throws DSpaceSwordException
     {
         String sdUrl = ConfigurationManager
-                .getProperty("swordv2-server", "servicedocument.url");
+            .getProperty("swordv2-server", "servicedocument.url");
         if (sdUrl == null || "".equals(sdUrl))
         {
             String dspaceUrl = ConfigurationManager
-                    .getProperty("dspace.baseUrl");
+                .getProperty("dspace.baseUrl");
             if (dspaceUrl == null || "".equals(dspaceUrl))
             {
                 throw new DSpaceSwordException(
-                        "Unable to construct service document urls, due to missing/invalid " +
-                                "config in swordv2-server.cfg servicedocument.url and/or dspace.baseUrl");
+                    "Unable to construct service document urls, due to missing/invalid " +
+                    "config in swordv2-server.cfg servicedocument.url and/or dspace.baseUrl");
             }
 
             try
             {
                 URL url = new URL(dspaceUrl);
                 sdUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(),
-                        "/swordv2/servicedocument").toString();
+                    "/swordv2/servicedocument").toString();
             }
             catch (MalformedURLException e)
             {
                 throw new DSpaceSwordException(
-                        "Unable to construct service document urls, due to invalid dspace.baseUrl " +
-                                e.getMessage(), e);
+                    "Unable to construct service document urls, due to invalid dspace.baseUrl " +
+                    e.getMessage(), e);
             }
         }
         return sdUrl;
@@ -381,36 +401,37 @@ public class SwordUrlManager
      *
      * where dspace.baseUrl is also in the configuration file.
      *
-     * @return the base URL for sword deposit
+     * @return the base URL for SWORD deposit
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getBaseCollectionUrl()
             throws DSpaceSwordException
     {
         String depositUrl = ConfigurationManager
-                .getProperty("swordv2-server", "collection.url");
+            .getProperty("swordv2-server", "collection.url");
         if (depositUrl == null || "".equals(depositUrl))
         {
             String dspaceUrl = ConfigurationManager
-                    .getProperty("dspace.baseUrl");
+                .getProperty("dspace.baseUrl");
             if (dspaceUrl == null || "".equals(dspaceUrl))
             {
                 throw new DSpaceSwordException(
-                        "Unable to construct deposit urls, due to missing/invalid config in " +
-                                "swordv2-server.cfg deposit.url and/or dspace.baseUrl");
+                    "Unable to construct deposit urls, due to missing/invalid config in " +
+                    "swordv2-server.cfg deposit.url and/or dspace.baseUrl");
             }
 
             try
             {
                 URL url = new URL(dspaceUrl);
                 depositUrl = new URL(url.getProtocol(), url.getHost(),
-                        url.getPort(), "/swordv2/collection").toString();
+                    url.getPort(), "/swordv2/collection").toString();
             }
             catch (MalformedURLException e)
             {
                 throw new DSpaceSwordException(
-                        "Unable to construct deposit urls, due to invalid dspace.baseUrl " +
-                                e.getMessage(), e);
+                    "Unable to construct deposit urls, due to invalid dspace.baseUrl " +
+                    e.getMessage(), e);
             }
 
         }
@@ -421,7 +442,10 @@ public class SwordUrlManager
      * Is the given URL the base service document URL?
      *
      * @param url
+     *     URL to check
+     * @return true if URL is service document base URL
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean isBaseServiceDocumentUrl(String url)
             throws DSpaceSwordException
@@ -431,10 +455,13 @@ public class SwordUrlManager
 
     /**
      * Central location for constructing usable URLs for DSpace bitstreams.
-     * There is no place in the main DSpace code base for doing this.
+     * There is no place in the main DSpace codebase for doing this.
      *
      * @param bitstream
+     *     target bitstream
+     * @return URL of given bitstream
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public String getBitstreamUrl(Bitstream bitstream)
             throws DSpaceSwordException
@@ -450,7 +477,7 @@ public class SwordUrlManager
             else
             {
                 throw new DSpaceSwordException(
-                        "Encountered orphaned bitstream");
+                    "Encountered orphaned bitstream");
             }
 
             List<Item> items = parent.getItems();
@@ -470,7 +497,7 @@ public class SwordUrlManager
             if (handle != null && !"".equals(handle))
             {
                 bsLink = bsLink + "/bitstream/" + handle + "/" +
-                        bitstream.getSequenceID() + "/" + bitstream.getName();
+                    bitstream.getSequenceID() + "/" + bitstream.getName();
             }
             else
             {
@@ -490,7 +517,7 @@ public class SwordUrlManager
             throws DSpaceSwordException
     {
         return this.getSwordBaseUrl() + "/edit-media/bitstream/" +
-                bitstream.getID() + "/" + bitstream.getName();
+            bitstream.getID() + "/" + bitstream.getName();
     }
 
     public boolean isActionableBitstreamUrl(Context context, String url)
@@ -508,7 +535,7 @@ public class SwordUrlManager
             if (!location.startsWith(emBaseUrl))
             {
                 throw new SwordError(DSpaceUriRegistry.BAD_URL,
-                        "The bitstream URL is invalid");
+                    "The bitstream URL is invalid");
             }
 
             String bitstreamParts = location.substring(emBaseUrl.length());
@@ -516,15 +543,15 @@ public class SwordUrlManager
             // the bitstream id is the part up to the first "/"
             int firstSlash = bitstreamParts.indexOf("/");
             String bid = bitstreamParts.substring(0, firstSlash);
-            Bitstream bitstream = bitstreamService
-                    .findByIdOrLegacyId(context, bid);
+            Bitstream bitstream =
+                bitstreamService.findByIdOrLegacyId(context, bid);
             return bitstream;
         }
         catch (SQLException e)
         {
             // log.error("Caught exception:", e);
             throw new DSpaceSwordException(
-                    "There was a problem resolving the collection", e);
+                "There was a problem resolving the collection", e);
         }
     }
 
@@ -567,7 +594,7 @@ public class SwordUrlManager
             if (urlTemplate != null)
             {
                 return urlTemplate.replace("#wsid#", Integer.toString(
-                        wft.getWorkspaceItem(context, item).getID()));
+                    wft.getWorkspaceItem(context, item).getID()));
             }
         }
         // otherwise, it may be in the workflow, in which case there is
@@ -596,6 +623,6 @@ public class SwordUrlManager
             throws DSpaceSwordException
     {
         return new IRI(this.getSwordBaseUrl() + "/edit-media/" + item.getID() +
-                ".atom");
+            ".atom");
     }
 }

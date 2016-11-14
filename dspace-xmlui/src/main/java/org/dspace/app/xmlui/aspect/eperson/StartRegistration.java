@@ -168,64 +168,66 @@ public class StartRegistration extends AbstractDSpaceTransformer implements Cach
         pageMeta.addTrail().addContent(T_trail_new_registration);
     }
     
-   public void addBody(Body body) throws WingException {
+    public void addBody(Body body) throws WingException {
+         
+        if (accountExists) {
+            Division exists = body.addInteractiveDivision(
+                "register-account-exists", contextPath + "/register",
+                Division.METHOD_POST, "primary");
+ 
+            exists.setHead(T_head1);
+            
+            exists.addPara(T_para1);
+ 
+            List form = exists.addList("form");
+            
+            form.addLabel(T_reset_password_for);
+            form.addItem(this.email);
+            
+            form.addLabel();
+            Item submit = form.addItem();
+            submit.addButton("submit_forgot").setValue(T_submit_reset);
+            
+            exists.addHidden("email").setValue(this.email);
+            exists.addHidden("eperson-continue").setValue(knot.getId()); 
+        }
         
-       if (accountExists) {
-           Division exists = body.addInteractiveDivision("register-account-exists",contextPath+"/register",Division.METHOD_POST,"primary");
-
-           exists.setHead(T_head1);
-           
-           exists.addPara(T_para1);
-
-           List form = exists.addList("form");
-           
-           form.addLabel(T_reset_password_for);
-           form.addItem(this.email);
-           
-           form.addLabel();
-           Item submit = form.addItem();
-           submit.addButton("submit_forgot").setValue(T_submit_reset);
-           
-           exists.addHidden("email").setValue(this.email);
-           exists.addHidden("eperson-continue").setValue(knot.getId()); 
-       }
-       
-       
-       Division register = body.addInteractiveDivision("register",
-               contextPath+"/register",Division.METHOD_POST,"primary");
-       
-       register.setHead(T_head2);
-       
-       EPersonUtils.registrationProgressList(register,1);
-       
-       register.addPara(T_para2);
-       
-       List form = register.addList("form",List.TYPE_FORM);
-       
-       Text email = form.addItem().addText("email");
-       email.setRequired();
-       email.setAutofocus("autofocus");
-       email.setLabel(T_email_address);
-       email.setHelp(T_email_address_help);
-       email.setValue(this.email);
-       if (errors.contains("email"))
-       {
-           email.addError(T_error_bad_email);
-       }
-       
-       Item submit = form.addItem();
-       submit.addButton("submit").setValue(T_submit_register);
-       
-       register.addHidden("eperson-continue").setValue(knot.getId()); 
-   }
-   
-   /**
-    * Recycle
-    */
-   public void recycle() 
-   {
-       this.email = null;
-       this.errors = null;
-       super.recycle();
-   }
+        
+        Division register = body.addInteractiveDivision("register",
+                contextPath+"/register",Division.METHOD_POST,"primary");
+        
+        register.setHead(T_head2);
+        
+        EPersonUtils.registrationProgressList(register,1);
+        
+        register.addPara(T_para2);
+        
+        List form = register.addList("form",List.TYPE_FORM);
+        
+        Text email = form.addItem().addText("email");
+        email.setRequired();
+        email.setAutofocus("autofocus");
+        email.setLabel(T_email_address);
+        email.setHelp(T_email_address_help);
+        email.setValue(this.email);
+        if (errors.contains("email"))
+        {
+            email.addError(T_error_bad_email);
+        }
+        
+        Item submit = form.addItem();
+        submit.addButton("submit").setValue(T_submit_register);
+        
+        register.addHidden("eperson-continue").setValue(knot.getId()); 
+    }
+    
+    /**
+     * Recycle
+     */
+    public void recycle() 
+    {
+        this.email = null;
+        this.errors = null;
+        super.recycle();
+    }
 }

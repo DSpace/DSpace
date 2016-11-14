@@ -33,6 +33,14 @@ public interface VersionDAO extends GenericDAO<Version>
      * remove a version we set the item, date, summary and eperson null. This
      * method returns only versions that aren't soft deleted and have items
      * assigned.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param versionHistory
+     *     version history
+     * @return all versions of an version history that have items assigned.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<Version> findVersionsWithItems(Context context, VersionHistory versionHistory)
             throws SQLException;

@@ -23,7 +23,7 @@ import org.dspace.xoai.filter.results.SolrFilterResult;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public class DSpaceAuthorizationFilter extends DSpaceFilter
 {

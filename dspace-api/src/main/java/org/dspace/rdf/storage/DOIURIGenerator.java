@@ -27,8 +27,7 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author pbecker
  */
-public class DOIURIGenerator
-implements URIGenerator
+public class DOIURIGenerator implements URIGenerator
 {
     private static final Logger log = Logger.getLogger(DOIURIGenerator.class);
 
@@ -43,11 +42,13 @@ implements URIGenerator
     protected DOIService doiService;
     
     @Override
-    public String generateIdentifier(Context context, int type, UUID id, String handle, List<String> identifiers) throws SQLException {
+    public String generateIdentifier(Context context, int type, UUID id, String handle, List<String> identifiers)
+        throws SQLException
+    {
         if (type != Constants.SITE
-                && type != Constants.COMMUNITY
-                && type != Constants.COLLECTION
-                && type != Constants.ITEM)
+            && type != Constants.COMMUNITY
+            && type != Constants.COLLECTION
+            && type != Constants.ITEM)
         {
             return null;
         }
@@ -73,9 +74,16 @@ implements URIGenerator
 
     @Override
     public String generateIdentifier(Context context, DSpaceObject dso)
-            throws SQLException
+        throws SQLException
     {
-        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle(), ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getIdentifiers(context, dso));
+        return generateIdentifier(
+            context,
+            dso.getType(),
+            dso.getID(),
+            dso.getHandle(),
+            ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
+                .getIdentifiers(context, dso)
+        );
     }
     
 }

@@ -31,7 +31,7 @@ public interface RDFStorage {
     /**
      * Don't use this method directly, use
      * {@link org.dspace.rdf.RDFUtil#loadModel(String) RDFizer.loadModel(...)} instead.
-     * @param uri
+     * @param uri Identifier for this DSO 
      * @return the model
      */
     public Model load(String uri);

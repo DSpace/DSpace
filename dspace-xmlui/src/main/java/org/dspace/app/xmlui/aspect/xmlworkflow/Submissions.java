@@ -43,7 +43,7 @@ import java.util.*;
  */
 public class Submissions extends AbstractDSpaceTransformer
 {
-	/** General Language Strings */
+    /** General Language Strings */
     protected static final Message T_title =
         message("xmlui.Submission.Submissions.title");
     protected static final Message T_dspace_home =
@@ -85,7 +85,7 @@ public class Submissions extends AbstractDSpaceTransformer
     protected static final Message T_w_info3 =
         message("xmlui.Submission.Submissions.workflow_info3");
 
-	// Used in the in progress section
+    // Used in the in progress section
     protected static final Message T_p_head1 =
         message("xmlui.Submission.Submissions.progress_head1");
     protected static final Message T_p_info1 =
@@ -105,22 +105,22 @@ public class Submissions extends AbstractDSpaceTransformer
     protected XmlWorkflowFactory workflowFactory = XmlWorkflowServiceFactory.getInstance().getWorkflowFactory();
 
 
-	public void addPageMeta(PageMeta pageMeta) throws SAXException,
-	WingException, SQLException, IOException,
-	AuthorizeException
-	{
-		pageMeta.addMetadata("title").addContent(T_title);
-
-		pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-		pageMeta.addTrailLink(contextPath + "/submissions",T_trail);
-	}
-
-
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, SQLException, IOException,
+        AuthorizeException
     {
+        pageMeta.addMetadata("title").addContent(T_title);
 
-        Division div = body.addInteractiveDivision("submissions", contextPath+"/submissions", Division.METHOD_POST,"primary");
+        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+        pageMeta.addTrailLink(contextPath + "/submissions",T_trail);
+    }
+
+
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        Division div = body.addInteractiveDivision("submissions", contextPath + "/submissions", Division.METHOD_POST, "primary");
         div.setHead(T_head);
 
         this.addWorkflowTasks(div);
@@ -129,8 +129,10 @@ public class Submissions extends AbstractDSpaceTransformer
 //        this.addPreviousSubmissions(div);
     }
 
-    private void addWorkflowTasksDiv(Division division) throws SQLException, WingException, AuthorizeException, IOException {
-    	division.addDivision("start-submision");
+    private void addWorkflowTasksDiv(Division division)
+        throws SQLException, WingException, AuthorizeException, IOException
+    {
+        division.addDivision("start-submision");
     }
 
     /**
@@ -141,23 +143,25 @@ public class Submissions extends AbstractDSpaceTransformer
      *
      * @param division The division to add the two queues too.
      */
-    private void addWorkflowTasks(Division division) throws SQLException, WingException, AuthorizeException, IOException {
-    	@SuppressWarnings("unchecked") // This cast is correct
-    	java.util.List<ClaimedTask> ownedItems = claimedTaskService.findByEperson(context, context.getCurrentUser());
-    	@SuppressWarnings("unchecked") // This cast is correct.
-    	java.util.List<PoolTask> pooledItems = poolTaskService.findByEperson(context, context.getCurrentUser());
+    private void addWorkflowTasks(Division division)
+        throws SQLException, WingException, AuthorizeException, IOException {
+        @SuppressWarnings("unchecked") // This cast is correct
+        java.util.List<ClaimedTask> ownedItems = claimedTaskService.findByEperson(context, context.getCurrentUser());
+        @SuppressWarnings("unchecked") // This cast is correct.
+        java.util.List<PoolTask> pooledItems = poolTaskService.findByEperson(context, context.getCurrentUser());
 
-    	if (!(ownedItems.size() > 0 || pooledItems.size() > 0))
-    		// No tasks, so don't show the table.
-    		return;
+        if (!(ownedItems.size() > 0 || pooledItems.size() > 0))
+        {
+            // No tasks, so don't show the table.
+            return;
+        }
 
+        Division workflow = division.addDivision("workflow-tasks");
+        workflow.setHead(T_w_head1);
+        workflow.addPara(T_w_info1);
 
-    	Division workflow = division.addDivision("workflow-tasks");
-    	workflow.setHead(T_w_head1);
-    	workflow.addPara(T_w_info1);
-
-    	// Tasks you own
-    	Table table = workflow.addTable("workflow-tasks",ownedItems.size() + 2,5);
+        // Tasks you own
+        Table table = workflow.addTable("workflow-tasks",ownedItems.size() + 2,5);
         table.setHead(T_w_head2);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_w_column1);
@@ -170,26 +174,31 @@ public class Submissions extends AbstractDSpaceTransformer
         boolean showReturnToPoolButton = false;
         if (ownedItems.size() > 0)
         {
-        	for (ClaimedTask owned : ownedItems)
-        	{
+            for (ClaimedTask owned : ownedItems)
+            {
                 String stepID = owned.getStepID();
                 String actionID = owned.getActionID();
                 XmlWorkflowItem item = owned.getWorkflowItem();
-                try {
+                try
+                {
                     Workflow wf = workflowFactory.getWorkflow(item.getCollection());
                     Step step = wf.getStep(stepID);
                     WorkflowActionConfig action = step.getActionConfig(actionID);
-                    String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+item.getID()+"&stepID="+stepID+"&actionID="+actionID;
+                    String url = contextPath + "/handle/"
+                        + item.getCollection().getHandle()
+                        + "/xmlworkflow?workflowID=" + item.getID()
+                        + "&stepID=" + stepID + "&actionID=" + actionID;
                     String title = item.getItem().getName();
                     String collectionName = item.getCollection().getName();
                     EPerson submitter = item.getSubmitter();
                     String submitterName = submitter.getFullName();
                     String submitterEmail = submitter.getEmail();
 
-    //        		Message state = getWorkflowStateMessage(owned);
+    //                Message state = getWorkflowStateMessage(owned);
 
                     boolean taskHasPool = step.getUserSelectionMethod().getProcessingAction().usesTaskPool();
-                    if(taskHasPool){
+                    if (taskHasPool)
+                    {
                         //We have a workflow item that uses a pool, ensure we see the return to pool button
                         showReturnToPoolButton = true;
                     }
@@ -197,60 +206,70 @@ public class Submissions extends AbstractDSpaceTransformer
                     Row row = table.addRow();
 
                     Cell firstCell = row.addCell();
-                    if(taskHasPool){
+                    if (taskHasPool){
                         CheckBox remove = firstCell.addCheckBox("workflowandstepID");
                         remove.setLabel("selected");
                         remove.addOption(item.getID() + ":" + step.getId());
                     }
 
                     // The task description
-                    row.addCell().addXref(url,message("xmlui.XMLWorkflow." + wf.getID() + "." + stepID + "." + actionID));
+                    row.addCell().addXref(url, message("xmlui.XMLWorkflow."
+                        + wf.getID() + "." + stepID + "." + actionID));
 
                     // The item description
                     if (title != null && title.length() > 0)
                     {
                         String displayTitle = title;
                         if (displayTitle.length() > 50)
-                            displayTitle = displayTitle.substring(0,50)+ " ...";
-                        row.addCell().addXref(url,displayTitle);
+                        {
+                            displayTitle = displayTitle.substring(0, 50)+ " ...";
+                        }
+                        row.addCell().addXref(url, displayTitle);
                     }
                     else
-                        row.addCell().addXref(url,T_untitled);
+                    {
+                        row.addCell().addXref(url, T_untitled);
+                    }
 
                     // Submitted too
-                    row.addCell().addXref(url,collectionName);
+                    row.addCell().addXref(url, collectionName);
 
                     // Submitted by
                     Cell cell = row.addCell();
                     cell.addContent(T_email);
-                    cell.addXref("mailto:"+submitterEmail,submitterName);
-                } catch (WorkflowConfigurationException e) {
+                    cell.addXref("mailto:"+submitterEmail, submitterName);
+                }
+                catch (WorkflowConfigurationException e)
+                {
                     Row row = table.addRow();
                     row.addCell().addContent("Error: Configuration error in workflow.");
                     log.error(LogManager.getHeader(context, "Error while adding owned tasks on the submissions page", ""), e);
 
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     log.error(LogManager.getHeader(context, "Error while adding owned tasks on the submissions page", ""), e);
                 }
             }
 
-        	if(showReturnToPoolButton){
+            if (showReturnToPoolButton)
+            {
                 Row row = table.addRow();
-                row.addCell(0,5).addButton("submit_return_tasks").setValue(T_w_submit_return);
+                row.addCell(0, 5).addButton("submit_return_tasks").setValue(T_w_submit_return);
             }
 
         }
         else
         {
-        	Row row = table.addRow();
-        	row.addCell(0,5).addHighlight("italic").addContent(T_w_info2);
+            Row row = table.addRow();
+            row.addCell(0, 5).addHighlight("italic").addContent(T_w_info2);
         }
 
 
 
 
         // Tasks in the pool
-        table = workflow.addTable("workflow-tasks",pooledItems.size()+2,5);
+        table = workflow.addTable("workflow-tasks", pooledItems.size() + 2, 5);
         table.setHead(T_w_head3);
 
         header = table.addRow(Row.ROLE_HEADER);
@@ -262,22 +281,25 @@ public class Submissions extends AbstractDSpaceTransformer
 
         if (pooledItems.size() > 0)
         {
-
-        	for (PoolTask pooled : pooledItems)
-        	{
+            for (PoolTask pooled : pooledItems)
+            {
                 String stepID = pooled.getStepID();
                 String actionID = pooled.getActionID();
-                try {
+                try
+                {
                     XmlWorkflowItem item = pooled.getWorkflowItem();
                     Workflow wf = workflowFactory.getWorkflow(item.getCollection());
-                    String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+item.getID()+"&stepID="+stepID+"&actionID="+actionID;
+                    String url = contextPath + "/handle/"
+                        + item.getCollection().getHandle()
+                        + "/xmlworkflow?workflowID=" + item.getID()
+                        + "&stepID="+ stepID + "&actionID=" + actionID;
                     String title = item.getItem().getName();
                     String collectionName = item.getCollection().getName();
                     EPerson submitter = item.getSubmitter();
                     String submitterName = submitter.getFullName();
                     String submitterEmail = submitter.getEmail();
 
-    //        		Message state = getWorkflowStateMessage(pooled);
+//                    Message state = getWorkflowStateMessage(pooled);
 
 
                     Row row = table.addRow();
@@ -287,43 +309,51 @@ public class Submissions extends AbstractDSpaceTransformer
                     claimTask.addOption(item.getID());
 
                     // The task description
-//                    row.addCell().addXref(url,message("xmlui.Submission.Submissions.claimAction"));
-                    row.addCell().addXref(url,message("xmlui.XMLWorkflow." + wf.getID() + "." + stepID + "." + actionID));
+//                    row.addCell().addXref(url, message("xmlui.Submission.Submissions.claimAction"));
+                    row.addCell().addXref(url, message("xmlui.XMLWorkflow." + wf.getID() + "." + stepID + "." + actionID));
 
                     // The item description
                     if (title != null && title.length() > 0)
                     {
                         String displayTitle = title;
                         if (displayTitle.length() > 50)
-                            displayTitle = displayTitle.substring(0,50)+ " ...";
+                        {
+                            displayTitle = displayTitle.substring(0, 50)+ " ...";
+                        }
 
-                        row.addCell().addXref(url,displayTitle);
+                        row.addCell().addXref(url,  displayTitle);
                     }
                     else
-                        row.addCell().addXref(url,T_untitled);
+                    {
+                        row.addCell().addXref(url,  T_untitled);
+                    }
 
                     // Submitted too
-                    row.addCell().addXref(url,collectionName);
+                    row.addCell().addXref(url, collectionName);
 
                     // Submitted by
                     Cell cell = row.addCell();
                     cell.addContent(T_email);
-                    cell.addXref("mailto:"+submitterEmail,submitterName);
-                } catch (WorkflowConfigurationException e) {
+                    cell.addXref("mailto:"+submitterEmail, submitterName);
+                }
+                catch (WorkflowConfigurationException e)
+                {
                     Row row = table.addRow();
                     row.addCell().addContent("Error: Configuration error in workflow.");
                     log.error(LogManager.getHeader(context, "Error while adding pooled tasks on the submissions page", ""), e);
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     log.error(LogManager.getHeader(context, "Error while adding pooled tasks on the submissions page", ""), e);
                 }
             }
-        	Row row = table.addRow();
-	    	row.addCell(0,5).addButton("submit_take_tasks").setValue(T_w_submit_take);
+            Row row = table.addRow();
+            row.addCell(0, 5).addButton("submit_take_tasks").setValue(T_w_submit_take);
         }
         else
         {
-        	Row row = table.addRow();
-        	row.addCell(0,4).addHighlight("italic").addContent(T_w_info3);
+            Row row = table.addRow();
+            row.addCell(0, 4).addHighlight("italic").addContent(T_w_info3);
         }
     }
 
@@ -339,12 +369,11 @@ public class Submissions extends AbstractDSpaceTransformer
      * presented listing all the unfinished submissions that this user has.
      *
      */
-    private void addUnfinishedSubmissions(Division division) throws SQLException, WingException
+    private void addUnfinishedSubmissions(Division division)
+        throws SQLException, WingException
     {
         division.addInteractiveDivision("unfinished-submisions", contextPath+"/submit", Division.METHOD_POST);
-
     }
-
 
 
     /**
@@ -352,20 +381,25 @@ public class Submissions extends AbstractDSpaceTransformer
      *
      * If the user has none, this nothing is displayed.
      */
-    private void addSubmissionsInWorkflow(Division division) throws SQLException, WingException, AuthorizeException, IOException {
+    private void addSubmissionsInWorkflow(Division division)
+        throws SQLException, WingException, AuthorizeException, IOException
+    {
         java.util.List<XmlWorkflowItem> inprogressItems;
-        try {
+        try
+        {
             inprogressItems = xmlWorkflowItemService.findBySubmitter(context, context.getCurrentUser());
             // If there is nothing in progress then don't add anything.
             if (!(inprogressItems.size() > 0))
-                    return;
+            {
+                return;
+            }
 
             Division inprogress = division.addDivision("submissions-inprogress");
             inprogress.setHead(T_p_head1);
             inprogress.addPara(T_p_info1);
 
 
-            Table table = inprogress.addTable("submissions-inprogress",inprogressItems.size()+1,3);
+            Table table = inprogress.addTable("submissions-inprogress", inprogressItems.size()+1, 3);
             Row header = table.addRow(Row.ROLE_HEADER);
             header.addCellContent(T_p_column1);
             header.addCellContent(T_p_column2);
@@ -376,16 +410,18 @@ public class Submissions extends AbstractDSpaceTransformer
             {
                 String title = workflowItem.getItem().getName();
                 String collectionName = workflowItem.getCollection().getName();
-                java.util.List<PoolTask> pooltasks = poolTaskService.find(context,workflowItem);
-                java.util.List<ClaimedTask> claimedtasks = claimedTaskService.find(context, workflowItem);
+                java.util.List<PoolTask> pooltasks = poolTaskService.find(context, workflowItem);
+                java.util.List<ClaimedTask> claimedtasks = claimedTaskService.find(context,  workflowItem);
 
                 Message state = message("xmlui.XMLWorkflow.step.unknown");
-                for(PoolTask task: pooltasks){
+                for (PoolTask task: pooltasks)
+                {
                     Workflow wf = workflowFactory.getWorkflow(workflowItem.getCollection());
                     Step step = wf.getStep(task.getStepID());
                     state = message("xmlui.XMLWorkflow." + wf.getID() + "." + step.getId() + "." + task.getActionID());
                 }
-                for(ClaimedTask task: claimedtasks){
+                for (ClaimedTask task: claimedtasks)
+                {
                     Workflow wf = workflowFactory.getWorkflow(workflowItem.getCollection());
                     Step step = wf.getStep(task.getStepID());
                     state = message("xmlui.XMLWorkflow." + wf.getID() + "." + step.getId() + "." + task.getActionID());
@@ -397,11 +433,15 @@ public class Submissions extends AbstractDSpaceTransformer
                 {
                     String displayTitle = title;
                     if (displayTitle.length() > 50)
-                        displayTitle = displayTitle.substring(0,50)+ " ...";
+                    {
+                        displayTitle = displayTitle.substring(0, 50)+ " ...";
+                    }
                     row.addCellContent(displayTitle);
                 }
                 else
+                {
                     row.addCellContent(T_untitled);
+                }
 
                 // Collection name column
                 row.addCellContent(collectionName);
@@ -412,10 +452,7 @@ public class Submissions extends AbstractDSpaceTransformer
         }  catch (Exception e) {
             Row row = division.addTable("table0",1,1).addRow();
             row.addCell().addContent("Error: Configuration error in workflow.");
-
         }
-
-
     }
 
     /**
@@ -428,9 +465,8 @@ public class Submissions extends AbstractDSpaceTransformer
      * @param division div to put archived submissions in
      */
     private void addPreviousSubmissions(Division division)
-            throws SQLException,WingException
+        throws SQLException, WingException
     {
         division.addDivision("completed-submissions");
-
     }
 }

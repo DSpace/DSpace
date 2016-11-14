@@ -53,7 +53,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      *
      * @param context DSpace context object
      * @param collection Collection (parent)
-     * @return Item
+     * @return empty template item for this collection
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */
@@ -96,8 +96,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
 
     /**
      * Retrieve the list of items submitted by eperson, ordered by recently submitted, optionally limitable
-     * @param context context
-     * @param eperson eperson
+     *
+     * @param context DSpace context object
+     * @param eperson
+     *            the submitter
      * @param limit a positive integer to limit, -1 or null for unlimited
      * @return an iterator over the items submitted by eperson
      * @throws SQLException if database error
@@ -128,7 +130,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
 
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
-     * @param context context
+     *
+     * @param context DSpace context object
      * @param since earliest interesting last-modified date, or null for no date test.
      * @return an iterator over the items in the collection.
      * @throws SQLException if database error
@@ -148,7 +151,8 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
 
     /**
      * See whether this Item is contained by a given Collection.
-     * @param item Item
+     *
+     * @param item item to check
      * @param collection Collection (parent
      * @return true if {@code collection} contains this Item.
      * @throws SQLException if database error
@@ -161,7 +165,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * communities of the owning collections.
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to check
      * @return the communities this item is in.
      * @throws SQLException if database error
      */
@@ -171,7 +175,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Get the bundles matching a bundle name (name corresponds roughly to type)
      *
-     * @param item Item
+     * @param item item to check
      * @param name
      *            name of bundle (ORIGINAL/TEXT/THUMBNAIL)
      * @throws SQLException if database error
@@ -184,7 +188,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Add an existing bundle to this item. This has immediate effect.
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to add the bundle to
      * @param bundle
      *            the bundle to add
      * @throws SQLException if database error
@@ -210,9 +214,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Remove all bundles linked to this item. This may result in the bundle being deleted, if the
      * bundle is orphaned.
+     *
      * @param context DSpace context object
      * @param item
-     *            the item from which to remove our bundles
+     *            the item from which to remove all bundles
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
@@ -224,7 +229,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * method for the most common use.
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to create bitstream on
      * @param is
      *            the stream to create the new bitstream from
      * @param name
@@ -241,7 +246,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Convenience method, calls createSingleBitstream() with name "ORIGINAL"
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to create bitstream on
      * @param is
      *            InputStream
      * @return created bitstream
@@ -256,8 +261,9 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Get all non-internal bitstreams in the item. This is mainly used for
      * auditing for provenance messages and adding format.* DC values. The order
      * is indeterminate.
+     *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to check
      * @return non-internal bitstreams.
      * @throws SQLException if database error
      */
@@ -271,7 +277,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * This method is used by the org.dspace.submit.step.LicenseStep class
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to remove DSpace license from
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
@@ -283,7 +289,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Remove all licenses from an item - it was rejected
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to remove all licenses from
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
@@ -295,7 +301,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * and metadata are not deleted, but it is not publicly accessible.
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to withdraw
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */
@@ -306,7 +312,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Reinstate a withdrawn item
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item withdrawn item to reinstate
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */
@@ -315,7 +321,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Return true if this Collection 'owns' this item
      *
-     * @param item Item
+     * @param item item to check
      * @param collection
      *            Collection
      * @return true if this Collection owns this item
@@ -327,7 +333,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * policies
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to replace policies on
      * @param newpolicies -
      *            this will be all of the new policies for the item and its
      *            contents
@@ -342,7 +348,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * them with a new list of policies
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to replace policies on
      * @param newpolicies -
      *            this will be all of the new policies for the bundle and
      *            bitstream contents
@@ -358,7 +364,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * to a given Group
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to remove group policies from
      * @param group
      *            Group referenced by policies that needs to be removed
      * @throws SQLException if database error
@@ -372,7 +378,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * the collection.
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to reset policies on
      * @param collection
      *            Collection
      * @throws SQLException if database error
@@ -392,7 +398,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Moves the item from one collection to another one
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to move
      * @param from Collection to move from
      * @param to Collection to move to
      * @throws SQLException if database error
@@ -405,7 +411,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Moves the item from one collection to another one
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to move
      * @param from Collection to move from
      * @param to Collection to move to
      * @param inheritDefaultPolicies whether to inherit policies from new collection
@@ -413,12 +419,12 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
      */
-    public void move (Context context, Item item, Collection from, Collection to, boolean inheritDefaultPolicies) throws SQLException, AuthorizeException, IOException;
+    public void move(Context context, Item item, Collection from, Collection to, boolean inheritDefaultPolicies) throws SQLException, AuthorizeException, IOException;
 
     /**
      * Check the bundle ORIGINAL to see if there are any uploaded files
      *
-     * @param item Item
+     * @param item item to check
      * @return true if there is a bundle named ORIGINAL with one or more
      *         bitstreams inside
      * @throws SQLException if database error
@@ -429,7 +435,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Get the collections this item is not in.
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to check
      * @return the collections this item is not in, if any.
      * @throws SQLException if database error
      */
@@ -439,7 +445,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * return TRUE if context's user can edit item, false otherwise
      *
      * @param context DSpace context object
-     * @param item Item
+     * @param item item to check
      * @return boolean true = current user can edit item
      * @throws SQLException if database error
      */
@@ -448,8 +454,10 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * return TRUE if context's user can create new version of the item, false
      * otherwise.
+     * @param context DSpace context object
+     * @param item item to check
      * @return boolean true = current user can create new version of the item
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public boolean canCreateNewVersion(Context context, Item item) throws SQLException;
      
@@ -500,7 +508,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * Service method for knowing if this Item should be visible in the item list.
      * Items only show up in the "item list" if the user has READ permission
      * and if the Item isn't flagged as unlisted.
-     * @param context context
+     * @param context DSpace context object
      * @param item item
      * @return true or false
      */
@@ -519,7 +527,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     /**
      * Find all Items modified since a Date.
      *
-     * @param context context
+     * @param context DSpace context object
      * @param last Earliest interesting last-modified date.
      * @return iterator over items
      * @throws SQLException if database error
@@ -564,11 +572,12 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      */
     int countWithdrawnItems(Context context) throws SQLException;
 
-	/**
-	 * Check if the supplied item is an inprogress submission
-	 * @param context
-	 * @param item
-	 * @return <code>true</code> if the item is linked to a workspaceitem or workflowitem
-	 */
+    /**
+     * Check if the supplied item is an inprogress submission
+     * @param context DSpace context object
+     * @param item item to check
+     * @return <code>true</code> if the item is linked to a workspaceitem or workflowitem
+     * @throws SQLException if database error
+     */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
 }

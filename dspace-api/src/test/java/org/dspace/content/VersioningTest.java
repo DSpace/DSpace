@@ -151,7 +151,7 @@ public class VersioningTest extends AbstractUnitTest {
         /* The following assertments are specific to the VersionHandleIdentifier 
          * that use "canonical" handles that are moved from version to version.
          * It would be good to create Tests for each IdentifierProvider, which
-         * would need to tell spring which one to use for which test.
+         * would need to tell Spring which one to use for which test.
          *
          * assertTrue("Test_version_handle 4 ", versionedItem.getHandles().size() == 2);
          * assertTrue("Test_version_handle 5 ", originalItem.getHandle().matches(versionedHandleRegex));

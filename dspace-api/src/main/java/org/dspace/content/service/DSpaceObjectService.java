@@ -181,7 +181,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
      *
      * @return the value of the metadata field (or null if the column is an SQL NULL)
      *
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
     public String getMetadata(T dSpaceObject, String value);

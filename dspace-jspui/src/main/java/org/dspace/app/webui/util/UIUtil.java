@@ -71,28 +71,28 @@ public class UIUtil extends Util
     public static final Logger log = Logger.getLogger(UIUtil.class);
 
     /**
-	 * Pattern used to get file.ext from filename (which can be a path)
-	 */
-	private static Pattern p = Pattern.compile("[^/]*$");
-	
-        private static boolean initialized = false;
-	    
-	private static AuthenticationService authenticationService;
-	private static EPersonService personService;
-        private static IdentifierService identifierService;
-        private static DOIService doiService;
-        private static HandleService handleService;
-	
-	private static synchronized void initialize() {
-		if (initialized) {
-			return;
-		}
-		authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-                doiService = IdentifierServiceFactory.getInstance().getDOIService();
-                handleService = HandleServiceFactory.getInstance().getHandleService();
-                identifierService = IdentifierServiceFactory.getInstance().getIdentifierService();
-		personService = EPersonServiceFactory.getInstance().getEPersonService();
-	}
+     * Pattern used to get file.ext from filename (which can be a path)
+     */
+    private static Pattern p = Pattern.compile("[^/]*$");
+    
+    private static boolean initialized = false;
+        
+    private static AuthenticationService authenticationService;
+    private static EPersonService personService;
+    private static IdentifierService identifierService;
+    private static DOIService doiService;
+    private static HandleService handleService;
+    
+    private static synchronized void initialize() {
+        if (initialized) {
+            return;
+        }
+        authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+        doiService = IdentifierServiceFactory.getInstance().getDOIService();
+        handleService = HandleServiceFactory.getInstance().getHandleService();
+        identifierService = IdentifierServiceFactory.getInstance().getIdentifierService();
+        personService = EPersonServiceFactory.getInstance().getEPersonService();
+    }
 
     /**
      * Obtain a new context object. If a context object has already been created
@@ -104,11 +104,13 @@ public class UIUtil extends Util
      *            the HTTP request
      *
      * @return a context object
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static Context obtainContext(HttpServletRequest request)
             throws SQLException
     {
-    	initialize();
+        initialize();
 
         //Set encoding to UTF-8, if not set yet
         //This avoids problems of using the HttpServletRequest
@@ -117,7 +119,7 @@ public class UIUtil extends Util
         //non-UTF-8 encoding.
         try
         {
-            if(request.getCharacterEncoding()==null)
+            if (request.getCharacterEncoding()==null)
             {
                 request.setCharacterEncoding(Constants.DEFAULT_ENCODING);
             }
@@ -145,15 +147,15 @@ public class UIUtil extends Util
                 String remAddr = (String)session.getAttribute("dspace.current.remote.addr");
                 if (remAddr != null && remAddr.equals(request.getRemoteAddr()))
                 {
-                	EPerson e = personService.find(c, userID);
+                    EPerson e = personService.find(c, userID);
 
-                	Authenticate.loggedIn(c, request, e);
+                    Authenticate.loggedIn(c, request, e);
                 }
                 else
                 {
-                    log.warn("POSSIBLE HIJACKED SESSION: request from "+
-                             request.getRemoteAddr()+" does not match original "+
-                             "session address: "+remAddr+". Authentication rejected.");
+                    log.warn("POSSIBLE HIJACKED SESSION: request from " +
+                        request.getRemoteAddr()+" does not match original " +
+                        "session address: "+remAddr+". Authentication rejected.");
                 }
             }
 
@@ -171,17 +173,17 @@ public class UIUtil extends Util
             if (useProxies == null) {
                 useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
             }
-            if(useProxies && request.getHeader("X-Forwarded-For") != null)
+            if (useProxies && request.getHeader("X-Forwarded-For") != null)
             {
                 /* This header is a comma delimited list */
-	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+                for(String xfip : request.getHeader("X-Forwarded-For").split(","))
                 {
-                    if(!request.getHeader("X-Forwarded-For").contains(ip))
+                    if (!request.getHeader("X-Forwarded-For").contains(ip))
                     {
                         ip = xfip.trim();
                     }
                 }
-	        }
+            }
             c.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
@@ -206,11 +208,14 @@ public class UIUtil extends Util
      * If no identifier is found this method returns null. If no handle but a
      * DOI is found the first value of the array is null.
      * 
-     * @param ctx DSpace Context
-     * @param item the item
+     * @param ctx
+     *     The relevant DSpace Context.
+     * @param item
+     *     Which DSpace Item to operate on.
      * @return string array containing URL or null if no ID found; string
-               array contains null if no handle, but a DOI is found
+           array contains null if no handle, but a DOI is found
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static String[] getItemIdentifier(Context ctx, Item item)
             throws SQLException
@@ -273,8 +278,8 @@ public class UIUtil extends Util
      */
     public static Community getCommunityLocation(HttpServletRequest request)
     {
-    	initialize();
-    	
+        initialize();
+        
         return ((Community) request.getAttribute("dspace.community"));
     }
 
@@ -290,8 +295,8 @@ public class UIUtil extends Util
      */
     public static Collection getCollectionLocation(HttpServletRequest request)
     {
-    	initialize();
-    	
+        initialize();
+        
         return ((Collection) request.getAttribute("dspace.collection"));
     }
 
@@ -306,8 +311,8 @@ public class UIUtil extends Util
      */
     public static void storeOriginalURL(HttpServletRequest request)
     {
-    	initialize();
-    	
+        initialize();
+        
         String orig = (String) request.getAttribute("dspace.original.url");
 
         if (orig == null)
@@ -333,8 +338,8 @@ public class UIUtil extends Util
      */
     public static String getOriginalURL(HttpServletRequest request)
     {
-    	initialize();
-    	
+        initialize();
+        
         // Make sure there's a URL in the attribute
         storeOriginalURL(request);
 
@@ -357,8 +362,8 @@ public class UIUtil extends Util
      */
     public static String displayDate(DCDate d, boolean time, boolean localTime, HttpServletRequest request)
     {
-    	initialize();
-    	
+        initialize();
+        
         return d.displayDate(time, localTime, getSessionLocale(request));
             }
 
@@ -372,8 +377,8 @@ public class UIUtil extends Util
      */
     public static String getRequestLogInfo(HttpServletRequest request)
     {
-    	initialize();
-    	
+        initialize();
+        
         StringBuilder report = new StringBuilder();
 
         report.append("-- URL Was: ").append(getOriginalURL(request)).append("\n").toString();
@@ -397,7 +402,7 @@ public class UIUtil extends Util
             else
             {
                 report.append("-- ").append(name).append(": \"")
-                        .append(request.getParameter(name)).append("\"\n");
+                    .append(request.getParameter(name)).append("\"\n");
             }
         }
 
@@ -420,8 +425,8 @@ public class UIUtil extends Util
     public static Locale getSessionLocale(HttpServletRequest request)
 
     {
-    	initialize();
-    	
+        initialize();
+        
         String paramLocale = request.getParameter("locale");
         Locale sessionLocale = null;
         Locale supportedLocale = null;
@@ -479,8 +484,8 @@ public class UIUtil extends Util
      */
     public static void sendAlert(HttpServletRequest request, Exception exception)
     {
-    	initialize();
-    	
+        initialize();
+        
         String logInfo = UIUtil.getRequestLogInfo(request);
         Context c = (Context) request.getAttribute("dspace.context");
         Locale locale = getSessionLocale(request);
@@ -546,71 +551,73 @@ public class UIUtil extends Util
     }
 
     /**
-	 * Evaluate filename and client and encode appropriate disposition
-	 *
-	 * @param filename
-	 * @param request
-	 * @param response
-	 * @throws UnsupportedEncodingException
-	 */
-	public static void setBitstreamDisposition(String filename, HttpServletRequest request,
-			HttpServletResponse response)
-	{
-		initialize();
-		
-		String name = filename;
+     * Evaluate filename and client and encode appropriate disposition
+     *
+     * @param filename
+     *     file name to evenluate
+     * @param request
+     *     Servlet's HTTP request object.
+     * @param response
+     *     Servlet's HTTP response object.
+     */
+    public static void setBitstreamDisposition(String filename, HttpServletRequest request,
+            HttpServletResponse response)
+    {
+        initialize();
+        
+        String name = filename;
 
-		Matcher m = p.matcher(name);
+        Matcher m = p.matcher(name);
 
-		if (m.find() && !m.group().equals(""))
-		{
-			name = m.group();
-		}
+        if (m.find() && !m.group().equals(""))
+        {
+            name = m.group();
+        }
 
-		try
-		{
-			String agent = request.getHeader("USER-AGENT");
+        try
+        {
+            String agent = request.getHeader("USER-AGENT");
 
-			if (null != agent && -1 != agent.indexOf("MSIE"))
-			{
-				name = URLEncoder.encode(name, "UTF8");
-			}
-			else if (null != agent && -1 != agent.indexOf("Mozilla"))
-			{
-				name = MimeUtility.encodeText(name, "UTF8", "B");
-			}
+            if (null != agent && -1 != agent.indexOf("MSIE"))
+            {
+                name = URLEncoder.encode(name, "UTF8");
+            }
+            else if (null != agent && -1 != agent.indexOf("Mozilla"))
+            {
+                name = MimeUtility.encodeText(name, "UTF8", "B");
+            }
 
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			log.error(e.getMessage(),e);
-		}
-		finally
-		{
-			response.setHeader("Content-Disposition", "attachment;filename=" + name);
-		}
-	}
-	
-	/**
-	 * Generate the (X)HTML required to show the item marking. Based on the markType it tries to find
-	 * the corresponding item marking Strategy on the item_marking.xml Spring configuration file in order
-	 * to apply it to the item.
-	 * This method is used in BrowseListTag and ItemListTag to du the actual item marking in browse
-	 * and search results
-	 * 
-	 * @param hrq The servlet request
-	 * @param dso The DSpaceObject to mark (it can be a BrowseItem or an Item)
-	 * @param markType the type of the mark.
-	 * @return (X)HTML markup
-	 * @throws JspException
-	 */
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            log.error(e.getMessage(),e);
+        }
+        finally
+        {
+            response.setHeader("Content-Disposition", "attachment;filename=" + name);
+        }
+    }
+    
+    /**
+     * Generate the (X)HTML required to show the item marking. Based on the markType it tries to find
+     * the corresponding item marking Strategy on the item_marking.xml Spring configuration file in order
+     * to apply it to the item.
+     * This method is used in BrowseListTag and ItemListTag to du the actual item marking in browse
+     * and search results
+     * 
+     * @param hrq The servlet request
+     * @param dso The DSpaceObject to mark (it can be a BrowseItem or an Item)
+     * @param markType the type of the mark.
+     * @return (X)HTML markup
+     * @throws JspException on a database error.
+     */
     public static String getMarkingMarkup(HttpServletRequest hrq, DSpaceObject dso, String markType)
             throws JspException
     {
-    	initialize();
-    	
-    	try
-    	{
+        initialize();
+        
+        try
+        {
             String contextPath = hrq.getContextPath();
 
             Context c = UIUtil.obtainContext(hrq);
@@ -620,79 +627,79 @@ public class UIUtil extends Util
             String mark = markType.replace("mark_", "");
             
             ItemMarkingExtractor markingExtractor = DSpaceServicesFactory.getInstance().getServiceManager()
-				.getServiceByName(
-						ItemMarkingExtractor.class.getName()+"."+mark,
-						ItemMarkingExtractor.class);
+                .getServiceByName(
+                    ItemMarkingExtractor.class.getName() + "." + mark,
+                    ItemMarkingExtractor.class);
             
-            if (markingExtractor == null){ // In case we cannot find the corresponding extractor (strategy) in xml beans
-            	return "";
+            if (markingExtractor == null) { // In case we cannot find the corresponding extractor (strategy) in xml beans
+                return "";
             }
             
             ItemMarkingInfo markInfo = markingExtractor.getItemMarkingInfo(c, item);
             
-            if (markInfo == null){
-            	return "";
+            if (markInfo == null) {
+                return "";
             }
             
             StringBuffer markFrag = new StringBuffer();
             
             String localizedTooltip = null;
-            if (markInfo.getTooltip()!=null){
-            	localizedTooltip = org.dspace.core.I18nUtil.getMessage(markInfo.getTooltip(), hrq.getLocale());
+            if (markInfo.getTooltip() != null) {
+                localizedTooltip = org.dspace.core.I18nUtil.getMessage(markInfo.getTooltip(), hrq.getLocale());
             }
-            		
+                    
             String markLink = markInfo.getLink();
             
-            if (markInfo.getImageName()!=null){
-            	
-            	//Link
-            	if (StringUtils.isNotEmpty(markLink)){
-            		markFrag.append("<a href=\"")
-            			.append(contextPath+"/" + markLink)
-            			.append("\">");
-            	}
-            	
-            	markFrag.append("<img class=\""+markType+"_img\" src=\""+ contextPath+"/")
-            		.append(markInfo.getImageName()).append("\"");
-            	if (StringUtils.isNotEmpty(localizedTooltip)){
-            		markFrag.append(" title=\"")
-            			.append(localizedTooltip)
-            			.append("\"");
-            	}
-            	markFrag.append("/>");
-            	
-            	//Link
-            	if (StringUtils.isNotEmpty(markLink)){
-            		markFrag.append("</a>");
-            	}
+            if (markInfo.getImageName() != null) {
+                
+                //Link
+                if (StringUtils.isNotEmpty(markLink)) {
+                    markFrag.append("<a href=\"")
+                        .append(contextPath+"/" + markLink)
+                        .append("\">");
+                }
+                
+                markFrag.append("<img class=\""+markType+"_img\" src=\""+ contextPath+"/")
+                    .append(markInfo.getImageName()).append("\"");
+                if (StringUtils.isNotEmpty(localizedTooltip)) {
+                    markFrag.append(" title=\"")
+                        .append(localizedTooltip)
+                        .append("\"");
+                }
+                markFrag.append("/>");
+                
+                //Link
+                if (StringUtils.isNotEmpty(markLink)) {
+                    markFrag.append("</a>");
+                }
             }
-            else  if (markInfo.getClassInfo()!=null){
-            	//Link
-            	if (StringUtils.isNotEmpty(markLink)){
-            		markFrag.append("<a href=\"")
-            			.append(contextPath+"/" + markLink)
-            			.append("\">");
-            	}
+            else if (markInfo.getClassInfo() != null) {
+                //Link
+                if (StringUtils.isNotEmpty(markLink)) {
+                    markFrag.append("<a href=\"")
+                        .append(contextPath+"/" + markLink)
+                        .append("\">");
+                }
 
-            	markFrag.append("<div class=\""+markType+"_class" + " " + markInfo.getClassInfo() + "\" ");
-            	if (StringUtils.isNotEmpty(localizedTooltip)){
-            		markFrag.append(" title=\"")
-            		.append(localizedTooltip)
-            		.append("\"");
-            	}
-            	markFrag.append("/>");
+                markFrag.append("<div class=\""+markType+"_class" + " " + markInfo.getClassInfo() + "\" ");
+                if (StringUtils.isNotEmpty(localizedTooltip)) {
+                    markFrag.append(" title=\"")
+                    .append(localizedTooltip)
+                    .append("\"");
+                }
+                markFrag.append("/>");
 
-            	//Link
-            	if (StringUtils.isNotEmpty(markLink)){
-            		markFrag.append("</a>");
-            	}
+                //Link
+                if (StringUtils.isNotEmpty(markLink)) {
+                    markFrag.append("</a>");
+                }
             }
             
-        	return markFrag.toString();
+            return markFrag.toString();
         }
         catch (SQLException sqle)
         {
-        	throw new JspException(sqle.getMessage(), sqle);
+            throw new JspException(sqle.getMessage(), sqle);
         }
     }
 }

@@ -143,6 +143,7 @@ public interface WorkspaceItemService extends InProgressSubmissionService<Worksp
     /**
      * The map entry returned contains stage reached as the key and count of items in that stage as a value
      * @param context
+     *     The relevant DSpace Context.
      * @return the map
      * @throws SQLException if database error
      */

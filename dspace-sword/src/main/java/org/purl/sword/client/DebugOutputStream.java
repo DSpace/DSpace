@@ -17,32 +17,32 @@ import java.io.OutputStream;
  */
 public class DebugOutputStream extends OutputStream
 {
-   /**
-    * Panel that will display the messages. 
-    */
-   private MessageOutputPanel panel; 
-   
-   /**
-    * Create a new instance and specify the panel that will receive the output. 
-    * 
-    * @param panel The panel. 
-    */
-   public DebugOutputStream(MessageOutputPanel panel)
-   {
-      this.panel = panel;    
-   }
-   
-   /**
-    * Override the write method from OutputStream. Capture the char and 
-    * send it to the panel. 
-    *  
-    * @param arg0 The output character, expressed as an integer. 
-    *  
-    * @see java.io.OutputStream#write(int)
-    */
-   public void write(int arg0) throws IOException
-   {
-      panel.addCharacter(Character.valueOf((char)arg0));  
-   }
-
+    /**
+     * Panel that will display the messages. 
+     */
+    private MessageOutputPanel panel; 
+    
+    /**
+     * Create a new instance and specify the panel that will receive the output. 
+     * 
+     * @param panel The panel. 
+     */
+    public DebugOutputStream(MessageOutputPanel panel)
+    {
+        this.panel = panel;    
+    }
+    
+    /**
+     * Override the write method from OutputStream. Capture the char and 
+     * send it to the panel. 
+     *  
+     * @param arg0 The output character, expressed as an integer. 
+     *  
+     * @see java.io.OutputStream#write(int)
+     */
+    public void write(int arg0) throws IOException
+    {
+        panel.addCharacter(Character.valueOf((char)arg0));  
+    }
+ 
 }

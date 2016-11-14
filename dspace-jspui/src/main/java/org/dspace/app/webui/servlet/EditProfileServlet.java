@@ -117,6 +117,8 @@ public class EditProfileServlet extends DSpaceServlet
      * request. This assumes that authentication has occurred. This method
      * doesn't write the changes to the database (i.e. doesn't call update.)
      * 
+     * @param context
+     *     The relevant DSpace Context.
      * @param eperson
      *            the e-person
      * @param request
@@ -124,6 +126,8 @@ public class EditProfileServlet extends DSpaceServlet
      * 
      * @return true if the user supplied all the required information, false if
      *         they left something out.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public boolean updateUserProfile(Context context, EPerson eperson,
             HttpServletRequest request) throws SQLException

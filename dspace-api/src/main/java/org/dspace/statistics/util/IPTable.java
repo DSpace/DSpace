@@ -28,6 +28,9 @@ public class IPTable {
      * Can be full v4 IP, subnet or range string
      *
      * @param ip
+     *     IP address(es)
+     * @throws IPFormatException
+     *     Exception Class to deal with IPFormat errors.
      */
     public void add(String ip) throws IPFormatException {
 
@@ -116,6 +119,7 @@ public class IPTable {
      * @param ip the address to be tested
      * @return true if {@code ip} is within this table's limits
      * @throws IPFormatException
+     *     Exception Class to deal with IPFormat errors.
      */
     public boolean contains(String ip) throws IPFormatException {
 

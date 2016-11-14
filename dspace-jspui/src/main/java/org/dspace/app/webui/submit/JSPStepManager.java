@@ -74,6 +74,7 @@ public class JSPStepManager
      * @throws Exception
      *             if the JSPStep cannot be loaded or the class
      *             specified doesn't implement the JSPStep interface
+     * @return JSPStepManager instance
      */
     public static JSPStepManager loadStep(SubmissionStepConfig stepConfig) throws Exception
     {
@@ -93,16 +94,17 @@ public class JSPStepManager
 
         Object stepInstance =  stepClass.newInstance();
         
-        if(stepInstance instanceof AbstractProcessingStep)
+        if (stepInstance instanceof AbstractProcessingStep)
         {
             // load the JSPStep interface for this step
             stepManager.stepProcessing = (AbstractProcessingStep) stepClass.newInstance();
         }
         else
         {
-            throw new Exception("The submission step class specified by '" + stepConfig.getProcessingClassName() + 
-                    "' does not extend the class org.dspace.submit.AbstractProcessingStep!" +
-                    " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
+            throw new Exception(
+                "The submission step class specified by '" + stepConfig.getProcessingClassName() + 
+                "' does not extend the class org.dspace.submit.AbstractProcessingStep!" +
+                " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
         }
         
         
@@ -110,24 +112,24 @@ public class JSPStepManager
          * Next, load the step's JSPUI binding class (using the current class loader)
          * (Only load JSPUI binding class if specified...otherwise this is a non-interactive step)
          */
-        if(stepConfig.getJSPUIClassName()!=null && stepConfig.getJSPUIClassName().length()>0)
+        if (stepConfig.getJSPUIClassName()!=null && stepConfig.getJSPUIClassName().length()>0)
         {
-        	stepClass = loader
-                	.loadClass(stepConfig.getJSPUIClassName());
+            stepClass = loader.loadClass(stepConfig.getJSPUIClassName());
 
-        	stepInstance =  stepClass.newInstance();
+            stepInstance =  stepClass.newInstance();
         
-	        if(stepInstance instanceof JSPStep)
-	        {
-	            // load the JSPStep interface for this step
-	            stepManager.stepJSPUI = (JSPStep) stepClass.newInstance();
-	        }
-	        else
-	        {
-	            throw new Exception("The submission step class specified by '" + stepConfig.getJSPUIClassName() + 
-	                    "' does not extend the class org.dspace.app.webui.JSPStep!" +
-	                    " Therefore it cannot be used by the Configurable Submission for the JSP user interface!");
-	        }
+            if (stepInstance instanceof JSPStep)
+            {
+                // load the JSPStep interface for this step
+                stepManager.stepJSPUI = (JSPStep) stepClass.newInstance();
+            }
+            else
+            {
+                throw new Exception(
+                    "The submission step class specified by '" + stepConfig.getJSPUIClassName() + 
+                    "' does not extend the class org.dspace.app.webui.JSPStep!" +
+                    " Therefore it cannot be used by the Configurable Submission for the JSP user interface!");
+            }
         }
         return stepManager;
     }
@@ -188,8 +190,8 @@ public class JSPStepManager
                         .booleanValue())
         {
             // current page should be the LAST page in this step
-            currentPage = getNumPagesInProgressBar(subInfo, this.stepConfig
-                    .getStepNumber());
+            currentPage = getNumPagesInProgressBar(subInfo,
+                this.stepConfig.getStepNumber());
 
             AbstractProcessingStep.setCurrentPage(request, currentPage);
         }
@@ -235,8 +237,8 @@ public class JSPStepManager
          * Determine whether we are Starting or Finishing this Step
          */
         // check if we just started this step
-        boolean beginningOfStep = SubmissionController
-                .isBeginningOfStep(request);
+        boolean beginningOfStep =
+            SubmissionController.isBeginningOfStep(request);
 
         // if this step has just been started, do beginning processing
         if (beginningOfStep)
@@ -266,7 +268,15 @@ public class JSPStepManager
      * 
      * @return true if the step is completed (no JSP was loaded), false
      *         otherwise
-     * 
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private boolean doStepStart(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
@@ -277,7 +287,7 @@ public class JSPStepManager
 
         // first, do any pre-processing and get the JSP to display
         // (assuming that this step has an interface)
-        if(stepJSPUI!=null)
+        if (stepJSPUI != null)
         {
             stepJSPUI.doPreProcessing(context, request, response, subInfo);
         }
@@ -295,7 +305,7 @@ public class JSPStepManager
             // and forward back to the Submission Controller servlet
 
             log.debug("Calling processing for step "
-                    + this.getClass().getName());
+                + this.getClass().getName());
             int errorFlag = stepProcessing.doProcessing(context, request, response, subInfo);
 
             // if it didn't complete successfully, try and log this error!
@@ -308,11 +318,11 @@ public class JSPStepManager
                 if (errorMessage == null)
                 {
                     errorMessage = "The doProcessing() method for "
-                            + this.getClass().getName()
-                            + " returned an error flag = "
-                            + errorFlag
-                            + ". "
-                            + "It is recommended to define a custom error message for this error flag using the addErrorMessage() method!";
+                        + this.getClass().getName()
+                        + " returned an error flag = "
+                        + errorFlag
+                        + ". "
+                        + "It is recommended to define a custom error message for this error flag using the addErrorMessage() method!";
                 }
 
                 log.error(errorMessage);
@@ -338,7 +348,12 @@ public class JSPStepManager
      *            submission info object
      * @param pathToJSP
      *            context path to the JSP to display
-     * 
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static final void showJSP(HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo,
@@ -385,7 +400,15 @@ public class JSPStepManager
      * @param subInfo
      *            submission info object
      * @return true if the step is completed (successfully), false otherwise
-     * 
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private boolean doStepEnd(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
@@ -457,6 +480,15 @@ public class JSPStepManager
      *            submission info object
      * 
      * @return true if step completed (successfully), false otherwise
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected final boolean completeStep(Context context,
             HttpServletRequest request, HttpServletResponse response,
@@ -505,10 +537,11 @@ public class JSPStepManager
      *            The current submission information object
      * @param pageNumber
      *            The current page
+     * @return true if there are more pages in the current step after the
+     *     current page
      * 
      * @throws ServletException
      *             if there are no more pages in this step
-     * 
      */
     protected final boolean hasMorePages(HttpServletRequest request,
             SubmissionInfo subInfo, int pageNumber) throws ServletException
@@ -551,6 +584,13 @@ public class JSPStepManager
      *            increment the page reached)
      * @param pageNumber
      *            new page reached
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private void updatePageReached(Context context, SubmissionInfo subInfo, int page)
             throws SQLException, AuthorizeException, IOException
@@ -561,8 +601,8 @@ public class JSPStepManager
 
             if (page > wi.getPageReached())
             {
-            	WorkspaceItemService wis = ContentServiceFactory.getInstance()
-            			.getWorkspaceItemService();
+                WorkspaceItemService wis = ContentServiceFactory.getInstance()
+                    .getWorkspaceItemService();
                 wi.setPageReached(page);
                 wis.update(context, wi);
             }
@@ -680,6 +720,7 @@ public class JSPStepManager
      *            current servlet response object
      * @param subInfo
      *            submission info object
+     * @return URL path of the JSP to review this step's information
      */
     public String getReviewJSP(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)

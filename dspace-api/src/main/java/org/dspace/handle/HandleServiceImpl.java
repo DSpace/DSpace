@@ -167,10 +167,10 @@ public class HandleServiceImpl implements HandleService
     {
         //Check if the supplied handle is already in use -- cannot use the same handle twice
         Handle handle = findHandleInternal(context, suppliedHandle);
-        if(handle!=null && handle.getDSpaceObject() != null)
+        if (handle != null && handle.getDSpaceObject() != null)
         {
             //Check if this handle is already linked up to this specified DSpace Object
-            if(handle.getDSpaceObject().getID().equals(dso.getID()))
+            if (handle.getDSpaceObject().getID().equals(dso.getID()))
             {
                 //This handle already links to this DSpace Object -- so, there's nothing else we need to do
                 return suppliedHandle;
@@ -181,7 +181,7 @@ public class HandleServiceImpl implements HandleService
                 throw new IllegalStateException("Attempted to create a handle which is already in use: " + suppliedHandle);
             }
         }
-        else if(handle!=null && handle.getResourceTypeId() != null)
+        else if (handle!=null && handle.getResourceTypeId() != null)
         {
             //If there is a 'resource_type_id' (but 'resource_id' is empty), then the object using
             // this handle was previously unbound (see unbindHandle() method) -- likely because object was deleted
@@ -189,14 +189,14 @@ public class HandleServiceImpl implements HandleService
 
             //Since we are restoring an object to a pre-existing handle, double check we are restoring the same *type* of object
             // (e.g. we will not allow an Item to be restored to a handle previously used by a Collection)
-            if(previousType != dso.getType())
+            if (previousType != dso.getType())
             {
                 throw new IllegalStateException("Attempted to reuse a handle previously used by a " +
                         Constants.typeText[previousType] + " for a new " +
                         Constants.typeText[dso.getType()]);
             }
         }
-        else if(handle==null) //if handle not found, create it
+        else if (handle==null) //if handle not found, create it
         {
             //handle not found in DB table -- create a new table entry
             handle = handleDAO.create(context, new Handle());
@@ -233,7 +233,7 @@ public class HandleServiceImpl implements HandleService
                 handle.setDSpaceObject(null);
                 handleDAO.save(context, handle);
 
-                if(log.isDebugEnabled())
+                if (log.isDebugEnabled())
                 {
                     log.debug("Unbound Handle " + handle.getHandle() + " from object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
                 }
@@ -281,7 +281,7 @@ public class HandleServiceImpl implements HandleService
             {
                 //Ensure that the handle doesn't look like this 12346/213.{version}
                 //If we find a match that indicates that we have a proper handle
-                if(!handle.getHandle().matches(".*/.*\\.\\d+"))
+                if (!handle.getHandle().matches(".*/.*\\.\\d+"))
                 {
                     result = handle.getHandle();
                 }
@@ -328,7 +328,7 @@ public class HandleServiceImpl implements HandleService
     @Override
     public void modifyHandleDSpaceObject(Context context, String handle, DSpaceObject newOwner) throws SQLException {
         Handle dbHandle = findHandleInternal(context, handle);
-        if(dbHandle != null)
+        if (dbHandle != null)
         {
             // Check if we have to remove the handle from the current handle list
             // or if object is alreday deleted.
@@ -358,7 +358,7 @@ public class HandleServiceImpl implements HandleService
      * @param dso
      *            DSpaceObject for which we require our handles
      * @return The handle for object, or null if the object has no handle.
-     * @exception SQLException
+     * @throws SQLException
      *                If a database error occurs
      */
     protected List<Handle> getInternalHandles(Context context, DSpaceObject dso)
@@ -375,7 +375,7 @@ public class HandleServiceImpl implements HandleService
      * @param handle
      *            The handle to resolve
      * @return The database row corresponding to the handle
-     * @exception SQLException
+     * @throws SQLException
      *                If a database error occurs
      */
     protected Handle findHandleInternal(Context context, String handle)
@@ -394,7 +394,7 @@ public class HandleServiceImpl implements HandleService
      *
      * @param context DSpace Context
      * @return A new handle id
-     * @exception SQLException
+     * @throws SQLException
      *                If a database error occurs
      */
     protected String createId(Context context) throws SQLException

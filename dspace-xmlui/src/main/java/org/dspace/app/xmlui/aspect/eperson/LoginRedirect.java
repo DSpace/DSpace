@@ -28,71 +28,78 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 /**
  * When only one login method is defined in the dspace.cfg file this class will
  * redirect to the URL provided by that AuthenticationMethod class
- * 
+ *
  * @author Jay Paz
  * @author Scott Phillips
- * 
+ *
  */
 public class LoginRedirect extends AbstractAction {
 
-	protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+    protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
 
-	public Map act(Redirector redirector, SourceResolver resolver,
-			Map objectModel, String source, Parameters parameters)
-			throws Exception {
+    public Map act(Redirector redirector, SourceResolver resolver,
+        Map objectModel, String source, Parameters parameters)
+        throws Exception
+    {
 
-		final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
-				.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-		final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
-				.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-		final Iterator<AuthenticationMethod> authMethods = authenticationService
-				    .authenticationMethodIterator();
+        final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+                .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+        final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
+                .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
+        final Iterator<AuthenticationMethod> authMethods = authenticationService
+                    .authenticationMethodIterator();
 
         if (authMethods == null)
         {
             throw new IllegalStateException(
-                    "No explicit authentication methods found when exactly one was expected.");
+                "No explicit authentication methods found when exactly one was expected.");
         }
 
-		AuthenticationMethod authMethod = null;
+        AuthenticationMethod authMethod = null;
 
         while (authMethods.hasNext())
         {
             AuthenticationMethod currAuthMethod = authMethods.next();
             if (currAuthMethod.loginPageURL(ContextUtil
-                    .obtainContext(objectModel), httpRequest, httpResponse) != null)
+                .obtainContext(objectModel), httpRequest, httpResponse) != null)
             {
                 if (authMethod != null)
                 {
                     throw new IllegalStateException(
-                            "Multiple explicit authentication methods found when only one was expected.");
+                        "Multiple explicit authentication methods found when only one was expected.");
                 }
                 authMethod = currAuthMethod;
             }
         }
 
         final String url = ((AuthenticationMethod) authMethod).loginPageURL(
-                ContextUtil.obtainContext(objectModel), httpRequest,
-                httpResponse);
+            ContextUtil.obtainContext(objectModel), httpRequest, httpResponse);
 
-	      
-		// now we want to check for the force ssl property
-		if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.force.ssl")) {
 
-			if (!httpRequest.isSecure()) {
-				StringBuffer location = new StringBuffer("https://");
-				location.append(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname")).append(url).append(
-						httpRequest.getQueryString() == null ? ""
-								: ("?" + httpRequest.getQueryString()));
-				httpResponse.sendRedirect(location.toString());
-			} else {
-				httpResponse.sendRedirect(url);
-			}
-		} else {
-			httpResponse.sendRedirect(url);
-		}
+        // now we want to check for the force ssl property
+        if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.force.ssl"))
+        {
 
-		return new HashMap();
-	}
+            if (!httpRequest.isSecure())
+            {
+                StringBuffer location = new StringBuffer("https://");
+                location.append(DSpaceServicesFactory.getInstance()
+                    .getConfigurationService().getProperty("dspace.hostname")).append(url).append(
+                        httpRequest.getQueryString() == null
+                        ? ""
+                        : ("?" + httpRequest.getQueryString()));
+                httpResponse.sendRedirect(location.toString());
+            }
+            else
+            {
+                httpResponse.sendRedirect(url);
+            }
+        }
+        else
+        {
+            httpResponse.sendRedirect(url);
+        }
 
+        return new HashMap();
+    }
 }

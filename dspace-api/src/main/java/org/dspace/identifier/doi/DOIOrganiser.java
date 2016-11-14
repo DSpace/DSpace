@@ -730,6 +730,7 @@ public class DOIOrganiser {
      * @throws IllegalStateException If the identifier was a valid DOI that is
      * not stored in our database or if it is a handle that is not bound to an
      * DSpaceObject.
+     * @throws IdentifierException if identifier error
      */
     public DOI resolveToDOI(String identifier)
             throws SQLException, IllegalArgumentException, IllegalStateException, IdentifierException

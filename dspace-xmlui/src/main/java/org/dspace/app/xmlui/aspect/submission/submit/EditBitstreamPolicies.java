@@ -29,39 +29,43 @@ import java.util.Map;
 public class EditBitstreamPolicies extends AbstractStep
 {
 
-	/** Language Strings **/
+    /** Language Strings **/
     protected static final Message T_head =message("xmlui.Submission.submit.EditBitstreamPolicies.head");
     protected static final Message T_submit_save = message("xmlui.general.save");
 
     protected static final Message T_submit_add_policy = message("xmlui.Submission.submit.AccessStep.submit_add_policy");
 
     /**
-	 * Establish our required parameters, abstractStep will enforce these.
-	 */
-	public EditBitstreamPolicies()
-	{
-		this.requireSubmission = true;
-		this.requireStep = true;
-	}
+     * Establish our required parameters, abstractStep will enforce these.
+     */
+    public EditBitstreamPolicies()
+    {
+        this.requireSubmission = true;
+        this.requireStep = true;
+    }
 
-	/**
-	 * Get the bitstream we are editing
-	 */
-	public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters)
-	throws ProcessingException, SAXException, IOException
-	{
-		super.setup(resolver,objectModel,src,parameters);
-	}
+    /**
+     * Get the bitstream we are editing
+     */
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters)
+    throws ProcessingException, SAXException, IOException
+    {
+        super.setup(resolver,objectModel,src,parameters);
+    }
 
 
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException{
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
 
         Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+        String actionURL = contextPath + "/handle/" + collection.getHandle()
+            + "/submit/" + knot.getId() + ".continue";
         Request request = ObjectModelHelper.getRequest(objectModel);
 
-        Division div = body.addInteractiveDivision("submit-edit-bitstream-policy", actionURL, Division.METHOD_POST, "primary submission");
+        Division div = body.addInteractiveDivision("submit-edit-bitstream-policy",
+            actionURL, Division.METHOD_POST, "primary submission");
         div.setHead(T_submission_head);
         addSubmissionProgressList(div);
 
@@ -76,16 +80,21 @@ public class EditBitstreamPolicies extends AbstractStep
         asu.addListGroups(request.getParameter("group_id"), form, errorFlag, collection);
 
         // radio buttons: Item will be visible / Embargo Access + date
-        asu.addAccessRadios(request.getParameter("open_access_radios"), request.getParameter("embargo_until_date"), form, errorFlag, submissionInfo.getBitstream());
+        asu.addAccessRadios(request.getParameter("open_access_radios"),
+            request.getParameter("embargo_until_date"), form, errorFlag,
+            submissionInfo.getBitstream());
 
-	    asu.addName(request.getParameter("name"), form, errorFlag);
+        asu.addName(request.getParameter("name"), form, errorFlag);
 
         // Reason
         asu.addReason(request.getParameter("reason"), form, errorFlag);
 
         // Add Policy Button
-        boolean isAdvancedFormEnabled= DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
-        if(isAdvancedFormEnabled){
+        boolean isAdvancedFormEnabled = DSpaceServicesFactory.getInstance()
+            .getConfigurationService().getBooleanProperty(
+                "webui.submission.restrictstep.enableAdvancedForm", false);
+        if (isAdvancedFormEnabled)
+        {
             Button addPolicy = form.addItem().addButton(org.dspace.submit.step.AccessStep.FORM_ACCESS_BUTTON_ADD);
             addPolicy.setValue(T_submit_add_policy);
         }

@@ -402,9 +402,13 @@ public class METSRightsCrosswalk
      * Ingest a whole XML document, starting at specified root.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to ingest
      * @param root
+     *     root element
      * @param createMissingMetadataFields
+     *     whether to create missing fields
      * @throws CrosswalkException if crosswalk error
      * @throws IOException if IO error
      * @throws SQLException if database error

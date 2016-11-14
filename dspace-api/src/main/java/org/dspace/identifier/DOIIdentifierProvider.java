@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Required;
  * Provide service for DOIs using DataCite.
  * 
  * <p>This class handles reservation, registration and deletion of DOIs using
- * the direct API from {@link <a href="http://www.datacite.org">DataCite</a>}.
+ * the direct API from <a href="http://www.datacite.org">DataCite</a>.
  * Please pay attention that some members of DataCite offer special services
  * and want their customers to use special APIs. If you are unsure ask your
  * registration agency.</p>
@@ -228,17 +228,17 @@ public class DOIIdentifierProvider
 
     /**
      * @param context
+     *     The relevant DSpace Context.
      * @param dso DSpaceObject the DOI should be reserved for. Some metadata of
-     *            this object will be send to the registration agency.
+     *     this object will be send to the registration agency.
      * @param identifier DOI to register in a format that
-     *                   {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)} accepts.
+     *     {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)} accepts.
      * @throws IdentifierException If the format of {@code identifier} was
-     *                             unrecognized or if it was impossible to 
-     *                             reserve the DOI (registration agency denied 
-     *                             for some reason, see logs).
+     *     unrecognized or if it was impossible to 
+     *     reserve the DOI (registration agency denied 
+     *     for some reason, see logs).
      * @throws IllegalArgumentException If {@code identifier} is a DOI already
-     *                                  registered for another DSpaceObject then
-     *                                  {@code dso}.
+     *     registered for another DSpaceObject then {@code dso}.
      * @see org.dspace.identifier.IdentifierProvider#reserve(Context, DSpaceObject, String)
      */
     @Override
@@ -694,12 +694,13 @@ public class DOIIdentifierProvider
      
     /**
      * Returns a DSpaceObject depending on its DOI.
-     * @param context the context
+     * @param context
+     *     The relevant DSpace Context.
      * @param identifier The DOI in a format that is accepted by
-     *                   {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)}.
+     *     {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)}.
      * @return Null if the DOI couldn't be found or the associated DSpaceObject.
      * @throws SQLException if database error
-     * @throws IdentifierException If {@code identifier} is null or an empty string.
+     * @throws DOIIdentifierException If {@code identifier} is null or an empty string.
      * @throws IllegalArgumentException If the identifier couldn't be recognized as DOI.
      */
     public DSpaceObject getObjectByDOI(Context context, String identifier)
@@ -728,8 +729,10 @@ public class DOIIdentifierProvider
      * Search the database for a DOI, using the type and id of an DSpaceObject.
      *
      * @param context
-     * @param dso DSpaceObject to find doi for. DOIs with status TO_BE_DELETED will be
-     * ignored.
+     *     The relevant DSpace Context.
+     * @param dso
+     *     DSpaceObject to find doi for. DOIs with status TO_BE_DELETED will be
+     *     ignored.
      * @return The DOI as String or null if DOI was not found.
      * @throws SQLException if database error
      */
@@ -764,6 +767,7 @@ public class DOIIdentifierProvider
      * DOI is in a decent format, use DOI.formatIdentifier(String) if necessary.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso The DSpaceObject the DOI should be loaded or created for.
      * @param doiIdentifier A DOI or null if a DOI should be generated. The generated DOI
      * can be found in the appropriate column for the TableRow.
@@ -860,7 +864,9 @@ public class DOIIdentifierProvider
     /**
      * Loads a DOI out of the metadata of an DSpaceObject.
      * @param dso
+     *     DSpace object to get DOI metadata from
      * @return The DOI or null if no DOI was found.
+     * @throws DOIIdentifierException if identifier error
      */
     public String getDOIOutOfObject(DSpaceObject dso)
             throws DOIIdentifierException {
@@ -886,10 +892,12 @@ public class DOIIdentifierProvider
      * Adds a DOI to the metadata of an item.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso DSpaceObject the DOI should be added to.
      * @param doi The DOI that should be added as metadata.
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
+     * @throws IdentifierException if identifier error
      */
     protected void saveDOIToObject(Context context, DSpaceObject dso, String doi)
             throws SQLException, AuthorizeException, IdentifierException
@@ -917,10 +925,12 @@ public class DOIIdentifierProvider
      * Removes a DOI out of the metadata of a DSpaceObject.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso The DSpaceObject the DOI should be removed from.
      * @param doi The DOI to remove out of the metadata.
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
+     * @throws IdentifierException if identifier error
      */
     protected void removeDOIFromObject(Context context, DSpaceObject dso, String doi)
             throws AuthorizeException, SQLException, IdentifierException

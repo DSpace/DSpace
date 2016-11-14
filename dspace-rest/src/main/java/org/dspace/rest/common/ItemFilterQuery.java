@@ -34,9 +34,11 @@ public class ItemFilterQuery {
      * @param operation
      *     Operation to perform on a metadata field
      * @param value
+           Query value.
      * @throws WebApplicationException
+           Runtime exception for applications.
      */
-    public ItemFilterQuery(String field, String operation, String value) throws WebApplicationException{
+    public ItemFilterQuery(String field, String operation, String value) throws WebApplicationException {
         setup(field, operation, value);
     }
 

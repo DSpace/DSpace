@@ -44,7 +44,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
     {
         Collection c = item.getOwningCollection();
  
-        if(c!=null)
+        if (c != null)
         {    
             // Style specified & exists
             return getFromMap(c.getHandle());
@@ -65,7 +65,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
         // Get all properties starting with "webui.itemdisplay"
         List<String> keys = configurationService.getPropertyKeys("webui.itemdisplay");
        
-        for(String key: keys)
+        for (String key: keys)
         {
             if (key.endsWith(".collections"))
             {
@@ -88,6 +88,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
      * Check for the style configuration: return the default style if no configuration has found.
      * 
      * @param handle
+     *     target handle to get style for
      * @return the specific style or the default if not properly defined
      */
     public String getFromMap(String handle)

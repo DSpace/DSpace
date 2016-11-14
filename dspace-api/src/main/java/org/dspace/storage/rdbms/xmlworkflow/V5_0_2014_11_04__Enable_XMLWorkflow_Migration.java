@@ -48,6 +48,11 @@ public class V5_0_2014_11_04__Enable_XMLWorkflow_Migration
     /**
      * Actually migrate the existing database
      * @param connection 
+     *     SQL Connection object
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     @Override
     public void migrate(Connection connection)

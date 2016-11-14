@@ -39,37 +39,38 @@ import org.dspace.content.Collection;
  * @author wbossons
  */
 public class CurateCollectionForm extends AbstractDSpaceTransformer {
-            /** Common Package Language Strings */
-	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-	private static final Message T_collection_trail = message("xmlui.administrative.collection.general.collection_trail");
-	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");
-	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
-	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
-        private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");
-        private static final Message T_submit_perform = message("xmlui.general.perform");
-        private static final Message T_submit_queue = message("xmlui.general.queue");
-        private static final Message T_submit_return = message("xmlui.general.return");
-        // End common package language strings
+    /** Common Package Language Strings */
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-        // Page/Form specific language strings
-        private static final Message T_main_head = message("xmlui.administrative.collection.CurateCollectionForm.main_head");
-        private static final Message T_title = message("xmlui.administrative.collection.CurateCollectionForm.title");
-        private static final Message T_trail = message("xmlui.administrative.collection.CurateCollectionForm.trail");
+    private static final Message T_collection_trail = message("xmlui.administrative.collection.general.collection_trail");
+    private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");
+    private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
+    private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
+    private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");
+    private static final Message T_submit_perform = message("xmlui.general.perform");
+    private static final Message T_submit_queue = message("xmlui.general.queue");
+    private static final Message T_submit_return = message("xmlui.general.return");
+    // End common package language strings
 
-        private static final Message T_label_name = message("xmlui.administrative.collection.CurateCollectionForm.label_name");
-        private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
-        
+    // Page/Form specific language strings
+    private static final Message T_main_head = message("xmlui.administrative.collection.CurateCollectionForm.main_head");
+    private static final Message T_title = message("xmlui.administrative.collection.CurateCollectionForm.title");
+    private static final Message T_trail = message("xmlui.administrative.collection.CurateCollectionForm.trail");
+
+    private static final Message T_label_name = message("xmlui.administrative.collection.CurateCollectionForm.label_name");
+    private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
+
 
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
 
     @Override
-        public void setup(SourceResolver resolver, Map objectModel, String src,
-		          Parameters parameters) throws ProcessingException, SAXException, IOException
-		{
-        	super.setup(resolver, objectModel, src, parameters);
-        	FlowCurationUtils.setupCurationTasks();
-		}
+    public void setup(SourceResolver resolver, Map objectModel, String src,
+        Parameters parameters) throws ProcessingException, SAXException, IOException
+    {
+        super.setup(resolver, objectModel, src, parameters);
+        FlowCurationUtils.setupCurationTasks();
+    }
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -82,35 +83,39 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
 
     @Override
     public void addBody(Body body)
-            throws WingException, SQLException, AuthorizeException, UnsupportedEncodingException
-	{
-            UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
-            Collection thisCollection = collectionService.find(context, collectionID);
-            String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
+        throws WingException, SQLException, AuthorizeException, UnsupportedEncodingException
+    {
+        UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
+        Collection thisCollection = collectionService.find(context, collectionID);
+        String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 
-		// DIVISION: main
-	    Division main = body.addInteractiveDivision("collection-curate",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
-	    main.setHead(T_main_head.parameterize(thisCollection.getName()));
+        // DIVISION: main
+        Division main = body.addInteractiveDivision("collection-curate",
+            contextPath + "/admin/collection", Division.METHOD_MULTIPART,
+            "primary administrative collection");
+        main.setHead(T_main_head.parameterize(thisCollection.getName()));
 
-            List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-            options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
-            options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
-	    options.addItem().addXref(baseURL+"&submit_harvesting",T_options_harvest);
-            options.addItem().addHighlight("bold").addXref(baseURL+"&submit_curate",T_options_curate);
+        List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
+        options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
+        options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
+        options.addItem().addXref(baseURL+"&submit_harvesting",T_options_harvest);
+        options.addItem().addHighlight("bold").addXref(baseURL+"&submit_curate",T_options_curate);
 
-	    List curationTaskList = main.addList("curationTaskList", "form");
+        List curationTaskList = main.addList("curationTaskList", "form");
         String curateGroup = "";
         try
         {
-        	curateGroup = (parameters.getParameter("select_curate_group") != null) ? parameters.getParameter("select_curate_group") : FlowCurationUtils.UNGROUPED_TASKS;
+            curateGroup = (parameters.getParameter("select_curate_group") != null)
+                ? parameters.getParameter("select_curate_group")
+                : FlowCurationUtils.UNGROUPED_TASKS;
         }
         catch (Exception pe)
         {
-        	// noop
+            // noop
         }
         if (!FlowCurationUtils.groups.isEmpty())
         {
-        	curationTaskList.addLabel(T_taskgroup_label_name); //needs to check for >=1 group configured
+            curationTaskList.addLabel(T_taskgroup_label_name); //needs to check for >=1 group configured
             Select groupSelect = curationTaskList.addItem().addSelect("select_curate_group");
             groupSelect = FlowCurationUtils.getGroupSelectOptions(groupSelect);
             groupSelect.setSize(1);
@@ -118,7 +123,7 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
             groupSelect.setEvtBehavior("submitOnChange");
             if (curateGroup.equals(""))
             {
-            	curateGroup = (String) (FlowCurationUtils.groups.keySet().iterator().next());
+                curateGroup = (String) (FlowCurationUtils.groups.keySet().iterator().next());
             }
             groupSelect.setOptionSelected(curateGroup);
         }
@@ -129,12 +134,10 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
         taskSelect.setRequired();
 
         // need submit_curate_task and submit_return
-	    Para buttonList = main.addPara();
-            buttonList.addButton("submit_curate_task").setValue(T_submit_perform);
-            buttonList.addButton("submit_queue_task").setValue(T_submit_queue);
-	    buttonList.addButton("submit_return").setValue(T_submit_return);
-            main.addHidden("administrative-continue").setValue(knot.getId());
-
+        Para buttonList = main.addPara();
+        buttonList.addButton("submit_curate_task").setValue(T_submit_perform);
+        buttonList.addButton("submit_queue_task").setValue(T_submit_queue);
+        buttonList.addButton("submit_return").setValue(T_submit_return);
+        main.addHidden("administrative-continue").setValue(knot.getId());
     }
-
 }

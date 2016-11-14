@@ -358,7 +358,7 @@ public class StatisticsImporterElasticSearch {
     /**
      * Main method to run the statistics importer.
      *
-     * @param args The command line arguments
+     * @param args the command line arguments given
      * @throws Exception If something goes wrong
      */
     public static void main(String[] args) throws Exception

@@ -43,7 +43,7 @@ public interface MetadataValueService {
      * @param context dspace context
      * @param valueId database key id of value
      * @return recalled metadata value
-     * @throws java.io.IOException
+     * @throws IOException if IO error
      * @throws SQLException if database error
      */
     public MetadataValue find(Context context, int valueId)
@@ -89,7 +89,7 @@ public interface MetadataValueService {
     /**
      * Get the minimum value of a given metadata field across all objects.
      *
-     * @param context
+     * @param context dspace context
      * @param metadataFieldId unique identifier of the interesting field.
      * @return the minimum value of the metadata field
      * @throws SQLException if database error

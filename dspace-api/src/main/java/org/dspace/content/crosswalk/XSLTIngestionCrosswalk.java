@@ -293,7 +293,8 @@ public class XSLTIngestionCrosswalk
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.
      * Usage: {@code java XSLTIngestionCrosswalk  <crosswalk-name> <input-file>}
-     * @param argv arguments
+     *
+     * @param argv the command line arguments given
      * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception

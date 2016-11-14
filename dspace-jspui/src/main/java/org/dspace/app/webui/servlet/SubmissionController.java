@@ -119,8 +119,8 @@ public class SubmissionController extends DSpaceServlet
     private static Object mutex = new Object();
     
     /** log4j logger */
-    private static Logger log = Logger
-            .getLogger(SubmissionController.class);
+    private static Logger log =
+        Logger.getLogger(SubmissionController.class);
 
     private static WorkspaceItemService workspaceItemService;
     
@@ -132,12 +132,12 @@ public class SubmissionController extends DSpaceServlet
     
     @Override
     public void init() throws ServletException {
-    	super.init();
-    	// this is a sort of HACK as we are injecting static services using the singleton nature of the servlet...
-    	workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    	bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    	bundleService = ContentServiceFactory.getInstance().getBundleService();
-    	workflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();    	
+        super.init();
+        // this is a sort of HACK as we are injecting static services using the singleton nature of the servlet...
+        workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        bundleService = ContentServiceFactory.getInstance().getBundleService();
+        workflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
     }
     
     protected void doDSGet(Context context, HttpServletRequest request,
@@ -179,7 +179,7 @@ public class SubmissionController extends DSpaceServlet
                 //where the submission process now has less steps, then
                 //we will need to reset the stepReached in the database
                 //(Hopefully this will never happen, but just in case!)
-                if(getStepReached(si) >= si.getSubmissionConfig().getNumberOfSteps())
+                if (getStepReached(si) >= si.getSubmissionConfig().getNumberOfSteps())
                 {
                     //update Stage Reached to the last step in the Process
                     int lastStep = si.getSubmissionConfig().getNumberOfSteps()-1;
@@ -249,7 +249,7 @@ public class SubmissionController extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-    	// Configuration of current step in Item Submission Process
+        // Configuration of current step in Item Submission Process
         SubmissionStepConfig currentStepConfig;
         
         //need to find out what type of form we are dealing with
@@ -275,7 +275,7 @@ public class SubmissionController extends DSpaceServlet
                         {
                             log.debug("Starting doPostResumable method.");
                             completedFile = doPostResumable(request);
-                        } catch(IOException e){
+                        } catch(IOException e) {
                             // we were unable to receive the complete chunk => initialize reupload
                             response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                         }
@@ -390,10 +390,10 @@ public class SubmissionController extends DSpaceServlet
         // First, check for a click on "Cancel/Save" button.
         if (UIUtil.getSubmitButton(request, "").equals(AbstractProcessingStep.CANCEL_BUTTON))
         {
-        	// Get the current step
+            // Get the current step
             currentStepConfig = getCurrentStepConfig(request, subInfo);
             
-        	// forward user to JSP which will confirm 
+            // forward user to JSP which will confirm 
             // the cancel/save request.
             doCancelOrSave(context, request, response, subInfo,
                     currentStepConfig);
@@ -464,8 +464,8 @@ public class SubmissionController extends DSpaceServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-    	SubmissionStepConfig currentStepConfig = null;
-    	
+        SubmissionStepConfig currentStepConfig = null;
+        
         if (subInfo.getSubmissionConfig() != null)
         {
             // get step to perform
@@ -505,11 +505,11 @@ public class SubmissionController extends DSpaceServlet
             boolean stepFinished = stepManager.processStep(context, request, response, subInfo);
             
             //if this step is finished, continue to next step
-            if(stepFinished)
+            if (stepFinished)
             {
                 // If we finished up an upload, then we need to change
                 // the FileUploadRequest object back to a normal HTTPServletRequest
-                if(request instanceof FileUploadRequest)
+                if (request instanceof FileUploadRequest)
                 {
                     request = ((FileUploadRequest)request).getOriginalRequest();
                 }
@@ -528,7 +528,7 @@ public class SubmissionController extends DSpaceServlet
         }
         catch (AuthorizeException ae)
         {
-        	throw ae;
+            throw ae;
         }
         catch (Exception e)
         {
@@ -582,7 +582,7 @@ public class SubmissionController extends DSpaceServlet
         {
             //if this submission is in the workflow process, 
             //forward user back to relevant task page
-            if(subInfo.isInWorkflow())
+            if (subInfo.isInWorkflow())
             {
                 request.setAttribute("workflow.item", subInfo.getSubmissionItem());
                 JSPManager.showJSP(request, response,
@@ -656,7 +656,7 @@ public class SubmissionController extends DSpaceServlet
         
         //since there are pages before this one in this current step
         //just go backwards one page.
-        if(currentPageNum > 1)
+        if (currentPageNum > 1)
         {
             //decrease current page number
             AbstractProcessingStep.setCurrentPage(request, currentPageNum-1);
@@ -678,13 +678,13 @@ public class SubmissionController extends DSpaceServlet
             
             currentStepConfig = getPreviousVisibleStep(request, subInfo);
             
-            if(currentStepConfig != null)
+            if (currentStepConfig != null)
             {
                 currentStepNum = currentStepConfig.getStepNumber();
                 foundPrevious = true;
             }
                 
-            if(foundPrevious)
+            if (foundPrevious)
             {    
                 //flag to JSPStepManager that we are going backwards
                 //an entire step
@@ -698,7 +698,7 @@ public class SubmissionController extends DSpaceServlet
         }
         
         //if there is no previous, visible step, throw an error!
-        if(!foundPrevious)
+        if (!foundPrevious)
         {
             log.error(LogManager
                     .getHeader(context, "no_previous_visible_step",
@@ -893,7 +893,7 @@ public class SubmissionController extends DSpaceServlet
                 double currStepAndPage = Float.parseFloat(currStep+"."+currPage);
                 double stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
                 
-                if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage < stepAndPageReached){
+                if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage < stepAndPageReached) {
                     setReachedStepAndPage(context, subInfo, currStep, currPage);
                 }
                 
@@ -906,7 +906,7 @@ public class SubmissionController extends DSpaceServlet
 
                 // forward to cancellation confirmation JSP
                 showProgressAwareJSP(request, response, subInfo,
-                        "/submit/cancel.jsp");
+                    "/submit/cancel.jsp");
             }
         }
     }
@@ -922,9 +922,8 @@ public class SubmissionController extends DSpaceServlet
         try
         {
             // call post-processing on Step (to save any inputs from JSP)
-            log
-                    .debug("Cancel/Save or Jump/Previous Request: calling processing for Step: '"
-                            + stepConfig.getProcessingClassName() + "'");
+            log.debug("Cancel/Save or Jump/Previous Request: calling processing for Step: '"
+                + stepConfig.getProcessingClassName() + "'");
 
             try
             {
@@ -935,14 +934,14 @@ public class SubmissionController extends DSpaceServlet
 
                 // load the JSPStepManager object for this step
                 AbstractProcessingStep step = (AbstractProcessingStep) stepClass
-                        .newInstance();
+                    .newInstance();
 
                 result = step.doProcessing(context, request, response, subInfo);
             }
             catch (Exception e)
             {
                 log.error("Error loading step class'"
-                        + stepConfig.getProcessingClassName() + "':", e);
+                    + stepConfig.getProcessingClassName() + "':", e);
                 JSPManager.showInternalError(request, response);
             }
         }
@@ -966,6 +965,15 @@ public class SubmissionController extends DSpaceServlet
      *            current servlet response object
      * @param subInfo
      *            submission info object
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private void processCancelOrSave(Context context,
             HttpServletRequest request, HttpServletResponse response,
@@ -978,8 +986,8 @@ public class SubmissionController extends DSpaceServlet
         {
             // re-load current step at beginning
             setBeginningOfStep(request, true);
-            doStep(context, request, response, subInfo, currentStepConfig
-                    .getStepNumber());
+            doStep(context, request, response, subInfo,
+                currentStepConfig.getStepNumber());
         }
         else if (buttonPressed.equals("submit_remove"))
         {
@@ -990,7 +998,7 @@ public class SubmissionController extends DSpaceServlet
             workspaceItemService.deleteAll(context, wi);
 
             JSPManager.showJSP(request, response,
-                    "/submit/cancelled-removed.jsp");
+                "/submit/cancelled-removed.jsp");
 
             context.complete();
         }
@@ -1022,6 +1030,10 @@ public class SubmissionController extends DSpaceServlet
      *            the SubmissionInfo object
      * @param jspPath
      *            relative path to JSP
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     private static void showProgressAwareJSP(HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo, String jspPath)
@@ -1042,6 +1054,10 @@ public class SubmissionController extends DSpaceServlet
      *            HTTP request
      * 
      * @return filled-out submission info, or null
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static SubmissionInfo getSubmissionInfo(Context context,
             HttpServletRequest request) throws SQLException, ServletException
@@ -1056,8 +1072,6 @@ public class SubmissionController extends DSpaceServlet
         }
         else
         {
-            
-            
             // Need to rebuild Submission Info from Request Parameters
             if (request.getParameter("workflow_id") != null)
             {
@@ -1065,10 +1079,10 @@ public class SubmissionController extends DSpaceServlet
                 
                 info = SubmissionInfo.load(request, workflowItemService.find(context, workflowID));
             }
-            else if(request.getParameter("workspace_item_id") != null)
+            else if (request.getParameter("workspace_item_id") != null)
             {
                 int workspaceID = UIUtil.getIntParameter(request,
-                        "workspace_item_id");
+                    "workspace_item_id");
                 
                 info = SubmissionInfo.load(request, workspaceItemService.find(context, workspaceID));
             }
@@ -1084,8 +1098,8 @@ public class SubmissionController extends DSpaceServlet
                     && (info.getSubmissionItem() == null))
             {
                 log.warn(LogManager.getHeader(context,
-                        "cannot_load_submission_info",
-                        "InProgressSubmission is null!"));
+                    "cannot_load_submission_info",
+                    "InProgressSubmission is null!"));
                 return null;
             }
                
@@ -1229,7 +1243,7 @@ public class SubmissionController extends DSpaceServlet
             //get previous step
             currentStepConfig = si.getSubmissionConfig().getStep(currentStepNum);
         
-            if(currentStepConfig.isVisible())
+            if (currentStepConfig.isVisible())
             {
                 previousStep = currentStepConfig;
                 break;
@@ -1331,6 +1345,10 @@ public class SubmissionController extends DSpaceServlet
      * @param request
      *            HTTP request
      * @return HTML hidden parameters
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     public static String getSubmissionParameters(Context context,
             HttpServletRequest request) throws SQLException, ServletException
@@ -1344,33 +1362,33 @@ public class SubmissionController extends DSpaceServlet
         if ((si.getSubmissionItem() != null) && si.isInWorkflow())
         {
             info = info
-                    + "<input type=\"hidden\" name=\"workflow_id\" value=\""
-                    + si.getSubmissionItem().getID() + "\"/>";
+                + "<input type=\"hidden\" name=\"workflow_id\" value=\""
+                + si.getSubmissionItem().getID() + "\"/>";
         }
         else if (si.getSubmissionItem() != null)
         {
             info = info
-                    + "<input type=\"hidden\" name=\"workspace_item_id\" value=\""
-                    + si.getSubmissionItem().getID() + "\"/>";
+                + "<input type=\"hidden\" name=\"workspace_item_id\" value=\""
+                + si.getSubmissionItem().getID() + "\"/>";
         }
 
         if (si.getBundle() != null)
         {
             info = info + "<input type=\"hidden\" name=\"bundle_id\" value=\""
-                    + si.getBundle().getID() + "\"/>";
+                + si.getBundle().getID() + "\"/>";
         }
 
         if (si.getBitstream() != null)
         {
             info = info
-                    + "<input type=\"hidden\" name=\"bitstream_id\" value=\""
-                    + si.getBitstream().getID() + "\"/>";
+                + "<input type=\"hidden\" name=\"bitstream_id\" value=\""
+                + si.getBitstream().getID() + "\"/>";
         }
 
         if (step != null)
         {
             info = info + "<input type=\"hidden\" name=\"step\" value=\""
-                    + step.getStepNumber() + "\"/>";
+                + step.getStepNumber() + "\"/>";
         }
 
         // save the current page from the current Step Servlet
@@ -1381,7 +1399,7 @@ public class SubmissionController extends DSpaceServlet
         // save the current JSP name to a hidden variable
         String jspDisplayed = JSPStepManager.getLastJSPDisplayed(request);
         info = info + "<input type=\"hidden\" name=\"jsp\" value=\""
-                   + jspDisplayed + "\"/>";
+                + jspDisplayed + "\"/>";
 
         return info;
     }
@@ -1400,6 +1418,13 @@ public class SubmissionController extends DSpaceServlet
      *            the SubmissionInfo object pertaining to the current submission
      * @param step
      *            the step the user has just reached
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private void userHasReached(Context c, SubmissionInfo subInfo, int step)
             throws SQLException, AuthorizeException, IOException
@@ -1412,20 +1437,27 @@ public class SubmissionController extends DSpaceServlet
             {
                 wi.setStageReached(step);
                 wi.setPageReached(1); // reset page reached back to 1 (since
-                                        // it's page 1 of the new step)
+                                      // it's page 1 of the new step)
                 workspaceItemService.update(c, wi);
             }
         }
     }
     
     /**
-    * Set a specific step and page as reached. 
-    * It will also "set back" where a user has reached.
-    * 
-    * @param subInfo
+     * Set a specific step and page as reached. 
+     * It will also "set back" where a user has reached.
+     * 
+     * @param subInfo
      *            the SubmissionInfo object pertaining to the current submission
-    * @param step the step to set as reached, can be also a previous reached step
-    * @param page the page (within the step) to set as reached, can be also a previous reached page
+     * @param step the step to set as reached, can be also a previous reached step
+     * @param page the page (within the step) to set as reached, can be also a previous reached page
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
     */
     private void setReachedStepAndPage(Context c, SubmissionInfo subInfo, int step,
             int page) throws SQLException, AuthorizeException, IOException
@@ -1482,6 +1514,10 @@ public class SubmissionController extends DSpaceServlet
      * 
      * @throws ServletException
      *             if there are no more pages in this step
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws FileSizeLimitExceededException
+     *     if the file size if the uploaded item exceeded the limit
      */
     private HttpServletRequest wrapMultipartRequest(HttpServletRequest request)
             throws ServletException, FileSizeLimitExceededException
@@ -1523,6 +1559,8 @@ public class SubmissionController extends DSpaceServlet
      *            current DSpace context
      * @param request
      *            current servlet request object
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     public void uploadFiles(Context context, HttpServletRequest request)
             throws ServletException
@@ -1601,7 +1639,7 @@ public class SubmissionController extends DSpaceServlet
         String resumableIdentifier = request.getParameter("resumableIdentifier");
         String resumableChunkNumber = request.getParameter("resumableChunkNumber");
         long resumableCurrentChunkSize = 
-                Long.valueOf(request.getParameter("resumableCurrentChunkSize"));
+            Long.valueOf(request.getParameter("resumableCurrentChunkSize"));
 
         tempDir = tempDir + File.separator + resumableIdentifier;
 
@@ -1675,7 +1713,7 @@ public class SubmissionController extends DSpaceServlet
         long currentSize = 0l;
         
         // check whether all chunks were received.
-        if(chunkDirPathFile.exists())
+        if (chunkDirPathFile.exists())
         {
             for (int p = 1; p <= resumableTotalChunks; p++) 
             {
@@ -1748,7 +1786,7 @@ public class SubmissionController extends DSpaceServlet
                 catch (IOException e) 
                 {
                     // try to delete destination file, as we got an exception while writing it.
-                    if(!destFile.delete())
+                    if (!destFile.delete())
                     {
                         log.warn("While writing an uploaded file an error occurred. "
                                 + "We were unable to delete the damaged file: " 

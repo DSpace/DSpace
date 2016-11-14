@@ -22,7 +22,7 @@ public class RDFFactoryImpl extends RDFFactory
 {
     // we have several URIGenerators that use each other as fallback
     // following we have to instantiate all of them and cannot use autowiring
-    // by type here. So we use setters and properties in spring configuration
+    // by type here. So we use setters and properties in Spring configuration
     // instead.
 
     private static final Logger log = Logger.getLogger(RDFFactoryImpl.class);

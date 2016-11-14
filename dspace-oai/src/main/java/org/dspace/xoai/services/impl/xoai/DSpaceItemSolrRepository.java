@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public class DSpaceItemSolrRepository extends DSpaceItemRepository
 {

@@ -33,7 +33,7 @@ public interface MetadataSchemaService {
      * @return new MetadataSchema
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
-     * @throws NonUniqueMetadataException
+     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already present
      */
     public MetadataSchema create(Context context, String name, String namespace) throws SQLException, AuthorizeException, NonUniqueMetadataException;
 
@@ -54,7 +54,7 @@ public interface MetadataSchemaService {
      * @param metadataSchema metadata schema
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
-     * @throws NonUniqueMetadataException
+     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already present
      */
     public void update(Context context, MetadataSchema metadataSchema) throws SQLException, AuthorizeException, NonUniqueMetadataException;
 

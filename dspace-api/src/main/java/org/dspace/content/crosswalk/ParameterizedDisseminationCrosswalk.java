@@ -32,6 +32,7 @@ public interface ParameterizedDisseminationCrosswalk
      * <p>
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso the DSpace Object whose metadata to export.
      * @param parameters
      *  names and values of parameters to be passed into the transform.

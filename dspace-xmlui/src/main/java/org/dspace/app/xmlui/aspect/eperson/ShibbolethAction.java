@@ -27,18 +27,18 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 /**
- * Attempt to authenticate the user based upon their presented shibboleth credentials. 
+ * Attempt to authenticate the user based upon their presented shibboleth credentials.
  * This action uses the HTTP parameters as supplied by Shibboleth SP.
  * Read dspace.cfg for configuration detail.
  *
  * <p>If the authentication attempt is successful then an HTTP redirect will be
- * sent to the browser redirecting them to their original location in the 
- * system before authenticated or if none is supplied back to the DSpace 
+ * sent to the browser redirecting them to their original location in the
+ * system before authenticated or if none is supplied back to the DSpace
  * home page. The action will also return true, thus contents of the action will
  * be executed.
  *
  * <p>If the authentication attempt fails, the action returns false.
- * 
+ *
  * <p>Example use:
  *
  * <pre>
@@ -70,8 +70,8 @@ public class ShibbolethAction extends AbstractAction
      */
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
-            String source, Parameters parameters)
-            throws PatternException, Exception
+        String source, Parameters parameters)
+        throws PatternException, Exception
     {
         try
         {
@@ -79,7 +79,7 @@ public class ShibbolethAction extends AbstractAction
             Context context = AuthenticationUtil.authenticate(objectModel, null, null, null);
 
             EPerson eperson = null;
-            if(context != null)
+            if (context != null)
             {
                 eperson = context.getCurrentUser();
             }
@@ -87,27 +87,28 @@ public class ShibbolethAction extends AbstractAction
             if (eperson != null)
             {
                 Request request = ObjectModelHelper.getRequest(objectModel);
-            	// The user has successfully logged in
-            	String redirectURL = request.getContextPath();
-            	
-            	if (AuthenticationUtil.isInterupptedRequest(objectModel))
-            	{
-            		// Resume the request and set the redirect target URL to
-            		// that of the originally interrupted request.
-            		redirectURL += AuthenticationUtil.resumeInterruptedRequest(objectModel);
-            	}
-            	else
-            	{
-            		// Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
-            		String loginRedirect = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.user.loginredirect");
-            		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
-            	}
-            	
+                // The user has successfully logged in
+                String redirectURL = request.getContextPath();
+
+                if (AuthenticationUtil.isInterupptedRequest(objectModel))
+                {
+                    // Resume the request and set the redirect target URL to
+                    // that of the originally interrupted request.
+                    redirectURL += AuthenticationUtil.resumeInterruptedRequest(objectModel);
+                }
+                else
+                {
+                    // Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
+                    String loginRedirect = DSpaceServicesFactory.getInstance()
+                        .getConfigurationService().getProperty("xmlui.user.loginredirect");
+                    redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";
+                }
+
                 // Authentication successful - send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                
+
                 httpResponse.sendRedirect(redirectURL);
-                
+
                 // log the user out for the rest of this current request, however they will be reauthenticated
                 // fully when they come back from the redirect. This prevents caching problems where part of the
                 // request is performed for the user was authenticated and the other half after it succeeded. This
@@ -115,17 +116,16 @@ public class ShibbolethAction extends AbstractAction
                 //
                 // TODO: have no idea what this is, but leave it as it is, could be broken
                 context.setCurrentUser(null);
-                
+
                 return new HashMap();
             }
         }
         catch (SQLException sqle)
         {
-            throw new PatternException("Unable to perform Shibboleth authentication",
-                    sqle);
+            throw new PatternException(
+                "Unable to perform Shibboleth authentication", sqle);
         }
-        
+
         return null;
     }
-
 }

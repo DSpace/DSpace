@@ -25,11 +25,11 @@ import org.purl.sword.base.Deposit;
  * @author Richard Jones
  *
  * This class represents the actual sword service provided by dspace.  It
- * is the central location for the authentcated contexts, the installation
- * specific configuration, and the url management.
+ * is the central location for the authenticated contexts, the installation
+ * specific configuration, and the URL management.
  *
- * It is ubiquotous in the sword implementation, and all related
- * information and services should be retrived via this api
+ * It is ubiquitous in the sword implementation, and all related
+ * information and services should be retrieved via this API.
  *
  */
 public class SWORDService
@@ -60,9 +60,10 @@ public class SWORDService
 
     /**
      * Construct a new service instance around the given authenticated
-     * sword context
+     * SWORD context
      *
      * @param sc
+     *     authenticated SWORD context
      */
     public SWORDService(SWORDContext sc)
     {
@@ -130,6 +131,7 @@ public class SWORDService
      * looking code up
      *
      * @param message
+     *     message to register with the verboseDescription member variable
      */
     public void message(String message)
     {
@@ -150,9 +152,13 @@ public class SWORDService
      * Construct the most appropriate filename for the incoming deposit.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param deposit
+     *     deposit request
      * @param original
-     * @throws DSpaceSWORDException
+     *     is original?
+     * @return the most appropriate filename for the incoming deposit
+     * @throws DSpaceSWORDException on database error.
      */
     public String getFilename(Context context, Deposit deposit,
             boolean original)
@@ -160,8 +166,8 @@ public class SWORDService
     {
         try
         {
-            BitstreamFormat bf = bitstreamFormatService
-                    .findByMIMEType(context, deposit.getContentType());
+            BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
+                context, deposit.getContentType());
             List<String> exts = null;
             if (bf != null)
             {
@@ -193,6 +199,8 @@ public class SWORDService
 
     /**
      * Get the name of the temp files that should be used.
+     *
+     * @return the name of the temp file that should be used
      */
     public String getTempFilename()
     {

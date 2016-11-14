@@ -30,8 +30,11 @@ public interface ChecksumHistoryDAO extends GenericDAO<ChecksumHistory> {
      * the specified result code.
      *
      * @param context
-     * @param retentionDate row must be older than this to be deleted.
-     * @param checksumResultCode row must have this result to be deleted.
+     *     The relevant DSpace Context.
+     * @param retentionDate
+     *     row must be older than this to be deleted.
+     * @param checksumResultCode
+     *     row must have this result to be deleted.
      * @return number of rows deleted.
      * @throws SQLException if database error
      */
@@ -41,7 +44,9 @@ public interface ChecksumHistoryDAO extends GenericDAO<ChecksumHistory> {
      * Delete all ChecksumHistory rows for the given Bitstream.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param bitstream
+     *     which bitstream's checksums to delete
      * @throws SQLException if database error
      */
     public void deleteByBitstream(Context context, Bitstream bitstream) throws SQLException;

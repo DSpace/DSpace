@@ -10,7 +10,7 @@ package org.dspace.xoai.filter.data;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public enum DSpaceMetadataFilterOperator {
     UNDEF, CONTAINS, EQUAL, GREATER, LOWER, GREATER_OR_EQUAL, LOWER_OR_EQUAL, ENDS_WITH, STARTS_WITH

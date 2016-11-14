@@ -39,10 +39,10 @@ public class ItemFilterSet {
      * Construct a set of Item Filters identified by a list string.
      * 
      * @param filterList
-     *        Comma separated list of filter names to include
-     *        @see org.dspace.rest.common#ItemFilter.ALL to retrieve all filters
+     *     Comma separated list of filter names to include.
+     *     Use {@link org.dspace.rest.common.ItemFilter#ALL} to retrieve all filters.
      * @param reportItems
-     *        If true, return item details.  If false, return only counts of items.
+     *     If true, return item details.  If false, return only counts of items.
      */
     public ItemFilterSet(String filterList, boolean reportItems) {
     	log.debug(String.format("Create ItemFilterSet: %s", filterList));
@@ -83,7 +83,8 @@ public class ItemFilterSet {
     }
     
     /**
-     * Get all of the Item Filters initialized into the Item Filter Sest
+     * Get all of the Item Filters initialized into the Item Filter Set
+     *
      * @return a list of Item Filters initialized into the Item Filter Set
      */
     public List<ItemFilter> getItemFilters() {
@@ -93,6 +94,11 @@ public class ItemFilterSet {
     /**
      * Evaluate a set of Items against the Item Filters in the Item Filter Set
      *     Current DSpace Context
+     *
+     * @param context
+     *     Current DSpace Context
+     * @param servletContext
+     *     Context of the servlet container.
      * @param childItems
      *     Collection of Items to Evaluate
      * @param save
@@ -102,7 +108,9 @@ public class ItemFilterSet {
      * @return 
      *     The number of items evaluated 
      * @throws WebApplicationException
+     *     Runtime exception for applications.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public int processSaveItems(Context context, ServletContext servletContext, Iterator<org.dspace.content.Item> childItems, boolean save, String expand) throws WebApplicationException, SQLException {
     	return processSaveItems(context, servletContext, childItems, new ArrayList<Item>(), save, expand);
@@ -110,7 +118,11 @@ public class ItemFilterSet {
 
     /**
      * Evaluate a set of Items against the Item Filters in the Item Filter Set
+     *
+     * @param context
      *     Current DSpace Context
+     * @param servletContext
+     *     Context of the servlet container.
      * @param childItems
      *     Collection of Items to Evaluate
      * @param items
@@ -122,7 +134,9 @@ public class ItemFilterSet {
      * @return 
      *     The number of items evaluated 
      * @throws WebApplicationException
+     *     Runtime exception for applications.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public int processSaveItems(Context context, ServletContext servletContext, Iterator<org.dspace.content.Item> childItems, List<Item> items, boolean save, String expand) throws WebApplicationException, SQLException {
     	int count = 0;

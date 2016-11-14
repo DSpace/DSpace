@@ -522,6 +522,8 @@ implements ConverterPlugin
      * As bitstreams currently don't get Persistent Identifier in DSpace, we have
      * to link them using a link to the repository. This link should work with
      * JSPUI and XMLUI (at least it does in DSpace 4.x).
+     * @param context
+     *     The relevant DSpace Context.
      * @param bitstream Bitstream for which a URL should be generated.
      * @return The link to the URL or null if the Bistream is is a Community or 
      * Collection logo.

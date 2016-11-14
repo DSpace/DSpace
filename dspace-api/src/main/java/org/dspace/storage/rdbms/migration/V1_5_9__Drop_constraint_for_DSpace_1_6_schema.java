@@ -16,7 +16,7 @@ import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 /**
  * This class is in support of the "V1.6__Upgrade_to_DSpace_1.6_schema.sql"
  * It simply drops a few database constraints. This is necessary for the upgrade
- * from 1.5 -> 1.6
+ * from 1.5 to 1.6
  * <P>
  * This class was created because the names of database constraints differs based
  * on the type of database (Postgres vs. Oracle vs. H2). As such, it becomes difficult
@@ -45,6 +45,11 @@ public class V1_5_9__Drop_constraint_for_DSpace_1_6_schema
     /**
      * Actually migrate the existing database
      * @param connection
+     *     SQL Connection object
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     @Override
     public void migrate(Connection connection)

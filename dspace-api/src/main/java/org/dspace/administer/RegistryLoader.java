@@ -54,8 +54,7 @@ public class RegistryLoader
     /**
      * For invoking via the command line
      * 
-     * @param argv
-     *            command-line arguments
+     * @param argv the command line arguments given
      * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
