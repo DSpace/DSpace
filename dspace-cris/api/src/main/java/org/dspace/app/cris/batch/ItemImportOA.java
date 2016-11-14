@@ -1065,14 +1065,6 @@ public class ItemImportOA
             String filepath = imp_bitstream.getStringColumn("filepath");
             String bundleName = imp_bitstream.getStringColumn("bundle");
             String description = imp_bitstream.getStringColumn("description");
-            String typeAttachment = imp_bitstream
-                    .getStringColumn("TYPE_ATTACHMENT");
-            int licenseType = imp_bitstream.getIntColumn("LICENSE_TYPE");
-            Integer licenseTypeId = null;
-            if (licenseType != -1)
-            {
-                licenseTypeId = licenseType;
-            }
             Boolean primary_bitstream = imp_bitstream
                     .getBooleanColumn("primary_bitstream");
 
@@ -1123,9 +1115,9 @@ public class ItemImportOA
             String valueMD5 = imp_bitstream.getStringColumn("md5value");
             byte[] content = imp_bitstream.getBinaryData("imp_blob");
             Bitstream bs = processBitstreamEntry(c, i, filepath, bundleName,
-                    typeAttachment, description, primary_bitstream, name_file,
+                    description, primary_bitstream, name_file,
                     assetstore, embargoGroup, start_date, content,
-                    licenseTypeId, valueMD5);
+                    valueMD5);
             // HACK: replace the bytea with a register like operation
             if (content != null)
             {
@@ -1167,10 +1159,10 @@ public class ItemImportOA
      * @throws AuthorizeException
      */
     private Bitstream processBitstreamEntry(Context c, Item i,
-            String bitstreamPath, String bundleName, String typeAttachment,
+            String bitstreamPath, String bundleName,
             String description, Boolean primaryBitstream, String name_file,
             int alreadyInAssetstoreNr, Group embargoGroup, String start_date,
-            byte[] content, Integer licenseTypeId, String valueMD5)
+            byte[] content, String valueMD5)
                     throws SQLException, IOException, AuthorizeException
     {
         String fullpath = null;
