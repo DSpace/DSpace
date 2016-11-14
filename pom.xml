@@ -38,9 +38,10 @@
 		<org.hibernate.annotations.version>4.0.1.Final</org.hibernate.annotations.version>
 		<org.hibernate.jpa.version>1.0.1.Final</org.hibernate.jpa.version>
 		
-		
 		<org.jdyna.version>5.7-SNAPSHOT</org.jdyna.version>		
 		<it.cilea.ccommons.version>2.2-SNAPSHOT</it.cilea.ccommons.version>
+		
+		<ckan.addon.modules>5.0-SNAPSHOT</ckan.addon.modules>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.7</java.version>
         <lucene.version>4.10.2</lucene.version>
@@ -733,29 +734,28 @@
 
         <profile>
             <id>addon-ckan</id>
-            <activation>
-                <property>
-                    <name>ckan.on</name>
-                </property>
-            </activation>
+			<activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>            
             <dependencyManagement>
             	<dependencies>
 			        <dependency>
 			             <groupId>it.4science.dspace</groupId>
 						 <artifactId>addon-ckan-api</artifactId>
-						 <version>5.0-SNAPSHOT</version>
+						 <version>${ckan.addon.modules}</version>
 						 <type>jar</type>
 			        </dependency>
 			        <dependency>
 			             <groupId>it.4science.dspace</groupId>
 						 <artifactId>addon-ckan-jspui</artifactId>
-						 <version>5.0-SNAPSHOT</version>
+						 <version>${ckan.addon.modules}</version>
 						 <type>war</type>
 			        </dependency>
 		        </dependencies>		                    
             </dependencyManagement>
         </profile>
 
+        
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
@@ -1128,7 +1128,7 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
+			<version>3.0.1</version>
 		</dependency>
 
          <dependency>

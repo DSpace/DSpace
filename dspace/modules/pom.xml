@@ -154,23 +154,24 @@
         
         <profile>
             <id>addon-ckan</id>
-            <activation>
-                <property>
-                    <name>ckan.on</name>
-                </property>
+			<activation>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
 			        <dependency>
 			             <groupId>it.4science.dspace</groupId>
 						 <artifactId>addon-ckan-api</artifactId>
+						 <version>${ckan.addon.modules}</version>
 						 <type>jar</type>
 			        </dependency>
 			        <dependency>
 			             <groupId>it.4science.dspace</groupId>
 						 <artifactId>addon-ckan-jspui</artifactId>
+						 <version>${ckan.addon.modules}</version>
 						 <type>war</type>
 			        </dependency>
             </dependencies>
         </profile>
+        
     </profiles>
 </project>
