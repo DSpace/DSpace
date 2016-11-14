@@ -5,6 +5,19 @@ env:
   # Give Maven 1GB of memory to work with
   - MAVEN_OPTS=-Xmx1024M
 
+jdk:
+  # DS-3384 Oracle JDK 8 has DocLint enabled by default.
+  # Let's use this to catch any newly introduced DocLint issues.
+  - oraclejdk8
+
+## Should we run into any problems with oraclejdk8 on Travis, we may try the following workaround.
+## https://docs.travis-ci.com/user/languages/java#Testing-Against-Multiple-JDKs
+## https://github.com/travis-ci/travis-ci/issues/3259#issuecomment-130860338
+#addons:
+#  apt:
+#    packages:
+#      - oracle-java8-installer
+
 # Install prerequisites for building Mirage2 more rapidly
 before_install:
   # Install Node.js 6.5.0 & print version info
