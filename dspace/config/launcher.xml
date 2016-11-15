@@ -429,5 +429,41 @@
         <step>
             <class>org.dspace.app.cris.batch.ExportCRISDataModelConfiguration</class>
         </step>
-    </command>    
+    </command>
+	<command>
+        <name>metrics-item-view-and-download</name>
+        <description>Build Item indicators from statistics solr core for view and download</description>
+        <step passuserargs="false">
+            <class>org.dspace.app.cris.batch.ScriptStatsMetrics</class>
+            <argument>-s</argument>
+            <argument>ItemStatsViewIndicatorsPlugin</argument>
+        </step>
+    </command>
+	<command>
+        <name>metrics-rp-view-and-download</name>
+        <description>Build ResearcherPage indicators from statistics solr core for view and download</description>
+        <step passuserargs="false">
+            <class>org.dspace.app.cris.batch.ScriptStatsMetrics</class>
+            <argument>-s</argument>
+            <argument>RPStatsViewIndicatorsPlugin</argument>
+        </step>
+    </command>
+	<command>
+        <name>metrics-ou-view-and-download</name>
+        <description>Build OrgUnit indicators from statistics solr core for view and download</description>
+        <step passuserargs="false">
+            <class>org.dspace.app.cris.batch.ScriptStatsMetrics</class>
+            <argument>-s</argument>
+            <argument>OUStatsViewIndicatorsPlugin</argument>
+        </step>
+    </command>
+	<command>
+        <name>metrics-pj-view-and-download</name>
+        <description>Build Project indicators from statistics solr core for view and download</description>
+        <step passuserargs="false">
+            <class>org.dspace.app.cris.batch.ScriptStatsMetrics</class>
+            <argument>-s</argument>
+            <argument>PJStatsViewIndicatorsPlugin</argument>
+        </step>
+    </command>           
 </commands>

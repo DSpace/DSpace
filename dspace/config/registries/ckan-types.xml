@@ -1,0 +1,18 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>CKAN Integration Plugin</title>
+        <contributor.author>Andrea Bollini</contributor.author>
+        <contributor.author>Luigi Andrea Pascarelli</contributor.author>
+        <contributor.author>Riccardo Fazio</contributor.author>
+      </dspace-header>
+
+
+    <dc-type>
+    	<schema>bitstream</schema>
+        <element>ckan</element>
+        <qualifier>resourceid</qualifier>
+        <scope_note>Metadata field used for the resource ID of the file in CKAN</scope_note>
+    </dc-type>
+
+</dspace-dc-types>

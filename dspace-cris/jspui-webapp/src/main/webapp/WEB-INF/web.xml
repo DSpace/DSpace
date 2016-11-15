@@ -1037,6 +1037,15 @@
 
 	</jsp-config>
 
+	<!--Custom viewers  -->
+  	<servlet>
+    	<servlet-name>explore</servlet-name>
+    	<servlet-class>org.dspace.app.webui.servlet.ExploreServlet</servlet-class>
+  	</servlet>
+  <servlet-mapping>
+    <servlet-name>explore</servlet-name>
+    <url-pattern>/explore</url-pattern>
+  </servlet-mapping>
 
 	<!-- CRIS -->
 	<servlet>

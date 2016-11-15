@@ -8,43 +8,33 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.IViewer;
 import org.dspace.app.util.MetadataExposure;
-import org.dspace.app.webui.util.DateDisplayStrategy;
-import org.dspace.app.webui.util.DefaultDisplayStrategy;
-import org.dspace.app.webui.util.IDisplayMetadataValueStrategy;
-import org.dspace.app.webui.util.LinkDisplayStrategy;
-import org.dspace.app.webui.util.ResolverDisplayStrategy;
-import org.dspace.app.webui.util.StyleSelection;
+import org.dspace.app.webui.jsptag.DisplayItemMetadataUtils.DisplayMetadata;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
 
 /**
@@ -196,71 +186,10 @@ public class ItemTag extends TagSupport
     /** Whether to show preview thumbs on the item page */
     private boolean showThumbs;
 
-    /** Default DC fields to display, in absence of configuration */
-    private static String defaultFields = "dc.title, dc.title.alternative, dc.contributor.*, dc.subject, dc.date.issued(date), dc.publisher, dc.identifier.citation, dc.relation.ispartofseries, dc.description.abstract, dc.description, dc.identifier.govdoc, dc.identifier.uri(link), dc.identifier.isbn, dc.identifier.issn, dc.identifier.ismn, dc.identifier";
-
     /** log4j logger */
     private static Logger log = Logger.getLogger(ItemTag.class);
 
-    private StyleSelection styleSelection = (StyleSelection) PluginManager.getSinglePlugin(StyleSelection.class);
-    
-    /** Hashmap of linked metadata to browse, from dspace.cfg */
-    private static Map<String,String> linkedMetadata;
-    
-    /** Hashmap of urn base url resolver, from dspace.cfg */
-    private static Map<String,String> urn2baseurl;
-    
-    /** regex pattern to capture the style of a field, ie <code>schema.element.qualifier(style)</code> */
-    private Pattern fieldStylePatter = Pattern.compile(".*\\((.*)\\)");
-
     private static final long serialVersionUID = -3841266490729417240L;
-
-    static {
-        int i;
-
-        linkedMetadata = new HashMap<String, String>();
-        String linkMetadata;
-
-        i = 1;
-        do {
-            linkMetadata = ConfigurationManager.getProperty("webui.browse.link."+i);
-            if (linkMetadata != null) {
-                String[] linkedMetadataSplit = linkMetadata.split(":");
-                String indexName = linkedMetadataSplit[0].trim();
-                String metadataName = linkedMetadataSplit[1].trim();
-                linkedMetadata.put(indexName, metadataName);
-            }
-
-            i++;
-        } while (linkMetadata != null);
-
-        urn2baseurl = new HashMap<String, String>();
-
-        String urn;
-        i = 1;
-        do {
-            urn = ConfigurationManager.getProperty("webui.resolver."+i+".urn");
-            if (urn != null) {
-                String baseurl = ConfigurationManager.getProperty("webui.resolver."+i+".baseurl");
-                if (baseurl != null){
-                    urn2baseurl.put(urn, baseurl);
-                } else {
-                    log.warn("Wrong webui.resolver configuration, you need to specify both webui.resolver.<n>.urn and webui.resolver.<n>.baseurl: missing baseurl for n = "+i);
-                }
-            }
-
-            i++;
-        } while (urn != null);
-
-        // Set sensible default if no config is found for doi & handle
-        if (!urn2baseurl.containsKey("doi")){
-            urn2baseurl.put("doi",DOI_DEFAULT_BASEURL);
-        }
-
-        if (!urn2baseurl.containsKey("hdl")){
-            urn2baseurl.put("hdl",HANDLE_DEFAULT_BASEURL);
-        }
-    }
     
     public ItemTag()
     {
@@ -272,11 +201,6 @@ public class ItemTag extends TagSupport
     {
         try
         {
-            if (style == null || style.equals(""))
-            {
-                style = styleSelection.getStyleForItem(item);
-            }
-
             if (style.equals("full"))
             {
                 renderFull();
@@ -377,134 +301,14 @@ public class ItemTag extends TagSupport
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
         Context context = UIUtil.obtainContext(request);
         
-        String configLine = styleSelection.getConfigurationForStyle(style);
-
-        if (configLine == null)
-        {
-            configLine = defaultFields;
-        }
-
         out.println("<table class=\"table itemDisplayTable\">");
 
-        /*
-         * Break down the configuration into fields and display them
-         * 
-         * FIXME?: it may be more efficient to do some processing once, perhaps
-         * to a more efficient intermediate class, but then it would become more
-         * difficult to reload the configuration "on the fly".
-         */
-        StringTokenizer st = new StringTokenizer(configLine, ",");
-
-        while (st.hasMoreTokens())
-        {
-        	String field = st.nextToken().trim();
-        	String displayStrategyName = null;
-            Matcher fieldStyleMatcher = fieldStylePatter.matcher(field);
-            if (fieldStyleMatcher.matches()){
-                displayStrategyName = fieldStyleMatcher.group(1);
-            }
-            
-            if (displayStrategyName != null)
-            {
-                field = field.replaceAll("\\("+displayStrategyName+"\\)", "");
-            }
-            else
-            {
-                displayStrategyName = "default";
-            }
-            
-            String browseIndex;
-            boolean viewFull = false;
-            try
-            {
-                browseIndex = getBrowseField(field);
-                if (browseIndex != null)
-                {
-                    viewFull = BrowseIndex.getBrowseIndex(browseIndex).isItemIndex();
-                }
-            }
-            catch (BrowseException e)
-            {
-                log.error(e);
-                browseIndex = null;
-            }
-
-            // Get the separate schema + element + qualifier
-
-            String[] eq = field.split("\\.");
-            String schema = eq[0];
-            String element = eq[1];
-            String qualifier = null;
-            if (eq.length > 2 && eq[2].equals("*"))
-            {
-                qualifier = Item.ANY;
-            }
-            else if (eq.length > 2)
-            {
-                qualifier = eq[2];
-            }
-
-            // check for hidden field, even if it's configured..
-            if (MetadataExposure.isHidden(context, schema, element, qualifier))
-            {
-                continue;
-            }
-
-            // FIXME: Still need to fix for metadata language?
-            Metadatum[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
-            
-            if (values.length > 0)
-            {
-                out.print("<tr><td class=\"metadataFieldLabel\">");
-
-                String label = null;
-                try
-                {
-                    label = I18nUtil.getMessage("metadata."
-                            + ("default".equals(this.style) ? "" : this.style + ".") + field,
-                            context);
-                }
-                catch (MissingResourceException e)
-                {
-                    // if there is not a specific translation for the style we
-                    // use the default one
-                    label = LocaleSupport.getLocalizedMessage(pageContext,
-                            "metadata." + field);
-                }
-                
-                out.print(label);
-                out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
-                
-                IDisplayMetadataValueStrategy strategy = (IDisplayMetadataValueStrategy) PluginManager
-                        .getNamedPlugin(IDisplayMetadataValueStrategy.class,
-                                displayStrategyName);
-
-                if (strategy == null)
-                        {
-                    if (displayStrategyName.equalsIgnoreCase("link"))
-                            {
-                        strategy = new LinkDisplayStrategy();
-                            }
-                    else if (displayStrategyName.equalsIgnoreCase("date"))
-                            {
-                        strategy = new DateDisplayStrategy();
-                                }
-                    else if (displayStrategyName.equalsIgnoreCase("resolver"))
-                                    {
-                        strategy = new ResolverDisplayStrategy();
-                                }
-                                else
-                                {
-                        strategy = new DefaultDisplayStrategy();
-                                }
-                            }
-
-                String metadata = strategy.getMetadataDisplay(request, -1, viewFull, browseIndex, 
-                        -1, field, values, item, false, false);
-
-                out.print(metadata);
-                out.println("</td></tr>");
-            }
+        for (DisplayMetadata display : DisplayItemMetadataUtils.getDisplayMetadata(context, request, item)) {
+        	out.print("<td class=\"metadataFieldLabel\">");
+        	out.print(display.label);
+            out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
+            out.print(display.value);
+            out.println("</td></tr>");
         }
 
         listCollections();
@@ -794,30 +598,14 @@ public class ItemTag extends TagSupport
             				// Skip internal types
             				if (!bitstreams[k].getFormat().isInternal())
             				{
-
+            					List<ViewOption> viewOptions = getViewOptions(context, request, pageContext, handle, bitstreams[k]);
+            					
                                 // Work out what the bitstream link should be
                                 // (persistent
                                 // ID if item has Handle)
-                                String bsLink = "target=\"_blank\" href=\""
-                                        + request.getContextPath();
-
-                                if ((handle != null)
-                                        && (bitstreams[k].getSequenceID() > 0))
-                                {
-                                    bsLink = bsLink + "/bitstream/"
-                                            + item.getHandle() + "/"
-                                            + bitstreams[k].getSequenceID() + "/";
-                                }
-                                else
-                                {
-                                    bsLink = bsLink + "/retrieve/"
-                                            + bitstreams[k].getID() + "/";
-                                }
-
-                                bsLink = bsLink
-                                        + UIUtil.encodeBitstreamName(bitstreams[k]
-                                            .getName(),
-                                            Constants.DEFAULT_ENCODING) + "\">";
+                                String bsLink = "target=\"_blank\" href=\"";
+                                bsLink = bsLink + viewOptions.get(0).link;
+                                bsLink = bsLink + "\">";
 
             					out
                                     .print("<tr><td headers=\"t1\" class=\"standard\">");
@@ -855,56 +643,80 @@ public class ItemTag extends TagSupport
 
             						if (tb != null)
             						{
-                                                            if (AuthorizeManager.authorizeActionBoolean(context, tb, Constants.READ))
-                                                            {
-                                                                String myPath = request.getContextPath()
-                                                                    + "/retrieve/"
-                                                                    + tb.getID()
-                                                                    + "/"
-                                                                    + UIUtil.encodeBitstreamName(tb
-                                            			.getName(),
-                                            			Constants.DEFAULT_ENCODING);
+                                        if (AuthorizeManager.authorizeActionBoolean(context, tb, Constants.READ))
+                                        {
+                                            String myPath = request.getContextPath()
+                                                + "/retrieve/"
+                                                + tb.getID()
+                                                + "/"
+                                                + UIUtil.encodeBitstreamName(tb.getName(),
+                                                		Constants.DEFAULT_ENCODING);
 
             							out.print("<a ");
             							out.print(bsLink);
             							out.print("<img src=\"" + myPath + "\" ");
             							out.print("alt=\"" + tAltText
             									+ "\" /></a><br />");
-                                                            }
+                                        }
             						}
             					}
-
-            					out.print("<a class=\"btn btn-primary\" ");
-            					out
-                                    .print(bsLink
-                                            + LocaleSupport
-                                                    .getLocalizedMessage(
-                                                            pageContext,
-                                                            "org.dspace.app.webui.jsptag.ItemTag.view")
-                                            + "</a>");
             					
-								try {
-									if (showRequestCopy && !AuthorizeManager
-											.authorizeActionBoolean(context,
-													bitstreams[k],
-													Constants.READ))
-										out.print("&nbsp;<a class=\"btn btn-success\" href=\""
-												+ request.getContextPath()
-												+ "/request-item?handle="
-												+ handle
-												+ "&bitstream-id="
-												+ bitstreams[k].getID()
-												+ "\">"
-												+ LocaleSupport
-														.getLocalizedMessage(
-																pageContext,
-																"org.dspace.app.webui.jsptag.ItemTag.restrict")
-												+ "</a>");
-								} catch (Exception e) {
+								boolean authorizedToVew = AuthorizeManager.authorizeActionBoolean(context,bitstreams[k],Constants.READ);
+								if(context.getCurrentUser() == null || authorizedToVew){
+									if (viewOptions.size() == 1) {
+										out.print("<a class=\"btn btn-primary\" ");
+		            					out
+		                                    .print(bsLink
+		                                            + LocaleSupport
+		                                                    .getLocalizedMessage(
+		                                                            pageContext,
+		                                                            "org.dspace.app.webui.jsptag.ItemTag.view")
+		                                            + "</a>");
+									}
+									else {
+										out.println("&nbsp;&nbsp;<div class=\"btn-group\">");
+										out.print("<a class=\"btn btn-primary\" href=\""+ viewOptions.get(0).link + "\">");
+										out.print(viewOptions.get(0).label);
+										out.println("</a>");
+									
+										out.print("<button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\" "
+												+ " aria-haspopup=\"true\" aria-expanded=\"false\"> "
+												+ " <span class=\"caret\"></span> <span class=\"sr-only\">Toggle Dropdown</span> </button>");
+										out.print("<ul class=\"dropdown-menu\"> ");
+										
+										for (int idx = 1; idx < viewOptions.size()-1; idx++) {
+											out.print("<li><a href=\""+ viewOptions.get(idx).link + "\">");
+											out.print(viewOptions.get(0).label);
+											out.print("</a></li>");
+										}
+										
+										if (viewOptions.size() > 2) {
+											out.print("<li role=\"separator\" class=\"divider\"></li> ");
+										}
+										out.print("<li><a href=\""+ viewOptions.get(viewOptions.size()-1).link + "\">");
+										out.print(viewOptions.get(viewOptions.size()-1).label);
+										out.print("</a></li>");
+										out.print("</ul> </div>");
+									}
+								}	
+								
+								if (!authorizedToVew && showRequestCopy){
+									out.print("&nbsp;<a class=\"btn btn-success\" href=\""
+											+ request.getContextPath()
+											+ "/request-item?handle="
+											+ handle
+											+ "&bitstream-id="
+											+ bitstreams[k].getID()
+											+ "\">"
+											+ LocaleSupport
+													.getLocalizedMessage(
+															pageContext,
+															"org.dspace.app.webui.jsptag.ItemTag.restrict")
+											+ "</a>");
 								}
-								out.print("</td></tr>");
             				}
-            			}
+						}
+						out.print("</td></tr>");
             		}
             	}
 
@@ -975,54 +787,40 @@ public class ItemTag extends TagSupport
         out.println("</td></tr></table>");
     }
 
-    /**
-     * Return the browse index related to the field. <code>null</code> if the field is not a browse field
-     * (look for <cod>webui.browse.link.<n></code> in dspace.cfg) 
-     * 
-     * @param field
-     * @return the browse index related to the field. Null otherwise 
-     * @throws BrowseException 
-     */
-    private String getBrowseField(String field) throws BrowseException
-    {
-        for (String indexName : linkedMetadata.keySet())
-        {            
-            StringTokenizer bw_dcf = new StringTokenizer(linkedMetadata.get(indexName), ".");
-            
-            String[] bw_tokens = { "", "", "" };
-            int i = 0;
-            while(bw_dcf.hasMoreTokens())
-            {
-                bw_tokens[i] = bw_dcf.nextToken().toLowerCase().trim();
-                i++;
-            }
-            String bw_schema = bw_tokens[0];
-            String bw_element = bw_tokens[1];
-            String bw_qualifier = bw_tokens[2];
-            
-            StringTokenizer dcf = new StringTokenizer(field, ".");
-            
-            String[] tokens = { "", "", "" };
-            int j = 0;
-            while(dcf.hasMoreTokens())
-            {
-                tokens[j] = dcf.nextToken().toLowerCase().trim();
-                j++;
-            }
-            String schema = tokens[0];
-            String element = tokens[1];
-            String qualifier = tokens[2];
-            if (schema.equals(bw_schema) // schema match
-                    && element.equals(bw_element) // element match
-                    && (
-                              (bw_qualifier != null) && ((qualifier != null && qualifier.equals(bw_qualifier)) // both not null and equals 
-                                      || bw_qualifier.equals("*")) // browse link with jolly
-                           || (bw_qualifier == null && qualifier == null)) // both null
-                        )
-            {
-                return indexName;
-            }
-        }
-        return null;
+    public static class ViewOption {
+    	String label;
+    	String link;
+    }
+    
+	public static List<ViewOption> getViewOptions(Context context, HttpServletRequest request, PageContext pageContext,
+			String handle, Bitstream bit) throws UnsupportedEncodingException {
+		List<ViewOption> results = new ArrayList<ViewOption>();
+
+		List<String> externalProviders = bit.getMetadataValue(IViewer.METADATA_STRING_PROVIDER);
+		for (String externalProvider : externalProviders) {
+			ViewOption opt = new ViewOption();
+			opt.link = request.getContextPath() + "/explore?bitstream_id=" + bit.getID() + "&handle=" + handle
+					+ "&provider=" + externalProvider;
+			opt.label = LocaleSupport.getLocalizedMessage(pageContext,
+					"org.dspace.app.webui.jsptag.ItemTag.explore." + externalProvider);
+			results.add(opt);
+		}
+
+		ViewOption opt = new ViewOption();
+		opt.link = request.getContextPath();
+
+		if ((handle != null) && (bit.getSequenceID() > 0)) {
+			opt.link = opt.link + "/bitstream/" + handle + "/" + bit.getSequenceID() + "/";
+		} else {
+			opt.link = opt.link + "/retrieve/" + bit.getID() + "/";
+		}
+
+		opt.link = opt.link + UIUtil.encodeBitstreamName(bit.getName(), Constants.DEFAULT_ENCODING);
+		opt.label = LocaleSupport
+                .getLocalizedMessage(
+                        pageContext,
+                        "org.dspace.app.webui.jsptag.ItemTag.view");
+		results.add(opt);
+		return results;
     }
 }

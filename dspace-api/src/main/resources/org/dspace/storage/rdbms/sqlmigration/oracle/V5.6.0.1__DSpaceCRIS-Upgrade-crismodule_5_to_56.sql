@@ -5,6 +5,7 @@
 --
 -- http://www.dspace.org/license/
 --
+
 BEGIN
 	EXECUTE IMMEDIATE
 'truncate table cris_do_box2policygroup;
