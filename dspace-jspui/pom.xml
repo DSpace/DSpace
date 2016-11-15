@@ -117,18 +117,26 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
-            <version>1.1.2</version>
         </dependency>
+		<dependency>
+		    <groupId>org.apache.taglibs</groupId>
+		    <artifactId>taglibs-standard-impl</artifactId>
+		    <version>1.2.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.taglibs</groupId>
+		    <artifactId>taglibs-standard-spec</artifactId>
+		    <version>1.2.1</version>
+		</dependency>		
+		<dependency>
+		    <groupId>javax.el</groupId>
+		    <artifactId>el-api</artifactId>
+		    <version>1.0</version>
+		</dependency>
         <dependency>
-            <groupId>taglibs</groupId>
-            <artifactId>standard</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
+            <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
-            <version>2.0</version>
-            <scope>provided</scope>
+            <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
