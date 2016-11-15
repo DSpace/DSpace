@@ -38,8 +38,8 @@
 		<org.hibernate.annotations.version>4.0.1.Final</org.hibernate.annotations.version>
 		<org.hibernate.jpa.version>1.0.1.Final</org.hibernate.jpa.version>
 		
-		<org.jdyna.version>5.7-SNAPSHOT</org.jdyna.version>		
-		<it.cilea.ccommons.version>2.2-SNAPSHOT</it.cilea.ccommons.version>
+		<org.jdyna.version>5.7</org.jdyna.version>		
+		<it.cilea.ccommons.version>2.2</it.cilea.ccommons.version>
 		
 		<ckan.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</ckan.addon.modules>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1561,10 +1561,21 @@
       </developer>
       <developer>
          <name>Andrea Bollini</name>
-         <email>a.bollini at cineca.it</email>
+         <email>andrea.bollini at 4science.it</email>
          <url>http://www.linkedin.com/in/andreabollini</url>
-         <organization>CINECA</organization>
-         <organizationUrl>http://www.cineca.it</organizationUrl>
+         <organization>4Science</organization>
+         <organizationUrl>http://www.4science.it/en</organizationUrl>
+         <roles>
+            <role>commiter</role>
+         </roles>
+         <timezone>+1</timezone>
+      </developer>
+      <developer>
+         <name>Luigi Andrea Pascarelli</name>
+         <email>luigiandrea.pascarelli at 4science.it</email>
+         <url>https://www.linkedin.com/in/luigiandreapascarelli</url>
+         <organization>4Science</organization>
+         <organizationUrl>http://www.4science.it/en</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
