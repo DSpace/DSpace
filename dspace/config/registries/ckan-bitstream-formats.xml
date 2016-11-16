@@ -15,20 +15,18 @@
 <dspace-bitstream-types>
 
   <bitstream-type>
-    <mimetype>text/plain</mimetype>
+    <mimetype>text/csv</mimetype>
     <short_description>Tabular data</short_description>
-    <description>Tabular data in plain text file with comma delimitator (CSV)
-	</description>
+    <description>Tabular data in plain text file with comma delimitator (CSV)</description>
     <support_level>1</support_level>
     <internal>false</internal>
     <extension>csv</extension>
   </bitstream-type>
 
    <bitstream-type>
-    <mimetype>text/plain</mimetype>
+    <mimetype>text/tab-separated-values</mimetype>
     <short_description>Tabular data</short_description>
-    <description>Tabular data in plain text file with comma delimitator (TSV)
-	</description>
+    <description>Tabular data in plain text file with comma delimitator (TSV)</description>
     <support_level>1</support_level>
     <internal>false</internal>
     <extension>tsv</extension>
