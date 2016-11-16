@@ -16,6 +16,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
 <%@ taglib uri="researchertags" prefix="researcher"%>
+<%@ page import="org.dspace.core.ConfigurationManager"%>
 
 <c:set var="contextPath" scope="application">${pageContext.request.contextPath}</c:set>
 <c:set var="dspace.layout.head" scope="request">        
@@ -31,9 +32,7 @@
 	<style type="text/css">
 	  #map_canvas { height: 100% }
 	</style>
-	<script type="text/javascript"
-	    src="//maps.google.com/maps/api/js?sensor=true&v=3">
-	</script>	
+	<script src="//maps.googleapis.com/maps/api/js?key=<%= ConfigurationManager.getProperty("key.googleapi.maps") %>&sensor=true&v=3" type="text/javascript"></script>
 	
 	<script type="text/javascript">
 		function setMessage(message,div){
