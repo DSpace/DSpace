@@ -413,25 +413,35 @@ public class CrisConsumer implements Consumer
         }
     }
 
-    private void fillerMetrics(Context ctx, Item item, Map<String, String> toBuildMetadata,
+    private void fillerMetrics(Context ctx, Item item,
+            Map<String, String> toBuildMetadata,
             Map<String, ACrisObject> createdObjects,
             Map<String, ACrisObject> referencedObjects)
     {
         MetricImportFiller fillerConfig = new DSpace()
                 .getSingletonService(MetricImportFiller.class);
 
-        Map<String, TargetMetricFillerPlugin> plugins = fillerConfig
-                .getPlugins();
-
-        for (String metadataMetric : plugins.keySet())
+        if (fillerConfig != null)
         {
+            Map<String, TargetMetricFillerPlugin> plugins = fillerConfig
+                    .getPlugins();
+            if (plugins != null)
+            {
+                for (String metadataMetric : plugins.keySet())
+                {
 
-            Metadatum[] metadata = item
-                    .getMetadataValueInDCFormat(metadataMetric);
-            if(metadata!=null && metadata.length>0) {
-                TargetMetricFillerPlugin plugin = plugins.get(metadataMetric);
-                plugin.buildMetric(ctx, item, metadata[0], toBuildMetadata, createdObjects, referencedObjects, applicationService,
-                        metricService);                
+                    Metadatum[] metadata = item
+                            .getMetadataValueInDCFormat(metadataMetric);
+                    if (metadata != null && metadata.length > 0)
+                    {
+                        TargetMetricFillerPlugin plugin = plugins
+                                .get(metadataMetric);
+                        plugin.buildMetric(ctx, item, metadata[0],
+                                toBuildMetadata, createdObjects,
+                                referencedObjects, applicationService,
+                                metricService);
+                    }
+                }
             }
         }
 
