@@ -8,7 +8,7 @@
     <parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-cris</artifactId>
-		<version>CRIS-5.6.1</version>
+		<version>CRIS-5.6.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
    </parent>
 
