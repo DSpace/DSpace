@@ -195,5 +195,9 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
     	</dependency>
+		<dependency>
+			<groupId>it.4science.dspace</groupId>
+			<artifactId>addon-commons-api</artifactId>
+		</dependency>    	
     </dependencies>
 </project>
