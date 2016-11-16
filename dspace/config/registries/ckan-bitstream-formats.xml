@@ -16,7 +16,7 @@
 
   <bitstream-type>
     <mimetype>text/csv</mimetype>
-    <short_description>Tabular data</short_description>
+    <short_description>Comma Separated Values</short_description>
     <description>Tabular data in plain text file with comma delimitator (CSV)</description>
     <support_level>1</support_level>
     <internal>false</internal>
@@ -25,7 +25,7 @@
 
    <bitstream-type>
     <mimetype>text/tab-separated-values</mimetype>
-    <short_description>Tabular data</short_description>
+    <short_description>Tab Separated Values</short_description>
     <description>Tabular data in plain text file with comma delimitator (TSV)</description>
     <support_level>1</support_level>
     <internal>false</internal>
