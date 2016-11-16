@@ -162,6 +162,12 @@
                 <input class="btn btn-danger col-md-12" type="submit" name="submit_delete" value="<fmt:message key="jsp.tools.edit-collection.button.delete"/>" />
               </form>
 <% } %>
+<% if(collection!=null) { %>
+	<div class="col-md-4">
+		<a class="btn btn-warning col-md-12" target="_blank" 
+   			href="<%= request.getContextPath() %>/tools/edit-dso?resource_type=3&resource_id=<%= collection.getID() %>"><fmt:message key="jsp.general.editnormal.button"/></a>
+	</div>   		
+<% } %>
 </div>
 <div class="row">
 <form class="form-group" method="post" action="<%= request.getContextPath() %>/tools/edit-communities">
@@ -235,8 +241,6 @@
 			</div>	
 		</div>
 	</div>
-	<a class="btn btn-warning col-sm-12" target="_blank" 
-    		href="<%= request.getContextPath() %>/tools/edit-dso?resource_type=3&resource_id=<%= collection.getID() %>"><fmt:message key="jsp.general.editnormal.button"/></a>
 </div>
 <div class="col-md-4">
 <% if(bSubmittersButton || bWorkflowsButton || bAdminCreateGroup || (admins != null && bAdminRemoveGroup)) { %>
