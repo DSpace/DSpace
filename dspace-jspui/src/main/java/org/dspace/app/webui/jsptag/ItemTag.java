@@ -201,7 +201,7 @@ public class ItemTag extends TagSupport
     {
         try
         {
-            if (style.equals("full"))
+            if (style!=null && style.equals("full"))
             {
                 renderFull();
             }

@@ -38,7 +38,7 @@
     <%-- <p>Are you sure you want to remove the following incomplete item?</p> --%>
     <p><fmt:message key="jsp.mydspace.remove-item.confirmation"/></p>
 
-    <dspace:item item="<%= wi.getItem() %>"/>
+    <dspace:item style="full" item="<%= wi.getItem() %>"/>
 
     <form action="<%= request.getContextPath() %>/mydspace" method="post">
         <input type="hidden" name="workspace_id" value="<%= wi.getID() %>"/>
