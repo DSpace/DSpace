@@ -1603,8 +1603,9 @@ public class PushToORCID {
 		if (StringUtils.isNotBlank(biography)) {
 			Biography bio = new Biography();
 			bio.setValue(biography);
-		}
-
+			bioJAXB.setBiography(bio);
+		}		
+		
 		// start researcher-urls and external-identifiers
 		ResearcherUrls researcherUrls = new ResearcherUrls();
 		ExternalIdentifiers externalIdentifiers = new ExternalIdentifiers();
