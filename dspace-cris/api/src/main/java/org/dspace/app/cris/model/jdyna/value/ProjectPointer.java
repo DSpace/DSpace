@@ -44,7 +44,8 @@ public class ProjectPointer extends PointerValue<Project>
     {
         this.real = oggetto;
         if(oggetto != null) {
-            sortValue = real.getDisplayValue().toLowerCase();
+            String displayValue = real.getDisplayValue();
+            sortValue = displayValue.substring(0,(displayValue.length()<200?displayValue.length():200)).toLowerCase();
         }        
     }
 

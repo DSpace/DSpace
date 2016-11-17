@@ -48,7 +48,8 @@ public class GroupValue extends AValue<Integer>
             Context context = null;
             try {
                 context = new Context();
-                sortValue = Group.find(context, oggetto).getName().toLowerCase();
+                String displayValue = Group.find(context, oggetto).getName().toLowerCase();
+                sortValue = displayValue.substring(0,(displayValue.length()<200?displayValue.length():200));
             }
             catch(Exception ex) {
                 log.error(ex.getMessage(), ex);

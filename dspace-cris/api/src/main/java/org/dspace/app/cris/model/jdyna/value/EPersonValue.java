@@ -43,7 +43,8 @@ public class EPersonValue extends AValue<Integer>
             Context context = null;
             try {
                 context = new Context();
-                sortValue = EPerson.find(context, oggetto).getFullName().toLowerCase();
+                String displayValue = EPerson.find(context, oggetto).getFullName().toLowerCase();
+                sortValue = displayValue.substring(0,(displayValue.length()<200?displayValue.length():200));
             }
             catch(Exception ex) {
                 log.error(ex.getMessage(), ex);
