@@ -10,18 +10,16 @@ import org.dspace.core.Context;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
-import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowRequirementsManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 
@@ -44,9 +42,6 @@ public class ResourceIdentifierController {
 
     public static final String DSPACE_OBJECT = "dspace.object";
     public static final String DSPACE_CONTEXT = "dspace.context";
-    private static final String RESOURCE = "/resource";
-    private static final String METS = "mets";
-    private static final String DRI = "DRI";
 
     private static final int STATUS_OK=200;
     private static final int STATUS_FORBIDDEN=400;
@@ -54,13 +49,12 @@ public class ResourceIdentifierController {
 
     @RequestMapping("/**")
     public String processHandle(HttpServletRequest request) {
-        String resourceIdentifier=null;
+        String path = (String) request.getAttribute( HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE );
+        String pattern = (String) request.getAttribute( HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
+
+        AntPathMatcher apm = new AntPathMatcher();
+        String resourceIdentifier = apm.extractPathWithinPattern(pattern, path);
         try {
-
-            String requestUri = request.getRequestURI().toString();
-
-            resourceIdentifier = requestUri.substring(requestUri.indexOf(RESOURCE) + RESOURCE.length() + 1);
-
             Context context = ContextUtil.obtainContext(request);
 
             IdentifierService dis = new DSpace().getSingletonService(IdentifierService.class);
@@ -90,13 +84,12 @@ public class ResourceIdentifierController {
 
     @RequestMapping("/**/mets.xml")
     public String processMETSHandle(HttpServletRequest request) {
+        String path = (String) request.getAttribute( HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE );
+        String pattern = (String) request.getAttribute( HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
+
+        AntPathMatcher apm = new AntPathMatcher();
+        String resourceIdentifier = apm.extractPathWithinPattern(pattern, path);
         try {
-
-            String requestUri = request.getRequestURI().toString();
-
-            String resourceIdentifier = requestUri.substring(requestUri.indexOf(RESOURCE) + RESOURCE.length() + 1);
-            resourceIdentifier = resourceIdentifier.substring(0, resourceIdentifier.indexOf(METS) - 1);
-
             Context context = ContextUtil.obtainContext(request);
 
             IdentifierService dis = new DSpace().getSingletonService(IdentifierService.class);
@@ -121,13 +114,12 @@ public class ResourceIdentifierController {
 
     @RequestMapping("/**/DRI")
     public String processDRIHandle(HttpServletRequest request) {
+        String path = (String) request.getAttribute( HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE );
+        String pattern = (String) request.getAttribute( HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
+
+        AntPathMatcher apm = new AntPathMatcher();
+        String resourceIdentifier = apm.extractPathWithinPattern(pattern, path);
         try {
-
-            String requestUri = request.getRequestURI().toString();
-
-            String resourceIdentifier = requestUri.substring(requestUri.indexOf(RESOURCE) + RESOURCE.length() + 1);
-            resourceIdentifier = resourceIdentifier.substring(0, resourceIdentifier.indexOf(DRI) - 1);
-
             Context context = ContextUtil.obtainContext(request);
 
             IdentifierService dis = new DSpace().getSingletonService(IdentifierService.class);
