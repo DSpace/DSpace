@@ -245,92 +245,93 @@ public class ImportExportUtils {
 		// row index
 		int i = 1;
 		for (ACO rp : rps) {
-			
-	        //HEADER_CRISID,HEADER_UUID,HEADER_SOURCEREF,HEADER_SOURCEID
-		    int y = 0;
-		    sheetEntities.addCell(new Label(0, i, ""));
-	        Label label = (Label) sheetEntities.getCell(0, i);
-	        label.setString(rp.getCrisID());
-	        y++;
-	        sheetEntities.addCell(new Label(1, i, ""));
-            label = (Label) sheetEntities.getCell(1, i);
-            label.setString(rp.getUuid());
-            y++;
-            sheetEntities.addCell(new Label(2, i, ""));
-            label = (Label) sheetEntities.getCell(2, i);
-            label.setString(rp.getSourceRef());
-            y++;
-            sheetEntities.addCell(new Label(3, i, ""));
-			label = (Label) sheetEntities.getCell(3, i);
-			label.setString(rp.getSourceID());
-			
-			for (IContainable containable : metadata) {
-				if (containable instanceof ADecoratorPropertiesDefinition) {
-					y = UtilsXLS.createCell(applicationService, y, i, (ADecoratorPropertiesDefinition) containable,
-							rp, sheetEntities);
-				}
-				if (containable instanceof DecoratorRestrictedField) {
-					y = UtilsXLS
-							.createCell(applicationService, y, i, (DecoratorRestrictedField) containable, rp, sheetEntities);
-				}
-			}
-
-			int ii = 1;
-            for (IContainable nestedContainable : metadataNestedLevel)
-            {
-                List<ACNO> nestedObject = applicationService
-                        .getNestedObjectsByParentIDAndShortname(rp.getId(),
-                                nestedContainable.getShortName(),
-                                rp.getClassNested());                
-                for (ACNO rpn : nestedObject)
+		    if(rp!=null) {	
+    	        //HEADER_CRISID,HEADER_UUID,HEADER_SOURCEREF,HEADER_SOURCEID
+    		    int y = 0;
+    		    sheetEntities.addCell(new Label(0, i, ""));
+    	        Label label = (Label) sheetEntities.getCell(0, i);
+    	        label.setString(rp.getCrisID());
+    	        y++;
+    	        sheetEntities.addCell(new Label(1, i, ""));
+                label = (Label) sheetEntities.getCell(1, i);
+                label.setString(rp.getUuid());
+                y++;
+                sheetEntities.addCell(new Label(2, i, ""));
+                label = (Label) sheetEntities.getCell(2, i);
+                label.setString(rp.getSourceRef());
+                y++;
+                sheetEntities.addCell(new Label(3, i, ""));
+    			label = (Label) sheetEntities.getCell(3, i);
+    			label.setString(rp.getSourceID());
+    			
+    			for (IContainable containable : metadata) {
+    				if (containable instanceof ADecoratorPropertiesDefinition) {
+    					y = UtilsXLS.createCell(applicationService, y, i, (ADecoratorPropertiesDefinition) containable,
+    							rp, sheetEntities);
+    				}
+    				if (containable instanceof DecoratorRestrictedField) {
+    					y = UtilsXLS
+    							.createCell(applicationService, y, i, (DecoratorRestrictedField) containable, rp, sheetEntities);
+    				}
+    			}
+    
+    			int ii = 1;
+                for (IContainable nestedContainable : metadataNestedLevel)
                 {
-
-                  // HEADER_CRISID(parent object), HEADER_SOURCEREF(parent object), HEADER_SOURCEID(parent object), HEADER_UUID,HEADER_SOURCEREF,HEADER_SOURCEID
-                    int yy = 0;
-                    sheetNested.addCell(new Label(0, ii, ""));
-                    label = (Label) sheetNested.getCell(0, ii);
-                    label.setString(rp.getCrisID());
-                    yy++;
-                    sheetNested.addCell(new Label(1, ii, ""));
-                    label = (Label) sheetNested.getCell(1, ii);
-                    label.setString(rp.getSourceRef());
-                    yy++;
-                    sheetNested.addCell(new Label(2, ii, ""));
-                    label = (Label) sheetNested.getCell(2, ii);
-                    label.setString(rp.getSourceID());
-                    yy++;
-                    sheetNested.addCell(new Label(3, ii, ""));
-                    label = (Label) sheetNested.getCell(3, ii);
-                    label.setString(rpn.getUuid());
-                    yy++;
-                    sheetNested.addCell(new Label(4, ii, ""));
-                    label = (Label) sheetNested.getCell(4, ii);
-                    label.setString(rpn.getSourceReference().getSourceRef());
-                    yy++;
-                    sheetNested.addCell(new Label(5, ii, ""));
-                    label = (Label) sheetNested.getCell(5, ii);
-                    label.setString(rpn.getSourceReference().getSourceID());
-
-                    try
+                    List<ACNO> nestedObject = applicationService
+                            .getNestedObjectsByParentIDAndShortname(rp.getId(),
+                                    nestedContainable.getShortName(),
+                                    rp.getClassNested());                
+                    for (ACNO rpn : nestedObject)
                     {
-                        for (IContainable containable : applicationService.newFindAllContainables(rpn.getClassPropertiesDefinition()))
+    
+                      // HEADER_CRISID(parent object), HEADER_SOURCEREF(parent object), HEADER_SOURCEID(parent object), HEADER_UUID,HEADER_SOURCEREF,HEADER_SOURCEID
+                        int yy = 0;
+                        sheetNested.addCell(new Label(0, ii, ""));
+                        label = (Label) sheetNested.getCell(0, ii);
+                        label.setString(rp.getCrisID());
+                        yy++;
+                        sheetNested.addCell(new Label(1, ii, ""));
+                        label = (Label) sheetNested.getCell(1, ii);
+                        label.setString(rp.getSourceRef());
+                        yy++;
+                        sheetNested.addCell(new Label(2, ii, ""));
+                        label = (Label) sheetNested.getCell(2, ii);
+                        label.setString(rp.getSourceID());
+                        yy++;
+                        sheetNested.addCell(new Label(3, ii, ""));
+                        label = (Label) sheetNested.getCell(3, ii);
+                        label.setString(rpn.getUuid());
+                        yy++;
+                        sheetNested.addCell(new Label(4, ii, ""));
+                        label = (Label) sheetNested.getCell(4, ii);
+                        label.setString(rpn.getSourceReference().getSourceRef());
+                        yy++;
+                        sheetNested.addCell(new Label(5, ii, ""));
+                        label = (Label) sheetNested.getCell(5, ii);
+                        label.setString(rpn.getSourceReference().getSourceID());
+    
+                        try
                         {
-                            if (containable instanceof ADecoratorNestedPropertiesDefinition)
+                            for (IContainable containable : applicationService.newFindAllContainables(rpn.getClassPropertiesDefinition()))
                             {
-                                yy = UtilsXLS.createCell(applicationService, yy, ii,
-                                        (ADecoratorNestedPropertiesDefinition) containable,
-                                        rpn, sheetNested);
+                                if (containable instanceof ADecoratorNestedPropertiesDefinition)
+                                {
+                                    yy = UtilsXLS.createCell(applicationService, yy, ii,
+                                            (ADecoratorNestedPropertiesDefinition) containable,
+                                            rpn, sheetNested);
+                                }
                             }
                         }
+                        catch (InstantiationException e)
+                        {
+                            log.error(e.getMessage(), e);
+                        }
+                        ii++;
                     }
-                    catch (InstantiationException e)
-                    {
-                        log.error(e.getMessage(), e);
-                    }
-                    ii++;
-                }
-			}
-			i++;
+    			}
+    			i++;
+		    }
 		}
 		// All sheets and cells added. Now write out the workbook
 		workbook.write();
