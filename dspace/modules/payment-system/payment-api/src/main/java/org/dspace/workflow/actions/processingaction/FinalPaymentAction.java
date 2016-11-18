@@ -11,10 +11,6 @@ import org.apache.log4j.Logger;
 import org.datadryad.anywhere.AssociationAnywhere;
 import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.authority.AuthorityMetadataValue;
-import org.dspace.content.authority.Concept;
-import org.dspace.content.authority.Scheme;
 import org.dspace.core.*;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.paymentsystem.PaymentSystemService;
@@ -52,33 +48,38 @@ public class FinalPaymentAction extends ProcessingAction {
 
     @Override
     public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
-	int itemID =  wfi.getItem().getID();
-	log.info("Verifying payment status of Item " + itemID);
-	
-        try{
-	    PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);   
-	    ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c,itemID);
+        int itemID = wfi.getItem().getID();
+        log.info("Verifying payment status of Item " + itemID);
 
-	    // if fee waiver is in place, transaction is paid
-	    if(shoppingCart.getCountry() != null && shoppingCart.getCountry().length() > 0) {
-		log.info("processed fee waiver for Item " + itemID + ", country = " + shoppingCart.getCountry());
-		return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
-	    }
-
-
-        // if a valid voucher is in place, transaction is paid
-        Voucher voucher = Voucher.findById(c,shoppingCart.getVoucher());
-        log.debug("voucher is " + voucher);
-        if(voucher != null) {
-            log.debug("voucher status " + voucher.getStatus());
-            if(voucher.getStatus().equals(Voucher.STATUS_OPEN)) {
-                voucher.setStatus(Voucher.STATUS_USED);
-                voucher.update();
-                c.commit();
-                log.info("processed voucher for Item " + itemID + ", voucherID = " + voucher.getID());
+        try {
+            PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+            ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(c, itemID);
+            // if cart is marked as completed, don't process this again
+            if (shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+                log.info("no additional payment processed for item " + itemID + ", cart already marked as complete");
                 return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
             }
-        }
+
+            // if fee waiver is in place, transaction is paid
+            if (shoppingCart.getCountry() != null && shoppingCart.getCountry().length() > 0) {
+                log.info("processed fee waiver for Item " + itemID + ", country = " + shoppingCart.getCountry());
+                return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+            }
+
+
+            // if a valid voucher is in place, transaction is paid
+            Voucher voucher = Voucher.findById(c, shoppingCart.getVoucher());
+            log.debug("voucher is " + voucher);
+            if (voucher != null) {
+                log.debug("voucher status " + voucher.getStatus());
+                if (voucher.getStatus().equals(Voucher.STATUS_OPEN)) {
+                    voucher.setStatus(Voucher.STATUS_USED);
+                    voucher.update();
+                    c.commit();
+                    log.info("processed voucher for Item " + itemID + ", voucherID = " + voucher.getID());
+                    return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
+                }
+            }
 
             DryadOrganizationConcept organizationConcept = shoppingCart.getSponsoringOrganization(c);
             // if journal-based subscription is in place, transaction is paid
@@ -110,21 +111,20 @@ public class FinalPaymentAction extends ProcessingAction {
                 }
             }
 
-	    
-	    // process payment via PayPal
+            // process payment via PayPal
             PaymentService paymentService = new DSpace().getSingletonService(PaymentService.class);
-            if(paymentService.submitReferenceTransaction(c,wfi,request)){
-		log.info("processed PayPal payment for Item " + itemID);
+            if (paymentService.submitReferenceTransaction(c, wfi, request)) {
+                log.info("processed PayPal payment for Item " + itemID);
                 return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
             }
 
 
-        } catch (Exception e){
-            log.error(e.getMessage(),e);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
 
         //Send us to the re authorization of paypal payment
-	log.info("no payment processded for Item " + itemID + ", sending to revalidation step");
+        log.info("no payment processed for Item " + itemID + ", sending to revalidation step");
         WorkflowEmailManager.notifyOfReAuthorizationPayment(c, wfi);
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 1);
 
