@@ -52,7 +52,7 @@ public class ResourceIdentifierController {
     private static final int STATUS_FORBIDDEN=400;
     private static final int STATUS_NOTFOUND=404;
 
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
+    @RequestMapping("/**")
     public String processHandle(HttpServletRequest request) {
         String resourceIdentifier=null;
         try {
