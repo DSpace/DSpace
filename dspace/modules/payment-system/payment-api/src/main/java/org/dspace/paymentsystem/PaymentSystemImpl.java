@@ -303,11 +303,11 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return totalSurcharge;
     }
 
-        String journal = shoppingcart.getJournal();
-
-        if (!shoppingcart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
-            if (journal == null || journal.length() == 0) {
     public boolean isSponsored(Context context, ShoppingCart shoppingcart) throws SQLException {
+        if (shoppingcart.getSponsoringOrganization(context) == null) {
+            // if this is an older cart that hasn't set a SponsoringOrganization yet, set one based on its journal.
+            if (!shoppingcart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+                String journal = "";
                 Item item = Item.find(context, shoppingcart.getItem());
                 if (item != null) {
                     try {
@@ -317,15 +317,17 @@ public class PaymentSystemImpl implements PaymentSystemService {
                             journal = values[0].value;
                         }
                     } catch (Exception e) {
-                        log.error("Exception when get journal in journal subscription:", e);
+                        log.error("Exception getting journal from item " + item.getID() + ":", e);
                     }
                 }
-
-
+                if (journal != null && journal.length() > 0) {
+                    //update shoppingcart
+                    DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+                    if (journalConcept != null) {
+                        shoppingcart.setSponsoringOrganization(journalConcept);
+                    }
+                }
             }
-            //update the journal and journal subscribtion
-            updateJournal(context, shoppingcart, journal);
-
         }
         return shoppingcart.hasSubscription();
     }
@@ -400,19 +402,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 break;
         }
         return payerName;
-    }
-
-    private void updateJournal(Context c, ShoppingCart shoppingCart, String journal) {
-        if (!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
-            if (journal != null && journal.length() > 0) {
-                //update shoppingcart journal
-                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
-                if (journalConcept != null) {
-                    shoppingCart.setSponsoringOrganization(journalConcept);
-                }
-            }
-
-        }
     }
 
     private String format(String label, String value) {
