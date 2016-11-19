@@ -934,9 +934,14 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public Boolean getJournalSub()
-    {
+
+    private Boolean getJournalSub() {
         return myRow.getBooleanColumn("journal_sub");
+    }
+
+    public Boolean hasSubscription()
+    {
+        return getJournalSub();
     }
 
 

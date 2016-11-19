@@ -84,7 +84,7 @@ public class FinalPaymentAction extends ProcessingAction {
             DryadOrganizationConcept organizationConcept = shoppingCart.getSponsoringOrganization(c);
             // if journal-based subscription is in place, transaction is paid
             if (organizationConcept != null) {
-                if (shoppingCart.getJournalSub()) {
+                if (shoppingCart.hasSubscription()) {
                     log.info("processed journal subscription for Item " + itemID + ", journal = " + organizationConcept.getFullName());
                     log.debug("tally credit for journal = " + organizationConcept.getFullName());
 

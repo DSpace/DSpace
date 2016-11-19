@@ -327,7 +327,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
             updateJournal(context, shoppingcart, journal);
 
         }
-        return shoppingcart.getJournalSub();
+        return shoppingcart.hasSubscription();
     }
 
 
