@@ -43,15 +43,15 @@ public interface PaymentSystemService
 
     public double getSurchargeLargeFileFee(Context context, ShoppingCart transaction) throws SQLException;
 
-    public boolean getJournalSubscription(Context context, ShoppingCart transaction) throws SQLException;
+    public boolean isSponsored(Context context, ShoppingCart transaction) throws SQLException;
 
-    public boolean hasDiscount(Context context, ShoppingCart transaction) throws SQLException;
+    public boolean dpcIsCovered(Context context, ShoppingCart transaction) throws SQLException;
 
     public void updateTotal(Context context, ShoppingCart transaction) throws SQLException;
 
     public void setCurrency(ShoppingCart shoppingCart,String currency)throws SQLException;
 
-    public int getWaiver(Context context,ShoppingCart shoppingcart,String journal)throws SQLException;
+    public int getWaiver(Context context, ShoppingCart shoppingcart)throws SQLException;
     public boolean getCountryWaiver(Context context, ShoppingCart transaction) throws SQLException;
 
     public String getPayer(Context context, ShoppingCart shoppingcart)throws SQLException;
