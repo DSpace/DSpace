@@ -303,7 +303,7 @@ public class ItemTag extends TagSupport
         
         out.println("<table class=\"table itemDisplayTable\">");
 
-        for (DisplayMetadata display : DisplayItemMetadataUtils.getDisplayMetadata(context, request, item)) {
+        for (DisplayMetadata display : DisplayItemMetadataUtils.getDisplayMetadata(context, request, item, style)) {
         	out.print("<td class=\"metadataFieldLabel\">");
         	out.print(display.label);
             out.print(":&nbsp;</td><td class=\"metadataFieldValue\">");
