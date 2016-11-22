@@ -3,7 +3,7 @@ AU  - @virtual.bibauthors.author@
 T1  - @dc.title@
 T2  - @dc.title.alternative@
 PY  - @dc.date.issued@
-PB  - @dc.publisher.name@
+PB  - @dc.publisher@
 CY  - @dc.publisher.place@
 JO  - @dc.relation.ispartof@
 VL  - @dc.relation.volume@

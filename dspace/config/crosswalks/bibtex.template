@@ -5,7 +5,7 @@
 	year = {@virtual.date.year@},
 	publisher = {@dc.publisher.name@},
 	address = {@dc.publisher.place@},
-	journal = {@dc.authority.ancejournal@},
+	journal = {@dc.relation.ispartof@},
 	volume = {@dc.relation.volume@},
 	booktitle = {@dc.relation.ispartofbook@},	
 	abstract = {@dc.description.abstract@},

@@ -2,7 +2,7 @@
 %A @virtual.bibauthors.author@
 %T @dc.title@
 %D @dc.date.issued@
-%I @dc.publisher.name@
+%I @dc.publisher@
 %C @dc.publisher.place@
 %J @dc.relation.ispartof@
 %V @dc.relation.volume@
