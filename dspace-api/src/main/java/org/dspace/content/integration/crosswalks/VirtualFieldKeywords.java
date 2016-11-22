@@ -53,10 +53,10 @@ public class VirtualFieldKeywords implements VirtualFieldDisseminator, VirtualFi
 			if (dcvs != null && dcvs.length > 0) {
 				if (dcvs.length > 1) {
 					StringBuffer sb = new StringBuffer();
-					for (int i = 0; i < dcvs.length - 1; i++) {
+					for (int i = 0; i < dcvs.length; i++) {
 						sb.append(dcvs[i].value).append("; ");
 					}
-					sb.append(dcvs[dcvs.length].value);
+					
 					return new String[] { sb.toString() };
 				} else {
 					return new String[] { dcvs[0].value };
