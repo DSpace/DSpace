@@ -199,8 +199,9 @@ public interface ItemImportService {
     /**
      * Get temporary work directory (as File)
      * @return directory as File
+     * @throws java.io.IOException if the directory cannot be created.
      */
-    public File getTempWorkDirFile();
+    public File getTempWorkDirFile() throws IOException;
 
     /**
      * Cleanup
