@@ -68,6 +68,11 @@ public class ReferencesServlet extends DSpaceServlet
 {
     /** Logger */
     private static Logger log = Logger.getLogger(ReferencesServlet.class);
+    
+    boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.list.enabled", false);
+
+	boolean exportBiblioAll =  ConfigurationManager.getBooleanProperty("exportcitation.show.all", false);
+
 
     DSpace dspace = new DSpace();
     
@@ -439,7 +444,7 @@ public class ReferencesServlet extends DSpaceServlet
             List<DSpaceObject> disseminate = new LinkedList<DSpaceObject>();
             for (Item item : items)
             {
-				if (context.getCurrentUser()==null)
+				if (!exportBiblioEnabled || (context.getCurrentUser()==null  && !exportBiblioAll) )
                 {
                     // the item is withdrawn we skip it
                     log.info(LogManager.getHeader(context, "references",
@@ -464,7 +469,7 @@ public class ReferencesServlet extends DSpaceServlet
         {
             for (Item item : items)
             {
-				if (context.getCurrentUser()==null)
+				if (!exportBiblioEnabled || (context.getCurrentUser()==null  && !exportBiblioAll) )
                 {
                     // the item is withdrawn we skip it
                     log.info(LogManager.getHeader(context, "references",

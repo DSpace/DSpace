@@ -45,8 +45,10 @@
 <%
 	
 	boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.list.enabled", false);
-	String cfg = (String)request.getAttribute("exportscitations");
+	
+    String cfg = (String)request.getAttribute("exportscitations");
 	Boolean isLoggedIn = (Boolean)request.getAttribute("isLoggedIn");
+	boolean exportBiblioAll =  ConfigurationManager.getBooleanProperty("exportcitation.show.all", false);
 	
 	Box holder = (Box)request.getAttribute("holder");
 	ComponentInfoDTO info = ((Map<String, ComponentInfoDTO>)(request.getAttribute("componentinfomap"))).get(holder.getShortName());
@@ -222,7 +224,7 @@ if (info.getPagetotal() > 1)
 <div class="table-responsive">
 
 <%  
-	if (exportBiblioEnabled && isLoggedIn) {
+	if (exportBiblioEnabled && (exportBiblioAll || isLoggedIn)) {
 %>
 
 		<form target="blank" class="form-inline"  id="<%= info.getType() %>exportform" action="<%= request.getContextPath() %>/references">
