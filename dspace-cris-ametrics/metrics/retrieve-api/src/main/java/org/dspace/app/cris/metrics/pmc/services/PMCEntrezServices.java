@@ -45,15 +45,15 @@ public class PMCEntrezServices
     /** log4j logger */
     private static Logger log = Logger.getLogger(PMCEntrezServices.class);
 
-    private static String ENTREZ_CITE_ENDPOINT = "http://www.ncbi.nlm.nih.gov/pmc/utils/entrez2pmcciting.cgi";
+    private static String ENTREZ_CITE_ENDPOINT = "https://www.ncbi.nlm.nih.gov/pmc/utils/entrez2pmcciting.cgi";
 
-    private static String ENTREZ_PMC_TO_PUBMED_ENDPOINT = "http://www.ncbi.nlm.nih.gov/pmc/utils/pmcentrez.cgi";
+    private static String ENTREZ_PMC_TO_PUBMED_ENDPOINT = "https://www.ncbi.nlm.nih.gov/pmc/utils/pmcentrez.cgi";
 
-    private static String ENTREZ_PUBMED_TO_PMC_ENDPOINT = "http://www.ncbi.nlm.nih.gov/pmc/utils/entrezpmc.cgi";
+    private static String ENTREZ_PUBMED_TO_PMC_ENDPOINT = "https://www.ncbi.nlm.nih.gov/pmc/utils/entrezpmc.cgi";
 
-    private static String ENTREZ_FETCH_ENDPOINT = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
+    private static String ENTREZ_FETCH_ENDPOINT = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
 
-    private static String ENTREZ_SEARCH_ENDPOINT = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
+    private static String ENTREZ_SEARCH_ENDPOINT = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
     private static final Pattern fullFetchDocsumPattern = Pattern
             .compile(
