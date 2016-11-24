@@ -18,7 +18,7 @@
 <c:if test="${weeklysubscribed}">&amp;freq=7</c:if>
 <c:if test="${monthlysubscribed}">&amp;freq=30</c:if>
 </c:set>
- <div style="margin-top:1.5em;" class="form-group">
+ <div style="margin-top:2.3em;" class="form-group">
 	<div class="col-md-12">
 		<div>
 		<ul class="nav nav-tabs">

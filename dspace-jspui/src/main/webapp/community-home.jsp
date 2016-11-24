@@ -102,7 +102,7 @@
             }
 %>
 		<small><fmt:message key="jsp.community-home.heading1"/></small>
-        <a class="statisticsLink btn btn-info" href="<%= request.getContextPath() %>/cris/stats/community.html?handle=<%= community.getHandle() %>"><fmt:message key="jsp.community-home.display-statistics"/></a>
+        <a class="statisticsLink btn btn-info" href="<%= request.getContextPath() %>/cris/stats/community.html?handle=<%= community.getHandle() %>&type=selected"><fmt:message key="jsp.community-home.display-statistics"/></a>
 		</h2>
 	</div>
 <%  if (logo != null) { %>
@@ -220,7 +220,22 @@
                     [<%= ic.getCount(subcommunities[j]) %>]
 <%
                 }
-%>
+			if(isAdmin || !ConfigurationManager.getBooleanProperty("solr-statistics","authorization.admin")) { %>
+					<a href="<%= request.getContextPath() %>/cris/stats/community.html?handle=<%= subcommunities[j].getHandle() %>&type=selected"><img src="<%= request.getContextPath() %>/image/stats/chart_curve.png" border="0" title="usage statistics"/></a>
+				&nbsp;
+		 <% } %>
+        
+		<a href="<%= request.getContextPath() %>/feed/rss_2.0/<%= subcommunities[j].getHandle() %>"><img src="<%= request.getContextPath() %>/image/stats/feed.png" border="0" title="Content update: RSS feed"/></a>
+		&nbsp;<a href=<%= request.getContextPath() %>/handle/<%= subcommunities[j].getHandle() %>?handle=<%= subcommunities[j].getHandle() %>&submit_<%
+		    if (commSubscribed!=null && commSubscribed.contains(subcommunities[j].getID()))
+		    { // subscribed
+		        %>unsubscribe=unsubscribe"><img src="<%= request.getContextPath() %>/image/stats/stop-bell.png" border="0" title="Content update: Email subscription"/></a><%
+		    }
+		    else
+		    { // not yet subscribed
+		        %>subscribe=subscribe"><img src="<%= request.getContextPath() %>/image/stats/start-bell.png" border="0" title="Content update: Email subscription"/></a><%
+		    }
+    	%>
 	    		<% if (remove_button) { %>
 	                <form class="btn-group" method="post" action="<%=request.getContextPath()%>/tools/edit-communities">
 			          <input type="hidden" name="parent_community_id" value="<%= community.getID() %>" />
@@ -277,7 +292,7 @@
 <%
             }
 			if(isAdmin || !ConfigurationManager.getBooleanProperty("solr-statistics","authorization.admin")) { %>
-					<a href="<%= request.getContextPath() %>/cris/stats/collection.html?handle=<%= collections[i].getHandle() %>"><img src="<%= request.getContextPath() %>/image/stats/chart_curve.png" border="0" title="usage statistics"/></a>
+					<a href="<%= request.getContextPath() %>/cris/stats/collection.html?handle=<%= collections[i].getHandle() %>&type=selected"><img src="<%= request.getContextPath() %>/image/stats/chart_curve.png" border="0" title="usage statistics"/></a>
 				&nbsp;
 		 <% } %>
         

@@ -18,11 +18,11 @@
 <c:if test="${weeklysubscribed}">&amp;freq=7</c:if>
 <c:if test="${monthlysubscribed}">&amp;freq=30</c:if>
 </c:set>
- <div style="margin-top:1.5em;" class="form-group">
+ <div style="margin-top:2.3em;" class="form-group">
 	<div class="col-md-12">
 		<div>
 		<ul class="nav nav-tabs">
-			<li class="<c:if test="${type ne 'community' && type ne 'collection' && type ne 'item' && type ne 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}"><fmt:message key="view.stats-community.selectedObject.page.title" /></a></li>
+			<li class="<c:if test="${type ne 'community' && type ne 'collection' && type ne 'item' && type ne 'bitstream'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&type=selected"><fmt:message key="view.stats-community.selectedObject.page.title" /></a></li>
 			<li class="<c:if test="${type eq 'community'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=community"><fmt:message key="view.stats-community.top.community.page.title" /></a></li>
 			<li class="<c:if test="${type eq 'collection'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=collection"><fmt:message key="view.stats-community.top.collection.page.title" /></a></li>
 			<li class="<c:if test="${type eq 'item'}">active</c:if>"><a class="ui-tabs-anchor" href="${link}&amp;type=item"><fmt:message key="view.stats-community.top.item.page.title" /></a></li>

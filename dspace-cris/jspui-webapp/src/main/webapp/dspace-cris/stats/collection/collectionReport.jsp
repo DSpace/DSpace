@@ -74,7 +74,7 @@
 	<%@ include file="/dspace-cris/stats/collection/_collectionReport.jsp" %>
 <div class="bottom">
 			<c:if test="${data.seeParentObject}">
-				<c:set var="parentLink">${contextPath}/stats/community.html?handle=${data.parentObject.handle}&type=${type}</c:set>
+				<c:set var="parentLink">${contextPath}/cris/stats/community.html?handle=${data.parentObject.handle}&type=${type}&stats_from_date=${data.stats_from_date}&stats_to_date=${data.stats_to_date}</c:set>
 				<div class="list-group">
 					<a class="list-group-item" href="${parentLink}"><fmt:message key="view.${data.jspKey}.${type}.parentStats"><fmt:param>${data.parentObject.name}</fmt:param></fmt:message></a>
 				</div>

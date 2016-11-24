@@ -117,7 +117,7 @@
             }
 %>
 		<small><fmt:message key="jsp.collection-home.heading1"/></small>
-      <a class="statisticsLink btn btn-info" href="<%= request.getContextPath() %>/cris/stats/collection.html?handle=<%= collection.getHandle() %>"><fmt:message key="jsp.collection-home.display-statistics"/></a>
+      <a class="statisticsLink btn btn-info" href="<%= request.getContextPath() %>/cris/stats/collection.html?handle=<%= collection.getHandle() %>&type=selected"><fmt:message key="jsp.collection-home.display-statistics"/></a>
       </h2></div>
 <%  if (logo != null) { %>
         <div class="col-md-4">
