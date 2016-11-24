@@ -96,7 +96,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
             }
             catch (Exception e)
             {
-                assertThat("testDSpaceCSV Bad heading CSV", e.getMessage(), equalTo("Unknown metadata element in row 4: dc.contributor.foobar"));
+                assertThat("testDSpaceCSV Bad heading CSV", e.getMessage(), equalTo("Unknown metadata element in column 4: dc.contributor.foobar"));
             }
             lines = dcsv.getCSVLinesAsStringArray();
             assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(7));
@@ -126,7 +126,7 @@ public class DSpaceCSVTest extends AbstractUnitTest
             }
             catch (Exception e)
             {
-                assertThat("testDSpaceCSV Bad heading CSV", e.getMessage(), equalTo("Unknown metadata schema in row 3: dcdc.title"));
+                assertThat("testDSpaceCSV Bad heading CSV", e.getMessage(), equalTo("Unknown metadata schema in column 3: dcdc.title"));
             }
 
             // Delete the test file
