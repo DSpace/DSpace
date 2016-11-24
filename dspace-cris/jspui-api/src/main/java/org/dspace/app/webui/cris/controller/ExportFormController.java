@@ -134,6 +134,7 @@ public class ExportFormController extends BaseFormController
                 query.setFields("search.resourceid", "search.resourcetype",
                         "cris-uuid");
                 query.setRows(Integer.MAX_VALUE);
+                searchService.commit();
                 QueryResponse qresponse = searchService.search(query);
                 SolrDocumentList docList = qresponse.getResults();
                 Iterator<SolrDocument> solrDoc = docList.iterator();
