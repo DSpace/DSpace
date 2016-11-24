@@ -37,12 +37,12 @@ import java.util.StringTokenizer;
 
 public class RisView implements View {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(RisView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RisView.class);
     private static final String EOL = "\r\n";
 
-    private String resourceIdentifier=null;
+    private String resourceIdentifier = null;
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
-    
+
     public RisView(String resourceIdentifier)
     {
         this.resourceIdentifier = resourceIdentifier;
@@ -50,11 +50,12 @@ public class RisView implements View {
 
     public String getContentType()
     {
-
         return "text/plain;charset=utf-8";
     }
 
-    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
+        throws Exception
+    {
 
         DSpaceObject item = (DSpaceObject)request.getAttribute(ResourceIdentifierController.DSPACE_OBJECT);
 
@@ -71,87 +72,88 @@ public class RisView implements View {
     private String getFileName(DSpaceObject item)
     {
         String fileName = resourceIdentifier;
-        if(resourceIdentifier.indexOf("/") !=-1)
+        if (resourceIdentifier.indexOf("/") !=-1)
         {
             fileName = resourceIdentifier.replaceAll("/", "_") + ".ris";
         }
         return fileName;
     }
 
-    private void write(HttpServletResponse aResponse, String aContent, String aFileName) throws IOException
+    private void write(HttpServletResponse aResponse, String aContent, String aFileName)
+        throws IOException
     {
-		aResponse.setContentType("text/plain;charset=utf-8");
-		aResponse.setContentLength(aContent.length());
-		aResponse.setHeader("Content-Disposition", "attachment; filename=\"" + aFileName + "\"");
+        aResponse.setContentType("text/plain;charset=utf-8");
+        aResponse.setContentLength(aContent.length());
+        aResponse.setHeader("Content-Disposition", "attachment; filename=\"" + aFileName + "\"");
 
-		// It's all over but the writing...
-		PrintWriter writer = aResponse.getWriter();
-		writer.print(aContent);
-		writer.close();
-	}
+        // It's all over but the writing...
+        PrintWriter writer = aResponse.getWriter();
+        writer.print(aContent);
+        writer.close();
+    }
 
 
     private String getRIS(Item item, String resourceIdentifier)
     {
-		StringBuilder builder = new StringBuilder("TY  - DATA").append(EOL);
+        StringBuilder builder = new StringBuilder("TY  - DATA").append(EOL);
 
         String[] dateParts = getDate(item);
-		String title = getMetadataValue(item, "dc.title");
-		String description = getMetadataValue(item, "dc.description");
+        String title = getMetadataValue(item, "dc.title");
+        String description = getMetadataValue(item, "dc.description");
 
         String[] keywords = getKeywords(item);
 
 
-		if (resourceIdentifier != null)
+        if (resourceIdentifier != null)
         {
-			builder.append("ID  - ").append(resourceIdentifier).append(EOL);
-		}
+            builder.append("ID  - ").append(resourceIdentifier).append(EOL);
+        }
 
-		if (title != null)
+        if (title != null)
         {
-			builder.append("T1  - ").append(title).append(EOL);
-		}
+            builder.append("T1  - ").append(title).append(EOL);
+        }
 
-		for (String author : getAuthors(item)) {
-			builder.append("AU  - ").append(author).append(EOL);
-		}
+        for (String author : getAuthors(item)) {
+            builder.append("AU  - ").append(author).append(EOL);
+        }
 
-		// Date for data package
-		if (dateParts.length > 0)
+        // Date for data package
+        if (dateParts.length > 0)
         {
-			int count = 3;
+            int count = 3;
 
-			builder.append("Y1  - ");
+            builder.append("Y1  - ");
 
-			if (dateParts.length < 3)
+            if (dateParts.length < 3)
             {
-				count = dateParts.length;
-			}
+                count = dateParts.length;
+            }
 
-			for (int index = 0; index < count; index++) {
-				builder.append(dateParts[index]).append("/");
-			}
+            for (int index = 0; index < count; index++) {
+                builder.append(dateParts[index]).append("/");
+            }
 
-			for (; count < 3; count++)
+            for (; count < 3; count++)
             {
-				builder.append('/');
-			}
+                builder.append('/');
+            }
 
-			builder.append(EOL);
-		}
+            builder.append(EOL);
+        }
 
-		if (description != null)
+        if (description != null)
         {
-			builder.append("N2  - ").append(description).append(EOL);
-		}
+            builder.append("N2  - ").append(description).append(EOL);
+        }
 
-		for (String keyword : keywords)
+        for (String keyword : keywords)
         {
-			builder.append("KW  - ").append(keyword).append(EOL);
-		}
+            builder.append("KW  - ").append(keyword).append(EOL);
+        }
 
-		return builder.append("ER  - ").append(EOL).toString();
-	}
+        return builder.append("ER  - ").append(EOL).toString();
+    }
 
 
     private String[] getAuthors(Item aItem)

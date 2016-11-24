@@ -10,7 +10,7 @@ package org.dspace.storage.rdbms;
 /**
  * Value object for the Database configuration, can be used to get the database configuration parameters.
  * The config parameters are retrieved by the implementation of the org.dspace.core.DBConnection object.
- * This class should never be used to store configuration, it is just used to export & can be used for display purposes
+ * This class should never be used to store configuration, it is just used to export and can be used for display purposes
  *
  * @author kevinvandevelde at atmire.com
  */

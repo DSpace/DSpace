@@ -37,7 +37,7 @@ public interface MetadataFieldService {
      * @return new MetadataField
      * @throws AuthorizeException if authorization error
      * @throws SQLException if database error
-     * @throws NonUniqueMetadataException
+     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already present
      */
     public MetadataField create(Context context, MetadataSchema metadataSchema, String element, String qualifier, String scopeNote)
             throws AuthorizeException, SQLException, NonUniqueMetadataException;
@@ -102,7 +102,7 @@ public interface MetadataFieldService {
      * @param metadataField metadata field
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
-     * @throws NonUniqueMetadataException
+     * @throws NonUniqueMetadataException if an existing field with an identical element and qualifier is already present
      * @throws IOException if IO error
      */
     public void update(Context context, MetadataField metadataField)

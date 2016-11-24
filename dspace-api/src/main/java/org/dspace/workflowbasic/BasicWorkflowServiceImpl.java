@@ -100,7 +100,7 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
 
     @Override
     public void addInitialWorkspaceItemPolicies(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
-                // Now create the policies for the submitter and workflow
+        // Now create the policies for the submitter and workflow
         // users to modify item and contents
         // contents = bitstreams, bundles
         // FIXME: icky hardcoded workflow steps
@@ -639,7 +639,18 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
      * with the relevant collection, added to the search index, and any other
      * tasks such as assigning dates are performed.
      *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param workflowItem
+     *     which workflow item to archive
      * @return the fully archived item.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     public Item archive(Context context, BasicWorkflowItem workflowItem)
@@ -664,6 +675,17 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
 
     /**
      * notify the submitter that the item is archived
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param item
+     *     which item was archived
+     * @param coll
+     *     collection name to display in template
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     protected void notifyOfArchive(Context context, Item item, Collection coll)
             throws SQLException, IOException
@@ -717,6 +739,13 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
      * @param wfi
      *            WorkflowItem to be 'dismantled'
      * @return the workspace item
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected WorkspaceItem returnToWorkspace(Context c, BasicWorkflowItem wfi)
             throws SQLException, IOException, AuthorizeException
@@ -1087,20 +1116,20 @@ public class BasicWorkflowServiceImpl implements BasicWorkflowService
             if (roleGroup == null)
                 roleGroup = collectionService.createWorkflowGroup(context, collection, 1);
 
-		}
-		else if ("WF_STEP2".equals(roleName))
-		{
+        }
+        else if ("WF_STEP2".equals(roleName))
+        {
             roleGroup = collection.getWorkflowStep2();
             if (roleGroup == null)
                 roleGroup = collectionService.createWorkflowGroup(context, collection, 2);
         }
-		else if ("WF_STEP3".equals(roleName))
-		{
+        else if ("WF_STEP3".equals(roleName))
+        {
             roleGroup = collection.getWorkflowStep3();
             if (roleGroup == null)
                 roleGroup = collectionService.createWorkflowGroup(context, collection, 3);
 
-		}
+        }
         return roleGroup;
     }
 

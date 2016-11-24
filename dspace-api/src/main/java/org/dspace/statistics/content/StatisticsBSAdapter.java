@@ -53,7 +53,8 @@ public class StatisticsBSAdapter {
      * @param visitType the type of visits we want, from the item, bitstream, total
      * @param item the item from which we need our visits
      * @return the number of visits
-     * @throws SolrServerException ....
+     * @throws SolrServerException
+     *     Exception from the Solr server to the solrj Java client.
      */
     public long getNumberOfVisits(int visitType, Item item) throws SolrServerException {
         switch (visitType){

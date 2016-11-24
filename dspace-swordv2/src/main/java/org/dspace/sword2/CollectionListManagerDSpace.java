@@ -52,7 +52,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
             SwordUrlManager urlManager = config.getUrlManager(context, config);
 
             Collection collection = urlManager
-                    .getCollection(context, colIRI.toString());
+                .getCollection(context, colIRI.toString());
             if (collection == null)
             {
                 throw new SwordError(404);
@@ -80,8 +80,8 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
             throws DSpaceSwordException
     {
         SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
-        SwordUrlManager urlManager = config
-                .getUrlManager(sc.getContext(), config);
+        SwordUrlManager urlManager = config.getUrlManager(
+            sc.getContext(), config);
 
         Abdera abdera = new Abdera();
         Feed feed = abdera.newFeed();
@@ -91,11 +91,11 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
             Entry entry = feed.addEntry();
             entry.setId(urlManager.getEditIRI(item).toString());
             String title = this.stringMetadata(item, ConfigurationManager
-                    .getProperty("swordv2-server", "title.field"));
+                .getProperty("swordv2-server", "title.field"));
             title = title == null ? "Untitled" : title;
             entry.setTitle(title);
-            entry.addLink(urlManager.getContentUrl(item).toString(),
-                    "edit-media");
+            entry.addLink(
+                urlManager.getContentUrl(item).toString(), "edit-media");
         }
 
         return feed;
@@ -108,13 +108,13 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI
         try
         {
             EPerson person = sc.getOnBehalfOf() != null ?
-                    sc.getOnBehalfOf() :
-                    sc.getAuthenticated();
+                sc.getOnBehalfOf() :
+                sc.getAuthenticated();
             List<Item> collectionItems = new ArrayList<>();
 
             // first get the ones out of the archive
             Iterator<Item> items = itemService
-                    .findBySubmitter(sc.getContext(), person);
+                .findBySubmitter(sc.getContext(), person);
             while (items.hasNext())
             {
                 Item item = items.next();

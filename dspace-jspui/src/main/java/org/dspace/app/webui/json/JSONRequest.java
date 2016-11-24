@@ -29,7 +29,9 @@ public abstract class JSONRequest
 
     /**
      * Set the subPath that this plugin-instance will serve
+     *
      * @param subPath
+     *      URL subpath to be served by this servlet plugin
      */
     public void setSubPath(String subPath)
     {

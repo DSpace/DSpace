@@ -57,31 +57,31 @@ public class SiteViewer extends AbstractDSpaceTransformer implements CacheablePr
     /**
      * Add a page title and trail links.
      */
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
-    	pageMeta.addMetadata("title").addContent(T_dspace_home);
-    	pageMeta.addTrailLink(contextPath, T_dspace_home);
+        pageMeta.addMetadata("title").addContent(T_dspace_home);
+        pageMeta.addTrailLink(contextPath, T_dspace_home);
 
         // Add RSS links if available
         String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
-		if ( formats != null )
-		{
-			for (String format : formats)
-			{
-				// Remove the protocol number, i.e. just list 'rss' or' atom'
-				String[] parts = format.split("_");
-				if (parts.length < 1)
+        if ( formats != null )
+        {
+            for (String format : formats)
+            {
+                // Remove the protocol number, i.e. just list 'rss' or' atom'
+                String[] parts = format.split("_");
+                if (parts.length < 1)
                 {
                     continue;
                 }
 
-				String feedFormat = parts[0].trim()+"+xml";
+                String feedFormat = parts[0].trim() + "+xml";
 
-				String feedURL = contextPath+"/feed/"+format.trim()+"/site";
-				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
-			}
-		}
+                String feedURL = contextPath + "/feed/" + format.trim() + "/site";
+                pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
+            }
+        }
     }
 }

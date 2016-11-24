@@ -155,6 +155,7 @@ public interface BrowseDAO
      * to only items or values within items that appear in the given container.
      *
      * @param containerID
+     *     community/collection internal ID (UUID)
      */
     public void setContainerID(UUID containerID);
 
@@ -234,7 +235,7 @@ public interface BrowseDAO
      * normal browse operations can be completed without it.  The default is -1, which
      * means do not offset.
      *
-     * @return      the offset
+     * @return      paging offset
      */
     public int getOffset();
 
@@ -245,6 +246,7 @@ public interface BrowseDAO
      * means do not offset.
      *
      * @param offset
+     *     paging offset
      */
     public void setOffset(int offset);
 

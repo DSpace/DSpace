@@ -43,18 +43,18 @@ import org.dspace.app.bulkedit.BulkEditChange;
 
 public class MetadataImportUpload extends AbstractDSpaceTransformer {
 
-	/** Language strings */
-	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
-	private static final Message T_submit_return = message("xmlui.general.return");
-	private static final Message T_trail = message("xmlui.administrative.metadataimport.general.trail");
-	private static final Message T_no_changes = message("xmlui.administrative.metadataimport.general.no_changes");
+    /** Language strings */
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_submit_return = message("xmlui.general.return");
+    private static final Message T_trail = message("xmlui.administrative.metadataimport.general.trail");
+    private static final Message T_no_changes = message("xmlui.administrative.metadataimport.general.no_changes");
     private static final Message T_new_item = message("xmlui.administrative.metadataimport.general.new_item");
-	private static final Message T_title = message("xmlui.administrative.metadataimport.general.title");
-	private static final Message T_head1 = message("xmlui.administrative.metadataimport.general.head1");
+    private static final Message T_title = message("xmlui.administrative.metadataimport.general.title");
+    private static final Message T_head1 = message("xmlui.administrative.metadataimport.general.head1");
 
-	private static final Message T_para = message("xmlui.administrative.metadataimport.MetadataImportUpload.hint");
+    private static final Message T_para = message("xmlui.administrative.metadataimport.MetadataImportUpload.hint");
     private static final Message T_submit_confirm = message("xmlui.administrative.metadataimport.MetadataImportUpload.submit_confirm");
-	private static final Message T_changes_pending = message("xmlui.administrative.metadataimport.MetadataImportUpload.changes_pending");
+    private static final Message T_changes_pending = message("xmlui.administrative.metadataimport.MetadataImportUpload.changes_pending");
     private static final Message T_item_addition = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_add");
     private static final Message T_item_deletion = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_remove");
     private static final Message T_collection_newowner = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_newowner");
@@ -65,36 +65,39 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
     private static final Message T_item_withdraw = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_withdraw");
     private static final Message T_item_reinstate = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_reinstate");
 
-	public void addPageMeta(PageMeta pageMeta) throws WingException  
-	{
-		pageMeta.addMetadata("title").addContent(T_title);
-		
-		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-		pageMeta.addTrail().addContent(T_trail);
-	}
+    public void addPageMeta(PageMeta pageMeta)
+        throws WingException
+    {
+        pageMeta.addMetadata("title").addContent(T_title);
 
-	
-	public void addBody(Body body) throws SAXException, WingException, SQLException
-	{
-		// Get list of changes
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        pageMeta.addTrail().addContent(T_trail);
+    }
 
-		Request request = ObjectModelHelper.getRequest(objectModel);
+
+    public void addBody(Body body)
+        throws SAXException, WingException, SQLException
+    {
+        // Get list of changes
+
+        Request request = ObjectModelHelper.getRequest(objectModel);
         ArrayList<BulkEditChange> changes = null;
         int num_changes = 0;
 
-        if(request.getAttribute("changes") != null)
+        if (request.getAttribute("changes") != null)
         {
             changes = ((ArrayList<BulkEditChange>)request.getAttribute("changes"));
             num_changes = changes.size();
         }
 
-		// DIVISION: metadata-import
-		Division div = body.addInteractiveDivision("metadata-import",contextPath + "/admin/metadataimport", Division.METHOD_MULTIPART,"primary administrative");
-		div.setHead(T_head1);
-	
-        if(num_changes > 0)
-        {
+        // DIVISION: metadata-import
+        Division div = body.addInteractiveDivision("metadata-import",
+            contextPath + "/admin/metadataimport", Division.METHOD_MULTIPART,
+            "primary administrative");
+        div.setHead(T_head1);
 
+        if (num_changes > 0)
+        {
             div.addPara(T_para);
 
             Table mdchanges = div.addTable("metadata-changes", num_changes, 2);
@@ -132,7 +135,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                 // Show actions
                 if (change.isDeleted())
                 {
-                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-delete");
+                    Row mdrow = mdchanges.addRow("addition", Row.ROLE_DATA, "item-delete");
 
                     Cell cell = mdrow.addCell();
                     cell.addContent(T_item_delete);
@@ -140,7 +143,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                 }
                 if (change.isWithdrawn())
                 {
-                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-withdraw");
+                    Row mdrow = mdchanges.addRow("addition", Row.ROLE_DATA, "item-withdraw");
 
                     Cell cell = mdrow.addCell();
                     cell.addContent(T_item_withdraw);
@@ -148,7 +151,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                 }
                 if (change.isReinstated())
                 {
-                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-reinstate");
+                    Row mdrow = mdchanges.addRow("addition", Row.ROLE_DATA, "item-reinstate");
 
                     Cell cell = mdrow.addCell();
                     cell.addContent(T_item_reinstate);
@@ -163,7 +166,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                     {
                         String cHandle = c.getHandle();
                         String cName = c.getName();
-                        Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
+                        Row colrow = mdchanges.addRow("addition", Row.ROLE_DATA, "metadata-addition");
                         colrow.addCellContent(T_collection_newowner);
                         colrow.addCellContent(cHandle + " (" + cName + ")");
                     }
@@ -177,7 +180,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                     {
                         String cHandle = c.getHandle();
                         String cName = c.getName();
-                        Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
+                        Row colrow = mdchanges.addRow("deletion", Row.ROLE_DATA, "metadata-deletion");
                         colrow.addCellContent(T_collection_oldowner);
                         colrow.addCellContent(cHandle + " (" + cName + ")");
                     }
@@ -188,7 +191,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                 {
                     String cHandle = c.getHandle();
                     String cName = c.getName();
-                    Row colrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
+                    Row colrow = mdchanges.addRow("addition", Row.ROLE_DATA, "metadata-addition");
                     colrow.addCellContent(T_collection_mapped);
                     colrow.addCellContent(cHandle + " (" + cName + ")");
                 }
@@ -198,7 +201,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                 {
                     String cHandle = c.getHandle();
                     String cName = c.getName();
-                    Row colrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
+                    Row colrow = mdchanges.addRow("deletion", Row.ROLE_DATA, "metadata-deletion");
                     colrow.addCellContent(T_collection_unmapped);
                     colrow.addCellContent(cHandle + " (" + cName + ")");
                 }
@@ -206,7 +209,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                 // Show additions
                 for (BulkEditMetadataValue dcv : adds)
                 {
-                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"metadata-addition");
+                    Row mdrow = mdchanges.addRow("addition", Row.ROLE_DATA, "metadata-addition");
                     String md = dcv.getSchema() + "." + dcv.getElement();
                     if (dcv.getQualifier() != null)
                     {
@@ -226,7 +229,7 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                 // Show removals
                 for (BulkEditMetadataValue dcv : removes)
                 {
-                    Row mdrow = mdchanges.addRow("deletion",Row.ROLE_DATA,"metadata-deletion");
+                    Row mdrow = mdchanges.addRow("deletion", Row.ROLE_DATA, "metadata-deletion");
                     String md = dcv.getSchema() + "." + dcv.getElement();
                     if (dcv.getQualifier() != null)
                     {
@@ -258,9 +261,6 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
             cancel.setValue(T_submit_return);
         }
 
-
-
         div.addHidden("administrative-continue").setValue(knot.getId());
-	}
-
+    }
 }

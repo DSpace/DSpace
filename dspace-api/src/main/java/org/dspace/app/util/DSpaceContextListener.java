@@ -30,6 +30,7 @@ public class DSpaceContextListener implements ServletContextListener
     /**
      * Initialize any resources required by the application.
      * @param event
+     *     This is the event class for notifications about changes to the servlet context of a web application.
      */
     @Override
     public void contextInitialized(ServletContextEvent event)
@@ -63,6 +64,7 @@ public class DSpaceContextListener implements ServletContextListener
      * Clean up resources used by the application when stopped
      * 
      * @param event
+     8     Event class for notifications about changes to the servlet context of a web application.
      */
     @Override
     public void contextDestroyed(ServletContextEvent event)

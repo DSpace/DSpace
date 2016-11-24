@@ -21,7 +21,7 @@ import org.dspace.content.Bitstream;
  */
 public class MediaEntryManager
 {
-    /** sword service implementation */
+    /** SWORD service implementation */
     private SWORDService swordService;
 
     public MediaEntryManager(SWORDService swordService)
@@ -35,8 +35,11 @@ public class MediaEntryManager
      * with DSpace custom URLs.
      *
      * @param url
+     *     URL to check
+     * @return media entry for the given URL request
      * @throws DSpaceSWORDException
-     * @throws SWORDErrorException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException on generic SWORD exception
      */
     public AtomDocumentResponse getMediaEntry(String url)
             throws DSpaceSWORDException, SWORDErrorException
@@ -53,8 +56,8 @@ public class MediaEntryManager
             // FIXME: what do we actually do about this situation?
             // throwing an error for the time being
             throw new SWORDErrorException(
-                    DSpaceSWORDErrorCodes.MEDIA_UNAVAILABLE,
-                    "The media link you requested is not available");
+                DSpaceSWORDErrorCodes.MEDIA_UNAVAILABLE,
+                "The media link you requested is not available");
         }
 
         // extract the thing that we are trying to get a media entry on
@@ -64,7 +67,7 @@ public class MediaEntryManager
         if (!(dso instanceof Bitstream))
         {
             throw new SWORDErrorException(DSpaceSWORDErrorCodes.BAD_URL,
-                    "The url you provided does not resolve to an appropriate object");
+                "The url you provided does not resolve to an appropriate object");
         }
 
         // now construct the atom entry for the bitstream

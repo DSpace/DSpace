@@ -39,7 +39,7 @@ public class SubmissionStepConfig implements Serializable
 
     /**
      * the id for this step ('id' only exists if this step is defined in the
-     * <step-definitions> section)
+     * &lt;step-definitions&gt; section)
      */
     private String id = null;
 

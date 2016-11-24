@@ -35,18 +35,18 @@ import org.dspace.app.util.CollectionDropDown;
  */
 public class MoveItemForm extends AbstractDSpaceTransformer {
 
-	/** Language strings */
-	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
-	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
-	private static final Message T_submit_cancel = message("xmlui.general.cancel");
-	
-	private static final Message T_title = message("xmlui.administrative.item.MoveItemForm.title");
-	private static final Message T_trail = message("xmlui.administrative.item.MoveItemForm.trail");
-	private static final Message T_head1 = message("xmlui.administrative.item.MoveItemForm.head1");
-	private static final Message T_collection = message("xmlui.administrative.item.MoveItemForm.collection");
-	private static final Message T_collection_help = message("xmlui.administrative.item.MoveItemForm.collection_help");
-	private static final Message T_collection_default = message("xmlui.administrative.item.MoveItemForm.collection_default");
-	private static final Message T_submit_move = message("xmlui.administrative.item.MoveItemForm.submit_move");
+    /** Language strings */
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
+    private static final Message T_submit_cancel = message("xmlui.general.cancel");
+    
+    private static final Message T_title = message("xmlui.administrative.item.MoveItemForm.title");
+    private static final Message T_trail = message("xmlui.administrative.item.MoveItemForm.trail");
+    private static final Message T_head1 = message("xmlui.administrative.item.MoveItemForm.head1");
+    private static final Message T_collection = message("xmlui.administrative.item.MoveItemForm.collection");
+    private static final Message T_collection_help = message("xmlui.administrative.item.MoveItemForm.collection_help");
+    private static final Message T_collection_default = message("xmlui.administrative.item.MoveItemForm.collection_default");
+    private static final Message T_submit_move = message("xmlui.administrative.item.MoveItemForm.submit_move");
     private static final Message T_submit_inherit = message("xmlui.administrative.item.MoveItemForm.inherit_policies");
     private static final Message T_submit_inherit_help = message("xmlui.administrative.item.MoveItemForm.inherit_policies_help");
 
@@ -54,24 +54,27 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
 
-	public void addPageMeta(PageMeta pageMeta) throws WingException
-	{
-		pageMeta.addMetadata("title").addContent(T_title);
-		
-		
-		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-		pageMeta.addTrailLink(contextPath+"/admin/item", T_item_trail);
-		pageMeta.addTrail().addContent(T_trail);
-	}
+    public void addPageMeta(PageMeta pageMeta)
+        throws WingException
+    {
+        pageMeta.addMetadata("title").addContent(T_title);
+        
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        pageMeta.addTrailLink(contextPath + "/admin/item", T_item_trail);
+        pageMeta.addTrail().addContent(T_trail);
+    }
 
-	public void addBody(Body body) throws WingException, SQLException 
-	{
+    public void addBody(Body body)
+        throws WingException, SQLException 
+    {
         // Get our parameters and state
         UUID itemID = UUID.fromString(parameters.getParameter("itemID", null));
         Item item = itemService.find(context, itemID);
         
         // DIVISION: Main
-        Division main = body.addInteractiveDivision("move-item", contextPath+"/admin/item", Division.METHOD_POST, "primary administrative item");
+        Division main = body.addInteractiveDivision("move-item",
+            contextPath + "/admin/item", Division.METHOD_POST,
+            "primary administrative item");
         main.setHead(T_head1.parameterize(item.getHandle()));
 
         java.util.List<Collection> collections = collectionService.findAuthorizedOptimized(context, Constants.ADD);
@@ -82,7 +85,8 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         select.setHelp(T_collection_help);
         
         Collection owningCollection = item.getOwningCollection();
-        if (owningCollection == null) {
+        if (owningCollection == null)
+        {
             select.addOption("",T_collection_default);
         }
         
@@ -97,7 +101,9 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
             // Only add the item if it isn't already the owner
             if (!itemService.isOwningCollection(item, collection))
             {
-                select.addOption(collection.equals(owningCollection), collection.getID().toString(), CollectionDropDown.collectionPath(context, collection));
+                select.addOption(collection.equals(owningCollection),
+                    collection.getID().toString(),
+                    CollectionDropDown.collectionPath(context, collection));
             }
         }
         
@@ -107,8 +113,8 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         inheritPolicies.setHelp(T_submit_inherit_help);
         inheritPolicies.addOption("inheritPolicies");
         actions.addButton("submit_move").setValue(T_submit_move);
-		actions.addButton("submit_cancel").setValue(T_submit_cancel);
+        actions.addButton("submit_cancel").setValue(T_submit_cancel);
 
-		main.addHidden("administrative-continue").setValue(knot.getId());
-	}
+        main.addHidden("administrative-continue").setValue(knot.getId());
+    }
 }

@@ -15,8 +15,7 @@ import org.dspace.core.ConfigurationManager;
 
 /**
  * An instance of this class contains the configuration profile of a specific,
- * named Consumer, <em>in the context of a specific
- * Dispatcher</em>. This
+ * named Consumer, <em>in the context of a specific Dispatcher</em>. This
  * includes the name, the class to instantiate and event filters. Note that all
  * characteristics are "global" and the same for all dispatchers.
  * 
@@ -53,20 +52,38 @@ public class ConsumerProfile
      * @param name
      *            configuration name of the consumer profile
      * @return a new ConsumerProfile; never null.
+     * @throws IllegalArgumentException if no class or no filters configured for the specified consumer
+     * @throws ClassNotFoundException passed through.
+     *     
+     * @throws InstantiationException passed through.
+     *     
+     * @throws IllegalAccessException passed through.
+     *     
      */
     public static ConsumerProfile makeConsumerProfile(String name)
-            throws IllegalArgumentException, ClassNotFoundException,
-            InstantiationException, IllegalAccessException
+        throws IllegalArgumentException, ClassNotFoundException,
+        InstantiationException, IllegalAccessException
     {
         ConsumerProfile result = new ConsumerProfile(name);
         result.readConfiguration();
         return result;
     }
 
-    // Get class and filters from DSpace Configuration.
-    private void readConfiguration() throws IllegalArgumentException,
-            ClassNotFoundException, InstantiationException,
-            IllegalAccessException
+    /**
+     * Get class and filters from DSpace Configuration.
+     * 
+     * @throws IllegalArgumentException if no class or no filters configured for the specified consumer
+     * @throws ClassNotFoundException passed through.
+     *     
+     * @throws InstantiationException passed through.
+     *     
+     * @throws IllegalAccessException passed through.
+     *     
+     */
+    
+    private void readConfiguration()
+        throws IllegalArgumentException, ClassNotFoundException,
+        InstantiationException, IllegalAccessException
     {
         String className = ConfigurationManager.getProperty(CONSUMER_PREFIX
                 + name + ".class");
@@ -94,12 +111,11 @@ public class ConsumerProfile
             String fpart[] = part[j].split("\\+");
             if (fpart.length != 2)
             {
-                log
-                        .error("Bad Filter clause in consumer stanza in Configuration entry for "
-                                + CONSUMER_PREFIX
-                                + name
-                                + ".consumers: "
-                                + part[j]);
+                log.error("Bad Filter clause in consumer stanza in Configuration entry for "
+                          + CONSUMER_PREFIX
+                          + name
+                          + ".consumers: "
+                          + part[j]);
             }
             else
             {
@@ -112,11 +128,10 @@ public class ConsumerProfile
                     int ot = Event.parseObjectType(objectNames[k]);
                     if (ot == 0)
                     {
-                        log
-                                .error("Bad ObjectType in Consumer Stanza in Configuration entry for "
-                                        + CONSUMER_PREFIX
-                                        + name
-                                        + ".consumers: " + objectNames[k]);
+                        log.error("Bad ObjectType in Consumer Stanza in Configuration entry for "
+                                  + CONSUMER_PREFIX
+                                  + name
+                                  + ".consumers: " + objectNames[k]);
                     }
                     else
                     {
@@ -129,11 +144,10 @@ public class ConsumerProfile
                     int et = Event.parseEventType(eventNames[k]);
                     if (et == 0)
                     {
-                        log
-                                .error("Bad EventType in Consumer Stanza in Configuration entry for "
-                                        + CONSUMER_PREFIX
-                                        + name
-                                        + ".consumers: " + eventNames[k]);
+                        log.error("Bad EventType in Consumer Stanza in Configuration entry for "
+                                  + CONSUMER_PREFIX
+                                  + name
+                                  + ".consumers: " + eventNames[k]);
                     }
                     else
                     {

@@ -171,6 +171,8 @@ public class EmbargoServiceImpl implements EmbargoService
      * Ensures the configurationService is injected, so that we can
      * get plugins and MD field settings from config.
      * Called by "init-method" in Spring config.
+     *
+     * @throws Exception on generic exception
      */
     public void init() throws Exception
     {

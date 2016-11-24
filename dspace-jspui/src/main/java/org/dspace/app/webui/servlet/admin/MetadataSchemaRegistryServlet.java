@@ -191,15 +191,17 @@ public class MetadataSchemaRegistryServlet extends DSpaceServlet
      * Show list of DC type
      *
      * @param context
-     *            Current DSpace context
+     *     The relevant DSpace Context.
      * @param request
-     *            Current HTTP request
+     *     Servlet's HTTP request object.
      * @param response
-     *            Current HTTP response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
-     * @throws IOException
+     *     An exception that provides information on a database access error or other errors.
      */
     private void showSchemas(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException,

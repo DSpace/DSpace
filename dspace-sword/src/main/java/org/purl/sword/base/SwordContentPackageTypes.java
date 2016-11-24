@@ -31,12 +31,12 @@ public class SwordContentPackageTypes {
         {
             types = new Properties();
             InputStream stream = SwordContentPackageTypes.class.getClassLoader().getResourceAsStream("swordContentPackageTypes.properties");
-            if( stream != null )
+            if ( stream != null )
             {
                 types.loadFromXML(stream);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             log.error("Unable to load sword types property file: " + ex.getMessage());
         }
@@ -50,7 +50,7 @@ public class SwordContentPackageTypes {
 
     public static SwordContentPackageTypes instance()
     {
-       if( instance == null )
+       if ( instance == null )
        {
            instance = new SwordContentPackageTypes();
        }
@@ -67,12 +67,8 @@ public class SwordContentPackageTypes {
         return types.isEmpty();
     }
 
-    /**
-     *
-     */
     public Enumeration elements()
     {
-
         return types.elements();
     }
     
@@ -80,7 +76,4 @@ public class SwordContentPackageTypes {
     {
         return types.keys();
     }
-
-
-
 }

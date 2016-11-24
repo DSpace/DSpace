@@ -40,12 +40,17 @@ public class DiscoverHitHighlightingField {
      * field containing a matching hit. e.g. If maxChars = 200
      * and a hit is found in the full-text the 200 chars
      * surrounding the hit will be shown
+     *
+     * @return max number of characters shown for a hit
      */
     public int getMaxChars()
     {
         return maxChars;
     }
 
+    /**
+     * @return max number of result snippets
+     */
     public int getMaxSnippets()
     {
         return maxSnippets;

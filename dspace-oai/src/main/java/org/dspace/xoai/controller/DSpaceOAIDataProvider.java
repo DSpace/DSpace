@@ -47,7 +47,7 @@ import static org.apache.log4j.Logger.getLogger;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @Controller
 public class DSpaceOAIDataProvider

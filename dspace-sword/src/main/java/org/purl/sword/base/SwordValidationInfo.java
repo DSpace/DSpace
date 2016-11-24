@@ -81,7 +81,7 @@ public class SwordValidationInfo {
      */
     public SwordValidationInfo(XmlName element)
     {
-       this(element, null, "", SwordValidationInfoType.VALID);
+        this(element, null, "", SwordValidationInfoType.VALID);
     }
 
     /**
@@ -108,7 +108,7 @@ public class SwordValidationInfo {
                                String theMessage,
                                SwordValidationInfoType theType)
     {
-       this(element, null, theMessage, theType);
+        this(element, null, theMessage, theType);
     }
 
     /**
@@ -124,15 +124,15 @@ public class SwordValidationInfo {
                                String theMessage,
                                SwordValidationInfoType theType)
     {
-       this.elementName = element;
-       this.attributeName = attribute;
-       
-       message = theMessage;
-       type = theType;
-       elementInfo = new ArrayList<SwordValidationInfo>();
-       attributeInfo = new ArrayList<SwordValidationInfo>();
-       unmarshallElementInfo = new ArrayList<SwordValidationInfo>();
-       unmarshallAttributeInfo = new ArrayList<SwordValidationInfo>(); 
+        this.elementName = element;
+        this.attributeName = attribute;
+        
+        message = theMessage;
+        type = theType;
+        elementInfo = new ArrayList<SwordValidationInfo>();
+        attributeInfo = new ArrayList<SwordValidationInfo>();
+        unmarshallElementInfo = new ArrayList<SwordValidationInfo>();
+        unmarshallAttributeInfo = new ArrayList<SwordValidationInfo>(); 
     }
 
     /**
@@ -215,17 +215,17 @@ public class SwordValidationInfo {
     public void addValidationInfo(SwordValidationInfo item)
     {
         
-       if( type.compareTo(item.getType()) < 0 )
-       {
-           type = item.getType();
-       }
-
-       elementInfo.add(item);
+        if ( type.compareTo(item.getType()) < 0 )
+        {
+            type = item.getType();
+        }
+ 
+        elementInfo.add(item);
     }
 
     public void addAttributeValidationInfo(SwordValidationInfo attribute)
     {
-        if( type.compareTo(attribute.getType()) < 0 )
+        if ( type.compareTo(attribute.getType()) < 0 )
         {
             type = attribute.getType();
         }
@@ -234,26 +234,26 @@ public class SwordValidationInfo {
 
     public void addUnmarshallElementInfo(SwordValidationInfo unmarshallElement)
     {
-       if( unmarshallElement == null )
-       {
-           // not part of the validation process - end here
-           return;
-       }
-       
-       if( type.compareTo(unmarshallElement.getType()) < 0 )
-       {
-           type = unmarshallElement.getType();
-       }
-       unmarshallElementInfo.add(unmarshallElement);
+        if ( unmarshallElement == null )
+        {
+            // not part of the validation process - end here
+            return;
+        }
+        
+        if ( type.compareTo(unmarshallElement.getType()) < 0 )
+        {
+            type = unmarshallElement.getType();
+        }
+        unmarshallElementInfo.add(unmarshallElement);
     }
 
     public void addUnmarshallAttributeInfo(SwordValidationInfo unmarshallAttribute)
     {
-       if( type.compareTo(unmarshallAttribute.getType()) < 0 )
-       {
-           type = unmarshallAttribute.getType();
-       }
-       unmarshallAttributeInfo.add(unmarshallAttribute);
+        if ( type.compareTo(unmarshallAttribute.getType()) < 0 )
+        {
+            type = unmarshallAttribute.getType();
+        }
+        unmarshallAttributeInfo.add(unmarshallAttribute);
     }
 
     /**
@@ -289,10 +289,10 @@ public class SwordValidationInfo {
     protected void resetType(Iterator<SwordValidationInfo> iterator)
     {
         SwordValidationInfo item = null;
-        while( iterator.hasNext() )
+        while ( iterator.hasNext() )
         {
             item = iterator.next();
-            if( item != null && type.compareTo(item.getType()) < 0 )
+            if ( item != null && type.compareTo(item.getType()) < 0 )
             {
                 type = item.getType();
             }
@@ -312,6 +312,7 @@ public class SwordValidationInfo {
 
     /**
      *
+     * @return the iterator.
      */
     public Iterator<SwordValidationInfo> getValidationAttributeInfoIterator()
     {
@@ -320,6 +321,7 @@ public class SwordValidationInfo {
 
     /**
      *
+     * @return the iterator.
      */
     public Iterator<SwordValidationInfo> getUnmarshallElementInfoIterator()
     {
@@ -328,6 +330,7 @@ public class SwordValidationInfo {
 
     /**
      * 
+     * @return the iterator.
      */
     public Iterator<SwordValidationInfo> getUnmarshallAttributeInfoIterator()
     {
@@ -350,117 +353,116 @@ public class SwordValidationInfo {
 
     /**
      * 
-     * @param elementItems
-     * @param attributeItems
+     * @param elementItems FIXME: PLEASE DOCUMENT.
+     * @param attributeItems FIXME: PLEASE DOCUMENT.
      */
     public void addUnmarshallValidationInfo(
             List<SwordValidationInfo> elementItems,
             List<SwordValidationInfo> attributeItems)
     {
-       if( elementItems != null )
-       {
-           Iterator<SwordValidationInfo> items = elementItems.iterator();
+        if ( elementItems != null )
+        {
+            Iterator<SwordValidationInfo> items = elementItems.iterator();
 
-           while( items.hasNext() )
-           {
-              addUnmarshallElementInfo(items.next());
-           }
-       }
+            while ( items.hasNext() )
+            {
+               addUnmarshallElementInfo(items.next());
+            }
+        }
 
-       if( attributeItems != null )
-       {
-          Iterator<SwordValidationInfo> attributes = attributeItems.iterator();
+        if ( attributeItems != null )
+        {
+            Iterator<SwordValidationInfo> attributes = attributeItems.iterator();
+ 
+            while ( attributes.hasNext() )
+            {
+                addUnmarshallAttributeInfo(attributes.next());
+            }
+        }
+    }
 
-           while( attributes.hasNext() )
-           {
-              addUnmarshallAttributeInfo(attributes.next());
-           }
-       }
-   }
+    public void addUnmarshallValidationInfo(SwordValidationInfo other)
+    {
+        addUnmarshallValidationInfo(other.elementInfo, other.attributeInfo);
+    }
 
-   public void addUnmarshallValidationInfo(SwordValidationInfo other)
-   {
-       addUnmarshallValidationInfo(other.elementInfo, other.attributeInfo);
-   }
-
-   @Override
-   public String toString()
-   {
-       return "" + getType();
-   }
+    @Override
+    public String toString()
+    {
+        return "" + getType();
+    }
 
    /**
      * Utility method that will recursively print out the list of items
      * for the specified validation info object.
      *
      * @param info   The validation info object to display.
+     * @param buffer string buffer to append to
      * @param indent The level of indent, expressed as a number of space characters.
      */
     public void createString(SwordValidationInfo info, StringBuffer buffer, String indent)
     {
-       String prefix = info.getElement().getPrefix();
-       buffer.append(indent);
+        String prefix = info.getElement().getPrefix();
+        buffer.append(indent);
 
-       buffer.append("[");
-       buffer.append(info.getType());
-       buffer.append("]");
+        buffer.append("[");
+        buffer.append(info.getType());
+        buffer.append("]");
 
-       if( prefix != null && prefix.trim().length() > 0 )
-       {
-          buffer.append(prefix);
-          buffer.append(":");
-       }
+        if ( prefix != null && prefix.trim().length() > 0 )
+        {
+            buffer.append(prefix);
+            buffer.append(":");
+        }
 
-       buffer.append(info.getElement().getLocalName());
-       buffer.append("  ");
-       if (info.getAttribute() != null) {
-          buffer.append(info.getAttribute().getLocalName());
-          buffer.append("=\"");
-          if( info.getContentDescription() != null )
-          {
-             buffer.append(info.getContentDescription());
-          }
-          buffer.append("\"");
-       }
-       else
-       {
-          if( info.getContentDescription() != null )
-          {
-                 buffer.append(" Value: '");
-                 buffer.append(info.getContentDescription());
-                 buffer.append("'");
-          }
-       }
-       buffer.append("\n" + indent + "message: " );
-       buffer.append(info.getMessage());
-       buffer.append("\n");
-       
-       // process the list of attributes first
-       Iterator<SwordValidationInfo> iterator = info.getValidationAttributeInfoIterator();
-       while( iterator.hasNext())
-       {
-          createString(iterator.next(), buffer, "   " + indent);
-       }
+        buffer.append(info.getElement().getLocalName());
+        buffer.append("  ");
+        if (info.getAttribute() != null) {
+            buffer.append(info.getAttribute().getLocalName());
+            buffer.append("=\"");
+            if ( info.getContentDescription() != null )
+            {
+                buffer.append(info.getContentDescription());
+            }
+            buffer.append("\"");
+        }
+        else
+        {
+            if ( info.getContentDescription() != null )
+            {
+                buffer.append(" Value: '");
+                buffer.append(info.getContentDescription());
+                buffer.append("'");
+            }
+        }
+        buffer.append("\n" + indent + "message: " );
+        buffer.append(info.getMessage());
+        buffer.append("\n");
+        
+        // process the list of attributes first
+        Iterator<SwordValidationInfo> iterator = info.getValidationAttributeInfoIterator();
+        while ( iterator.hasNext())
+        {
+            createString(iterator.next(), buffer, "   " + indent);
+        }
 
-       iterator = info.getUnmarshallAttributeInfoIterator();
-       while( iterator.hasNext())
-       {
-          createString(iterator.next(), buffer, "   " + indent);
-       }
+        iterator = info.getUnmarshallAttributeInfoIterator();
+        while ( iterator.hasNext())
+        {
+            createString(iterator.next(), buffer, "   " + indent);
+        }
 
-       // next, process the element messages
-       iterator = info.getValidationElementInfoIterator();
-       while( iterator.hasNext())
-       {
-          createString(iterator.next(), buffer, "   " + indent);
-       }
+        // next, process the element messages
+        iterator = info.getValidationElementInfoIterator();
+        while ( iterator.hasNext())
+        {
+            createString(iterator.next(), buffer, "   " + indent);
+        }
 
-       iterator = info.getUnmarshallElementInfoIterator();
-       while( iterator.hasNext())
-       {
-          createString(iterator.next(), buffer, "   " + indent);
-       }
+        iterator = info.getUnmarshallElementInfoIterator();
+        while ( iterator.hasNext())
+        {
+            createString(iterator.next(), buffer, "   " + indent);
+        }
     }
-
-
 }

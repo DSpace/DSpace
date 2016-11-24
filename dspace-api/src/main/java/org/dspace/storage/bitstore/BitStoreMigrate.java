@@ -29,8 +29,7 @@ public class BitStoreMigrate {
     /**
      * Migrates asset store.
      *
-     * @param argv -
-     *            Command-line arguments
+     * @param argv the command line arguments given
      */
     public static void main(String[] argv)
     {

@@ -49,6 +49,8 @@ public class ServiceDocumentManager
      *
      * @return The service document based on the context of the request
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException on generic SWORD exception
      */
     public ServiceDocument getServiceDocument()
             throws DSpaceSWORDException, SWORDErrorException
@@ -78,13 +80,13 @@ public class ServiceDocumentManager
         if (context == null)
         {
             throw new DSpaceSWORDException(
-                    "The Context is null; please set it before calling getServiceDocument");
+                "The Context is null; please set it before calling getServiceDocument");
         }
 
         if (swordContext == null)
         {
             throw new DSpaceSWORDException(
-                    "The SWORD Context is null; please set it before calling getServiceDocument");
+                "The SWORD Context is null; please set it before calling getServiceDocument");
         }
 
         // construct a new service document
@@ -108,13 +110,13 @@ public class ServiceDocumentManager
             workspace.setTitle(ws);
 
             // next thing to do is determine whether the default is communities or collections
-            boolean swordCommunities = ConfigurationManager
-                    .getBooleanProperty("sword-server", "expose-communities");
+            boolean swordCommunities = ConfigurationManager.getBooleanProperty(
+                "sword-server", "expose-communities");
 
             if (swordCommunities)
             {
-                List<Community> comms = swordAuth
-                        .getAllowedCommunities(swordContext);
+                List<Community> comms = swordAuth.getAllowedCommunities(
+                    swordContext);
                 for (Community comm : comms)
                 {
                     org.purl.sword.base.Collection scol = comGen
@@ -198,8 +200,8 @@ public class ServiceDocumentManager
      */
     private void addGenerator(Service service)
     {
-        boolean identify = ConfigurationManager
-                .getBooleanProperty("sword-server", "identify-version", false);
+        boolean identify = ConfigurationManager.getBooleanProperty(
+            "sword-server", "identify-version", false);
         SWORDUrlManager urlManager = swordService.getUrlManager();
         String softwareUri = urlManager.getGeneratorUrl();
         if (identify)

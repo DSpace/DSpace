@@ -22,7 +22,7 @@ import org.jdom.xpath.XPath;
 
 /**
  * This class reads the XMLUI configuration file.
- * 
+ *
  * @author Scott Phillips
  */
 
@@ -31,7 +31,7 @@ public class XMLUIConfiguration
 
     /** log4j category */
     private static final Logger log = Logger.getLogger(XMLUIConfiguration.class);
-    
+
     /** The configured Aspects */
     private static final List<Aspect> aspects = new ArrayList<>();
 
@@ -40,12 +40,12 @@ public class XMLUIConfiguration
 
     /**
      * Initialize the XMLUI Configuration.
-	 *
-	 * Load and parse the xmlui.xconf configuration file for a list of 
-     * installed aspects and themes. Multiple configuration paths may be 
+     *
+     * Load and parse the xmlui.xconf configuration file for a list of
+     * installed aspects and themes. Multiple configuration paths may be
      * supplied but only the first valid file (exists and readable) will
      * be used.
-     * 
+     *
      * @param configPaths Multiple configuration paths may be specified.
      * @throws java.io.IOException if file access fails.
      * @throws org.jdom.JDOMException if file cannot be parsed.
@@ -59,42 +59,42 @@ public class XMLUIConfiguration
         }
 
         File configFile = null;
-        
+
         for (String configPath : configPaths )
         {
-        	if (configPath != null)
+            if (configPath != null)
             {
                 configFile = new File(configPath);
             }
-        	
-        	if (configFile != null && configFile.exists() && configFile.canRead())
-        	{
-        		log.info("Loading XMLUI configuration from: "+configPath);
-        		break;
-        	}
-        	else
-        	{
-        		log.debug("Failed to load XMLUI configuration from: "+configPath);
-        	}
+
+            if (configFile != null && configFile.exists() && configFile.canRead())
+            {
+                log.info("Loading XMLUI configuration from: "+configPath);
+                break;
+            }
+            else
+            {
+                log.debug("Failed to load XMLUI configuration from: "+configPath);
+            }
         }
-        
+
         if (configFile == null)
         {
-        	StringBuilder allPaths = new StringBuilder();
-        	for (String configPath : configPaths)
-        	{
-        		if (allPaths.length() > 0)
+            StringBuilder allPaths = new StringBuilder();
+            for (String configPath : configPaths)
+            {
+                if (allPaths.length() > 0)
                 {
-        			allPaths.append(", ");
+                    allPaths.append(", ");
                 }
-                
-        		allPaths.append(configPath);
-        	}
-            
-        	throw new IllegalStateException("None of the xmlui configuration paths were valid: "+ allPaths);
+
+                allPaths.append(configPath);
+            }
+
+            throw new IllegalStateException("None of the xmlui configuration paths were valid: "+ allPaths);
         }
-        
-        // FIXME: Sometime in the future require that the xmlui.xconf be valid. 
+
+        // FIXME: Sometime in the future require that the xmlui.xconf be valid.
         // SAXBuilder builder = new SAXBuilder(true);
         SAXBuilder builder = new SAXBuilder();
         Document config = builder.build(configFile);
@@ -121,7 +121,7 @@ public class XMLUIConfiguration
         }
         // Put them in the order that people expect.
         Collections.reverse(aspects);
-        
+
 
         for (Element themeElement : themeElements)
         {
@@ -141,20 +141,18 @@ public class XMLUIConfiguration
     }
 
     /**
-     * 
+     *
      * @return The configured Aspect chain.
      */
     public static List<Aspect> getAspectChain() {
         return aspects;
     }
-    
+
     /**
-     * 
+     *
      * @return The configured Theme rules.
      */
     public static List<Theme> getThemeRules() {
         return themes;
     }
-    
-    
 }

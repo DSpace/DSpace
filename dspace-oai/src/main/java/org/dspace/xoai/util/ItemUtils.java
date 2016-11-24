@@ -34,7 +34,7 @@ import org.dspace.core.Context;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @SuppressWarnings("deprecation")
 public class ItemUtils

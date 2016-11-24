@@ -56,6 +56,7 @@ public class CiNiiFileDataLoader extends FileDataLoader
 
     /**
      * @param filename
+     *     Name of file to load CiNii data from.
      */
     public CiNiiFileDataLoader(String filename)
     {
@@ -63,9 +64,9 @@ public class CiNiiFileDataLoader extends FileDataLoader
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see gr.ekt.bte.core.DataLoader#getRecords()
+     * {@see gr.ekt.bte.core.DataLoader#getRecords()}
+     *
+     * @throws MalformedSourceException 
      */
     @Override
     public RecordSet getRecords() throws MalformedSourceException

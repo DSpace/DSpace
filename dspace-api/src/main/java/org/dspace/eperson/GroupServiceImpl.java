@@ -167,16 +167,16 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         if (StringUtils.equals(groupName, Group.ANONYMOUS))
         {
             return true;
-        } else if(context.getCurrentUser() != null) {
+        } else if (context.getCurrentUser() != null) {
             EPerson currentUser = context.getCurrentUser();
 
             //First check the special groups
             List<Group> specialGroups = context.getSpecialGroups();
-            if(CollectionUtils.isNotEmpty(specialGroups)) {
+            if (CollectionUtils.isNotEmpty(specialGroups)) {
                 for (Group specialGroup : specialGroups)
                 {
                     //Check if the current special group is the one we are looking for OR retrieve all groups & make a check here.
-                    if(StringUtils.equals(specialGroup.getName(), groupName) || allMemberGroups(context, currentUser).contains(findByName(context, groupName)))
+                    if (StringUtils.equals(specialGroup.getName(), groupName) || allMemberGroups(context, currentUser).contains(findByName(context, groupName)))
                     {
                         return true;
                     }
@@ -251,7 +251,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public Group find(Context context, UUID id) throws SQLException {
-        if(id == null) {
+        if (id == null) {
             return null;
         } else {
             return groupDAO.findByID(context, Group.class, id);
@@ -260,7 +260,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public Group findByName(Context context, String name) throws SQLException {
-        if(name == null)
+        if (name == null)
         {
             return null;
         }
@@ -272,7 +272,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     @Deprecated
     public List<Group> findAll(Context context, int sortField) throws SQLException {
-        if(sortField == GroupService.NAME) {
+        if (sortField == GroupService.NAME) {
             return findAll(context, null);
         } else {
             throw new UnsupportedOperationException("You can only find all groups sorted by name with this method");
@@ -282,7 +282,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public List<Group> findAll(Context context, List<MetadataField> metadataSortFields) throws SQLException
     {
-        if(CollectionUtils.isEmpty(metadataSortFields)) {
+        if (CollectionUtils.isEmpty(metadataSortFields)) {
             return groupDAO.findAll(context);
         } else {
             return groupDAO.findAll(context, metadataSortFields);
@@ -299,13 +299,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     {
         List<Group> groups = new ArrayList<>();
         UUID uuid = UUIDUtils.fromString(groupIdentifier);
-        if(uuid == null) {
+        if (uuid == null) {
             //Search by group name
             groups = groupDAO.findByNameLike(context, groupIdentifier, offset, limit);
         } else {
             //Search by group id
             Group group = find(context, uuid);
-            if(group != null)
+            if (group != null)
             {
                 groups.add(group);
             }
@@ -318,13 +318,13 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public int searchResultCount(Context context, String groupIdentifier) throws SQLException {
         int result = 0;
         UUID uuid = UUIDUtils.fromString(groupIdentifier);
-        if(uuid == null && StringUtils.isNotBlank(groupIdentifier)) {
+        if (uuid == null && StringUtils.isNotBlank(groupIdentifier)) {
             //Search by group name
             result = groupDAO.countByNameLike(context, groupIdentifier);
         } else {
             //Search by group id
             Group group = find(context, uuid);
-            if(group != null)
+            if (group != null)
             {
                 result = 1;
             }
@@ -407,7 +407,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         // Check for Anonymous group. If not found, create it
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
-        if(anonymousGroup==null)
+        if (anonymousGroup==null)
         {
             anonymousGroup = groupService.create(context);
             anonymousGroup.setName(Group.ANONYMOUS);
@@ -418,7 +418,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
         // Check for Administrator group. If not found, create it
         Group adminGroup = groupService.findByName(context, Group.ADMIN);
-        if(adminGroup == null)
+        if (adminGroup == null)
         {
             adminGroup = groupService.create(context);
             adminGroup.setName(Group.ADMIN);
@@ -427,6 +427,15 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         }
     }
 
+    /**
+     * Get a list of groups with no members.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @return list of groups with no members
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
     @Override
     public List<Group> getEmptyGroups(Context context) throws SQLException {
         return groupDAO.getEmptyGroups(context);
@@ -434,6 +443,16 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     /**
      * Update the group - writing out group object and EPerson list if necessary
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param group
+     *     Group to update
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     public void update(Context context, Group group) throws SQLException, AuthorizeException
@@ -449,7 +468,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             group.clearDetails();
         }
 
-        if(group.isGroupsChanged())
+        if (group.isGroupsChanged())
         {
             rethinkGroupCache(context, true);
             group.clearGroupsChanged();
@@ -473,6 +492,12 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
      * Regenerate the group cache AKA the group2groupcache table in the database -
      * meant to be called when a group is added or removed from another group
      *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param flushQueries
+     *     flushQueries Flush all pending queries
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void rethinkGroupCache(Context context, boolean flushQueries) throws SQLException {
 
@@ -521,7 +546,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 Group childGroup = find(context, child);
 
 
-                if(parentGroup != null && childGroup != null && group2GroupCacheDAO.find(context, parentGroup, childGroup) == null)
+                if (parentGroup != null && childGroup != null && group2GroupCacheDAO.find(context, parentGroup, childGroup) == null)
                 {
                     Group2GroupCache group2GroupCache = group2GroupCacheDAO.create(context, new Group2GroupCache());
                     group2GroupCache.setParent(parentGroup);
@@ -535,7 +560,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     @Override
     public DSpaceObject getParentObject(Context context, Group group) throws SQLException
     {
-        if(group == null)
+        if (group == null)
         {
             return null;
         }
@@ -647,7 +672,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public Group findByIdOrLegacyId(Context context, String id) throws SQLException {
-        if(org.apache.commons.lang.StringUtils.isNumeric(id))
+        if (org.apache.commons.lang.StringUtils.isNumeric(id))
         {
             return findByLegacyId(context, Integer.parseInt(id));
         }

@@ -94,7 +94,9 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * Execute a JPA Criteria query and return a collection of results.
      *
      * @param context
-     * @param query JPQL query string
+     *     The relevant DSpace Context.
+     * @param query
+     *     JPQL query string
      * @return list of DAOs specified by the query string
      * @throws SQLException if database error
      */
@@ -134,7 +136,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * Retrieve a unique result from the query.  If multiple results CAN be
      * retrieved an exception will be thrown,
      * so only use when the criteria state uniqueness in the database.
-     * @param criteria
+     * @param criteria JPA criteria
      * @return a DAO specified by the criteria
      */
     public T uniqueResult(Criteria criteria)
@@ -147,7 +149,7 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * Retrieve a single result from the query.  Best used if you expect a
      * single result, but this isn't enforced on the database.
-     * @param criteria
+     * @param criteria JPA criteria
      * @return a DAO specified by the criteria
      */
     public T singleResult(Criteria criteria)

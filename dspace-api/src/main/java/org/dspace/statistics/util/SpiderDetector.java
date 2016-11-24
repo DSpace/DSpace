@@ -51,7 +51,7 @@ public class SpiderDetector {
             = Collections.synchronizedList(new ArrayList<Pattern>());
 
     /**
-     * Utility method which reads lines from a file & returns them in a Set.
+     * Utility method which reads lines from a file and returns them in a Set.
      *
      * @param patternFile the location of our spider file
      * @return a vector full of patterns
@@ -259,6 +259,7 @@ public class SpiderDetector {
      * Static Service Method for testing spiders against existing spider files.
      *
      * @param request
+     *     Servlet's HTTP request object.
      * @return true|false if the request was detected to be from a spider.
      */
     public static boolean isSpider(HttpServletRequest request)
@@ -273,6 +274,7 @@ public class SpiderDetector {
      * Check individual IP is a spider.
      *
      * @param ip
+     *     IP address to check
      * @return if is spider IP
      */
     public static boolean isSpider(String ip) {

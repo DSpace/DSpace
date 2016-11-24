@@ -64,8 +64,11 @@ public abstract class UserSelectionAction extends Action {
      * @param c the dspace context
      * @param wfi the workflowitem
      * @param roleMembers the list of users for which tasks must be regenerated
-     * @throws SQLException ...
      * @throws AuthorizeException thrown if the current user isn't authorized
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public abstract void regenerateTasks(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers) throws SQLException, AuthorizeException, IOException;
 
@@ -77,7 +80,8 @@ public abstract class UserSelectionAction extends Action {
      * @param hasUI boolean indicating whether or not the action has a user interface
      * @return if the action is valid
      * @throws WorkflowConfigurationException occurs if there is a configuration error in the workflow
-     * @throws SQLException ...
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public abstract boolean isValidUserSelection(Context context, XmlWorkflowItem wfi, boolean hasUI) throws WorkflowConfigurationException, SQLException;
 

@@ -43,17 +43,17 @@ public class CollectionDepositor extends Depositor
     /** logger */
     private static Logger log = Logger.getLogger(CollectionDepositor.class);
 
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
+    protected ItemService itemService =
+        ContentServiceFactory.getInstance().getItemService();
 
-    protected BundleService bundleService = ContentServiceFactory.getInstance()
-            .getBundleService();
+    protected BundleService bundleService =
+        ContentServiceFactory.getInstance().getBundleService();
 
-    protected BitstreamService bitstreamService = ContentServiceFactory
-            .getInstance().getBitstreamService();
+    protected BitstreamService bitstreamService =
+        ContentServiceFactory.getInstance().getBitstreamService();
 
-    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
-            .getInstance().getBitstreamFormatService();
+    protected BitstreamFormatService bitstreamFormatService =
+        ContentServiceFactory.getInstance().getBitstreamFormatService();
 
     /**
      * The DSpace Collection we are depositing into
@@ -66,8 +66,11 @@ public class CollectionDepositor extends Depositor
      * this constructor will throw an Exception
      *
      * @param swordService
+     *     SWORD service
      * @param dso
+     *     target DSpace object
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public CollectionDepositor(SWORDService swordService, DSpaceObject dso)
             throws DSpaceSWORDException
@@ -77,8 +80,8 @@ public class CollectionDepositor extends Depositor
         if (!(dso instanceof Collection))
         {
             throw new DSpaceSWORDException(
-                    "You tried to initialise the collection depositor with something" +
-                            "other than a collection object");
+                "You tried to initialise the collection depositor with something" +
+                "other than a collection object");
         }
 
         this.collection = (Collection) dso;
@@ -90,8 +93,10 @@ public class CollectionDepositor extends Depositor
      * Perform a deposit, using the supplied SWORD Deposit object.
      *
      * @param deposit
-     * @throws SWORDErrorException
+     *     deposit request
+     * @throws SWORDErrorException on generic SWORD exception
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public DepositResult doDeposit(Deposit deposit)
             throws SWORDErrorException, DSpaceSWORDException
@@ -110,29 +115,29 @@ public class CollectionDepositor extends Depositor
                         collection))
         {
             log.error("Unacceptable content type detected: " +
-                    deposit.getContentType() + " for collection " +
-                    collection.getID());
+                deposit.getContentType() + " for collection " +
+                collection.getID());
             throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT,
-                    "Unacceptable content type in deposit request: " +
-                            deposit.getContentType());
+                "Unacceptable content type in deposit request: " +
+                deposit.getContentType());
         }
 
         // determine if this is an acceptable packaging type for the deposit
         // if not, we throw a 415 HTTP error (Unsupported Media Type, ERROR_CONTENT)
-        if (!swordConfig
-                .isSupportedMediaType(deposit.getPackaging(), this.collection))
+        if (!swordConfig.isSupportedMediaType(
+            deposit.getPackaging(), this.collection))
         {
             log.error("Unacceptable packaging type detected: " +
-                    deposit.getPackaging() + "for collection" +
-                    collection.getID());
+                deposit.getPackaging() + "for collection" +
+                collection.getID());
             throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT,
-                    "Unacceptable packaging type in deposit request: " +
-                            deposit.getPackaging());
+                "Unacceptable packaging type in deposit request: " +
+                deposit.getPackaging());
         }
 
         // Obtain the relevant ingester from the factory
-        SWORDIngester si = SWORDIngesterFactory
-                .getInstance(context, deposit, collection);
+        SWORDIngester si = SWORDIngesterFactory.getInstance(
+            context, deposit, collection);
         swordService.message("Loaded ingester: " + si.getClass().getName());
 
         // do the deposit
@@ -146,15 +151,15 @@ public class CollectionDepositor extends Depositor
             if (swordConfig.isKeepOriginal())
             {
                 swordService.message(
-                        "DSpace will store an original copy of the deposit, " +
-                                "as well as ingesting the item into the archive");
+                    "DSpace will store an original copy of the deposit, " +
+                    "as well as ingesting the item into the archive");
 
                 // in order to be allowed to add the file back to the item, we need to ignore authorisations
                 // for a moment
                 context.turnOffAuthorisationSystem();
 
-                String bundleName = ConfigurationManager
-                        .getProperty("sword-server", "bundle.name");
+                String bundleName = ConfigurationManager.getProperty(
+                    "sword-server", "bundle.name");
                 if (bundleName == null || "".equals(bundleName))
                 {
                     bundleName = "SWORD";
@@ -173,8 +178,8 @@ public class CollectionDepositor extends Depositor
                 }
                 if (swordBundle == null)
                 {
-                    swordBundle = bundleService
-                            .create(context, item, bundleName);
+                    swordBundle = bundleService.create(
+                        context, item, bundleName);
                 }
 
                 String fn = swordService.getFilename(context, deposit, true);
@@ -184,8 +189,8 @@ public class CollectionDepositor extends Depositor
                 try
                 {
                     fis = new FileInputStream(deposit.getFile());
-                    bitstream = bitstreamService
-                            .create(context, swordBundle, fis);
+                    bitstream = bitstreamService.create(
+                        context, swordBundle, fis);
                 }
                 finally
                 {
@@ -198,8 +203,8 @@ public class CollectionDepositor extends Depositor
                 bitstream.setName(context, fn);
                 bitstream.setDescription(context, "SWORD deposit package");
 
-                BitstreamFormat bf = bitstreamFormatService
-                        .findByMIMEType(context, deposit.getContentType());
+                BitstreamFormat bf = bitstreamFormatService.findByMIMEType(
+                    context, deposit.getContentType());
                 if (bf != null)
                 {
                     bitstreamService.setFormat(context, bitstream, bf);
@@ -210,7 +215,7 @@ public class CollectionDepositor extends Depositor
                 itemService.update(context, item);
 
                 swordService.message("Original package stored as " + fn +
-                        ", in item bundle " + swordBundle);
+                    ", in item bundle " + swordBundle);
 
                 // now reset the context ignore authorisation
                 context.restoreAuthSystemState();
@@ -241,7 +246,9 @@ public class CollectionDepositor extends Depositor
      * to abort the database connection, so no changes are written.
      *
      * @param result
+     *     deposit result to undo
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public void undoDeposit(DepositResult result) throws DSpaceSWORDException
     {

@@ -23,7 +23,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * A class representing a set of all referenced repositories in the DRI document.
- * 
+ *
  * @author Scott Phillips
  */
 public class RepositoryMeta extends AbstractWingElement implements WingMergeableElement, MetadataElement
@@ -36,39 +36,40 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
 
     /** The name of this repository identifier attribute*/
     public static final String A_REPOSITORY_ID = "repositoryID";
-    
+
     /** The unique url of this repository */
     public static final String A_REPOSITORY_URL = "url";
-    
+
     /** Has this repositoryMeta element been merged? */
     private boolean merged = false;
-    
+
     /** The registered repositories on this page */
     private Map<String,String> repositories = new HashMap<>();
 
     /**
      * Construct a new RepositoryMeta
-     * 
+     *
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
-    protected RepositoryMeta(WingContext context) throws WingException
+    protected RepositoryMeta(WingContext context)
+        throws WingException
     {
         super(context);
-        
+
         ObjectManager objectManager = context.getObjectManager();
 
         if (!(objectManager == null))
         {
-        	this.repositories = objectManager.getAllManagedRepositories();
+            this.repositories = objectManager.getAllManagedRepositories();
         }
     }
 
     /**
      * Determine if the given SAX event is a ObjectMeta element.
-     * 
+     *
      * @param namespace
      *            The element's name space
      * @param localName
@@ -81,7 +82,8 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
      */
     @Override
     public boolean mergeEqual(String namespace, String localName, String qName,
-            Attributes attributes) throws SAXException, WingException
+        Attributes attributes)
+        throws SAXException, WingException
     {
 
         if (!WingConstants.DRI.URI.equals(namespace))
@@ -95,10 +97,10 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
     /**
      * Since we will only add to the object set and never modify an existing
      * object we do not merge any child elements.
-     * 
+     *
      * However we will notify the object manager of each identifier we
      * encounter.
-     * 
+     *
      * @param namespace
      *            The element's name space
      * @param localName
@@ -111,28 +113,28 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
      */
     @Override
     public WingMergeableElement mergeChild(String namespace, String localName,
-            String qName, Attributes attributes) throws SAXException,
-            WingException
+        String qName, Attributes attributes)
+        throws SAXException, WingException
     {
         // Check if it's in our name space and an options element.
         if (!WingConstants.DRI.URI.equals(namespace))
         {
             return null;
         }
-        
+
         if (!E_REPOSITORY.equals(localName))
         {
             return null;
         }
-        
+
         // Get the repositoryIdentefier
         String repositoryIdentifier = attributes.getValue(A_REPOSITORY_ID);
 
         if (repositories.containsKey(repositoryIdentifier))
         {
-        	repositories.remove(repositoryIdentifier);
+            repositories.remove(repositoryIdentifier);
         }
-   
+
         return null;
     }
 
@@ -140,8 +142,8 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
      * Inform this element that it is being merged with an existing element.
      */
     @Override
-    public Attributes merge(Attributes attributes) throws SAXException,
-            WingException
+    public Attributes merge(Attributes attributes)
+        throws SAXException, WingException
     {
         this.merged = true;
 
@@ -150,12 +152,12 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
 
     /**
      * Translate this element into SAX events.
-     * 
+     *
      * @param contentHandler
      *            (Required) The registered contentHandler where SAX events
      *            should be routed too.
      * @param lexicalHandler
-     *            (Required) The registered lexicalHandler where lexical 
+     *            (Required) The registered lexicalHandler where lexical
      *            events (such as CDATA, DTD, etc) should be routed too.
      * @param namespaces
      *            (Required) SAX Helper class to keep track of namespaces able
@@ -170,18 +172,17 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
         {
             startElement(contentHandler, namespaces, E_REPOSITORY_META, null);
         }
-    
-    	for (String identifier : repositories.keySet())
-    	{
-    		// add the repository XML
-    		AttributeMap attributes = new AttributeMap();
-    		attributes.put(A_REPOSITORY_ID, identifier);
-    		attributes.put(A_REPOSITORY_URL, repositories.get(identifier));
-    		
-    		startElement(contentHandler,namespaces,E_REPOSITORY,attributes);
-    		endElement(contentHandler,namespaces,E_REPOSITORY);
-    	}
-       
+
+        for (String identifier : repositories.keySet())
+        {
+            // add the repository XML
+            AttributeMap attributes = new AttributeMap();
+            attributes.put(A_REPOSITORY_ID, identifier);
+            attributes.put(A_REPOSITORY_URL, repositories.get(identifier));
+
+            startElement(contentHandler,namespaces,E_REPOSITORY,attributes);
+            endElement(contentHandler,namespaces,E_REPOSITORY);
+        }
 
         if (!merged)
         {

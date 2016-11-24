@@ -162,8 +162,12 @@ public class VersionHistoryServlet extends DSpaceServlet
      * Delete the given version(s)
      * 
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     private Item doDeleteVersions(HttpServletRequest request,
             UUID itemID, String... versionIDs) throws SQLException,
@@ -179,8 +183,12 @@ public class VersionHistoryServlet extends DSpaceServlet
      * Restore the given version
      * 
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws NumberFormatException
      */
     private UUID doRestoreVersion(HttpServletRequest request,
@@ -198,8 +206,12 @@ public class VersionHistoryServlet extends DSpaceServlet
      * Update the summary of the given version
      * 
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     private UUID doUpdateVersion(HttpServletRequest request, UUID itemID,
             String versionID) throws SQLException, AuthorizeException,

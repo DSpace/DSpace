@@ -31,74 +31,75 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
 /**
- * This is a class to test the use of form fields inline with normal 
+ * This is a class to test the use of form fields inline with normal
  * paragraphs, lists, or tables. Any other location besides forms.
- * 
+ *
  * This class is not internationalized because it is never intended
  * to be used in production. It is merely a tool to aid developers of
  * aspects and themes.
- * 
+ *
  * @author Scott Phillips
  */
 public class InlineFormTest extends AbstractDSpaceTransformer
 {
-    
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         pageMeta.addMetadata("title").addContent("Inline Form Test");
-       
+
         pageMeta.addTrailLink(contextPath + "/","DSpace Home");
         pageMeta.addTrail().addContent("Inline form test");
     }
 
-  
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
-    	Request request = ObjectModelHelper.getRequest(objectModel);
-		boolean help = false, error = false;
-		if (request.getParameter("help") != null)
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        boolean help = false, error = false;
+        if (request.getParameter("help") != null)
         {
             help = true;
         }
-		if (request.getParameter("error") != null)
+        if (request.getParameter("error") != null)
         {
             error = true;
         }
-		
+        
         Division div = body.addInteractiveDivision("test", "", "post", "primary");
         div.setHead("Inline form test");
         div.addPara("There are two options you can use to control how this page is generated. First is the help parameter, if this is present then help text will be provided for all fields. Next is the error parameter, if it is provided then all fields will be generated in error conditions.");
-		
-		if (help)
+        
+        if (help)
         {
             div.addPara().addXref(makeURL(false, error), "Turn help OFF");
         }
-		else
+        else
         {
             div.addPara().addXref(makeURL(true, error), "Turn help ON");
         }
-			
-		if (error)
+            
+        if (error)
         {
             div.addPara().addXref(makeURL(help, false), "Turn errors OFF");
         }
-		else
+        else
         {
             div.addPara().addXref(makeURL(help, true), "Turn errors ON");
         }
-		
-		
-		Division suited = body.addDivision("suited");
-		suited.setHead("Fields suited towards being used inline");
-		
-		suited.addPara("Below are a list of embedded fields that are normally considered usefully in an inline context.");
-		
-		// Text field
-		Para p = suited.addPara();
-		p.addContent("This is a plain 'Text' field, ");
+        
+        
+        Division suited = body.addDivision("suited");
+        suited.setHead("Fields suited towards being used inline");
+        
+        suited.addPara("Below are a list of embedded fields that are normally considered usefully in an inline context.");
+        
+        // Text field
+        Para p = suited.addPara();
+        p.addContent("This is a plain 'Text' field, ");
         Text text = p.addText("text");
         text.setLabel("Text");
         if (help)
@@ -111,10 +112,10 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         }
         text.setValue("Current raw value");
         p.addContent(", embedded in a paragraph.");
-        
+
         // Single Checkbox field
         p = suited.addPara();
-		p.addContent("This is a single 'CheckBox' field, ");
+        p.addContent("This is a single 'CheckBox' field, ");
         CheckBox checkBox = p.addCheckBox("yes-or-no");
         if (help)
         {
@@ -127,10 +128,10 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         checkBox.setLabel("Yes or no");
         checkBox.addOption("yes");
         p.addContent(", embedded in a paragraph.");
-        
+
         // File
         p = suited.addPara();
-		p.addContent("This is a 'File' field, ");
+        p.addContent("This is a 'File' field, ");
         File file = p.addFile("file");
         file.setLabel("File");
         if (help)
@@ -142,10 +143,10 @@ public class InlineFormTest extends AbstractDSpaceTransformer
             file.addError("This field is in error.");
         }
         p.addContent(", embedded in a paragraph.");
-        
+
         // Select (single)
         p = suited.addPara();
-		p.addContent("This is single 'Select' (aka dropdown) field, ");
+        p.addContent("This is single 'Select' (aka dropdown) field, ");
         Select select = p.addSelect("select");
         select.setLabel("Select (single)");
         if (help)
@@ -163,10 +164,10 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         select.addOption("five","cinco");
         select.setOptionSelected("one");
         p.addContent(", embedded in a paragraph.");
-        
+
         // Button
         p = suited.addPara();
-		p.addContent("This is a 'Button' field, ");
+        p.addContent("This is a 'Button' field, ");
         Button button = p.addButton("button");
         button.setLabel("Button");
         button.setValue("When you touch me I do things, lots of things");
@@ -179,18 +180,18 @@ public class InlineFormTest extends AbstractDSpaceTransformer
             button.addError("This button is in error.");
         }
         p.addContent(", embedded in a paragraph.");
-        
-        
-        
+
+
+
         Division unsuited = body.addDivision("unsuited");
         unsuited.setHead("Fields typically unsuited towards being used inline");
-		
-        unsuited.addPara("Below are a list of embedded fields that are normally considered useless in an inline context. This is because there widgets normally cross multiple lines making them hard to render inline. However these are all legal, but perhaps not advisable, and in some circumstances may be needed.");
-		
         
+        unsuited.addPara("Below are a list of embedded fields that are normally considered useless in an inline context. This is because there widgets normally cross multiple lines making them hard to render inline. However these are all legal, but perhaps not advisable, and in some circumstances may be needed.");
+        
+
         // Text Area Field
         p = unsuited.addPara();
-		p.addContent("This is a 'Text Area' field, ");
+        p.addContent("This is a 'Text Area' field, ");
         TextArea textArea = p.addTextArea("textarea");
         textArea.setLabel("Text Area");
         if (help)
@@ -203,10 +204,10 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         }
         textArea.setValue("This is the raw value");
         p.addContent(", embedded in a paragraph.");
-        
+
         // Multi-option Checkbox field
         p = unsuited.addPara();
-		p.addContent("This is a multi-option 'CheckBox' field, ");
+        p.addContent("This is a multi-option 'CheckBox' field, ");
         checkBox = p.addCheckBox("fruit");
         if (help)
         {
@@ -223,12 +224,12 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         checkBox.addOption("tootsie","Tootsie Roll");
         checkBox.addOption(true,"cherry","Cherry");
         p.addContent(", embedded in a paragraph.");
-        
+
         // multi-option Radio field
         p = unsuited.addPara();
-		p.addContent("This is a multi-option 'Radio' field, ");
+        p.addContent("This is a multi-option 'Radio' field, ");
         Radio radio = p.addRadio("sex");
-        radio.setLabel("Football colors");         
+        radio.setLabel("Football colors");
         if (help)
         {
             radio.setHelp("Select the colors of the best (college) football team.");
@@ -247,7 +248,7 @@ public class InlineFormTest extends AbstractDSpaceTransformer
 
         // Select (multiple)
         p = unsuited.addPara();
-		p.addContent("This is multiple 'Select' field, ");
+        p.addContent("This is multiple 'Select' field, ");
         select = p.addSelect("multi-select");
         select.setLabel("Select (multiple)");
         select.setMultiple();
@@ -266,13 +267,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         select.addOption("four","cuatro");
         select.addOption("five","cinco");
         select.setOptionSelected("one");
-        select.setOptionSelected("three"); 
+        select.setOptionSelected("three");
         select.setOptionSelected("five");
         p.addContent(", embedded in a paragraph.");
-        
+
         // Composite
         p = unsuited.addPara();
-		p.addContent("This is a 'Composite' field of two text fields, ");
+        p.addContent("This is a 'Composite' field of two text fields, ");
         Composite composite = p.addComposite("composite-2text");
         composite.setLabel("Composite (two text fields)");
         if (help)
@@ -298,32 +299,29 @@ public class InlineFormTest extends AbstractDSpaceTransformer
             text.setHelp("Part B");
         }
         p.addContent(", embedded in a paragraph.");
-        
-        
-        
     }
-    
+
     /**
-     * Helpful method to generate the return url to this page given the 
-     * error & help parameters.
+     * Helpful method to generate the return url to this page given the
+     * error and help parameters.
      */
     private String makeURL(boolean help, boolean error)
-	{
-		if (help && error)
+    {
+        if (help && error)
         {
             return "?help&error";
         }
-		
-		if (help)
+        
+        if (help)
         {
             return "?help";
         }
-		
-		if (error)
+        
+        if (error)
         {
             return "?error";
         }
-		
-		return "?neither";
-	}
+        
+        return "?neither";
+    }
 }

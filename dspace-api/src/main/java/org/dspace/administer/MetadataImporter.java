@@ -71,7 +71,8 @@ public class MetadataImporter
 
     /**
      * main method for reading user input from the command line
-     * @param args arguments
+     *
+     * @param args the command line arguments given
      * @throws ParseException if parse error
      * @throws SQLException if database error
      * @throws IOException if IO error
@@ -83,9 +84,9 @@ public class MetadataImporter
      * @throws RegistryImportException if import fails
      **/
     public static void main(String[] args)
-    	throws ParseException, SQLException, IOException, TransformerException,
-    			ParserConfigurationException, AuthorizeException, SAXException,
-    			NonUniqueMetadataException, RegistryImportException
+        throws ParseException, SQLException, IOException, TransformerException,
+               ParserConfigurationException, AuthorizeException, SAXException,
+               NonUniqueMetadataException, RegistryImportException
     {
         boolean forceUpdate = false;
         
@@ -114,7 +115,7 @@ public class MetadataImporter
     /**
      * Load the data from the specified file path into the database
      * 
-     * @param 	file	the file path containing the source data
+     * @param     file    the file path containing the source data
      * @param   forceUpdate whether to force update
      * @throws SQLException if database error
      * @throws IOException if IO error
@@ -126,8 +127,8 @@ public class MetadataImporter
      * @throws RegistryImportException if import fails
      */
     public static void loadRegistry(String file, boolean forceUpdate)
-    	throws SQLException, IOException, TransformerException, ParserConfigurationException, 
-    		AuthorizeException, SAXException, NonUniqueMetadataException, RegistryImportException
+        throws SQLException, IOException, TransformerException, ParserConfigurationException, 
+            AuthorizeException, SAXException, NonUniqueMetadataException, RegistryImportException
     {
         Context context = null;
 
@@ -301,8 +302,8 @@ public class MetadataImporter
     public static void usage()
     {
         String usage = "Use this class with the following option:\n" +
-        				" -f <xml source file> : specify which xml source file " +
-        				"contains the DC fields to import.\n";
+                        " -f <xml source file> : specify which xml source file " +
+                        "contains the DC fields to import.\n";
         System.out.println(usage);
     }
 }

@@ -92,8 +92,9 @@ public class ScriptLauncher
 
     /**
      * Recognize and execute a single command.
+     *
      * @param doc Document
-     * @param args arguments
+     * @param args the command line arguments given
      */
     static int runOneCommand(Document commandConfigs, String[] args)
     {

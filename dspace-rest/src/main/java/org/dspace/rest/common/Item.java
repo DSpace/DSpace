@@ -57,28 +57,44 @@ public class Item extends DSpaceObject {
 
     public Item(){}
 
-    public Item(org.dspace.content.Item item, ServletContext servletContext, String expand, Context context) throws SQLException, WebApplicationException{
+    public Item(org.dspace.content.Item item, ServletContext servletContext, String expand, Context context)
+        throws SQLException, WebApplicationException
+    {
         super(item, servletContext);
         setup(item, servletContext, expand, context);
     }
 
-    private void setup(org.dspace.content.Item item, ServletContext servletContext, String expand, Context context) throws SQLException{
+    private void setup(org.dspace.content.Item item, ServletContext servletContext, String expand, Context context)
+        throws SQLException
+    {
         List<String> expandFields = new ArrayList<String>();
-        if(expand != null) {
+        if (expand != null)
+        {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        if(expandFields.contains("metadata") || expandFields.contains("all")) {
+        if (expandFields.contains("metadata") || expandFields.contains("all"))
+        {
             metadata = new ArrayList<MetadataEntry>();
-            List<MetadataValue> metadataValues = itemService.getMetadata(item, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
+            List<MetadataValue> metadataValues = itemService.getMetadata(
+                item, org.dspace.content.Item.ANY, org.dspace.content.Item.ANY,
+                org.dspace.content.Item.ANY, org.dspace.content.Item.ANY);
 
-            for (MetadataValue metadataValue : metadataValues) {
+            for (MetadataValue metadataValue : metadataValues)
+            {
                 MetadataField metadataField = metadataValue.getMetadataField();
-                if (!metadataExposureService.isHidden(context, metadataField.getMetadataSchema().getName(), metadataField.getElement(), metadataField.getQualifier())) {
-                    metadata.add(new MetadataEntry(metadataField.toString('.'), metadataValue.getValue(), metadataValue.getLanguage()));
+                if (!metadataExposureService.isHidden(context,
+                    metadataField.getMetadataSchema().getName(),
+                    metadataField.getElement(),
+                    metadataField.getQualifier()))
+                {
+                    metadata.add(new MetadataEntry(metadataField.toString('.'),
+                        metadataValue.getValue(), metadataValue.getLanguage()));
                 }
             }
-        } else {
+        }
+        else
+        {
             this.addExpand("metadata");
         }
 
@@ -86,56 +102,79 @@ public class Item extends DSpaceObject {
         this.setWithdrawn(Boolean.toString(item.isWithdrawn()));
         this.setLastModified(item.getLastModified().toString());
 
-        if(expandFields.contains("parentCollection") || expandFields.contains("all")) {
-        	if (item.getOwningCollection() != null) {
-                this.parentCollection = new Collection(item.getOwningCollection(), servletContext, null, context, null, null);
-            } else {
+        if (expandFields.contains("parentCollection") || expandFields.contains("all"))
+        {
+            if (item.getOwningCollection() != null)
+            {
+                this.parentCollection = new Collection(item.getOwningCollection(),
+                    servletContext, null, context, null, null);
+            }
+            else
+            {
                 this.addExpand("parentCollection");
             }
-        } else {
+        }
+        else
+        {
             this.addExpand("parentCollection");
         }
 
-        if(expandFields.contains("parentCollectionList") || expandFields.contains("all")) {
+        if (expandFields.contains("parentCollectionList") || expandFields.contains("all"))
+        {
             this.parentCollectionList = new ArrayList<Collection>();
             List<org.dspace.content.Collection> collections = item.getCollections();
-            for(org.dspace.content.Collection collection : collections) {
-                this.parentCollectionList.add(new Collection(collection, servletContext, null, context, null, null));
+            for (org.dspace.content.Collection collection : collections)
+            {
+                this.parentCollectionList.add(new Collection(collection,
+                    servletContext, null, context, null, null));
             }
-        } else {
+        }
+        else
+        {
             this.addExpand("parentCollectionList");
         }
 
-        if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
+        if (expandFields.contains("parentCommunityList") || expandFields.contains("all"))
+        {
             this.parentCommunityList = new ArrayList<Community>();
             List<org.dspace.content.Community> communities = itemService.getCommunities(context, item);
 
-            for(org.dspace.content.Community community : communities) {
+            for (org.dspace.content.Community community : communities)
+            {
                 this.parentCommunityList.add(new Community(community, servletContext, null, context));
             }
-        } else {
+        }
+        else
+        {
             this.addExpand("parentCommunityList");
         }
 
         //TODO: paging - offset, limit
-        if(expandFields.contains("bitstreams") || expandFields.contains("all")) {
+        if (expandFields.contains("bitstreams") || expandFields.contains("all"))
+        {
             bitstreams = new ArrayList<Bitstream>();
 
             List<Bundle> bundles = item.getBundles();
-            for(Bundle bundle : bundles) {
+            for (Bundle bundle : bundles)
+            {
 
                 List<org.dspace.content.Bitstream> itemBitstreams = bundle.getBitstreams();
-                for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
-                    if(authorizeService.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
+                for (org.dspace.content.Bitstream itemBitstream : itemBitstreams)
+                {
+                    if (authorizeService.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ))
+                    {
                         bitstreams.add(new Bitstream(itemBitstream, servletContext, null, context));
                     }
                 }
             }
-        } else {
+        }
+        else
+        {
             this.addExpand("bitstreams");
         }
 
-        if(!expandFields.contains("all")) {
+        if (!expandFields.contains("all"))
+        {
             this.addExpand("all");
         }
     }
@@ -184,24 +223,24 @@ public class Item extends DSpaceObject {
         return parentCommunityList;
     }
 
-	public void setParentCollection(Collection parentCollection) {
-		this.parentCollection = parentCollection;
-	}
+    public void setParentCollection(Collection parentCollection) {
+        this.parentCollection = parentCollection;
+    }
 
-	public void setParentCollectionList(List<Collection> parentCollectionList) {
-		this.parentCollectionList = parentCollectionList;
-	}
+    public void setParentCollectionList(List<Collection> parentCollectionList) {
+        this.parentCollectionList = parentCollectionList;
+    }
 
-	public void setParentCommunityList(List<Community> parentCommunityList) {
-		this.parentCommunityList = parentCommunityList;
-	}
+    public void setParentCommunityList(List<Community> parentCommunityList) {
+        this.parentCommunityList = parentCommunityList;
+    }
 
-	@XmlElement(required = true)
-	public void setMetadata(List<MetadataEntry> metadata) {
-		this.metadata = metadata;
-	}
+    @XmlElement(required = true)
+    public void setMetadata(List<MetadataEntry> metadata) {
+        this.metadata = metadata;
+    }
 
-	public void setBitstreams(List<Bitstream> bitstreams) {
-		this.bitstreams = bitstreams;
-	}
+    public void setBitstreams(List<Bitstream> bitstreams) {
+        this.bitstreams = bitstreams;
+    }
 }

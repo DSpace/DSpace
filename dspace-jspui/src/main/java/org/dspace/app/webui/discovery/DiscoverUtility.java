@@ -47,9 +47,16 @@ public class DiscoverUtility
      * Get the scope of the search using the parameter found in the request.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
+     * @return scope of the search using the parameter found in the request
      * @throws IllegalStateException
+     *     Signals that a method has been invoked at an illegal or inappropriate
+     *     time. In other words, the Java environment or Java application is
+     *     not in an appropriate state for the requested operation.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static DSpaceObject getSearchScope(Context context,
             HttpServletRequest request) throws IllegalStateException,
@@ -77,29 +84,35 @@ public class DiscoverUtility
     /**
      * Build a DiscoverQuery object using the parameter in the request
      * 
+     * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
+     * @param scope
+     *     DSpace object
+     * @param enableFacet
+     *     FIXME: PLEASE DOCUMENT.
      * @return the query.
-     * @throws SearchServiceException
      */
     public static DiscoverQuery getDiscoverQuery(Context context,
             HttpServletRequest request, DSpaceObject scope, boolean enableFacet)
     {
         DiscoverQuery queryArgs = new DiscoverQuery();
-        DiscoveryConfiguration discoveryConfiguration = SearchUtils
-                .getDiscoveryConfiguration(scope);
+        DiscoveryConfiguration discoveryConfiguration =
+            SearchUtils.getDiscoveryConfiguration(scope);
 
-        List<String> userFilters = setupBasicQuery(context,
-                discoveryConfiguration, request, queryArgs);
+        List<String> userFilters = setupBasicQuery(
+            context, discoveryConfiguration, request, queryArgs);
 
         setPagination(request, queryArgs, discoveryConfiguration);
 
-        if (enableFacet
-                && !"submit_export_metadata".equals(UIUtil.getSubmitButton(
-                        request, "submit")))
+        if (enableFacet && !"submit_export_metadata".equals(
+            UIUtil.getSubmitButton( request, "submit")))
         {
             setFacet(context, request, scope, queryArgs,
-                    discoveryConfiguration, userFilters, discoveryConfiguration
-                    .getSidebarFacets(), TYPE_FACETS);
+                discoveryConfiguration, userFilters,
+                discoveryConfiguration.getSidebarFacets(),
+                TYPE_FACETS);
         }
 
         return queryArgs;
@@ -108,29 +121,35 @@ public class DiscoverUtility
     /**
      * Build a DiscoverQuery object using the tag cloud parameter in the request
      * 
+     * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
+     * @param scope
+     *     DSpace object
+     * @param enableFacet
+     *     FIXME: PLEASE DOCUMENT.
      * @return the query.
-     * @throws SearchServiceException
      */
     public static DiscoverQuery getTagCloudDiscoverQuery(Context context,
             HttpServletRequest request, DSpaceObject scope, boolean enableFacet)
     {
         DiscoverQuery queryArgs = new DiscoverQuery();
-        DiscoveryConfiguration discoveryConfiguration = SearchUtils
-                .getDiscoveryConfiguration(scope);
+        DiscoveryConfiguration discoveryConfiguration =
+            SearchUtils.getDiscoveryConfiguration(scope);
 
         List<String> userFilters = setupBasicQuery(context,
-                discoveryConfiguration, request, queryArgs);
+            discoveryConfiguration, request, queryArgs);
 
         setPagination(request, queryArgs, discoveryConfiguration);
 
-        if (enableFacet
-                && !"submit_export_metadata".equals(UIUtil.getSubmitButton(
-                        request, "submit")))
+        if (enableFacet && !"submit_export_metadata".equals(
+            UIUtil.getSubmitButton(request, "submit")))
         {
             setFacet(context, request, scope, queryArgs,
-                    discoveryConfiguration, userFilters, discoveryConfiguration
-                    .getTagCloudFacetConfiguration().getTagCloudFacets(), TYPE_TAGCLOUD);
+                discoveryConfiguration, userFilters, discoveryConfiguration
+                .getTagCloudFacetConfiguration().getTagCloudFacets(),
+                TYPE_TAGCLOUD);
         }
 
         return queryArgs;
@@ -141,8 +160,11 @@ public class DiscoverUtility
      * parameters in the request
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param scope
+     *     target DSpace object to search in
      * @return the query.
      */
     public static DiscoverQuery getDiscoverAutocomplete(Context context,
@@ -200,9 +222,8 @@ public class DiscoverUtility
         {
             limit = 10;
         }
-        DiscoverFacetField autocompleteField = new DiscoverFacetField(autoIndex, 
-                autoType, 
-                limit, sortBy, autoQuery.toLowerCase());
+        DiscoverFacetField autocompleteField = new DiscoverFacetField(
+            autoIndex, autoType, limit, sortBy, autoQuery.toLowerCase());
         queryArgs.addFacetField(autocompleteField);
         queryArgs.setMaxResults(0);
         queryArgs.setFacetMinCount(1);
@@ -214,7 +235,9 @@ public class DiscoverUtility
      * (default + user). Return the list of user filter
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param queryArgs
      *            the query object to populate
      * @return the list of user filer (as filter query)
@@ -232,8 +255,8 @@ public class DiscoverUtility
             queryArgs.setQuery(query);
         }
 
-        List<String> defaultFilterQueries = discoveryConfiguration
-                .getDefaultFilterQueries();
+        List<String> defaultFilterQueries =
+            discoveryConfiguration.getDefaultFilterQueries();
         if (defaultFilterQueries != null)
         {
             for (String f : defaultFilterQueries)
@@ -247,26 +270,25 @@ public class DiscoverUtility
         {
             try
             {
-            String newFilterQuery = null;
-            if (StringUtils.isNotBlank(f[0]) && StringUtils.isNotBlank(f[2]))
-            {
-                newFilterQuery = SearchUtils.getSearchService()
+                String newFilterQuery = null;
+                if (StringUtils.isNotBlank(f[0]) && StringUtils.isNotBlank(f[2]))
+                {
+                    newFilterQuery = SearchUtils.getSearchService()
                         .toFilterQuery(context, f[0], f[1], f[2])
                         .getFilterQuery();
-            }
-            if (newFilterQuery != null)
-            {
-                queryArgs.addFilterQueries(newFilterQuery);
-                userFilters.add(newFilterQuery);
-            }
+                }
+                if (newFilterQuery != null)
+                {
+                    queryArgs.addFilterQueries(newFilterQuery);
+                    userFilters.add(newFilterQuery);
+                }
             }
             catch (SQLException e)
             {
                 log.error(LogManager.getHeader(context,
-                        "Error in discovery while setting up user facet query",
-                        "filter_field: " + f[0] + ",filter_type:"
-                                + f[1] + ",filer_value:"
-                                + f[2]), e);
+                    "Error in discovery while setting up user facet query",
+                    "filter_field: " + f[0] + ",filter_type:"
+                    + f[1] + ",filer_value:" + f[2]), e);
             }
 
         }
@@ -302,26 +324,23 @@ public class DiscoverUtility
         String sortBy = request.getParameter("sort_by");
         String sortOrder = request.getParameter("order");
 
-        DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration
-                .getSearchSortConfiguration();
+        DiscoverySortConfiguration searchSortConfiguration =
+            discoveryConfiguration.getSearchSortConfiguration();
         if (sortBy == null)
         {
             // Attempt to find the default one, if none found we use SCORE
             sortBy = "score";
             if (searchSortConfiguration != null)
             {
-                for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration
-                        .getSortFields())
+                for (DiscoverySortFieldConfiguration sortFieldConfiguration :
+                    searchSortConfiguration.getSortFields())
                 {
-                    if (sortFieldConfiguration.equals(searchSortConfiguration
-                            .getDefaultSort()))
+                    if (sortFieldConfiguration.equals(
+                        searchSortConfiguration.getDefaultSort()))
                     {
-                        sortBy = SearchUtils
-                                .getSearchService()
-                                .toSortFieldIndex(
-                                        sortFieldConfiguration
-                                                .getMetadataField(),
-                                        sortFieldConfiguration.getType());
+                        sortBy = SearchUtils.getSearchService().toSortFieldIndex(
+                            sortFieldConfiguration.getMetadataField(),
+                            sortFieldConfiguration.getType());
                     }
                 }
             }
@@ -635,12 +654,10 @@ public class DiscoverUtility
                     }
                     catch (Exception e)
                     {
-                        log.error(
-                                LogManager
-                                        .getHeader(
-                                                context,
-                                                "Error in discovery while setting up date facet range",
-                                                "date facet: " + dateFacet), e);
+                        log.error(LogManager.getHeader(
+                            context,
+                            "Error in discovery while setting up date facet range",
+                            "date facet: " + dateFacet), e);
                     }
                 }
                 else
@@ -648,7 +665,7 @@ public class DiscoverUtility
                     int facetLimit = type==TYPE_FACETS?facet.getFacetLimit():-1;
 
                     int facetPage = UIUtil.getIntParameter(request,
-                            facet.getIndexFieldName() + "_page");
+                        facet.getIndexFieldName() + "_page");
                     if (facetPage < 0)
                     {
                         facetPage = 0;
@@ -665,17 +682,17 @@ public class DiscoverUtility
                     // top list
                     // if possible
                     int limit = 0;
-                    if (type==TYPE_FACETS){
-                    	limit = facetLimit + 1 + alreadySelected;
+                    if (type==TYPE_FACETS) {
+                        limit = facetLimit + 1 + alreadySelected;
                     }
                     else 
-                    	limit = facetLimit;
+                        limit = facetLimit;
                     
-                    queryArgs.addFacetField(new DiscoverFacetField(facet
-                            .getIndexFieldName(),
-                            DiscoveryConfigurationParameters.TYPE_TEXT,
-                           limit, facet
-                                    .getSortOrderSidebar(), facetPage * facetLimit));
+                    queryArgs.addFacetField(new DiscoverFacetField(
+                        facet.getIndexFieldName(),
+                        DiscoveryConfigurationParameters.TYPE_TEXT,
+                        limit, facet.getSortOrderSidebar(),
+                        facetPage * facetLimit));
                 }
             }
         }

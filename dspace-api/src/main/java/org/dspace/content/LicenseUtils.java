@@ -57,10 +57,15 @@ public class LicenseUtils
      * LicenseArgumentFormatter based on his type (map key)
      * 
      * @param locale
+     *     Formatter locale
      * @param collection
+     *     collection to get license from
      * @param item
+     *     the item object of the license
      * @param eperson
+     *     EPerson to get firstname, lastname and email from
      * @param additionalInfo
+     *     additional template arguments beyond 0-6
      * @return the license text obtained substituting the provided argument in
      *         the license template
      */
@@ -104,9 +109,13 @@ public class LicenseUtils
      * supplying {@code null} for the additionalInfo argument)
      *
      * @param locale
+     *     Formatter locale
      * @param collection
+     *     collection to get license from
      * @param item
+     *     the item object of the license
      * @param eperson
+     *     EPerson to get firstname, lastname and email from
      * @return the license text, with no custom substitutions.
      */
     public static String getLicenseText(Locale locale, Collection collection,

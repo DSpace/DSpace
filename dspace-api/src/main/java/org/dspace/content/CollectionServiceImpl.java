@@ -379,12 +379,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * Get the value of a metadata field
      *
      * @param collection
+     *     which collection to operate on
      * @param field
-     *            the name of the metadata field to get
+     *     the name of the metadata field to get
      *
      * @return the value of the metadata field
      *
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
     @Override

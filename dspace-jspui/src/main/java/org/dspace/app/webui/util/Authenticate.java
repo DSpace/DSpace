@@ -54,12 +54,12 @@ public class Authenticate
     private static EPersonService personService;
 
     private static synchronized void initialize() {
-    	if (initialized) {
-    		return;
-    	}
-    	authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-    	authorizeService =  AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    	personService = EPersonServiceFactory.getInstance().getEPersonService();
+        if (initialized) {
+            return;
+        }
+        authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+        authorizeService =  AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        personService = EPersonServiceFactory.getInstance().getEPersonService();
     }
     
     /**
@@ -75,15 +75,15 @@ public class Authenticate
      */
     public static HttpServletRequest getRealRequest(HttpServletRequest request)
     {
-    	initialize();
-    	
+        initialize();
+        
         HttpSession session = request.getSession();
 
         if (session.getAttribute("resuming.request") != null)
         {
             // Get info about the interrupted request
             RequestInfo requestInfo = (RequestInfo) session
-                    .getAttribute("interrupted.request.info");
+                .getAttribute("interrupted.request.info");
 
             HttpServletRequest actualRequest;
 
@@ -125,15 +125,17 @@ public class Authenticate
      *            <em>current</em> HTTP request
      * @param response
      *            HTTP response
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void resumeInterruptedRequest(HttpServletRequest request,
             HttpServletResponse response) throws IOException
     {
-    	initialize();
-    	
+        initialize();
+        
         HttpSession session = request.getSession();
         String originalURL = (String) session
-                .getAttribute("interrupted.request.url");
+            .getAttribute("interrupted.request.url");
 
         if (originalURL == null)
         {
@@ -170,13 +172,17 @@ public class Authenticate
      *            current HTTP response
      *
      * @return true if authentication is already finished (implicit method)
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static boolean startAuthentication(Context context,
             HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
-    	initialize();
-    	
+        initialize();
+        
         HttpSession session = request.getSession();
 
         /*
@@ -191,11 +197,11 @@ public class Authenticate
         {
             loggedIn(context, request, context.getCurrentUser());
             log.info(LogManager.getHeader(context, "login", "type=implicit"));
-            if(context.getCurrentUser() != null){
+            if (context.getCurrentUser() != null) {
                 //We have a new user
                 Authenticate.resumeInterruptedRequest(request, response);
                 return false;
-            }else{
+            } else {
                 //Couldn't log & authentication finished
                 return true;
             }
@@ -214,8 +220,8 @@ public class Authenticate
         session.setAttribute("interrupted.request.info", info);
 
         // Store the URL of the request that led to authentication
-        session.setAttribute("interrupted.request.url", UIUtil
-                .getOriginalURL(request));
+        session.setAttribute("interrupted.request.url",
+            UIUtil.getOriginalURL(request));
 
             /*
              * Grovel over authentication methods, counting the
@@ -263,8 +269,8 @@ public class Authenticate
                                 HttpServletRequest request,
                                 EPerson eperson)
     {
-    	initialize();
-    	
+        initialize();
+        
         HttpSession session = request.getSession();
 
         // For security reasons after login, give the user a new session
@@ -280,7 +286,7 @@ public class Authenticate
             String requestUrl = (String) session.getAttribute("interrupted.request.url");
 
             // Invalidate session unless dspace.cfg says not to
-            if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true))
+            if (ConfigurationManager.getBooleanProperty("webui.session.invalidate", true))
             {
                session.invalidate();
             }
@@ -333,7 +339,7 @@ public class Authenticate
         // and the remote IP address to compare against later requests
         // so we can detect session hijacking.
         session.setAttribute("dspace.current.remote.addr",
-                             request.getRemoteAddr());
+            request.getRemoteAddr());
 
     }
 
@@ -344,12 +350,13 @@ public class Authenticate
      *            DSpace context
      * @param request
      *            HTTP request
-     * @throws SQLException 
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static void loggedOut(Context context, HttpServletRequest request) throws SQLException
     {
-    	initialize();
-    	
+        initialize();
+        
         HttpSession session = request.getSession();
 
         context.setCurrentUser(null);
@@ -363,8 +370,8 @@ public class Authenticate
         Locale sessionLocale = UIUtil.getSessionLocale(request);
 
         // Invalidate session unless dspace.cfg says not to (or it is a loggedOut from a loginAs)
-        if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true) 
-                && previousUserID != null)
+        if (ConfigurationManager.getBooleanProperty("webui.session.invalidate", true) 
+            && previousUserID != null)
         {
             session.invalidate();
         }

@@ -30,13 +30,13 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 {
     /** logger */
     public static final Logger log = Logger
-            .getLogger(SwordConfigurationDSpace.class);
+        .getLogger(SwordConfigurationDSpace.class);
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
-            .getInstance().getBitstreamFormatService();
+        .getInstance().getBitstreamFormatService();
     
     protected ConfigurationService configurationService = DSpaceServicesFactory
-            .getInstance().getConfigurationService();
+        .getInstance().getConfigurationService();
 
     /** whether we can be verbose */
     private boolean verbose = true;
@@ -74,7 +74,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     {
         // set the max upload size
         int mus = configurationService
-                .getIntProperty("swordv2-server.max-upload-size");
+            .getIntProperty("swordv2-server.max-upload-size");
         if (mus > 0)
         {
             this.maxUploadSize = mus;
@@ -82,15 +82,15 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
         // set the mediation value
         this.mediated = configurationService
-                .getBooleanProperty("swordv2-server.on-behalf-of.enable", false);
+            .getBooleanProperty("swordv2-server.on-behalf-of.enable", false);
 
         // find out if we keep the original as bitstream
         this.keepOriginal = configurationService
-                .getBooleanProperty("swordv2-server.keep-original-package");
+            .getBooleanProperty("swordv2-server.keep-original-package");
 
         // get the sword bundle
         String bundle = configurationService
-                .getProperty("swordv2-server.bundle.name");
+            .getProperty("swordv2-server.bundle.name");
         if (StringUtils.isBlank(bundle))
         {
             this.swordBundle = bundle;
@@ -98,16 +98,15 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
         // find out if we keep the package as a file in specified directory
         this.keepPackageOnFailedIngest = configurationService
-                .getBooleanProperty("swordv2-server.keep-package-on-fail",
-                        false);
+            .getBooleanProperty("swordv2-server.keep-package-on-fail", false);
 
         // get directory path and name
         this.failedPackageDir = configurationService
-                .getProperty("swordv2-server.failed-package.dir");
+            .getProperty("swordv2-server.failed-package.dir");
 
         // Get the accepted formats
         String[] acceptsFormats = configurationService
-                .getArrayProperty("swordv2-server.accepts");
+            .getArrayProperty("swordv2-server.accepts");
         swordaccepts = new ArrayList<String>();
         if (ArrayUtils.isEmpty(acceptsFormats))
         {
@@ -120,12 +119,11 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
         // find out if community deposit is allowed
         this.allowCommunityDeposit = configurationService
-                .getBooleanProperty("swordv2-server.allow-community-deposit");
+            .getBooleanProperty("swordv2-server.allow-community-deposit");
 
         // find out if we keep the package as a file in specified directory
         this.entryFirst = configurationService
-                .getBooleanProperty("swordv2-server.multipart.entry-first",
-                        false);
+            .getBooleanProperty("swordv2-server.multipart.entry-first", false);
 
     }
 
@@ -208,7 +206,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     public String getAuthType()
     {
         return this.getStringProperty("swordv2-server.auth-type", "Basic",
-                new String[] { "Basic", "None" });
+            new String[] { "Basic", "None" });
     }
 
     public boolean storeAndCheckBinary()
@@ -224,13 +222,13 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     public String getAlternateUrl()
     {
         return configurationService
-                .getProperty("swordv2-server.error.alternate.url");
+            .getProperty("swordv2-server.error.alternate.url");
     }
 
     public String getAlternateUrlContentType()
     {
         return configurationService
-                .getProperty("swordv2-server.error.alternate.content-type");
+            .getProperty("swordv2-server.error.alternate.content-type");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -286,6 +284,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     /**
      * Get the bundle name that SWORD will store its original deposit packages in, when
      * storing them inside an item
+     *
      * @return SWORD bundle name
      */
     public String getSwordBundle()
@@ -296,6 +295,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     /**
      * Set the bundle name that SWORD will store its original deposit packages in, when
      * storing them inside an item
+     *
      * @param swordBundle SWORD bundle name
      */
     public void setSwordBundle(String swordBundle)
@@ -305,6 +305,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * Is this a verbose deposit?
+     *
+     * @return true if this is verbose deposit
      */
     public boolean isVerbose()
     {
@@ -313,7 +315,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * Set whether this is a verbose deposit.
+     *
      * @param verbose
+     *    verbose deposit
      */
     public void setVerbose(boolean verbose)
     {
@@ -322,6 +326,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * What is the max upload size (in bytes) for the SWORD interface?
+     *
+     * @return max upload size
      */
     public int getMaxUploadSize()
     {
@@ -329,8 +335,10 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     }
 
     /**
-     * Set the max uplaod size (in bytes) for the SWORD interface.
+     * Set the max upload size (in bytes) for the SWORD interface.
+     *
      * @param maxUploadSize
+     *     max upload size to set
      */
     public void setMaxUploadSize(int maxUploadSize)
     {
@@ -339,6 +347,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * Does the server support mediated deposit (aka on-behalf-of)?
+     *
+     * @return true if server supports mediated deposit
      */
     public boolean isMediated()
     {
@@ -347,7 +357,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * Set whether the server supports mediated deposit (aka on-behalf-of).
+     *
      * @param mediated
+     *     mediated deposit state to set
      */
     public void setMediated(boolean mediated)
     {
@@ -356,6 +368,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * Should the repository keep the original package?
+     *
+     * @return true if should keep original package
      */
     public boolean isKeepOriginal()
     {
@@ -364,7 +378,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * set whether the repository should keep copies of the original package
+     *
      * @param keepOriginal
+     *     should keep original package?
      */
     public void setKeepOriginal(boolean keepOriginal)
     {
@@ -373,7 +389,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * set whether the repository should write file of the original package if ingest fails
+     *
      * @param keepOriginalOnFail
+     *     should keep original package if ingest fails?
      */
     public void setKeepPackageOnFailedIngest(boolean keepOriginalOnFail)
     {
@@ -382,7 +400,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * should the repository write file of the original package if ingest fails
-     * @return keepPackageOnFailedIngest
+     *
+     * @return whether the repository should keep original package if ingest fails
      */
     public boolean isKeepPackageOnFailedIngest()
     {
@@ -391,7 +410,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * set the directory to write file of the original package
+     *
      * @param dir
+     *     directory where to store the original package
      */
     public void setFailedPackageDir(String dir)
     {
@@ -401,7 +422,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     /**
      * directory location of the files with original packages
      * for failed ingests
-     * @return failedPackageDir
+     *
+     * @return directory where to store the original package
      */
     public String getFailedPackageDir()
     {
@@ -413,8 +435,13 @@ public class SwordConfigurationDSpace implements SwordConfiguration
      * accept as packages.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     DSpace object to check
+     * @return list of MIME types that the given DSpace object will
+     * accept as packages.
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<String> getAccepts(Context context, DSpaceObject dso)
             throws DSpaceSwordException
@@ -461,6 +488,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
      *
      * @return the list of mime types
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<String> getCollectionAccepts() throws DSpaceSwordException
     {
@@ -482,9 +510,12 @@ public class SwordConfigurationDSpace implements SwordConfiguration
      * http://purl.org/net/sword-types/METSDSpaceSIP
      *
      * and the Q value is a floating point between 0 and 1 which defines
-     * how much  the server "likes" this packaging type.
+     * how much the server "likes" this packaging type.
      *
      * @param col
+     *     target collection
+     * @return map of packaging URIs to Q values for the packaging types which
+     * the given collection will accept.
      */
     public List<String> getAcceptPackaging(Collection col)
     {
@@ -550,9 +581,14 @@ public class SwordConfigurationDSpace implements SwordConfiguration
      * object?
      *
      * @param packageFormat
+     *     packaging/media type to check
      * @param dso
+     *     DSpace object to check
+     * @return true if supported
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      * @throws SwordError
+     *     SWORD error per SWORD spec
      */
     public boolean isAcceptedPackaging(String packageFormat, DSpaceObject dso)
             throws DSpaceSwordException, SwordError
@@ -590,10 +626,17 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
     /**
      * Is the given content MIME type acceptable to the given DSpace object.
+     *
      * @param context
+     *     The relevant DSpace Context.
      * @param type
+     *     MIME type to check
      * @param dso
+     *     DSpace object to compare to
+     * @return true if acceptable
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean isAcceptableContentType(Context context, String type,
             DSpaceObject dso)
@@ -646,13 +689,13 @@ public class SwordConfigurationDSpace implements SwordConfiguration
     public String getStateUri(String state)
     {
         return configurationService
-                .getProperty("swordv2-server.state." + state + ".uri");
+            .getProperty("swordv2-server.state." + state + ".uri");
     }
 
     public String getStateDescription(String state)
     {
         return configurationService
-                .getProperty("swordv2-server.state." + state + ".description");
+            .getProperty("swordv2-server.state." + state + ".description");
     }
 
     public boolean allowUnauthenticatedMediaAccess()

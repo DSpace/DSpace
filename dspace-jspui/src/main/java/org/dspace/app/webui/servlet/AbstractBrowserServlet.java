@@ -72,9 +72,14 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
      * @param response The servlet response
      * @return A BrowserScope for the current parameters
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected BrowserScope getBrowserScopeForRequest(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, AuthorizeException
@@ -91,15 +96,15 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             String startsWith = request.getParameter("starts_with");
             //validate input to avoid cross-site scripting
             try {
-            	if (StringUtils.isNotBlank(month) && !"-1".equals(month)) {
-            		Integer.valueOf(month);
-            	}
-            	if (StringUtils.isNotBlank(year) && !"-1".equals(year)) {
-            		Integer.valueOf(year);
-            	}
-            	if(StringUtils.isNotBlank(startsWith)) {
-            		startsWith = Utils.addEntities(startsWith);
-            	}
+                if (StringUtils.isNotBlank(month) && !"-1".equals(month)) {
+                    Integer.valueOf(month);
+                }
+                if (StringUtils.isNotBlank(year) && !"-1".equals(year)) {
+                    Integer.valueOf(year);
+                }
+                if (StringUtils.isNotBlank(startsWith)) {
+                    startsWith = Utils.addEntities(startsWith);
+                }
             }
             catch(Exception ex) {
                 log.warn("We were unable to parse the browse request: maybe a cross-site scripting attach?");
@@ -324,6 +329,24 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
     /**
      * Do the usual DSpace GET method.  You will notice that browse does not currently
      * respond to POST requests.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param scope
+     *     represents the initial request to the browse system
+     * @param request
+     *     Servlet's HTTP request object.
+     * @param response
+     *     Servlet's HTTP response object.
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void processBrowse(Context context, BrowserScope scope, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
@@ -349,14 +372,14 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             {
                 if (bi.isMetadataIndex() && !scope.isSecondLevel())
                 {
-                	if (bi.isTagCloudEnabled()){
-                		TagCloudConfiguration tagCloudConfiguration = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("browseTagCloudConfiguration", TagCloudConfiguration.class);
-                		if (tagCloudConfiguration == null){
-                			tagCloudConfiguration = new TagCloudConfiguration();
-                		}
-                		request.setAttribute("tagCloudConfig", tagCloudConfiguration);
-                	}
-                	
+                    if (bi.isTagCloudEnabled()) {
+                        TagCloudConfiguration tagCloudConfiguration = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("browseTagCloudConfiguration", TagCloudConfiguration.class);
+                        if (tagCloudConfiguration == null) {
+                            tagCloudConfiguration = new TagCloudConfiguration();
+                        }
+                        request.setAttribute("tagCloudConfig", tagCloudConfiguration);
+                    }
+                    
                     showSinglePage(context, request, response);
                 }
                 else
@@ -380,12 +403,20 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
      * Display the error page
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected abstract void showError(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
@@ -395,12 +426,20 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
      * Display the No Results page
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected abstract void showNoResultsPage(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
@@ -412,17 +451,44 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
      * that match that metadata value
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected abstract void showSinglePage(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
             AuthorizeException;
 
+    /**
+     * Display the full page.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param request
+     *     Servlet's HTTP request object.
+     * @param response
+     *     Servlet's HTTP response object.
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
+     */
     protected abstract void showFullPage(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
             AuthorizeException;

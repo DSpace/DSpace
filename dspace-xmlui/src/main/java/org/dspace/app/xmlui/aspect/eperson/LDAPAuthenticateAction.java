@@ -30,14 +30,14 @@ import org.dspace.eperson.EPerson;
  * Attempt to authenticate the user based upon their presented credentials. This
  * action uses the HTTP parameters of username, ldap_password, and login_realm
  * as credentials.
- * 
+ *
  * <p>If the authentication attempt is successful then an HTTP redirect will be
  * sent to the browser redirecting them to their original location in the system
  * before authenticated or if none is supplied back to the DSpace home page. The
  * action will also return true, thus contents of the action will be executed.
- * 
+ *
  * <p>If the authentication attempt fails, the action returns false.
- * 
+ *
  * <p>Example use:
  *
  * <pre>
@@ -46,14 +46,14 @@ import org.dspace.eperson.EPerson;
  * <map:transform type="try-to-login-again-transformer">
  * }
  * </pre>
- * 
+ *
  * @author Jay Paz
  */
 
 public class LDAPAuthenticateAction extends AbstractAction {
 
-	/**
-	 * Attempt to authenticate the user.
+    /**
+     * Attempt to authenticate the user.
      * @param redirector redirector.
      * @param resolver source resolver.
      * @param objectModel object model.
@@ -62,69 +62,72 @@ public class LDAPAuthenticateAction extends AbstractAction {
      * @return results of the action.
      * @throws org.apache.cocoon.sitemap.PatternException if unable to authenticate.
      * @throws java.lang.Exception passed through.
-	 */
+     */
     @Override
-	public Map act(Redirector redirector, SourceResolver resolver,
-			Map objectModel, String source, Parameters parameters)
-			throws PatternException, Exception {
-		// First check if we are performing a new login
-		Request request = ObjectModelHelper.getRequest(objectModel);
+    public Map act(Redirector redirector, SourceResolver resolver,
+        Map objectModel, String source, Parameters parameters)
+        throws PatternException, Exception
+    {
+        // First check if we are performing a new login
+        Request request = ObjectModelHelper.getRequest(objectModel);
 
-		String username = request.getParameter("username");
-		String password = request.getParameter("ldap_password");
-		String realm = request.getParameter("login_realm");
+        String username = request.getParameter("username");
+        String password = request.getParameter("ldap_password");
+        String realm = request.getParameter("login_realm");
 
-		// Skip out of no name or password given.
-		if (username == null || password == null)
+        // Skip out of no name or password given.
+        if (username == null || password == null)
         {
             return null;
         }
-		
-		try {
-			Context context = AuthenticationUtil.authenticate(objectModel,username, password, realm);
 
-			EPerson eperson = context.getCurrentUser();
+        try
+        {
+            Context context = AuthenticationUtil.authenticate(objectModel,username, password, realm);
 
-			if (eperson != null) {
-				// The user has successfully logged in
-				String redirectURL = request.getContextPath();
+            EPerson eperson = context.getCurrentUser();
 
-				if (AuthenticationUtil.isInterupptedRequest(objectModel)) {
-					// Resume the request and set the redirect target URL to
-					// that of the originally interrupted request.
-					redirectURL += AuthenticationUtil
-							.resumeInterruptedRequest(objectModel);
-				}
+            if (eperson != null) {
+                // The user has successfully logged in
+                String redirectURL = request.getContextPath();
+
+                if (AuthenticationUtil.isInterupptedRequest(objectModel)) {
+                    // Resume the request and set the redirect target URL to
+                    // that of the originally interrupted request.
+                    redirectURL += AuthenticationUtil
+                            .resumeInterruptedRequest(objectModel);
+                }
                 else
                 {
                     // Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
                     String loginRedirect = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.user.loginredirect");
-                    redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
+                    redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";
                 }
 
-				// Authentication successful send a redirect.
-				final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
-						.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                // Authentication successful send a redirect.
+                final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+                    .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
-				httpResponse.sendRedirect(redirectURL);
+                httpResponse.sendRedirect(redirectURL);
 
-				// log the user out for the rest of this current request,
-				// however they will be reauthenticated
-				// fully when they come back from the redirect. This prevents
-				// caching problems where part of the
-				// request is performed fore the user was authenticated and the
-				// other half after it succeeded. This
-				// way the user is fully authenticated from the start of the
-				// request.
-				context.setCurrentUser(null);
+                // log the user out for the rest of this current request,
+                // however they will be reauthenticated
+                // fully when they come back from the redirect. This prevents
+                // caching problems where part of the
+                // request is performed fore the user was authenticated and the
+                // other half after it succeeded. This
+                // way the user is fully authenticated from the start of the
+                // request.
+                context.setCurrentUser(null);
 
-				return new HashMap();
-			}
-		} catch (SQLException sqle) {
-			throw new PatternException("Unable to perform authentication", sqle);
-		}
+                return new HashMap();
+            }
+        }
+        catch (SQLException sqle)
+        {
+            throw new PatternException("Unable to perform authentication", sqle);
+        }
 
-		return null;
-	}
-
+        return null;
+    }
 }

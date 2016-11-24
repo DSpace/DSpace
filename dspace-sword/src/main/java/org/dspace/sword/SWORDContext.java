@@ -85,6 +85,8 @@ public class SWORDContext
      * Returns the most appropriate context for operations on the
      * database.  This is the on-behalf-of user's context if the
      * user exists, or the authenticated user's context otherwise.
+     *
+     * @return appropriate DSpace context
      */
     public Context getContext()
     {
@@ -104,6 +106,8 @@ public class SWORDContext
      * getContext()
      *
      * on this class instead.
+     *
+     * @return DSpace context of the user who authenticated
      */
     public Context getAuthenticatorContext()
     {
@@ -123,6 +127,8 @@ public class SWORDContext
      *
      * on this class instead.  If there is no on-behalf-of user, this
      * method will return null.
+     *
+     * @return DSpace context of the on-behalf-of user
      */
     public Context getOnBehalfOfContext()
     {
@@ -157,9 +163,9 @@ public class SWORDContext
      * user's context if it is different.  This ensures that only changes written
      * through the appropriate user's context is persisted, and all other
      * operations are flushed.  You should, in general, not try to commit the contexts directly
-     * when using the sword api.
+     * when using the SWORD API.
      *
-     * @throws DSpaceSWORDException
+     * @throws DSpaceSWORDException on database error.
      */
     public void commit()
             throws DSpaceSWORDException

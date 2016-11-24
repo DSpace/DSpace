@@ -15,17 +15,17 @@ package org.purl.sword.base;
  */
 public class SWORDErrorException extends Exception 
 {
-	/** The error URI (defined in ErrorCodes class) */
-	private String errorURI;
-	
-	/** The HTTP error code (defined in HTTPServletResponse class) */
-	private int status; 
-	
-	/** The error message given by the repository */
-	private String description;
-	
-	
-	/**
+    /** The error URI (defined in ErrorCodes class) */
+    private String errorURI;
+    
+    /** The HTTP error code (defined in HTTPServletResponse class) */
+    private int status; 
+    
+    /** The error message given by the repository */
+    private String description;
+    
+    
+    /**
      * Create a new instance and store the specified data. 
      * 
      * @param errorURI The errorURI of the exception being thrown 
@@ -47,33 +47,33 @@ public class SWORDErrorException extends Exception
     }
 
 
-	/**
-	 * @return the errorURI
-	 */
-	public String getErrorURI() {
-		return errorURI;
-	}
+    /**
+     * @return the errorURI
+     */
+    public String getErrorURI() {
+        return errorURI;
+    }
 
-	/**
-	 * @return the status
-	 */
-	public int getStatus() {
-		return status;
-	}
-	
-	/**
-	 * Set the status
-	 * 
-	 * @param status The HTTP status code
-	 */
-	public void setStatus(int status) {
-		this.status = status;
-	}
+    /**
+     * @return the status
+     */
+    public int getStatus() {
+        return status;
+    }
+    
+    /**
+     * Set the status
+     * 
+     * @param status The HTTP status code
+     */
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}    
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }    
 }

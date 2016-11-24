@@ -25,14 +25,14 @@ import java.sql.SQLException;
 
 public class WorkflowTools
 {
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory
-            .getInstance().getWorkspaceItemService();
+    protected WorkspaceItemService workspaceItemService =
+        ContentServiceFactory.getInstance().getWorkspaceItemService();
 
-    protected WorkflowItemService workflowItemService = WorkflowServiceFactory
-            .getInstance().getWorkflowItemService();
+    protected WorkflowItemService workflowItemService =
+        WorkflowServiceFactory.getInstance().getWorkflowItemService();
 
-    protected WorkflowService workflowService = WorkflowServiceFactory
-            .getInstance().getWorkflowService();
+    protected WorkflowService workflowService =
+        WorkflowServiceFactory.getInstance().getWorkflowService();
 
     /**
      * Is the given item in the DSpace workflow?
@@ -41,8 +41,12 @@ public class WorkflowTools
      * case rather than using the DSpace API (which is very slow).
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     item to check
+     * @return true if item is in workflow
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean isItemInWorkflow(Context context, Item item)
             throws DSpaceSwordException
@@ -64,8 +68,12 @@ public class WorkflowTools
      * case rather than using the DSpace API (which is very slow).
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     item to check
+     * @return true if item is in workspace
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean isItemInWorkspace(Context context, Item item)
             throws DSpaceSwordException
@@ -87,8 +95,12 @@ public class WorkflowTools
      * case rather than using the DSpace API (which is very slow).
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     item to check
+     * @return workflow item
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public WorkflowItem getWorkflowItem(Context context, Item item)
             throws DSpaceSwordException
@@ -110,8 +122,12 @@ public class WorkflowTools
      * case rather than using the DSpace API (which is very slow).
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     item to check
+     * @return workspace item
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public WorkspaceItem getWorkspaceItem(Context context, Item item)
             throws DSpaceSwordException
@@ -129,8 +145,12 @@ public class WorkflowTools
     /**
      * Start the DSpace workflow on the given item
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     item to check
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public void startWorkflow(Context context, Item item)
             throws DSpaceSwordException
@@ -161,8 +181,12 @@ public class WorkflowTools
     /**
      * Stop the DSpace workflow, and return the item to the user workspace
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     item to check
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public void stopWorkflow(Context context, Item item)
             throws DSpaceSwordException

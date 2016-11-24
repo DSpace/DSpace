@@ -55,14 +55,21 @@ public class MetadataImportServlet extends DSpaceServlet
     /**
      * Respond to a post request for metadata bulk importing via csv
      *
-     * @param context a DSpace Context object
-     * @param request the HTTP request
-     * @param response the HTTP response
-     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param request
+     *     Servlet's HTTP request object.
+     * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -169,16 +176,20 @@ public class MetadataImportServlet extends DSpaceServlet
      * GET request is only ever used to show the upload form
      * 
      * @param context
-     *            a DSpace Context object
+     *     The relevant DSpace Context.
      * @param request
-     *            the HTTP request
+     *     Servlet's HTTP request object.
      * @param response
-     *            the HTTP response
-     *
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,

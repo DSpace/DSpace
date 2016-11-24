@@ -32,6 +32,7 @@ public class RemoveLastDotModifier extends AbstractModifier
 
     /**
      * @param name
+     *     modifier name
      */
     public RemoveLastDotModifier(String name)
     {

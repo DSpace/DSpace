@@ -105,49 +105,48 @@ public class StartForgotPassword extends AbstractDSpaceTransformer
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(T_trail_forgot_password);
     }
-    
-    
-   public void addBody(Body body) throws WingException {
+
+    public void addBody(Body body) throws WingException {
+         
+        Division forgot = body.addInteractiveDivision("start-forgot-password",
+                contextPath+"/forgot",Division.METHOD_POST,"primary");
         
-       Division forgot = body.addInteractiveDivision("start-forgot-password",
-               contextPath+"/forgot",Division.METHOD_POST,"primary");
-       
-       forgot.setHead(T_head);
-       
-       EPersonUtils.forgottProgressList(forgot,1);
-       
-       forgot.addPara(T_para1);
-       
-       List form = forgot.addList("form",List.TYPE_FORM);
-       
-       Text email = form.addItem().addText("email");
-       email.setRequired();
-       email.setAutofocus("autofocus");
-       email.setLabel(T_email_address);
-       email.setHelp(T_email_address_help);
-       
-       // Prefill with invalid email if this is a retry attempt.
-       if (email != null)
-       {
-           email.setValue(this.email);
-       }
-       if (errors.contains("email"))
-       {
-           email.addError(T_error_not_found);
-       }
-       
-       Item submit = form.addItem();
-       submit.addButton("submit").setValue(T_submit);
-       
-       forgot.addHidden("eperson-continue").setValue(knot.getId()); 
-   }
-   
-   /**
-    * Recycle
-    */
-   public void recycle() 
-   {
-       this.email = null;
-       super.recycle();
-   } 
+        forgot.setHead(T_head);
+        
+        EPersonUtils.forgottProgressList(forgot,1);
+        
+        forgot.addPara(T_para1);
+        
+        List form = forgot.addList("form",List.TYPE_FORM);
+        
+        Text email = form.addItem().addText("email");
+        email.setRequired();
+        email.setAutofocus("autofocus");
+        email.setLabel(T_email_address);
+        email.setHelp(T_email_address_help);
+        
+        // Prefill with invalid email if this is a retry attempt.
+        if (email != null)
+        {
+            email.setValue(this.email);
+        }
+        if (errors.contains("email"))
+        {
+            email.addError(T_error_not_found);
+        }
+        
+        Item submit = form.addItem();
+        submit.addButton("submit").setValue(T_submit);
+        
+        forgot.addHidden("eperson-continue").setValue(knot.getId()); 
+    }
+    
+    /**
+     * Recycle
+     */
+    public void recycle() 
+    {
+        this.email = null;
+        super.recycle();
+    } 
 }

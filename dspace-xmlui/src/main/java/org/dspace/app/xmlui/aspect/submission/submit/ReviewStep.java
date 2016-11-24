@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
 public class ReviewStep extends AbstractSubmissionStep
 {
 
-	/** Language Strings **/
+    /** Language Strings **/
     protected static final Message T_head = 
         message("xmlui.Submission.submit.ReviewStep.head");
     protected static final Message T_yes = 
@@ -78,14 +78,14 @@ public class ReviewStep extends AbstractSubmissionStep
     private static Logger log = Logger.getLogger(UploadStep.class);
 
     
-	/**
-	 * Establish our required parameters, abstractStep will enforce these.
-	 */
-	public ReviewStep()
-	{
-		this.requireSubmission = true;
-		this.requireStep = true;
-	}
+    /**
+     * Establish our required parameters, abstractStep will enforce these.
+     */
+    public ReviewStep()
+    {
+        this.requireSubmission = true;
+        this.requireStep = true;
+    }
    
     /**
      * Save these setup parameters, to use for loading up
@@ -100,12 +100,14 @@ public class ReviewStep extends AbstractSubmissionStep
         this.src = src;
     }
         
-	public void addBody(Body body) throws SAXException, WingException,
-	UIException, SQLException, IOException, AuthorizeException
-	{
-		// Get actionable URL
-		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        // Get actionable URL
+        Collection collection = submission.getCollection();
+        String actionURL = contextPath + "/handle/" + collection.getHandle()
+            + "/submit/" + knot.getId() + ".continue";
 
         SubmissionConfig subConfig = submissionInfo.getSubmissionConfig();
         
@@ -128,14 +130,14 @@ public class ReviewStep extends AbstractSubmissionStep
         
         //loop through each page in progress bar,
         //adding each as a separate section to the review form
-        for(int i=0; i<submissionPages.length; i++)
+        for (int i=0; i<submissionPages.length; i++)
         {
             StepAndPage currentStepAndPage = new StepAndPage(submissionPages[i]);
             
             //If the step we are looking at is this current
             // Review/Verify step, exit the for loop,
             // since we have completed all steps up to this one!
-            if(currentStepAndPage.equals(this.stepAndPage))
+            if (currentStepAndPage.equals(this.stepAndPage))
             {
                 break;
             }
@@ -152,22 +154,22 @@ public class ReviewStep extends AbstractSubmissionStep
                 parameters.setParameter("step", currentStepAndPage.toString());
                 stepUIClass.setup(resolver, objectModel, src, parameters);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new UIException("Unable to initialize AbstractStep identified by " 
-                                        + stepConfig.getXMLUIClassName() + ":", e);
+                    + stepConfig.getXMLUIClassName() + ":", e);
             }
             
             //If this stepUIClass is not a value AbstractSubmissionStep,
             //we will be unable to display its review information!
-            if(stepUIClass instanceof AbstractSubmissionStep)
+            if (stepUIClass instanceof AbstractSubmissionStep)
             {
                 //add the Review section for this step, 
                 //and return a reference to that newly created step section
                 List stepSection = ((AbstractSubmissionStep) stepUIClass).addReviewSection(review);
                 
                 //as long as this step has something to review
-                if(stepSection!=null)
+                if (stepSection != null)
                 {    
                     //add a Jump To button for this section
                     addJumpButton(stepSection, T_submit_jump, currentStepAndPage);
@@ -176,15 +178,16 @@ public class ReviewStep extends AbstractSubmissionStep
             else
             {
                 //Log a warning that this step cannot be reviewed!
-                log.warn("The Step represented by " + stepConfig.getXMLUIClassName() + " is not a valid AbstractSubmissionStep, so it cannot be reviewed during the ReviewStep!");
+                log.warn("The Step represented by " + stepConfig.getXMLUIClassName()
+                    + " is not a valid AbstractSubmissionStep, so it cannot be reviewed during the ReviewStep!");
             }   
         }
         
       
-		// Part C:
+        // Part C:
         // add standard control/paging buttons
         addControlButtons(review); 
-	}
+    }
 
     /** 
      * Each submission step must define its own information to be reviewed
@@ -205,9 +208,9 @@ public class ReviewStep extends AbstractSubmissionStep
      *      all the reviewable information.  If this step has nothing to
      *      review, then return null!   
      */
-    public List addReviewSection(List reviewList) throws SAXException,
-        WingException, UIException, SQLException, IOException,
-        AuthorizeException
+    public List addReviewSection(List reviewList)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         //Review step cannot review itself :)
         return null;
@@ -228,24 +231,22 @@ public class ReviewStep extends AbstractSubmissionStep
         {
             //retrieve an instance of the transformer class
             ClassLoader loader = this.getClass().getClassLoader();
-            Class stepClass = loader
-                    .loadClass(transformerClassName);
+            Class stepClass = loader .loadClass(transformerClassName);
     
             // this XML-UI class *must* be a valid AbstractStep, 
             // or else we'll have problems here
-            return (AbstractStep) stepClass
-                        .newInstance();
+            return (AbstractStep) stepClass.newInstance();
         }
-        catch(ClassNotFoundException cnfe)
+        catch (ClassNotFoundException cnfe)
         {
             //means that we couldn't find a class by the given name
             throw new UIException("Class Not Found: " + transformerClassName, cnfe);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             //means we couldn't instantiate the class as an AbstractStep
             throw new UIException("Unable to instantiate class " + transformerClassName + ". " +
-                                          "Please make sure it extends org.dspace.app.xmlui.submission.AbstractSubmissionStep!", e);
+                "Please make sure it extends org.dspace.app.xmlui.submission.AbstractSubmissionStep!", e);
         }
     }
     

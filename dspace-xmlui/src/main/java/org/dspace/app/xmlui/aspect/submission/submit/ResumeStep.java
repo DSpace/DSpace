@@ -26,77 +26,78 @@ import org.dspace.content.Item;
 import org.xml.sax.SAXException;
 
 /**
- * This step is used when the a user clicks an unfinished submission 
- * from the submissions page. Here we present the full item and then 
+ * This step is used when the a user clicks an unfinished submission
+ * from the submissions page. Here we present the full item and then
  * give the user the option to resume the item's submission.
  * <P>
  * This is not a true "step" in the submission process, it just
  * kicks off editing an unfinished submission.
- * 
- * FIXME: We should probably give the user the option to remove the 
+ *
+ * FIXME: We should probably give the user the option to remove the
  * submission as well.
- * 
+ *
  * @author Scott Phillips
  * @author Tim Donohue (small updates for Configurable Submission)
  */
 public class ResumeStep extends AbstractStep
 {
-	/** Language Strings **/
-    protected static final Message T_submit_resume = 
+    /** Language Strings **/
+    protected static final Message T_submit_resume =
         message("xmlui.Submission.submit.ResumeStep.submit_resume");
-    protected static final Message T_submit_cancel = 
+    protected static final Message T_submit_cancel =
         message("xmlui.general.cancel");
-  
-	/**
-	 * Establish our required parameters, abstractStep will enforce these.
-	 */
-	public ResumeStep()
-	{
-		this.requireWorkspace = true;
-	}
+
+    /**
+     * Establish our required parameters, abstractStep will enforce these.
+     */
+    public ResumeStep()
+    {
+        this.requireWorkspace = true;
+    }
 
 
-	public void addBody(Body body) throws SAXException, WingException,
-	UIException, SQLException, IOException, AuthorizeException
-	{
-		// Get any metadata that may be removed by unselecting one of these options.
-		Item item = submission.getItem();
-		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        // Get any metadata that may be removed by unselecting one of these options.
+        Item item = submission.getItem();
+        Collection collection = submission.getCollection();
+        String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
-		Request request = ObjectModelHelper.getRequest(objectModel);
-		String showfull = request.getParameter("showfull");
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String showfull = request.getParameter("showfull");
 
-		// if the user selected showsimple, remove showfull.
-		if (showfull != null && request.getParameter("showsimple") != null)
+        // if the user selected showsimple, remove showfull.
+        if (showfull != null && request.getParameter("showsimple") != null)
         {
             showfull = null;
         }
 
-		Division div = body.addInteractiveDivision("resume-submission", actionURL, Division.METHOD_POST, "primary submission");
-		div.setHead(T_submission_head);
+        Division div = body.addInteractiveDivision("resume-submission", actionURL, Division.METHOD_POST, "primary submission");
+        div.setHead(T_submission_head);
 
 
-		if (showfull == null)
-		{
-			ReferenceSet referenceSet = div.addReferenceSet("submission",ReferenceSet.TYPE_SUMMARY_VIEW);
-			referenceSet.addReference(item);
-			div.addPara().addButton("showfull").setValue(T_showfull);
-		} 
-		else
-		{
-			ReferenceSet referenceSet = div.addReferenceSet("submission",ReferenceSet.TYPE_DETAIL_VIEW);
-			referenceSet.addReference(item);
-			div.addPara().addButton("showsimple").setValue(T_showsimple);
+        if (showfull == null)
+        {
+            ReferenceSet referenceSet = div.addReferenceSet("submission", ReferenceSet.TYPE_SUMMARY_VIEW);
+            referenceSet.addReference(item);
+            div.addPara().addButton("showfull").setValue(T_showfull);
+        }
+        else
+        {
+            ReferenceSet referenceSet = div.addReferenceSet("submission", ReferenceSet.TYPE_DETAIL_VIEW);
+            referenceSet.addReference(item);
+            div.addPara().addButton("showsimple").setValue(T_showsimple);
 
-			div.addHidden("showfull").setValue("true");
-		}
+            div.addHidden("showfull").setValue("true");
+        }
 
 
-		List form = div.addList("resume-submission",List.TYPE_FORM);
+        List form = div.addList("resume-submission", List.TYPE_FORM);
 
-		org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
-		actions.addButton("submit_resume").setValue(T_submit_resume);
-		actions.addButton("submit_cancel").setValue(T_submit_cancel);
-	}
+        org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
+        actions.addButton("submit_resume").setValue(T_submit_resume);
+        actions.addButton("submit_cancel").setValue(T_submit_cancel);
+    }
 }

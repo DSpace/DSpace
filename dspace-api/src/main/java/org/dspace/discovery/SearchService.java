@@ -34,6 +34,7 @@ public interface SearchService {
      *            DSpace Context object.
      * @param query
      *            the discovery query object.
+     * @return discovery search result object
      * @throws SearchServiceException if search error
      */
     DiscoverResult search(Context context, DiscoverQuery query)
@@ -50,6 +51,7 @@ public interface SearchService {
      *            within this object)
      * @param query
      *            the discovery query object
+     * @return discovery search result object
      * @throws SearchServiceException if search error
      */
     DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query)
@@ -64,6 +66,7 @@ public interface SearchService {
      * @param includeWithdrawn
      *            use <code>true</code> to include in the results also withdrawn
      *            items that match the query.
+     * @return discovery search result object
      * @throws SearchServiceException if search error
      */
     DiscoverResult search(Context context, DiscoverQuery query,
@@ -81,7 +84,7 @@ public interface SearchService {
      * @param includeWithdrawn
      *            use <code>true</code> to include in the results also withdrawn
      *            items that match the query
-     * 
+     * @return discovery search result object
      * @throws SearchServiceException if search error
      */
     DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query, boolean includeWithdrawn) throws SearchServiceException;
@@ -97,11 +100,14 @@ public interface SearchService {
 
     /**
      * Transforms the given string field and value into a filter query
-     * @param context the DSpace context
+     * @param context
+     *     The relevant DSpace Context.
      * @param field the field of the filter query
+     * @param operator equals/notequals/notcontains/authority/notauthority
      * @param value the filter query value
      * @return a filter query
      * @throws SQLException if database error
+     *     An exception that provides information on a database access error or other errors.
      */
     DiscoverFilterQuery toFilterQuery(Context context, String field, String operator, String value) throws SQLException;
 
@@ -118,21 +124,27 @@ public interface SearchService {
      * communities/collections only.
      *
      * @param context
-     * @return
+     *     The relevant DSpace Context.
+     * @return query string specific to the user's rights
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     String createLocationQueryForAdministrableItems(Context context) throws SQLException;
 
     /**
-     * Transforms the metadata field of the given sort configuration into the indexed field which we can then use in our solr queries
+     * Transforms the metadata field of the given sort configuration into the indexed field which we can then use in our Solr queries.
+     *
      * @param metadataField the metadata field
+     * @param type see {@link org.dspace.discovery.configuration.DiscoveryConfigurationParameters}
      * @return the indexed field
      */
     String toSortFieldIndex(String metadataField, String type);
 
     /**
      * Utility method to escape any special characters in a user's query
+     *
      * @param query
+     *     User's query to escape.
      * @return query with any special characters escaped
      */
     String escapeQueryChars(String query);

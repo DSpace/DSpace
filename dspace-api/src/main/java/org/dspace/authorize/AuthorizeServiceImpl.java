@@ -92,7 +92,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
     @Override
     public void authorizeAction(Context c, DSpaceObject o, int action, boolean useInheritance) throws AuthorizeException, SQLException
     {
-    	authorizeAction(c, c.getCurrentUser(), o, action, useInheritance);
+        authorizeAction(c, c.getCurrentUser(), o, action, useInheritance);
     }
     
     @Override
@@ -538,12 +538,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
     
     @Override
     public void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction) throws SQLException, AuthorizeException {
-		List<ResourcePolicy> rps = getPoliciesActionFilter(context, dso, fromAction);
+        List<ResourcePolicy> rps = getPoliciesActionFilter(context, dso, fromAction);
         for (ResourcePolicy rp : rps) {
-        	rp.setAction(toAction);
+            rp.setAction(toAction);
         }
         resourcePolicyService.update(context, rps);
-	}
+    }
 
     @Override
     public void addPolicies(Context c, List<ResourcePolicy> policies, DSpaceObject dest)
@@ -624,7 +624,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
         List<Group> groups = new ArrayList<Group>();
         for (ResourcePolicy resourcePolicy : policies) {
-            if(resourcePolicy.getGroup() != null)
+            if (resourcePolicy.getGroup() != null)
             {
                 groups.add(resourcePolicy.getGroup());
             }
@@ -653,7 +653,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
         if (CollectionUtils.isNotEmpty(policies))
         {
             return policies.iterator().next();
-        }else{
+        } else {
             return null;
         }
     }
@@ -664,16 +664,22 @@ public class AuthorizeServiceImpl implements AuthorizeService
      * have right on the collection. E.g., if the anonymous can access the collection policies are assigned to anonymous.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param embargoDate
+     *     embargo end date
      * @param reason
+     *     embargo reason
      * @param dso
+     *     DSpace object
      * @param owningCollection
+     *     collection to get group policies from
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error
      */
     @Override
     public void generateAutomaticPolicies(Context context, Date embargoDate,
-                                                 String reason, DSpaceObject dso, Collection owningCollection) throws SQLException, AuthorizeException
+        String reason, DSpaceObject dso, Collection owningCollection)
+        throws SQLException, AuthorizeException
     {
 
         if (embargoDate != null || (embargoDate == null && dso instanceof Bitstream))
@@ -714,7 +720,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
     @Override
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson, int type, String rpType) throws SQLException, AuthorizeException {
-        if(group == null && eperson == null)
+        if (group == null && eperson == null)
         {
             throw new IllegalArgumentException("We need at least an eperson or a group in order to create a resource policy.");
         }

@@ -54,89 +54,87 @@ import javax.swing.JComboBox;
  */
 public class SWORDComboBox extends JComboBox
 {
-   /**
-    * Create an instance of the SWORD Combo box. 
-    */
-   public SWORDComboBox()
-   {
-      super();
-      setEditable(true);
-   }
-
-   /**
-    * Update the list for the Combo box with the currently selected
-    * item. This will only add an item to the list if: i) the control 
-    * is editable, ii) the selected item is not empty and iii) the
-    * item is not already in the list. 
-    */
-   public void updateList()
-   {
-      Object s = getSelectedItem();
-      
-      if( ! isEditable() || s == null || (s != null && ((String)s).trim().length() == 0 ) )
-      {
-         
-         // don't update with an empty item or if the combo box is not editable.
-         return;   
-      }
-      
-      insertItem(s);
-      
-   }
-   
-   /**
-    * Insert an item into the combo box. This will only be added
-    * if the item is not already present in the combo box. 
-    * 
-    * @param newItem The item to insert. 
-    */
-   public void insertItem(Object newItem)
-   {
-	   int count = getItemCount(); 
-
-	   boolean found = false; 
-
-	   for( int i = 0; i < count && ! found; i++ )
-	   {
-		   Object item = getItemAt(i);
-		   if( item != null && item.equals(newItem) )
-		   {
-			   found = true; 
-		   }
-	   }
-
-	   if( ! found )
-	   {
-		   addItem(newItem);
-	   } 
-   }
-   
-   /**
-    * Insert multiple items into the combo box. 
-    * 
-    * @param items The array of items. 
-    */
-   public void insertItems(String[] items)
-   {
-      for( String item : items )
-      {
-    	  insertItem(item);
-      }
-   }
-   
-   /**
-    * Get the text of the currently selected item in the combo box.
-    * @return The text. <code>null</code> is returned if no item 
-    * is selected. 
-    */
-   public String getText()
-   {
-	   Object o = getSelectedItem(); 
-	   if( o != null )
-	   {
-		   return o.toString().trim();
-	   }
-
-	   return null;
-   }
+    /**
+     * Create an instance of the SWORD Combo box. 
+     */
+    public SWORDComboBox()
+    {
+        super();
+        setEditable(true);
+    }
+ 
+    /**
+     * Update the list for the Combo box with the currently selected
+     * item. This will only add an item to the list if: i) the control 
+     * is editable, ii) the selected item is not empty and iii) the
+     * item is not already in the list. 
+     */
+    public void updateList()
+    {
+        Object s = getSelectedItem();
+        
+        if ( ! isEditable() || s == null || (s != null && ((String)s).trim().length() == 0 ) )
+        {
+            // don't update with an empty item or if the combo box is not editable.
+            return;   
+        }
+        
+        insertItem(s);
+    }
+    
+    /**
+     * Insert an item into the combo box. This will only be added
+     * if the item is not already present in the combo box. 
+     * 
+     * @param newItem The item to insert. 
+     */
+    public void insertItem(Object newItem)
+    {
+        int count = getItemCount(); 
+ 
+        boolean found = false; 
+ 
+        for ( int i = 0; i < count && ! found; i++ )
+        {
+            Object item = getItemAt(i);
+            if ( item != null && item.equals(newItem) )
+            {
+                found = true; 
+            }
+        }
+ 
+        if ( ! found )
+        {
+            addItem(newItem);
+        } 
+    }
+    
+    /**
+     * Insert multiple items into the combo box. 
+     * 
+     * @param items The array of items. 
+     */
+    public void insertItems(String[] items)
+    {
+        for ( String item : items )
+        {
+             insertItem(item);
+        }
+    }
+    
+    /**
+     * Get the text of the currently selected item in the combo box.
+     * @return The text. <code>null</code> is returned if no item 
+     * is selected. 
+     */
+    public String getText()
+    {
+        Object o = getSelectedItem(); 
+        if ( o != null )
+        {
+            return o.toString().trim();
+        }
+ 
+        return null;
+    }
 }

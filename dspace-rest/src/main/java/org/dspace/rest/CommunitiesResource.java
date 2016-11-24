@@ -50,21 +50,32 @@ public class CommunitiesResource extends Resource
      * parameter or method for community collections or subcommunities.
      * 
      * @param communityId
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of community. Options are: "all", "parentCommunity",
-     *            "collections", "subCommunities" and "logo". If you want to use
-     *            multiple options, it must be separated by commas.
+     *     String in which is what you want to add to returned instance
+     *     of community. Options are: "all", "parentCommunity",
+     *     "collections", "subCommunities" and "logo". If you want to use
+     *     multiple options, it must be separated by commas.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return instance of org.dspace.rest.common.Community.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading. Also if id of community is incorrect
-     *             or logged user into context has no permission to read.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading. Also if id of community is incorrect
+     *     or logged user into context has no permission to read.
      */
     @GET
     @Path("/{community_id}")
@@ -114,23 +125,33 @@ public class CommunitiesResource extends Resource
      * Return all communities in DSpace.
      * 
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of community. Options are: "all", "parentCommunity",
-     *            "collections", "subCommunities" and "logo". If you want to use
-     *            multiple options, it must be separated by commas.
-     * 
+     *     String in which is what you want to add to returned instance
+     *     of community. Options are: "all", "parentCommunity",
+     *     "collections", "subCommunities" and "logo". If you want to use
+     *     multiple options, it must be separated by commas.
      * @param limit
-     *            Maximum communities in array. Default value is 100.
+     *     Maximum communities in array. Default value is 100.
      * @param offset
-     *            Index from which will start array of communities.
+     *     Index from which will start array of communities.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of communities.
      * @throws WebApplicationException
-     *             It can be caused by creating context or while was problem
-     *             with reading community from database(SQLException).
+     *     It can be caused by creating context or while was problem
+     *     with reading community from database(SQLException).
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
@@ -194,24 +215,34 @@ public class CommunitiesResource extends Resource
      * the root of tree.
      * 
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of community. Options are: "all", "parentCommunity",
-     *            "collections", "subCommunities" and "logo". If you want to use
-     *            multiple options, it must be separated by commas.
-     * 
+     *     String in which is what you want to add to returned instance
+     *     of community. Options are: "all", "parentCommunity",
+     *     "collections", "subCommunities" and "logo". If you want to use
+     *     multiple options, it must be separated by commas.
      * @param limit
-     *            Maximum communities in array. Default value is 100.
+     *     Maximum communities in array. Default value is 100.
      * @param offset
-     *            Index from which will start array of communities. Default
-     *            value is 0.
+     *     Index from which will start array of communities. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of top communities.
      * @throws WebApplicationException
-     *             It can be caused by creating context or while was problem
-     *             with reading community from database(SQLException).
+     *     It can be caused by creating context or while was problem
+     *     with reading community from database(SQLException).
      */
     @GET
     @Path("/top-communities")
@@ -275,25 +306,36 @@ public class CommunitiesResource extends Resource
      * Return all collections of community.
      * 
      * @param communityId
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of collection. Options are: "all", "parentCommunityList",
-     *            "parentCommunity", "items", "license" and "logo". If you want
-     *            to use multiple options, it must be separated by commas.
+     *     String in which is what you want to add to returned instance
+     *     of collection. Options are: "all", "parentCommunityList",
+     *     "parentCommunity", "items", "license" and "logo". If you want
+     *     to use multiple options, it must be separated by commas.
      * @param limit
-     *            Maximum collection in array. Default value is 100.
+     *     Maximum collection in array. Default value is 100.
      * @param offset
-     *            Index from which will start array of collections. Default
-     *            value is 0.
+     *     Index from which will start array of collections. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of collections of community.
      * @throws WebApplicationException
-     *             It can be caused by creating context or while was problem
-     *             with reading community from database(SQLException).
+     *     It can be caused by creating context or while was problem
+     *     with reading community from database(SQLException).
      */
     @GET
     @Path("/{community_id}/collections")
@@ -361,25 +403,36 @@ public class CommunitiesResource extends Resource
      * Return all subcommunities of community.
      * 
      * @param communityId
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of community. Options are: "all", "parentCommunity",
-     *            "collections", "subCommunities" and "logo". If you want to use
-     *            multiple options, it must be separated by commas.
+     *     String in which is what you want to add to returned instance
+     *     of community. Options are: "all", "parentCommunity",
+     *     "collections", "subCommunities" and "logo". If you want to use
+     *     multiple options, it must be separated by commas.
      * @param limit
-     *            Maximum communities in array. Default value is 20.
+     *     Maximum communities in array. Default value is 20.
      * @param offset
-     *            Index from which will start array of communities. Default
-     *            value is 0.
+     *     Index from which will start array of communities. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of subcommunities of community.
      * @throws WebApplicationException
-     *             It can be caused by creating context or while was problem
-     *             with reading community from database(SQLException).
+     *     It can be caused by creating context or while was problem
+     *     with reading community from database(SQLException).
      */
     @GET
     @Path("/{community_id}/communities")
@@ -449,15 +502,26 @@ public class CommunitiesResource extends Resource
      * permission only admin.
      * 
      * @param community
-     *            Community which will be created at top level of communities.
+     *     Community which will be created at top level of communities.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Returns response with handle of community, if was all ok.
      * @throws WebApplicationException
-     *             It can be thrown by SQLException, AuthorizeException and
-     *             ContextException.
+     *     It can be thrown by SQLException, AuthorizeException and
+     *     ContextException.
      */
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
@@ -525,20 +589,31 @@ public class CommunitiesResource extends Resource
      * Create collection in community.
      * 
      * @param communityId
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
      * @param collection
-     *            Collection which will be added into community.
+     *     Collection which will be added into community.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response 200 if was everything all right. Otherwise 400
-     *         when id of community was incorrect or 401 if was problem with
-     *         permission to write into collection.
+     *     when id of community was incorrect or 401 if was problem with
+     *     permission to write into collection.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading or
-     *             writing. Or problem with authorization to community. Or
-     *             problem with creating context.
+     *     It is thrown when was problem with database reading or
+     *     writing. Or problem with authorization to community. Or
+     *     problem with creating context.
      */
     @POST
     @Path("/{community_id}/collections")
@@ -605,21 +680,32 @@ public class CommunitiesResource extends Resource
      * Create subcommunity in community.
      * 
      * @param communityId
-     *            Id of community in DSpace, in which will be created
-     *            subcommunity.
+     *     Id of community in DSpace, in which will be created
+     *     subcommunity.
      * @param community
-     *            Community which will be added into community.
+     *     Community which will be added into community.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response 200 if was everything all right. Otherwise 400
-     *         when id of community was incorrect or 401 if was problem with
-     *         permission to write into collection.
+     *     when id of community was incorrect or 401 if was problem with
+     *     permission to write into collection.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading or
-     *             writing. Or problem with authorization to community. Or
-     *             problem with creating context.
+     *     It is thrown when was problem with database reading or
+     *     writing. Or problem with authorization to community. Or
+     *     problem with creating context.
      */
     @POST
     @Path("/{community_id}/communities")
@@ -686,20 +772,31 @@ public class CommunitiesResource extends Resource
      * handle and expandle items.
      * 
      * @param communityId
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
      * @param community
-     *            Instance of community which will replace actual community in
-     *            DSpace.
+     *     Instance of community which will replace actual community in
+     *     DSpace.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
-     * @return Response 200 if was all ok. Otherwise 400 if was id incorrect or
-     *         401 if logged user has no permission to delete community.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
+     * @return Response 200 if was all ok. Otherwise 400 if id was incorrect or
+     *     401 if logged user has no permission to delete community.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading or writing. Or problem with writing to
-     *             community caused by authorization.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading or writing. Or problem with writing to
+     *     community caused by authorization.
      */
     @PUT
     @Path("/{community_id}")
@@ -753,18 +850,29 @@ public class CommunitiesResource extends Resource
      * Delete community from DSpace. It delete it everything with community!
      * 
      * @param communityId
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response code OK(200) if was everything all right.
-     *         Otherwise return NOT_FOUND(404) if was id of community incorrect.
-     *         Or (UNAUTHORIZED)401 if was problem with permission to community.
+     *     Otherwise return NOT_FOUND(404) if was id of community incorrect.
+     *     Or (UNAUTHORIZED)401 if was problem with permission to community.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading or deleting. Or problem with deleting
-     *             community caused by IOException or authorization.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading or deleting. Or problem with deleting
+     *     community caused by IOException or authorization.
      */
     @DELETE
     @Path("/{community_id}")
@@ -820,21 +928,32 @@ public class CommunitiesResource extends Resource
      * Delete collection in community.
      * 
      * @param communityId
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
      * @param collectionId
-     *            Id of collection which will be deleted.
+     *     Id of collection which will be deleted.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response code OK(200) if was everything all right.
-     *         Otherwise return NOT_FOUND(404) if was id of community or
-     *         collection incorrect. Or (UNAUTHORIZED)401 if was problem with
-     *         permission to community or collection.
+     *     Otherwise return NOT_FOUND(404) if was id of community or
+     *     collection incorrect. Or (UNAUTHORIZED)401 if was problem with
+     *     permission to community or collection.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading or deleting. Or problem with deleting
-     *             collection caused by IOException or authorization.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading or deleting. Or problem with deleting
+     *     collection caused by IOException or authorization.
      */
     @DELETE
     @Path("/{community_id}/collections/{collection_id}")
@@ -920,21 +1039,32 @@ public class CommunitiesResource extends Resource
      * Delete subcommunity in community.
      * 
      * @param parentCommunityId
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
      * @param subcommunityId
-     *            Id of community which will be deleted.
+     *     Id of community which will be deleted.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response code OK(200) if was everything all right.
-     *         Otherwise return NOT_FOUND(404) if was id of community or
-     *         subcommunity incorrect. Or (UNAUTHORIZED)401 if was problem with
-     *         permission to community or subcommunity.
+     *     Otherwise return NOT_FOUND(404) if was id of community or
+     *     subcommunity incorrect. Or (UNAUTHORIZED)401 if was problem with
+     *     permission to community or subcommunity.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading or deleting. Or problem with deleting
-     *             subcommunity caused by IOException or authorization.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading or deleting. Or problem with deleting
+     *     subcommunity caused by IOException or authorization.
      */
     @DELETE
     @Path("/{community_id}/communities/{community_id2}")
@@ -1023,15 +1153,15 @@ public class CommunitiesResource extends Resource
      * logged into context has permission to do passed action.
      * 
      * @param context
-     *            Context of actual logged user.
+     *     Context of actual logged user.
      * @param id
-     *            Id of community in DSpace.
+     *     Id of community in DSpace.
      * @param action
-     *            Constant from org.dspace.core.Constants.
+     *     Constant from org.dspace.core.Constants.
      * @return It returns DSpace collection.
      * @throws WebApplicationException
-     *             Is thrown when item with passed id is not exists and if user
-     *             has no permission to do passed action.
+     *     Is thrown when item with passed id is not exists and if user
+     *     has no permission to do passed action.
      */
     private org.dspace.content.Community findCommunity(org.dspace.core.Context context, String id, int action)
             throws WebApplicationException

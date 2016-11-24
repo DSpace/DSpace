@@ -9,8 +9,8 @@ package org.dspace.xmlworkflow.state.actions;
 
 /**
  * A class that represent the result of an action
- * The result consists of 2 parts a type & and a result
- * The type is represented by an enum & can either be something like
+ * The result consists of 2 parts a type and a result
+ * The type is represented by an enum and can either be something like
  * TYPE_OUTCOME: we have a certain outcome so move to another action/step
  * TYPE_ERROR: an error has occurred while processing the action
  * ...
