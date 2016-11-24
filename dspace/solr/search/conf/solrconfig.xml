@@ -377,10 +377,14 @@
          'soft' commit which only ensures that changes are visible
          but does not ensure that data is synced to disk.  This is
          faster and more near-realtime friendly than a hard commit.
+         
+         PLEASE NOTE: If your repository have high input load 
+         it could be useful to raise such parameter to 1, 5, 10 minutes;
+         Now setup softcommit to 15000ms = 15s
       -->
 
      <autoSoftCommit> 
-       <maxTime>${solr.autoSoftCommit.maxTime:1000}</maxTime> 
+       <maxTime>${solr.autoSoftCommit.maxTime:15000}</maxTime> 
      </autoSoftCommit>
 
     <!-- Update Related Event Listeners
