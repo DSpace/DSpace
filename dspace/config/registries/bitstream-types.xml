@@ -30,5 +30,19 @@
         <scope_note>Metadata field used to link an alternative (mostly
 					for access) copy to the master one</scope_note>
     </dc-type>
+    
+    <dc-type>
+        <schema>bitstream</schema>
+        <element>image</element>
+        <qualifier>height</qualifier>
+        <scope_note>Metadata field used to store the height of the image</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>bitstream</schema>
+        <element>image</element>
+        <qualifier>width</qualifier>
+        <scope_note>Metadata field used to store the width of the image</scope_note>
+    </dc-type>
 
 </dspace-dc-types>

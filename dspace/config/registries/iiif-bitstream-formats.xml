@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<!--
+  - iiif-bitstream-formats.xml
+  -
+  - Version:  $Revision$
+  -
+  - Date:     $Date$
+  -
+  - Additional bitstream format used by the IIIF integration
+  -
+  -->
+
+
+<dspace-bitstream-types>
+
+  <bitstream-type>
+    <mimetype>image/x-nikon-nef</mimetype>
+    <short_description>Nikon Image RAW</short_description>
+    <description>Nikon Digital SLR Camera Raw Image File
+	</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>nef</extension>
+  </bitstream-type>
+
+<bitstream-type>
+    <mimetype>image/x-canon-cr2</mimetype>
+    <short_description>Canon Image RAW</short_description>
+    <description>Canon Digital SLR Camera Raw Image File
+	</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>cr2</extension>
+  </bitstream-type>
+  
+</dspace-bitstream-types>

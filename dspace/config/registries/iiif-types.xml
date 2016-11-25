@@ -1,0 +1,58 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>IIIF Integration Plugin</title>
+        <contributor.author>Andrea Bollini</contributor.author>
+        <contributor.author>Luigi Andrea Pascarelli</contributor.author>
+        <contributor.author>Riccardo Fazio</contributor.author>
+      </dspace-header>
+
+
+    <dc-type>
+    	<schema>bitstream</schema>
+        <element>iiif</element>
+        <qualifier>imageid</qualifier>
+        <scope_note>Metadata field used to store the IIIF Image ID of the file in the IIIF Image Server</scope_note>
+    </dc-type>
+
+    <dc-type>
+    	<schema>bitstream</schema>
+        <element>iiif</element>
+        <qualifier>sequence</qualifier>
+        <scope_note>Metadata field used to store the ID of the DSpace
+					bundle that provide an alternative IIIF presentation compliant
+					representation of the bitstream</scope_note>
+    </dc-type>
+
+    <dc-type>
+    	<schema>bitstream</schema>
+        <element>iiif</element>
+        <qualifier>canvasindex</qualifier>
+        <scope_note>Metadata field used to store the initial canvas within the sequence 
+        			to display (0 based)</scope_note>
+    </dc-type>
+
+    <dc-type>
+    	<schema>bundle</schema>
+        <element>iiif</element>
+        <qualifier>searchid</qualifier>
+        <scope_note>Metadata field used to store the endpoint of the IIIF Search API 
+        			compliant Server</scope_note>
+    </dc-type>
+    
+    <dc-type>
+    	<schema>bundle</schema>
+        <element>iiif</element>
+        <qualifier>autocompleteid</qualifier>
+        <scope_note>Metadata field used to store the endpoint of the IIIF Search API 
+        			Autocomplete service</scope_note>
+    </dc-type>
+    
+    <dc-type>
+    	<schema>bitstream</schema>
+        <element>iiif</element>
+        <qualifier>view-orientation</qualifier>
+        <scope_note>Metadata field used to store the rotation necessary to apply to the image to have a proper visualization</scope_note>
+    </dc-type>
+    
+</dspace-dc-types>

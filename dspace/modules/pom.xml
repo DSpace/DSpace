@@ -172,6 +172,28 @@
 			        </dependency>
             </dependencies>
         </profile>
-        
+
+        <profile>
+            <id>addon-iiif</id>
+            <activation>
+                <property>
+                    <name>iiif.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-iiif-api</artifactId>
+					<version>${iiif.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-iiif-jspui</artifactId>
+					<version>${iiif.addon.modules}</version>
+					<type>war</type>
+				</dependency>
+			</dependencies>		                    
+        </profile>        
     </profiles>
 </project>
