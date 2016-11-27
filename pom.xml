@@ -780,7 +780,52 @@
 		        </dependencies>		                    
             </dependencyManagement>
         </profile>
-                
+
+        <profile>
+            <id>addon-ocr</id>
+			<activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>            
+            <dependencyManagement>
+            	<dependencies>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-ocr-api</artifactId>
+						 <version>${ocr.addon.modules}</version>
+						 <type>jar</type>
+			        </dependency>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-annoiiif-api</artifactId>
+						 <version>${annoiiif.addon.modules}</version>
+						 <type>jar</type>
+			        </dependency>
+		        </dependencies>		                    
+            </dependencyManagement>
+        </profile>
+        
+        <profile>
+            <id>addon-document-viewer</id>
+			<activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>            
+            <dependencyManagement>
+            	<dependencies>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-docviewer-api</artifactId>
+						 <version>${docviewer.addon.modules}</version>
+						 <type>jar</type>
+			        </dependency>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-annoiiif-api</artifactId>
+						 <version>${annoiiif.addon.modules}</version>
+						 <type>jar</type>
+			        </dependency>			        
+		        </dependencies>		                    
+            </dependencyManagement>
+        </profile>                        
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
