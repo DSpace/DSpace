@@ -1,0 +1,18 @@
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>OCR Integration Plugin</title>
+        <contributor.author>Andrea Bollini</contributor.author>
+        <contributor.author>Luigi Andrea Pascarelli</contributor.author>
+        <contributor.author>Riccardo Fazio</contributor.author>
+      </dspace-header>
+
+
+    <dc-type>
+    	<schema>bitstream</schema>
+        <element>alternative</element>
+        <qualifier>ocr</qualifier>
+        <scope_note>Metadata field used to store the bitstream ID of the resulting OCR process</scope_note>
+    </dc-type>
+
+</dspace-dc-types>
