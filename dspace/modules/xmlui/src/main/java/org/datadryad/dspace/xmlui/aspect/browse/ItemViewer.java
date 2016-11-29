@@ -25,6 +25,8 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadJournalConcept;
+import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -329,6 +331,24 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             // THIS IS A PACKAGE ITEM
 
             pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
+
+            DCValue[] values;
+
+            if ((values = item.getMetadata("prism.publicationName")).length != 0) {
+                pageMeta.addMetadata("publicationName").addContent(values[0].value);
+                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(values[0].value);
+                if (journalConcept != null) {
+                    if (!"".equals(journalConcept.getCoverImage())) {
+                        pageMeta.addMetadata("journal", "cover").addContent(journalConcept.getCoverImage());
+                    }
+                    if (!"".equals(journalConcept.getWebsite())) {
+                        pageMeta.addMetadata("journal", "website").addContent(journalConcept.getWebsite());
+                    }
+                    if (!"".equals(journalConcept.getISSN())) {
+                        pageMeta.addMetadata("journal", "issn").addContent(journalConcept.getISSN());
+                    }
+                }
+            }
 
             for (DCValue metadata : item.getMetadata("dryad.fundingEntity")) {
                 pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
