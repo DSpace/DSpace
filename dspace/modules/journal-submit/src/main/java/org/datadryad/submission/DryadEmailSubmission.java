@@ -341,7 +341,7 @@ public class DryadEmailSubmission extends HttpServlet {
                 } else if (manuscript.isRejected()) {
                     approved = false;
                 } else if (manuscript.isNeedsRevision()) {
-                    approved = false;
+                    approved = null;  // needs revision is the same as submitted, so approved should stay null.
                 } else if (manuscript.isPublished()) {
                     approved = true;
                 }
