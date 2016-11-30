@@ -141,4 +141,8 @@ public class Author {
         return this.identifierType;
     }
 
+    public static String normalizeName(String name) {
+        return Normalizer.normalize(name, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+    }
+
 }
