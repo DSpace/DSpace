@@ -19,6 +19,15 @@
         "hidden" : "N"
      },
      {
+        "sponsor" : "$120",
+        "title" : "Annals of the Entomological Society of America",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "2046-6390",
+        "embargo" : "N",
+        "submission" : "R"
+     },
+     {
         "integrated" : "N",
         "embargo" : "N",
         "issn" : "2168-0450",
@@ -260,6 +269,15 @@
         "embargo" : "N",
         "sponsor" : "eLife",
         "title" : "eLife"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Environmental Entomology",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "0046-225X",
+        "embargo" : "N",
+        "submission" : "R"
      },
      {
         "title" : "Environmental Epigenetics",
@@ -505,6 +523,15 @@
         "integrated" : "Y"
      },
      {
+        "sponsor" : "$120",
+        "title" : "Journal of Economic Entomology",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "0022-0493",
+        "embargo" : "N",
+        "submission" : "R"
+     },
+     {
         "title" : "Journal of Evolutionary Biology",
         "sponsor" : "European Society for Evolutionary Biology",
         "integrated" : "Y",
@@ -548,6 +575,24 @@
         "integrated" : "Y",
         "sponsor" : "Pensoft",
         "title" : "Journal of Hymenoptera Research"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Journal of Insect Science",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "1536-2442",
+        "embargo" : "N",
+        "submission" : "R"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Journal of Medical Entomology",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "0022-2585",
+        "embargo" : "N",
+        "submission" : "R"
      },
      {
         "title" : "Journal of Paleontology",
