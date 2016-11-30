@@ -40,6 +40,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
@@ -351,7 +352,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             }
             
             for (DCValue metadata : item.getMetadata("dryad.fundingEntity")) {
-                pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
+                if (metadata.confidence == Choices.CF_ACCEPTED) {
+                    pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
+                }
             }
             
             // Data file metadata included on data package items (integrated view)
