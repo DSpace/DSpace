@@ -43,7 +43,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
     @Before
     public void setUp() {
         super.setUp();
-        // Create an journal
+        // Create a journal
         Journal journal = null;
         try {
             DryadJournalConcept journalConcept = new DryadJournalConcept();

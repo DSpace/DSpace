@@ -1830,6 +1830,10 @@ img.pub-cover {
     font-weight: bold;
     word-wrap: break-word;
 }
+
+.pub-authors {
+    font-weight: bold;
+}
 .citation-sample {
     background-color: #ddd;
     border: 1px solid #eee;

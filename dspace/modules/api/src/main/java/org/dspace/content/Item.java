@@ -1011,6 +1011,10 @@ public class Item extends DSpaceObject
         addMetadata(schema, element, qualifier, lang, valArray, authArray, confArray);
     }
 
+    public void addMetadata(DCValue dcValue) {
+        addMetadata(dcValue.schema, dcValue.element, dcValue.qualifier, dcValue.language, dcValue.value, dcValue.authority, dcValue.confidence);
+    }
+
     /**
      * Clear Dublin Core metadata values. As with <code>getDC</code> above,
      * passing in <code>null</code> only matches fields where the qualifier or
@@ -2143,29 +2147,6 @@ public class Item extends DSpaceObject
 
         return true;
     }
-
-
-    /**
-     * Compares a value to any metadata values in an item.
-     *
-     * @param metadataString metadata string
-     * @param compareValue value to compare
-     * @return Returns false if there are no equivalent values,
-     * including if there are no values for that metadata field at all.
-     */
-    public boolean hasMetadataEqualTo(String metadataString, String compareValue) {
-        DCValue[] mds = getMetadata(metadataString);
-        if (mds != null) {
-            for (int i = 0; i < mds.length; i++) {
-                if (mds[i].value.equals(compareValue)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
 
     @Override
     public int hashCode()

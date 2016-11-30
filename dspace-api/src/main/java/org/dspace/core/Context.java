@@ -407,7 +407,6 @@ public class Context
      */
     public void abort()
     {
-//        log.error("Aborting context: connection " + connection.hashCode());
         try
         {
             if (!connection.isClosed())

@@ -46,7 +46,7 @@ public class DryadGmailService {
      * @throws IOException
      */
     public DryadGmailService(File credentialPath, String clientsecretsFile, String scope, String user) {
-        myUserID = "me";
+        myUserID = user;
         try {
             myDataStoreFactory = new FileDataStoreFactory(credentialPath);
             myHttpTransport = new NetHttpTransport();

@@ -1,9 +1,7 @@
 package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
-import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Author;
-import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -272,8 +270,7 @@ public class WorkflowItem implements InProgressSubmission {
     }
 
     public static List<WorkflowItem> findAllByManuscript(Context context, Manuscript manuscript) throws ApproveRejectReviewItemException {
-        DryadJournalConcept journalConcept = manuscript.getJournalConcept();
-        String journalCode = journalConcept.getJournalID();
+        String journalCode = manuscript.getJournalConcept().getJournalID();
         WorkflowItem[] workflowItems = null;
         ArrayList<WorkflowItem> matchingItems = new ArrayList<WorkflowItem>();
 
@@ -286,14 +283,9 @@ public class WorkflowItem implements InProgressSubmission {
                 // check to see if this matches by msid:
                 DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
                 for (int j=0; j<msids.length; j++) {
-                    try {
-                        String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msids[j].value, journalConcept);
-                        if (manuscript.getManuscriptId().equals(canonicalMSID)) {
-                            log.debug("matched " + item.getID() + " by msid");
-                            matched = true;
-                        }
-                    } catch (Exception e) {
-                        log.error("couldn't parse msid " + msids[j].value);
+                    if (manuscript.getManuscriptId().equals(msids[j].value)) {
+                        log.debug("matched " + item.getID() + " by msid");
+                        matched = true;
                     }
 
                     // TEMPORARY FIX: manuscript numbers from metadata files had the JournalCode prefixed onto the manuscript number as well.

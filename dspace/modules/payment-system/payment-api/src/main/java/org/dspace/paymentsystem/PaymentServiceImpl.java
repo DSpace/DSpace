@@ -11,9 +11,9 @@ import org.apache.cocoon.environment.Request;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadFunderConcept;
+import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -42,7 +42,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
@@ -85,7 +84,6 @@ public class PaymentServiceImpl implements PaymentService {
     //generate a secure token from paypal
     public String generateSecureToken(ShoppingCart shoppingCart, String secureTokenId, String transactionType, Context context) {
         String secureToken = null;
-        ArrayList<BasicNameValuePair> queryParams = new ArrayList<BasicNameValuePair>();
         String requestUrl = ConfigurationManager.getProperty("payment-system", "paypal.payflow.link");
 
         try {
@@ -119,22 +117,7 @@ public class PaymentServiceImpl implements PaymentService {
                 amount = Double.toString(shoppingCart.getTotal());
             }
 
-            queryParams.add(new BasicNameValuePair("SECURETOKENID", secureTokenId));
-            queryParams.add(new BasicNameValuePair("CREATESECURETOKEN", "Y"));
-            queryParams.add(new BasicNameValuePair("MODE", ConfigurationManager.getProperty("payment-system", "paypal.mode")));
-            queryParams.add(new BasicNameValuePair("PARTNER", ConfigurationManager.getProperty("payment-system", "paypal.partner")));
-            queryParams.add(new BasicNameValuePair("VENDOR", ConfigurationManager.getProperty("payment-system", "paypal.vendor")));
-            queryParams.add(new BasicNameValuePair("USER", ConfigurationManager.getProperty("payment-system", "paypal.user")));
-            queryParams.add(new BasicNameValuePair("PWD", ConfigurationManager.getProperty("payment-system", "paypal.pwd")));
-            queryParams.add(new BasicNameValuePair("TENDER", "C" ));
-            queryParams.add(new BasicNameValuePair("TRXTYPE", transactionType));
-            queryParams.add(new BasicNameValuePair("FIRSTNAME", userFirstName));
-            queryParams.add(new BasicNameValuePair("LASTNAME", userLastName));
-            queryParams.add(new BasicNameValuePair("COMMENT1", userName));
-            queryParams.add(new BasicNameValuePair("COMMENT2", userEmail));
-            queryParams.add(new BasicNameValuePair("AMT", amount));
-            queryParams.add(new BasicNameValuePair("CURRENCY", shoppingCart.getCurrency()));
-            String urlParameters = URLEncodedUtils.format(queryParams, "UTF-8");
+            String urlParameters = "SECURETOKENID=" + secureTokenId + "&CREATESECURETOKEN=Y" + "&MODE=" + ConfigurationManager.getProperty("payment-system", "paypal.mode") + "&PARTNER=" + ConfigurationManager.getProperty("payment-system", "paypal.partner") + "&VENDOR=" + ConfigurationManager.getProperty("payment-system", "paypal.vendor") + "&USER=" + ConfigurationManager.getProperty("payment-system", "paypal.user") + "&PWD=" + ConfigurationManager.getProperty("payment-system", "paypal.pwd") + "&TENDER=C" + "&TRXTYPE=" + transactionType + "&FIRSTNAME=" + userFirstName + "&LASTNAME=" + userLastName + "&COMMENT1=" + userName + "&COMMENT2=" + userEmail + "&AMT=" + amount + "&CURRENCY=" + shoppingCart.getCurrency();
 
             // Send post request
             con.setDoOutput(true);
@@ -443,7 +426,7 @@ public class PaymentServiceImpl implements PaymentService {
                     // set the error message; this will be passed in as a request parameter for the next round.
                     errorMessage = PAYMENT_ERROR_VOUCHER;
                 }
-                paymentSystemService.updateTotal(context, shoppingCart, null);
+                paymentSystemService.updateTotal(context, shoppingCart);
             }
 
             // similarly, check for existence of either dryad.fundingEntity metadata or a grant-info request parameter
@@ -463,6 +446,7 @@ public class PaymentServiceImpl implements PaymentService {
                         hasGrant = false;
                         log.debug("no grant, go to payment screen");
                     } else {
+                        // This clause is temporary for the NSF pilot project: in future, we should already have grant information in the item.
                         int confidence = 0;
                         if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
                             log.debug("valid grant");
@@ -471,39 +455,30 @@ public class PaymentServiceImpl implements PaymentService {
                             log.error("invalid grant");
                             confidence = Choices.CF_REJECTED;
                         }
+                        DryadFunderConcept nsfConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, DryadFunderConcept.NSF_ID);
                         item.clearMetadata("dryad.fundingEntity");
-                        item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, "NSF", confidence);
+                        item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, DryadFunderConcept.NSF_ID, confidence);
                         item.update();
                         hasGrant = true;
                         log.debug("added grant info " + grantInfo);
                     }
                 }
-
-//                if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
-//                    int confidence = 0;
-//                    if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
-//                        log.error("valid grant");
-//                        confidence = Choices.CF_ACCEPTED;
-//                    } else {
-//                        log.error("invalid grant");
-//                        confidence = Choices.CF_REJECTED;
-//                    }
-//                    item.clearMetadata("dryad.fundingEntity");
-//                    item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, "NSF", confidence);
-//                    item.update();
-//                } else {
-//                    hasGrant = false;
-//                }
             }
 
             // Now that we've checked vouchers and grants, we can generate the corresponding UI and update the cart accordingly.
             if (hasGrant && transactionType.equals(PAYPAL_AUTHORIZE)) {
-                log.error("grant is -" + grantInfo + "-");
-                if (!"".equals(StringUtils.stripToEmpty(grantInfo))) {
+                fundingEntities = item.getMetadata("dryad.fundingEntity");
+                String authority = null;
+                if (fundingEntities != null && fundingEntities.length > 0) {
+                    authority = fundingEntities[0].authority;
+                }
+                if (authority != null) {
                     log.debug("nsf pays");
-                    paymentSystemService.updateTotal(context, shoppingCart, "the US National Science Foundation");
-                    shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
+                    DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, authority);
+                    shoppingCart.setSponsoringOrganization(funderConcept);
+//                    shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     shoppingCart.update();
+                    paymentSystemService.updateTotal(context, shoppingCart);
                     mainDiv.addPara(T_funding_valid);
                     mainDiv.addHidden("show_button").setValue(T_button_finalize);
                     List buttons = mainDiv.addList("paypal-form-buttons");
@@ -544,8 +519,5 @@ public class PaymentServiceImpl implements PaymentService {
             mainDiv.addHidden("submission-continue").setValue(knotId);
             addButtons(mainDiv);
         }
-
-
     }
-
 }

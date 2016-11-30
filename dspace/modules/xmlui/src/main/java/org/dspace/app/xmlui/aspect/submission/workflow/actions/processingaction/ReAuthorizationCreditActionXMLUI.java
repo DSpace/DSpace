@@ -21,7 +21,6 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.utils.DSpace;
-import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 
 import java.util.Date;
@@ -97,7 +96,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
             // if journal-based subscription is in place, transaction is paid
-            if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)&&shoppingCart.getJournalSub()) {
+            if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)&&shoppingCart.hasSubscription()) {
                 log.info("processed journal subscription for Item " + item.getHandle() + ", journal = " + shoppingCart.getJournal());
                 log.debug("tally credit for journal = "+shoppingCart.getJournal());
 
@@ -106,16 +105,16 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                 if(concepts!=null&&concepts.length!=0){
                     AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerID", Item.ANY);
                     if(metadataValues!=null&&metadataValues.length>0){
-                        shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
-                        shoppingCart.setPaymentDate(new Date());
-                        shoppingCart.update();
-
                         try{
+                            shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
+                            Date date= new Date();
+                            shoppingCart.setPaymentDate(date);
+                            shoppingCart.update();
                             success = AssociationAnywhere.tallyCredit(context, metadataValues[0].value, DOIIdentifierProvider.getDoiValue(item));
                             paymentSystemService.sendPaymentApprovedEmail(context, workflowItem, shoppingCart);
                         }catch (Exception e)
                         {
-                            paymentSystemService.sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \n \n " + e.getMessage());
+                            paymentSystemService.sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \\n \\n " + e.getMessage());
                             log.error(e.getMessage());
                             return e.getMessage();
                         }

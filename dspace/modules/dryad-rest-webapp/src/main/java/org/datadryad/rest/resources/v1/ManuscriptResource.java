@@ -2,25 +2,21 @@
  */
 package org.datadryad.rest.resources.v1;
 
-import java.net.URI;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.handler.ManuscriptHandlerGroup;
-import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Journal;
+import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.responses.ErrorsResponse;
 import org.datadryad.rest.responses.ResponseFactory;
-import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.AbstractJournalStorage;
+import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.Status;
+import java.net.URI;
 
 /**
  *
