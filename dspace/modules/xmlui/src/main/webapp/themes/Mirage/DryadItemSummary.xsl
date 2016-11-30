@@ -611,7 +611,7 @@
                         <xsl:if test="$funder">
                             <tr>
                                 <xsl:call-template name="make-funding-string">
-                                    <xsl:with-param name="funder" select="$funder"/>
+                                    <xsl:with-param name="InputString" select="$funder"/>
                                 </xsl:call-template>
                             </tr>
                         </xsl:if>
@@ -1344,41 +1344,18 @@
     </xsl:template>
 
     <xsl:template name="make-funding-string">
-        <xsl:param name="funder"/>
-        <!-- the funder@fundingEntity node is packed by DryadWorkflowUtils.getAuthors()-->
-        <!-- format is @12345678@#National Science Foundation (United States)#,@12345678@#National Science Foundation (United States)#-->
-        <!-- comma-delimited, with each name offset by @ and orcid offset by #, tailing comma-->
-        <xsl:call-template name="format-funding-strings">
-            <xsl:with-param name="InputString" select="$funder"/>
-        </xsl:call-template>
-    </xsl:template>
-
-    <xsl:template name="format-funding-strings">
-        <!--@12345678@#National Science Foundation (United States)#,@12345678@#National Science Foundation (United States)#-->
+        <!-- Funding strings are in the format 'grantnumber@FunderName (country)'-->
         <xsl:param name="InputString"/>
         <xsl:choose>
-            <xsl:when test="contains($InputString, ',')">
-                <xsl:choose>
-                    <!-- There is only one name, but there's still a comma after-->
-                    <xsl:when test="substring-after($InputString,',') = ''">
-                        <xsl:call-template name="format-funding-strings">
-                            <xsl:with-param name="InputString" select="substring-before($InputString,',')"/>
-                        </xsl:call-template>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <!-- There are multiple names -->
-                        <xsl:call-template name="format-single-funder">
-                            <xsl:with-param name="nameString" select="substring-before($InputString,',')"/>
-                        </xsl:call-template>
-                        <xsl:call-template name="format-funding-strings">
-                            <xsl:with-param name="InputString" select="substring-after($InputString,',')"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+            <!-- This test is for pre-DryadFundingConcept packages: they don't have the funder packed into the metadata; we assumed that US NSF was the only funder.-->
+            <xsl:when test="contains($InputString, '@')">
+                <xsl:call-template name="format-single-funder">
+                    <xsl:with-param name="nameString" select="$InputString"/>
+                </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="format-single-funder">
-                    <xsl:with-param name="nameString" select="$InputString"/>
+                    <xsl:with-param name="nameString" select="concat($InputString,'@National Science Foundation (United States)')"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
