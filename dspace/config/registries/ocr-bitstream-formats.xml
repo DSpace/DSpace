@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<!--
+  - ocr-bitstream-formats.xml
+  -
+  - Version:  $Revision$
+  -
+  - Date:     $Date$
+  -
+  - Additional bitstream format used by the OCR integration
+  -
+  -->
+
+
+<dspace-bitstream-types>
+
+  <!-- Used by system: do not remove -->
+  <bitstream-type>
+    <mimetype>text/xml</mimetype>
+    <short_description>hOCR</short_description>
+    <description>hOCR is an open standard of data representation for
+		formatted text obtained from optical character recognition (OCR). The
+		definition encodes text, style, layout information, recognition
+		confidence metrics and other information using Extensible Markup
+		Language (XML) in form of Hypertext Markup Language (HTML) or XHTML.
+	</description>
+    <support_level>1</support_level>
+    <internal>true</internal>
+    <extension>hocr</extension>
+  </bitstream-type>
+
+  <!-- Used by system: do not remove -->
+  <bitstream-type>
+    <mimetype>text/xml</mimetype>
+    <short_description>PDFTextLocation</short_description>
+	<description>This is an internal XML format used to collect detailed
+		information about text location in a PDF page
+	</description>
+    <support_level>1</support_level>
+    <internal>true</internal>
+    <extension>xml</extension>
+  </bitstream-type>
+
+</dspace-bitstream-types>

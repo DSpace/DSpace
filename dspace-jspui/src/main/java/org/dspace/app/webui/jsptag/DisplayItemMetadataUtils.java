@@ -139,8 +139,8 @@ public class DisplayItemMetadataUtils {
 
 		String style = styleSelection.getStyleForItem(item);
 		String configLine = "";
-		if (postfix != null && styleSelection.isConfigurationDefinedForStyle(style + ".iiif")) {
-			configLine = styleSelection.getConfigurationForStyle(style + ".iiif");
+		if (postfix != null && styleSelection.isConfigurationDefinedForStyle(style + "." + postfix)) {
+			configLine = styleSelection.getConfigurationForStyle(style + "." + postfix);
 		} else {
 			configLine = styleSelection.getConfigurationForStyle(style);
 		}

@@ -194,6 +194,52 @@
 					<type>war</type>
 				</dependency>
 			</dependencies>		                    
-        </profile>        
+	    </profile>
+	
+		<profile>
+			<id>addon-ocr</id>
+            <activation>
+                <property>
+                    <name>ocr.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-ocr-api</artifactId>
+					<version>${ocr.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-annoiiif-api</artifactId>
+					<version>${annoiiif.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</profile>
+	
+		<profile>
+			<id>addon-document-viewer</id>
+            <activation>
+                <property>
+                    <name>docviewer.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-docviewer-api</artifactId>
+					<version>${docviewer.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-annoiiif-api</artifactId>
+					<version>${annoiiif.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</profile>                
     </profiles>
 </project>
