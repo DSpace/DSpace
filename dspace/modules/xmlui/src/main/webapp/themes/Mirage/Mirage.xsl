@@ -396,14 +396,17 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
-                        <!-- ERJ Open Research -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aerj%5C+open%5C+research%5C%7C%5C%7C%5C%7CERJ%5C+Open%5C+Research"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJOR.png" alt="ERJ Open Research" /></a>
-                        <!-- European Respiratory Journal -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aeuropean%5C+respiratory%5C+journal%5C%7C%5C%7C%5C%7CEuropean%5C+Respiratory%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJ.png" alt="European Respiratory Journal" /></a>
-                        <!-- Applications in Plant Sciences -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aapplications%5C+in%5C+plant%5C+sciences%5C%7C%5C%7C%5C%7CApplications%5C+in%5C+Plant%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-APPS.png" alt="Applications in Plant Sciences" /></a>
-                        <!-- Journal of Systematics and Evolution -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+systematics%5C+and%5C+evolution%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Systematics%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JSE_Cover.png" alt="Journal of Systematics and Evolution" /></a>
+                        <!-- Annals of the Entomological Society of America -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aannals%5C+of%5C+the%5C+entomological%5C+society%5C+of%5C+america%5C%7C%5C%7C%5C%7CAnnals%5C+of%5C+the%5C+Entomological%5C+Society%5C+of%5C+America"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-AESAME.png" alt="Annals of the Entomological Society of America" /></a>
+
+                        <!-- Environmental Entomology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aenvironmental%5C+entomology%5C%7C%5C%7C%5C%7CEnvironmental%5C+Entomology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ENVENT.png" alt="Environmental Entomology" /></a>
+
+                        <!-- Journal of Economic Entomology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+economic%5C+entomology%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Economic%5C+Entomology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JEENTO.png" alt="Journal of Economic Entomology" /></a>
+
+                        <!-- Journal of Insect Science -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+insect%5C+science%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Insect%5C+Science"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JISESA.png" alt="Journal of Insect Science" /></a>
 
                     </div>
                 </div>
