@@ -1,4 +1,6 @@
 #!/bin/sh
 
 # Get the DSPACE/bin directory
-./dspace dsrun org.dspace.app.cris.metrics.pmc.script.RetrievePubMedID
+BINDIR=`dirname $0`
+
+$BINDIR/dspace dsrun org.dspace.app.cris.metrics.pmc.script.RetrievePubMedID
