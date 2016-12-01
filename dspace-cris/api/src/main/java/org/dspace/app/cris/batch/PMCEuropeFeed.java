@@ -141,12 +141,6 @@ public class PMCEuropeFeed
         {
             endpoint = PMCEUROPE_ENDPOINT_SEARCH;
         }
-        String queryFixedParam = ConfigurationManager.getProperty("pmceuropefeed",
-                "query.fixed-param");
-        if (!StringUtils.isNotBlank(queryFixedParam))
-        {
-            queryFixedParam = QUERY_FIXED_PARAM;
-        }
 
         String queryParam = ConfigurationManager.getProperty("pmceuropefeed",
                 "query.param.default");
@@ -261,13 +255,6 @@ public class PMCEuropeFeed
             pagesize = QUERY_PAGESIZE;
         }
 
-        if (line.hasOption("z"))
-        {
-            query = ConfigurationManager.getProperty("pmceuropefeed",
-                    "query.param.scratch");
-        }
-
-        
         if (line.hasOption("m"))
         {
             pmidMetadata = line.getOptionValue("m");

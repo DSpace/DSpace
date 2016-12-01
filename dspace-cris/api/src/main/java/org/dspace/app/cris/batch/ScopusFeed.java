@@ -98,13 +98,13 @@ public class ScopusFeed
         options.addOption(
                 OptionBuilder.withArgName("query Start Date").hasArg(true)
                         .withDescription(
-                                "Query start date to retrieve data publications from Wos, default start date is yesterday")
+                                "Query start date to retrieve data publications from Scopus, default start date is yesterday")
                 .create("s"));
 
         options.addOption(
                 OptionBuilder.withArgName("query End Date").hasArg(true)
                         .withDescription(
-                                "Query End date to retrieve data publications from Wos, default is today")
+                                "Query End date to retrieve data publications from Scopus, default is today")
                 .create("e"));
 
         options.addOption(OptionBuilder.withArgName("forceCollectionID")
