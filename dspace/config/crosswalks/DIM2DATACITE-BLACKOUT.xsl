@@ -73,6 +73,13 @@
 				<xsl:text>0000</xsl:text>
 			</publicationYear>
 
+			<!-- ************ Subjects ************** -->
+			<subjects>
+				<subject>
+					<xsl:text>(:tba)</xsl:text>
+				</subject>
+			</subjects>
+
 			<!-- ************ Funding information ************** -->
 			<xsl:if test="dspace:field[@element='fundingEntity']">
 				<contributors>
@@ -90,13 +97,6 @@
 					</xsl:for-each>
 				</contributors>
 			</xsl:if>
-
-			<!-- ************ Subjects ************** -->
-			<subjects>
-				<subject>
-					<xsl:text>(:tba)</xsl:text>
-				</subject>
-			</subjects>
 
 			<!-- ************ Dates - Only for Data Files ************** -->
 			<xsl:if test="$datatype='DataFile'">
