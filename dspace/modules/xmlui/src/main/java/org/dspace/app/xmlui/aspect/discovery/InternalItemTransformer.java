@@ -105,6 +105,9 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
         pageMeta.addTrailLink(contextPath + "/submissions", T_non_archived_trail);
         pageMeta.addTrail().addContent(T_internal_trail);
         pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
+        for (DCValue metadata : item.getMetadata("dryad.fundingEntity")) {
+            pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
+        }
     }
 
     private String getTitle(Item item) {

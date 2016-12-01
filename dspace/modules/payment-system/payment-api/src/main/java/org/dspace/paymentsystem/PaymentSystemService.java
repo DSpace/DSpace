@@ -7,15 +7,12 @@
  */
 package org.dspace.paymentsystem;
 
-import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.workflow.WorkflowItem;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -42,22 +39,22 @@ public interface PaymentSystemService
 
     public ShoppingCart getShoppingCartByItemId(Context context, Integer itemId) throws SQLException,PaymentSystemException;
 
-    public Double calculateShoppingCartTotal(Context context, ShoppingCart transaction, String journal) throws SQLException;
+    public Double calculateShoppingCartTotal(Context context, ShoppingCart transaction) throws SQLException;
 
     public double getSurchargeLargeFileFee(Context context, ShoppingCart transaction) throws SQLException;
 
-    public boolean getJournalSubscription(Context context, ShoppingCart transaction, String journal) throws SQLException;
+    public boolean isSponsored(Context context, ShoppingCart transaction) throws SQLException;
 
-    public boolean hasDiscount(Context context, ShoppingCart transaction, String journal) throws SQLException;
+    public boolean dpcIsCovered(Context context, ShoppingCart transaction) throws SQLException;
 
-    public void updateTotal(Context context, ShoppingCart transaction, String journal) throws SQLException;
+    public void updateTotal(Context context, ShoppingCart transaction) throws SQLException;
 
     public void setCurrency(ShoppingCart shoppingCart,String currency)throws SQLException;
 
-    public int getWaiver(Context context,ShoppingCart shoppingcart,String journal)throws SQLException;
+    public int getWaiver(Context context, ShoppingCart shoppingcart)throws SQLException;
     public boolean getCountryWaiver(Context context, ShoppingCart transaction) throws SQLException;
 
-    public String getPayer(Context context,ShoppingCart shoppingcart,String journal)throws SQLException;
+    public String getPayer(Context context, ShoppingCart shoppingcart)throws SQLException;
 
     public String printShoppingCart(Context c, ShoppingCart shoppingCart);
 

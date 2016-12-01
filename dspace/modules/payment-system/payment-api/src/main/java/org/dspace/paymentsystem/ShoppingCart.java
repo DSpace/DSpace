@@ -8,6 +8,7 @@
 package org.dspace.paymentsystem;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
@@ -861,12 +862,41 @@ public class ShoppingCart {
         return myRow.getDoubleColumn("surcharge");
     }
 
+    public void setSponsoringOrganization(DryadOrganizationConcept organizationConcept) {
+        if (organizationConcept != null) {
+            setJournal(organizationConcept.getFullName());
+            setJournalSub(organizationConcept.getSubscriptionPaid());
+            setSponsorID(organizationConcept.getConceptID());
+        } else {
+            setJournal(null);
+            setJournalSub(false);
+            setSponsorID(-1);
+        }
+    }
+
+    public DryadOrganizationConcept getSponsoringOrganization(Context context) {
+        int concept_id = getSponsorID();
+        if (concept_id > 0) {
+            return DryadOrganizationConcept.getOrganizationConceptMatchingConceptID(context, concept_id);
+        }
+        return null;
+    }
+
+    private void setSponsorID(int concept_id) {
+        myRow.setColumn("sponsor_id", concept_id);
+        modified = true;
+    }
+
+    private int getSponsorID() {
+        return myRow.getIntColumn("sponsor_id");
+    }
+
     /**
      * Set the JOURNAL
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public void setJournal(String journal)
+    private void setJournal(String journal)
     {
         if(journal==null)
         {
@@ -888,13 +918,12 @@ public class ShoppingCart {
         return myRow.getStringColumn("journal");
     }
 
-
     /**
      * Set the JOURNAL
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public void setJournalSub(boolean journal_sub)
+    private void setJournalSub(boolean journal_sub)
     {
         myRow.setColumn("journal_sub",journal_sub);
         modified = true;
@@ -905,9 +934,14 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public Boolean getJournalSub()
-    {
+
+    private Boolean getJournalSub() {
         return myRow.getBooleanColumn("journal_sub");
+    }
+
+    public Boolean hasSubscription()
+    {
+        return getJournalSub();
     }
 
 

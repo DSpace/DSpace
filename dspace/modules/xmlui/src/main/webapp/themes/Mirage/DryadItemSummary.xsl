@@ -77,26 +77,6 @@
         </xsl:variable>
 
 
-        <!-- If in admin view, show title (in Dryad.xsl for non-admin views) -->
-        <xsl:if
-                test="$meta[@element='request'][@qualifier='URI'][.='admin/item/view_item'] ">
-            <h1 class="pagetitle">
-                <xsl:choose>
-                    <xsl:when
-                            test="not(.//dim:field[@element='title']) and not($meta[@element='title'])">
-                        <xsl:text> </xsl:text>
-                    </xsl:when>
-                    <xsl:when test=".//dim:field[@element='title']">
-                        <xsl:value-of select=".//dim:field[@element='title']"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="$meta[@element='title']"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </h1>
-        </xsl:if>
-
-
         <xsl:variable name="title"
                       select=".//dim:field[@element='title']/node()"/>
 
@@ -109,16 +89,59 @@
                 <xsl:with-param name="cover" select="$meta[@element='journal'][@qualifier='cover']"/>
                 <xsl:with-param name="website" select="$meta[@element='journal'][@qualifier='website']"/>
             </xsl:call-template>
-              <p class="pub-title">
-                  <xsl:value-of select="$title"/>
-              </p>
+            <p class="pub-title">
+                <xsl:value-of select="$title"/>
+            </p>
+            <p class="pub-authors">
+                <xsl:call-template name="make-author-string"/>
+            </p>
+            <xsl:if test=".//dim:field[@element='date' and @qualifier='accessioned']">
+                <p>
+                    <i18n:text>xmlui.DryadItemSummary.depDate</i18n:text><xsl:text>: </xsl:text>
+                    <xsl:call-template name="format-date">
+                        <xsl:with-param name="datetime"><xsl:value-of select=".//dim:field[@element='date' and @qualifier='accessioned']"/></xsl:with-param>
+                    </xsl:call-template>
+                </p>
+            </xsl:if>
+            <xsl:if test="$my_doi != ''">
+                <p>
+                    <i18n:text>xmlui.DryadItemSummary.dryadPkgID</i18n:text>
+                    <xsl:text>: </xsl:text>
+                    <xsl:value-of select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
+                </p>
+            </xsl:if>
+            <xsl:if test="$treebase_url != ''">
+                <p>
+                    <i18n:text>xmlui.DryadItemSummary.viewContentTB</i18n:text>
+                    <xsl:text>: </xsl:text>
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="$treebase_url"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="$treebase_url"/>
+                    </a>
+                </p>
+            </xsl:if>
+            <xsl:if test="$knb_url != ''">
+                <p>
+                    <i18n:text>xmlui.DryadItemSummary.viewContentKNB</i18n:text>
+                    <xsl:text>: </xsl:text>
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="$knb_url"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="$knb_url"/>
+                    </a>
+                </p>
+            </xsl:if>
+
         </div>
         <xsl:if test=".//dim:field[@element='curatorNotePublic']">
-        <div class="ds-static-div primary">
-            <p class="ds-paragraph">
-                <xsl:value-of select=".//dim:field[@element='curatorNotePublic']"/>
-            </p>
-        </div>
+            <div class="ds-static-div primary">
+                <p class="ds-paragraph">
+                    <xsl:value-of select=".//dim:field[@element='curatorNotePublic']"/>
+                </p>
+            </div>
         </xsl:if>
         <!-- Data Files in package -->
         <xsl:if test="$datafiles">
@@ -161,20 +184,9 @@
                         <xsl:call-template name="make-author-string"/>
                         <xsl:call-template name="package-citation">
                             <xsl:with-param name="package_doi">
-                                <xsl:variable name="id" select="$meta[@element='identifier'][@qualifier='package']"/>
-                                <xsl:choose>
-                                    <xsl:when test="starts-with($id, 'doi')">
-                                        <xsl:value-of
-                                                select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
-                                    </xsl:when>
-                                    <xsl:when test="starts-with($id,'http://dx.doi')">
-                                        <xsl:value-of select="$id"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-
+                                <xsl:call-template name="package-doi">
+                                    <xsl:with-param name="id" select="$meta[@element='identifier'][@qualifier='package']"/>
+                                </xsl:call-template>
                             </xsl:with-param>
                             <xsl:with-param name="date">
                                 <xsl:choose>
@@ -592,67 +604,17 @@
         </xsl:if>
         <!-- package metadata -->
         <div class="ds-static-div primary">
-          <div class="item-summary-view-metadata">
-            <table class="package-metadata">
-            <tbody>
-            <tr>
-                <th>
-                    <xsl:choose>
-                        <xsl:when test="$treebase_url != ''">
-                            <i18n:text>xmlui.DryadItemSummary.viewContentTB</i18n:text>
-                        </xsl:when>
-                        <xsl:when test="$knb_url!=''">
-                            <i18n:text>xmlui.DryadItemSummary.viewContentKNB</i18n:text>
-                        </xsl:when>
-                        <xsl:when test="$datafiles!=''">
-                            <i18n:text>xmlui.DryadItemSummary.dryadPkgID</i18n:text>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <i18n:text>xmlui.DryadItemSummary.dryadFileID</i18n:text>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </th>
-                <td>
-                    <xsl:choose>
-                        <xsl:when test="$treebase_url!=''">
-                            <a>
-                                <xsl:attribute name="href">
-                                  <xsl:value-of select="$treebase_url"/>
-                                </xsl:attribute>
-                              <xsl:value-of select="$treebase_url"/>
-                            </a>
-                        </xsl:when>
-                        <xsl:when test="$knb_url!=''">
-                            <a>
-                                <xsl:attribute name="href">
-                                  <xsl:value-of select="$knb_url"/>
-                                </xsl:attribute>
-                              <xsl:value-of select="$knb_url"/>
-                            </a>
-                        </xsl:when>
-                        <xsl:when test="$my_doi">
-                            <!--<a>-->
-                            <!--<xsl:attribute name="href">-->
-                            <!--<xsl:call-template name="checkURL">-->
-                            <!--<xsl:with-param name="doiIdentifier" select="$my_doi"/>-->
-                            <!--</xsl:call-template>-->
-                            <!--</xsl:attribute>-->
-                            <xsl:value-of select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
-                            <!--</a>-->
-                        </xsl:when>
-                        <xsl:when test="$my_full_doi">
-                          <xsl:value-of select="$my_full_doi"/>
-                        </xsl:when>
-                        <xsl:when test="$my_uri">
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of select="$my_uri"/>
-                                </xsl:attribute>
-                                <xsl:value-of select="$my_uri"/>
-                            </a>
-                        </xsl:when>
-                    </xsl:choose>
-
+            <div class="item-summary-view-metadata">
+                <table class="package-metadata">
+                    <tbody>
+                        <xsl:variable name="funder" select="$meta[@element='dryad'][@qualifier='fundingEntity']"/>
+                        <xsl:if test="$funder">
+                            <tr>
+                                <xsl:call-template name="make-funding-string">
+                                    <xsl:with-param name="funder" select="$funder"/>
+                                </xsl:call-template>
+                            </tr>
+                        </xsl:if>
                     <xsl:variable name="pageviews"
                                   select="$meta[@element='dryad'][@qualifier='pageviews']"/>
                     <xsl:if test="$pageviews > 0">
@@ -677,36 +639,14 @@
 		      </tr>
                     </xsl:if>
 
-                    <span class="Z3988">
-                        <xsl:attribute name="title">
-                            <xsl:call-template name="renderCOinS"/>
-                        </xsl:attribute>
-                        <xsl:text>&#160;</xsl:text>
-                    </span>
-
-
-                    <!-- the message is dynamic. If the message has to be displayed at the center of the page, manage it in a dynamically.-->
-                    <!--xsl:if test="$versionNotice">
-                        <span style="versionNotice">
-                            <xsl:variable name="targetcell" select="$latestDataVersion"/>
-                            <xsl:variable name="target" select="string($targetcell/dri:xref[1]/attribute::target)"/>
-                            <i18n:text>xmlui.DryadItemSummary.notCurrentVersion</i18n:text>
-                            <xsl:text>&#160;</xsl:text>
-                            <xsl:element name="a">
-                                <xsl:attribute name="class"></xsl:attribute>
-                                <xsl:attribute name="href">
-                                    <xsl:value-of select="$target"/>
-                                </xsl:attribute>
-                                <i18n:text>xmlui.DryadItemSummary.mostCurrentVersion</i18n:text>
-                            </xsl:element>
+                        <span class="Z3988" style="display:none;">
+                            <xsl:attribute name="title">
+                                <xsl:call-template name="renderCOinS"/>
+                            </xsl:attribute>
                             <xsl:text>&#160;</xsl:text>
                         </span>
-                    </xsl:if-->
 
-                </td>
-            </tr>
-            
-            <!-- End of identifier -->
+                        <!-- End of identifier -->
 
             <!-- Need to add spatial, temporal, taxonomic keywords from file metadata -->
             <xsl:if test=".//dim:field[@element='subject'][@mdschema='dc'][not(@qualifier)]">
@@ -729,21 +669,6 @@
                         </xsl:for-each>
                     </td>
                     <td></td>
-                </tr>
-            </xsl:if>
-
-            <xsl:if
-                    test=".//dim:field[@element='identifier'][not(@qualifier)][contains(., 'dryad.')]">
-                <tr>
-                    <th>
-                        <i18n:text>xmlui.DryadItemSummary.depDate</i18n:text>
-                    </th>
-                    <td>
-                        <xsl:value-of
-                                select=".//dim:field[@element='date' and @qualifier='accessioned']"/>
-                    </td>
-                    <td>
-                    </td>
                 </tr>
             </xsl:if>
 
@@ -856,20 +781,20 @@
                         </td>
                     </tr>
                 </xsl:if>
+            </xsl:if>
 
-                <xsl:variable name="dc-date"
-                              select=".//dim:field[@element='date'][not(@qualifier)][@mdschema='dc']"/>
+            <xsl:variable name="dc-date"
+                          select=".//dim:field[@element='date'][not(@qualifier)][@mdschema='dc']"/>
 
-                <xsl:if test="$dc-date != ''">
-                    <tr>
-                        <th>
-                            <i18n:text>xmlui.DryadItemSummary.published</i18n:text>
-                        </th>
-                        <td>
-                            <xsl:value-of select="$dc-date[1]"/>
-                        </td>
-                    </tr>
-                </xsl:if>
+            <xsl:if test="$dc-date != ''">
+                <tr>
+                    <th>
+                        <i18n:text>xmlui.DryadItemSummary.published</i18n:text>
+                    </th>
+                    <td>
+                        <xsl:value-of select="$dc-date[1]"/>
+                    </td>
+                </tr>
             </xsl:if>
 
             <xsl:variable name="externalDataSets">
@@ -1417,6 +1342,60 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+
+    <xsl:template name="make-funding-string">
+        <xsl:param name="funder"/>
+        <!-- the funder@fundingEntity node is packed by DryadWorkflowUtils.getAuthors()-->
+        <!-- format is @12345678@#National Science Foundation (United States)#,@12345678@#National Science Foundation (United States)#-->
+        <!-- comma-delimited, with each name offset by @ and orcid offset by #, tailing comma-->
+        <xsl:call-template name="format-funding-strings">
+            <xsl:with-param name="InputString" select="$funder"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="format-funding-strings">
+        <!--@12345678@#National Science Foundation (United States)#,@12345678@#National Science Foundation (United States)#-->
+        <xsl:param name="InputString"/>
+        <xsl:choose>
+            <xsl:when test="contains($InputString, ',')">
+                <xsl:choose>
+                    <!-- There is only one name, but there's still a comma after-->
+                    <xsl:when test="substring-after($InputString,',') = ''">
+                        <xsl:call-template name="format-funding-strings">
+                            <xsl:with-param name="InputString" select="substring-before($InputString,',')"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- There are multiple names -->
+                        <xsl:call-template name="format-single-funder">
+                            <xsl:with-param name="nameString" select="substring-before($InputString,',')"/>
+                        </xsl:call-template>
+                        <xsl:call-template name="format-funding-strings">
+                            <xsl:with-param name="InputString" select="substring-after($InputString,',')"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="format-single-funder">
+                    <xsl:with-param name="nameString" select="$InputString"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="format-single-funder">
+        <xsl:param name="nameString"/>
+        <xsl:variable name="grantNumber" select="substring-before($nameString,'@')"/>
+        <xsl:variable name="funder" select="substring-after($nameString,'@')"/>
+        <tr>
+            <th>Funding</th>
+            <td>
+                <xsl:value-of select="$funder"/><xsl:text>, grant number </xsl:text><xsl:value-of select="$grantNumber"/>
+            </td>
+        </tr>
+    </xsl:template>
+
 
     <xsl:template name="make-author-string">
         <xsl:variable name="authors">

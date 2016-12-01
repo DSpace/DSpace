@@ -9,11 +9,8 @@ package org.dspace.workflow.actions.processingaction;
 
 import org.apache.log4j.Logger;
 import org.datadryad.anywhere.AssociationAnywhere;
+import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Item;
-import org.dspace.content.authority.AuthorityMetadataValue;
-import org.dspace.content.authority.Concept;
-import org.dspace.content.authority.Scheme;
 import org.dspace.core.*;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.paymentsystem.PaymentSystemService;
@@ -84,23 +81,21 @@ public class FinalPaymentAction extends ProcessingAction {
                 }
             }
 
+            DryadOrganizationConcept organizationConcept = shoppingCart.getSponsoringOrganization(c);
             // if journal-based subscription is in place, transaction is paid
-            if (shoppingCart.getJournalSub()) {
-                log.info("processed journal subscription for Item " + itemID + ", journal = " + shoppingCart.getJournal());
-                log.debug("tally credit for journal = " + shoppingCart.getJournal());
-                String success = "";
-                Scheme scheme = Scheme.findByIdentifier(c, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
-                Concept[] concepts = Concept.findByPreferredLabel(c, shoppingCart.getJournal(), scheme.getID());
-                if (concepts != null && concepts.length != 0) {
-                    AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("journal", "customerID", null, Item.ANY);
-                    if (metadataValues != null && metadataValues.length > 0) {
+            if (organizationConcept != null) {
+                if (shoppingCart.hasSubscription()) {
+                    log.info("processed journal subscription for Item " + itemID + ", journal = " + organizationConcept.getFullName());
+                    log.debug("tally credit for journal = " + organizationConcept.getFullName());
+
+                    if (organizationConcept.getCustomerID() != null) {
                         try {
                             String packageDOI = DOIIdentifierProvider.getDoiValue(wfi.getItem());
                             shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                             Date date = new Date();
                             shoppingCart.setPaymentDate(date);
                             shoppingCart.update();
-                            success = AssociationAnywhere.tallyCredit(c, metadataValues[0].value, packageDOI);
+                            AssociationAnywhere.tallyCredit(c, organizationConcept.getCustomerID(), packageDOI);
                             paymentSystemService.sendPaymentApprovedEmail(c, wfi, shoppingCart);
                             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
                         } catch (Exception e) {
@@ -109,13 +104,12 @@ public class FinalPaymentAction extends ProcessingAction {
                             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 2);
                         }
                     } else {
-                        log.error("unable to tally credit due to missing customerID");
+                        log.error("unable to tally credit for " + organizationConcept.getFullName() + " due to missing customerID");
                     }
                 } else {
-                    log.error("unable to tally credit due to missing concept");
+                    log.error("unable to tally credit due to missing concept " + shoppingCart.getJournal());
                 }
             }
-
 
             // process payment via PayPal
             PaymentService paymentService = new DSpace().getSingletonService(PaymentService.class);
@@ -130,7 +124,7 @@ public class FinalPaymentAction extends ProcessingAction {
         }
 
         //Send us to the re authorization of paypal payment
-        log.info("no payment processded for Item " + itemID + ", sending to revalidation step");
+        log.info("no payment processed for Item " + itemID + ", sending to revalidation step");
         WorkflowEmailManager.notifyOfReAuthorizationPayment(c, wfi);
         return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, 1);
 

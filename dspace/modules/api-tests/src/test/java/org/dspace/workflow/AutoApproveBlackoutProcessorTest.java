@@ -42,11 +42,10 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
         futureDate = calendar.getTime();
     }
 
-    private void enableJournalSubscription(DryadDataPackage dataPackage) throws Exception {
+    private void completePayment(DryadDataPackage dataPackage) throws Exception {
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
         ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,dataPackage.getItem().getID());
-        shoppingCart.setJournalSub(true);
-        shoppingCart.setJournal("Dryad Testing Blackout Journal");
+        shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
         shoppingCart.update();
     }
 
@@ -70,7 +69,7 @@ public class AutoApproveBlackoutProcessorTest extends ContextUnitTest {
         // Current workflow moves items through payment processing steps/actions
         // To prevent the item from requiring real payment processing, we update
         // its shopping cart record as soon as it exists.
-        enableJournalSubscription(dataPackage);
+        completePayment(dataPackage);
         return dataPackage;
     }
 

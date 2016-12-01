@@ -1011,6 +1011,10 @@ public class Item extends DSpaceObject
         addMetadata(schema, element, qualifier, lang, valArray, authArray, confArray);
     }
 
+    public void addMetadata(DCValue dcValue) {
+        addMetadata(dcValue.schema, dcValue.element, dcValue.qualifier, dcValue.language, dcValue.value, dcValue.authority, dcValue.confidence);
+    }
+
     /**
      * Clear Dublin Core metadata values. As with <code>getDC</code> above,
      * passing in <code>null</code> only matches fields where the qualifier or

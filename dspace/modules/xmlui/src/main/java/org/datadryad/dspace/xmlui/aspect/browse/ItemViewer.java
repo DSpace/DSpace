@@ -348,6 +348,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                         pageMeta.addMetadata("journal", "issn").addContent(journalConcept.getISSN());
                     }
                 }
+
+            for (DCValue metadata : item.getMetadata("dryad.fundingEntity")) {
+                pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
+            }
+
+            for (DCValue metadata : item.getMetadata("dryad.fundingEntity")) {
+                pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
             }
 
             // Data file metadata included on data package items (integrated view)

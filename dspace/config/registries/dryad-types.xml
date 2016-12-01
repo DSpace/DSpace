@@ -36,5 +36,9 @@
         <schema>dryad</schema>
         <element>fundingEntity</element>
     </dc-type>
+    <dc-type>
+        <schema>dryad</schema>
+        <element>organization</element>
+    </dc-type>
 
 </dspace-dc-types>

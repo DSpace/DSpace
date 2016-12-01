@@ -21,7 +21,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.*;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
@@ -49,7 +48,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         PaymentSystemConfigurationManager paymentSystemConfigurationManager = new PaymentSystemConfigurationManager();
         PaymentSystemService payementSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
 
-        String transactionId =(String) request.getParameter("transactionId");
+        String transactionId = request.getParameter("transactionId");
         Item item =null;
         try{
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -89,7 +88,6 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         Double total = shoppingCart.getTotal();
         String symbol = PaymentSystemConfigurationManager.getCurrencySymbolISO(shoppingCart.getCurrency())+";";
         //{ "firstName":"John" , "lastName":"Doe" }
-        String journal =request.getParameter("journal");
         Double basicFee =shoppingCart.getBasicFee();
         Double surcharge = paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart);
         Integer voucherId= shoppingCart.getVoucher();
@@ -100,8 +98,8 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
             voucherCode = voucher.getCode();
         }
         String waiverMessage = "";
-        String payername = paymentSystemService.getPayer(context,shoppingCart,null);
-        switch (paymentSystemService.getWaiver(context,shoppingCart,""))
+        String payername = paymentSystemService.getPayer(context,shoppingCart);
+        switch (paymentSystemService.getWaiver(context,shoppingCart))
         {
 	case ShoppingCart.COUNTRY_WAIVER: waiverMessage = "Data Publishing Charge has been waived due to submitter's association with " + StringEscapeUtils.escapeJava(shoppingCart.getCountry()) + "."; break;
 	case ShoppingCart.JOUR_WAIVER: waiverMessage = "Your Data Publishing Charge is covered by " + shoppingCart.getJournal() + "."; break;
@@ -144,7 +142,6 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
 
 
         String itemId = request.getParameter("itemId");
-        String journal =request.getParameter("journal");
 
         item =findItem(itemId, context, transaction);
         if(item == null)
@@ -161,18 +158,18 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
 
         if(request.getParameter("currency")!=null)
         {
-            String currency=request.getParameter("currency") .toString();
+            String currency=request.getParameter("currency");
             payementSystemService.setCurrency(transaction,currency);
 
         }
         if(request.getParameter("country")!=null)
         {
-            String country=request.getParameter("country").toString();
+            String country=request.getParameter("country");
             transaction.setCountry(country);
         }
         if(request.getParameter("voucher")!=null&&request.getParameter("voucher").length()>0&&!request.getParameter("voucher").equals("undefined"))
         {
-            String voucherCode=request.getParameter("voucher").toString();
+            String voucherCode=request.getParameter("voucher");
             Voucher voucher = Voucher.findByCode(context,voucherCode);
             VoucherValidationService voucherValidationService =  new DSpace().getSingletonService(VoucherValidationService.class);
             if(voucher!=null&&voucherValidationService.validate(context,voucher.getID(),transaction))
@@ -194,7 +191,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         {
             transaction.setVoucher(null);
         }
-        payementSystemService.updateTotal(context,transaction,journal);
+        payementSystemService.updateTotal(context,transaction);
         return errorMessage;
 
     }

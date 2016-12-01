@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+    <!-- The Organization schema reflects metadata for DryadOrganizationConcepts and its subclasses. -->
+    <!-- DryadOrganizationConcepts include entities like Journals and Funders, entities that can sponsor DPCs.-->
+
+    <dc-schema>
+        <name>organization</name>
+        <namespace>http://purl.org/dspace/models/organization</namespace>
+    </dc-schema>
+
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>fullName</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>paymentPlanType</element>
+    </dc-type>
+
+    <!-- The customer ID associated with this organization in Association Anywhere-->
+    <dc-type>
+        <schema>organization</schema>
+        <element>customerID</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>description</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
+        <element>website</element>
+    </dc-type>
+
+</dspace-dc-types>
