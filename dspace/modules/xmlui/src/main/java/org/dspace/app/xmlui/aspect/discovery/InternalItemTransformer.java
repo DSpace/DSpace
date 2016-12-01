@@ -15,6 +15,7 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -106,7 +107,9 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
         pageMeta.addTrail().addContent(T_internal_trail);
         pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
         for (DCValue metadata : item.getMetadata("dryad.fundingEntity")) {
-            pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
+            if (metadata.confidence == Choices.CF_ACCEPTED) {
+                pageMeta.addMetadata("dryad", "fundingEntity").addContent(metadata.value);
+            }
         }
     }
 
