@@ -1,9 +1,11 @@
 #!/bin/sh
 
 # Get the DSPACE/bin directory
-./dspace dsrun org.dspace.app.cris.metrics.pmc.script.RetrievePubMedID
-./dspace dsrun org.dspace.app.cris.metrics.pmc.script.RetrieveCitationInPMC -t 604800 -x 1000
-./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s RPStatsAggregatorPUBMEDIndicatorsPlugin
-#./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentilePubmedIndicatorsPlugin
-#./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentilePubmedAggregateIndicatorsPlugin
-#./dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentilePubmedCountIndicatorsPlugin
+BINDIR=`dirname $0`
+
+$BINDIR/dspace dsrun org.dspace.app.cris.metrics.pmc.script.RetrievePubMedID
+$BINDIR/dspace dsrun org.dspace.app.cris.metrics.pmc.script.RetrieveCitationInPMC -t 604800 -x 1000
+$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s RPStatsAggregatorPUBMEDIndicatorsPlugin
+#$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentilePubmedIndicatorsPlugin
+#$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentilePubmedAggregateIndicatorsPlugin
+#$BINDIR/dspace dsrun org.dspace.app.cris.batch.ScriptStatsMetrics -s PercentilePubmedCountIndicatorsPlugin

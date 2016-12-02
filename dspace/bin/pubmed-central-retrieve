@@ -1,8 +1,12 @@
 #!/bin/sh
 
 # Get the DSPACE/bin directory
-split -d -l 50000 PMC-ids.csv split_files.
+BINDIR=`dirname $0`
+
+PMCSERVER=`$BINDIR/dspace dsprop -module cris -property pmc.server`
+
+split -d -l 50000 $BINDIR/PMC-ids.csv split_files.
 for file in `ls split_files.*`
 do
-curl '${solr.server}/pmc/update?update.contentType=text/csv&fieldnames=,,,,,,,DOI,PMCID,PMID,,' -H 'Content-type:text/csv; charset=utf-8' --data-binary @$file;
+curl '$PMCSERVER/update?update.contentType=text/csv&fieldnames=,,,,,,,DOI,PMCID,PMID,,' -H 'Content-type:text/csv; charset=utf-8' --data-binary @$file;
 done
