@@ -782,14 +782,19 @@ public class DiscoverUtility
 
     public static List<String[]> getFilters(HttpServletRequest request, String relationType)
     {
-        if(StringUtils.isEmpty(relationType)) {
+        String suffixRelationType = "";
+        if(StringUtils.isBlank(relationType)) {
             relationType = "";
+        }
+        else {
+            suffixRelationType = relationType + "_";
         }
         String submit = UIUtil.getSubmitButton(request, "submit");
         int ignore = -1;
-        if (submit.startsWith("submit_filter_remove_" + relationType + "_"))
+        
+        if (submit.startsWith("submit_filter_remove_" + suffixRelationType))
         {
-            ignore = Integer.parseInt(submit.substring(("submit_filter_remove_" + relationType + "_").length()));
+            ignore = Integer.parseInt(submit.substring(("submit_filter_remove_" + suffixRelationType).length()));
         }
         List<String[]> appliedFilters = new ArrayList<String[]>();
         
@@ -798,7 +803,7 @@ public class DiscoverUtility
         List<String> filterField = new ArrayList<String>();
         for (int idx = 1; ; idx++)
         {
-            String op = request.getParameter("filter_type_" + relationType + "_" + idx);
+            String op = request.getParameter("filter_type_" + suffixRelationType + idx);
             if (StringUtils.isBlank(op))
             {
                 break;
@@ -806,8 +811,8 @@ public class DiscoverUtility
             else if (idx != ignore)
             {
                 filterOp.add(op);
-                filterField.add(request.getParameter("filter_field_" + relationType + "_" + idx));
-                filterValue.add(request.getParameter("filter_value_" + relationType + "_" + idx));
+                filterField.add(request.getParameter("filter_field_" + suffixRelationType + idx));
+                filterValue.add(request.getParameter("filter_value_" + suffixRelationType + idx));
             }
         }
         
