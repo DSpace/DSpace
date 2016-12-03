@@ -31,9 +31,9 @@
     <xsl:template match="dri:p[@id='aspect.journal.landing.JournalStats.p.hidden-fields']"/>
     <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-banner-outer']">
         <xsl:variable name="journal-name" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalName'])"/>
-        <xsl:variable name="journal-abbr" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalAbbr'])"/>
         <xsl:variable name="alt" select="concat($journal-name, ' cover')"/>
-        <xsl:variable name="cover" select="concat('/themes/Dryad/images/coverimages/', $journal-abbr, '.png')"/>
+        <xsl:variable name="cover" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalCover'])"/>
+        <xsl:variable name="website" select="string(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='journalWebsite'])"/>
 
         <div id="{translate(string(@id), '.', '_')}" class="ds-static-div primary clearfix">
             <table width="100%">
@@ -45,11 +45,13 @@
                         <xsl:apply-templates/>
                     </td>
                     <td>
+                        <a href="{$website}">
                         <img alt="{$alt}"
                             src="{$cover}"
                             id="journal-logo"
                             class="pub-cover"
-                            onerror="this.src='{$default-image}'"></img>
+                            onerror="this.src='{$default-image}'"/>
+                        </a>
                     </td>
                 </tr>
             </table>
@@ -57,7 +59,7 @@
     </xsl:template>
 
     <!--
-        Search data in Dryad associated with ...
+        Find data in Dryad associated with ...
     -->
     <xsl:template match="//dri:document/dri:body/dri:div[@n='journal-landing-search']">
         <xsl:variable name="label" select="'Enter keyword, author, title, DOI.'"/>
@@ -77,19 +79,24 @@
 
         <xsl:apply-templates select="dri:head"/>
         <form id="{translate(string(@id), '.', '_')}" class="ds-interactive-div primary"
-              action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
-            <input type="hidden" name="fq" value="{$fq}"></input>
-            <p class="ds-paragraph" style="overflow; hidden; margin-bottom: 0px;">
-                <label for="aspect_discovery_SiteViewer_field_query" class="accessibly-hidden">
-                    <xsl:value-of select="$label"/>
-                </label>
-                <input id="aspect_journal_landing_JournalSearch_field_query" class="ds-text-field" name="query"
-                    placeholder="{$placeholder}" title="{$placeholder}"
-                    type="text" value="" style="width: 80%;"/><!-- no whitespace between these!
-                     --><input id="aspect_journal_landing_JournalSearch_field_submit" class="ds-button-field" name="submit"
-                    type="submit" value="Go" style="margin-right: -4px;"/>
-            </p>
-        </form>
+	      action="/discover" method="get" onsubmit="javascript:tSubmit(this);">
+	  <p class="ds-paragraph" style="overflow; hidden;
+					 margin-bottom: 0px;"> 
+	    <input type="hidden" name="fq" value="{$fq}"></input> 
+	    <input id="aspect_journal_landing_JournalSearch_field_submit" class="ds-button-field" name="submit"
+		   type="submit" value="{concat('View all data from ', $journal-name)}" style="margin-right: -4px;"/> 
+	    <br/> 
+	    <br/>
+	    <label for="aspect_discovery_SiteViewer_field_query" class="accessibly-hidden"> 
+	      <xsl:value-of select="$label"/> 
+	    </label>
+	    <input id="aspect_journal_landing_JournalSearch_field_query" class="ds-text-field" name="query"
+		   placeholder="{$placeholder}" title="{$placeholder}"
+		   type="text" value="" style="width: 60%;"/><!-- no whitespace between these!
+		   --><input id="aspect_journal_landing_JournalSearch_field_submit" class="ds-button-field" name="submit"
+		   type="submit" value="Search" style="margin-right:-4px;"/>
+	  </p>
+	</form>    
     </xsl:template>
 
     <!--

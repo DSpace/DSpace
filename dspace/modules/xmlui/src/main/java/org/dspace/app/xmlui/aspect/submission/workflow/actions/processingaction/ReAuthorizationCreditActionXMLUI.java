@@ -105,16 +105,16 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                 if(concepts!=null&&concepts.length!=0){
                     AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerID", Item.ANY);
                     if(metadataValues!=null&&metadataValues.length>0){
+                        shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
+                        shoppingCart.setPaymentDate(new Date());
+                        shoppingCart.update();
+
                         try{
-                            shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
-                            Date date= new Date();
-                            shoppingCart.setPaymentDate(date);
-                            shoppingCart.update();
                             success = AssociationAnywhere.tallyCredit(context, metadataValues[0].value, DOIIdentifierProvider.getDoiValue(item));
                             paymentSystemService.sendPaymentApprovedEmail(context, workflowItem, shoppingCart);
                         }catch (Exception e)
                         {
-                            paymentSystemService.sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \\n \\n " + e.getMessage());
+                            paymentSystemService.sendPaymentErrorEmail(context, workflowItem, shoppingCart,"problem: credit not tallied successfully. \n \n " + e.getMessage());
                             log.error(e.getMessage());
                             return e.getMessage();
                         }

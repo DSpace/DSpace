@@ -2148,6 +2148,29 @@ public class Item extends DSpaceObject
         return true;
     }
 
+
+    /**
+     * Compares a value to any metadata values in an item.
+     *
+     * @param metadataString metadata string
+     * @param compareValue value to compare
+     * @return Returns false if there are no equivalent values,
+     * including if there are no values for that metadata field at all.
+     */
+    public boolean hasMetadataEqualTo(String metadataString, String compareValue) {
+        DCValue[] mds = getMetadata(metadataString);
+        if (mds != null) {
+            for (int i = 0; i < mds.length; i++) {
+                if (mds[i].value.equals(compareValue)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
     @Override
     public int hashCode()
     {

@@ -11,6 +11,8 @@ import org.apache.cocoon.environment.Request;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadFunderConcept;
 import org.datadryad.api.DryadOrganizationConcept;
@@ -42,6 +44,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static org.dspace.app.xmlui.wing.AbstractWingTransformer.message;
@@ -84,6 +87,7 @@ public class PaymentServiceImpl implements PaymentService {
     //generate a secure token from paypal
     public String generateSecureToken(ShoppingCart shoppingCart, String secureTokenId, String transactionType, Context context) {
         String secureToken = null;
+        ArrayList<BasicNameValuePair> queryParams = new ArrayList<BasicNameValuePair>();
         String requestUrl = ConfigurationManager.getProperty("payment-system", "paypal.payflow.link");
 
         try {
@@ -117,7 +121,22 @@ public class PaymentServiceImpl implements PaymentService {
                 amount = Double.toString(shoppingCart.getTotal());
             }
 
-            String urlParameters = "SECURETOKENID=" + secureTokenId + "&CREATESECURETOKEN=Y" + "&MODE=" + ConfigurationManager.getProperty("payment-system", "paypal.mode") + "&PARTNER=" + ConfigurationManager.getProperty("payment-system", "paypal.partner") + "&VENDOR=" + ConfigurationManager.getProperty("payment-system", "paypal.vendor") + "&USER=" + ConfigurationManager.getProperty("payment-system", "paypal.user") + "&PWD=" + ConfigurationManager.getProperty("payment-system", "paypal.pwd") + "&TENDER=C" + "&TRXTYPE=" + transactionType + "&FIRSTNAME=" + userFirstName + "&LASTNAME=" + userLastName + "&COMMENT1=" + userName + "&COMMENT2=" + userEmail + "&AMT=" + amount + "&CURRENCY=" + shoppingCart.getCurrency();
+            queryParams.add(new BasicNameValuePair("SECURETOKENID", secureTokenId));
+            queryParams.add(new BasicNameValuePair("CREATESECURETOKEN", "Y"));
+            queryParams.add(new BasicNameValuePair("MODE", ConfigurationManager.getProperty("payment-system", "paypal.mode")));
+            queryParams.add(new BasicNameValuePair("PARTNER", ConfigurationManager.getProperty("payment-system", "paypal.partner")));
+            queryParams.add(new BasicNameValuePair("VENDOR", ConfigurationManager.getProperty("payment-system", "paypal.vendor")));
+            queryParams.add(new BasicNameValuePair("USER", ConfigurationManager.getProperty("payment-system", "paypal.user")));
+            queryParams.add(new BasicNameValuePair("PWD", ConfigurationManager.getProperty("payment-system", "paypal.pwd")));
+            queryParams.add(new BasicNameValuePair("TENDER", "C" ));
+            queryParams.add(new BasicNameValuePair("TRXTYPE", transactionType));
+            queryParams.add(new BasicNameValuePair("FIRSTNAME", userFirstName));
+            queryParams.add(new BasicNameValuePair("LASTNAME", userLastName));
+            queryParams.add(new BasicNameValuePair("COMMENT1", userName));
+            queryParams.add(new BasicNameValuePair("COMMENT2", userEmail));
+            queryParams.add(new BasicNameValuePair("AMT", amount));
+            queryParams.add(new BasicNameValuePair("CURRENCY", shoppingCart.getCurrency()));
+            String urlParameters = URLEncodedUtils.format(queryParams, "UTF-8");
 
             // Send post request
             con.setDoOutput(true);
