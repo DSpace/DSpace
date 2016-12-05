@@ -60,7 +60,7 @@ public class ScriptStatsMetrics
         Options options = new Options();
         options.addOption("h", "help", false, "help");
         options.addOption("s", "single_plugin", true, "Work on single plugin");
-        options.addOption("l", "level", true, "add number of level for frequency (NOTUSED)");
+        options.addOption("l", "filter", true, "Filter by");
 
         CommandLine line = parser.parse(options, args);
 
@@ -94,13 +94,13 @@ public class ScriptStatsMetrics
                             + connection);
         }
 
-        String level = "alltime";
+        String level = null;
         if (line.hasOption('l')) {            
             level = line.getOptionValue("l");
             if (StringUtils.isBlank(level))
             {
                 System.out.println(
-                        "\n\nUSAGE:\n ScriptStatsIndicators -s <plugin_name>] -l <level of stats>\n");
+                        "\n\nUSAGE:\n ScriptStatsIndicators -s <plugin_name>] -l <filter>\n");
                 System.exit(1);
             }
         }

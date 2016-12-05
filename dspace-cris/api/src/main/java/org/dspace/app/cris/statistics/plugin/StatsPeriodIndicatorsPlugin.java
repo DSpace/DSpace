@@ -36,7 +36,7 @@ public class StatsPeriodIndicatorsPlugin extends AStatsIndicatorsPlugin
     @Override
     public void buildIndicator(Context context,
             ApplicationService applicationService, CrisSolrLogger statsService,
-            CrisSearchService searchService, String level)
+            CrisSearchService searchService, String filter)
                     throws SearchServiceException
     {
 

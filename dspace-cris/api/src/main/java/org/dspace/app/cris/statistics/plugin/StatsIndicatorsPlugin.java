@@ -18,7 +18,7 @@ public interface StatsIndicatorsPlugin
 {
 
     void buildIndicator(Context context, ApplicationService persistenceService,
-            CrisSolrLogger statsService, CrisSearchService searchService, String level) throws SearchServiceException;
+            CrisSolrLogger statsService, CrisSearchService searchService, String filter) throws SearchServiceException;
 
     String getName();
 

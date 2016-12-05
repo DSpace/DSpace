@@ -10,6 +10,7 @@ package org.dspace.app.cris.statistics.plugin;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -33,8 +34,6 @@ public class StatsPercentileIndicatorsPlugin extends AStatsIndicatorsPlugin
     private static Logger log = Logger
             .getLogger(StatsPercentileIndicatorsPlugin.class);
 
-    private String queryDefault = "*:*";
-
     private String metrics;
 
     private List<String> fq;
@@ -42,7 +41,7 @@ public class StatsPercentileIndicatorsPlugin extends AStatsIndicatorsPlugin
     @Override
     public void buildIndicator(Context context,
             ApplicationService applicationService, CrisSolrLogger statsService,
-            CrisSearchService searchService, String level)
+            CrisSearchService searchService, String filter)
                     throws SearchServiceException
     {
         ServiceManager serviceManager = new DSpace().getServiceManager();
@@ -51,8 +50,14 @@ public class StatsPercentileIndicatorsPlugin extends AStatsIndicatorsPlugin
                 MetricsPersistenceService.class);
 
         SolrQuery query = new SolrQuery();
-        query.setQuery(queryDefault);
+        query.setQuery(getQueryDefault());
         query.setSort(ConstantMetrics.PREFIX_FIELD + metrics, ORDER.desc);
+        if(StringUtils.isNotBlank(filter)) {
+            query.addFilterQuery(filter);
+        }
+        else if(StringUtils.isNotBlank(getFilterDefault())) {
+            query.addFilterQuery(getFilterDefault());    
+        }
         if (fq != null) {
 	        for(String f : fq) {
 	            query.addFilterQuery(f);
@@ -91,11 +96,6 @@ public class StatsPercentileIndicatorsPlugin extends AStatsIndicatorsPlugin
         }   
     }
 
-    public void setQueryDefault(String queryDefault)
-    {
-        this.queryDefault = queryDefault;
-    }
-
     public String getMetrics()
     {
         return metrics;
@@ -104,11 +104,6 @@ public class StatsPercentileIndicatorsPlugin extends AStatsIndicatorsPlugin
     public void setMetrics(String metrics)
     {
         this.metrics = metrics;
-    }
-
-    public String getQueryDefault()
-    {
-        return queryDefault;
     }
 
     public List<String> getFq()

@@ -10,17 +10,23 @@ package org.dspace.app.cris.statistics.plugin;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.cris.metrics.common.model.CrisMetrics;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.service.ApplicationService;
-import org.dspace.core.Context;
-import org.dspace.kernel.ServiceManager;
-import org.dspace.utils.DSpace;
+import org.dspace.content.generator.DateValueGenerator;
 
 public abstract class AStatsIndicatorsPlugin implements StatsIndicatorsPlugin
 {
-
+    /** log4j logger */
+    private static Logger log = Logger.getLogger(AStatsIndicatorsPlugin.class);
+    
     private String name;
+
+    private String queryDefault = "*:*";
+    
+    private String filterDefault;
 
     private boolean renewMetricsCache = true;
     
@@ -81,4 +87,42 @@ public abstract class AStatsIndicatorsPlugin implements StatsIndicatorsPlugin
         this.renewMetricsCache = renewMetricsCache;
     }
 
+    public String getQueryDefault()
+    {
+        return queryDefault;
+    }
+    
+    public void setQueryDefault(String queryDefault)
+    {
+        this.queryDefault = queryDefault;
+    }
+    
+    public String getFilterDefault()
+    {
+        if (StringUtils.startsWith(filterDefault, "###")
+                && StringUtils.endsWith(filterDefault, "###"))
+        {
+            String[] firstsplitted = filterDefault.substring(3, filterDefault.length()-3).split("###", 2);
+            //found field
+            String field = firstsplitted[0];
+            // search rule to apply
+            String[] secondsplitted = firstsplitted[1].split("\\.", 2);
+            //TODO extract this logic and inject from external
+            String generator = secondsplitted[0];            
+            String rule = secondsplitted[1];                       
+            if("date".equals(generator)) {
+                String value = DateValueGenerator.buildValue(rule);
+                return field + ":" + value;
+            }
+            else {
+                log.warn("ONLY generator supported for metrics is 'date'. No strategy: "+generator+" - found for rule:"+ rule);
+            }
+        }
+        return filterDefault;
+    }
+
+    public void setFilterDefault(String filterDefault)
+    {
+        this.filterDefault = filterDefault;
+    }
 }

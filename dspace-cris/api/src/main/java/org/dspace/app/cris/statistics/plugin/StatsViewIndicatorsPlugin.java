@@ -48,15 +48,13 @@ public class StatsViewIndicatorsPlugin extends AStatsIndicatorsPlugin
 
     private String resourceTypeString;
 
-    private String queryDefault = "*:*";
-
     @Override
     public void buildIndicator(Context context,
             ApplicationService applicationService, CrisSolrLogger statsService,
-            CrisSearchService searchService, String level)
+            CrisSearchService searchService, String filter)
     {
     	MetricsPersistenceService pService = new DSpace().getSingletonService(MetricsPersistenceService.class); 
-        SolrQuery query = new SolrQuery(queryDefault);
+        SolrQuery query = new SolrQuery(getQueryDefault());
         if (StringUtils.isNotBlank(getResourceTypeString()))
         {
             query.addFilterQuery("{!field f=resourcetype_authority}"
@@ -66,6 +64,12 @@ public class StatsViewIndicatorsPlugin extends AStatsIndicatorsPlugin
         {
             query.addFilterQuery(
                     "{!field f=search.resourcetype}" + getResourceTypeId());
+        }
+        if(StringUtils.isNotBlank(filter)) {
+            query.addFilterQuery(filter);
+        }
+        else if(StringUtils.isNotBlank(getFilterDefault())) {
+            query.addFilterQuery(getFilterDefault());    
         }
         query.setFields("search.resourceid", "search.resourcetype",
                 resourceTypeId == Constants.ITEM ? "handle" : "cris-uuid");
@@ -167,11 +171,6 @@ public class StatsViewIndicatorsPlugin extends AStatsIndicatorsPlugin
     public void setResourceTypeString(String resourceTypeString)
     {
         this.resourceTypeString = resourceTypeString;
-    }
-
-    public void setQueryDefault(String queryDefault)
-    {
-        this.queryDefault = queryDefault;
     }
 
 }
