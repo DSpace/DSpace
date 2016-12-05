@@ -224,22 +224,24 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     public void setFullName(String value) throws StorageException {
         Context context = null;
-        try {
-            setConceptMetadataValue(metadataProperties.getProperty(FULLNAME), value);
-            context = new Context();
-            context.turnOffAuthorisationSystem();
+        if (!getFullName().equals(value)) {
+            try {
+                setConceptMetadataValue(metadataProperties.getProperty(FULLNAME), value);
+                context = new Context();
+                context.turnOffAuthorisationSystem();
 
-            // add the new Term
-            Term newTerm = getUnderlyingConcept(context).createTerm(context, value, Term.prefer_term);
-            context.restoreAuthSystemState();
-            context.complete();
-        } catch (Exception e) {
-            if (context != null) {
-                context.abort();
+                // add the new Term
+                Term newTerm = getUnderlyingConcept(context).createTerm(context, value, Term.prefer_term);
+                context.restoreAuthSystemState();
+                context.complete();
+            } catch (Exception e) {
+                if (context != null) {
+                    context.abort();
+                }
+                throw new StorageException("Couldn't set fullname for " + fullName + ", " + e.getMessage());
             }
-            throw new StorageException ("Couldn't set fullname for " + fullName + ", " + e.getMessage());
+            fullName = value;
         }
-        fullName = value;
     }
 
     public int getConceptID() {
