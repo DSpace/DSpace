@@ -1156,6 +1156,7 @@ public class Concept extends AuthorityObject
             log.error("couldn't create Term " + e.getMessage());
         }
         context.commit();
+        log.error("creating Term " + getID() + " with relationType " + relationType);
         term.setLiteralForm(context, literalForm);
         term.setCreated(context, getCreated());
         term.setLang(context, getLang());
