@@ -491,9 +491,9 @@ public class Scheme extends AuthorityObject
         // Get the table rows
         TableRowIterator tri = DatabaseManager.queryTable(
                 context, "concept",
-                "SELECT concept.* FROM concept, scheme2concept,concept2term,term WHERE " +
+                "SELECT concept.* FROM concept, scheme2concept WHERE " +
                         "scheme2concept.concept_id=concept.id " +
-                        "AND scheme2concept.scheme_id= ? AND concept2term.concept_id=concept.id AND concept2term.role_id=1 AND concept2term.term_id=term.id ORDER BY term.literalform",
+                        "AND scheme2concept.scheme_id= ? ORDER BY concept.id",
                 getID());
 
         // Make Concept objects
