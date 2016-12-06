@@ -48,6 +48,9 @@
     			<entry key="date">
     				<bean class="org.dspace.content.generator.DateValueGenerator" />
     			</entry>
+    			<entry key="identifier">
+    				<bean class="org.dspace.content.generator.IdentifierValueGenerator" />
+    			</entry>    			
     		</map>
     	</property>
     </bean>
