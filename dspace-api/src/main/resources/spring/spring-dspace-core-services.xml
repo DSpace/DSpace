@@ -50,7 +50,13 @@
     			</entry>
     			<entry key="identifier">
     				<bean class="org.dspace.content.generator.IdentifierValueGenerator" />
-    			</entry>    			
+    			</entry>
+				<entry key="group">
+    				<bean class="org.dspace.content.generator.GroupValueGenerator" />
+    			</entry>
+				<entry key="eperson">
+    				<bean class="org.dspace.content.generator.EPersonValueGenerator" />
+    			</entry>     			    			
     		</map>
     	</property>
     </bean>

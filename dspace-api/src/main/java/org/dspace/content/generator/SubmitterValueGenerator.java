@@ -12,12 +12,13 @@ import java.sql.SQLException;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
 public class SubmitterValueGenerator implements TemplateValueGenerator {
 
 	@Override
-	public Metadatum[] generator(Item targetItem, Item templateItem, Metadatum metadatum, String extraParams) {
+	public Metadatum[] generator(Context context, Item targetItem, Item templateItem, Metadatum metadatum, String extraParams) {
 		Metadatum[] m = new Metadatum[1];
 		m[0] = metadatum;
 		try {

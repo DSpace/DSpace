@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.content.generator.TemplateValueGenerator;
+import org.dspace.core.Context;
 
 public class DSpaceTemplateItemService implements TemplateItemService {
 	private Map<String, TemplateValueGenerator> generators;
@@ -22,7 +23,7 @@ public class DSpaceTemplateItemService implements TemplateItemService {
 	}
 
 	@Override
-	public void applyTemplate(Item targetItem, Item templateItem) {
+	public void applyTemplate(Context context, Item targetItem, Item templateItem) {
         Metadatum[] md = templateItem.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         for (int n = 0; n < md.length; n++)
@@ -38,7 +39,7 @@ public class DSpaceTemplateItemService implements TemplateItemService {
             		if (splitted.length == 2) {
 	            		extraParams = splitted[1];
 	            	}
-            		Metadatum[] genMetadata = gen.generator(targetItem, templateItem, md[n], extraParams);
+            		Metadatum[] genMetadata = gen.generator(context, targetItem, templateItem, md[n], extraParams);
             		for (Metadatum gm : genMetadata) {
             			targetItem.addMetadata(gm.schema, gm.element, gm.qualifier, gm.language,
                                 gm.value, gm.authority, gm.confidence);

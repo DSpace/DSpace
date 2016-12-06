@@ -10,6 +10,7 @@ package org.dspace.content.generator;
 import org.apache.log4j.Logger;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
+import org.dspace.core.Context;
 
 public class IdentifierValueGenerator implements TemplateValueGenerator
 {
@@ -17,7 +18,7 @@ public class IdentifierValueGenerator implements TemplateValueGenerator
     private static Logger log = Logger.getLogger(IdentifierValueGenerator.class);
 
     @Override
-    public Metadatum[] generator(Item targetItem, Item templateItem,
+    public Metadatum[] generator(Context context, Item targetItem, Item templateItem,
             Metadatum metadatum, String extraParams)
     {
 

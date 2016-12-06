@@ -242,7 +242,7 @@ public class WorkspaceItem implements InProgressSubmission
         if (template && (templateItem != null))
         {
         	TemplateItemService tis = new DSpace().getSingletonService(TemplateItemService.class);
-        	tis.applyTemplate(i, templateItem);
+        	tis.applyTemplate(c, i, templateItem);
         }
 
         i.update();

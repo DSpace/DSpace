@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.apache.solr.util.DateMathParser;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
+import org.dspace.core.Context;
 
 public class DateValueGenerator implements TemplateValueGenerator
 {
@@ -24,7 +25,7 @@ public class DateValueGenerator implements TemplateValueGenerator
     private static Logger log = Logger.getLogger(DateValueGenerator.class);
 
     @Override
-    public Metadatum[] generator(Item targetItem, Item templateItem,
+    public Metadatum[] generator(Context context, Item targetItem, Item templateItem,
             Metadatum metadatum, String extraParams)
     {
 

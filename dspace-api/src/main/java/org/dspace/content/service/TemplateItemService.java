@@ -8,7 +8,8 @@
 package org.dspace.content.service;
 
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 public interface TemplateItemService {
-	void applyTemplate(Item targetItem, Item templateItem);
+	void applyTemplate(Context context, Item targetItem, Item templateItem);
 }
