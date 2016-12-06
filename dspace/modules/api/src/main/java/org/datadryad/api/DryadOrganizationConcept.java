@@ -88,22 +88,6 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         if (amvs.length > 0) {
             fullName = amvs[0].getValue();
         }
-        amvs = concept.getMetadata(metadataProperties.getProperty(PAYMENT_PLAN));
-        if (amvs.length > 0) {
-            this.setPaymentPlan(amvs[0].getValue());
-        }
-        amvs = concept.getMetadata(metadataProperties.getProperty(DESCRIPTION));
-        if (amvs.length > 0) {
-            this.setDescription(amvs[0].getValue());
-        }
-        amvs = concept.getMetadata(metadataProperties.getProperty(WEBSITE));
-        if (amvs.length > 0) {
-            this.setWebsite(amvs[0].getValue());
-        }
-        amvs = concept.getMetadata(metadataProperties.getProperty(CUSTOMER_ID));
-        if (amvs.length > 0) {
-            this.setCustomerID(amvs[0].getValue());
-        }
     }
 
     public void create(Context context) {
