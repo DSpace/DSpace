@@ -81,6 +81,7 @@ public class Term extends AuthorityObject {
     public void setLiteralForm(Context context, String literalForm) throws SQLException
     {
         myRow.setColumn("literalForm", literalForm);
+        log.error("setting term " + this.getID() + " with literal " + literalForm);
         DatabaseManager.update(context, myRow);
     }
 

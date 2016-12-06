@@ -84,29 +84,9 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     public DryadOrganizationConcept(Context context, Concept concept) {
         this();
         setUnderlyingConcept(context, concept);
-        try {
-            AuthorityMetadataValue[] amvs = concept.getMetadata(metadataProperties.getProperty(FULLNAME));
-            if (amvs.length > 0) {
-                this.setFullName(amvs[0].getValue());
-            }
-            amvs = concept.getMetadata(metadataProperties.getProperty(PAYMENT_PLAN));
-            if (amvs.length > 0) {
-                this.setPaymentPlan(amvs[0].getValue());
-            }
-            amvs = concept.getMetadata(metadataProperties.getProperty(DESCRIPTION));
-            if (amvs.length > 0) {
-                this.setDescription(amvs[0].getValue());
-            }
-            amvs = concept.getMetadata(metadataProperties.getProperty(WEBSITE));
-            if (amvs.length > 0) {
-                this.setWebsite(amvs[0].getValue());
-            }
-            amvs = concept.getMetadata(metadataProperties.getProperty(CUSTOMER_ID));
-            if (amvs.length > 0) {
-                this.setCustomerID(amvs[0].getValue());
-            }
-        } catch (StorageException e) {
-            log.error("couldn't create DryadOrganizationConcept from concept " + concept.getID() + ": " + e.getMessage());
+        AuthorityMetadataValue[] amvs = concept.getMetadata(metadataProperties.getProperty(FULLNAME));
+        if (amvs.length > 0) {
+            fullName = amvs[0].getValue();
         }
     }
 
@@ -219,27 +199,32 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     }
 
     public String getFullName() {
+        if (fullName == null) {
+            fullName = "";
+        }
         return fullName;
     }
 
     public void setFullName(String value) throws StorageException {
         Context context = null;
-        try {
-            setConceptMetadataValue(metadataProperties.getProperty(FULLNAME), value);
-            context = new Context();
-            context.turnOffAuthorisationSystem();
+        if (!getFullName().equals(value)) {
+            try {
+                setConceptMetadataValue(metadataProperties.getProperty(FULLNAME), value);
+                context = new Context();
+                context.turnOffAuthorisationSystem();
 
-            // add the new Term
-            Term newTerm = getUnderlyingConcept(context).createTerm(context, value, Term.prefer_term);
-            context.restoreAuthSystemState();
-            context.complete();
-        } catch (Exception e) {
-            if (context != null) {
-                context.abort();
+                // add the new Term
+                Term newTerm = getUnderlyingConcept(context).createTerm(context, value, Term.prefer_term);
+                context.restoreAuthSystemState();
+                context.complete();
+            } catch (Exception e) {
+                if (context != null) {
+                    context.abort();
+                }
+                throw new StorageException("Couldn't set fullname for " + fullName + ", " + e.getMessage());
             }
-            throw new StorageException ("Couldn't set fullname for " + fullName + ", " + e.getMessage());
+            fullName = value;
         }
-        fullName = value;
     }
 
     public int getConceptID() {

@@ -79,6 +79,7 @@ public class JournalUtils {
             try {
                 Concept newConcept = Concept.findByIdentifier(context, concept.getIdentifier()).get(0);
                 journalConcept = new DryadJournalConcept(context, newConcept);
+                log.error("journal concept " + journalConcept);
                 context.commit();
             } catch (Exception e) {
                 throw new StorageException("couldn't add a journal concept " + concept.getID() + ": " + e.getMessage());
