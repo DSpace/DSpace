@@ -22,9 +22,9 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.dspace.app.cris.integration.CRISAuthority;
 import org.dspace.app.cris.integration.DOAuthority;
-import org.dspace.app.cris.metrics.common.model.CrisMetrics;
 import org.dspace.app.cris.metrics.common.services.MetricsPersistenceService;
 import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.service.ApplicationService;
@@ -392,6 +392,13 @@ public class CrisConsumer implements Consumer
             if (filler != null && (!isUpdate || filler.allowsUpdate(ctx, item,
                     toBuild.get(authorityKey), authorityKey, rp)))
             {
+                if(!filler.isAppendMode()) {
+                    rp.setAnagrafica(null);
+                    ResearcherPageUtils.buildTextValue(rp,
+                            toBuild.get(authorityKey).get(0).value,
+                            ((rp.getType()>CrisConstants.CRIS_DYNAMIC_TYPE_ID_START?rp.getAuthorityPrefix():"") + rp.getMetadataFieldTitle()));
+                    applicationService.saveOrUpdate(rp.getCRISTargetClass(), rp);
+                }
                 filler.fillRecord(ctx, item, toBuild.get(authorityKey),
                         authorityKey, rp);
                 extraUpdateObjects.put(authorityKey, rp);

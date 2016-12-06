@@ -7,6 +7,7 @@
  */
 package org.dspace.app.cris.integration.authority;
 
+import java.beans.PropertyEditor;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,6 +41,8 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
 
     private boolean allowsUpdateByDefault = false;
 
+    private boolean appendMode = false;
+    
     private Map<String, ItemMetadataImportFillerConfiguration> configurations;
 
     private ApplicationService applicationService;
@@ -316,7 +319,11 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
     {
         for (Property p : props)
         {
-            if (p.getValue().getObject().equals(val))
+            PropertyEditor pe1 = p.getTypo().getRendering().getPropertyEditor(applicationService);
+            PropertyEditor pe2 = p.getTypo().getRendering().getPropertyEditor(applicationService);
+            pe1.setValue(p.getValue().getObject());
+            pe2.setValue(val);
+            if (pe1.getAsText().equals(pe2.getAsText()))
             {
                 return true;
             }
@@ -327,5 +334,15 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
     public void setMetricsPersistenceService(MetricsPersistenceService metricsPersistenceService)
     {
         this.metricsPersistenceService = metricsPersistenceService;
+    }
+
+    public boolean isAppendMode()
+    {
+        return appendMode;
+    }
+
+    public void setAppendMode(boolean appendMode)
+    {
+        this.appendMode = appendMode;
     }
 }

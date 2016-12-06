@@ -18,4 +18,6 @@ public interface ImportAuthorityFiller {
 	void fillRecord(Context context, Item item, List<Metadatum> metadata, String authorityID, ACrisObject crisObject);
 
 	boolean allowsUpdate(Context ctx, Item item, List<Metadatum> metadatumList, String authorityKey, ACrisObject rp);
+	
+	boolean isAppendMode();
 }
