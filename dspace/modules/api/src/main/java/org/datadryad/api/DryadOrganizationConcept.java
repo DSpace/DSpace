@@ -219,6 +219,9 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     }
 
     public String getFullName() {
+        if (fullName == null) {
+            fullName = "";
+        }
         return fullName;
     }
 
