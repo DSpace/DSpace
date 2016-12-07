@@ -7,16 +7,10 @@
  */
 package org.dspace.app.cris.model.jdyna;
 
-import it.cilea.osd.common.service.IPersistenceService;
-import it.cilea.osd.jdyna.web.AbstractEditTab;
-import it.cilea.osd.jdyna.web.ITabService;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -30,6 +24,8 @@ import org.dspace.app.cris.model.CrisConstants;
 import org.dspace.core.ConfigurationManager;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import it.cilea.osd.jdyna.web.AbstractEditTab;
 
 @Entity
 @Table(name = "cris_pj_etab")
@@ -118,7 +114,10 @@ public class EditTabProject extends
     @Override
     public List<ProjectPropertiesDefinition> getAuthorizedSingle()
     {
-        return authorizedSingle;
+        if(this.authorizedSingle==null) {
+            this.authorizedSingle = new ArrayList<ProjectPropertiesDefinition>();
+        }
+        return this.authorizedSingle;
     }
 
     public void setAuthorizedSingle(List<ProjectPropertiesDefinition> authorizedSingle)
@@ -129,7 +128,10 @@ public class EditTabProject extends
     @Override
     public List<ProjectPropertiesDefinition> getAuthorizedGroup()
     {
-        return authorizedGroup;
+        if(this.authorizedGroup==null) {
+            this.authorizedGroup = new ArrayList<ProjectPropertiesDefinition>();
+        }
+        return this.authorizedGroup;
     }
 
     public void setAuthorizedGroup(List<ProjectPropertiesDefinition> authorizedGroup)

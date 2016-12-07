@@ -99,7 +99,10 @@ public class TabProject extends AbstractTab<BoxProject> {
     @Override
     public List<ProjectPropertiesDefinition> getAuthorizedSingle()
     {
-        return authorizedSingle;
+        if(this.authorizedSingle==null) {
+            this.authorizedSingle = new ArrayList<ProjectPropertiesDefinition>();
+        }
+        return this.authorizedSingle;
     }
 
     public void setAuthorizedSingle(List<ProjectPropertiesDefinition> authorizedSingle)
@@ -110,7 +113,10 @@ public class TabProject extends AbstractTab<BoxProject> {
     @Override
     public List<ProjectPropertiesDefinition> getAuthorizedGroup()
     {
-        return authorizedGroup;
+        if(this.authorizedGroup==null) {
+            this.authorizedGroup = new ArrayList<ProjectPropertiesDefinition>();
+        }
+        return this.authorizedGroup;
     }
 
     public void setAuthorizedGroup(List<ProjectPropertiesDefinition> authorizedGroup)
