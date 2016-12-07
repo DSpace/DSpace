@@ -7,7 +7,6 @@
  */
 package org.dspace.content.authority;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -27,11 +26,8 @@ import java.lang.Exception;
 import java.lang.Override;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import static java.lang.Thread.currentThread;
 
 /**
  * Class representing a DSpace Concept, that acts as
@@ -1160,8 +1156,6 @@ public class Concept extends AuthorityObject
             log.error("couldn't create Term " + e.getMessage());
         }
         context.commit();
-        log.error("creating Term " + getID() + " with relationType " + relationType);
-        log.error(StringUtils.join(Arrays.copyOf(currentThread().getStackTrace(), 15), "\n    "));
         term.setLiteralForm(context, literalForm);
         term.setCreated(context, getCreated());
         term.setLang(context, getLang());
