@@ -462,7 +462,7 @@ public class PublicationUpdater extends HttpServlet {
         }
 
         LOGGER.debug("scheduling publication checker");
-        myPublicationUpdaterTimer = new Timer();
+//        myPublicationUpdaterTimer = new Timer();
         // schedule harvesting to the number of days set in the configuration:
         // timers are set in units of milliseconds.
 //        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("publication.updater.timer"));

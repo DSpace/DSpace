@@ -126,7 +126,6 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
             context.turnOffAuthorisationSystem();
             Scheme journalScheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
             Concept newConcept = journalScheme.createConcept(context);
-            log.error("creating concept " + newConcept.getID());
             this.setUnderlyingConcept(context, newConcept);
             JournalUtils.addDryadJournalConcept(context, this);
             context.commit();
