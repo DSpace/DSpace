@@ -39,12 +39,12 @@ public class LegacyManuscript {
         this.Submission_Metadata.Article_Title = manuscript.getTitle();
         this.Article_Status = manuscript.getLiteralStatus();
         for (Author author : manuscript.getAuthors().author) {
-            this.Authors.Author.add(author.fullName());
+            this.Authors.Author.add(author.getUnicodeFullName());
         }
         CorrespondingAuthor correspondingAuthor = manuscript.getCorrespondingAuthor();
         if(correspondingAuthor != null) {
             if(correspondingAuthor.author != null) {
-                this.Corresponding_Author = correspondingAuthor.author.fullName();
+                this.Corresponding_Author = correspondingAuthor.author.getUnicodeFullName();
             }
             this.Email = correspondingAuthor.email;
             if(correspondingAuthor.address != null) {

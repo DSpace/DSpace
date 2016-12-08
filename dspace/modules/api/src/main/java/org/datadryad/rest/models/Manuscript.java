@@ -265,7 +265,7 @@ public class Manuscript {
     public String getCorrespondingAuthorFullName() {
         String fullname = null;
         if (this.correspondingAuthor != null && this.correspondingAuthor.author != null) {
-            fullname = this.correspondingAuthor.author.fullName();
+            fullname = this.correspondingAuthor.author.getHTMLFullName();
         }
         return fullname;
     }
@@ -615,13 +615,13 @@ public class Manuscript {
             ArrayList<String> authorStrings = new ArrayList<String>();
             for (Author a : authors.author) {
                 StringBuilder authorString = new StringBuilder();
-                String authorFamilyName = a.familyName;
+                String authorFamilyName = a.getHTMLFamilyName();
                 if (authorFamilyName == null) {
                     authorFamilyName = "";
                 }
                 authorString.append(authorFamilyName);
                 authorString.append(" ");
-                String authorGivenName = a.givenNames;
+                String authorGivenName = a.getHTMLGivenNames();
                 if (authorGivenName == null) {
                     authorGivenName = "";
                 }
@@ -715,7 +715,6 @@ public class Manuscript {
             journalConfidence = Choices.CF_ACCEPTED;
         }
         addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL, journalConcept.getFullName(), journalConcept.getIdentifier(), journalConfidence);
-        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_CODE, journalConcept.getJournalID());
         addSingleMetadataValueFromJournal(context, item, Manuscript.ISSN, journalConcept.getISSN());
 
         addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_VOLUME, this.getJournalVolume());
@@ -725,13 +724,12 @@ public class Manuscript {
         if (publicationDate != null) {
             addSingleMetadataValueFromJournal(context, item, Manuscript.PUBLICATION_DATE, sdf.format(publicationDate));
         }
-        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_NUMBER, this.getJournalNumber());
         addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_PUBLISHER, this.getPublisher());
         addSingleMetadataValueFromJournal(context, item, Manuscript.MANUSCRIPT, this.getManuscriptId());
         addSingleMetadataValueFromJournal(context, item, Manuscript.SKIP_REVIEW, String.valueOf(this.isSkipReviewStep()));
         ArrayList<String> authors = new ArrayList<String>();
         for (Author a : this.authors.author) {
-            authors.add(a.fullName());
+            authors.add(a.getHTMLFullName());
         }
         addMultiMetadataValueFromJournal(context, item, Manuscript.AUTHORS, authors);
         addMultiMetadataValueFromJournal(context, item, Manuscript.CLASSIFICATION, keywords);
@@ -798,15 +796,11 @@ public class Manuscript {
     public void configureTestValues() {
         this.manuscript_abstract = "This is the abstract of the article";
         List<Author> localAuthors = new ArrayList<Author>();
-        Author author1 = new Author();
-        author1.familyName = "Smith";
-        author1.givenNames = "John";
-        author1.identifier = "0000-0000-0000-0000";
-        author1.identifierType = "orcid";
+        Author author1 = new Author("Smith", "John");
+        author1.setIdentifier("0000-0000-0000-0000");
+        author1.setIdentifierType("orcid");
         localAuthors.add(author1);
-        Author author2 = new Author();
-        author2.familyName = "Jones";
-        author2.givenNames = "Sally";
+        Author author2 = new Author("Jones", "Sally");
         localAuthors.add(author2);
         AuthorsList localAuthorsList = new AuthorsList();
         localAuthorsList.author = localAuthors;

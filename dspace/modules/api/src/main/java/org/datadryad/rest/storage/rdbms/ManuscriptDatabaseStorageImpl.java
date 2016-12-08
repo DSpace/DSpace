@@ -216,7 +216,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                 List<Author> authorList = manuscript.getAuthorList();
                 StringBuilder authorString = new StringBuilder();
                 for (Author author : authorList) {
-                    authorString.append(" and " + COLUMN_JSON_DATA + " like '%\"familyName\"%:%\"" + StringEscapeUtils.escapeSql(author.familyName) + "\"%' ");
+                    authorString.append(" and " + COLUMN_JSON_DATA + " like '%\"familyName\"%:%\"" + StringEscapeUtils.escapeSql(author.getUnicodeFamilyName()) + "\"%' ");
                 }
                 if (!"".equals(authorString.toString())) {
                     String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? " + authorString.toString();
