@@ -35,101 +35,107 @@ import org.xml.sax.SAXException;
 
 /**
  * Search for items from other collections to map into this collection.
- * 
+ *
  * @author Scott Phillips
  */
 
 public class SearchItemForm extends AbstractDSpaceTransformer {
 
-	/** Language strings */
-	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
-	private static final Message T_submit_cancel = message("xmlui.general.cancel");
-	private static final Message T_mapper_trail = message("xmlui.administrative.mapper.general.mapper_trail");
-	
-	private static final Message T_title = message("xmlui.administrative.mapper.SearchItemForm.title");
-	private static final Message T_trail = message("xmlui.administrative.mapper.SearchItemForm.trail");
-	private static final Message T_head1 = message("xmlui.administrative.mapper.SearchItemForm.head1");
-	private static final Message T_submit_map = message("xmlui.administrative.mapper.SearchItemForm.submit_map");
-	private static final Message T_column1 = message("xmlui.administrative.mapper.SearchItemForm.column1");
-	private static final Message T_column2 = message("xmlui.administrative.mapper.SearchItemForm.column2");
-	private static final Message T_column3 = message("xmlui.administrative.mapper.SearchItemForm.column3");
-	private static final Message T_column4 = message("xmlui.administrative.mapper.SearchItemForm.column4");
+    /** Language strings */
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_submit_cancel = message("xmlui.general.cancel");
+    private static final Message T_mapper_trail = message("xmlui.administrative.mapper.general.mapper_trail");
+
+    private static final Message T_title = message("xmlui.administrative.mapper.SearchItemForm.title");
+    private static final Message T_trail = message("xmlui.administrative.mapper.SearchItemForm.trail");
+    private static final Message T_head1 = message("xmlui.administrative.mapper.SearchItemForm.head1");
+    private static final Message T_submit_map = message("xmlui.administrative.mapper.SearchItemForm.submit_map");
+    private static final Message T_column1 = message("xmlui.administrative.mapper.SearchItemForm.column1");
+    private static final Message T_column2 = message("xmlui.administrative.mapper.SearchItemForm.column2");
+    private static final Message T_column3 = message("xmlui.administrative.mapper.SearchItemForm.column3");
+    private static final Message T_column4 = message("xmlui.administrative.mapper.SearchItemForm.column4");
 
     private static final Logger log = LoggerFactory.getLogger(SearchItemForm.class);
 
-	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+    protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     @Override
-	public void addPageMeta(PageMeta pageMeta) throws WingException  
-	{
-		pageMeta.addMetadata("title").addContent(T_title);
-		
-		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-		pageMeta.addTrail().addContent(T_mapper_trail);
-		pageMeta.addTrail().addContent(T_trail);
-	}
+    public void addPageMeta(PageMeta pageMeta)
+        throws WingException
+    {
+        pageMeta.addMetadata("title").addContent(T_title);
 
-	
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        pageMeta.addTrail().addContent(T_mapper_trail);
+        pageMeta.addTrail().addContent(T_trail);
+    }
+
+
     @Override
-	public void addBody(Body body) throws SAXException, WingException, SQLException, IOException
-	{
-		// Get our parameters and state;
-		UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
-		Collection collection = collectionService.find(context,collectionID);
-		
-		String query = decodeFromURL(parameters.getParameter("query",null));
-		java.util.List<Item> items = performSearch(collection,query);
-		
-		
-		
-		// DIVISION: manage-mapper
-		Division div = body.addInteractiveDivision("search-items",contextPath + "/admin/mapper", Division.METHOD_GET,"primary administrative mapper");
-		div.setHead(T_head1.parameterize(query));
-		
-		Para actions = div.addPara();
-		actions.addButton("submit_map").setValue(T_submit_map);
-		actions.addButton("submit_cancel").setValue(T_submit_cancel);
-		
-		Table table = div.addTable("search-items-table",1,1);
-		
-		Row header = table.addRow(Row.ROLE_HEADER);
-		header.addCellContent(T_column1);
-		header.addCellContent(T_column2);
-		header.addCellContent(T_column3);
-		header.addCellContent(T_column4);
-		
-		for (Item item : items)
-		{
-			String itemID = String.valueOf(item.getID());
-			Collection owningCollection = item.getOwningCollection();
-			String owning = "unknown";
-			if (owningCollection != null)
-				owning = owningCollection.getName();
-			String author = "unknown";
-			List<MetadataValue> dcCreators = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "creator", Item.ANY, Item.ANY);
-			if (dcCreators != null && dcCreators.size() >= 1)
+    public void addBody(Body body)
+        throws SAXException, WingException, SQLException, IOException
+    {
+        // Get our parameters and state;
+        UUID collectionID = UUID.fromString(parameters.getParameter("collectionID", null));
+        Collection collection = collectionService.find(context,collectionID);
+
+        String query = decodeFromURL(parameters.getParameter("query",null));
+        java.util.List<Item> items = performSearch(collection,query);
+
+
+        // DIVISION: manage-mapper
+        Division div = body.addInteractiveDivision("search-items",
+            contextPath + "/admin/mapper", Division.METHOD_GET,
+            "primary administrative mapper");
+        div.setHead(T_head1.parameterize(query));
+
+        Para actions = div.addPara();
+        actions.addButton("submit_map").setValue(T_submit_map);
+        actions.addButton("submit_cancel").setValue(T_submit_cancel);
+
+        Table table = div.addTable("search-items-table",1,1);
+
+        Row header = table.addRow(Row.ROLE_HEADER);
+        header.addCellContent(T_column1);
+        header.addCellContent(T_column2);
+        header.addCellContent(T_column3);
+        header.addCellContent(T_column4);
+
+        for (Item item : items)
+        {
+            String itemID = String.valueOf(item.getID());
+            Collection owningCollection = item.getOwningCollection();
+            String owning = "unknown";
+            if (owningCollection != null)
+                owning = owningCollection.getName();
+            String author = "unknown";
+            List<MetadataValue> dcCreators = itemService.getMetadata(
+                item, MetadataSchema.DC_SCHEMA, "creator", Item.ANY, Item.ANY);
+            if (dcCreators != null && dcCreators.size() >= 1)
             {
                 author = dcCreators.get(0).getValue();
             } else {
-            	// Do a fallback look for contributors
-				List<MetadataValue> dcContributors = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "contributor", Item.ANY, Item.ANY);
-				if (dcContributors != null && dcContributors.size() >= 1)
-	            {
-	                author = dcContributors.get(0).getValue();
-	            }
-			}
-			
-			String title = "untitled";
-			List<MetadataValue> dcTitles = itemService.getMetadata(item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
-			if (dcTitles != null && dcTitles.size() >= 1)
+                // Do a fallback look for contributors
+                List<MetadataValue> dcContributors = itemService.getMetadata(
+                    item, MetadataSchema.DC_SCHEMA, "contributor", Item.ANY, Item.ANY);
+                if (dcContributors != null && dcContributors.size() >= 1)
+                {
+                    author = dcContributors.get(0).getValue();
+                }
+            }
+
+            String title = "untitled";
+            List<MetadataValue> dcTitles = itemService.getMetadata(
+                item, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            if (dcTitles != null && dcTitles.size() >= 1)
             {
                 title = dcTitles.get(0).getValue();
             }
 
-			String url = contextPath+"/handle/"+item.getHandle();
-			
-			Row row = table.addRow();
+            String url = contextPath+"/handle/"+item.getHandle();
+
+            Row row = table.addRow();
 
             boolean canBeMapped = true;
             List<Collection> collections = item.getCollections();
@@ -152,42 +158,42 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
                 row.addCell().addContent("");
             }
 
-			row.addCellContent(owning);
-			row.addCell().addXref(url,author);
-			row.addCell().addXref(url,title);
-		}
-		
-		actions = div.addPara();
-		actions.addButton("submit_map").setValue(T_submit_map);
-		actions.addButton("submit_cancel").setValue(T_submit_cancel);
-		
-		
-		
-		
-		div.addHidden("administrative-continue").setValue(knot.getId());
-	}
-	
-	
-	/**
-	 * Search the repository for items in other collections that can be mapped into this one.
-	 * 
-	 * @param collection The collection to map into
-	 * @param query The search query.
-	 */
-	private java.util.List<Item> performSearch(Collection collection, String query) throws SQLException, IOException
-	{
+            row.addCellContent(owning);
+            row.addCell().addXref(url,author);
+            row.addCell().addXref(url,title);
+        }
+
+        actions = div.addPara();
+        actions.addButton("submit_map").setValue(T_submit_map);
+        actions.addButton("submit_cancel").setValue(T_submit_cancel);
+
+        div.addHidden("administrative-continue").setValue(knot.getId());
+    }
+
+
+    /**
+     * Search the repository for items in other collections that can be mapped into this one.
+     *
+     * @param collection The collection to map into
+     * @param query The search query.
+     */
+    private java.util.List<Item> performSearch(Collection collection, String query)
+        throws SQLException, IOException
+    {
         // Which search provider do we use?
         SearchRequestProcessor processor = null;
         try {
             processor = (SearchRequestProcessor) CoreServiceFactory.getInstance().getPluginService()
                     .getSinglePlugin(SearchRequestProcessor.class);
-        } catch (PluginConfigurationError e) {
+        }
+        catch (PluginConfigurationError e)
+        {
             log.warn("{} not properly configured.  Please configure the {} plugin.  {}",
-                    new Object[] {
-                        SearchItemForm.class.getName(),
-                        SearchRequestProcessor.class.getName(),
-                        e.getMessage()
-                    });
+                new Object[] {
+                    SearchItemForm.class.getName(),
+                    SearchRequestProcessor.class.getName(),
+                    e.getMessage()
+                });
         }
         if (processor == null)
         {   // Discovery is the default search provider since DSpace 4.0
@@ -203,9 +209,9 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
         {
             if (resultDSO instanceof Item)
             {
-            	Item item = (Item) resultDSO;
+                Item item = (Item) resultDSO;
 
-            	if (!itemService.isOwningCollection(item, collection))
+                if (!itemService.isOwningCollection(item, collection))
                 {
                     items.add(item);
                 }
@@ -214,5 +220,4 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 
         return items;
     }
-
 }

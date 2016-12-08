@@ -82,6 +82,7 @@ public class DCInputsReader
      * level structures: a map between collections and forms, the definition for
      * each page of each form, and lists of pairs of values that populate
      * selection boxes.
+     *
      * @throws DCInputsReaderException if input reader error
      */
 
@@ -90,7 +91,7 @@ public class DCInputsReader
     {
         // Load from default file
         String defsFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
-                + File.separator + "config" + File.separator + FORM_DEF_FILE;
+            + File.separator + "config" + File.separator + FORM_DEF_FILE;
 
         buildInputs(defsFile);
     }
@@ -114,23 +115,23 @@ public class DCInputsReader
 
         try
         {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setValidating(false);
-                factory.setIgnoringComments(true);
-                factory.setIgnoringElementContentWhitespace(true);
-                
-                DocumentBuilder db = factory.newDocumentBuilder();
-                Document doc = db.parse(uri);
-                doNodes(doc);
-                checkValues();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setValidating(false);
+            factory.setIgnoringComments(true);
+            factory.setIgnoringElementContentWhitespace(true);
+            
+            DocumentBuilder db = factory.newDocumentBuilder();
+            Document doc = db.parse(uri);
+            doNodes(doc);
+            checkValues();
         }
         catch (FactoryConfigurationError fe)
         {
-                throw new DCInputsReaderException("Cannot create Submission form parser",fe);
+            throw new DCInputsReaderException("Cannot create Submission form parser",fe);
         }
         catch (Exception e)
         {
-                throw new DCInputsReaderException("Error creating submission forms: "+e);
+            throw new DCInputsReaderException("Error creating submission forms: "+e);
         }
     }
    
@@ -155,27 +156,27 @@ public class DCInputsReader
      *             if no default set defined
      */
     public DCInputSet getInputs(String collectionHandle)
-                throws DCInputsReaderException
+        throws DCInputsReaderException
     {
         String formName = whichForms.get(collectionHandle);
         if (formName == null)
         {
-                formName = whichForms.get(DEFAULT_COLLECTION);
+            formName = whichForms.get(DEFAULT_COLLECTION);
         }
         if (formName == null)
         {
-                throw new DCInputsReaderException("No form designated as default");
+            throw new DCInputsReaderException("No form designated as default");
         }
         // check mini-cache, and return if match
         if ( lastInputSet != null && lastInputSet.getFormName().equals( formName ) )
         {
-                return lastInputSet;
+            return lastInputSet;
         }
         // cache miss - construct new DCInputSet
         List<List<Map<String, String>>> pages = formDefns.get(formName);
         if ( pages == null )
         {
-                throw new DCInputsReaderException("Missing the " + formName  + " form");
+            throw new DCInputsReaderException("Missing the " + formName  + " form");
         }
         lastInputSet = new DCInputSet(formName, pages, valuePairs);
         return lastInputSet;
@@ -197,13 +198,16 @@ public class DCInputsReader
      * Process the top level child nodes in the passed top-level node. These
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
+     *
+     * @param n
+     *     top-level DOM node
      */
     private void doNodes(Node n)
-                throws SAXException, DCInputsReaderException
+        throws SAXException, DCInputsReaderException
     {
         if (n == null)
         {
-                return;
+            return;
         }
         Node e = getElement(n);
         NodeList nl = e.getChildNodes();
@@ -212,35 +216,35 @@ public class DCInputsReader
         boolean foundDefs = false;
         for (int i = 0; i < len; i++)
         {
-                Node nd = nl.item(i);
-                if ((nd == null) || isEmptyTextNode(nd))
-                {
-                        continue;
-                }
-                String tagName = nd.getNodeName();
-                if (tagName.equals("form-map"))
-                {
-                        processMap(nd);
-                        foundMap = true;
-                }
-                else if (tagName.equals("form-definitions"))
-                {
-                        processDefinition(nd);
-                        foundDefs = true;
-                }
-                else if (tagName.equals("form-value-pairs"))
-                {
-                        processValuePairs(nd);
-                }
-                // Ignore unknown nodes
+            Node nd = nl.item(i);
+            if ((nd == null) || isEmptyTextNode(nd))
+            {
+                continue;
+            }
+            String tagName = nd.getNodeName();
+            if (tagName.equals("form-map"))
+            {
+                processMap(nd);
+                foundMap = true;
+            }
+            else if (tagName.equals("form-definitions"))
+            {
+                processDefinition(nd);
+                foundDefs = true;
+            }
+            else if (tagName.equals("form-value-pairs"))
+            {
+                processValuePairs(nd);
+            }
+            // Ignore unknown nodes
         }
         if (!foundMap)
         {
-                throw new DCInputsReaderException("No collection to form map found");
+            throw new DCInputsReaderException("No collection to form map found");
         }
         if (!foundDefs)
         {
-                throw new DCInputsReaderException("No form definition found");
+            throw new DCInputsReaderException("No form definition found");
         }
     }
 
@@ -258,26 +262,26 @@ public class DCInputsReader
         int len = nl.getLength();
         for (int i = 0; i < len; i++)
         {
-                Node nd = nl.item(i);
-                if (nd.getNodeName().equals("name-map"))
+            Node nd = nl.item(i);
+            if (nd.getNodeName().equals("name-map"))
+            {
+                String id = getAttribute(nd, "collection-handle");
+                String value = getAttribute(nd, "form-name");
+                String content = getValue(nd);
+                if (id == null)
                 {
-                        String id = getAttribute(nd, "collection-handle");
-                        String value = getAttribute(nd, "form-name");
-                        String content = getValue(nd);
-                        if (id == null)
-                        {
-                                throw new SAXException("name-map element is missing collection-handle attribute");
-                        }
-                        if (value == null)
-                        {
-                                throw new SAXException("name-map element is missing form-name attribute");
-                        }
-                        if (content != null && content.length() > 0)
-                        {
-                                throw new SAXException("name-map element has content, it should be empty.");
-                        }
-                        whichForms.put(id, value);
-                }  // ignore any child node that isn't a "name-map"
+                    throw new SAXException("name-map element is missing collection-handle attribute");
+                }
+                if (value == null)
+                {
+                    throw new SAXException("name-map element is missing form-name attribute");
+                }
+                if (content != null && content.length() > 0)
+                {
+                    throw new SAXException("name-map element has content, it should be empty.");
+                }
+                whichForms.put(id, value);
+            }  // ignore any child node that isn't a "name-map"
         }
     }
 
@@ -296,62 +300,61 @@ public class DCInputsReader
         int len = nl.getLength();
         for (int i = 0; i < len; i++)
         {
-                Node nd = nl.item(i);
-                // process each form definition
-                if (nd.getNodeName().equals("form"))
+            Node nd = nl.item(i);
+            // process each form definition
+            if (nd.getNodeName().equals("form"))
+            {
+                numForms++;
+                String formName = getAttribute(nd, "name");
+                if (formName == null)
                 {
-                        numForms++;
-                        String formName = getAttribute(nd, "name");
-                        if (formName == null)
-                        {
-                                throw new SAXException("form element has no name attribute");
-                        }
-                        List<List<Map<String, String>>> pages = new ArrayList<List<Map<String, String>>>(); // the form contains pages
-                        formDefns.put(formName, pages);
-                        NodeList pl = nd.getChildNodes();
-                        int lenpg = pl.getLength();
-                        for (int j = 0; j < lenpg; j++)
-                        {
-                                Node npg = pl.item(j);
-                                // process each page definition
-                                if (npg.getNodeName().equals("page"))
-                                {
-                                        String pgNum = getAttribute(npg, "number");
-                                        if (pgNum == null)
-                                        {
-                                                throw new SAXException("Form " + formName + " has no identified pages");
-                                        }
-                                        List<Map<String, String>> page = new ArrayList<Map<String, String>>();
-                                        pages.add(page);
-                                        NodeList flds = npg.getChildNodes();
-                                        int lenflds = flds.getLength();
-                                        for (int k = 0; k < lenflds; k++)
-                                        {
-                                                Node nfld = flds.item(k);
-                                                if ( nfld.getNodeName().equals("field") )
-                                                {
-                                                        // process each field definition
-                                                        Map<String, String> field = new HashMap<String, String>();
-                                                        page.add(field);
-                                                        processPageParts(formName, pgNum, nfld, field);
-
-                                                        // we omit the duplicate validation, allowing multiple fields definition for 
-                                                        // the same metadata and different visibility/type-bind
-
-                                                }
-                                        }
-                                } // ignore any child that is not a 'page'
-                        }
-                        // sanity check number of pages
-                        if (pages.size() < 1)
-                        {
-                                throw new DCInputsReaderException("Form " + formName + " has no pages");
-                        }
+                    throw new SAXException("form element has no name attribute");
                 }
+                List<List<Map<String, String>>> pages = new ArrayList<List<Map<String, String>>>(); // the form contains pages
+                formDefns.put(formName, pages);
+                NodeList pl = nd.getChildNodes();
+                int lenpg = pl.getLength();
+                for (int j = 0; j < lenpg; j++)
+                {
+                    Node npg = pl.item(j);
+                    // process each page definition
+                    if (npg.getNodeName().equals("page"))
+                    {
+                        String pgNum = getAttribute(npg, "number");
+                        if (pgNum == null)
+                        {
+                            throw new SAXException("Form " + formName + " has no identified pages");
+                        }
+                        List<Map<String, String>> page = new ArrayList<Map<String, String>>();
+                        pages.add(page);
+                        NodeList flds = npg.getChildNodes();
+                        int lenflds = flds.getLength();
+                        for (int k = 0; k < lenflds; k++)
+                        {
+                            Node nfld = flds.item(k);
+                            if ( nfld.getNodeName().equals("field") )
+                            {
+                                // process each field definition
+                                Map<String, String> field = new HashMap<String, String>();
+                                page.add(field);
+                                processPageParts(formName, pgNum, nfld, field);
+
+                                // we omit the duplicate validation, allowing multiple fields definition for 
+                                // the same metadata and different visibility/type-bind
+                            }
+                        }
+                    } // ignore any child that is not a 'page'
+                }
+                // sanity check number of pages
+                if (pages.size() < 1)
+                {
+                    throw new DCInputsReaderException("Form " + formName + " has no pages");
+                }
+            }
         }
         if (numForms == 0)
         {
-                throw new DCInputsReaderException("No form definition found");
+            throw new DCInputsReaderException("No form definition found");
         }
     }
 
@@ -368,86 +371,86 @@ public class DCInputsReader
         int len = nl.getLength();
         for (int i = 0; i < len; i++)
         {
-                Node nd = nl.item(i);
-                if ( ! isEmptyTextNode(nd) )
+            Node nd = nl.item(i);
+            if ( ! isEmptyTextNode(nd) )
+            {
+                String tagName = nd.getNodeName();
+                String value   = getValue(nd);
+                field.put(tagName, value);
+                if (tagName.equals("input-type"))
                 {
-                        String tagName = nd.getNodeName();
-                        String value   = getValue(nd);
-                        field.put(tagName, value);
-                        if (tagName.equals("input-type"))
+                    if (value.equals("dropdown")
+                        || value.equals("qualdrop_value")
+                        || value.equals("list"))
+                    {
+                        String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
+                        if (pairTypeName == null)
                         {
-                            if (value.equals("dropdown")
-                                    || value.equals("qualdrop_value")
-                                    || value.equals("list"))
-                            {
-                                    String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
-                                    if (pairTypeName == null)
-                                    {
-                                            throw new SAXException("Form " + formName + ", field " +
-                                                                           field.get("dc-element") +
-                                                                           "." + field.get("dc-qualifier") +
-                                                                           " has no name attribute");
-                                    }
-                                    else
-                                    {
-                                            field.put(PAIR_TYPE_NAME, pairTypeName);
-                                    }
-                            }
+                            throw new SAXException("Form " + formName + ", field " +
+                                                   field.get("dc-element") +
+                                                   "." + field.get("dc-qualifier") +
+                                                   " has no name attribute");
                         }
-                        else if (tagName.equals("vocabulary"))
+                        else
                         {
-                                String closedVocabularyString = getAttribute(nd, "closed");
-                                field.put("closedVocabulary", closedVocabularyString);
+                            field.put(PAIR_TYPE_NAME, pairTypeName);
                         }
-                        else if (tagName.equals("language"))
-                        {
-                                if (Boolean.valueOf(value))
-                                {
-                                        String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
-                                        if (pairTypeName == null)
-                                        {
-                                                throw new SAXException("Form " + formName + ", field " +
-                                                                               field.get("dc-element") +
-                                                                               "." + field.get("dc-qualifier") +
-                                                                               " has no language attribute");
-                                        }
-                                        else
-                                        {
-                                                field.put(PAIR_TYPE_NAME, pairTypeName);
-                                        }
-                                }
-                        }
+                    }
                 }
+                else if (tagName.equals("vocabulary"))
+                {
+                    String closedVocabularyString = getAttribute(nd, "closed");
+                    field.put("closedVocabulary", closedVocabularyString);
+                }
+                else if (tagName.equals("language"))
+                {
+                    if (Boolean.valueOf(value))
+                    {
+                        String pairTypeName = getAttribute(nd, PAIR_TYPE_NAME);
+                        if (pairTypeName == null)
+                        {
+                            throw new SAXException("Form " + formName + ", field " +
+                                                   field.get("dc-element") +
+                                                   "." + field.get("dc-qualifier") +
+                                                   " has no language attribute");
+                        }
+                        else
+                        {
+                            field.put(PAIR_TYPE_NAME, pairTypeName);
+                        }
+                    }
+                }
+            }
         }
         String missing = null;
         if (field.get("dc-element") == null)
         {
-                missing = "dc-element";
+            missing = "dc-element";
         }
         if (field.get("label") == null)
         {
-                missing = "label";
+            missing = "label";
         }
         if (field.get("input-type") == null)
         {
-                missing = "input-type";
+            missing = "input-type";
         }
         if ( missing != null )
         {
-                String msg = "Required field " + missing + " missing on page " + page + " of form " + formName;
-                throw new SAXException(msg);
+            String msg = "Required field " + missing + " missing on page " + page + " of form " + formName;
+            throw new SAXException(msg);
         }
         String type = field.get("input-type");
         if (type.equals("twobox") || type.equals("qualdrop_value"))
         {
-                String rpt = field.get("repeatable");
-                if ((rpt == null) ||
-                                ((!rpt.equalsIgnoreCase("yes")) &&
-                                                (!rpt.equalsIgnoreCase("true"))))
-                {
-                        String msg = "The field \'"+field.get("label")+"\' must be repeatable";
-                        throw new SAXException(msg);
-                }
+            String rpt = field.get("repeatable");
+            if ((rpt == null) ||
+                ((!rpt.equalsIgnoreCase("yes")) &&
+                (!rpt.equalsIgnoreCase("true"))))
+            {
+                String msg = "The field \'"+field.get("label")+"\' must be repeatable";
+                throw new SAXException(msg);
+            }
         }
     }
 
@@ -526,63 +529,62 @@ public class DCInputsReader
      * in the passed in hashmap.
      */
     private void processValuePairs(Node e)
-                throws SAXException
+        throws SAXException
     {
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
         for (int i = 0; i < len; i++)
         {
-                Node nd = nl.item(i);
-                    String tagName = nd.getNodeName();
+            Node nd = nl.item(i);
+            String tagName = nd.getNodeName();
 
-                    // process each value-pairs set
-                    if (tagName.equals("value-pairs"))
+            // process each value-pairs set
+            if (tagName.equals("value-pairs"))
+            {
+                String pairsName = getAttribute(nd, PAIR_TYPE_NAME);
+                String dcTerm = getAttribute(nd, "dc-term");
+                if (pairsName == null)
+                {
+                    String errString =
+                        "Missing name attribute for value-pairs for DC term " + dcTerm;
+                    throw new SAXException(errString);
+                }
+                List<String> pairs = new ArrayList<String>();
+                valuePairs.put(pairsName, pairs);
+                NodeList cl = nd.getChildNodes();
+                int lench = cl.getLength();
+                for (int j = 0; j < lench; j++)
+                {
+                    Node nch = cl.item(j);
+                    String display = null;
+                    String storage = null;
+
+                    if (nch.getNodeName().equals("pair"))
                     {
-                        String pairsName = getAttribute(nd, PAIR_TYPE_NAME);
-                        String dcTerm = getAttribute(nd, "dc-term");
-                        if (pairsName == null)
+                        NodeList pl = nch.getChildNodes();
+                        int plen = pl.getLength();
+                        for (int k = 0; k < plen; k++)
                         {
-                                String errString =
-                                        "Missing name attribute for value-pairs for DC term " + dcTerm;
-                                throw new SAXException(errString);
-
-                        }
-                        List<String> pairs = new ArrayList<String>();
-                        valuePairs.put(pairsName, pairs);
-                        NodeList cl = nd.getChildNodes();
-                        int lench = cl.getLength();
-                        for (int j = 0; j < lench; j++)
-                        {
-                                Node nch = cl.item(j);
-                                String display = null;
-                                String storage = null;
-
-                                if (nch.getNodeName().equals("pair"))
+                            Node vn= pl.item(k);
+                            String vName = vn.getNodeName();
+                            if (vName.equals("displayed-value"))
+                            {
+                                display = getValue(vn);
+                            }
+                            else if (vName.equals("stored-value"))
+                            {
+                                storage = getValue(vn);
+                                if (storage == null)
                                 {
-                                        NodeList pl = nch.getChildNodes();
-                                        int plen = pl.getLength();
-                                        for (int k = 0; k < plen; k++)
-                                        {
-                                                Node vn= pl.item(k);
-                                                String vName = vn.getNodeName();
-                                                if (vName.equals("displayed-value"))
-                                                {
-                                                        display = getValue(vn);
-                                                }
-                                                else if (vName.equals("stored-value"))
-                                                {
-                                                        storage = getValue(vn);
-                                                        if (storage == null)
-                                                        {
-                                                                storage = "";
-                                                        }
-                                                } // ignore any children that aren't 'display' or 'storage'
-                                        }
-                                        pairs.add(display);
-                                        pairs.add(storage);
-                                } // ignore any children that aren't a 'pair'
+                                    storage = "";
+                                }
+                            } // ignore any children that aren't 'display' or 'storage'
                         }
-                    } // ignore any children that aren't a 'value-pair'
+                        pairs.add(display);
+                        pairs.add(storage);
+                    } // ignore any children that aren't a 'pair'
+                }
+            } // ignore any children that aren't a 'value-pair'
         }
     }
 
@@ -595,40 +597,39 @@ public class DCInputsReader
      */
 
     private void checkValues()
-                throws DCInputsReaderException
+        throws DCInputsReaderException
     {
         // Step through every field of every page of every form
         Iterator<String> ki = formDefns.keySet().iterator();
         while (ki.hasNext())
         {
-                String idName = ki.next();
-                List<List<Map<String, String>>> pages = formDefns.get(idName);
-                for (int i = 0; i < pages.size(); i++)
+            String idName = ki.next();
+            List<List<Map<String, String>>> pages = formDefns.get(idName);
+            for (int i = 0; i < pages.size(); i++)
+            {
+                List<Map<String, String>> page = pages.get(i);
+                for (int j = 0; j < page.size(); j++)
                 {
-                        List<Map<String, String>> page = pages.get(i);
-                        for (int j = 0; j < page.size(); j++)
-                        {
-                                Map<String, String> fld = page.get(j);
-                                // verify reference in certain input types
-                                String type = fld.get("input-type");
+                    Map<String, String> fld = page.get(j);
+                    // verify reference in certain input types
+                    String type = fld.get("input-type");
                     if (type.equals("dropdown")
-                            || type.equals("qualdrop_value")
-                            || type.equals("list"))
-                                {
-                                        String pairsName = fld.get(PAIR_TYPE_NAME);
-                                        List<String> v = valuePairs.get(pairsName);
-                                        if (v == null)
-                                        {
-                                                String errString = "Cannot find value pairs for " + pairsName;
-                                                throw new DCInputsReaderException(errString);
-                                        }
-                                }
-                    
-                    			// we omit the "required" and "visibility" validation, provided this must be checked in the processing class
-                    			// only when it makes sense (if the field isn't visible means that it is not applicable, therefore it can't be required)
-
+                        || type.equals("qualdrop_value")
+                        || type.equals("list"))
+                    {
+                        String pairsName = fld.get(PAIR_TYPE_NAME);
+                        List<String> v = valuePairs.get(pairsName);
+                        if (v == null)
+                        {
+                            String errString = "Cannot find value pairs for " + pairsName;
+                            throw new DCInputsReaderException(errString);
                         }
+                    }
+                
+                        // we omit the "required" and "visibility" validation, provided this must be checked in the processing class
+                        // only when it makes sense (if the field isn't visible means that it is not applicable, therefore it can't be required)
                 }
+            }
         }
     }
     
@@ -652,11 +653,11 @@ public class DCInputsReader
         boolean isEmpty = false;
         if (nd.getNodeType() == Node.TEXT_NODE)
         {
-                String text = nd.getNodeValue().trim();
-                if (text.length() == 0)
-                {
-                        isEmpty = true;
-                }
+            String text = nd.getNodeValue().trim();
+            if (text.length() == 0)
+            {
+                isEmpty = true;
+            }
         }
         return isEmpty;
     }
@@ -670,15 +671,15 @@ public class DCInputsReader
         int len = attrs.getLength();
         if (len > 0)
         {
-                int i;
-                for (i = 0; i < len; i++)
+            int i;
+            for (i = 0; i < len; i++)
+            {
+                Node attr = attrs.item(i);
+                if (name.equals(attr.getNodeName()))
                 {
-                        Node attr = attrs.item(i);
-                        if (name.equals(attr.getNodeName()))
-                        {
-                                return attr.getNodeValue().trim();
-                        }
+                    return attr.getNodeValue().trim();
                 }
+            }
         }
         //no such attribute
         return null;
@@ -694,12 +695,12 @@ public class DCInputsReader
         int len = nl.getLength();
         for (int i = 0; i < len; i++)
         {
-                Node n = nl.item(i);
-                short type = n.getNodeType();
-                if (type == Node.TEXT_NODE)
-                {
-                        return n.getNodeValue().trim();
-                }
+            Node n = nl.item(i);
+            short type = n.getNodeType();
+            if (type == Node.TEXT_NODE)
+            {
+                return n.getNodeValue().trim();
+            }
         }
         // Didn't find a text node
         return null;

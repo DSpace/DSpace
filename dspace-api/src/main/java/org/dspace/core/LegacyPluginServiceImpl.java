@@ -23,38 +23,43 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * <p>
  * The Legacy Plugin Service is a very simple component container (based on the
  * legacy PluginManager class from 5.x or below). It reads defined "plugins" (interfaces)
  * from config file(s) and makes them available to the API. (TODO: Someday, this
  * entire "plugin" framework needs to be replaced by Spring Beans.)
+ * </p>
  * <p>
  * It creates and organizes components (plugins), and helps select a plugin in
  * the cases where there are many possible choices. It also gives some limited
  * control over the lifecycle of a plugin.  It manages three different types
  * (usage patterns) of plugins:
- * <p>
- * <ol><li> Singleton Plugin
- * <br>  There is only one implementation class for the plugin.  It is indicated
+ * </p>
+ * <ol>
+ *   <li>Singleton Plugin<br>
+ *   There is only one implementation class for the plugin.  It is indicated
  *   in the configuration.  This type of plugin chooses an implementations of
  *   a service, for the entire system, at configuration time.  Your
  *   application just fetches the plugin for that interface and gets the
- *   configured-in choice.
+ *   configured-in choice.</li>
  *
- * <p><li> Sequence Plugins
- *  <br> You need a sequence or series of plugins, to implement a mechanism like
+ *   <li>Sequence Plugins<br>
+ *   You need a sequence or series of plugins, to implement a mechanism like
  *   StackableAuthenticationMethods or a pipeline, where each plugin is
  *   called in order to contribute its implementation of a process to the
- *   whole.
- *  <p><li> Named Plugins
- *  <br> Use a named plugin when the application has to choose one plugin
+ *   whole.</li>
+ *   <li>Named Plugins<br>
+ *   Use a named plugin when the application has to choose one plugin
  *   implementation out of many available ones.  Each implementation is bound
- *   to one or more names (symbolic identifiers) in the configuration.
- *  </ol><p>
+ *   to one or more names (symbolic identifiers) in the configuration.</li>
+ *  </ol>
+ *  <p>
  *  The name is just a <code>String</code> to be associated with the
  *  combination of implementation class and interface.  It may contain
  *  any characters except for comma (,) and equals (=).  It may contain
  *  embedded spaces.  Comma is a special character used to separate
  *  names in the configuration entry.
+ *  </p>
  *
  * @author Larry Stone
  * @author Tim Donohue (turned old PluginManager into a PluginService)
@@ -122,7 +127,7 @@ public class LegacyPluginServiceImpl implements PluginService
      *
      * @param interfaceClass interface Class object
      * @return instance of plugin
-     * @throws PluginConfigurationError
+     * @throws PluginConfigurationError if no matching singleton plugin is configured.
      */
     @Override
     public Object getSinglePlugin(Class interfaceClass)
@@ -209,7 +214,7 @@ public class LegacyPluginServiceImpl implements PluginService
         catch (ClassNotFoundException e)
         {
             throw new PluginInstantiationException("Cannot load plugin class: " +
-            		                               e.toString(), e);
+                                                   e.toString(), e);
         }
         catch (InstantiationException|IllegalAccessException e)
         {
@@ -257,7 +262,7 @@ public class LegacyPluginServiceImpl implements PluginService
                     // If there's no "=" separator in this value, assume it's
                     // just a "name" that belongs with previous class.
                     // (This may occur if there's an unescaped comma between names)
-                    if(prevClassName!=null && valSplit.length==1)
+                    if (prevClassName!=null && valSplit.length==1)
                     {
                         className = prevClassName;
                         name = valSplit[0];
@@ -383,7 +388,7 @@ public class LegacyPluginServiceImpl implements PluginService
         catch (ClassNotFoundException e)
         {
             throw new PluginInstantiationException("Cannot load plugin class: " +
-            		                               e.toString(), e);
+                                                   e.toString(), e);
         }
         catch (InstantiationException|IllegalAccessException e)
         {
@@ -416,7 +421,7 @@ public class LegacyPluginServiceImpl implements PluginService
         catch (ClassNotFoundException e)
         {
             throw new PluginInstantiationException("Cannot load plugin class: " +
-            		                               e.toString(), e);
+                                                   e.toString(), e);
         }
     }
 
@@ -713,7 +718,8 @@ public class LegacyPluginServiceImpl implements PluginService
      * Invoking this class from the command line just runs
      * <code>checkConfiguration</code> and shows the results.
      * There are no command-line options.
-     * @param argv arguments
+     *
+     * @param argv the command line arguments given
      * @throws Exception if error
      */
     public void main(String[] argv) throws Exception

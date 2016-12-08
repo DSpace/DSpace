@@ -50,8 +50,8 @@ import org.xml.sax.SAXException;
  */
 public class EditFileStep extends AbstractStep
 {
-	
-	/** Language Strings **/
+    
+    /** Language Strings **/
     protected static final Message T_head = 
         message("xmlui.Submission.submit.EditFileStep.head");
     protected static final Message T_file = 
@@ -80,55 +80,57 @@ public class EditFileStep extends AbstractStep
         message("xmlui.general.cancel");
 
     /** The bitstream we are editing */
-	private Bitstream bitstream;
+    private Bitstream bitstream;
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
-	
-	/**
-	 * Establish our required parameters, abstractStep will enforce these.
-	 */
-	public EditFileStep()
-	{
-		this.requireSubmission = true;
-		this.requireStep = true;
-	}
-	
-	
-	/**
-	 * Get the bitstream we are editing
-	 */
-	public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) 
-	throws ProcessingException, SAXException, IOException
-	{ 
-		super.setup(resolver,objectModel,src,parameters);
-		
-		//the bitstream should be stored in our Submission Info object
+    
+    /**
+     * Establish our required parameters, abstractStep will enforce these.
+     */
+    public EditFileStep()
+    {
+        this.requireSubmission = true;
+        this.requireStep = true;
+    }
+    
+    
+    /**
+     * Get the bitstream we are editing
+     */
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) 
+        throws ProcessingException, SAXException, IOException
+    { 
+        super.setup(resolver,objectModel,src,parameters);
+        
+        //the bitstream should be stored in our Submission Info object
         this.bitstream = submissionInfo.getBitstream();
-	}
+    }
 
   
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
-		Collection collection = submission.getCollection();
-		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+        Collection collection = submission.getCollection();
+        String actionURL = contextPath + "/handle/" + collection.getHandle()
+            + "/submit/" + knot.getId() + ".continue";
 
-    	// Get the bitstream and all the various formats
-		BitstreamFormat currentFormat = bitstream.getFormat(context);
+        // Get the bitstream and all the various formats
+        BitstreamFormat currentFormat = bitstream.getFormat(context);
         BitstreamFormat guessedFormat = bitstreamFormatService.guessFormat(context, bitstream);
-    	java.util.List<BitstreamFormat> bitstreamFormats = bitstreamFormatService.findNonInternal(context);
-    	
+        java.util.List<BitstreamFormat> bitstreamFormats = bitstreamFormatService.findNonInternal(context);
+        
         UUID itemID = submissionInfo.getSubmissionItem().getItem().getID();
-    	String fileUrl = contextPath + "/bitstream/item/" + itemID + "/" + bitstream.getName();
-    	String fileName = bitstream.getName();
-    	
-    	// Build the form that describes an item.
-    	Division div = body.addInteractiveDivision("submit-edit-file", actionURL, Division.METHOD_POST, "primary submission");
-    	div.setHead(T_submission_head);
-    	addSubmissionProgressList(div);
-    	
-    	List edit = div.addList("submit-edit-file", List.TYPE_FORM);
+        String fileUrl = contextPath + "/bitstream/item/" + itemID + "/" + bitstream.getName();
+        String fileName = bitstream.getName();
+        
+        // Build the form that describes an item.
+        Division div = body.addInteractiveDivision("submit-edit-file", actionURL, Division.METHOD_POST, "primary submission");
+        div.setHead(T_submission_head);
+        addSubmissionProgressList(div);
+        
+        List edit = div.addList("submit-edit-file", List.TYPE_FORM);
         edit.setHead(T_head);    
         
         edit.addLabel(T_file);
@@ -152,8 +154,8 @@ public class EditFileStep extends AbstractStep
         edit.addItem(T_info1);
         if (guessedFormat != null)
         {
-        	edit.addLabel(T_format_detected);
-        	edit.addItem(guessedFormat.getShortDescription());
+            edit.addLabel(T_format_detected);
+            edit.addItem(guessedFormat.getShortDescription());
         }
         
         // System supported formats
@@ -163,31 +165,32 @@ public class EditFileStep extends AbstractStep
         format.addOption(-1,T_format_default);
         for (BitstreamFormat bitstreamFormat : bitstreamFormats)
         {
-        	String supportLevel = "Unknown";
-        	if (bitstreamFormat.getSupportLevel() == BitstreamFormat.KNOWN)
+            String supportLevel = "Unknown";
+            if (bitstreamFormat.getSupportLevel() == BitstreamFormat.KNOWN)
             {
                 supportLevel = "known";
             }
-        	else if (bitstreamFormat.getSupportLevel() == BitstreamFormat.SUPPORTED)
+            else if (bitstreamFormat.getSupportLevel() == BitstreamFormat.SUPPORTED)
             {
                 supportLevel = "Supported";
             }
-        	String name = bitstreamFormat.getShortDescription()+" ("+supportLevel+")";
-        	int id = bitstreamFormat.getID();
+            String name = bitstreamFormat.getShortDescription()
+                + " ("+supportLevel+")";
+            int id = bitstreamFormat.getID();
        
-        	format.addOption(id,name);
+            format.addOption(id,name);
         }
         if (currentFormat != null)
         {
-        	format.setOptionSelected(currentFormat.getID());
+            format.setOptionSelected(currentFormat.getID());
         }
         else if (guessedFormat != null)
         {
-        	format.setOptionSelected(guessedFormat.getID());
+            format.setOptionSelected(guessedFormat.getID());
         }
         else
         {
-        	format.setOptionSelected(-1);
+            format.setOptionSelected(-1);
         }
         
         edit.addItem(T_info2);
@@ -204,7 +207,7 @@ public class EditFileStep extends AbstractStep
         // Note, not standard control actions, this page just goes back to the upload step.
         org.dspace.app.xmlui.wing.element.Item actions = edit.addItem();
         actions.addButton("submit_save").setValue(T_submit_save);
-		actions.addButton("submit_edit_cancel").setValue(T_submit_cancel);
+        actions.addButton("submit_edit_cancel").setValue(T_submit_cancel);
         
     }
     

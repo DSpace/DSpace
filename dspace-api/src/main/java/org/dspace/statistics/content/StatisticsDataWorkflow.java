@@ -149,10 +149,10 @@ public class StatisticsDataWorkflow extends StatisticsData {
 
 
     /**
-     * Retrieve the total counts for the facets (total count is same query but none of the filter queries
+     * Retrieve the total counts for the facets (total count is same query but none of the filter queries).
      * @param typeGenerator the type generator
-     * @return as a key the
-     * @throws org.apache.solr.client.solrj.SolrServerException
+     * @return counts for each facet by name.
+     * @throws org.apache.solr.client.solrj.SolrServerException passed through.
      */
     protected Map<String, Long> getTotalFacetCounts(DatasetTypeGenerator typeGenerator) throws SolrServerException {
         ObjectCount[] objectCounts = solrLoggerService.queryFacetField(getQuery(), null, typeGenerator.getType(), -1, false, null);

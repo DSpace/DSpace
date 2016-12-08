@@ -36,6 +36,7 @@ public class BitstreamEntryGenerator extends DSpaceATOMEntry
      * a bitstream
      *
      * @param service
+     *     SWORD service
      */
     protected BitstreamEntryGenerator(SWORDService service)
     {

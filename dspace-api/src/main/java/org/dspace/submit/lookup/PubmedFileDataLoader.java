@@ -46,14 +46,15 @@ public class PubmedFileDataLoader extends FileDataLoader
                                   // intermediate fields
 
     /**
-	 * 
-	 */
+     * 
+     */
     public PubmedFileDataLoader()
     {
     }
 
     /**
      * @param filename
+     *     Name of file to load CiNii data from.
      */
     public PubmedFileDataLoader(String filename)
     {
@@ -61,9 +62,9 @@ public class PubmedFileDataLoader extends FileDataLoader
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see gr.ekt.bte.core.DataLoader#getRecords()
+     * {@see gr.ekt.bte.core.DataLoader#getRecords()}
+     *
+     * @throws MalformedSourceException 
      */
     @Override
     public RecordSet getRecords() throws MalformedSourceException

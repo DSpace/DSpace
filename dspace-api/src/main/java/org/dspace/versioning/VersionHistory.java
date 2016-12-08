@@ -61,6 +61,8 @@ public class VersionHistory implements ReloadableEntity<Integer> {
      * To keep version number stables we keep information about deleted Versions.
      * {@code org.dspace.versioning.service.VersioningService#getVersionsByHistory(Context, VersionHistory) VersioningService#getVersionsByHistory} filters
      * such versions and returns only active versions.
+     * 
+     * @return list of versions
      */
     protected List<Version> getVersions() {
         return versions;
@@ -104,8 +106,8 @@ public class VersionHistory implements ReloadableEntity<Integer> {
     @Override
     public int hashCode()
     {
-        int hash=7;
-        hash=79*hash+ this.getID();
+        int hash = 7;
+        hash = 79*hash + this.getID();
         return hash;
     }
 

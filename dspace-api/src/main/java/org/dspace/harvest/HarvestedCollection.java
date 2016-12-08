@@ -59,31 +59,31 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     private Date lastHarvested;
 
     @Transient
-	public static final int TYPE_NONE = 0;
+    public static final int TYPE_NONE = 0;
     @Transient
-	public static final int TYPE_DMD = 1;
+    public static final int TYPE_DMD = 1;
     @Transient
-	public static final int TYPE_DMDREF = 2;
+    public static final int TYPE_DMDREF = 2;
     @Transient
-	public static final int TYPE_FULL = 3;
+    public static final int TYPE_FULL = 3;
 
     @Transient
-	public static final int STATUS_READY = 0;
+    public static final int STATUS_READY = 0;
     @Transient
-	public static final int STATUS_BUSY = 1;
+    public static final int STATUS_BUSY = 1;
     @Transient
-	public static final int STATUS_QUEUED = 2;
+    public static final int STATUS_QUEUED = 2;
     @Transient
-	public static final int STATUS_OAI_ERROR = 3;
+    public static final int STATUS_OAI_ERROR = 3;
     @Transient
-	public static final int STATUS_UNKNOWN_ERROR = -1;
+    public static final int STATUS_UNKNOWN_ERROR = -1;
 
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.harvest.service.HarvestedCollectionService#create(Context, Collection)}
      *
      */
-	protected HarvestedCollection()
+    protected HarvestedCollection()
     {
     }
 
@@ -93,32 +93,57 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
 
     /** 
      * A function to set all harvesting-related parameters at once 
+     * @param type
+     *     harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL)
+     * @param oaiSource
+     *     base URL of the OAI-PMH server
+     * @param oaiSetId
+     *     OAI set identifier
+     * @param mdConfigId
+     *     harvest metadata config ID
      */
     public void setHarvestParams(int type, String oaiSource, String oaiSetId, String mdConfigId) {
-   		setHarvestType(type);
-    	setOaiSource(oaiSource);
-    	setOaiSetId(oaiSetId); 
-    	setHarvestMetadataConfig(mdConfigId);
+        setHarvestType(type);
+        setOaiSource(oaiSource);
+        setOaiSetId(oaiSetId); 
+        setHarvestMetadataConfig(mdConfigId);
     }     
 
-    /* Setters for the appropriate harvesting-related columns */
+    /*
+     * Setters for the appropriate harvesting-related columns
+     *
+     * @param type
+     *     harvest type (TYPE_NONE, TYPE_DMD, TYPE_DMDREF, TYPE_FULL
+     */
     public void setHarvestType(int type) {
-    	this.harvestType = type;
+        this.harvestType = type;
     }
     
     /** 
      * Sets the current status of the collection.
      *    
-     * @param	status	a HarvestInstance.STATUS_... constant
+     * @param    status    a HarvestInstance.STATUS_... constant (STATUS_READY, STATUS_BUSY, STATUS_QUEUED, STATUS_OAI_ERROR, STATUS_UNKNOWN_ERROR)
      */
     public void setHarvestStatus(int status) {
-    	this.harvestStatus = status;
+        this.harvestStatus = status;
     }
 
+    /** 
+     * Sets the base URL of the OAI-PMH server.
+     *    
+     * @param oaiSource base URL of the OAI-PMH server
+     *
+     */
     public void setOaiSource(String oaiSource) {
         this.oaiSource = oaiSource;
     }
 
+    /** 
+     * Sets the OAI set to harvest.
+     *    
+     * @param oaiSetId OAI set to harvest
+     *
+     */
     public void setOaiSetId(String oaiSetId) {
         this.oaiSetId = oaiSetId;
     }
@@ -142,7 +167,7 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
 
     /* Getting for the appropriate harvesting-related columns */
     public Collection getCollection() {
-    	return collection;
+        return collection;
     }
 
     void setCollection(Collection collection) {
@@ -150,34 +175,34 @@ public class HarvestedCollection implements ReloadableEntity<Integer>
     }
 
     public int getHarvestType() {
-    	return harvestType;
+        return harvestType;
     }
     
     public int getHarvestStatus() {
-    	return harvestStatus;
+        return harvestStatus;
     }
 
     public String getOaiSource() {
-    	return oaiSource;
+        return oaiSource;
     }
 
     public String getOaiSetId() {
-    	return oaiSetId;
+        return oaiSetId;
     }
 
     public String getHarvestMetadataConfig() {
-    	return metadataConfigId;
+        return metadataConfigId;
     }
     
     public String getHarvestMessage() {
-    	return harvestMessage;
+        return harvestMessage;
     }
 
     public Date getHarvestDate() {
-    	return lastHarvested;
+        return lastHarvested;
     }
     
     public Date getHarvestStartTime() {
-    	return harvestStartTime;
+        return harvestStartTime;
     }
 }

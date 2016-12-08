@@ -23,14 +23,14 @@ public interface MetadataSource {
      * Gets the number of records matching a query
      * @param query the query in string format
      * @return the number of records matching the query
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     public int getNbRecords(String query) throws MetadataSourceException;
     /**
      * Gets the number of records matching a query
      * @param query the query object
      * @return the number of records matching the query
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     public int getNbRecords(Query query) throws MetadataSourceException;
 
@@ -40,7 +40,7 @@ public interface MetadataSource {
      * @param start offset
      * @param count page size
      * @return a collection of fully transformed id's
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     public Collection<ImportRecord> getRecords(String query, int start, int count)throws MetadataSourceException;
 
@@ -48,7 +48,7 @@ public interface MetadataSource {
      *
      * @param query a query object to base the search on.
      * @return a set of records. Fully transformed.
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     public Collection<ImportRecord> getRecords(Query query)throws MetadataSourceException;
 
@@ -56,7 +56,7 @@ public interface MetadataSource {
      * The first match will be returned
      * @param id identifier for the record
      * @return a matching record
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     public ImportRecord getRecord(String id)throws MetadataSourceException;
 
@@ -64,7 +64,7 @@ public interface MetadataSource {
      * The first match will be returned
      * @param query a query matching a single record
      * @return a matching record
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     public ImportRecord getRecord(Query query)throws MetadataSourceException;
 
@@ -78,7 +78,7 @@ public interface MetadataSource {
      * Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
      * @param item an item to base the search on
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
-     * @throws MetadataSourceException if the underlying imports throw any exception.
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     public Collection<ImportRecord> findMatchingRecords(Item item) throws MetadataSourceException;
 
@@ -86,7 +86,7 @@ public interface MetadataSource {
      *  Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
      * @param query a query object to base the search on.
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException passed through.
      */
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException;
 }

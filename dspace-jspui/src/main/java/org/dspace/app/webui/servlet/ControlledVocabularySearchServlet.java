@@ -125,7 +125,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      * @param query
      *            The query expression
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     private void doSearch(Context context, HttpServletRequest request,
             String query) throws IOException, SQLException

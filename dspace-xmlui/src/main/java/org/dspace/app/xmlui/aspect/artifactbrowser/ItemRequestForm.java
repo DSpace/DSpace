@@ -44,10 +44,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Display to the user a simple form letting the user to request a protected item.
- * 
+ *
  * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
  * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
- * 
+ *
  * @author Adán Román Ruiz at arvo.es (added request item support)
  */
 public class ItemRequestForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
@@ -57,16 +57,16 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
     /** Language Strings */
     private static final Message T_title =
         message("xmlui.ArtifactBrowser.ItemRequestForm.title");
-    
+
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-    
+
     private static final Message T_trail =
         message("xmlui.ArtifactBrowser.ItemRequestForm.trail");
-    
-    private static final Message T_head = 
+
+    private static final Message T_head =
         message("xmlui.ArtifactBrowser.ItemRequestForm.head");
-    
+
     private static final Message T_para1 =
         message("xmlui.ArtifactBrowser.ItemRequestForm.para1");
 
@@ -75,53 +75,54 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 
     private static final Message T_login =
             message("xmlui.ArtifactBrowser.ItemRequestForm.login");
-    
+
     private static final Message T_requesterEmail =
         message("xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail");
 
     private static final Message T_requesterEmail_help =
         message("xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail_help");
-    
+
     private static final Message T_requesterEmail_error =
         message("xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail.error");
-    
-    private static final Message T_message = 
+
+    private static final Message T_message =
         message("xmlui.ArtifactBrowser.ItemRequestForm.message");
-    
-    private static final Message T_message_error = 
+
+    private static final Message T_message_error =
         message("xmlui.ArtifactBrowser.ItemRequestForm.message.error");
-    
-    private static final Message T_requesterName = 
+
+    private static final Message T_requesterName =
         message("xmlui.ArtifactBrowser.ItemRequestForm.requesterName");
-    
-    private static final Message T_requesterName_error = 
+
+    private static final Message T_requesterName_error =
         message("xmlui.ArtifactBrowser.ItemRequestForm.requesterName.error");
-    
-    private static final Message T_allFiles = 
+
+    private static final Message T_allFiles =
         message("xmlui.ArtifactBrowser.ItemRequestForm.allFiles");
-    
-    private static final Message T_files = 
+
+    private static final Message T_files =
         message("xmlui.ArtifactBrowser.ItemRequestForm.files");
-    
-    private static final Message T_notAllFiles = 
+
+    private static final Message T_notAllFiles =
         message("xmlui.ArtifactBrowser.ItemRequestForm.notAllFiles");
-    
+
     private static final Message T_submit =
         message("xmlui.ArtifactBrowser.ItemRequestForm.submit");
-    
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-    	
+
         String requesterName = parameters.getParameter("requesterName","");
         String requesterEmail = parameters.getParameter("requesterEmail","");
         String allFiles = parameters.getParameter("allFiles","");
         String message = parameters.getParameter("message","");
         String bitstreamId = parameters.getParameter("bitstreamId","");
-        
-       return HashUtil.hash(requesterName + "-" + requesterEmail + "-" + allFiles +"-"+message+"-"+bitstreamId);
+
+        return HashUtil.hash(requesterName + "-" + requesterEmail + "-"
+            + allFiles + "-" + message + "-" + bitstreamId);
     }
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
@@ -131,35 +132,37 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
     /**
      * Generate the cache validity object.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
         return NOPValidity.SHARED_INSTANCE;
     }
-    
-    
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
-    {       
+
+
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
         pageMeta.addMetadata("title").addContent(T_title);
- 
+
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(T_trail);
     }
 
-	public void addBody(Body body) throws SAXException, WingException,
-			UIException, SQLException, IOException, AuthorizeException {
-		
-		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-		if (!(dso instanceof Item)) {
-			return;
-		}
-		Request request = ObjectModelHelper.getRequest(objectModel);
-		Item item = (Item) dso;
-		// Build the item viewer division.
-		Division itemRequest = body.addInteractiveDivision("itemRequest-form",
-				request.getRequestURI(), Division.METHOD_POST, "primary");
-		itemRequest.setHead(T_head);
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        if (!(dso instanceof Item))
+        {
+            return;
+        }
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        Item item = (Item) dso;
+        // Build the item viewer division.
+        Division itemRequest = body.addInteractiveDivision("itemRequest-form",
+                request.getRequestURI(), Division.METHOD_POST, "primary");
+        itemRequest.setHead(T_head);
 
         // add a login link if user !loggedIn
         if (context.getCurrentUser() == null)
@@ -176,68 +179,81 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 
             // Interrupt this request
             AuthenticationUtil.interruptRequest(objectModel, header, message, characters);
-        } else {
+        }
+        else
+        {
             //If user has read permissions to bitstream, redirect them to bitstream, instead of restrict page
-            try {
+            try
+            {
                 UUID bitstreamID = UUID.fromString(parameters.getParameter("bitstreamId"));
                 Bitstream bitstream = bitstreamService.find(context, bitstreamID);
 
-                if(authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ)) {
-                    String redirectURL = request.getContextPath() + "/bitstream/handle/" + item.getHandle() + "/"
-                            + bitstream.getName() + "?sequence=" + bitstream.getSequenceID();
+                if (authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ))
+                {
+                    String redirectURL = request.getContextPath()
+                        + "/bitstream/handle/" + item.getHandle() + "/"
+                        + bitstream.getName() + "?sequence=" + bitstream.getSequenceID();
 
                     HttpServletResponse httpResponse = (HttpServletResponse)
-                            objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                        objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                     httpResponse.sendRedirect(redirectURL);
                 }
-            } catch (ParameterException e) {
+            }
+            catch (ParameterException e)
+            {
                 log.error(e.getMessage());
             }
         }
 
         itemRequest.addPara(T_para1);
 
-		String titleDC = item.getName();
-		if (titleDC != null && titleDC.length() > 0)
-			itemRequest.addPara(titleDC);
+        String titleDC = item.getName();
+        if (titleDC != null && titleDC.length() > 0)
+        {
+            itemRequest.addPara(titleDC);
+        }
 
-		List form = itemRequest.addList("form", List.TYPE_FORM);
+        List form = itemRequest.addList("form", List.TYPE_FORM);
 
-		Text requesterName = form.addItem().addText("requesterName");
-		requesterName.setLabel(T_requesterName);
-		requesterName.setValue(parameters.getParameter("requesterName", ""));
+        Text requesterName = form.addItem().addText("requesterName");
+        requesterName.setLabel(T_requesterName);
+        requesterName.setValue(parameters.getParameter("requesterName", ""));
 
-		Text requesterEmail = form.addItem().addText("requesterEmail");
-		requesterEmail.setLabel(T_requesterEmail);
-		requesterEmail.setHelp(T_requesterEmail_help);
-		requesterEmail.setValue(parameters.getParameter("requesterEmail", ""));
+        Text requesterEmail = form.addItem().addText("requesterEmail");
+        requesterEmail.setLabel(T_requesterEmail);
+        requesterEmail.setHelp(T_requesterEmail_help);
+        requesterEmail.setValue(parameters.getParameter("requesterEmail", ""));
 
-		Radio radio = form.addItem().addRadio("allFiles");
-		String selected=!parameters.getParameter("allFiles","true").equalsIgnoreCase("false")?"true":"false";
-		radio.setOptionSelected(selected);
-		radio.setLabel(T_files);
-		radio.addOption("true", T_allFiles);
-		radio.addOption("false", T_notAllFiles);
-		
+        Radio radio = form.addItem().addRadio("allFiles");
+        String selected=!parameters.getParameter("allFiles","true").equalsIgnoreCase("false")?"true":"false";
+        radio.setOptionSelected(selected);
+        radio.setLabel(T_files);
+        radio.addOption("true", T_allFiles);
+        radio.addOption("false", T_notAllFiles);
 
-		TextArea message = form.addItem().addTextArea("message");
-		message.setLabel(T_message);
-		message.setValue(parameters.getParameter("message", ""));
-		form.addItem().addHidden("bitstreamId").setValue(parameters.getParameter("bitstreamId", ""));
-		form.addItem().addButton("submit").setValue(T_submit);
-		
-		// if button is pressed and form is re-loaded it means some parameter is missing
-		if(request.getParameter("submit")!=null){
-			if(StringUtils.isEmpty(parameters.getParameter("requesterName", ""))){
-				requesterName.addError(T_requesterName_error);
-			}
-			if(StringUtils.isEmpty(parameters.getParameter("requesterEmail", ""))){
-				requesterEmail.addError(T_requesterEmail_error);
-			}
-			if(StringUtils.isEmpty(parameters.getParameter("message", ""))){
-				message.addError(T_message_error);
-			}
-		}
-		itemRequest.addHidden("page").setValue(parameters.getParameter("page", "unknown"));
-	}
+
+        TextArea message = form.addItem().addTextArea("message");
+        message.setLabel(T_message);
+        message.setValue(parameters.getParameter("message", ""));
+        form.addItem().addHidden("bitstreamId").setValue(parameters.getParameter("bitstreamId", ""));
+        form.addItem().addButton("submit").setValue(T_submit);
+
+        // if button is pressed and form is re-loaded it means some parameter is missing
+        if (request.getParameter("submit") != null)
+        {
+            if (StringUtils.isEmpty(parameters.getParameter("requesterName", "")))
+            {
+                requesterName.addError(T_requesterName_error);
+            }
+            if (StringUtils.isEmpty(parameters.getParameter("requesterEmail", "")))
+            {
+                requesterEmail.addError(T_requesterEmail_error);
+            }
+            if (StringUtils.isEmpty(parameters.getParameter("message", "")))
+            {
+                message.addError(T_message_error);
+            }
+        }
+        itemRequest.addHidden("page").setValue(parameters.getParameter("page", "unknown"));
+    }
 }

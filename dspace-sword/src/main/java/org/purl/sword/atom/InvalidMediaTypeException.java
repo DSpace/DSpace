@@ -14,13 +14,13 @@ package org.purl.sword.atom;
  */
 public class InvalidMediaTypeException extends Exception
 {
-   /**
-    * Create a new instance and store the message. 
-    * 
-    * @param message The exception's message. 
-    */
-   public InvalidMediaTypeException( String message )
-   {
-      super(message);
-   }
+    /**
+     * Create a new instance and store the message. 
+     * 
+     * @param message The exception's message. 
+     */
+    public InvalidMediaTypeException( String message )
+    {
+        super(message);
+    }
 }

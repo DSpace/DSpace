@@ -52,7 +52,7 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
         message("xmlui.general.go");
 
     public static final Message T_untitled =
-    	message("xmlui.general.untitled");
+        message("xmlui.general.untitled");
 
     private static final Message T_head_sub_collections =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections");
@@ -65,7 +65,8 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-        try {
+        try
+        {
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
@@ -93,48 +94,50 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
     public SourceValidity getValidity()
     {
         if (this.validity == null)
-    	{
+        {
             Community community = null;
-	        try {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+            try
+            {
+                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-	            if (dso == null)
+                if (dso == null)
                 {
                     return null;
                 }
 
-	            if (!(dso instanceof Community))
+                if (!(dso instanceof Community))
                 {
                     return null;
                 }
 
-	            community = (Community) dso;
+                community = (Community) dso;
 
-	            DSpaceValidity validity = new DSpaceValidity();
-	            validity.add(context, community);
+                DSpaceValidity validity = new DSpaceValidity();
+                validity.add(context, community);
 
-	            List<Community> subCommunities = community.getSubcommunities();
-	            List<Collection> collections = community.getCollections();
-	            // Sub communities
-	            for (Community subCommunity : subCommunities)
-	            {
-	                validity.add(context, subCommunity);
-	            }
-	            // Sub collections
-	            for (Collection collection : collections)
-	            {
-	                validity.add(context, collection);
-	            }
+                List<Community> subCommunities = community.getSubcommunities();
+                List<Collection> collections = community.getCollections();
+                // Sub communities
+                for (Community subCommunity : subCommunities)
+                {
+                    validity.add(context, subCommunity);
+                }
+                // Sub collections
+                for (Collection collection : collections)
+                {
+                    validity.add(context, collection);
+                }
 
-	            this.validity = validity.complete();
-	        }
-	        catch (Exception e)
-	        {
-	            // Ignore all errors and invalidate the cache.
-	        }
+                this.validity = validity.complete();
+            }
+            catch (Exception e)
+            {
+                // Ignore all errors and invalidate the cache.
+            }
 
-            log.info(LogManager.getHeader(context, "view_community", "community_id=" + (community == null ? "" : community.getID())));
-    	}
+            log.info(LogManager.getHeader(context, "view_community",
+                "community_id=" + (community == null ? "" : community.getID())));
+        }
         return this.validity;
     }
 
@@ -142,9 +145,9 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
     /**
      * Add the community's title and trail links to the page's metadata
      */
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
 
     }
@@ -153,8 +156,9 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
      * Display a single community (and reference any subcommunites or
      * collections)
      */
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -183,12 +187,12 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
 
         {
             Division search = home.addDivision("community-search-browse",
-                    "secondary search-browse");
+                "secondary search-browse");
 
             // Search query
             Division query = search.addInteractiveDivision("community-search",
-                    contextPath + "/handle/" + community.getHandle() + "/discover",
-                    Division.METHOD_POST, "secondary search");
+                contextPath + "/handle/" + community.getHandle() + "/discover",
+                Division.METHOD_POST, "secondary search");
 
             Para para = query.addPara("search-query", null);
             para.addContent(T_full_text_search);
@@ -196,19 +200,18 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
             para.addText("query");
             para.addContent(" ");
             para.addButton("submit").setValue(T_go);
-           //query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);
+//            query.addPara().addXref(contextPath + "/handle/" + community.getHandle() + "/advanced-search", T_advanced_search_link);
 
-            // Browse by list
-       //     Division browseDiv = search.addDivision("community-browse","secondary browse");
-         //   List browse = browseDiv.addList("community-browse", List.TYPE_SIMPLE,
-        //            "community-browse");
-      //      browse.setHead(T_head_browse);
-    //        String url = contextPath + "/handle/" + community.getHandle();
-  //          browse.addItemXref(url + "/browse?type=title",T_browse_titles);
-  //          browse.addItemXref(url + "/browse?type=author",T_browse_authors);
+//            Browse by list
+//            Division browseDiv = search.addDivision("community-browse","secondary browse");
+//            List browse = browseDiv.addList("community-browse", List.TYPE_SIMPLE,
+//                "community-browse");
+//            browse.setHead(T_head_browse);
+//            String url = contextPath + "/handle/" + community.getHandle();
+//            browse.addItemXref(url + "/browse?type=title",T_browse_titles);
+//            browse.addItemXref(url + "/browse?type=author",T_browse_authors);
 //            browse.addItemXref(url + "/browse?type=dateissued",T_browse_dates);
         }
-
     }
 
     /**
@@ -220,7 +223,4 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
         this.validity = null;
         super.recycle();
     }
-
-
-
 }

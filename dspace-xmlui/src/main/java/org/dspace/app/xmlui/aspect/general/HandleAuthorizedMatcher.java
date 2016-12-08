@@ -28,7 +28,7 @@ import org.dspace.core.Context;
  * Test the current URL to see if the user has access to the described
  * resources. The privelege tested against uses the pattern attribute, the
  * possible values are listed in the DSpace Constant class.
- * 
+ *
  * @author Scott Phillips
  * @author Tim Van den Langenbergh
  */
@@ -42,7 +42,7 @@ public class HandleAuthorizedMatcher extends AbstractLogEnabled implements Match
      * Match method to see if the sitemap parameter exists. If it does have a
      * value the parameter added to the array list for later sitemap
      * substitution.
-     * 
+     *
      * @param pattern
      *            name of sitemap parameter to find
      * @param objectModel
@@ -50,55 +50,54 @@ public class HandleAuthorizedMatcher extends AbstractLogEnabled implements Match
      * @return null or map containing value of sitemap parameter 'pattern'
      */
     public Map match(String pattern, Map objectModel, Parameters parameters)
-            throws PatternException
+        throws PatternException
     {
-    	// Are we checking for *NOT* the action or the action.
-    	boolean not = false;
-    	int action = -1; // the action to check
-    	
-    	if (pattern.startsWith("!"))
-    	{
-    		not = true;
-    		pattern = pattern.substring(1);
-    	}
-    	
-    	for (int i=0; i< Constants.actionText.length; i++)
-    	{
-    		if (Constants.actionText[i].equals(pattern))
-    		{
-    			action = i;
-    		}
-    	}
-    	
-    	// Is it a valid action?
-    	if (action < 0 || action >= Constants.actionText.length)
-    	{
-    		getLogger().warn("Invalid action: '"+pattern+"'");
-    		return null;
-    	}
-    	
+        // Are we checking for *NOT* the action or the action.
+        boolean not = false;
+        int action = -1; // the action to check
+
+        if (pattern.startsWith("!"))
+        {
+            not = true;
+            pattern = pattern.substring(1);
+        }
+
+        for (int i=0; i< Constants.actionText.length; i++)
+        {
+            if (Constants.actionText[i].equals(pattern))
+            {
+                action = i;
+            }
+        }
+
+        // Is it a valid action?
+        if (action < 0 || action >= Constants.actionText.length)
+        {
+            getLogger().warn("Invalid action: '"+pattern+"'");
+            return null;
+        }
+
         try
         {
-        	Context context = ContextUtil.obtainContext(objectModel);
+            Context context = ContextUtil.obtainContext(objectModel);
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-            
+
             if (dso == null)
             {
                 return null;
             }
-            
+
             boolean authorized = authorizeService.authorizeActionBoolean(context, dso, action);
 
             // XOR
             if (not ^ authorized)
             {
-            	return new HashMap();
+                return new HashMap();
             }
             else
             {
                 return null;
             }
-
         }
         catch (SQLException sqle)
         {

@@ -24,28 +24,30 @@ public interface BitStoreService
     /**
      * Initialize the asset store
      *
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
-	public void init() throws IOException;
+    public void init() throws IOException;
 
     /**
      * Return an identifier unique to this asset store instance
      * 
      * @return a unique ID
      */
-	public String generateId();
-	
+    public String generateId();
+    
     /**
      * Retrieve the bits for bitstream
      * 
      * @param bitstream
-     *
-     * @exception java.io.IOException
-     *         If a problem occurs while retrieving the bits, or if no
-     *         asset with ID exists in the store
+     *     DSpace Bitstream object
+     * @throws java.io.IOException
+     *     If a problem occurs while retrieving the bits, or if no
+     *     asset with ID exists in the store
      *
      * @return The stream of bits
      */
-	public InputStream get(Bitstream bitstream) throws IOException;
+    public InputStream get(Bitstream bitstream) throws IOException;
 
     /**
      * Store a stream of bits.
@@ -56,37 +58,37 @@ public interface BitStoreService
      * </p>
      *
      * @param bitstream
-     *            The bitstream object
+     *     The bitstream object
      * @param inputStream
-     *            The stream of bits
-     * @exception java.io.IOException
-     *             If a problem occurs while storing the bits
+     *     The stream of bits
+     * @throws java.io.IOException
+     *     If a problem occurs while storing the bits
      */
-	public void put(Bitstream bitstream, InputStream inputStream) throws IOException;
+    public void put(Bitstream bitstream, InputStream inputStream) throws IOException;
 
     /**
      * Obtain technical metadata about an asset in the asset store.
      *
      * @param bitstream
-     *            The bitstream to describe
+     *     The bitstream to describe
      * @param attrs
-     *            A Map whose keys consist of desired metadata fields
+     *     A Map whose keys consist of desired metadata fields
      *
-     * @exception java.io.IOException
-     *            If a problem occurs while obtaining metadata
+     * @throws java.io.IOException
+     *     If a problem occurs while obtaining metadata
      * @return attrs
-     *            A Map with key/value pairs of desired metadata
-     *            If file not found, then return null
+     *     A Map with key/value pairs of desired metadata
+     *     If file not found, then return null
      */
-	public Map about(Bitstream bitstream, Map attrs) throws IOException;
+    public Map about(Bitstream bitstream, Map attrs) throws IOException;
 
     /**
      * Remove an asset from the asset store.
      *
      * @param bitstream
-     *            The bitstream of the asset to delete
-     * @exception java.io.IOException
-     *            If a problem occurs while removing the asset
+     *     The bitstream of the asset to delete
+     * @throws java.io.IOException
+     *     If a problem occurs while removing the asset
      */
-	public void remove(Bitstream bitstream) throws IOException;
+    public void remove(Bitstream bitstream) throws IOException;
 }

@@ -39,13 +39,13 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
 {
 
      /**
-     * Messages to be sent when the user is not authorized to view 
+     * Messages to be sent when the user is not authorized to view
      * a particular bitstream. They will be redirected to the login
      * where this message will be displayed.
      */
-	private static final String AUTH_REQUIRED_HEADER = "xmlui.ItemExportDownloadReader.auth_header";
-	private static final String AUTH_REQUIRED_MESSAGE = "xmlui.ItemExportDownloadReader.auth_message";
-	
+    private static final String AUTH_REQUIRED_HEADER = "xmlui.ItemExportDownloadReader.auth_header";
+    private static final String AUTH_REQUIRED_MESSAGE = "xmlui.ItemExportDownloadReader.auth_message";
+
     /**
      * How big a buffer should we use when reading from the bitstream before
      * writing to the HTTP response?
@@ -69,12 +69,12 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
 
     /** The bitstream file */
     protected InputStream compressedExportInputStream;
-    
+
     /** The compressed export's reported size */
     protected long compressedExportSize;
-    
+
     protected String compressedExportName;
-    
+
     protected ItemExportService itemExportService = ItemExportServiceFactory.getInstance().getItemExportService();
     /**
      * Set up the export reader.
@@ -95,40 +95,42 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
 
             // Get our parameters that identify the bitstream
             String fileName = par.getParameter("fileName", null);
-            
-                
+
+
             // Is there a User logged in and does the user have access to read it?
             if (!itemExportService.canDownload(context, fileName))
             {
-                if(context.getCurrentUser()!=null){
-            		// A user is logged in, but they are not authorized to read this bitstream, 
-            		// instead of asking them to login again we'll point them to a friendly error 
-            		// message that tells them the bitstream is restricted.
-            		String redictURL = request.getContextPath() + "/restricted-resource?name=" + fileName;
+                if (context.getCurrentUser()!=null)
+                {
+                    // A user is logged in, but they are not authorized to read this bitstream,
+                    // instead of asking them to login again we'll point them to a friendly error
+                    // message that tells them the bitstream is restricted.
+                    String redictURL = request.getContextPath() + "/restricted-resource?name=" + fileName;
 
-            		HttpServletResponse httpResponse = (HttpServletResponse) 
-            		objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-            		httpResponse.sendRedirect(redictURL);
-            		return;
-            	}
-            	else{
+                    HttpServletResponse httpResponse = (HttpServletResponse)
+                    objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                    httpResponse.sendRedirect(redictURL);
+                    return;
+                }
+                else
+                {
 
-            		// The user does not have read access to this bitstream. Interrupt this current request
-            		// and then forward them to the login page so that they can be authenticated. Once that is
-            		// successful they will request will be resumed.
-            		AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
+                    // The user does not have read access to this bitstream. Interrupt this current request
+                    // and then forward them to the login page so that they can be authenticated. Once that is
+                    // successful they will request will be resumed.
+                    AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
 
-            		// Redirect
-            		String redictURL = request.getContextPath() + "/login";
+                    // Redirect
+                    String redictURL = request.getContextPath() + "/login";
 
-            		HttpServletResponse httpResponse = (HttpServletResponse) 
-            		objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-            		httpResponse.sendRedirect(redictURL);
-            		return;
-            	}
+                    HttpServletResponse httpResponse = (HttpServletResponse)
+                    objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                    httpResponse.sendRedirect(redictURL);
+                    return;
+                }
             }
-                
-                
+
+
             // Success, bitstream found and the user has access to read it.
             // Store these for later retrieval:
             this.compressedExportInputStream = itemExportService.getExportDownloadInputStream(fileName, context.getCurrentUser());
@@ -138,29 +140,29 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
         catch (Exception e)
         {
             throw new ProcessingException("Unable to read bitstream.",e);
-        } 
+        }
     }
 
-    
+
     /**
-	 * Write the actual data out to the response.
-	 * 
-	 * Some implementation notes:
-	 * 
-	 * 1) We set a short expiration time just in the hopes of preventing someone
-	 * from overloading the server by clicking reload a bunch of times. I
-	 * Realize that this is nowhere near 100% effective but it may help in some
-	 * cases and shouldn't hurt anything.
-	 * 
-	 */
+     * Write the actual data out to the response.
+     * 
+     * Some implementation notes:
+     * 
+     * 1) We set a short expiration time just in the hopes of preventing someone
+     * from overloading the server by clicking reload a bunch of times. I
+     * Realize that this is nowhere near 100% effective but it may help in some
+     * cases and shouldn't hurt anything.
+     * 
+     */
     public void generate() throws IOException, SAXException,
             ProcessingException
     {
-    	if (this.compressedExportInputStream == null)
+        if (this.compressedExportInputStream == null)
         {
             return;
         }
-    	
+
         byte[] buffer = new byte[BUFFER_SIZE];
         int length = -1;
 
@@ -254,21 +256,18 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
      */
     public String getMimeType()
     {
-    	return itemExportService.COMPRESSED_EXPORT_MIME_TYPE;
+        return itemExportService.COMPRESSED_EXPORT_MIME_TYPE;
     }
-    
+
     /**
-	 * Recycle
-	 */
-    public void recycle() {        
+     * Recycle
+     */
+    public void recycle() {
         this.response = null;
         this.request = null;
         this.compressedExportInputStream = null;
         this.compressedExportSize = 0;
         this.compressedExportName = null;
         super.recycle();
-        
     }
-
-
 }

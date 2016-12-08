@@ -9,7 +9,7 @@ package org.dspace.xoai.solr.exceptions;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @SuppressWarnings("serial")
 public class DSpaceSolrException extends Exception

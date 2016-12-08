@@ -25,10 +25,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  * <p>
  * For example:
  * <pre>{@code
- * 		<map:act type="DSpacePropertyFileReader">
- *			<map:parameter name="dspace.dir" value="dspace_dir" />
- *			<map:transform type="Include" src="{dspace_dir}/config/news.xml" /> 
- *		</map:act>
+ *         <map:act type="DSpacePropertyFileReader">
+ *            <map:parameter name="dspace.dir" value="dspace_dir" />
+ *            <map:transform type="Include" src="{dspace_dir}/config/news.xml" /> 
+ *        </map:act>
  * }</pre>
  * Will place the value of the {@code dspace.dir} property in the
  * {@code dspace_dir} variable to be used in the sitemap.
@@ -50,20 +50,21 @@ public class DSpacePropertyFileReader extends AbstractAction {
      * @throws Exception passed through.
      */
     @Override
-	public Map act(Redirector redirector, SourceResolver resolver,
-			Map objectModel, String source, Parameters parameters)
-			throws Exception {
+    public Map act(Redirector redirector, SourceResolver resolver,
+        Map objectModel, String source, Parameters parameters)
+        throws Exception
+    {
 
-		Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<String, String>();
 
-		final String[] parameterNames = parameters.getNames();
-		
-		for (int i = 0; i < parameterNames.length; i++) {
-			final String paramName = parameterNames[i];
-			map.put(parameters.getParameter(paramName),
-					DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(paramName));
-		}
-		
-		return map;
-	}
+        final String[] parameterNames = parameters.getNames();
+        
+        for (int i = 0; i < parameterNames.length; i++) {
+            final String paramName = parameterNames[i];
+            map.put(parameters.getParameter(paramName),
+                DSpaceServicesFactory.getInstance().getConfigurationService().getProperty(paramName));
+        }
+        
+        return map;
+    }
 }

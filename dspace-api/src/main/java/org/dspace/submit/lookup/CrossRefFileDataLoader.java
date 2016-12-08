@@ -46,14 +46,15 @@ public class CrossRefFileDataLoader extends FileDataLoader
                                   // intermediate fields
 
     /**
-	 * 
-	 */
+     * 
+     */
     public CrossRefFileDataLoader()
     {
     }
 
     /**
      * @param filename
+     *     Name of file to load ArXiv data from.
      */
     public CrossRefFileDataLoader(String filename)
     {

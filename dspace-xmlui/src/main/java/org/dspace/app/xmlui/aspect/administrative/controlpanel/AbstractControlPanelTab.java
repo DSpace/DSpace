@@ -23,8 +23,8 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
  */
 public abstract class AbstractControlPanelTab extends AbstractDSpaceTransformer implements Serviceable, Disposable, ControlPanelTab {
 
-    /** 
-     * The service manager allows us to access the continuation's 
+    /**
+     * The service manager allows us to access the continuation's
      * manager.  It is obtained from the Serviceable API
      */
     protected ServiceManager serviceManager;
@@ -48,36 +48,44 @@ public abstract class AbstractControlPanelTab extends AbstractDSpaceTransformer 
      * The Cocoon Persistent Store (used for cache statistics)
      */
     protected Store storePersistent;
-    
-    
+
+
     /**
      * Link of the tab
      */
     protected String web_link;
-	
-	
-	@Override
-	public void service(ServiceManager serviceManager) throws ServiceException {
+
+
+    @Override
+    public void service(ServiceManager serviceManager)
+        throws ServiceException
+    {
         this.serviceManager = serviceManager;
-        
+
         this.settings = (Settings) this.serviceManager.lookup(Settings.ROLE);
-        
-        if(this.serviceManager.hasService(StoreJanitor.ROLE))
+
+        if (this.serviceManager.hasService(StoreJanitor.ROLE))
+        {
             this.storeJanitor = (StoreJanitor) this.serviceManager.lookup(StoreJanitor.ROLE);
-        
+        }
+
         if (this.serviceManager.hasService(Store.ROLE))
+        {
             this.storeDefault = (Store) this.serviceManager.lookup(Store.ROLE);
-        
-        if(this.serviceManager.hasService(Store.PERSISTENT_STORE))
+        }
+
+        if (this.serviceManager.hasService(Store.PERSISTENT_STORE))
+        {
             this.storePersistent = (Store) this.serviceManager.lookup(Store.PERSISTENT_STORE);
-	}
-	
+        }
+    }
+
     /**
      * Release all Cocoon resources.
      * @see org.apache.avalon.framework.activity.Disposable#dispose()
      */
     @Override
-    public void dispose() 
+    public void dispose()
     {
         if (this.serviceManager != null) 
         {
@@ -86,7 +94,7 @@ public abstract class AbstractControlPanelTab extends AbstractDSpaceTransformer 
             this.serviceManager.release(this.storeDefault);
             this.serviceManager.release(this.settings);
             this.storePersistent = null;
-            this.storeJanitor = null; 	
+            this.storeJanitor = null;     
             this.storeDefault = null;
             this.settings = null;
         }
@@ -94,8 +102,7 @@ public abstract class AbstractControlPanelTab extends AbstractDSpaceTransformer 
     }
     
     public void setWebLink(String web_link) {
-    	this.web_link = web_link;
+        this.web_link = web_link;
     }
-
 }
 

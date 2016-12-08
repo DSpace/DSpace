@@ -55,6 +55,8 @@ public class DiscoveryHitHighlightFieldConfiguration
 
     /**
      * Get the maximum number of highlighted snippets to generate per field
+     *
+     * @return maximum number of highlighted snippets to generate per field
      */
     public int getSnippets()
     {

@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class Submissions extends AbstractDSpaceTransformer
 {
-	/** General Language Strings */
+    /** General Language Strings */
     protected static final Message T_title =
         message("xmlui.Submission.Submissions.title");
     protected static final Message T_dspace_home =
@@ -72,7 +72,7 @@ public class Submissions extends AbstractDSpaceTransformer
     protected static final Message T_w_info3 =
         message("xmlui.Submission.Submissions.workflow_info3");
 
-	// Used in the in progress section
+    // Used in the in progress section
     protected static final Message T_p_head1 =
         message("xmlui.Submission.Submissions.progress_head1");
     protected static final Message T_p_info1 =
@@ -109,22 +109,24 @@ public class Submissions extends AbstractDSpaceTransformer
 
 
     @Override
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-	WingException, UIException, SQLException, IOException,
-	AuthorizeException
-	{
-		pageMeta.addMetadata("title").addContent(T_title);
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        pageMeta.addMetadata("title").addContent(T_title);
 
-		pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-		pageMeta.addTrailLink(contextPath + "/submissions",T_trail);
-	}
+        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+        pageMeta.addTrailLink(contextPath + "/submissions",T_trail);
+    }
 
     @Override
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
 
-        Division div = body.addInteractiveDivision("submissions", contextPath+"/submissions", Division.METHOD_POST,"primary");
+        Division div = body.addInteractiveDivision("submissions",
+            contextPath + "/submissions", Division.METHOD_POST, "primary");
         div.setHead(T_head);
 
         this.addWorkflowTasks(div);
@@ -142,28 +144,29 @@ public class Submissions extends AbstractDSpaceTransformer
      *
      * @param division The division to add the two queues too.
      */
-    private void addWorkflowTasks(Division division) throws SQLException, WingException
+    private void addWorkflowTasks(Division division)
+        throws SQLException, WingException
     {
-    	@SuppressWarnings("unchecked") // This cast is correct
-    	List<BasicWorkflowItem> ownedItems = basicWorkflowService.getOwnedTasks(context, context
-                .getCurrentUser());
-    	@SuppressWarnings("unchecked") // This cast is correct.
-    	List<BasicWorkflowItem> pooledItems = basicWorkflowService.getPooledTasks(context, context
-                .getCurrentUser());
+        @SuppressWarnings("unchecked") // This cast is correct
+        List<BasicWorkflowItem> ownedItems = basicWorkflowService.getOwnedTasks(
+            context, context.getCurrentUser());
+        @SuppressWarnings("unchecked") // This cast is correct.
+        List<BasicWorkflowItem> pooledItems = basicWorkflowService.getPooledTasks(
+            context, context.getCurrentUser());
 
-    	if (!(ownedItems.size() > 0 || pooledItems.size() > 0))
-    		// No tasks, so don't show the table.
+        if (!(ownedItems.size() > 0 || pooledItems.size() > 0))
+            // No tasks, so don't show the table.
         {
             return;
         }
 
 
-    	Division workflow = division.addDivision("workflow-tasks");
-    	workflow.setHead(T_w_head1);
-    	workflow.addPara(T_w_info1);
+        Division workflow = division.addDivision("workflow-tasks");
+        workflow.setHead(T_w_head1);
+        workflow.addPara(T_w_info1);
 
-    	// Tasks you own
-    	Table table = workflow.addTable("workflow-tasks",ownedItems.size() + 2,5);
+        // Tasks you own
+        Table table = workflow.addTable("workflow-tasks",ownedItems.size() + 2,5);
         table.setHead(T_w_head2);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_w_column1);
@@ -174,63 +177,64 @@ public class Submissions extends AbstractDSpaceTransformer
 
         if (ownedItems.size() > 0)
         {
-        	for (BasicWorkflowItem owned : ownedItems)
-        	{
-        		int workflowItemID = owned.getID();
-        		String collectionUrl = contextPath + "/handle/" + owned.getCollection().getHandle();
-        		String ownedWorkflowItemUrl = contextPath + "/handle/" + owned.getCollection().getHandle() + "/workflow?workflowID=" + workflowItemID;
-        		String title = owned.getItem().getName();
-        		String collectionName = owned.getCollection().getName();
-        		EPerson submitter = owned.getSubmitter();
-        		String submitterName = submitter.getFullName();
-        		String submitterEmail = submitter.getEmail();
+            for (BasicWorkflowItem owned : ownedItems)
+            {
+                int workflowItemID = owned.getID();
+                String collectionUrl = contextPath + "/handle/"
+                    + owned.getCollection().getHandle();
+                String ownedWorkflowItemUrl = contextPath + "/handle/"
+                    + owned.getCollection().getHandle()
+                    + "/workflow?workflowID=" + workflowItemID;
+                String title = owned.getItem().getName();
+                String collectionName = owned.getCollection().getName();
+                EPerson submitter = owned.getSubmitter();
+                String submitterName = submitter.getFullName();
+                String submitterEmail = submitter.getEmail();
 
-        		Message state = getWorkflowStateMessage(owned);
+                Message state = getWorkflowStateMessage(owned);
 
-        		Row row = table.addRow();
+                Row row = table.addRow();
 
-        		CheckBox remove = row.addCell().addCheckBox("workflowID");
-	        	remove.setLabel("selected");
-	        	remove.addOption(workflowItemID);
+                CheckBox remove = row.addCell().addCheckBox("workflowID");
+                remove.setLabel("selected");
+                remove.addOption(workflowItemID);
 
-        		// The task description
-	        	row.addCell().addXref(ownedWorkflowItemUrl, state);
+                // The task description
+                row.addCell().addXref(ownedWorkflowItemUrl, state);
 
-        		// The item description
-        		if (StringUtils.isNotBlank(title))
-        		{
-        			String displayTitle = title;
-        			if (displayTitle.length() > 50)
+                // The item description
+                if (StringUtils.isNotBlank(title))
+                {
+                    String displayTitle = title;
+                    if (displayTitle.length() > 50)
                     {
                         displayTitle = displayTitle.substring(0, 50) + " ...";
                     }
-        			row.addCell().addXref(ownedWorkflowItemUrl, displayTitle);
-        		}
-        		else
+                    row.addCell().addXref(ownedWorkflowItemUrl, displayTitle);
+                }
+                else
                 {
                     row.addCell().addXref(ownedWorkflowItemUrl, T_untitled);
                 }
 
-        		// Submitted too
-        		row.addCell().addXref(collectionUrl, collectionName);
+                // Submitted too
+                row.addCell().addXref(collectionUrl, collectionName);
 
-        		// Submitted by
-	        	Cell cell = row.addCell();
-	        	cell.addContent(T_email);
-	        	cell.addXref("mailto:"+submitterEmail,submitterName);
-        	}
+                // Submitted by
+                Cell cell = row.addCell();
+                cell.addContent(T_email);
+                cell.addXref("mailto:"+submitterEmail,submitterName);
+            }
 
-        	Row row = table.addRow();
- 	    	row.addCell(0,5).addButton("submit_return_tasks").setValue(T_w_submit_return);
+            Row row = table.addRow();
+             row.addCell(0,5).addButton("submit_return_tasks").setValue(T_w_submit_return);
 
         }
         else
         {
-        	Row row = table.addRow();
-        	row.addCell(0,5).addHighlight("italic").addContent(T_w_info2);
+            Row row = table.addRow();
+            row.addCell(0,5).addHighlight("italic").addContent(T_w_info2);
         }
-
-
 
 
         // Tasks in the pool
@@ -247,63 +251,64 @@ public class Submissions extends AbstractDSpaceTransformer
         if (pooledItems.size() > 0)
         {
 
-        	for (BasicWorkflowItem pooled : pooledItems)
-        	{
-        		int workflowItemID = pooled.getID();
-        		String collectionUrl = contextPath + "/handle/" + pooled.getCollection().getHandle();
-        		String pooledItemUrl = contextPath + "/handle/" + pooled.getCollection().getHandle() + "/workflow?workflowID=" + workflowItemID;
-        		String title = pooled.getItem().getName();
-        		String collectionName = pooled.getCollection().getName();
-        		EPerson submitter = pooled.getSubmitter();
-        		String submitterName = submitter.getFullName();
-        		String submitterEmail = submitter.getEmail();
+            for (BasicWorkflowItem pooled : pooledItems)
+            {
+                int workflowItemID = pooled.getID();
+                String collectionUrl = contextPath + "/handle/" + pooled.getCollection().getHandle();
+                String pooledItemUrl = contextPath + "/handle/" + pooled.getCollection().getHandle() + "/workflow?workflowID=" + workflowItemID;
+                String title = pooled.getItem().getName();
+                String collectionName = pooled.getCollection().getName();
+                EPerson submitter = pooled.getSubmitter();
+                String submitterName = submitter.getFullName();
+                String submitterEmail = submitter.getEmail();
 
-        		Message state = getWorkflowStateMessage(pooled);
+                Message state = getWorkflowStateMessage(pooled);
 
 
-        		Row row = table.addRow();
+                Row row = table.addRow();
 
-        		CheckBox remove = row.addCell().addCheckBox("workflowID");
-	        	remove.setLabel("selected");
-	        	remove.addOption(workflowItemID);
+                CheckBox remove = row.addCell().addCheckBox("workflowID");
+                remove.setLabel("selected");
+                remove.addOption(workflowItemID);
 
-        		// The task description
-	        	row.addCell().addXref(pooledItemUrl, state);
+                // The task description
+                row.addCell().addXref(pooledItemUrl, state);
 
-        		// The item description
-        		if (StringUtils.isNotBlank(title))
-        		{
-        			String displayTitle = title;
-        			if (displayTitle.length() > 50)
+                // The item description
+                if (StringUtils.isNotBlank(title))
+                {
+                    String displayTitle = title;
+                    if (displayTitle.length() > 50)
                     {
                         displayTitle = displayTitle.substring(0, 50) + " ...";
                     }
 
-        			row.addCell().addXref(pooledItemUrl, displayTitle);
-        		}
-        		else
+                    row.addCell().addXref(pooledItemUrl, displayTitle);
+                }
+                else
                 {
                     row.addCell().addXref(pooledItemUrl, T_untitled);
                 }
 
-        		// Submitted too
-        		row.addCell().addXref(collectionUrl, collectionName);
+                // Submitted too
+                row.addCell().addXref(collectionUrl, collectionName);
 
-        		// Submitted by
-        		Cell cell = row.addCell();
-	        	cell.addContent(T_email);
-	        	cell.addXref("mailto:"+submitterEmail,submitterName);
+                // Submitted by
+                Cell cell = row.addCell();
+                cell.addContent(T_email);
+                cell.addXref("mailto:"+submitterEmail,submitterName);
 
-        	}
-        	Row row = table.addRow();
- 	    	row.addCell(0,5).addButton("submit_take_tasks").setValue(T_w_submit_take);
+            }
+            Row row = table.addRow();
+             row.addCell(0,5).addButton("submit_take_tasks").setValue(T_w_submit_take);
         }
         else
         {
-        	Row row = table.addRow();
-        	row.addCell(0,5).addHighlight("italic").addContent(T_w_info3);
+            Row row = table.addRow();
+            row.addCell(0,5).addHighlight("italic").addContent(T_w_info3);
         }
     }
+
 
     /**
      * There are two options, the user has some unfinished submissions
@@ -316,33 +321,36 @@ public class Submissions extends AbstractDSpaceTransformer
      * presented listing all the unfinished submissions that this user has.
      *
      */
-    private void addUnfinishedSubmissions(Division division) throws SQLException, WingException
+    private void addUnfinishedSubmissions(Division division)
+        throws SQLException, WingException
     {
-        division.addInteractiveDivision("unfinished-submisions", contextPath+"/submit", Division.METHOD_POST);
-
+        division.addInteractiveDivision("unfinished-submisions",
+            contextPath + "/submit", Division.METHOD_POST);
     }
+
 
     /**
      * This section lists all the submissions that this user has submitted which are currently under review.
      *
      * If the user has none, this nothing is displayed.
      */
-    private void addSubmissionsInWorkflow(Division division) throws SQLException, WingException
+    private void addSubmissionsInWorkflow(Division division)
+        throws SQLException, WingException
     {
-    	List<BasicWorkflowItem> inprogressItems = basicWorkflowItemService.findBySubmitter(context, context.getCurrentUser());
+        List<BasicWorkflowItem> inprogressItems = basicWorkflowItemService.findBySubmitter(context, context.getCurrentUser());
 
-    	// If there is nothing in progress then don't add anything.
-    	if (!(inprogressItems.size() > 0))
+        // If there is nothing in progress then don't add anything.
+        if (!(inprogressItems.size() > 0))
         {
             return;
         }
 
-    	Division inprogress = division.addDivision("submissions-inprogress");
-    	inprogress.setHead(T_p_head1);
-    	inprogress.addPara(T_p_info1);
+        Division inprogress = division.addDivision("submissions-inprogress");
+        inprogress.setHead(T_p_head1);
+        inprogress.addPara(T_p_info1);
 
 
-    	Table table = inprogress.addTable("submissions-inprogress",inprogressItems.size()+1,3);
+        Table table = inprogress.addTable("submissions-inprogress",inprogressItems.size()+1,3);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_p_column1);
         header.addCellContent(T_p_column2);
@@ -353,36 +361,33 @@ public class Submissions extends AbstractDSpaceTransformer
         {
             String title = workflowItem.getItem().getName();
             String collectionName = workflowItem.getCollection().getName();
-        	Message state = getWorkflowStateMessage(workflowItem);
+            Message state = getWorkflowStateMessage(workflowItem);
 
 
-        	Row row = table.addRow();
+            Row row = table.addRow();
 
-        	// Add the title column
-        	if (title.length() > 0)
-        	{
-        		String displayTitle = title;
-    			if (displayTitle.length() > 50)
+            // Add the title column
+            if (title.length() > 0)
+            {
+                String displayTitle = title;
+                if (displayTitle.length() > 50)
                 {
                     displayTitle = displayTitle.substring(0, 50) + " ...";
                 }
-        		row.addCellContent(displayTitle);
-        	}
-        	else
+                row.addCellContent(displayTitle);
+            }
+            else
             {
                 row.addCellContent(T_untitled);
             }
 
-        	// Collection name column
-        	row.addCellContent(collectionName);
+            // Collection name column
+            row.addCellContent(collectionName);
 
-        	// Status column
-        	row.addCellContent(state);
+            // Status column
+            row.addCellContent(state);
         }
     }
-
-
-
 
 
     /**
@@ -392,27 +397,27 @@ public class Submissions extends AbstractDSpaceTransformer
      */
     private Message getWorkflowStateMessage(BasicWorkflowItem workflowItem)
     {
-		switch (workflowItem.getState())
-		{
-			case BasicWorkflowService.WFSTATE_SUBMIT:
-				return T_status_0;
-			case BasicWorkflowService.WFSTATE_STEP1POOL:
-				return T_status_1;
-    		case BasicWorkflowService.WFSTATE_STEP1:
-    			return T_status_2;
-    		case BasicWorkflowService.WFSTATE_STEP2POOL:
-    			return T_status_3;
-    		case BasicWorkflowService.WFSTATE_STEP2:
-    			return T_status_4;
-    		case BasicWorkflowService.WFSTATE_STEP3POOL:
-    			return T_status_5;
-    		case BasicWorkflowService.WFSTATE_STEP3:
-    			return T_status_6;
-    		case BasicWorkflowService.WFSTATE_ARCHIVE:
-    			return T_status_7;
-   			default:
-   				return T_status_unknown;
-		}
+        switch (workflowItem.getState())
+        {
+            case BasicWorkflowService.WFSTATE_SUBMIT:
+                return T_status_0;
+            case BasicWorkflowService.WFSTATE_STEP1POOL:
+                return T_status_1;
+            case BasicWorkflowService.WFSTATE_STEP1:
+                return T_status_2;
+            case BasicWorkflowService.WFSTATE_STEP2POOL:
+                return T_status_3;
+            case BasicWorkflowService.WFSTATE_STEP2:
+                return T_status_4;
+            case BasicWorkflowService.WFSTATE_STEP3POOL:
+                return T_status_5;
+            case BasicWorkflowService.WFSTATE_STEP3:
+                return T_status_6;
+            case BasicWorkflowService.WFSTATE_ARCHIVE:
+                return T_status_7;
+               default:
+                   return T_status_unknown;
+        }
     }
 
     /**
@@ -425,9 +430,8 @@ public class Submissions extends AbstractDSpaceTransformer
      * @param division div to put archived submissions in
      */
     private void addPreviousSubmissions(Division division)
-            throws SQLException,WingException
+        throws SQLException,WingException
     {
         division.addDivision("completed-submissions");
-
     }
 }

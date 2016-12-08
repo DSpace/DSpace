@@ -85,6 +85,8 @@ public class SwordContext
      * Returns the most appropriate context for operations on the
      * database.  This is the on-behalf-of user's context if the
      * user exists, or the authenticated user's context otherwise.
+     *
+     * @return appropriate DSpace context
      */
     public Context getContext()
     {
@@ -104,6 +106,8 @@ public class SwordContext
      * getContext()
      *
      * on this class instead.
+     *
+     * @return DSpace context of the user who authenticated
      */
     public Context getAuthenticatorContext()
     {
@@ -123,6 +127,8 @@ public class SwordContext
      *
      * on this class instead.  If there is no on-behalf-of user, this
      * method will return null.
+     *
+     * @return DSpace context of the on-behalf-of user
      */
     public Context getOnBehalfOfContext()
     {
@@ -160,6 +166,7 @@ public class SwordContext
      * when using the sword api.
      *
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public void commit()
             throws DSpaceSwordException

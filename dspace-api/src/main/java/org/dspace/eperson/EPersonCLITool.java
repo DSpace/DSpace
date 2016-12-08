@@ -45,6 +45,15 @@ public class EPersonCLITool {
 
     /**
      * Tool for manipulating user accounts.
+     *
+     * @param argv the command line arguments given
+     * @throws ParseException
+     *     Base for Exceptions thrown during parsing of a command-line.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public static void main(String argv[])
             throws ParseException, SQLException, AuthorizeException {

@@ -47,7 +47,7 @@ public class Step {
     private Workflow workflow;
     private int requiredUsers;
 
-    public Step(String id, Workflow workflow, Role role, UserSelectionActionConfig userSelectionMethod, List<String> actionConfigsList, Map<Integer, String> outcomes, int requiredUsers){
+    public Step(String id, Workflow workflow, Role role, UserSelectionActionConfig userSelectionMethod, List<String> actionConfigsList, Map<Integer, String> outcomes, int requiredUsers) {
         this.actionConfigsMap = new HashMap<>();
         this.outcomes = outcomes;
         this.userSelectionMethod = userSelectionMethod;
@@ -61,9 +61,9 @@ public class Step {
     }
 
     public WorkflowActionConfig getActionConfig(String actionID) {
-        if(actionConfigsMap.get(actionID)!=null){
+        if (actionConfigsMap.get(actionID)!=null) {
             return actionConfigsMap.get(actionID);
-        }else{
+        } else {
             WorkflowActionConfig action = xmlWorkflowFactory.createWorkflowActionConfig(actionID);
             action.setStep(this);
             actionConfigsMap.put(actionID, action);
@@ -75,7 +75,7 @@ public class Step {
      * Boolean that returns whether or not the actions in this step have a ui
      * @return a boolean
      */
-    public boolean hasUI(){
+    public boolean hasUI() {
         for (String actionConfigId : actionConfigsList) {
             WorkflowActionConfig actionConfig = getActionConfig(actionConfigId);
             if (actionConfig.requiresUI()) {
@@ -102,9 +102,9 @@ public class Step {
 
     public WorkflowActionConfig getNextAction(WorkflowActionConfig currentAction) {
         int index = actionConfigsList.indexOf(currentAction.getId());
-        if(index < actionConfigsList.size()-1){
+        if (index < actionConfigsList.size()-1) {
             return getActionConfig(actionConfigsList.get(index+1));
-        }else{
+        } else {
             return null;
         }
     }
@@ -120,14 +120,19 @@ public class Step {
 
     /**
      * Check if enough users have finished this step for it to continue
-     * @param wfi the workflow item to check
+     * @param c
+     *     The relevant DSpace Context.
+     * @param wfi
+     *     the workflow item to check
      * @return if enough users have finished this task
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public boolean isFinished(Context c, XmlWorkflowItem wfi) throws SQLException {
         return inProgressUserService.getNumberOfFinishedUsers(c, wfi) == requiredUsers;
     }
 
-    public int getRequiredUsers(){
+    public int getRequiredUsers() {
         return requiredUsers;
     }
 
@@ -135,6 +140,6 @@ public class Step {
         return role;
     }
 
-//    public boolean skipStep(){
+//    public boolean skipStep() {
 //    }
 }

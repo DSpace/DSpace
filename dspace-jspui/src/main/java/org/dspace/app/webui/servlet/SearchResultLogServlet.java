@@ -26,8 +26,8 @@ import org.dspace.usage.UsageEvent;
 import org.dspace.usage.UsageSearchEvent;
 
 /**
- * Every time a user clicks on a search result he will be redirected through this servlet
- * this servlet will retrieve all query information & store this for the search statistics
+ * Every time a user clicks on a search result he will be redirected through this servlet.
+ * This servlet will retrieve all query information and store it for the search statistics
  * Once everything has been stored the user will be
  * redirected to the dso he clicked on (indicated by the redirectUrl parameter)
  *
@@ -37,7 +37,7 @@ import org.dspace.usage.UsageSearchEvent;
  */
 public class SearchResultLogServlet extends DSpaceServlet
 {
-	private final transient HandleService handleService
+    private final transient HandleService handleService
             = HandleServiceFactory.getInstance().getHandleService();
 
     @Override
@@ -57,16 +57,16 @@ public class SearchResultLogServlet extends DSpaceServlet
                 result,
                 Arrays.asList(request.getParameterValues("query")), scope);
 
-        if(!StringUtils.isBlank(request.getParameter("rpp"))){
+        if (!StringUtils.isBlank(request.getParameter("rpp"))) {
             searchEvent.setRpp(Integer.parseInt(request.getParameter("rpp")));
         }
-        if(!StringUtils.isBlank(request.getParameter("sort_by"))){
+        if (!StringUtils.isBlank(request.getParameter("sort_by"))) {
             searchEvent.setSortBy(request.getParameter("sort_by"));
         }
-        if(!StringUtils.isBlank(request.getParameter("order"))){
+        if (!StringUtils.isBlank(request.getParameter("order"))) {
             searchEvent.setSortOrder(request.getParameter("order"));
         }
-        if(!StringUtils.isBlank(request.getParameter("page"))){
+        if (!StringUtils.isBlank(request.getParameter("page"))) {
             searchEvent.setPage(Integer.parseInt(request.getParameter("page")));
         }
 

@@ -120,8 +120,8 @@ public class Utils
     /**
      * Performs a buffered copy from one file into another.
      * 
-     * @param inFile
-     * @param outFile
+     * @param inFile input file
+     * @param outFile output file
      * @throws IOException if IO error
      */
     public static void copy(File inFile, File outFile) throws IOException

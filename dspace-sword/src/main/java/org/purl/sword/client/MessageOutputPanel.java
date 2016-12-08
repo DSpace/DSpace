@@ -65,79 +65,79 @@ public class MessageOutputPanel extends JPanel
 implements ActionListener 
 {
    
-   /**
-    * The text area that displays the messages. 
-    */
-   private JTextArea messages = null; 
-   
-   /**
-    * Create a new instance and initialise the panel.
-    */
-   public MessageOutputPanel()
-   {
-      super();
-      
-      setLayout(new GridBagLayout());
-      
-      messages = new JTextArea();
-      
-      JScrollPane detailsPane = new JScrollPane(messages, 
+    /**
+     * The text area that displays the messages. 
+     */
+    private JTextArea messages = null; 
+    
+    /**
+     * Create a new instance and initialise the panel.
+     */
+    public MessageOutputPanel()
+    {
+        super();
+        
+        setLayout(new GridBagLayout());
+        
+        messages = new JTextArea();
+        
+        JScrollPane detailsPane = new JScrollPane(messages, 
             JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, 
             JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-      JButton clearButton = new JButton("Clear");
-      clearButton.addActionListener(this);
-      
-      //add components and set constraints
-      //dpc = details pane constraint
-      GridBagConstraints dpc = new GridBagConstraints();
-      dpc.gridx = 0;
-      dpc.gridy = 0;
-      dpc.fill = GridBagConstraints.BOTH;
-      dpc.weightx = 0.75;
-      dpc.weighty = 0.45;
-      dpc.gridwidth = 2;
-      dpc.insets = new Insets(5,5,5,5);
-      add(detailsPane,dpc);
-      
-      //cbc = clear button constraint
-      GridBagConstraints cbc = new GridBagConstraints();
-      cbc.gridx = 1;
-      cbc.gridy = 1;
-      cbc.insets = new Insets(0,0,5,5);
-      cbc.anchor = GridBagConstraints.LINE_END;
-      add(clearButton,cbc);
-      
-   }
-   
-   /**
-    * Add a message to the text area. The message will be added with a carriage return. 
-    *  
-    * @param message The message. 
-    */
-   public void addMessage(String message)
-   {
-      messages.insert(message + "\n", messages.getDocument().getLength());
-   }
-   
-   /**
-    * Add a single character to the text area. 
-    * 
-    * @param character The character. 
-    */
-   public void addCharacter(Character character)
-   {
-      messages.insert(character.toString(), messages.getDocument().getLength());
-   }
-   
-   /**
-    * Clear the text from the display. 
-    * 
-    * @param arg0 The action event. 
-    * 
-    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-    */
-   public void actionPerformed(ActionEvent arg0)
-   {
-      messages.setText("");
-   }
+        JButton clearButton = new JButton("Clear");
+        clearButton.addActionListener(this);
+        
+        //add components and set constraints
+        //dpc = details pane constraint
+        GridBagConstraints dpc = new GridBagConstraints();
+        dpc.gridx = 0;
+        dpc.gridy = 0;
+        dpc.fill = GridBagConstraints.BOTH;
+        dpc.weightx = 0.75;
+        dpc.weighty = 0.45;
+        dpc.gridwidth = 2;
+        dpc.insets = new Insets(5,5,5,5);
+        add(detailsPane,dpc);
+        
+        //cbc = clear button constraint
+        GridBagConstraints cbc = new GridBagConstraints();
+        cbc.gridx = 1;
+        cbc.gridy = 1;
+        cbc.insets = new Insets(0,0,5,5);
+        cbc.anchor = GridBagConstraints.LINE_END;
+        add(clearButton,cbc);
+       
+    }
+    
+    /**
+     * Add a message to the text area. The message will be added with a carriage return. 
+     *  
+     * @param message The message. 
+     */
+    public void addMessage(String message)
+    {
+        messages.insert(message + "\n", messages.getDocument().getLength());
+    }
+    
+    /**
+     * Add a single character to the text area. 
+     * 
+     * @param character The character. 
+     */
+    public void addCharacter(Character character)
+    {
+        messages.insert(character.toString(), messages.getDocument().getLength());
+    }
+    
+    /**
+     * Clear the text from the display. 
+     * 
+     * @param arg0 The action event. 
+     * 
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
+    public void actionPerformed(ActionEvent arg0)
+    {
+        messages.setText("");
+    }
 }

@@ -109,6 +109,7 @@ public class RDFizer {
      * </p>
      * 
      * @param context 
+     *     The relevant DSpace Context.
      */
     protected void overrideContext(Context context)
     {
@@ -118,6 +119,7 @@ public class RDFizer {
     /**
      * Returns whether all converted data is printed to stdout. Turtle will be
      * used as serialization.
+     *
      * @return {@code true} if print all generated data is to be printed to stdout
      */
     public boolean isStdout() {
@@ -128,7 +130,9 @@ public class RDFizer {
      * Set this to true to print all generated data to stdout. The data will be
      * stored as well, unless {@code dryrun} is set true. Turtle will be used
      * as serialization.
+     *
      * @param stdout 
+     *     if {@code true}, print all data to standard output
      */
     public void setStdout(boolean stdout) {
         this.stdout = stdout;
@@ -137,6 +141,7 @@ public class RDFizer {
     /**
      * Returns whether verbose information is printed to System.err. Probably 
      * this is helpful for CLI only.
+     *
      * @return {@code true} if verbose mode is on
      */
     public boolean isVerbose() {
@@ -146,7 +151,9 @@ public class RDFizer {
     /**
      * Set this to true to print verbose information to System.err. Probably 
      * this is helpful for CLI only.
+     *
      * @param verbose 
+     *     print verbose information to stderr
      */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
@@ -154,6 +161,7 @@ public class RDFizer {
 
     /**
      * Returns whether this is a dry run. Probably this is helpful for CLI only.
+     *
      * @return {@code true} if dry-run mode is on
      */
     public boolean isDryrun() {
@@ -163,7 +171,9 @@ public class RDFizer {
     /**
      * Set this true to prevent any changes on the triple store. Probably this 
      * is helpful for CLI usage only.
+     *
      * @param dryrun 
+     *     test run without any changes to the triple store
      */
     public void setDryrun(boolean dryrun) {
         this.dryrun = dryrun;
@@ -176,7 +186,9 @@ public class RDFizer {
     public void deleteAll()
     {
         report("Sending delete command to the triple store.");
-        if (!this.dryrun) storage.deleteAll();
+        if (!this.dryrun) {
+            storage.deleteAll();
+        }
         report("Deleted all data from the triplestore.");
     }
     
@@ -184,17 +196,24 @@ public class RDFizer {
      * Delete the data about the DSpaceObject from the triplestore.
      * All data about descendent Subcommunities, Collections and Items will be 
      * deleted as well.
+     *
+     * @param dso
+     *     DSpace object
+     * @param reset
+     *      reset processed status (converted or deleted from the triplestore)
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public void delete(DSpaceObject dso, boolean reset)
-            throws SQLException
+    throws SQLException
     {
         if (dso.getType() != Constants.SITE
-                && dso.getType() != Constants.COMMUNITY
-                && dso.getType() != Constants.COLLECTION
-                && dso.getType() != Constants.ITEM)
+            && dso.getType() != Constants.COMMUNITY
+            && dso.getType() != Constants.COLLECTION
+            && dso.getType() != Constants.ITEM)
         {
             throw new IllegalArgumentException(contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso)
-                    + " is currently not supported as independent entity.");
+                + " is currently not supported as independent entity.");
         }
 
         if (dso.getType() == Constants.SITE)
@@ -205,19 +224,19 @@ public class RDFizer {
         Callback callback = new Callback() {
             @Override
             protected void callback(DSpaceObject dso)
-                    throws SQLException
+                throws SQLException
             {
                 String identifier = RDFUtil.generateIdentifier(context, dso);
                 
                 if (StringUtils.isEmpty(identifier))
                 {
                     System.err.println("Cannot determine RDF URI for " 
-                            + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + "(handle " 
-                            + dso.getHandle() + ")" + ", skipping. Please "
-                            + "delete it specifying the RDF URI.");
+                        + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + "(handle " 
+                        + dso.getHandle() + ")" + ", skipping. Please "
+                        + "delete it specifying the RDF URI.");
                     log.error("Cannot detgermine RDF URI for " 
-                            + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + "(handle "
-                            + dso.getHandle() + ")" + ", skipping deletion.");
+                        + contentServiceFactory.getDSpaceObjectService(dso).getTypeText(dso) + " " + dso.getID() + "(handle "
+                        + dso.getHandle() + ")" + ", skipping deletion.");
                     return;
                 }
                 
@@ -234,9 +253,12 @@ public class RDFizer {
     /**
      * Converts and stores all DSpaceObjects that are readable for an anonymous 
      * user.
+     *
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public void convertAll()
-            throws SQLException
+        throws SQLException
     {
         report("Starting conversion of all DSpaceItems, this may take a while...");
         this.convert(contentServiceFactory.getSiteService().findSite(context), true);
@@ -244,7 +266,7 @@ public class RDFizer {
     }
     
     protected void convert(DSpaceObject dso, boolean reset)
-            throws SQLException
+    throws SQLException
     {
         if (dso.getType() != Constants.SITE
                 && dso.getType() != Constants.COMMUNITY
@@ -258,7 +280,7 @@ public class RDFizer {
         Callback callback = new Callback() {
             @Override
             protected void callback(DSpaceObject dso)
-                    throws SQLException
+            throws SQLException
             {
                 Model converted = null;
                 try
@@ -320,7 +342,7 @@ public class RDFizer {
     }
     
     protected void dspaceDFS(DSpaceObject dso, Callback callback, boolean check, boolean reset)
-            throws SQLException
+    throws SQLException
     {
         if (dso.getType() != Constants.SITE
                 && dso.getType() != Constants.COMMUNITY
@@ -810,6 +832,6 @@ public class RDFizer {
     protected abstract class Callback
     {
         protected abstract void callback(DSpaceObject dso)
-                throws SQLException;
+        throws SQLException;
     }
 }

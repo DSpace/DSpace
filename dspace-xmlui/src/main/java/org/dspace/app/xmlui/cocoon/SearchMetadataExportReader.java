@@ -50,15 +50,15 @@ import org.dspace.discovery.*;
  * result metadata using MetadataExport.
  */
 public class SearchMetadataExportReader extends AbstractReader implements Recyclable
-{	
-     /**
-     * Messages to be sent when the user is not authorized to view 
+{
+    /**
+     * Messages to be sent when the user is not authorized to view
      * a particular bitstream. They will be redirected to the login
      * where this message will be displayed.
      */
-	private static final String AUTH_REQUIRED_HEADER = "xmlui.ItemExportDownloadReader.auth_header";
-	private static final String AUTH_REQUIRED_MESSAGE = "xmlui.ItemExportDownloadReader.auth_message";
-	
+    private static final String AUTH_REQUIRED_HEADER = "xmlui.ItemExportDownloadReader.auth_header";
+    private static final String AUTH_REQUIRED_MESSAGE = "xmlui.ItemExportDownloadReader.auth_message";
+
     /**
      * How big a buffer should we use when reading from the bitstream before
      * writing to the HTTP response?
@@ -69,7 +69,7 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
      * When should a download expire in milliseconds. This should be set to
      * some low value just to prevent someone hitting DSpace repeatedly from
      * killing the server. Note: there are 60000 milliseconds in a minute.
-     * 
+     *
      * Format: minutes * seconds * milliseconds
      */
     protected static final int expires = 60 * 60 * 60000;
@@ -79,18 +79,18 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
 
     /** The Cocoon request */
     protected Request request;
-    
-    
+
+
     private static Logger log = Logger.getLogger(SearchMetadataExportReader.class);
-    
-    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();    
+
+    private AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     private HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     private DSpaceCSV csv = null;
     private String filename = null;
-    
+
     private SimpleSearch simpleSearch = null;
-    
+
     /**
      * Set up the export reader.
      * See the class description for information on configuration options.
@@ -111,32 +111,35 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
 
         try
         {
-        	this.request = ObjectModelHelper.getRequest(objectModel);
-        	this.response = ObjectModelHelper.getResponse(objectModel);
-        	
-        	String query = request.getParameter("query");
-        	String scope = request.getParameter("scope");
-        	String filters = request.getParameter("filters");
-        	       	 
+            this.request = ObjectModelHelper.getRequest(objectModel);
+            this.response = ObjectModelHelper.getResponse(objectModel);
+
+            String query = request.getParameter("query");
+            String scope = request.getParameter("scope");
+            String filters = request.getParameter("filters");
+
             Context context = ContextUtil.obtainContext(objectModel);
-            
+
             String search_export_config = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.search.metadata_export");
-            
-            
-            if(search_export_config.equals("admin")) {            	
-            	if(!authorizeService.isAdmin(context)) {
+
+            if (search_export_config.equals("admin"))
+            {
+                if (!authorizeService.isAdmin(context))
+                {
                     /*
                      * Auth should be done by MetadataExport -- pass context through
                      * we should just be catching exceptions and displaying errors here
                      */
-                    if(AuthenticationUtil.isLoggedIn(request)) {
-                    	String redictURL = request.getContextPath() + "/restricted-resource";
+                    if (AuthenticationUtil.isLoggedIn(request))
+                    {
+                        String redictURL = request.getContextPath() + "/restricted-resource";
                         HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                		httpResponse.sendRedirect(redictURL);
-                		return;
+                        httpResponse.sendRedirect(redictURL);
+                        return;
                     }
-                    else {
-                    	String redictURL = request.getContextPath() + "/login";
+                    else
+                    {
+                        String redictURL = request.getContextPath() + "/login";
                         AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
                         HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                         httpResponse.sendRedirect(redictURL);
@@ -144,39 +147,41 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
                     }
                 }
             }
-            else if(search_export_config.equals("user")) {
-            	if(!AuthenticationUtil.isLoggedIn(request)) {            		
-                	String redictURL = request.getContextPath() + "/login";
+            else if (search_export_config.equals("user"))
+            {
+                if (!AuthenticationUtil.isLoggedIn(request))
+                {
+                    String redictURL = request.getContextPath() + "/login";
                     AuthenticationUtil.interruptRequest(objectModel, AUTH_REQUIRED_HEADER, AUTH_REQUIRED_MESSAGE, null);
                     HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                     httpResponse.sendRedirect(redictURL);
                     return;
                 }
             }
-            
+
             simpleSearch = new SimpleSearch();
-            
+
             csv = exportMetadata(context, objectModel, query, scope, filters);
             filename = "search-results.csv";
-            
+
         }
         catch (RuntimeException e) {
-            throw e;    
+            throw e;
         }
         catch (IOException e) {
-        	throw new ProcessingException("Unable to export metadata.",e);
+            throw new ProcessingException("Unable to export metadata.",e);
         }
         catch (Exception e) {
             throw new ProcessingException("Unable to read bitstream.",e);
-        } 
+        }
     }
-    
+
     /**
-	 * Write the CSV.
+     * Write the CSV.
      * @throws java.io.IOException passed through.
      * @throws org.xml.sax.SAXException passed through.
      * @throws org.apache.cocoon.ProcessingException passed through.
-	 */
+     */
     @Override
     public void generate() throws IOException, SAXException, ProcessingException
     {
@@ -186,16 +191,16 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
         out.flush();
         out.close();
     }
-    
+
     /**
-	 * Recycle
-	 */
+     * Recycle
+     */
     @Override
-    public void recycle() {        
+    public void recycle() {
         this.response = null;
         this.request = null;
     }
-    
+
     /**
      * Save and return the search results as a CSV file.
      * 
@@ -213,73 +218,77 @@ public class SearchMetadataExportReader extends AbstractReader implements Recycl
     public DSpaceCSV exportMetadata(Context context, Map objectModel, String query, String scopeString, String filters)
             throws IOException, UIException, SearchServiceException, SQLException
     {
-    	DiscoverResult qResults = new DiscoverResult();
-    	
-    	DiscoverQuery qArgs = new DiscoverQuery();
-    	    	
-    	 // Are we in a community or collection?
+        DiscoverResult qResults = new DiscoverResult();
+
+        DiscoverQuery qArgs = new DiscoverQuery();
+
+         // Are we in a community or collection?
         DSpaceObject scope;
-    	
-    	if(scopeString != null && scopeString.length() > 0) {
-    		scopeString = scopeString.replace("~", "/");
-    		// Get the search scope from the location parameter
-    		scope = handleService.resolveToObject(context, scopeString);
-    	}
-    	else {
-    		// get the search scope from the url handle
-        	scope = HandleUtil.obtainHandle(objectModel);
-    	}
-    	
-    	
+
+        if (scopeString != null && scopeString.length() > 0)
+        {
+            scopeString = scopeString.replace("~", "/");
+            // Get the search scope from the location parameter
+            scope = handleService.resolveToObject(context, scopeString);
+        }
+        else
+        {
+            // get the search scope from the url handle
+            scope = HandleUtil.obtainHandle(objectModel);
+        }
+
+
         // set the object model on the simple search object
         simpleSearch.objectModel = objectModel;
-        
+
         String[] fqs = filters != null ? filters.split(",") : new String[0];
-        
+
         // prepare query from SimpleSearch object
         qArgs = simpleSearch.prepareQuery(scope, query, fqs);
-                
+
         // no paging required
         qArgs.setStart(0);
-                
+
         // some arbitrary value for first search
         qArgs.setMaxResults(10);
-                
+
         // search once to get total search results
         qResults = SearchUtils.getSearchService().search(context, scope, qArgs);
-                	        	
+
         // set max results to total search results
-        qArgs.setMaxResults(safeLongToInt(qResults.getTotalSearchResults()));        	        	
-        
+        qArgs.setMaxResults(safeLongToInt(qResults.getTotalSearchResults()));
+
         // search again to return all search results
         qResults = SearchUtils.getSearchService().search(context, scope, qArgs);
-        
-    	// Get a list of found items
-        ArrayList<Item> items = new ArrayList<Item>();        
-        for (DSpaceObject resultDSO : qResults.getDspaceObjects()) {
-            if (resultDSO instanceof Item) {
+
+        // Get a list of found items
+        ArrayList<Item> items = new ArrayList<Item>();
+        for (DSpaceObject resultDSO : qResults.getDspaceObjects())
+        {
+            if (resultDSO instanceof Item)
+            {
                 items.add((Item) resultDSO);
             }
-        } 
-        
+        }
+
         // Log the attempt
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
 
         MetadataExport exporter = new MetadataExport(context, items.iterator(), false);
-        
+
         // Perform the export
         DSpaceCSV csv = exporter.export();
 
         log.info(LogManager.getHeader(context, "metadataexport", "exported_file:search-results.csv"));
-        
+
         return csv;
     }
-    
+
     public static int safeLongToInt(long l) {
-        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE)
+        {
             throw new IllegalArgumentException(l + " cannot be cast to int.");
         }
         return (int) l;
     }
-    
 }

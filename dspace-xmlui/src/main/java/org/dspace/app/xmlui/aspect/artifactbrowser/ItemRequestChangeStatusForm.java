@@ -32,10 +32,10 @@ import org.xml.sax.SAXException;
 
 /**
  * Display to the user a form to request change of permissions of a item.
- * 
+ *
  * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
  * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
- * 
+ *
  * @author Adán Román Ruiz at arvo.es (added request item support)
  */
 public class ItemRequestChangeStatusForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
@@ -43,40 +43,40 @@ public class ItemRequestChangeStatusForm extends AbstractDSpaceTransformer imple
     /** Language Strings */
     private static final Message T_title =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.title");
-    
+
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-    
+
     private static final Message T_trail =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.trail");
-    
-    private static final Message T_head = 
+
+    private static final Message T_head =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.head");
-    
+
     private static final Message T_para1 =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.para1");
-    
-    private static final Message T_name = 
+
+    private static final Message T_name =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name");
-    
-    private static final Message T_email = 
+
+    private static final Message T_email =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email");
-    
-    private static final Message T_name_error = 
+
+    private static final Message T_name_error =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name.error");
-    
-    private static final Message T_email_error = 
+
+    private static final Message T_email_error =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email.error");
-    
+
     private static final Message T_changeToOpen =
         message("xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.changeToOpen");
-    
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-        
+
         String token = parameters.getParameter("token","");
         String name = parameters.getParameter("name","");
         String email = parameters.getParameter("email","");
@@ -88,24 +88,25 @@ public class ItemRequestChangeStatusForm extends AbstractDSpaceTransformer imple
     /**
      * Generate the cache validity object.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
         return NOPValidity.SHARED_INSTANCE;
     }
-    
-    
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
-    {       
+
+
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
         pageMeta.addMetadata("title").addContent(T_title);
- 
+
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(T_trail);
     }
 
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -114,27 +115,30 @@ public class ItemRequestChangeStatusForm extends AbstractDSpaceTransformer imple
         Division itemRequest = body.addInteractiveDivision("itemRequest-form",
                 request.getRequestURI(),Division.METHOD_POST,"primary");
         itemRequest.setHead(T_head);
-        
+
         itemRequest.addPara(T_para1);
-                
+
         List form = itemRequest.addList("form",List.TYPE_FORM);
-        
+
         Text name = form.addItem().addText("name");
         name.setLabel(T_name);
         name.setValue(parameters.getParameter("name",""));
-        
+
         Text mail = form.addItem().addText("email");
         mail.setLabel(T_email);
         mail.setValue(parameters.getParameter("email",""));
-        
-        if(request.getParameter("openAccess")!=null){
-			if(StringUtils.isEmpty(parameters.getParameter("name", ""))){
-				name.addError(T_name_error);
-			}
-			if(StringUtils.isEmpty(parameters.getParameter("email", ""))){
-				mail.addError(T_email_error);
-			}
-		}
+
+        if (request.getParameter("openAccess") != null)
+        {
+            if (StringUtils.isEmpty(parameters.getParameter("name", "")))
+            {
+                name.addError(T_name_error);
+            }
+            if (StringUtils.isEmpty(parameters.getParameter("email", "")))
+            {
+                mail.addError(T_email_error);
+            }
+        }
        // mail.setValue(parameters.getParameter("mail",""));
         form.addItem().addHidden("isSent").setValue("true");
         form.addItem().addButton("openAccess").setValue(T_changeToOpen);

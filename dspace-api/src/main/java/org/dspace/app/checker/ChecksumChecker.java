@@ -53,25 +53,25 @@ public final class ChecksumChecker
     /**
      * Command line access to the checksum package.
      * 
-     * @param args
-     *            <dl>
-     *            <dt>-h</dt>
-     *            <dd>Print help on command line options</dd>
-     *            <dt>-l</dt>
-     *            <dd>loop through bitstreams once</dd>
-     *            <dt>-L</dt>
-     *            <dd>loop continuously through bitstreams</dd>
-     *            <dt>-d</dt>
-     *            <dd>specify duration of process run</dd>
-     *            <dt>-b</dt>
-     *            <dd>specify bitstream IDs</dd>
-     *            <dt>-a [handle_id]</dt>
-     *            <dd>check anything by handle</dd>
-     *            <dt>-e</dt>
-     *            <dd>Report only errors in the logs</dd>
-     *            <dt>-p</dt>
-     *            <dd>Don't prune results before running checker</dd>
-     *            </dl>
+     * <dl>
+     *   <dt>-h</dt>
+     *   <dd>Print help on command line options</dd>
+     *   <dt>-l</dt>
+     *   <dd>loop through bitstreams once</dd>
+     *   <dt>-L</dt>
+     *   <dd>loop continuously through bitstreams</dd>
+     *   <dt>-d</dt>
+     *   <dd>specify duration of process run</dd>
+     *   <dt>-b</dt>
+     *   <dd>specify bitstream IDs</dd>
+     *   <dt>-a [handle_id]</dt>
+     *   <dd>check anything by handle</dd>
+     *   <dt>-e</dt>
+     *   <dd>Report only errors in the logs</dd>
+     *   <dt>-p</dt>
+     *   <dd>Don't prune results before running checker</dd>
+     * </dl>
+     * @param args the command line arguments given
      * @throws SQLException if error
      */
     public static void main(String[] args) throws SQLException {
@@ -84,7 +84,7 @@ public final class ChecksumChecker
 
         options.addOption("l", "looping", false, "Loop once through bitstreams");
         options.addOption("L", "continuous", false,
-                "Loop continuously through bitstreams");
+            "Loop continuously through bitstreams");
         options.addOption("h", "help", false, "Help");
         options.addOption("d", "duration", true, "Checking duration");
         options.addOption("c", "count", true, "Check count");
@@ -92,19 +92,18 @@ public final class ChecksumChecker
         options.addOption("v", "verbose", false, "Report all processing");
 
         OptionBuilder.withArgName("bitstream-ids").hasArgs().withDescription(
-                "Space separated list of bitstream ids");
+            "Space separated list of bitstream ids");
         Option useBitstreamIds = OptionBuilder.create('b');
 
         options.addOption(useBitstreamIds);
 
         options.addOption("p", "prune", false, "Prune configuration file");
-        options
-                .addOption(OptionBuilder
-                        .withArgName("prune")
-                        .hasOptionalArgs(1)
-                        .withDescription(
-                                "Prune old results (optionally using specified properties file for configuration)")
-                        .create('p'));
+        options.addOption(OptionBuilder
+            .withArgName("prune")
+            .hasOptionalArgs(1)
+            .withDescription(
+                "Prune old results (optionally using specified properties file for configuration)")
+            .create('p'));
 
         try
         {
@@ -233,7 +232,7 @@ public final class ChecksumChecker
             context.complete();
             context = null;
         } finally {
-            if(context != null){
+            if (context != null) {
                 context.abort();
             }
         }
@@ -249,19 +248,15 @@ public final class ChecksumChecker
         HelpFormatter myhelp = new HelpFormatter();
 
         myhelp.printHelp("Checksum Checker\n", options);
-        System.out
-                .println("\nSpecify a duration for checker process, using s(seconds),"
-                        + "m(minutes), or h(hours): ChecksumChecker -d 30s"
-                        + " OR ChecksumChecker -d 30m"
-                        + " OR ChecksumChecker -d 2h");
-        System.out
-                .println("\nSpecify bitstream IDs: ChecksumChecker -b 13 15 17 20");
+        System.out.println("\nSpecify a duration for checker process, using s(seconds),"
+            + "m(minutes), or h(hours): ChecksumChecker -d 30s"
+            + " OR ChecksumChecker -d 30m"
+            + " OR ChecksumChecker -d 2h");
+        System.out.println("\nSpecify bitstream IDs: ChecksumChecker -b 13 15 17 20");
         System.out.println("\nLoop once through all bitstreams: "
-                + "ChecksumChecker -l");
-        System.out
-                .println("\nLoop continuously through all bitstreams: ChecksumChecker -L");
-        System.out
-                .println("\nCheck a defined number of bitstreams: ChecksumChecker -c 10");
+            + "ChecksumChecker -l");
+        System.out.println("\nLoop continuously through all bitstreams: ChecksumChecker -L");
+        System.out.println("\nCheck a defined number of bitstreams: ChecksumChecker -c 10");
         System.out.println("\nReport all processing (verbose)(default reports only errors): ChecksumChecker -v");
         System.out.println("\nDefault (no arguments) is equivalent to '-c 1'");
         System.exit(0);

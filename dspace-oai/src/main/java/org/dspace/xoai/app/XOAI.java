@@ -69,7 +69,7 @@ import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 
 /**
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 @SuppressWarnings("deprecation")
 public class XOAI {

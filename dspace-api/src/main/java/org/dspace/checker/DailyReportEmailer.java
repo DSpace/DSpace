@@ -67,7 +67,7 @@ public class DailyReportEmailer
     public void sendReport(File attachment, int numberOfBitstreams) 
             throws IOException, javax.mail.MessagingException 
     { 
-        if(numberOfBitstreams > 0)
+        if (numberOfBitstreams > 0)
         {
             String hostname = ConfigurationManager.getProperty("dspace.hostname");
             Email email = new Email();
@@ -83,22 +83,22 @@ public class DailyReportEmailer
      * Allows users to have email sent to them. The default is to send all
      * reports in one email
      * 
-     * @param args
-     *            <dl>
-     *            <dt>-h</dt>
-     *            <dd>help</dd>
-     *            <dt>-d</dt>
-     *            <dd>Select deleted bitstreams</dd>
-     *            <dt>-m</dt>
-     *            <dd>Bitstreams missing from assetstore</dd>
-     *            <dt>-c</dt>
-     *            <dd>Bitstreams whose checksums were changed</dd>
-     *            <dt>-n</dt>
-     *            <dd>Bitstreams whose checksums were changed</dd>
-     *            <dt>-a</dt>
-     *            <dd>Send all reports in one email</dd>
-     *            </dl>
+     * <dl>
+     *   <dt>-h</dt>
+     *   <dd>help</dd>
+     *   <dt>-d</dt>
+     *   <dd>Select deleted bitstreams</dd>
+     *   <dt>-m</dt>
+     *   <dd>Bitstreams missing from assetstore</dd>
+     *   <dt>-c</dt>
+     *   <dd>Bitstreams whose checksums were changed</dd>
+     *   <dt>-n</dt>
+     *   <dd>Bitstreams whose checksums were changed</dd>
+     *   <dt>-a</dt>
+     *   <dd>Send all reports in one email</dd>
+     * </dl>
      * 
+     * @param args the command line arguments given
      */
     public static void main(String[] args)
     {
@@ -110,26 +110,18 @@ public class DailyReportEmailer
         Options options = new Options();
 
         options.addOption("h", "help", false, "Help");
-        options
-                .addOption("d", "Deleted", false,
-                        "Send E-mail report for all bitstreams set as deleted for today");
-        options
-                .addOption("m", "Missing", false,
-                        "Send E-mail report for all bitstreams not found in assetstore for today");
-        options
-                .addOption(
-                        "c",
-                        "Changed",
-                        false,
-                        "Send E-mail report for all bitstreams where checksum has been changed for today");
-        options.addOption("a", "All", false, "Send all E-mail reports");
-
+        options.addOption("d", "Deleted", false,
+            "Send E-mail report for all bitstreams set as deleted for today");
+        options.addOption("m", "Missing", false,
+            "Send E-mail report for all bitstreams not found in assetstore for today");
+        options.addOption("c", "Changed", false,
+            "Send E-mail report for all bitstreams where checksum has been changed for today");
+        options.addOption("a", "All", false,
+            "Send all E-mail reports");
         options.addOption("u", "Unchecked", false,
-                "Send the Unchecked bitstream report");
-
-        options
-                .addOption("n", "Not Processed", false,
-                        "Send E-mail report for all bitstreams set to longer be processed for today");
+            "Send the Unchecked bitstream report");
+        options.addOption("n", "Not Processed", false,
+            "Send E-mail report for all bitstreams set to longer be processed for today");
 
         try
         {
@@ -147,19 +139,11 @@ public class DailyReportEmailer
             HelpFormatter myhelp = new HelpFormatter();
 
             myhelp.printHelp("Checksum Reporter\n", options);
-            System.out
-                    .println("\nSend Deleted bitstream email report: DailyReportEmailer -d");
-            System.out
-                    .println("\nSend Missing bitstreams email report: DailyReportEmailer -m");
-            System.out
-                    .println("\nSend Checksum Changed email report: DailyReportEmailer -c");
-
-            System.out
-                    .println("\nSend bitstream not to be processed email report: DailyReportEmailer -n");
-
-            System.out
-                    .println("\nSend Un-checked bitstream report: DailyReportEmailer -u");
-
+            System.out.println("\nSend Deleted bitstream email report: DailyReportEmailer -d");
+            System.out.println("\nSend Missing bitstreams email report: DailyReportEmailer -m");
+            System.out.println("\nSend Checksum Changed email report: DailyReportEmailer -c");
+            System.out.println("\nSend bitstream not to be processed email report: DailyReportEmailer -n");
+            System.out.println("\nSend Un-checked bitstream report: DailyReportEmailer -u");
             System.out.println("\nSend All email reports: DailyReportEmailer");
             System.exit(0);
         }
@@ -201,34 +185,24 @@ public class DailyReportEmailer
             else
             {
                 throw new IllegalStateException("directory :" + dirLocation
-                        + " does not exist");
+                    + " does not exist");
             }
 
             writer = new FileWriter(report);
 
             if ((line.hasOption("a")) || (line.getOptions().length == 0))
             {
-                writer
-                        .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
-                numBitstreams += reporter.getDeletedBitstreamReport(context, yesterday,
-                        tomorrow, writer);
-                writer
-                        .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getChangedChecksumReport(context, yesterday,
-                        tomorrow, writer);
-                writer
-                        .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getBitstreamNotFoundReport(context, yesterday,
-                        tomorrow, writer);
-                writer
-                        .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
-                numBitstreams += reporter.getNotToBeProcessedReport(context, yesterday,
-                        tomorrow, writer);
-                writer
-                        .write("\n--------------------------------- Report Spacer ---------------------------\n\n");
+                writer.write("\n--------------------------------- Begin Reporting ------------------------\n\n");
+                numBitstreams += reporter.getDeletedBitstreamReport(context, yesterday, tomorrow, writer);
+                writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
+                numBitstreams += reporter.getChangedChecksumReport(context, yesterday, tomorrow, writer);
+                writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
+                numBitstreams += reporter.getBitstreamNotFoundReport(context, yesterday, tomorrow, writer);
+                writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
+                numBitstreams += reporter.getNotToBeProcessedReport(context, yesterday, tomorrow, writer);
+                writer.write("\n--------------------------------- Report Spacer ---------------------------\n\n");
                 numBitstreams += reporter.getUncheckedBitstreamsReport(context, writer);
-                writer
-                        .write("\n--------------------------------- End Report ---------------------------\n\n");
+                writer.write("\n--------------------------------- End Report ---------------------------\n\n");
                 writer.flush();
                 writer.close();
                 emailer.sendReport(report, numBitstreams);
@@ -237,10 +211,9 @@ public class DailyReportEmailer
             {
                 if (line.hasOption("d"))
                 {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
+                    writer.write("\n--------------------------------- Begin Reporting ------------------------\n\n");
                     numBitstreams += reporter.getDeletedBitstreamReport(context,
-                            yesterday, tomorrow, writer);
+                        yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
                     emailer.sendReport(report, numBitstreams);
@@ -248,10 +221,9 @@ public class DailyReportEmailer
 
                 if (line.hasOption("m"))
                 {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
+                    writer.write("\n--------------------------------- Begin Reporting ------------------------\n\n");
                     numBitstreams += reporter.getBitstreamNotFoundReport(context,
-                            yesterday, tomorrow, writer);
+                        yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
                     emailer.sendReport(report, numBitstreams);
@@ -259,10 +231,9 @@ public class DailyReportEmailer
 
                 if (line.hasOption("c"))
                 {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
+                    writer.write("\n--------------------------------- Begin Reporting ------------------------\n\n");
                     numBitstreams += reporter.getChangedChecksumReport(context,
-                            yesterday, tomorrow, writer);
+                        yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
                     emailer.sendReport(report, numBitstreams);
@@ -270,10 +241,9 @@ public class DailyReportEmailer
 
                 if (line.hasOption("n"))
                 {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
+                    writer.write("\n--------------------------------- Begin Reporting ------------------------\n\n");
                     numBitstreams += reporter.getNotToBeProcessedReport(context,
-                            yesterday, tomorrow, writer);
+                        yesterday, tomorrow, writer);
                     writer.flush();
                     writer.close();
                     emailer.sendReport(report, numBitstreams);
@@ -281,10 +251,9 @@ public class DailyReportEmailer
 
                 if (line.hasOption("u"))
                 {
-                    writer
-                            .write("\n--------------------------------- Begin Reporting ------------------------\n\n");
+                    writer.write("\n--------------------------------- Begin Reporting ------------------------\n\n");
                     numBitstreams += reporter
-                            .getUncheckedBitstreamsReport(context, writer);
+                        .getUncheckedBitstreamsReport(context, writer);
                     writer.flush();
                     writer.close();
                     emailer.sendReport(report, numBitstreams);
@@ -294,9 +263,10 @@ public class DailyReportEmailer
         catch (MessagingException | SQLException | IOException e)
         {
             log.fatal(e);
-        } finally
+        }
+        finally
         {
-            if(context != null && context.isValid())
+            if (context != null && context.isValid())
             {
                 context.abort();
             }

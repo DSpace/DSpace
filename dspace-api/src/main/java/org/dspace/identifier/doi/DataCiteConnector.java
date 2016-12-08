@@ -747,9 +747,12 @@ implements DOIConnector
     }
     
     /**
+     * Internal method to send requests prepared by the caller to DataCite.
      * 
      * @param req
+     *     Extended version of the HttpRequest interface that provides convenience methods to access request properties such as request URI and method type.
      * @param doi
+     *     DOI string to operate on
      * @return response from DataCite
      * @throws DOIIdentifierException if DOI error
      */

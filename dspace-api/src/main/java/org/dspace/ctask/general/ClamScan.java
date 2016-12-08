@@ -156,6 +156,9 @@ public class ClamScan extends AbstractCurationTask
     /** openSession
      *
      * This method opens a session.
+     *
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
 
     protected void openSession() throws IOException

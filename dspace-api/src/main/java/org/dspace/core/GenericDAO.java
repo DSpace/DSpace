@@ -33,6 +33,7 @@ public interface GenericDAO<T>
      * Fetch all persisted instances of a given object type.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param clazz the desired type.
      * @return list of DAOs of the same type as clazz
      * @throws SQLException if database error
@@ -43,6 +44,7 @@ public interface GenericDAO<T>
      * Execute a JPQL query returning a unique result.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param query JPQL query string
      * @return a DAO specified by the query string
      * @throws SQLException if database error
@@ -57,6 +59,7 @@ public interface GenericDAO<T>
      * Execute a JPQL query and return a collection of results.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param query JPQL query string
      * @return list of DAOs specified by the query string
      * @throws SQLException if database error

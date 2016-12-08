@@ -311,7 +311,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     /**
      * Returns object's metadata in MODS format, as List of XML structure nodes.
      * @param context context
-     * @throws org.dspace.content.crosswalk.CrosswalkException
+     * @throws CrosswalkException if crosswalk error
      * @throws IOException if IO error
      * @throws SQLException if database error
      * @throws AuthorizeException if authorization error

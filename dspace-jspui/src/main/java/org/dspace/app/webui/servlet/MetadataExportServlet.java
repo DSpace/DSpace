@@ -54,14 +54,21 @@ public class MetadataExportServlet extends DSpaceServlet
     /**
      * Respond to a post request
      *
-     * @param context a DSpace Context object
-     * @param request the HTTP request
-     * @param response the HTTP response
-     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param request
+     *     Servlet's HTTP request object.
+     * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     protected void doDSPost(Context context, HttpServletRequest request,

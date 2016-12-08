@@ -236,239 +236,239 @@ public class EditProfile extends AbstractDSpaceTransformer
     }
     
     
-   public void addBody(Body body) throws WingException, SQLException
-   {
-       // Log that we are viewing a profile
-       log.info(LogManager.getHeader(context, "view_profile", ""));
-
-       Request request = ObjectModelHelper.getRequest(objectModel);
-       
-       String defaultFirstName="",defaultLastName="",defaultPhone="";
-       String defaultLanguage=null;
-       if (request.getParameter("submit") != null)
-       {
-           defaultFirstName = request.getParameter("first_name");
-           defaultLastName = request.getParameter("last_name");
-           defaultPhone = request.getParameter("phone");
-           defaultLanguage = request.getParameter("language");
-       }
-       else if (eperson != null)
-       {
-            defaultFirstName = eperson.getFirstName();
-            defaultLastName = eperson.getLastName();
-            defaultPhone = ePersonService.getMetadata(eperson, "phone");
-            defaultLanguage = eperson.getLanguage();
-       }
-       
-       String action = contextPath;
-       if (registering)
-       {
-           action += "/register";
-       }
-       else
-       {
-           action += "/profile";
-       }
-       
-       
-       
-       
-       Division profile = body.addInteractiveDivision("information",
-               action,Division.METHOD_POST,"primary");
-       
-       if (registering)
-       {
-           profile.setHead(T_head_create);
-       }
-       else
-       {
-           profile.setHead(T_head_update);
-       }
-       
-       // Add the progress list if we are registering a new user
-       if (registering)
-       {
-           EPersonUtils.registrationProgressList(profile, 2);
-       }
-       
-       
-       
-       
-       
-       List form = profile.addList("form",List.TYPE_FORM);
-       
-       List identity = form.addList("identity",List.TYPE_FORM);
-       identity.setHead(T_head_identify);
-       
-       // Email
-       identity.addLabel(T_email_address);
-       identity.addItem(email);
-       
-       // First name
-       Text firstName = identity.addItem().addText("first_name");
-       firstName.setAutofocus("autofocus");
-       firstName.setRequired();
-       firstName.setLabel(T_first_name);
-       firstName.setValue(defaultFirstName);
-       if (errors.contains("first_name"))
-       {
-           firstName.addError(T_error_required);
-       }
-       if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
-       {
-           firstName.setDisabled();
-       }
-       
-       // Last name
-       Text lastName = identity.addItem().addText("last_name");
-       lastName.setRequired();
-       lastName.setLabel(T_last_name);
-       lastName.setValue(defaultLastName);
-       if (errors.contains("last_name"))
-       {
-           lastName.addError(T_error_required);
-       }
-       if (!registering &&!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
-       {
-           lastName.setDisabled();
-       }
-       
-       // Phone
-       Text phone = identity.addItem().addText("phone");
-       phone.setLabel(T_telephone);
-       phone.setValue(defaultPhone);
-       if (errors.contains("phone"))
-       {
-           phone.addError(T_error_required);
-       }
-       if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
-       {
-           phone.setDisabled();
-       }
+    public void addBody(Body body) throws WingException, SQLException
+    {
+        // Log that we are viewing a profile
+        log.info(LogManager.getHeader(context, "view_profile", ""));
+ 
+        Request request = ObjectModelHelper.getRequest(objectModel);
         
-       // Language
-       Select lang = identity.addItem().addSelect("language");
-       lang.setLabel(T_language);
-       if (supportedLocales.length > 0)
-       {
-           for (Locale lc : supportedLocales)
-           {
-               lang.addOption(lc.toString(), lc.getDisplayName());
-           }
-       }
-       else
-       {
-           lang.addOption(I18nUtil.DEFAULTLOCALE.toString(), I18nUtil.DEFAULTLOCALE.getDisplayName());
-       }
-       lang.setOptionSelected((defaultLanguage == null || defaultLanguage.equals("")) ?
-                              I18nUtil.DEFAULTLOCALE.toString() : defaultLanguage);
-       if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
-       {
-           lang.setDisabled();
-       }
-
-       // Subscriptions
-       if (!registering)
-       {
-           List subscribe = form.addList("subscriptions",List.TYPE_FORM);
-           subscribe.setHead(T_subscriptions);
-           
-           subscribe.addItem(T_subscriptions_help);
-           
-           java.util.List<Subscription> currentList = subscribeService.getSubscriptions(context, context.getCurrentUser());
-           java.util.List<Collection> possibleList = collectionService.findAll(context);
-           
-           Select subscriptions = subscribe.addItem().addSelect("subscriptions");
-           subscriptions.setLabel(T_email_subscriptions);
-           subscriptions.setHelp("");
-           subscriptions.enableAddOperation();
-           subscriptions.enableDeleteOperation();
-           
-           subscriptions.addOption(-1,T_select_collection);
-	       CollectionDropDown.CollectionPathEntry[] possibleEntries = CollectionDropDown.annotateWithPaths(context, possibleList);
-           for (CollectionDropDown.CollectionPathEntry possible : possibleEntries)
-           {
-               subscriptions.addOption(possible.collection.getID().toString(), possible.path);
-           }
-
-           for (Subscription subscription : currentList) {
-               subscriptions.addInstance().setOptionSelected(subscription.getCollection().getID().toString());
-           }
-       }
-       
-       
-       if (allowSetPassword)
-       {
-           List security = form.addList("security",List.TYPE_FORM);
-           security.setHead(T_head_security);
-           
-           if (registering)
-           {
-                   security.addItem().addContent(T_create_password_instructions);
-           }
-           else
-           {
-                   security.addItem().addContent(T_update_password_instructions);
-           }
-           
-           
-           Field password = security.addItem().addPassword("password");
-           password.setLabel(T_password);
-           if (registering)
-           {
-               password.setRequired();
-           }
-           if (errors.contains("password"))
-           {
-               password.addError(T_error_invalid_password);
-           }
-           
-           Field passwordConfirm = security.addItem().addPassword("password_confirm");
-           passwordConfirm.setLabel(T_confirm_password);
-           if (registering)
-           {
-               passwordConfirm.setRequired();
-           }
-           if (errors.contains("password_confirm"))
-           {
-               passwordConfirm.addError(T_error_unconfirmed_password);
-           }
-       }
-       
-       Button submit = form.addItem().addButton("submit");
-       if (registering)
-       {
-           submit.setValue(T_submit_update);
-       }
-       else
-       {
-           submit.setValue(T_submit_create);
-       }
-       
-       profile.addHidden("eperson-continue").setValue(knot.getId());
-       
-       
-       
-       if (!registering)
-       {
-                // Add a list of groups that this user is apart of.
-                        java.util.List<Group> memberships = groupService.allMemberGroups(context, context.getCurrentUser());
-                
-                
-                        // Not a member of any groups then don't do anything.
-                        if (!(memberships.size() > 0))
-                        {
-                            return;
-                        }
-                        
-                        List list = profile.addList("memberships");
-                        list.setHead(T_head_auth);
-                        for (Group group: memberships)
-                        {
-                                list.addItem(group.getName());
-                        }
-       }
-   }
+        String defaultFirstName="",defaultLastName="",defaultPhone="";
+        String defaultLanguage=null;
+        if (request.getParameter("submit") != null)
+        {
+            defaultFirstName = request.getParameter("first_name");
+            defaultLastName = request.getParameter("last_name");
+            defaultPhone = request.getParameter("phone");
+            defaultLanguage = request.getParameter("language");
+        }
+        else if (eperson != null)
+        {
+             defaultFirstName = eperson.getFirstName();
+             defaultLastName = eperson.getLastName();
+             defaultPhone = ePersonService.getMetadata(eperson, "phone");
+             defaultLanguage = eperson.getLanguage();
+        }
+        
+        String action = contextPath;
+        if (registering)
+        {
+            action += "/register";
+        }
+        else
+        {
+            action += "/profile";
+        }
+        
+        
+        
+        
+        Division profile = body.addInteractiveDivision("information",
+                action,Division.METHOD_POST,"primary");
+        
+        if (registering)
+        {
+            profile.setHead(T_head_create);
+        }
+        else
+        {
+            profile.setHead(T_head_update);
+        }
+        
+        // Add the progress list if we are registering a new user
+        if (registering)
+        {
+            EPersonUtils.registrationProgressList(profile, 2);
+        }
+        
+        
+        
+        
+        
+        List form = profile.addList("form",List.TYPE_FORM);
+        
+        List identity = form.addList("identity",List.TYPE_FORM);
+        identity.setHead(T_head_identify);
+        
+        // Email
+        identity.addLabel(T_email_address);
+        identity.addItem(email);
+        
+        // First name
+        Text firstName = identity.addItem().addText("first_name");
+        firstName.setAutofocus("autofocus");
+        firstName.setRequired();
+        firstName.setLabel(T_first_name);
+        firstName.setValue(defaultFirstName);
+        if (errors.contains("first_name"))
+        {
+            firstName.addError(T_error_required);
+        }
+        if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
+        {
+            firstName.setDisabled();
+        }
+        
+        // Last name
+        Text lastName = identity.addItem().addText("last_name");
+        lastName.setRequired();
+        lastName.setLabel(T_last_name);
+        lastName.setValue(defaultLastName);
+        if (errors.contains("last_name"))
+        {
+            lastName.addError(T_error_required);
+        }
+        if (!registering &&!DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
+        {
+            lastName.setDisabled();
+        }
+        
+        // Phone
+        Text phone = identity.addItem().addText("phone");
+        phone.setLabel(T_telephone);
+        phone.setValue(defaultPhone);
+        if (errors.contains("phone"))
+        {
+            phone.addError(T_error_required);
+        }
+        if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
+        {
+            phone.setDisabled();
+        }
+         
+        // Language
+        Select lang = identity.addItem().addSelect("language");
+        lang.setLabel(T_language);
+        if (supportedLocales.length > 0)
+        {
+            for (Locale lc : supportedLocales)
+            {
+                lang.addOption(lc.toString(), lc.getDisplayName());
+            }
+        }
+        else
+        {
+            lang.addOption(I18nUtil.DEFAULTLOCALE.toString(), I18nUtil.DEFAULTLOCALE.getDisplayName());
+        }
+        lang.setOptionSelected((defaultLanguage == null || defaultLanguage.equals("")) ?
+                               I18nUtil.DEFAULTLOCALE.toString() : defaultLanguage);
+        if (!registering && !DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.user.editmetadata", true))
+        {
+            lang.setDisabled();
+        }
+ 
+        // Subscriptions
+        if (!registering)
+        {
+            List subscribe = form.addList("subscriptions",List.TYPE_FORM);
+            subscribe.setHead(T_subscriptions);
+            
+            subscribe.addItem(T_subscriptions_help);
+            
+            java.util.List<Subscription> currentList = subscribeService.getSubscriptions(context, context.getCurrentUser());
+            java.util.List<Collection> possibleList = collectionService.findAll(context);
+            
+            Select subscriptions = subscribe.addItem().addSelect("subscriptions");
+            subscriptions.setLabel(T_email_subscriptions);
+            subscriptions.setHelp("");
+            subscriptions.enableAddOperation();
+            subscriptions.enableDeleteOperation();
+            
+            subscriptions.addOption(-1,T_select_collection);
+            CollectionDropDown.CollectionPathEntry[] possibleEntries = CollectionDropDown.annotateWithPaths(context, possibleList);
+            for (CollectionDropDown.CollectionPathEntry possible : possibleEntries)
+            {
+                subscriptions.addOption(possible.collection.getID().toString(), possible.path);
+            }
+ 
+            for (Subscription subscription : currentList) {
+                subscriptions.addInstance().setOptionSelected(subscription.getCollection().getID().toString());
+            }
+        }
+        
+        
+        if (allowSetPassword)
+        {
+            List security = form.addList("security",List.TYPE_FORM);
+            security.setHead(T_head_security);
+            
+            if (registering)
+            {
+                    security.addItem().addContent(T_create_password_instructions);
+            }
+            else
+            {
+                    security.addItem().addContent(T_update_password_instructions);
+            }
+            
+            
+            Field password = security.addItem().addPassword("password");
+            password.setLabel(T_password);
+            if (registering)
+            {
+                password.setRequired();
+            }
+            if (errors.contains("password"))
+            {
+                password.addError(T_error_invalid_password);
+            }
+            
+            Field passwordConfirm = security.addItem().addPassword("password_confirm");
+            passwordConfirm.setLabel(T_confirm_password);
+            if (registering)
+            {
+                passwordConfirm.setRequired();
+            }
+            if (errors.contains("password_confirm"))
+            {
+                passwordConfirm.addError(T_error_unconfirmed_password);
+            }
+        }
+        
+        Button submit = form.addItem().addButton("submit");
+        if (registering)
+        {
+            submit.setValue(T_submit_update);
+        }
+        else
+        {
+            submit.setValue(T_submit_create);
+        }
+        
+        profile.addHidden("eperson-continue").setValue(knot.getId());
+        
+        
+        
+        if (!registering)
+        {
+                 // Add a list of groups that this user is apart of.
+                         java.util.List<Group> memberships = groupService.allMemberGroups(context, context.getCurrentUser());
+                 
+                 
+                         // Not a member of any groups then don't do anything.
+                         if (!(memberships.size() > 0))
+                         {
+                             return;
+                         }
+                         
+                         List list = profile.addList("memberships");
+                         list.setHead(T_head_auth);
+                         for (Group group: memberships)
+                         {
+                                 list.addItem(group.getName());
+                         }
+        }
+    }
    
    /**
     * Recycle
@@ -490,7 +490,7 @@ public class EditProfile extends AbstractDSpaceTransformer
     private static Locale[] getSupportedLocales()
     {
         String[] ll = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.supported.locales");
-        if(ll != null && ll.length>0)
+        if (ll != null && ll.length>0)
         {
             return I18nUtil.parseLocales(ll);
         }

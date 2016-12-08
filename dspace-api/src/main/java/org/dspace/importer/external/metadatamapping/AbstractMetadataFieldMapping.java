@@ -39,7 +39,7 @@ public abstract class AbstractMetadataFieldMapping<RecordType> implements Metada
 
     /**
      * Set a map of metadataprocessors. This map is used to process metadata to make it more compliant for certain metadata fields
-     * @param metadataProcessorMap
+     * @param metadataProcessorMap the new map.
      */
     public void setMetadataProcessorMap(Map<MetadataFieldConfig, MetadataProcessorService> metadataProcessorMap)
     {
@@ -84,7 +84,7 @@ public abstract class AbstractMetadataFieldMapping<RecordType> implements Metada
 
     /**
      * Retrieve the metadataFieldMap set to this class
-     * @return Map<MetadataFieldConfig, MetadataContributor<RecordType>> representing the metadataFieldMap
+     * @return a map representing the metadataFieldMap
      */
     public Map<MetadataFieldConfig, MetadataContributor<RecordType>> getMetadataFieldMap() {
         return metadataFieldMap;

@@ -74,12 +74,20 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
      * Display the error page
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void showError(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
@@ -94,12 +102,20 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
      * Display the No Results page
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void showNoResultsPage(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
@@ -116,12 +132,20 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
      * that match that metadata value
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void showSinglePage(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,
@@ -135,12 +159,20 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
      * Display a full item listing.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void showFullPage(Context context, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException,

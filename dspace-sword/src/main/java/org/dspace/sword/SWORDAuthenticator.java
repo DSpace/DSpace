@@ -46,37 +46,40 @@ public class SWORDAuthenticator
     /** logger */
     private static Logger log = Logger.getLogger(SWORDAuthenticator.class);
 
-    protected AuthenticationService authenticationService = AuthenticateServiceFactory
-            .getInstance().getAuthenticationService();
+    protected AuthenticationService authenticationService =
+        AuthenticateServiceFactory.getInstance().getAuthenticationService();
 
-    protected AuthorizeService authorizeService = AuthorizeServiceFactory
-            .getInstance().getAuthorizeService();
+    protected AuthorizeService authorizeService =
+        AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    protected EPersonService ePersonService = EPersonServiceFactory
-            .getInstance().getEPersonService();
+    protected EPersonService ePersonService =
+        EPersonServiceFactory.getInstance().getEPersonService();
 
-    protected CommunityService communityService = ContentServiceFactory
-            .getInstance().getCommunityService();
+    protected CommunityService communityService =
+        ContentServiceFactory.getInstance().getCommunityService();
 
-    protected CollectionService collectionService = ContentServiceFactory
-            .getInstance().getCollectionService();
+    protected CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
 
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
+    protected ItemService itemService =
+        ContentServiceFactory.getInstance().getItemService();
 
     /**
      * Does the given username and password authenticate for the
      * given DSpace Context?
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param un
+     *     username
      * @param pw
+     *     password
      * @return true if yes, false if not
      */
     public boolean authenticates(Context context, String un, String pw)
     {
-        int auth = authenticationService
-                .authenticate(context, un, pw, null, null);
+        int auth = authenticationService.authenticate(
+            context, un, pw, null, null);
         return auth == AuthenticationMethod.SUCCESS;
     }
 
@@ -104,9 +107,11 @@ public class SWORDAuthenticator
      * appropriate authentication method.
      *
      * @param request
-     * @throws SWORDException
-     * @throws SWORDErrorException
-     * @throws SWORDAuthenticationException
+     *     service document request
+     * @return authenticated SWORD context
+     * @throws SWORDException passed through.
+     * @throws SWORDErrorException on generic SWORD exception
+     * @throws SWORDAuthenticationException Thrown if the authentication fails
      */
     public SWORDContext authenticate(ServiceDocumentRequest request)
             throws SWORDException, SWORDErrorException,
@@ -135,9 +140,11 @@ public class SWORDAuthenticator
      * appropriate authentication method.
      *
      * @param request
-     * @throws SWORDException
-     * @throws SWORDErrorException
-     * @throws SWORDAuthenticationException
+     *     ATOM document request
+     * @return a SWORDContext object containing the relevant users
+     * @throws SWORDException passed through.
+     * @throws SWORDErrorException on generic SWORD exception
+     * @throws SWORDAuthenticationException Thrown if the authentication fails
      */
     public SWORDContext authenticate(AtomDocumentRequest request)
             throws SWORDException, SWORDErrorException,
@@ -166,6 +173,7 @@ public class SWORDAuthenticator
      * authenticatate(username, password, onBehalfOf)
      *
      * @param request
+     *     ATOM document request
      * @return a SWORDContext object containing the relevant users
      * @throws org.purl.sword.base.SWORDAuthenticationException
      * @throws SWORDException
@@ -176,7 +184,7 @@ public class SWORDAuthenticator
             SWORDErrorException
     {
         return this.authenticate(context, request.getUsername(),
-                request.getPassword(), null, request.getIPAddress());
+            request.getPassword(), null, request.getIPAddress());
     }
 
     /**
@@ -185,6 +193,8 @@ public class SWORDAuthenticator
      * authenticatate(username, password, onBehalfOf)
      *
      * @param request
+     *     service document request
+     * @return a SWORDContext object containing the relevant users
      * @return a SWORDContext object containing the relevant users
      * @throws org.purl.sword.base.SWORDAuthenticationException
      * @throws SWORDException
@@ -195,17 +205,19 @@ public class SWORDAuthenticator
             SWORDErrorException
     {
         return this.authenticate(context, request.getUsername(),
-                request.getPassword(), request.getOnBehalfOf(),
-                request.getIPAddress());
+            request.getPassword(), request.getOnBehalfOf(),
+            request.getIPAddress());
     }
 
     /**
      * Authenticate the deposit request.
      *
      * @param deposit
-     * @throws SWORDException
-     * @throws SWORDErrorException
-     * @throws SWORDAuthenticationException
+     *     deposit request
+     * @return a SWORDContext object containing the relevant users
+     * @throws SWORDException passed through.
+     * @throws SWORDErrorException on generic SWORD exception
+     * @throws SWORDAuthenticationException Thrown if the authentication fails
      */
     public SWORDContext authenticate(Deposit deposit)
             throws SWORDException, SWORDErrorException,
@@ -234,8 +246,9 @@ public class SWORDAuthenticator
      * authenticate(username, password, onBehalfOf)
      *
      * @param deposit
+     *     deposit request
      * @return a SWORDContext object containing the relevant users
-     * @throws SWORDAuthenticationException
+     * @throws SWORDAuthenticationException Thrown if the authentication fails
      * @throws SWORDException
      */
     private SWORDContext authenticate(Context context, Deposit deposit)
@@ -243,8 +256,8 @@ public class SWORDAuthenticator
             SWORDErrorException
     {
         return this.authenticate(context, deposit.getUsername(),
-                deposit.getPassword(), deposit.getOnBehalfOf(),
-                deposit.getIPAddress());
+            deposit.getPassword(), deposit.getOnBehalfOf(),
+            deposit.getIPAddress());
     }
 
     /**
@@ -254,10 +267,13 @@ public class SWORDAuthenticator
      * must exist in the user database.
      *
      * @param un
+     *     username
      * @param pw
+     *     username
      * @param obo
+     *     onBehalfOf user
      * @return a SWORD context holding the various user information
-     * @throws SWORDAuthenticationException
+     * @throws SWORDAuthenticationException Thrown if the authentication fails
      * @throws SWORDException
      */
     private SWORDContext authenticate(Context context, String un, String pw,
@@ -273,19 +289,19 @@ public class SWORDAuthenticator
         }
 
         // first find out if we support on-behalf-of deposit
-        boolean mediated = ConfigurationManager
-                .getBooleanProperty("sword-server", "on-behalf-of.enable");
+        boolean mediated = ConfigurationManager.getBooleanProperty(
+            "sword-server", "on-behalf-of.enable");
         if (!mediated && obo != null)
         {
             // user is trying to do a mediated deposit on a repository which does not support it
             log.error(
-                    "Attempted mediated deposit on service not configured to do so");
+                "Attempted mediated deposit on service not configured to do so");
             throw new SWORDErrorException(ErrorCodes.MEDIATION_NOT_ALLOWED,
-                    "Mediated deposit to this service is not permitted");
+                "Mediated deposit to this service is not permitted");
         }
 
         log.info(LogManager.getHeader(context, "sword_authenticate",
-                "username=" + un + ",on_behalf_of=" + obo));
+            "username=" + un + ",on_behalf_of=" + obo));
 
         try
         {
@@ -335,13 +351,13 @@ public class SWORDAuthenticator
                         oboContext.setCurrentUser(epObo);
                         // Set any special groups - invoke the authentication mgr.
                         List<Group> groups = authenticationService
-                                .getSpecialGroups(oboContext, null);
+                            .getSpecialGroups(oboContext, null);
 
                         for (Group group : groups)
                         {
                             oboContext.setSpecialGroup(group.getID());
                             log.debug(
-                                    "Adding Special Group id=" + group.getID());
+                                "Adding Special Group id=" + group.getID());
                         }
                         sc.setContext(oboContext);
                     }
@@ -349,8 +365,8 @@ public class SWORDAuthenticator
                     {
                         authenticated = false;
                         throw new SWORDErrorException(
-                                ErrorCodes.TARGET_OWNER_UKNOWN,
-                                "unable to identify on-behalf-of user: " + obo);
+                            ErrorCodes.TARGET_OWNER_UKNOWN,
+                            "unable to identify on-behalf-of user: " + obo);
                     }
                 }
             }
@@ -360,21 +376,20 @@ public class SWORDAuthenticator
                 // decide what kind of error to throw
                 if (ep != null)
                 {
-                    log.info(LogManager
-                            .getHeader(context, "sword_unable_to_set_user",
-                                    "username=" + un));
+                    log.info(LogManager.getHeader(context,
+                        "sword_unable_to_set_user", "username=" + un));
                     throw new SWORDAuthenticationException(
-                            "Unable to authenticate the supplied used");
+                        "Unable to authenticate the supplied used");
                 }
                 else
                 {
                     // FIXME: this shouldn't ever happen now, but may as well leave it in just in case
                     // there's a bug elsewhere
                     log.info(LogManager.getHeader(context,
-                            "sword_unable_to_set_on_behalf_of",
-                            "username=" + un + ",on_behalf_of=" + obo));
+                        "sword_unable_to_set_on_behalf_of",
+                        "username=" + un + ",on_behalf_of=" + obo));
                     throw new SWORDAuthenticationException(
-                            "Unable to authenticate the onBehalfOf account");
+                        "Unable to authenticate the onBehalfOf account");
                 }
             }
 
@@ -384,8 +399,8 @@ public class SWORDAuthenticator
         {
             log.error("caught exception: ", e);
             throw new SWORDException(
-                    "There was a problem accessing the repository user database",
-                    e);
+                "There was a problem accessing the repository user database",
+                e);
         }
     }
 
@@ -396,8 +411,16 @@ public class SWORDAuthenticator
      * See javadocs for individual canSubmitTo methods to see the conditions
      * which are applied in each situation
      *
+     * @param swordService
+     *     SWORD service
+     * @param deposit
+     *     unused
+     * @param dso
+     *     target DSpace object
      * @return true if yes, false if not
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException on generic SWORD exception
      */
     public boolean canSubmit(SWORDService swordService, Deposit deposit,
             DSpaceObject dso)
@@ -415,8 +438,8 @@ public class SWORDAuthenticator
         }
         else
         {
-            swordService
-                    .message("User is not authorised to submit to collection");
+            swordService.message(
+                "User is not authorised to submit to collection");
         }
 
         return submit;
@@ -428,8 +451,10 @@ public class SWORDAuthenticator
      * of the special DSpace group Administrator, with id 1
      *
      * @param swordContext
+     *     The relevant SWORD Context.
      * @return true if administrator, false if not
-     * @throws SQLException
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean isUserAdmin(SWORDContext swordContext)
             throws DSpaceSWORDException
@@ -437,8 +462,8 @@ public class SWORDAuthenticator
         try
         {
             EPerson authenticated = swordContext.getAuthenticated();
-            return authenticated != null && authorizeService
-                    .isAdmin(swordContext.getAuthenticatorContext());
+            return authenticated != null && authorizeService.isAdmin(
+                swordContext.getAuthenticatorContext());
         }
         catch (SQLException e)
         {
@@ -453,8 +478,10 @@ public class SWORDAuthenticator
      * of the special DSpace group Administrator, with id 1
      *
      * @param swordContext
+     *     The relevant SWORD Context.
      * @return true if administrator, false if not
-     * @throws SQLException
+     * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean isOnBehalfOfAdmin(SWORDContext swordContext)
             throws DSpaceSWORDException
@@ -462,8 +489,8 @@ public class SWORDAuthenticator
         EPerson onBehalfOf = swordContext.getOnBehalfOf();
         try
         {
-            return onBehalfOf != null && authorizeService
-                    .isAdmin(swordContext.getOnBehalfOfContext());
+            return onBehalfOf != null && authorizeService.isAdmin(
+                swordContext.getOnBehalfOfContext());
         }
         catch (SQLException e)
         {
@@ -476,7 +503,10 @@ public class SWORDAuthenticator
      * Is the authenticated user a member of the given group
      * or one of its sub groups?
      *
-     * @param group
+     * @param swordContext
+     *     The relevant SWORD Context.
+     * @param group group to search recursively
+     * @return true if the authenticated user is a member of group or its subgroups
      */
     public boolean isUserInGroup(SWORDContext swordContext, Group group)
     {
@@ -488,7 +518,10 @@ public class SWORDAuthenticator
      * Is the onBehalfOf user a member of the given group or
      * one of its sub groups?
      *
-     * @param group
+     * @param swordContext
+     *     The relevant SWORD Context.
+     * @param group group to search recursively
+     * @return true if the onBehalfOf user is a member of group or its subgroups
      */
     public boolean isOnBehalfOfInGroup(SWORDContext swordContext, Group group)
     {
@@ -502,8 +535,8 @@ public class SWORDAuthenticator
      * until it has exhausted the tree of groups or finds the given
      * eperson
      *
-     * @param group
-     * @param eperson
+     * @param group group to search recursively
+     * @param eperson EPerson to find
      * @return true if in group, false if not
      */
     public boolean isInGroup(Group group, EPerson eperson)
@@ -546,17 +579,19 @@ public class SWORDAuthenticator
      * IF: the authenticated user is an administrator
      *   AND:
      *      (the on-behalf-of user is an administrator
-     *	 	OR the on-behalf-of user is authorised to READ
-     *	 	OR the on-behalf-of user is null)
+     *         OR the on-behalf-of user is authorised to READ
+     *         OR the on-behalf-of user is null)
      * OR IF: the authenticated user is authorised to READ
      *   AND:
-     *	     (the on-behalf-of user is an administrator
-     *		  OR the on-behalf-of user is authorised to READ
-     *		  OR the on-behalf-of user is null)
+     *         (the on-behalf-of user is an administrator
+     *          OR the on-behalf-of user is authorised to READ
+     *          OR the on-behalf-of user is null)
      *
      * @param swordContext
+     *     The relevant SWORD Context.
      * @return the array of allowed collections
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<Community> getAllowedCommunities(SWORDContext swordContext)
             throws DSpaceSWORDException
@@ -593,8 +628,8 @@ public class SWORDAuthenticator
                 if (!authAllowed)
                 {
                     authAllowed = authorizeService.authorizeActionBoolean(
-                            swordContext.getAuthenticatorContext(), comm,
-                            Constants.READ);
+                        swordContext.getAuthenticatorContext(), comm,
+                        Constants.READ);
                 }
 
                 // if we have not already determined that the obo user is ok to submit, look up the READ policy on the
@@ -602,8 +637,8 @@ public class SWORDAuthenticator
                 if (!oboAllowed)
                 {
                     oboAllowed = authorizeService.authorizeActionBoolean(
-                            swordContext.getOnBehalfOfContext(), comm,
-                            Constants.READ);
+                        swordContext.getOnBehalfOfContext(), comm,
+                        Constants.READ);
                 }
 
                 // final check to see if we are allowed to READ
@@ -631,17 +666,21 @@ public class SWORDAuthenticator
      * IF: the authenticated user is an administrator
      *   AND:
      *      (the on-behalf-of user is an administrator
-     *	 	OR the on-behalf-of user is authorised to READ
-     *	 	OR the on-behalf-of user is null)
+     *         OR the on-behalf-of user is authorised to READ
+     *         OR the on-behalf-of user is null)
      * OR IF: the authenticated user is authorised to READ
      *   AND:
-     *	     (the on-behalf-of user is an administrator
-     *		  OR the on-behalf-of user is authorised to READ
-     *		  OR the on-behalf-of user is null)
+     *         (the on-behalf-of user is an administrator
+     *          OR the on-behalf-of user is authorised to READ
+     *          OR the on-behalf-of user is null)
      *
+     * @param swordContext
+     *     The relevant SWORD Context.
      * @param community
+     *     target community
      * @return the array of allowed collections
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<Community> getCommunities(SWORDContext swordContext,
             Community community)
@@ -678,8 +717,8 @@ public class SWORDAuthenticator
                 if (!authAllowed)
                 {
                     authAllowed = authorizeService.authorizeActionBoolean(
-                            swordContext.getAuthenticatorContext(), comm,
-                            Constants.READ);
+                        swordContext.getAuthenticatorContext(), comm,
+                        Constants.READ);
                 }
 
                 // if we have not already determined that the obo user is ok to submit, look up the READ policy on the
@@ -687,8 +726,8 @@ public class SWORDAuthenticator
                 if (!oboAllowed)
                 {
                     oboAllowed = authorizeService.authorizeActionBoolean(
-                            swordContext.getOnBehalfOfContext(), comm,
-                            Constants.READ);
+                        swordContext.getOnBehalfOfContext(), comm,
+                        Constants.READ);
                 }
 
                 // final check to see if we are allowed to READ
@@ -718,8 +757,10 @@ public class SWORDAuthenticator
      * See that method for details of the conditions applied
      *
      * @param swordContext
+     *     The relevant SWORD Context.
      * @return the array of allowed collections
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<org.dspace.content.Collection> getAllowedCollections(
             SWORDContext swordContext)
@@ -735,17 +776,21 @@ public class SWORDAuthenticator
      * IF: the authenticated user is an administrator
      *   AND:
      *      (the on-behalf-of user is an administrator
-     *	 	OR the on-behalf-of user is authorised to ADD
-     *	 	OR the on-behalf-of user is null)
+     *         OR the on-behalf-of user is authorised to ADD
+     *         OR the on-behalf-of user is null)
      * OR IF: the authenticated user is authorised to ADD
      *   AND:
-     *	     (the on-behalf-of user is an administrator
-     *		  OR the on-behalf-of user is authorised to ADD
-     *		  OR the on-behalf-of user is null)
+     *         (the on-behalf-of user is an administrator
+     *          OR the on-behalf-of user is authorised to ADD
+     *          OR the on-behalf-of user is null)
      *
      * @param swordContext
+     *     The relevant SWORD Context.
+     * @param community
+     *     target community
      * @return the array of allowed collections
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<org.dspace.content.Collection> getAllowedCollections(
             SWORDContext swordContext, Community community)
@@ -768,8 +813,8 @@ public class SWORDAuthenticator
             Context authContext = swordContext.getAuthenticatorContext();
 
             // short cut by obtaining the collections to which the authenticated user can submit
-            List<Collection> cols = collectionService
-                    .findAuthorized(authContext, community, Constants.ADD);
+            List<Collection> cols = collectionService.findAuthorized(
+                authContext, community, Constants.ADD);
             List<org.dspace.content.Collection> allowed = new ArrayList<>();
 
             // now find out if the obo user is allowed to submit to any of these collections
@@ -788,8 +833,8 @@ public class SWORDAuthenticator
                 if (!oboAllowed)
                 {
                     oboAllowed = authorizeService.authorizeActionBoolean(
-                            swordContext.getOnBehalfOfContext(), col,
-                            Constants.ADD);
+                        swordContext.getOnBehalfOfContext(), col,
+                        Constants.ADD);
                 }
 
                 // final check to see if we are allowed to READ
@@ -815,17 +860,21 @@ public class SWORDAuthenticator
      * IF: the authenticated user is an administrator
      *   AND:
      *      (the on-behalf-of user is an administrator
-     *	 	OR the on-behalf-of user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
-     *	 	OR the on-behalf-of user is null)
+     *         OR the on-behalf-of user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
+     *         OR the on-behalf-of user is null)
      * OR IF: the authenticated user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
      *   AND:
-     *	     (the on-behalf-of user is an administrator
-     *		  OR the on-behalf-of user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
-     *		  OR the on-behalf-of user is null)
+     *         (the on-behalf-of user is an administrator
+     *          OR the on-behalf-of user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
+     *          OR the on-behalf-of user is null)
      *
      * @param swordContext
+     *     The relevant SWORD Context.
+     * @param collection
+     *     target collection
      * @return the array of allowed collections
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public List<Item> getAllowedItems(SWORDContext swordContext,
             org.dspace.content.Collection collection)
@@ -845,8 +894,8 @@ public class SWORDAuthenticator
         try
         {
             List<Item> allowed = new ArrayList<>();
-            Iterator<Item> ii = itemService
-                    .findByCollection(swordContext.getContext(), collection);
+            Iterator<Item> ii = itemService.findByCollection(
+                swordContext.getContext(), collection);
 
             while (ii.hasNext())
             {
@@ -869,8 +918,8 @@ public class SWORDAuthenticator
                 if (!authAllowed)
                 {
                     boolean write = authorizeService.authorizeActionBoolean(
-                            swordContext.getAuthenticatorContext(), item,
-                            Constants.WRITE);
+                        swordContext.getAuthenticatorContext(), item,
+                        Constants.WRITE);
 
                     boolean add = false;
                     for (Bundle bundle : bundles)
@@ -879,8 +928,8 @@ public class SWORDAuthenticator
                                 .equals(bundle.getName()))
                         {
                             add = authorizeService.authorizeActionBoolean(
-                                    swordContext.getAuthenticatorContext(),
-                                    bundle, Constants.ADD);
+                                swordContext.getAuthenticatorContext(),
+                                bundle, Constants.ADD);
                             if (!add)
                             {
                                 break;
@@ -903,10 +952,10 @@ public class SWORDAuthenticator
                     for (Bundle bundle : bundles)
                     {
                         if (Constants.CONTENT_BUNDLE_NAME
-                                .equals(bundle.getName()))
+                            .equals(bundle.getName()))
                             add = authorizeService.authorizeActionBoolean(
-                                    swordContext.getOnBehalfOfContext(), bundle,
-                                    Constants.ADD);
+                                swordContext.getOnBehalfOfContext(), bundle,
+                                Constants.ADD);
                         if (!add)
                         {
                             break;
@@ -938,17 +987,21 @@ public class SWORDAuthenticator
      * IF: the authenticated user is an administrator
      *   AND:
      *      (the on-behalf-of user is an administrator
-     *	 	OR the on-behalf-of user is authorised to ADD
-     *	 	OR the on-behalf-of user is null)
+     *         OR the on-behalf-of user is authorised to ADD
+     *         OR the on-behalf-of user is null)
      * OR IF: the authenticated user is authorised to ADD
      *   AND:
-     *	     (the on-behalf-of user is an administrator
-     *		  OR the on-behalf-of user is authorised to ADD
-     *		  OR the on-behalf-of user is null)
+     *         (the on-behalf-of user is an administrator
+     *          OR the on-behalf-of user is authorised to ADD
+     *          OR the on-behalf-of user is null)
      *
      * @param swordContext
+     *     The relevant SWORD Context.
      * @param collection
+     *     target collection
+     * @return true if collection permits submission by current context
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean canSubmitTo(SWORDContext swordContext,
             org.dspace.content.Collection collection)
@@ -981,8 +1034,8 @@ public class SWORDAuthenticator
             if (!authAllowed)
             {
                 authAllowed = authorizeService.authorizeActionBoolean(
-                        swordContext.getAuthenticatorContext(), collection,
-                        Constants.ADD);
+                    swordContext.getAuthenticatorContext(), collection,
+                    Constants.ADD);
             }
 
             // if we have not already determined that the obo user is ok to submit, look up the READ policy on the
@@ -990,8 +1043,8 @@ public class SWORDAuthenticator
             if (!oboAllowed)
             {
                 oboAllowed = authorizeService.authorizeActionBoolean(
-                        swordContext.getOnBehalfOfContext(), collection,
-                        Constants.ADD);
+                    swordContext.getOnBehalfOfContext(), collection,
+                    Constants.ADD);
             }
 
             // final check to see if we are allowed to READ
@@ -1013,17 +1066,21 @@ public class SWORDAuthenticator
      * IF: the authenticated user is an administrator
      *   AND:
      *      (the on-behalf-of user is an administrator
-     *	 	OR the on-behalf-of user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
-     *	 	OR the on-behalf-of user is null)
+     *         OR the on-behalf-of user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
+     *         OR the on-behalf-of user is null)
      * OR IF: the authenticated user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
      *   AND:
-     *	     (the on-behalf-of user is an administrator
-     *		  OR the on-behalf-of user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
-     *		  OR the on-behalf-of user is null)
+     *         (the on-behalf-of user is an administrator
+     *          OR the on-behalf-of user is authorised to WRITE on the item and ADD on the ORIGINAL bundle
+     *          OR the on-behalf-of user is null)
      *
      * @param swordContext
+     *     The relevant SWORD Context.
+     * @param item
+     *     target item
      * @return the array of allowed collections
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean canSubmitTo(SWORDContext swordContext, Item item)
             throws DSpaceSWORDException
@@ -1058,8 +1115,8 @@ public class SWORDAuthenticator
             if (!authAllowed)
             {
                 boolean write = authorizeService.authorizeActionBoolean(
-                        swordContext.getAuthenticatorContext(), item,
-                        Constants.WRITE);
+                    swordContext.getAuthenticatorContext(), item,
+                    Constants.WRITE);
 
                 boolean add = false;
                 for (Bundle bundle : bundles)
@@ -1067,8 +1124,8 @@ public class SWORDAuthenticator
                     if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                     {
                         add = authorizeService.authorizeActionBoolean(
-                                swordContext.getAuthenticatorContext(), bundle,
-                                Constants.ADD);
+                            swordContext.getAuthenticatorContext(), bundle,
+                            Constants.ADD);
                         if (!add)
                         {
                             break;
@@ -1093,8 +1150,8 @@ public class SWORDAuthenticator
                     if (Constants.CONTENT_BUNDLE_NAME.equals(bundle.getName()))
                     {
                         add = authorizeService.authorizeActionBoolean(
-                                swordContext.getOnBehalfOfContext(), bundle,
-                                Constants.ADD);
+                            swordContext.getOnBehalfOfContext(), bundle,
+                            Constants.ADD);
                         if (!add)
                         {
                             break;
@@ -1117,22 +1174,26 @@ public class SWORDAuthenticator
     }
 
     /**
-     * Can the given context submit to the specified dspace object.
+     * Can the given context submit to the specified DSpace object.
      *
      * This forwards to the individual methods for different object types; see
      * their documentation for details of the conditions.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param dso
+     *     target DSpace object
+     * @return true if the given context can submit to the specified DSpace object
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public boolean canSubmitTo(SWORDContext context, DSpaceObject dso)
             throws DSpaceSWORDException
     {
         if (dso instanceof org.dspace.content.Collection)
         {
-            return this
-                    .canSubmitTo(context, (org.dspace.content.Collection) dso);
+            return this.canSubmitTo(
+                context, (org.dspace.content.Collection) dso);
         }
         else
         {

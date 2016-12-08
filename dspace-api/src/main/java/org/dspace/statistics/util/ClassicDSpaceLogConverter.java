@@ -278,7 +278,7 @@ public class ClassicDSpaceLogConverter {
     /**
      * Main method to execute the converter
      *
-     * @param args CLI args
+     * @param args the command line arguments given
      */
     public static void main(String[] args)
     {
@@ -286,12 +286,18 @@ public class ClassicDSpaceLogConverter {
 
         Options options = new Options();
 
-        options.addOption("i", "in", true, "source file ('-' or omit for standard input)");
-        options.addOption("o", "out", true, "destination file or directory ('-' or omit for standard output)");
-        options.addOption("m", "multiple",false, "treat the input file as having a wildcard ending");
-        options.addOption("n", "newformat",false, "process new format log lines (1.6+)");
-        options.addOption("v", "verbose", false, "display verbose output (useful for debugging)");
-        options.addOption("h", "help", false, "help");
+        options.addOption("i", "in", true,
+            "source file ('-' or omit for standard input)");
+        options.addOption("o", "out", true,
+            "destination file or directory ('-' or omit for standard output)");
+        options.addOption("m", "multiple", false,
+            "treat the input file as having a wildcard ending");
+        options.addOption("n", "newformat", false,
+            "process new format log lines (1.6+)");
+        options.addOption("v", "verbose", false,
+            "display verbose output (useful for debugging)");
+        options.addOption("h", "help", false,
+            "help");
 
         // Parse the command line arguments
         CommandLine line;
@@ -317,10 +323,11 @@ public class ClassicDSpaceLogConverter {
 
         // Create a copy of the converter
         Context context = new Context();
-            context.turnOffAuthorisationSystem();
-        ClassicDSpaceLogConverter converter = new ClassicDSpaceLogConverter(context,
-                                                                            line.hasOption('v'),
-                                                                            newEvents);
+        context.turnOffAuthorisationSystem();
+        ClassicDSpaceLogConverter converter = new ClassicDSpaceLogConverter(
+            context,
+            line.hasOption('v'),
+            newEvents);
 
         // Set up the log analyser
         try
@@ -353,18 +360,21 @@ public class ClassicDSpaceLogConverter {
                 System.err.println(sample + " could not be used to find a directory of log files.");
                 System.exit(1);
             }
-            else if (children.length <= 0)
+            else if (children.length <= 0) {
                 System.err.println(sample + " matched no files.");
+            }
             else
+            {
                 for (String in : children)
                 {
                     System.err.println(in);
                     String out = line.getOptionValue('o') +
-                                 (dir.getAbsolutePath() +
-                                  System.getProperty("file.separator") + in).substring(line.getOptionValue('i').length());
+                        (dir.getAbsolutePath() +
+                         System.getProperty("file.separator") + in).substring(line.getOptionValue('i').length());
 
                     converter.convert(dir.getAbsolutePath() + System.getProperty("file.separator") + in, out);
                 }
+            }
         }
         else
         {

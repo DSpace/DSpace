@@ -24,16 +24,16 @@ import org.dspace.workflowbasic.service.BasicWorkflowItemService;
 import org.dspace.workflowbasic.service.BasicWorkflowService;
 
 /**
- * Claim all the selected workflows. This action is used by the 
+ * Claim all the selected workflows. This action is used by the
  * submission page, when the user clicks the claim tasks button.
- * 
+ *
  * @author Scott Phillips
  */
 public class ClaimTasksAction extends AbstractAction
 {
 
-	protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
-	protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
+    protected BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowService();
+    protected BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance().getBasicWorkflowItemService();
 
     /**
      * Claim-tasks action.
@@ -49,31 +49,31 @@ public class ClaimTasksAction extends AbstractAction
      */
     @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
-            String source, Parameters parameters) throws Exception
+        String source, Parameters parameters)
+        throws Exception
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
-        
-    	// Or the user selected a checkbox full of workflow IDs
-    	String[] workflowIDs = request.getParameterValues("workflowID");
-    	if (workflowIDs != null)
-    	{
-    		for (String workflowID : workflowIDs)
-    		{
-    			BasicWorkflowItem workflowItem = basicWorkflowItemService.find(context, Integer.valueOf(workflowID));
-    			
-    			int state = workflowItem.getState();
-    			// Only unclaim tasks that are already claimed.
-    			if ( state == BasicWorkflowServiceImpl.WFSTATE_STEP1POOL ||
-    				 state == BasicWorkflowServiceImpl.WFSTATE_STEP2POOL ||
-    				 state == BasicWorkflowServiceImpl.WFSTATE_STEP3POOL)
-    			{
-					basicWorkflowService.claim(context, workflowItem, context.getCurrentUser());
-    			}
-    		}
-    	}
-    	
-    	return null;
-    }
 
+        // Or the user selected a checkbox full of workflow IDs
+        String[] workflowIDs = request.getParameterValues("workflowID");
+        if (workflowIDs != null)
+        {
+            for (String workflowID : workflowIDs)
+            {
+                BasicWorkflowItem workflowItem = basicWorkflowItemService.find(context, Integer.valueOf(workflowID));
+
+                int state = workflowItem.getState();
+                // Only unclaim tasks that are already claimed.
+                if ( state == BasicWorkflowServiceImpl.WFSTATE_STEP1POOL ||
+                     state == BasicWorkflowServiceImpl.WFSTATE_STEP2POOL ||
+                     state == BasicWorkflowServiceImpl.WFSTATE_STEP3POOL)
+                {
+                    basicWorkflowService.claim(context, workflowItem, context.getCurrentUser());
+                }
+            }
+        }
+
+        return null;
+    }
 }
