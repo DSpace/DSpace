@@ -40,15 +40,15 @@ public class EPersonValueGenerator implements TemplateValueGenerator
         {
             if (StringUtils.startsWith(prefix, "submitter"))
             {
-                String metadata = suffix.substring("submitter[".length(),
+                String metadata = prefix.substring("submitter[".length(),
                         prefix.length() - 1);
 
-                targetItem.getSubmitter().getMetadata(metadata);
+                value = targetItem.getSubmitter().getMetadata(metadata);
 
             }
             else if (StringUtils.startsWith(prefix, "item"))
             {
-                value = targetItem.getMetadata(suffix);
+                value = targetItem.getMetadata(prefix.replace("_", "."));
             }
         }
         catch (SQLException e)

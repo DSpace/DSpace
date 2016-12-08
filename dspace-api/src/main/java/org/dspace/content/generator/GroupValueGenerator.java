@@ -37,22 +37,22 @@ public class GroupValueGenerator implements TemplateValueGenerator
         {
             if (StringUtils.startsWith(prefix, "community"))
             {
-                String metadata = suffix.substring("community[".length(),
+                String metadata = prefix.substring("community[".length(),
                         prefix.length() - 1);
 
-                templateItem.getParentObject().getParentObject()
+                value = templateItem.getParentObject().getParentObject()
                         .getMetadata(metadata);
 
             }
             else if (StringUtils.startsWith(prefix, "collection"))
             {
-                String metadata = suffix.substring("collection[".length(),
+                String metadata = prefix.substring("collection[".length(),
                         prefix.length() - 1);
-                templateItem.getParentObject().getMetadata(metadata);
+                value = templateItem.getParentObject().getMetadata(metadata);
             }
             else if (StringUtils.startsWith(prefix, "item"))
             {
-                value = targetItem.getMetadata(suffix);
+                value = targetItem.getMetadata(prefix.replace("_", "."));
             }
         }
         catch (SQLException e)
