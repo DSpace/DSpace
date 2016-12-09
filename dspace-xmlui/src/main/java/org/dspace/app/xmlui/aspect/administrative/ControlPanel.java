@@ -51,18 +51,18 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private static final Logger log = Logger.getLogger(ControlPanel.class);
 
     /** Language Strings */
-    private static final Message T_DSPACE_HOME		= message("xmlui.general.dspace_home");
-    private static final Message T_title			= message("xmlui.administrative.ControlPanel.title");
-    private static final Message T_trail			= message("xmlui.administrative.ControlPanel.trail");
-    private static final Message T_head				= message("xmlui.administrative.ControlPanel.head");
-    
-    private static final Message T_select_panel		= message("xmlui.administrative.ControlPanel.select_panel");
+    private static final Message T_DSPACE_HOME  = message("xmlui.general.dspace_home");
+    private static final Message T_title        = message("xmlui.administrative.ControlPanel.title");
+    private static final Message T_trail        = message("xmlui.administrative.ControlPanel.trail");
+    private static final Message T_head         = message("xmlui.administrative.ControlPanel.head");
+
+    private static final Message T_select_panel = message("xmlui.administrative.ControlPanel.select_panel");
 
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
-     * The service manager allows us to access the continuation's 
+     * The service manager allows us to access the continuation's
      * manager.  It is obtained from the Serviceable API
      */
     private ServiceManager serviceManager;
@@ -86,9 +86,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
      * The Cocoon Persistent Store (used for cache statistics)
      */
     private Store storePersistent;
-    
+
     /**
-     * From the <code>org.apache.avalon.framework.service.Serviceable</code> API, 
+     * From the <code>org.apache.avalon.framework.service.Serviceable</code> API,
      * give us the current <code>ServiceManager</code> instance.
      * <P>
      * Much of this ServiceManager logic/code has been borrowed from the source
@@ -96,26 +96,32 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
      * http://svn.apache.org/repos/asf/cocoon/tags/cocoon-2.2/cocoon-sitemap-components/cocoon-sitemap-components-1.0.0/src/main/java/org/apache/cocoon/generation/StatusGenerator.java
      */
     @Override
-    public void service(ServiceManager serviceManager) throws ServiceException 
+    public void service(ServiceManager serviceManager) throws ServiceException
     {
         this.serviceManager = serviceManager;
-        
+
         this.settings = (Settings) this.serviceManager.lookup(Settings.ROLE);
-        
-        if(this.serviceManager.hasService(StoreJanitor.ROLE))
+
+        if (this.serviceManager.hasService(StoreJanitor.ROLE))
+        {
             this.storeJanitor = (StoreJanitor) this.serviceManager.lookup(StoreJanitor.ROLE);
-        
+        }
+
         if (this.serviceManager.hasService(Store.ROLE))
+        {
             this.storeDefault = (Store) this.serviceManager.lookup(Store.ROLE);
-        
-        if(this.serviceManager.hasService(Store.PERSISTENT_STORE))
+        }
+
+        if (this.serviceManager.hasService(Store.PERSISTENT_STORE))
+        {
             this.storePersistent = (Store) this.serviceManager.lookup(Store.PERSISTENT_STORE);
+        }
     }
 
     @Override
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-                    WingException, UIException, SQLException, IOException,
-                    AuthorizeException 
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         pageMeta.addMetadata("title").addContent(T_title);
 
@@ -124,8 +130,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     }
 
     @Override
-    public void addBody(Body body) throws SAXException, WingException,
-                    UIException, SQLException, IOException, AuthorizeException 
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
 
         if (!authorizeService.isAdmin(context))
@@ -133,7 +140,8 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
             throw new AuthorizeException("You are not authorized to view this page.");
         }
 
-        Division div = body.addInteractiveDivision("control-panel", contextPath+"/admin/panel", Division.METHOD_POST, "primary administrative");
+        Division div = body.addInteractiveDivision("control-panel", contextPath
+            + "/admin/panel", Division.METHOD_POST, "primary administrative");
         div.setHead(T_head);
 
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -141,60 +149,75 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 
         if (request.getParameter("tab") != null)
         {
-        	selected_tab = request.getParameter("tab");
-        	div.addHidden("tab").setValue(selected_tab);
+            selected_tab = request.getParameter("tab");
+            div.addHidden("tab").setValue(selected_tab);
         }
 
         // LIST: options
         List options = div.addList("options", List.TYPE_SIMPLE, "horizontal");
-        
+
         String tabs[] = configurationService.getArrayProperty("controlpanel.tabs");
-        
-        for(String tab : tabs) {
-        	tab = tab.trim();
+
+        for (String tab : tabs)
+        {
+            tab = tab.trim();
             Message linkText = message("xmlui.administrative.ControlPanel.tabs." + tab);
-        	if(tab.equals(selected_tab)) {
-        		options.addItem().addHighlight("bold").addXref("?tab=" + selected_tab, linkText);
-        	} else {
-        		options.addItemXref(contextPath + "/admin/panel?tab=" + tab, linkText);
-        	}
+            if (tab.equals(selected_tab))
+            {
+                options.addItem().addHighlight("bold").addXref("?tab=" + selected_tab, linkText);
+            }
+            else
+            {
+                options.addItemXref(contextPath + "/admin/panel?tab=" + tab, linkText);
+            }
         }
-        
-        if(selected_tab.equals("")) {
-        	div.addPara(T_select_panel);
-        } else {
-        	ControlPanelTab cpTab = (ControlPanelTab)CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(ControlPanelTab.class, selected_tab);
-        	if(cpTab instanceof AbstractControlPanelTab) {
-        		try {
-        			((AbstractControlPanelTab) cpTab).setup(null, objectModel, null, parameters);
-					((AbstractControlPanelTab) cpTab).service(serviceManager);
-					((AbstractControlPanelTab) cpTab).setWebLink(contextPath + "/admin/panel?tab=" + selected_tab);
-				} catch (ServiceException e) {
-					log.error(e);
-				} catch (ProcessingException e) {
-					log.error(e);
-				}
-        	}        	
-        	cpTab.addBody(objectModel, div);
-        }        
+
+        if (selected_tab.equals(""))
+        {
+            div.addPara(T_select_panel);
+        }
+        else
+        {
+            ControlPanelTab cpTab = (ControlPanelTab)CoreServiceFactory
+                .getInstance().getPluginService().getNamedPlugin(
+                    ControlPanelTab.class, selected_tab);
+            if (cpTab instanceof AbstractControlPanelTab)
+            {
+                try
+                {
+                    ((AbstractControlPanelTab) cpTab).setup(null, objectModel, null, parameters);
+                    ((AbstractControlPanelTab) cpTab).service(serviceManager);
+                    ((AbstractControlPanelTab) cpTab).setWebLink(contextPath + "/admin/panel?tab=" + selected_tab);
+                }
+                catch (ServiceException e)
+                {
+                    log.error(e);
+                }
+                catch (ProcessingException e)
+                {
+                    log.error(e);
+                }
+            }
+            cpTab.addBody(objectModel, div);
+        }
     }
 
-    
+
     /**
      * Release all Cocoon resources.
      * @see org.apache.avalon.framework.activity.Disposable#dispose()
      */
     @Override
-    public void dispose() 
+    public void dispose()
     {
-        if (this.serviceManager != null) 
+        if (this.serviceManager != null)
         {
             this.serviceManager.release(this.storePersistent);
             this.serviceManager.release(this.storeJanitor);
             this.serviceManager.release(this.storeDefault);
             this.serviceManager.release(this.settings);
             this.storePersistent = null;
-            this.storeJanitor = null; 	
+            this.storeJanitor = null;
             this.storeDefault = null;
             this.settings = null;
         }

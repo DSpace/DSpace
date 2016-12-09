@@ -7,7 +7,7 @@
 
     http://www.dspace.org/license/
 
-	Developed by DSpace @ Lyncode <dspace@lyncode.com> 
+	Developed by DSpace @ Lyncode (dspace at lyncode dot com) 
 	Following OpenAIRE Guidelines 1.1:
 		- http://www.openaire.eu/component/content/article/207
 

@@ -257,7 +257,7 @@ public class HandlePlugin implements HandleStorage
      *            ignored
      * @return A byte array with the raw data for this handle. Currently, this
      *         consists of a single URL value.
-     * @exception HandleException
+     * @throws HandleException
      *                If an error occurs while calling the Handle API.
      */
     @Override
@@ -354,7 +354,7 @@ public class HandlePlugin implements HandleStorage
      * @param theHandle
      *            byte array representation of handle
      * @return True if we have this handle in storage
-     * @exception HandleException
+     * @throws HandleException
      *                If an error occurs while calling the Handle API.
      */
     @Override
@@ -410,7 +410,7 @@ public class HandlePlugin implements HandleStorage
      *            byte array representation of naming authority handle
      * @return All handles in local storage which start with the naming
      *         authority handle.
-     * @exception HandleException
+     * @throws HandleException
      *                If an error occurs while calling the Handle API.
      */
     @Override

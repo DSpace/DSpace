@@ -32,16 +32,16 @@ import org.xml.sax.SAXException;
 public class FrontPageFeeds extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
     /** Language Strings */
-    
+
     public static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-	
-    
+
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
-    public Serializable getKey() 
+    public Serializable getKey()
     {
        return "1";
     }
@@ -49,39 +49,39 @@ public class FrontPageFeeds extends AbstractDSpaceTransformer implements Cacheab
     /**
      * Generate the cache validity object.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
         return NOPValidity.SHARED_INSTANCE;
     }
-    
+
     /**
      * Add a page title and trail links.
      */
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
-    	pageMeta.addMetadata("title").addContent(T_dspace_home);
-    	pageMeta.addTrailLink(contextPath, T_dspace_home);
-        
+        pageMeta.addMetadata("title").addContent(T_dspace_home);
+        pageMeta.addTrailLink(contextPath, T_dspace_home);
+
         // Add RSS links if available
         String[] formats = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.formats");
-		if ( formats != null )
-		{
-			for (String format : formats)
-			{
-				// Remove the protocol number, i.e. just list 'rss' or' atom'
-				String[] parts = format.split("_");
-				if (parts.length < 1)
+        if ( formats != null )
+        {
+            for (String format : formats)
+            {
+                // Remove the protocol number, i.e. just list 'rss' or' atom'
+                String[] parts = format.split("_");
+                if (parts.length < 1)
                 {
                     continue;
                 }
-				
-				String feedFormat = parts[0].trim()+"+xml";
-					
-				String feedURL = contextPath+"/feed/"+format.trim()+"/site";
-				pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
-			}
-		}
+
+                String feedFormat = parts[0].trim()+"+xml";
+
+                String feedURL = contextPath+"/feed/"+format.trim()+"/site";
+                pageMeta.addMetadata("feed", feedFormat).addContent(feedURL);
+            }
+        }
     }
 }

@@ -34,13 +34,15 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
 
     private MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping;
 
-    /* A list of all the dateFormats to attempt, these should be configured to have the most specific first and the more lenient at the back */
+    /* A list of all the dateFormats to attempt.  These should be configured to
+       have the most specific first and the more lenient at the back. */
     private List<String> dateFormatsToAttempt;
 
 
     public List<String> getDateFormatsToAttempt() {
         return dateFormatsToAttempt;
     }
+
     @Required
     public void setDateFormatsToAttempt(List<String> dateFormatsToAttempt) {
         this.dateFormatsToAttempt = dateFormatsToAttempt;
@@ -52,8 +54,8 @@ public class PubmedDateMetadatumContributor<T> implements MetadataContributor<T>
     private MetadataContributor year;
 
     /**
-     * Set the metadatafieldMapping used in the transforming of a record to actual metadata
-     * @param metadataFieldMapping
+     * Set the metadatafieldMapping used in the transforming of a record to actual metadata.
+     * @param metadataFieldMapping the new mapping.
      */
     @Override
     public void setMetadataFieldMapping(MetadataFieldMapping<T, MetadataContributor<T>> metadataFieldMapping) {

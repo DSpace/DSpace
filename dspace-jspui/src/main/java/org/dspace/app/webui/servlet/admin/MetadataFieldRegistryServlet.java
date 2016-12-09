@@ -82,14 +82,14 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         ResourceBundle labels = ResourceBundle.getBundle("Messages", locale);
 
         String element = request.getParameter("element");
-		String scope = request.getParameter("scope_note");
+        String scope = request.getParameter("scope_note");
         String qual = request.getParameter("qualifier");
         if ("".equals(qual))
         {
             qual = null;
         }
 
-		if ("submit_update".equals(button))
+        if ("submit_update".equals(button))
         {
             // The sanity check will update the request error string if needed
             if (!sanityCheck(request, labels))
@@ -198,7 +198,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                 }
                 else
                 {
-                	schema = schemaService.find(context, schemaID);
+                    schema = schemaService.find(context, schemaID);
                     for (int ii = 0; ii < param.length; ii++)
                     {
                         int fieldID = Integer.parseInt(param[ii]);
@@ -253,16 +253,21 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
      * Show list of DC type
      * 
      * @param context
-     *            Current DSpace context
+     *     The relevant DSpace Context.
      * @param request
-     *            Current HTTP request
+     *     Servlet's HTTP request object.
      * @param response
-     *            Current HTTP response
+     *     Servlet's HTTP response object.
      * @param schemaID
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private void showTypes(Context context, HttpServletRequest request,
             HttpServletResponse response, MetadataSchema schema)
@@ -291,6 +296,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
      * description.
      *
      * @param request
+     *     Servlet's HTTP request object.
      * @param labels
      * @return true of false
      */
@@ -329,7 +335,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             for (int ii = 0; ii < qualifier.length(); ii++)
             {
                 if (qualifier.charAt(ii) == '.' || qualifier.charAt(ii) == '_'
-                        || qualifier.charAt(ii) == ' ')
+                    || qualifier.charAt(ii) == ' ')
                 {
                     return error(request, labels.getString(clazz
                             + ".badqualchar"));
@@ -344,8 +350,10 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
      * Bind the error text to the request object.
      *
      * @param request
+     *     Servlet's HTTP request object.
      * @param text
-     * @return false
+     *     Error text
+     * @return false - always false
      */
     private boolean error(HttpServletRequest request, String text)
     {

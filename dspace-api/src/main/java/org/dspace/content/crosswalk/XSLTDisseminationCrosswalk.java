@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * Configurable XSLT-driven dissemination Crosswalk
  * <p>
  * See the XSLTCrosswalk superclass for details on configuration.
- * <p>
+ * </p>
  * <h3>Additional Configuration of Dissemination crosswalk:</h3>
  * The disseminator also needs to be configured with an XML Namespace
  * (including prefix and URI) and an XML Schema for output format.  This
@@ -524,7 +524,8 @@ public class XSLTDisseminationCrosswalk
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.
      * Usage:  {@code java XSLTDisseminationCrosswalk  <crosswalk-name> <handle> [output-file]}
-     * @param argv arguments
+     *
+     * @param argv the command line arguments given
      * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception

@@ -93,6 +93,15 @@ public class InitialQuestionsStep extends AbstractProcessingStep
      * @return Status or error flag which will be processed by
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     public int doProcessing(Context context, HttpServletRequest request,
@@ -284,6 +293,15 @@ public class InitialQuestionsStep extends AbstractProcessingStep
      *            if published before
      * @param multipleFiles
      *            if there will be multiple files
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void processVerifyPrune(Context context,
             HttpServletRequest request, HttpServletResponse response,

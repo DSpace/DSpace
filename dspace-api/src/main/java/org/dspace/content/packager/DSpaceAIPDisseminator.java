@@ -454,6 +454,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * @throws IOException if IO error
      * @throws AuthorizeException if authorization error
      * @throws MetsException
+     *     METS Java toolkit exception class.
      */
     @Override
     public void addStructMap(Context context, DSpaceObject dso,

@@ -18,26 +18,26 @@ import org.purl.sword.base.XmlName;
  */
 public class Rights extends TextConstruct
 {
-   /**
-	* Local name for the element. 
-	*/
-   private static final XmlName XML_NAME = new XmlName(
-           Namespaces.PREFIX_ATOM, "rights", Namespaces.NS_ATOM);
-
-
-
-   /** 
-    * Create a new instance and set the prefix to 
-    * 'atom' and the local name to 'rights'. 
-    */
-   public Rights()
-   {
-      super(XML_NAME);
-   }
-
-   public static XmlName elementName()
-   {
-       return XML_NAME;
-   }
+    /**
+     * Local name for the element. 
+     */
+    private static final XmlName XML_NAME = new XmlName(
+            Namespaces.PREFIX_ATOM, "rights", Namespaces.NS_ATOM);
+ 
+ 
+ 
+    /** 
+     * Create a new instance and set the prefix to 
+     * 'atom' and the local name to 'rights'. 
+     */
+    public Rights()
+    {
+        super(XML_NAME);
+    }
+ 
+    public static XmlName elementName()
+    {
+        return XML_NAME;
+    }
 
 }

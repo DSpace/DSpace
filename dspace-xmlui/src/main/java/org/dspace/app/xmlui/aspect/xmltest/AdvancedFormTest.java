@@ -28,136 +28,139 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
 /**
- * This is a class to test the advanced form capabilities of DRI. 
- * All the fields on this page will either be composite or have 
+ * This is a class to test the advanced form capabilities of DRI.
+ * All the fields on this page will either be composite or have
  * multiple instances.
- * 
+ *
  * This class is not internationalized because it is never intended
  * to be used in production. It is merely a tool to aid developers of
  * aspects and themes.
- * 
+ *
  * @author Scott Phillips
  */
 public class AdvancedFormTest extends AbstractDSpaceTransformer {
 
-	public void addPageMeta(PageMeta pageMeta) throws SAXException,
-			WingException, UIException, SQLException, IOException,
-			AuthorizeException {
-		pageMeta.addMetadata("title").addContent("Advanced Form Test");
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        pageMeta.addMetadata("title").addContent("Advanced Form Test");
 
-		pageMeta.addTrailLink(contextPath + "/", "DSpace Home");
-		pageMeta.addTrail().addContent("Advanced Form Test");
-	}
+        pageMeta.addTrailLink(contextPath + "/", "DSpace Home");
+        pageMeta.addTrail().addContent("Advanced Form Test");
+    }
 
-	public void addBody(Body body) throws SAXException, WingException,
-			UIException, SQLException, IOException, AuthorizeException {
-		
-		Request request = ObjectModelHelper.getRequest(objectModel);
-		boolean help = false, error = false;
-		if (request.getParameter("help") != null)
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        boolean help = false, error = false;
+        if (request.getParameter("help") != null)
         {
             help = true;
         }
-		if (request.getParameter("error") != null)
+        if (request.getParameter("error") != null)
         {
             error = true;
         }
-		
-		Division div = body.addInteractiveDivision("test", "", "post", "primary");
-		div.setHead("Advanced form test");
-		div.addPara("There are two options you can use to control how this page is generated. First is the help parameter, if this is present then help text will be provided for all fields. Next is the error parameter, if it is provided then all fields will be generated in error conditions.");
-		
-		if (help)
+
+        Division div = body.addInteractiveDivision("test", "", "post", "primary");
+        div.setHead("Advanced form test");
+        div.addPara("There are two options you can use to control how this page is generated. First is the help parameter, if this is present then help text will be provided for all fields. Next is the error parameter, if it is provided then all fields will be generated in error conditions.");
+
+        if (help)
         {
             div.addPara().addXref(makeURL(false, error), "Turn help OFF");
         }
-		else
+        else
         {
             div.addPara().addXref(makeURL(true, error), "Turn help ON");
         }
-			
-		if (error)
+
+        if (error)
         {
             div.addPara().addXref(makeURL(help, false), "Turn errors OFF");
         }
-		else
+        else
         {
             div.addPara().addXref(makeURL(help, true), "Turn errors ON");
         }
-		
-		
-		List list = div.addList("fieldTest",List.TYPE_FORM);
-		list.setHead("Tests");
-		
-		// text
-		Text text = list.addItem().addText("text");
-		text.setLabel("Text");
-		text.enableAddOperation();
-		text.enableDeleteOperation();
-		if (help)
+
+
+        List list = div.addList("fieldTest",List.TYPE_FORM);
+        list.setHead("Tests");
+
+        // text
+        Text text = list.addItem().addText("text");
+        text.setLabel("Text");
+        text.enableAddOperation();
+        text.enableDeleteOperation();
+        if (help)
         {
             text.setHelp("This is helpful text.");
         }
-		if (error)
+        if (error)
         {
             text.addError("This field is in error.");
         }
-		text.setValue("First is special");
-		Instance instance = text.addInstance();
-		instance.setValue("Second raw");
-		instance.setInterpretedValue("Second interpreted");
-		instance = text.addInstance();
-		instance.setValue("Third raw");
-		instance.setInterpretedValue("Third interpreted");
+        text.setValue("First is special");
+        Instance instance = text.addInstance();
+        instance.setValue("Second raw");
+        instance.setInterpretedValue("Second interpreted");
+        instance = text.addInstance();
+        instance.setValue("Third raw");
+        instance.setInterpretedValue("Third interpreted");
 
-		// Select
-		Select select = list.addItem().addSelect("select");
-		select.setLabel("Text");
-		select.enableAddOperation();
-		select.enableDeleteOperation();
-		select.setMultiple();
-		select.setSize(4);
-		if (help)
+        // Select
+        Select select = list.addItem().addSelect("select");
+        select.setLabel("Text");
+        select.enableAddOperation();
+        select.enableDeleteOperation();
+        select.setMultiple();
+        select.setSize(4);
+        if (help)
         {
             select.setHelp("This is helpful text.");
         }
-		if (error)
+        if (error)
         {
             select.addError("This field is in error.");
         }
-		select.addOption("one", "uno");
-		select.addOption("two", "dos");
-		select.addOption("three", "tres");
-		select.addOption("four", "cuatro");
-		select.addOption("five", "cinco");
-		
-		instance = select.addInstance();
-		instance.setOptionSelected("one");
-		
-		instance = select.addInstance();
-		instance.setOptionSelected("one");
-		instance.setOptionSelected("two");
-		
-		instance = select.addInstance();
-		instance.setOptionSelected("one");
-		instance.setOptionSelected("two");
-		instance.setOptionSelected("three");
-		
-		instance = select.addInstance();
-		instance.setOptionSelected("one");
-		instance.setOptionSelected("two");
-		instance.setOptionSelected("three");
-		instance.setOptionSelected("four");
-		
-		instance = select.addInstance();
-		instance.setOptionSelected("one");
-		instance.setOptionSelected("two");
-		instance.setOptionSelected("three");
-		instance.setOptionSelected("four");
-		instance.setOptionSelected("five");
-		
+        select.addOption("one", "uno");
+        select.addOption("two", "dos");
+        select.addOption("three", "tres");
+        select.addOption("four", "cuatro");
+        select.addOption("five", "cinco");
 
-        // composite two text fields   
+        instance = select.addInstance();
+        instance.setOptionSelected("one");
+
+        instance = select.addInstance();
+        instance.setOptionSelected("one");
+        instance.setOptionSelected("two");
+
+        instance = select.addInstance();
+        instance.setOptionSelected("one");
+        instance.setOptionSelected("two");
+        instance.setOptionSelected("three");
+
+        instance = select.addInstance();
+        instance.setOptionSelected("one");
+        instance.setOptionSelected("two");
+        instance.setOptionSelected("three");
+        instance.setOptionSelected("four");
+
+        instance = select.addInstance();
+        instance.setOptionSelected("one");
+        instance.setOptionSelected("two");
+        instance.setOptionSelected("three");
+        instance.setOptionSelected("four");
+        instance.setOptionSelected("five");
+
+
+        // composite two text fields
         Composite composite = list.addItem().addComposite("compositeA");
         composite.setLabel("Composite (two text fields)");
         composite.enableAddOperation();
@@ -178,7 +181,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         text.addInstance().setValue("1, Raw A");
         text.addInstance().setValue("2, Raw A");
         text.addInstance().setValue("3, Raw A");
-        
+
         text = composite.addText("secondA");
         if (help)
         {
@@ -187,7 +190,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         text.addInstance().setValue("1, Raw B");
         text.addInstance().setValue("2, Raw B");
         text.addInstance().setValue("3, Raw B");
-        
+
         // composite select & text fields
         composite = list.addItem().addComposite("compositeB");
         composite.setLabel("Composite (select & text fields)");
@@ -197,7 +200,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         {
             composite.setHelp("This field is composed of a select and text field, select one and type the other.");
         }
-  
+
         select = composite.addSelect("selectB");
         if (help)
         {
@@ -213,11 +216,11 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         select.addOption("four","cuatro");
         select.addOption("five","cinco");
         select.setOptionSelected("one");
-        
+
         select.addInstance().addOptionValue("one");
         select.addInstance().addOptionValue("two");
         select.addInstance().addOptionValue("three");
-        
+
         text = composite.addText("TextB");
         if (help)
         {
@@ -230,11 +233,11 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         text.addInstance().setValue("1, Raw B");
         text.addInstance().setValue("2, Raw B");
         text.addInstance().setValue("3, Raw B");
-        
+
         composite.addInstance().setInterpretedValue("One interpreted.");
         composite.addInstance().setInterpretedValue("Two interpreted.");
         composite.addInstance().setInterpretedValue("Three interpreted.");
-        
+
         // Composite (date)
         composite = list.addItem().addComposite("composite-date");
         composite.setLabel("Composite (date)");
@@ -248,7 +251,7 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         {
             composite.setHelp("The composite is in error.");
         }
-        
+
         text = composite.addText("day");
         if (help)
         {
@@ -259,13 +262,13 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
             text.setHelp("The first text field is in error.");
         }
         text.setSize(4,2);
-        
+
         text.addInstance().setValue("1");
         text.addInstance().setValue("2");
         text.addInstance().setValue("3");
         text.addInstance().setValue("4");
         text.addInstance().setValue("5");
-        
+
         select = composite.addSelect("month");
         if (error)
         {
@@ -285,13 +288,13 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         select.addOption(11,"October");
         select.addOption(12,"November");
         select.addOption(13,"December");
-        
+
         select.addInstance().setOptionSelected(1);
         select.addInstance().setOptionSelected(2);
         select.addInstance().setOptionSelected(3);
         select.addInstance().setOptionSelected(4);
         select.addInstance().setOptionSelected(5);
-        
+
         text = composite.addText("year");
         text.setSize(4,4);
         if (help)
@@ -307,35 +310,34 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         text.addInstance().setValue("2003");
         text.addInstance().setValue("2004");
         text.addInstance().setValue("2005");
-        
+
         // Buttons one typical finds at the end of forums
         Item actions = list.addItem();
         actions.addButton("submit_save").setValue("Save");
         actions.addButton("submit_cancel").setValue("Cancel");
-	}
-	
+    }
+
     /**
-     * Helpful method to generate the return url to this page given the 
-     * error & help parameters.
+     * Helpful method to generate the return url to this page given the
+     * error and help parameters.
      */
-	private String makeURL(boolean help, boolean error)
-	{
-		if (help && error)
+    private String makeURL(boolean help, boolean error)
+    {
+        if (help && error)
         {
             return "?help&error";
         }
-		
-		if (help)
+
+        if (help)
         {
             return "?help";
         }
-		
-		if (error)
+
+        if (error)
         {
             return "?error";
         }
-		
-		return "?neither";
-	}
-	
+
+        return "?neither";
+    }
 }

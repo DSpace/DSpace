@@ -38,19 +38,19 @@ import org.xml.sax.SAXException;
 /**
  * Add a single link to the display item page that allows
  * the user to submit a new item to this collection.
- * 
+ *
  * @author Scott Phillips
  */
 public class CollectionViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-	
-	/** Language Strings */
-    protected static final Message T_title = 
+
+    /** Language Strings */
+    protected static final Message T_title =
         message("xmlui.Submission.SelectCollection.title");
-    protected static final Message T_submit = 
-    	message("xmlui.Submission.CollectionViewer.link1");
-    
-	
+    protected static final Message T_submit =
+        message("xmlui.Submission.CollectionViewer.link1");
+
+
     /** Cached validity object */
     private SourceValidity validity;
 
@@ -71,7 +71,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             {
                 return "0";
             }
-                
+
             return HashUtil.hash(dso.getHandle());
         }
         catch (SQLException sqle)
@@ -84,88 +84,88 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
     /**
      * Generate the cache validity object.
-     * 
-     * The validity object will include the collection being viewed and 
+     *
+     * The validity object will include the collection being viewed and
      * all recently submitted items. This does not include the community / collection
      * hierarchy, when this changes they will not be reflected in the cache.
      */
     public SourceValidity getValidity()
     {
-    	if (this.validity == null)
-    	{
-	        try
-	        {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-	
-	            if (dso == null)
+        if (this.validity == null)
+        {
+            try
+            {
+                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+
+                if (dso == null)
                 {
                     return null;
                 }
-	
-	            if (!(dso instanceof Collection))
+
+                if (!(dso instanceof Collection))
                 {
                     return null;
                 }
-	
-	            Collection collection = (Collection) dso;
-	
-	            DSpaceValidity validity = new DSpaceValidity();
-	            
-	            // Add the actual collection;
-	            validity.add(context, collection);
-	            
-	            // Add the eperson viewing the collection
-	            validity.add(context, eperson);
-	            
-	            // Include any groups they are a member of
-	            List<Group> groups = groupService.allMemberGroups(context, eperson);
-	            for (Group group : groups)
-	            {
-	            	validity.add(context, group);
-	            }
-	            
-	            this.validity = validity.complete();
-	        }
-	        catch (Exception e)
-	        {
-	            // Just ignore all errors and return an invalid cache.
-	        }
-    	}
-    	return this.validity;
+
+                Collection collection = (Collection) dso;
+
+                DSpaceValidity validity = new DSpaceValidity();
+
+                // Add the actual collection;
+                validity.add(context, collection);
+
+                // Add the eperson viewing the collection
+                validity.add(context, eperson);
+
+                // Include any groups they are a member of
+                List<Group> groups = groupService.allMemberGroups(context, eperson);
+                for (Group group : groups)
+                {
+                    validity.add(context, group);
+                }
+
+                this.validity = validity.complete();
+            }
+            catch (Exception e)
+            {
+                // Just ignore all errors and return an invalid cache.
+            }
+        }
+        return this.validity;
     }
 
     /**
-     * Add a single link to the view item page that allows the user 
+     * Add a single link to the view item page that allows the user
      * to submit to the collection.
      */
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
         {
             return;
         }
- 
+
         // Set up the major variables
         Collection collection = (Collection) dso;
-        
+
         // Only add the submit link if the user has the ability to add items.
         if (authorizeService.authorizeActionBoolean(context, collection, Constants.ADD))
         {
-	        Division home = body.addDivision("collection-home","primary repository collection");
-	        Division viewer = home.addDivision("collection-view","secondary");
-	        String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
-	        viewer.addPara().addXref(submitURL,T_submit); 
+            Division home = body.addDivision("collection-home", "primary repository collection");
+            Division viewer = home.addDivision("collection-view", "secondary");
+            String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
+            viewer.addPara().addXref(submitURL, T_submit);
         }
-        
     }
-    
+
     /**
      * Recycle
      */
-    public void recycle() 
-    {   
+    public void recycle()
+    {
         this.validity = null;
         super.recycle();
     }

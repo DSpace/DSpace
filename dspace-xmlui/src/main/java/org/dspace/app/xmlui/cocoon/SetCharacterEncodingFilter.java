@@ -90,8 +90,8 @@ public class SetCharacterEncodingFilter implements Filter
      * @param response The servlet response we are creating
      * @param chain The filter chain we are processing
      *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet error occurs
+     * @throws IOException if an input/output error occurs
+     * @throws ServletException if a servlet error occurs
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,

@@ -62,10 +62,11 @@ public class EmbargoCLITool {
      *   <dt>-q,--quiet</dt>
      *   <dd>         No output except upon error.</dd>
      * </dl>
+     *
+     * @param argv the command line arguments given
      */
     public static void main(String argv[])
     {
-
         int status = 0;
 
         Options options = new Options();
@@ -197,7 +198,7 @@ public class EmbargoCLITool {
                 if (line.hasOption('a')){
                     embargoService.setEmbargo(context, item);
                 }
-                else{
+                else {
                     log.debug("Testing embargo on item="+item.getHandle()+", date="+liftDate.toString());
                     if (liftDate.toDate().before(now))
                     {
@@ -229,8 +230,8 @@ public class EmbargoCLITool {
             }
             catch (Exception e)
             {
-                log.error("Failed attempting to lift embargo, item="+item.getHandle()+": ", e);
-                System.err.println("Failed attempting to lift embargo, item="+item.getHandle()+": "+ e);
+                log.error("Failed attempting to lift embargo, item=" + item.getHandle() + ": ", e);
+                System.err.println("Failed attempting to lift embargo, item=" + item.getHandle() + ": " + e);
                 status = true;
             }
         }

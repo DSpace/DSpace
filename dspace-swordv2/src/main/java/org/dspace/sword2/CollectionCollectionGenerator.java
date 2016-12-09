@@ -29,18 +29,21 @@ import java.util.List;
  */
 public class CollectionCollectionGenerator implements AtomCollectionGenerator
 {
-    private static Logger log = Logger
-            .getLogger(CommunityCollectionGenerator.class);
+    private static Logger log = Logger.getLogger(
+        CommunityCollectionGenerator.class);
 
-    protected CollectionService collectionService = ContentServiceFactory
-            .getInstance().getCollectionService();
+    protected CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
 
     /**
      * Build the collection for the given DSpaceObject.  In this implementation,
      * if the object is not a DSpace Collection, it will throw DSpaceSwordException
-     * @param dso
+     * @param context
+     *     The relevant DSpace Context.
+     * @param dso DSpace object
      * @return the SWORD ATOM collection
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public SwordCollection buildCollection(Context context, DSpaceObject dso,
             SwordConfigurationDSpace swordConfig)
@@ -49,9 +52,9 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
         if (!(dso instanceof org.dspace.content.Collection))
         {
             log.error(
-                    "buildCollection passed argument which is not of type Collection");
+                "buildCollection passed argument which is not of type Collection");
             throw new DSpaceSwordException(
-                    "Incorrect ATOMCollectionGenerator instantiated");
+                "Incorrect ATOMCollectionGenerator instantiated");
         }
 
         // get the things we need out of the service
@@ -127,8 +130,8 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 
         // should we offer the items in the collection up as deposit
         // targets?
-        boolean itemService = ConfigurationManager
-                .getBooleanProperty("sword.expose-items");
+        boolean itemService = ConfigurationManager.getBooleanProperty(
+            "sword.expose-items");
         if (itemService)
         {
             String subService = urlManager.constructSubServiceUrl(col);

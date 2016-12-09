@@ -29,45 +29,71 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
     public StatisticsSolrDateFilter() {
     }
 
-    /** Set the start date as a string expression.
+    /**
+     *  Set the start date as a string expression.
+     *     
+     * @param startStr
+     *     statistics start date as a string
+     *
      * Must be paired with {@link #setEndStr(String)}.
      */
     public void setStartStr(String startStr) {
         this.startStr = startStr;
     }
 
-    /** Set the end date as a string expression.
+    /**
+     * Set the end date as a string expression.
+     *     
+     * @param endStr
+     *     statistics end date as a string
+     *
      * Must be paired with {@link #setStartStr(String)}.
      */
     public void setEndStr(String endStr) {
         this.endStr = endStr;
     }
 
-    /** Set the range granularity:  DAY, MONTH, or YEAR. */
+    /**
+     * Set the range granularity:  DAY, MONTH, or YEAR.
+     *
+     * @param typeStr
+     *     which granularity (case insensitive string: "day" / "month" / "year")
+     */
     public void setTypeStr(String typeStr) {
         this.typeStr = typeStr;
     }
 
-    /** Set the start date as a Date object.
+    /**
+     * Set the start date as a Date object.
+     *     
+     * @param startDate
+     *     statistics start date object
+     *
      * Must be paired with {@link #setEndDate(Date)}.
      */
     public void setStartDate(Date startDate) {
         this.startDate = (startDate == null ? null : new Date(startDate.getTime()));
     }
 
-    /** Set the end date as a Date object.
+    /**
+     * Set the end date as a Date object.
+     *     
+     * @param endDate
+     *     statistics end date object
+     *
      * Must be paired with {@link #setStartDate(Date)}.
      */
     public void setEndDate(Date endDate) {
         this.endDate = (endDate == null ? null : new Date(endDate.getTime()));
     }
 
-    /** Convert the date range to a filter expression.
+    /**
+     * Convert the date range to a filter expression.
      * @return Solr date filter expression
      */
     @Override
     public String toQuery() {
-        if(startDate == null || endDate == null){
+        if (startDate == null || endDate == null) {
             // We have got strings instead of dates so calculate our dates out
             // of these strings
             Calendar startCal = Calendar.getInstance();
@@ -78,12 +104,12 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
             startCal.set(Calendar.HOUR_OF_DAY, 0);
 
             int dateType = -1;
-            if(typeStr.equalsIgnoreCase("day")) {
+            if (typeStr.equalsIgnoreCase("day")) {
                 dateType = Calendar.DATE;
-            } else if(typeStr.equalsIgnoreCase("month")) {
+            } else if (typeStr.equalsIgnoreCase("month")) {
                 dateType = Calendar.MONTH;
                 startCal.set(Calendar.DATE, 1);
-            } else if(typeStr.equalsIgnoreCase("year")) {
+            } else if (typeStr.equalsIgnoreCase("year")) {
                 startCal.clear(Calendar.MONTH);
                 startCal.set(Calendar.DATE, 1);
                 dateType = Calendar.YEAR;
@@ -96,7 +122,7 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
 
             if (startDate == null)
             {
-                if(startStr.startsWith("+"))
+                if (startStr.startsWith("+"))
                 {
                     startStr = startStr.substring(startStr.indexOf('+') + 1);
                 }
@@ -107,7 +133,7 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
 
             if (endDate == null)
             {
-                if(endStr.startsWith("+"))
+                if (endStr.startsWith("+"))
                 {
                     endStr = endStr.substring(endStr.indexOf('+') + 1);
                 }

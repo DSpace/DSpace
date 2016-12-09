@@ -24,58 +24,59 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
 /**
- * Simple navigation class to add the top level link to 
+ * Simple navigation class to add the top level link to
  * the main submissions page.
- * 
+ *
  * @author Scott Phillips
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-	
-    
-	/** Language Strings **/
-    protected static final Message T_submissions = 
+
+
+    /** Language Strings **/
+    protected static final Message T_submissions =
         message("xmlui.Submission.Navigation.submissions");
-	
-	 /**
+
+    /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
     public Serializable getKey() {
-        
+
         return 1;
     }
 
     /**
      * Generate the cache validity object.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
         return NOPValidity.SHARED_INSTANCE;
     }
-	
-   
-    public void addOptions(Options options) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+
+
+    public void addOptions(Options options)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
-		// Basic navigation skeleton
+        // Basic navigation skeleton
         options.addList("browse");
         List account = options.addList("account");
         options.addList("context");
         options.addList("administrative");
-    	
-//      This doesn't flow very well, lets remove it and see if anyone misses it.  
-//    	DSpaceObject dso = HandleUtil.obtainHandle(objectModel);	
-//    	if (dso != null && dso instanceof Collection)
-//    	{
-//    		Collection collection = (Collection) dso;  		
-//    		if (AuthorizeManager.authorizeActionBoolean(context, collection, Constants.ADD))
-//    		{
-//    	        String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
-//		        account.addItemXref(submitURL,"Submit to this collection");
-//    		}
-//    	}
-    	
-    	account.addItemXref(contextPath+"/submissions",T_submissions);
+
+//      This doesn't flow very well, lets remove it and see if anyone misses it.
+//        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+//        if (dso != null && dso instanceof Collection)
+//        {
+//            Collection collection = (Collection) dso;
+//            if (AuthorizeManager.authorizeActionBoolean(context, collection, Constants.ADD))
+//            {
+//                String submitURL = contextPath + "/handle/" + collection.getHandle() + "/submit";
+//                account.addItemXref(submitURL,"Submit to this collection");
+//            }
+//        }
+
+        account.addItemXref(contextPath+"/submissions",T_submissions);
     }
 }

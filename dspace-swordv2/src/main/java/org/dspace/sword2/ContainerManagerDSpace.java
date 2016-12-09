@@ -35,14 +35,14 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
 {
     private static Logger log = Logger.getLogger(ContainerManagerDSpace.class);
 
-    protected AuthorizeService authorizeService = AuthorizeServiceFactory
-            .getInstance().getAuthorizeService();
+    protected AuthorizeService authorizeService =
+        AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
-    protected WorkflowItemService workflowItemService = WorkflowServiceFactory
-            .getInstance().getWorkflowItemService();
+    protected WorkflowItemService workflowItemService =
+        WorkflowServiceFactory.getInstance().getWorkflowItemService();
 
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory
-            .getInstance().getWorkspaceItemService();
+    protected WorkspaceItemService workspaceItemService =
+        ContentServiceFactory.getInstance().getWorkspaceItemService();
 
     private VerboseDescription verboseDescription = new VerboseDescription();
 
@@ -81,7 +81,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         {
             log.error("caught exception:", e);
             throw new SwordServerException(
-                    "There was a problem determining the request type", e);
+                "There was a problem determining the request type", e);
         }
         finally
         {
@@ -145,8 +145,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         Date start = new Date();
 
         // store up the verbose description, which we can then give back at the end if necessary
-        this.verboseDescription
-                .append("Initialising verbose replace of metadata");
+        this.verboseDescription.append(
+            "Initialising verbose replace of metadata");
 
         SwordContext sc = null;
         SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
@@ -184,30 +184,28 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager
-                        .getHeader(context, "replace_failed_authorisation",
-                                "user=" +
-                                        sc.getAuthenticated().getEmail() +
-                                        ",on_behalf_of=" + oboEmail));
+                log.info(LogManager.getHeader(
+                    context, "replace_failed_authorisation",
+                    "user=" + sc.getAuthenticated().getEmail() +
+                    ",on_behalf_of=" + oboEmail));
                 throw new SwordAuthException(
                         "Cannot replace the given item with this context");
             }
 
             // make a note of the authentication in the verbose string
-            this.verboseDescription.append("Authenticated user: " +
-                    sc.getAuthenticated().getEmail());
+            this.verboseDescription.append(
+                "Authenticated user: " + sc.getAuthenticated().getEmail());
             if (sc.getOnBehalfOf() != null)
             {
                 this.verboseDescription.append("Depositing on behalf of: " +
-                        sc.getOnBehalfOf().getEmail());
+                    sc.getOnBehalfOf().getEmail());
             }
 
             DepositResult result = null;
             try
             {
-                result = this
-                        .doReplaceMetadata(sc, item, deposit, authCredentials,
-                                config);
+                result = this.doReplaceMetadata(
+                    sc, item, deposit, authCredentials, config);
             }
             catch (DSpaceSwordException | SwordError e)
             {
@@ -229,15 +227,14 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             wfm.resolveState(context, deposit, result, this.verboseDescription);
 
             ReceiptGenerator genny = new ReceiptGenerator();
-            DepositReceipt receipt = genny
-                    .createReceipt(context, result, config);
+            DepositReceipt receipt = genny.createReceipt(
+                context, result, config);
 
             Date finish = new Date();
             long delta = finish.getTime() - start.getTime();
 
-            this.verboseDescription
-                    .append("Total time for deposit processing: " + delta +
-                            " ms");
+            this.verboseDescription.append(
+                "Total time for deposit processing: " + delta + " ms");
             this.addVerboseDescription(receipt, this.verboseDescription);
 
             // if something hasn't killed it already (allowed), then complete the transaction
@@ -249,7 +246,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         {
             log.error("caught exception:", e);
             throw new SwordServerException(
-                    "There was a problem depositing the item", e);
+                "There was a problem depositing the item", e);
         }
         finally
         {
@@ -270,8 +267,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         Date start = new Date();
 
         // store up the verbose description, which we can then give back at the end if necessary
-        this.verboseDescription
-                .append("Initialising verbose multipart replace");
+        this.verboseDescription.append(
+            "Initialising verbose multipart replace");
 
         SwordContext sc = null;
         SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
@@ -285,8 +282,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
 
             if (log.isDebugEnabled())
             {
-                log.debug(
-                        LogManager.getHeader(context, "sword_create_new", ""));
+                log.debug(LogManager.getHeader(
+                    context, "sword_create_new", ""));
             }
 
             // get the deposit target
@@ -311,29 +308,28 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager
-                        .getHeader(context, "deposit_failed_authorisation",
-                                "user=" +
-                                        sc.getAuthenticated().getEmail() +
-                                        ",on_behalf_of=" + oboEmail));
+                log.info(LogManager.getHeader(context,
+                    "deposit_failed_authorisation",
+                    "user=" + sc.getAuthenticated().getEmail() +
+                    ",on_behalf_of=" + oboEmail));
                 throw new SwordAuthException(
-                        "Cannot submit to the given collection with this context");
+                    "Cannot submit to the given collection with this context");
             }
 
             // make a note of the authentication in the verbose string
-            this.verboseDescription.append("Authenticated user: " +
-                    sc.getAuthenticated().getEmail());
+            this.verboseDescription.append(
+                "Authenticated user: " + sc.getAuthenticated().getEmail());
             if (sc.getOnBehalfOf() != null)
             {
                 this.verboseDescription.append("Depositing on behalf of: " +
-                        sc.getOnBehalfOf().getEmail());
+                    sc.getOnBehalfOf().getEmail());
             }
 
             DepositResult result = null;
             try
             {
-                result = this.replaceFromMultipart(sc, item, deposit,
-                        authCredentials, config);
+                result = this.replaceFromMultipart(
+                sc, item, deposit, authCredentials, config);
             }
             catch (DSpaceSwordException | SwordError e)
             {
@@ -357,15 +353,14 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             wfm.resolveState(context, deposit, result, this.verboseDescription);
 
             ReceiptGenerator genny = new ReceiptGenerator();
-            DepositReceipt receipt = genny
-                    .createReceipt(context, result, config);
+            DepositReceipt receipt = genny.createReceipt(
+                context, result, config);
 
             Date finish = new Date();
             long delta = finish.getTime() - start.getTime();
 
-            this.verboseDescription
-                    .append("Total time for deposit processing: " + delta +
-                            " ms");
+            this.verboseDescription.append(
+                "Total time for deposit processing: " + delta + " ms");
             this.addVerboseDescription(receipt, this.verboseDescription);
 
             // if something hasn't killed it already (allowed), then complete the transaction
@@ -377,7 +372,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         {
             log.error("caught exception:", e);
             throw new SwordServerException(
-                    "There was a problem depositing the item", e);
+                "There was a problem depositing the item", e);
         }
         finally
         {
@@ -404,8 +399,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         Date start = new Date();
 
         // store up the verbose description, which we can then give back at the end if necessary
-        this.verboseDescription
-                .append("Initialising verbose replace of metadata");
+        this.verboseDescription.append(
+            "Initialising verbose replace of metadata");
 
         SwordContext sc = null;
         SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
@@ -443,29 +438,28 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager
-                        .getHeader(context, "replace_failed_authorisation",
-                                "user=" +
-                                        sc.getAuthenticated().getEmail() +
-                                        ",on_behalf_of=" + oboEmail));
+                log.info(LogManager.getHeader(
+                    context, "replace_failed_authorisation",
+                    "user=" + sc.getAuthenticated().getEmail() +
+                    ",on_behalf_of=" + oboEmail));
                 throw new SwordAuthException(
-                        "Cannot replace the given item with this context");
+                    "Cannot replace the given item with this context");
             }
 
             // make a note of the authentication in the verbose string
             this.verboseDescription.append("Authenticated user: " +
-                    sc.getAuthenticated().getEmail());
+                sc.getAuthenticated().getEmail());
             if (sc.getOnBehalfOf() != null)
             {
                 this.verboseDescription.append("Depositing on behalf of: " +
-                        sc.getOnBehalfOf().getEmail());
+                    sc.getOnBehalfOf().getEmail());
             }
 
             DepositResult result = null;
             try
             {
-                result = this.doAddMetadata(sc, item, deposit, authCredentials,
-                        config);
+                result = this.doAddMetadata(
+                    sc, item, deposit, authCredentials, config);
             }
             catch (DSpaceSwordException | SwordError e)
             {
@@ -487,15 +481,14 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             wfm.resolveState(context, deposit, result, this.verboseDescription);
 
             ReceiptGenerator genny = new ReceiptGenerator();
-            DepositReceipt receipt = genny
-                    .createReceipt(context, result, config);
+            DepositReceipt receipt = genny.createReceipt(
+                context, result, config);
 
             Date finish = new Date();
             long delta = finish.getTime() - start.getTime();
 
-            this.verboseDescription
-                    .append("Total time for deposit processing: " + delta +
-                            " ms");
+            this.verboseDescription.append(
+                "Total time for deposit processing: " + delta + " ms");
             this.addVerboseDescription(receipt, this.verboseDescription);
 
             // if something hasn't killed it already (allowed), then complete the transaction
@@ -507,7 +500,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         {
             log.error("caught exception:", e);
             throw new SwordServerException(
-                    "There was a problem depositing the item", e);
+                "There was a problem depositing the item", e);
         }
         finally
         {
@@ -572,22 +565,21 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager
-                        .getHeader(context, "replace_failed_authorisation",
-                                "user=" +
-                                        sc.getAuthenticated().getEmail() +
-                                        ",on_behalf_of=" + oboEmail));
+                log.info(LogManager.getHeader(context,
+                    "replace_failed_authorisation",
+                    "user=" + sc.getAuthenticated().getEmail() +
+                    ",on_behalf_of=" + oboEmail));
                 throw new SwordAuthException(
-                        "Cannot delete the given item with this context");
+                    "Cannot delete the given item with this context");
             }
 
             // make a note of the authentication in the verbose string
             this.verboseDescription.append("Authenticated user: " +
-                    sc.getAuthenticated().getEmail());
+                sc.getAuthenticated().getEmail());
             if (sc.getOnBehalfOf() != null)
             {
                 this.verboseDescription.append("Depositing on behalf of: " +
-                        sc.getOnBehalfOf().getEmail());
+                    sc.getOnBehalfOf().getEmail());
             }
 
             this.doContainerDelete(sc, item, authCredentials, config);
@@ -595,9 +587,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             Date finish = new Date();
             long delta = finish.getTime() - start.getTime();
 
-            this.verboseDescription
-                    .append("Total time for deposit processing: " + delta +
-                            " ms");
+            this.verboseDescription.append(
+                "Total time for deposit processing: " + delta + " ms");
 
             // if something hasn't killed it already (allowed), then complete the transaction
             sc.commit();
@@ -606,7 +597,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         {
             log.error("caught exception:", e);
             throw new SwordServerException(
-                    "There was a problem depositing the item", e);
+                "There was a problem depositing the item", e);
         }
         finally
         {
@@ -626,8 +617,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         Date start = new Date();
 
         // store up the verbose description, which we can then give back at the end if necessary
-        this.verboseDescription
-                .append("Initialising verbose empty request (headers only)");
+        this.verboseDescription.append(
+            "Initialising verbose empty request (headers only)");
 
         SwordContext sc = null;
         SwordConfigurationDSpace config = (SwordConfigurationDSpace) swordConfig;
@@ -639,8 +630,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
 
             if (log.isDebugEnabled())
             {
-                log.debug(LogManager
-                        .getHeader(context, "sword_modify_by_headers", ""));
+                log.debug(LogManager.getHeader(
+                    context, "sword_modify_by_headers", ""));
             }
 
             // get the deposit target
@@ -666,22 +657,21 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 {
                     oboEmail = sc.getOnBehalfOf().getEmail();
                 }
-                log.info(LogManager
-                        .getHeader(context, "modify_failed_authorisation",
-                                "user=" +
-                                        sc.getAuthenticated().getEmail() +
-                                        ",on_behalf_of=" + oboEmail));
+                log.info(LogManager.getHeader(context,
+                    "modify_failed_authorisation",
+                    "user=" + sc.getAuthenticated().getEmail() +
+                    ",on_behalf_of=" + oboEmail));
                 throw new SwordAuthException(
-                        "Cannot modify the given item with this context");
+                    "Cannot modify the given item with this context");
             }
 
             // make a note of the authentication in the verbose string
             this.verboseDescription.append("Authenticated user: " +
-                    sc.getAuthenticated().getEmail());
+                sc.getAuthenticated().getEmail());
             if (sc.getOnBehalfOf() != null)
             {
                 this.verboseDescription.append("Modifying on behalf of: " +
-                        sc.getOnBehalfOf().getEmail());
+                    sc.getOnBehalfOf().getEmail());
             }
 
             DepositResult result = new DepositResult();
@@ -697,9 +687,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             Date finish = new Date();
             long delta = finish.getTime() - start.getTime();
 
-            this.verboseDescription
-                    .append("Total time for modify processing: " + delta +
-                            " ms");
+            this.verboseDescription.append(
+                "Total time for modify processing: " + delta + " ms");
             this.addVerboseDescription(receipt, this.verboseDescription);
 
             // if something hasn't killed it already (allowed), then complete the transaction
@@ -711,7 +700,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         {
             log.error("caught exception:", e);
             throw new SwordServerException(
-                    "There was a problem depositing the item", e);
+                "There was a problem depositing the item", e);
         }
         finally
         {
@@ -742,10 +731,10 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
                 .append("Loaded content ingester: " + sci.getClass().getName());
 
         // obtain the relevant entry intester from the factory
-        SwordEntryIngester sei = SwordIngesterFactory
-                .getEntryInstance(context, deposit, item);
-        this.verboseDescription
-                .append("Loaded entry ingester: " + sei.getClass().getName());
+        SwordEntryIngester sei = SwordIngesterFactory.getEntryInstance(
+            context, deposit, item);
+        this.verboseDescription.append(
+            "Loaded entry ingester: " + sei.getClass().getName());
 
         try
         {
@@ -767,31 +756,31 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         if (swordConfig.isEntryFirst())
         {
             // do the entry deposit
-            result = sei.ingest(context, deposit, item, this.verboseDescription,
-                    null, true);
+            result = sei.ingest(
+                context, deposit, item, this.verboseDescription, null, true);
 
             // do the content deposit
-            result = sci.ingest(context, deposit, item, this.verboseDescription,
-                    result);
-            this.verboseDescription
-                    .append("Archive ingest completed successfully");
+            result = sci.ingest(
+                context, deposit, item, this.verboseDescription, result);
+            this.verboseDescription.append(
+                "Archive ingest completed successfully");
         }
         else
         {
             // do the content deposit
-            result = sci.ingest(context, deposit, item, this.verboseDescription,
-                    null);
+            result = sci.ingest(
+                context, deposit, item, this.verboseDescription, null);
 
             // do the entry deposit
-            result = sei.ingest(context, deposit, item, this.verboseDescription,
-                    result, true);
-            this.verboseDescription
-                    .append("Archive ingest completed successfully");
+            result = sei.ingest(
+                context, deposit, item, this.verboseDescription, result, true);
+            this.verboseDescription.append(
+                "Archive ingest completed successfully");
         }
 
         // store the originals (this code deals with the possibility that that's not required)
-        this.storeOriginals(swordConfig, context, this.verboseDescription,
-                deposit, result);
+        this.storeOriginals(
+            swordConfig, context, this.verboseDescription, deposit, result);
 
         return result;
     }
@@ -806,20 +795,19 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         Context context = swordContext.getContext();
 
         // Obtain the relevant ingester from the factory
-        SwordEntryIngester si = SwordIngesterFactory
-                .getEntryInstance(context, deposit, null);
-        this.verboseDescription
-                .append("Loaded ingester: " + si.getClass().getName());
+        SwordEntryIngester si = SwordIngesterFactory.getEntryInstance(
+            context, deposit, null);
+        this.verboseDescription.append(
+            "Loaded ingester: " + si.getClass().getName());
 
         // do the deposit
-        DepositResult result = si
-                .ingest(context, deposit, item, this.verboseDescription, null,
-                        true);
+        DepositResult result = si.ingest(
+            context, deposit, item, this.verboseDescription, null, true);
         this.verboseDescription.append("Replace completed successfully");
 
         // store the originals (this code deals with the possibility that that's not required)
-        this.storeOriginals(swordConfig, context, this.verboseDescription,
-                deposit, result);
+        this.storeOriginals(
+            swordConfig, context, this.verboseDescription, deposit, result);
 
         return result;
     }
@@ -830,8 +818,8 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             throws DSpaceSwordException, SwordError, SwordAuthException,
             SwordServerException
     {
-        return this.doAddMetadata(swordContext, item, deposit, authCredentials,
-                swordConfig, null);
+        return this.doAddMetadata(
+            swordContext, item, deposit, authCredentials, swordConfig, null);
     }
 
     protected DepositResult doAddMetadata(SwordContext swordContext, Item item,
@@ -849,20 +837,19 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
         Context context = swordContext.getContext();
 
         // Obtain the relevant ingester from the factory
-        SwordEntryIngester si = SwordIngesterFactory
-                .getEntryInstance(context, deposit, null);
-        this.verboseDescription
-                .append("Loaded ingester: " + si.getClass().getName());
+        SwordEntryIngester si = SwordIngesterFactory.getEntryInstance(
+            context, deposit, null);
+        this.verboseDescription.append(
+            "Loaded ingester: " + si.getClass().getName());
 
         // do the deposit
-        result = si
-                .ingest(context, deposit, item, this.verboseDescription, result,
-                        false);
+        result = si.ingest(
+            context, deposit, item, this.verboseDescription, result, false);
         this.verboseDescription.append("Replace completed successfully");
 
         // store the originals (this code deals with the possibility that that's not required)
-        this.storeOriginals(swordConfig, context, this.verboseDescription,
-                deposit, result);
+        this.storeOriginals(
+            swordConfig, context, this.verboseDescription, deposit, result);
 
         return result;
     }
@@ -915,11 +902,10 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI
             throw new SwordError(404);
         }
 
-        this.verboseDescription
-                .append("Performing replace using edit-media URL: " + editUrl);
-        this.verboseDescription
-                .append("Location resolves to item with handle: " +
-                        item.getHandle());
+        this.verboseDescription.append(
+            "Performing replace using edit-media URL: " + editUrl);
+        this.verboseDescription.append(
+            "Location resolves to item with handle: " + item.getHandle());
 
         return item;
     }

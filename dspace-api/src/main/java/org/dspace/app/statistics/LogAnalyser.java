@@ -212,7 +212,7 @@ public class LogAnalyser
     /**
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags (-help)
-     * @param argv arguments
+     * @param argv the command line arguments given
      * @throws Exception if error
      * @throws SQLException if database error
      */
@@ -1051,7 +1051,7 @@ public class LogAnalyser
     {
         // Use SimpleDateFormat
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'MM'-'dd'T'hh:mm:ss'Z'");
-	    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(date);
     }
     
@@ -1187,13 +1187,13 @@ public class LogAnalyser
         // that
 
         DiscoverQuery discoverQuery = new DiscoverQuery();
-        if(StringUtils.isNotBlank(type))
+        if (StringUtils.isNotBlank(type))
         {
             discoverQuery.addFilterQueries("dc.type=" + type +"*");
         }
         StringBuilder accessionedQuery = new StringBuilder();
         accessionedQuery.append("dc.date.accessioned_dt:[");
-        if(startDate != null)
+        if (startDate != null)
         {
             accessionedQuery.append(unParseDate(startDate));
         }
@@ -1202,7 +1202,7 @@ public class LogAnalyser
             accessionedQuery.append("*");
         }
         accessionedQuery.append(" TO ");
-        if(endDate != null)
+        if (endDate != null)
         {
             accessionedQuery.append(unParseDate(endDate));
         }
@@ -1242,44 +1242,44 @@ public class LogAnalyser
     public static void usage()
     {
         String usage = "Usage Information:\n" +
-                        "LogAnalyser [options [parameters]]\n" +
-                        "-log [log directory]\n" +
-                            "\tOptional\n" +
-                            "\tSpecify a directory containing log files\n" +
-                            "\tDefault uses [dspace.dir]/log from dspace.cfg\n" +
-                        "-file [file name regex]\n" +
-                            "\tOptional\n" +
-                            "\tSpecify a regular expression as the file name template.\n" +
-                            "\tCurrently this needs to be correctly escaped for Java string handling (FIXME)\n" +
-                            "\tDefault uses dspace.log*\n" +
-                        "-cfg [config file path]\n" +
-                            "\tOptional\n" +
-                            "\tSpecify a config file to be used\n" +
-                            "\tDefault uses dstat.cfg in dspace config directory\n" +
-                        "-out [output file path]\n" +
-                            "\tOptional\n" +
-                            "\tSpecify an output file to write results into\n" +
-                            "\tDefault uses dstat.dat in dspace log directory\n" +
-                        "-start [YYYY-MM-DD]\n" +
-                            "\tOptional\n" +
-                            "\tSpecify the start date of the analysis\n" +
-                            "\tIf a start date is specified then no attempt to gather \n" +
-                            "\tcurrent database statistics will be made unless -lookup is\n" +
-                            "\talso passed\n" +
-                            "\tDefault is to start from the earliest date records exist for\n" +
-                        "-end [YYYY-MM-DD]\n" +
-                            "\tOptional\n" +
-                            "\tSpecify the end date of the analysis\n" +
-                            "\tIf an end date is specified then no attempt to gather \n" +
-                            "\tcurrent database statistics will be made unless -lookup is\n" +
-                            "\talso passed\n" +
-                            "\tDefault is to work up to the last date records exist for\n" +
-                        "-lookup\n" +
-                            "\tOptional\n" +
-                            "\tForce a lookup of the current database statistics\n" +
-                            "\tOnly needs to be used if date constraints are also in place\n" +
-                        "-help\n" +
-                            "\tdisplay this usage information\n";
+            "LogAnalyser [options [parameters]]\n" +
+            "-log [log directory]\n" +
+                "\tOptional\n" +
+                "\tSpecify a directory containing log files\n" +
+                "\tDefault uses [dspace.dir]/log from dspace.cfg\n" +
+            "-file [file name regex]\n" +
+                "\tOptional\n" +
+                "\tSpecify a regular expression as the file name template.\n" +
+                "\tCurrently this needs to be correctly escaped for Java string handling (FIXME)\n" +
+                "\tDefault uses dspace.log*\n" +
+            "-cfg [config file path]\n" +
+                "\tOptional\n" +
+                "\tSpecify a config file to be used\n" +
+                "\tDefault uses dstat.cfg in dspace config directory\n" +
+            "-out [output file path]\n" +
+                "\tOptional\n" +
+                "\tSpecify an output file to write results into\n" +
+                "\tDefault uses dstat.dat in dspace log directory\n" +
+            "-start [YYYY-MM-DD]\n" +
+                "\tOptional\n" +
+                "\tSpecify the start date of the analysis\n" +
+                "\tIf a start date is specified then no attempt to gather \n" +
+                "\tcurrent database statistics will be made unless -lookup is\n" +
+                "\talso passed\n" +
+                "\tDefault is to start from the earliest date records exist for\n" +
+            "-end [YYYY-MM-DD]\n" +
+                "\tOptional\n" +
+                "\tSpecify the end date of the analysis\n" +
+                "\tIf an end date is specified then no attempt to gather \n" +
+                "\tcurrent database statistics will be made unless -lookup is\n" +
+                "\talso passed\n" +
+                "\tDefault is to work up to the last date records exist for\n" +
+            "-lookup\n" +
+                "\tOptional\n" +
+                "\tForce a lookup of the current database statistics\n" +
+                "\tOnly needs to be used if date constraints are also in place\n" +
+            "-help\n" +
+                "\tdisplay this usage information\n";
         
         System.out.println(usage);
     }

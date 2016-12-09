@@ -60,11 +60,11 @@ public class BasicBooleanContentElement extends BasicContentElement
     protected SwordValidationInfo validateContent(Properties validationContext)
     {
         SwordValidationInfo result = null;
-        if( ! isSet )
+        if ( ! isSet )
         {
-           result = new SwordValidationInfo(xmlName,
-                             SwordValidationInfo.MISSING_CONTENT,
-                             SwordValidationInfoType.WARNING);
+            result = new SwordValidationInfo(xmlName,
+                SwordValidationInfo.MISSING_CONTENT,
+                SwordValidationInfoType.WARNING);
         }
         return result; 
     }

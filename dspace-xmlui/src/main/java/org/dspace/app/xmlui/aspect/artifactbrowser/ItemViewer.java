@@ -81,14 +81,15 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
 
     private static final Message T_withdrawn = message("xmlui.ArtifactBrowser.ItemViewer.withdrawn");
-    
-	/** Cached validity object */
-	private SourceValidity validity = null;
 
-	/** XHTML crosswalk instance */
-	private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
+    /** Cached validity object */
+    private SourceValidity validity = null;
 
-	private final String sfxFile = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
+    /** XHTML crosswalk instance */
+    private DisseminationCrosswalk xHTMLHeadCrosswalk = null;
+
+    private final String sfxFile = DSpaceServicesFactory.getInstance()
+        .getConfigurationService().getProperty("dspace.dir")
             + File.separator + "config" + File.separator + "sfx.xml";
 
     private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
@@ -132,30 +133,29 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         DSpaceObject dso = null;
 
         if (this.validity == null)
-    	{
-	        try {
-	            dso = HandleUtil.obtainHandle(objectModel);
+        {
+            try {
+                dso = HandleUtil.obtainHandle(objectModel);
 
-	            DSpaceValidity newValidity = new DSpaceValidity();
-	            newValidity.add(context, dso);
-	            this.validity =  newValidity.complete();
-	        }
-	        catch (Exception e)
-	        {
-	            // Ignore all errors and just invalidate the cache.
-	        }
-
-    	}
-    	return this.validity;
+                DSpaceValidity newValidity = new DSpaceValidity();
+                newValidity.add(context, dso);
+                this.validity =  newValidity.complete();
+            }
+            catch (Exception e)
+            {
+                // Ignore all errors and just invalidate the cache.
+            }
+        }
+        return this.validity;
     }
 
     /** Matches Handle System URIs. */
     private static final Pattern handlePattern = Pattern.compile(
-            "hdl:|https?://hdl\\.handle\\.net/", Pattern.CASE_INSENSITIVE);
+        "hdl:|https?://hdl\\.handle\\.net/", Pattern.CASE_INSENSITIVE);
 
     /** Matches DOI URIs. */
     private static final Pattern doiPattern = Pattern.compile(
-            "doi:|https?://(dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
+        "doi:|https?://(dx\\.)?doi\\.org/", Pattern.CASE_INSENSITIVE);
 
     /**
      * Add the item's title and trail links to the page's metadata.
@@ -191,8 +191,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             pageMeta.addMetadata("title").addContent(item.getHandle());
         }
 
-        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-        HandleUtil.buildHandleTrail(context, item,pageMeta,contextPath);
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        HandleUtil.buildHandleTrail(context, item, pageMeta, contextPath);
         pageMeta.addTrail().addContent(T_trail);
 
         // Add SFX link
@@ -212,7 +212,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             sfxserverUrl = sfxserverUrl.trim() +"&" + sfxQuery.trim();
             pageMeta.addMetadata("sfx","server").addContent(sfxserverUrl);
         }
-        
+
         // Add persistent identifiers
         /* Temporarily switch to using metadata directly.
          * FIXME Proper fix is to have IdentifierService handle all durable
@@ -223,15 +223,20 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         {
             log.debug("Looking up Item {} by IdentifierProvider {}",
                     dso.getID(), idP.getClass().getName());
-            try {
+            try
+            {
                 String id = idP.lookup(context, dso);
                 log.debug("Found identifier {}", id);
                 String idType;
                 String providerName = idP.getClass().getSimpleName().toLowerCase();
                 if (providerName.contains("handle"))
+                {
                     idType = "handle";
+                }
                 else if (providerName.contains("doi"))
+                {
                     idType = "doi";
+                }
                 else
                 {
                     log.info("Unhandled provider {}", idP.getClass().getName());
@@ -240,7 +245,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
                 log.debug("Adding identifier of type {}", idType);
                 Metadata md = pageMeta.addMetadata("identifier", idType);
                 md.addContent(id);
-            } catch (IdentifierNotFoundException | IdentifierNotResolvableException ex) {
+            }
+            catch (IdentifierNotFoundException | IdentifierNotResolvableException ex)
+            {
                 continue;
             }
         }
@@ -275,7 +282,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         String sfxserverImg = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("sfx.server.image_url");
         if (sfxserverImg != null && sfxserverImg.length() > 0)
         {
-            pageMeta.addMetadata("sfx","image_url").addContent(sfxserverImg);
+            pageMeta.addMetadata("sfx", "image_url").addContent(sfxserverImg);
         }
 
         boolean googleEnabled = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty(
@@ -295,8 +302,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // Metadata for <head> element
         if (xHTMLHeadCrosswalk == null)
         {
-            xHTMLHeadCrosswalk = (DisseminationCrosswalk) CoreServiceFactory.getInstance().getPluginService().getNamedPlugin(
-              DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
+            xHTMLHeadCrosswalk = (DisseminationCrosswalk) CoreServiceFactory
+                .getInstance().getPluginService().getNamedPlugin(
+                    DisseminationCrosswalk.class, "XHTML_HEAD_ITEM");
         }
 
         // Produce <meta> elements for header from crosswalk
@@ -361,13 +369,14 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         // Add Withdrawn Message if it is
-        if(item.isWithdrawn()){
+        if (item.isWithdrawn())
+        {
             Division div = division.addDivision("notice", "notice");
             Para p = div.addPara();
             p.addContent(T_withdrawn);
             //Set proper response. Return "404 Not Found"
             HttpServletResponse response = (HttpServletResponse)objectModel
-                    .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);   
+                    .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -399,7 +408,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         // Reference the actual Item
-        ReferenceSet appearsInclude = referenceSet.addReference(item).addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST,null,"hierarchy");
+        ReferenceSet appearsInclude = referenceSet.addReference(item)
+            .addReferenceSet(ReferenceSet.TYPE_DETAIL_LIST, null, "hierarchy");
         appearsInclude.setHead(T_head_parent_collections);
 
         // Reference all collections the item appears in.
@@ -408,7 +418,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             appearsInclude.addReference(collection);
         }
 
-        showfullPara = division.addPara(null,"item-view-toggle item-view-toggle-bottom");
+        showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-bottom");
 
         if (showFullItem(objectModel))
         {
@@ -418,7 +428,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         else
         {
             String link = contextPath + "/handle/" + item.getHandle()
-                    + "?show=full";
+                + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
         }
     }
@@ -438,7 +448,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     @Override
     public void recycle() {
-    	this.validity = null;
-    	super.recycle();
+        this.validity = null;
+        super.recycle();
     }
 }

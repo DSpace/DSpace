@@ -125,14 +125,14 @@ public class ReportGenerator
     private static Pattern real = Pattern.compile("^(.+)=(.+)");
     
     //////////////////////////
-   // Miscellaneous variables
-   //////////////////////////
-   
-   /** process timing clock */
-   private static Calendar startTime = null;
-   
-   /** a map from log file action to human readable action */
-   private static Map<String, String> actionMap = null;
+    // Miscellaneous variables
+    //////////////////////////
+    
+    /** process timing clock */
+    private static Calendar startTime = null;
+    
+    /** a map from log file action to human readable action */
+    private static Map<String, String> actionMap = null;
    
     /////////////////
     // report generator config data
@@ -141,9 +141,9 @@ public class ReportGenerator
     /** the input file to build the report from */
     private static String input = null;
     
-   /** the log file action to human readable action map */
-   private static String map = ConfigurationManager.getProperty("dspace.dir") +
-                            File.separator + "config" + File.separator + "dstat.map";
+    /** the log file action to human readable action map */
+    private static String map = ConfigurationManager.getProperty("dspace.dir") +
+        File.separator + "config" + File.separator + "dstat.map";
 
     private static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     private static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
@@ -152,9 +152,10 @@ public class ReportGenerator
     /**
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags
-     * @param argv
-     * @throws java.lang.Exception
-     * @throws java.sql.SQLException
+     * @param argv the command line arguments given
+     * @throws Exception on generic exception
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static void main(String [] argv)
         throws Exception, SQLException

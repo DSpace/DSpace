@@ -54,14 +54,21 @@ public class BatchImportServlet extends DSpaceServlet
     /**
      * Respond to a post request for metadata bulk importing via csv
      *
-     * @param context a DSpace Context object
-     * @param request the HTTP request
-     * @param response the HTTP response
-     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param request
+     *     Servlet's HTTP request object.
+     * @param response
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     protected void doDSPost(Context context, HttpServletRequest request,
@@ -242,43 +249,47 @@ public class BatchImportServlet extends DSpaceServlet
      * GET request is only ever used to show the upload form
      *
      * @param context
-     *            a DSpace Context object
+     *     The relevant DSpace Context.
      * @param request
-     *            the HTTP request
+     *     Servlet's HTTP request object.
      * @param response
-     *            the HTTP response
-     *
+     *     Servlet's HTTP response object.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-    	//Get all collections
-		List<Collection> collections = null;
-		String colIdS = request.getParameter("colId");
-		if (colIdS!=null){
-			collections = new ArrayList<>();
-			collections.add(collectionService.findByIdOrLegacyId(context, colIdS));
+        //Get all collections
+        List<Collection> collections = null;
+        String colIdS = request.getParameter("colId");
+        if (colIdS!=null){
+            collections = new ArrayList<>();
+            collections.add(collectionService.findByIdOrLegacyId(context, colIdS));
 
-		}
-		else {
-			collections = collectionService.findAll(context);
-		}
+        }
+        else {
+            collections = collectionService.findAll(context);
+        }
 
-		request.setAttribute("collections", collections);
+        request.setAttribute("collections", collections);
 
-		//Get all the possible data loaders from the Spring configuration
-		BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
-		List<String> inputTypes = dls.getFileDataLoaders();
-		request.setAttribute("input-types", inputTypes);
+        //Get all the possible data loaders from the Spring configuration
+        BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
+        List<String> inputTypes = dls.getFileDataLoaders();
+        request.setAttribute("input-types", inputTypes);
 
-		// Show the upload screen
-		JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
+        // Show the upload screen
+        JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
     }
     
     /**

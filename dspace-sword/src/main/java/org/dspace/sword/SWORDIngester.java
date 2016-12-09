@@ -26,9 +26,16 @@ public interface SWORDIngester
      * Ingest the package as described in the given Deposit object
      * within the given DSpace Context
      *
+     * @param service
+     *     SWORD service
      * @param deposit
+     *     deposit request
+     * @param target
+     *     target DSpace object
      * @return the result of the deposit
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SWORDErrorException on generic SWORD exception
      */
     DepositResult ingest(SWORDService service, Deposit deposit,
             DSpaceObject target)

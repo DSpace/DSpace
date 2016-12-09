@@ -74,7 +74,12 @@ public class JSPDescribeStep extends JSPStep
     /** log4j logger */
     private static Logger log = Logger.getLogger(JSPDescribeStep.class);
 
-    /** Constructor */
+    /**
+     * Constructor
+     *
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     */
     public JSPDescribeStep() throws ServletException
     {
         //just call DescribeStep's constructor
@@ -103,6 +108,15 @@ public class JSPDescribeStep extends JSPStep
      *            current servlet response object
      * @param subInfo
      *            submission info object
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void doPreProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
@@ -135,6 +149,15 @@ public class JSPDescribeStep extends JSPStep
      *            submission info object
      * @param status
      *            any status/errors reported by doProcessing() method
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void doPostProcessing(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo, int status)
@@ -193,7 +216,12 @@ public class JSPDescribeStep extends JSPStep
      *            the response object
      * @param subInfo
      *            the SubmissionInfo object
-     *
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     private void showEditMetadata(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)

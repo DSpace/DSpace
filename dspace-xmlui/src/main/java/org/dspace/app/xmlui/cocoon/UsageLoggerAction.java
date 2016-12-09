@@ -41,17 +41,23 @@ public class UsageLoggerAction extends AbstractAction {
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
-    public Map act(Redirector redirector, SourceResolver sourceResolver, Map objectModel, String string, Parameters parameters) throws Exception {
-        try{
+    public Map act(Redirector redirector, SourceResolver sourceResolver, Map objectModel, String string, Parameters parameters)
+        throws Exception
+    {
+        try
+        {
             Request request = ObjectModelHelper.getRequest(objectModel);
             Context context = ContextUtil.obtainContext(objectModel);
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-            if(dso == null){
+            if (dso == null)
+            {
                 //We might have a bitstream
                 dso = findBitstream(context, parameters);
             }
             logDspaceObject(request, dso, context);
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
             // Ignore, we cannot let this crash
             // TODO: log this
             e.printStackTrace();
@@ -62,25 +68,27 @@ public class UsageLoggerAction extends AbstractAction {
     }
 
     public static void logDspaceObject(Request request, DSpaceObject dso, Context context){
-        if(dso == null)
+        if (dso == null)
         {
             return;
         }
 
-        try {
-        	
+        try
+        {
             DSpaceServicesFactory.getInstance().getEventService().fireEvent(
-					new UsageEvent(
-							UsageEvent.Action.VIEW,
-							(HttpServletRequest)request,
-							ContextUtil.obtainContext((HttpServletRequest)request),
-							dso));
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
+                new UsageEvent(
+                    UsageEvent.Action.VIEW,
+                    (HttpServletRequest) request,
+                    ContextUtil.obtainContext((HttpServletRequest) request),
+                    dso));
+
+        }
+        catch (SQLException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 
     private Bitstream findBitstream(Context context, Parameters par) throws SQLException {
@@ -148,21 +156,21 @@ public class UsageLoggerAction extends AbstractAction {
      */
     private Bitstream findBitstreamBySequence(Item item, int sequence) throws SQLException
     {
-    	if (item == null)
+        if (item == null)
         {
             return null;
         }
 
-    	List<Bundle> bundles = item.getBundles();
+        List<Bundle> bundles = item.getBundles();
         for (Bundle bundle : bundles)
         {
             List<Bitstream> bitstreams = bundle.getBitstreams();
 
             for (Bitstream bitstream : bitstreams)
             {
-            	if (bitstream.getSequenceID() == sequence)
-            	{
-            		return bitstream;
+                if (bitstream.getSequenceID() == sequence)
+                {
+                    return bitstream;
                 }
             }
         }
@@ -181,68 +189,68 @@ public class UsageLoggerAction extends AbstractAction {
      */
     private Bitstream findBitstreamByName(Item item, String name) throws SQLException
     {
-    	if (name == null || item == null)
+        if (name == null || item == null)
         {
             return null;
         }
 
-    	// Determine our the maximum number of directories that will be removed for a path.
-    	int maxDepthPathSearch = 3;
-    	if (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.html.max-depth-guess") != null)
+        // Determine our the maximum number of directories that will be removed for a path.
+        int maxDepthPathSearch = 3;
+        if (DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.html.max-depth-guess") != null)
         {
             maxDepthPathSearch = DSpaceServicesFactory.getInstance().getConfigurationService().getIntProperty("xmlui.html.max-depth-guess");
         }
 
-    	// Search for the named bitstream on this item. Each time through the loop
-    	// a directory is removed from the name until either our maximum depth is
-    	// reached or the bitstream is found. Note: an extra pass is added on to the
-    	// loop for a last ditch effort where all directory paths will be removed.
-    	for (int i = 0; i < maxDepthPathSearch+1; i++)
-    	{
-    	   	// Search through all the bitstreams and see
-	    	// if the name can be found
-	    	List<Bundle> bundles = item.getBundles();
-	        for (Bundle bundle : bundles)
-	        {
-	            List<Bitstream> bitstreams = bundle.getBitstreams();
+        // Search for the named bitstream on this item. Each time through the loop
+        // a directory is removed from the name until either our maximum depth is
+        // reached or the bitstream is found. Note: an extra pass is added on to the
+        // loop for a last ditch effort where all directory paths will be removed.
+        for (int i = 0; i < maxDepthPathSearch+1; i++)
+        {
+               // Search through all the bitstreams and see
+            // if the name can be found
+            List<Bundle> bundles = item.getBundles();
+            for (Bundle bundle : bundles)
+            {
+                List<Bitstream> bitstreams = bundle.getBitstreams();
 
-	            for (Bitstream bitstream : bitstreams)
-	            {
-	            	if (name.equals(bitstream.getName()))
-	            	{
-	            		return bitstream;
-	            	}
-	            }
-	        }
+                for (Bitstream bitstream : bitstreams)
+                {
+                    if (name.equals(bitstream.getName()))
+                    {
+                        return bitstream;
+                    }
+                }
+            }
 
-	        // The bitstream was not found, so try removing a directory
-	        // off of the name and see if we lost some path information.
-	        int indexOfSlash = name.indexOf('/');
+            // The bitstream was not found, so try removing a directory
+            // off of the name and see if we lost some path information.
+            int indexOfSlash = name.indexOf('/');
 
-	        if (indexOfSlash < 0)
+            if (indexOfSlash < 0)
             {
                 // No more directories to remove from the path, so return null for no
                 // bitstream found.
                 return null;
             }
 
-	        name = name.substring(indexOfSlash+1);
+            name = name.substring(indexOfSlash+1);
 
-	        // If this is our next to last time through the loop then
-	        // trim everything and only use the trailing filename.
-    		if (i == maxDepthPathSearch-1)
-    		{
-    			int indexOfLastSlash = name.lastIndexOf('/');
-    			if (indexOfLastSlash > -1)
+            // If this is our next to last time through the loop then
+            // trim everything and only use the trailing filename.
+            if (i == maxDepthPathSearch-1)
+            {
+                int indexOfLastSlash = name.lastIndexOf('/');
+                if (indexOfLastSlash > -1)
                 {
                     name = name.substring(indexOfLastSlash + 1);
                 }
-    		}
+            }
 
-    	}
+        }
 
-    	// The named bitstream was not found and we exausted the maximum path depth that
-    	// we search.
-    	return null;
+        // The named bitstream was not found and we exausted the maximum path depth that
+        // we search.
+        return null;
     }
 }

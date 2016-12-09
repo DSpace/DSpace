@@ -26,138 +26,149 @@ import nu.xom.Serializer;
  * @author Neil Taylor
  */
 public class ServiceDocument {
-	/**
-	 * The Service object that is held by this object.
-	 */
-	private Service service;
+    /**
+     * The Service object that is held by this object.
+     */
+    private Service service;
 
-	/**
-	 * Create a new instance and set the initial service level to Zero.
-	 */
-	public ServiceDocument() {
-		
-	}
+    /**
+     * Create a new instance and set the initial service level to Zero.
+     */
+    public ServiceDocument() {
+        
+    }
 
-	/**
-	 * Create a new instance and set the specified service level.
-	 * 
-	 * @param version 
-	 * 			The SWORD version.
-	 */
-	public ServiceDocument(String version) {
-		service = new Service(version);
-	}
+    /**
+     * Create a new instance and set the specified service level.
+     * 
+     * @param version 
+     *             The SWORD version.
+     */
+    public ServiceDocument(String version) {
+        service = new Service(version);
+    }
 
-	/**
-	 * Create a new instance and store the specified Service document.
-	 * 
-	 * @param service
-	 *            The Service object.
-	 */
-	public ServiceDocument(Service service) {
-		this.service = service;
-	}
+    /**
+     * Create a new instance and store the specified Service document.
+     * 
+     * @param service
+     *            The Service object.
+     */
+    public ServiceDocument(Service service) {
+        this.service = service;
+    }
 
-	/**
-	 * Set the service object associated with this document.
-	 * 
-	 * @param service
-	 *            The new Service object.
-	 */
-	public void setService(Service service) {
-		this.service = service;
-	}
+    /**
+     * Set the service object associated with this document.
+     * 
+     * @param service
+     *            The new Service object.
+     */
+    public void setService(Service service) {
+        this.service = service;
+    }
 
-	/**
-	 * Retrieve the Service object associated with this document.
-	 * 
-	 * @return The Service object.
-	 */
-	public Service getService() {
-		return service;
-	}
+    /**
+     * Retrieve the Service object associated with this document.
+     * 
+     * @return The Service object.
+     */
+    public Service getService() {
+        return service;
+    }
 
-	/**
-	 * Return the Service Document in its XML form.
-	 * 
-	 * @return The ServiceDocument
-	 */
-	public String toString() {
-		return marshall();
-	}
+    /**
+     * Return the Service Document in its XML form.
+     * 
+     * @return The ServiceDocument
+     */
+    public String toString() {
+        return marshall();
+    }
 
-	/**
-	 * Marshall the data in the Service element and generate a String
-	 * representation. The returned string is UTF-8 format.
-	 * 
-	 * @return A string of XML, or <code>null</code> if there was an error
-	 *         marshalling the data.
-	 */
-	public String marshall() {
-		try {
-			ByteArrayOutputStream stream = new ByteArrayOutputStream();
-			Serializer serializer = new Serializer(stream, "UTF-8");
-			serializer.setIndent(3);
-			//serializer.setMaxLength(64);
+    /**
+     * Marshall the data in the Service element and generate a String
+     * representation. The returned string is UTF-8 format.
+     * 
+     * @return A string of XML, or <code>null</code> if there was an error
+     *         marshalling the data.
+     */
+    public String marshall() {
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            Serializer serializer = new Serializer(stream, "UTF-8");
+            serializer.setIndent(3);
+            //serializer.setMaxLength(64);
 
-			Document doc = new Document(service.marshall());
-			serializer.write(doc);
+            Document doc = new Document(service.marshall());
+            serializer.write(doc);
 
-			return stream.toString();
-		} catch (IOException ex) {
-			System.err.println(ex);
-		}
+            return stream.toString();
+        } catch (IOException ex) {
+            System.err.println(ex);
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Convert the specified XML string into a set of objects used within the
-	 * service. A new Service object will be created and stored. This will
-	 * dispose of any previous Service object associated with this object.
-	 * 
-	 * @param xml
-	 *            The XML string.
-	 * @throws UnmarshallException
-	 *             If there was a problem unmarshalling the data. This might be
-	 *             as a result of an error in parsing the XML string, extracting
-	 *             information.
-	 */
-	public void unmarshall(String xml) throws UnmarshallException
+    /**
+     * Convert the specified XML string into a set of objects used within the
+     * service. A new Service object will be created and stored. This will
+     * dispose of any previous Service object associated with this object.
+     * 
+     * @param xml
+     *            The XML string.
+     * @throws UnmarshallException
+     *     If there was a problem unmarshalling the data. This might be
+     *     as a result of an error in parsing the XML string, extracting
+     *     information.
+     */
+    public void unmarshall(String xml) throws UnmarshallException
     {
        unmarshall(xml, null);
     }
 
     /**
-     * 
-     * @param xml
-     * @param validationProperties
-     * @throws org.purl.sword.base.UnmarshallException
+     * Convert the specified XML string into a set of objects used within the
+     * service. A new Service object will be created and stored. This will
+     * dispose of any previous Service object associated with this object.
+     *
+     * @param xml The XML string.
+     * @param validationProperties FIXME: PLEASE DOCUMENT.
+     * @return SWORD validation info
+     * @throws UnmarshallException
+     *     If there was a problem unmarshalling the data. This might be
+     *     as a result of an error in parsing the XML string, extracting
+     *     information.
      */
     public SwordValidationInfo unmarshall(String xml, Properties validationProperties)
     throws UnmarshallException
     {
-		try {
-			Builder builder = new Builder();
-			Document doc = builder.build(xml, Namespaces.PREFIX_APP);
+        try {
+            Builder builder = new Builder();
+            Document doc = builder.build(xml, Namespaces.PREFIX_APP);
             Element root = doc.getRootElement();
-			return unmarshall(root, validationProperties);
-		} catch (ParsingException ex) {
-			throw new UnmarshallException("Unable to parse the XML", ex);
-		} catch (IOException ex) {
-			throw new UnmarshallException("Error acessing the file?", ex);
-		}
-	}
+            return unmarshall(root, validationProperties);
+        } catch (ParsingException ex) {
+            throw new UnmarshallException("Unable to parse the XML", ex);
+        } catch (IOException ex) {
+            throw new UnmarshallException("Error acessing the file?", ex);
+        }
+    }
 
 
     /**
      * Unmarshall the specified element. This version does not generate any
-     * valiation information.
+     * validation information.
      *
      * @param element
-     * @throws org.purl.sword.base.UnmarshallException
+     *     element to unmarshall
+     * @throws UnmarshallException
+     *     If there was a problem unmarshalling the data. This might be
+     *     as a result of an error in parsing the XML string, extracting
+     *     information.
      */
-	public void unmarshall(Element element)
+    public void unmarshall(Element element)
     throws UnmarshallException
     {
        unmarshall(element, null);
@@ -168,24 +179,30 @@ public class ServiceDocument {
      * information.
      * 
      * @param element
+     *     element to unmarshall.
      * @param validationProperties
-     * @throws org.purl.sword.base.UnmarshallException
+     *     FIXME: PLEASE DOCUMENT.
+     * @return SWORD validation info
+     * @throws UnmarshallException
+     *     If there was a problem unmarshalling the data. This might be
+     *     as a result of an error in parsing the XML string, extracting
+     *     information.
      */
     public SwordValidationInfo unmarshall(Element element, Properties validationProperties)
     throws UnmarshallException
     {
-		service = new Service();
-		try {
-			return service.unmarshall(element, validationProperties);
-		} catch (UnmarshallException e) {
-			throw new UnmarshallException("Unable to parse the XML", e);
-		}
-	}
+        service = new Service();
+        try {
+            return service.unmarshall(element, validationProperties);
+        } catch (UnmarshallException e) {
+            throw new UnmarshallException("Unable to parse the XML", e);
+        }
+    }
 
 
     public SwordValidationInfo validate()
     {
-        if( service == null )
+        if ( service == null )
         {
             return null;
         }
@@ -194,7 +211,7 @@ public class ServiceDocument {
 
     public SwordValidationInfo validate(Properties validationContext)
     {
-        if( service == null)
+        if ( service == null)
         {
             return null;
         }

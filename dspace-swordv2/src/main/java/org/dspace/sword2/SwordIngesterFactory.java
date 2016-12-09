@@ -35,8 +35,16 @@ public class SwordIngesterFactory
      * documentation for more details.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param deposit
+     *     The original deposit request
+     * @param dso
+     *     target DSpace object
+     * @return SWORDIngester object
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
+     * @throws SwordError
+     *     if no suitable ingester is configured.
      */
     public static SwordContentIngester getContentInstance(Context context,
             Deposit deposit, DSpaceObject dso)
@@ -48,7 +56,7 @@ public class SwordIngesterFactory
 
         // first look to see if there's an intester for the content type
         ingester = (SwordContentIngester) pluginService
-                .getNamedPlugin(SwordContentIngester.class, deposit.getMimeType());
+            .getNamedPlugin(SwordContentIngester.class, deposit.getMimeType());
         if (ingester != null)
         {
             return ingester;
@@ -57,11 +65,11 @@ public class SwordIngesterFactory
         // if no ingester, then 
         // look to see if there's an ingester for the package format
         ingester = (SwordContentIngester) pluginService
-                .getNamedPlugin(SwordContentIngester.class, deposit.getPackaging());
+            .getNamedPlugin(SwordContentIngester.class, deposit.getPackaging());
         if (ingester == null)
         {
             throw new SwordError(UriRegistry.ERROR_CONTENT,
-                    "No ingester configured for this package type");
+                "No ingester configured for this package type");
         }
         return ingester;
     }
@@ -71,11 +79,11 @@ public class SwordIngesterFactory
             throws DSpaceSwordException, SwordError
     {
         SwordEntryIngester ingester = (SwordEntryIngester) CoreServiceFactory.getInstance().getPluginService()
-                .getSinglePlugin(SwordEntryIngester.class);
+            .getSinglePlugin(SwordEntryIngester.class);
         if (ingester == null)
         {
             throw new SwordError(UriRegistry.ERROR_CONTENT,
-                    "No ingester configured for handling sword entry documents");
+                "No ingester configured for handling SWORD entry documents");
         }
         return ingester;
     }

@@ -24,35 +24,37 @@ import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 
 /**
- * Selector will count the number of interactive AuthenticationMethods defined in the 
+ * Selector will count the number of interactive AuthenticationMethods defined in the
  * dspace configuration file.
  * @author Jay Paz
  * @author Scott Phillips
  *
  */
-public class AuthenticationCountSelector implements Selector{
+public class AuthenticationCountSelector implements Selector {
 
     protected AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     /**
      * Returns true if the expression (in this case a number) is equal to the number
      * of AuthenticationMethods defined in the dspace.cfg file.
      */
-	public boolean select(String expression, Map objectModel, Parameters parameters) {
-		// get an iterator of all the AuthenticationMethods defined
-		final Iterator<AuthenticationMethod> authMethods = authenticationService
-		    .authenticationMethodIterator();
-		
-		  final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
-          .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-  final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
-          .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-  
-		int authMethodCount = 0;
-		
-		// iterate to count the methods
-		while(authMethods.hasNext()){
-			AuthenticationMethod auth = authMethods.next();
-			try
+    public boolean select(String expression, Map objectModel, Parameters parameters)
+    {
+        // get an iterator of all the AuthenticationMethods defined
+        final Iterator<AuthenticationMethod> authMethods =
+            authenticationService.authenticationMethodIterator();
+
+        final HttpServletResponse httpResponse = (HttpServletResponse) objectModel
+            .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+        final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
+            .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
+
+        int authMethodCount = 0;
+
+        // iterate to count the methods
+        while (authMethods.hasNext())
+        {
+            AuthenticationMethod auth = authMethods.next();
+            try
             {
                 if (auth.loginPageURL(
                         ContextUtil.obtainContext(objectModel), httpRequest,
@@ -65,13 +67,10 @@ public class AuthenticationCountSelector implements Selector{
                 // mmm... we should not never go here, anyway we convert it in an unchecked exception 
                 throw new IllegalStateException(e);
             }
-		}
-		
-		final Integer exp = Integer.valueOf(expression);
-		
-		return (authMethodCount == exp);
-	}
-
-	
-
+        }
+        
+        final Integer exp = Integer.valueOf(expression);
+        
+        return (authMethodCount == exp);
+    }
 }

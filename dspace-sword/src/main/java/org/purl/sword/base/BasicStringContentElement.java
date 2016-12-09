@@ -40,7 +40,7 @@ public class BasicStringContentElement extends BasicContentElement
 
     protected void marshallContent(Element element)
     {
-        if( content != null )
+        if ( content != null )
         {
             element.appendChild(content);
         }
@@ -55,11 +55,11 @@ public class BasicStringContentElement extends BasicContentElement
     protected SwordValidationInfo validateContent(Properties validationContext)
     {
         SwordValidationInfo result = null;
-        if( content == null )
+        if ( content == null )
         {
-           result = new SwordValidationInfo(xmlName,
-                               SwordValidationInfo.MISSING_CONTENT,
-                               SwordValidationInfoType.WARNING);
+            result = new SwordValidationInfo(xmlName,
+                SwordValidationInfo.MISSING_CONTENT,
+                SwordValidationInfoType.WARNING);
         }
         return result; 
     }
@@ -69,6 +69,4 @@ public class BasicStringContentElement extends BasicContentElement
     {
         return content;
     }
-
-
 }

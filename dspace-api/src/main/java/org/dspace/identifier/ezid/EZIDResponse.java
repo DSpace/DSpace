@@ -123,6 +123,8 @@ public class EZIDResponse
 
     /**
      * Value associated with the EZID status (identifier, error text, etc.).
+     *
+     * @return EZID status value
      */
     public String getEZIDStatusValue()
     {

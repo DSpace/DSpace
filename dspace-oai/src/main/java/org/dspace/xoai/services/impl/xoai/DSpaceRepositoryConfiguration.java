@@ -30,8 +30,8 @@ import java.util.List;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
- * @author Domingo Iglesias <diglesias@ub.edu>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
+ * @author Domingo Iglesias (diglesias at ub dot edu)
  */
 public class DSpaceRepositoryConfiguration implements RepositoryConfiguration
 {

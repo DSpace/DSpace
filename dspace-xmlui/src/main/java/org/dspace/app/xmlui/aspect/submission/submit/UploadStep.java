@@ -508,7 +508,7 @@ public class UploadStep extends AbstractSubmissionStep
      *
      * @param item The DSpace Item that the bitstream is part of
      * @param bitstream The bitstream to link to
-     * @returns a String link to the bitstream
+     * @return a String link to the bitstream
      */
     private String makeBitstreamLink(Item item, Bitstream bitstream)
     {

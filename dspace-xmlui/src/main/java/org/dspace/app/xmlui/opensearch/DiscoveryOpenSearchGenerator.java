@@ -48,7 +48,7 @@ import org.xml.sax.*;
  * @author Nestor Oviedo
  */
 public class DiscoveryOpenSearchGenerator extends AbstractOpenSearchGenerator
-					implements CacheableProcessingComponent, Recyclable
+                    implements CacheableProcessingComponent, Recyclable
 {
 
     /** the  search service to use */
@@ -58,29 +58,33 @@ public class DiscoveryOpenSearchGenerator extends AbstractOpenSearchGenerator
      * Setup the Discovery search service. Other paramas are setup in superclass's methods
      */
     public void setup(SourceResolver resolver, Map objectModel, String src,
-            Parameters par) throws ProcessingException, SAXException, IOException
+        Parameters par)
+        throws ProcessingException, SAXException, IOException
     {
         super.setup(resolver, objectModel, src, par);
-        
+
         searchService = SearchUtils.getSearchService();
-        if(searchService == null)
+        if (searchService == null)
+        {
             throw new IllegalStateException("Couldn't get a search service instance");
+        }
     }
-    
+
 
     /**
      * Generate the search results document.
      */
-    public void generate() throws IOException, SAXException, ProcessingException
+    public void generate()
+        throws IOException, SAXException, ProcessingException
     {
         try
         {
             if (resultsDoc == null)
             {
-            	Context context = ContextUtil.obtainContext(objectModel);
+                Context context = ContextUtil.obtainContext(objectModel);
                 DiscoverQuery queryArgs = new DiscoverQuery();
 
-            	// Sets the query
+                // Sets the query
                 queryArgs.setQuery(query);
                 // start -1 because Solr indexing starts at 0 and OpenSearch
                 // indexing starts at 1.
@@ -88,28 +92,39 @@ public class DiscoveryOpenSearchGenerator extends AbstractOpenSearchGenerator
                 queryArgs.setMaxResults(rpp);
 
                 // we want Items only
-            	queryArgs.setDSpaceObjectFilter(Constants.ITEM);
-                
+                queryArgs.setDSpaceObjectFilter(Constants.ITEM);
+
                 // sort info
-                if(sort != null)
+                if (sort != null)
                 {
-                    String sortField = this.searchService.toSortFieldIndex(sort.getMetadata(), sort.getType());
-                    if(SortOption.ASCENDING.equals( sortOrder ))
+                    String sortField = this.searchService.toSortFieldIndex(
+                        sort.getMetadata(), sort.getType());
+                    if (SortOption.ASCENDING.equals( sortOrder ))
+                    {
                         queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.asc);
+                    }
                     else
+                    {
                         queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.desc);
+                    }
                 }
 
                 DiscoverResult queryResults = null;
-                if(scope == null)
+                if (scope == null)
+                {
                     queryResults = SearchUtils.getSearchService().search(context, queryArgs);
+                }
                 else
+                {
                     queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
+                }
 
-	            // creates the results array and generates the OpenSearch result
-	            List<DSpaceObject> results = queryResults.getDspaceObjects();
-	            
-	            resultsDoc = openSearchService.getResultsDoc(context, format, query, (int) queryResults.getTotalSearchResults(), start, rpp, scope, results, FeedUtils.i18nLabels);
+                // creates the results array and generates the OpenSearch result
+                List<DSpaceObject> results = queryResults.getDspaceObjects();
+
+                resultsDoc = openSearchService.getResultsDoc(context, format,
+                    query, (int) queryResults.getTotalSearchResults(), start,
+                    rpp, scope, results, FeedUtils.i18nLabels);
                 FeedUtils.unmangleI18N(resultsDoc);
             }
 
@@ -118,23 +133,22 @@ public class DiscoveryOpenSearchGenerator extends AbstractOpenSearchGenerator
             streamer.stream(resultsDoc);
         }
         catch (SQLException sqle)
-		{
-        	throw new SAXException(sqle);
-		}
+        {
+            throw new SAXException(sqle);
+        }
         catch (SearchServiceException se)
-		{
-			throw new ProcessingException(se);
-		}
+        {
+            throw new ProcessingException(se);
+        }
     }
-    
+
     /**
      * Recycle
      */
-    
+
     public void recycle()
     {
         this.searchService = null;
         super.recycle();
     }
-	
 }

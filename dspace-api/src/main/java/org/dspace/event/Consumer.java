@@ -26,6 +26,8 @@ public interface Consumer
      * initializing any pooled JMS resources. Called ONCE when created by the
      * dispatcher pool. This should be used to set up expensive resources that
      * will remain for the lifetime of the consumer.
+     *
+     * @throws Exception if error
      */
     public void initialize() throws Exception;
 
@@ -37,21 +39,29 @@ public interface Consumer
      * 
      * @param ctx
      *            the execution context object
-     * 
      * @param event
      *            the content event
+     * @throws Exception if error
      */
     public void consume(Context ctx, Event event) throws Exception;
 
     /**
      * Signal that there are no more events queued in this event stream and
      * event processing for the preceding consume calls should be finished up.
+     * 
+     * @param ctx
+     *            the execution context object
+     * @throws Exception if error
      */
     public void end(Context ctx) throws Exception;
 
     /**
      * Finish - free any allocated resources. Called when consumer (via it's
      * parent dispatcher) is going to be destroyed by the dispatcher pool.
+     * 
+     * @param ctx
+     *            the execution context object
+     * @throws Exception if error
      */
     public void finish(Context ctx) throws Exception;
 

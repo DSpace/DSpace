@@ -57,9 +57,24 @@ public class CrosswalkMetadataValidator {
     /**
      * Scans metadata for elements not defined in this DSpace instance. It then takes action based
      * on a configurable parameter (fail, ignore, add).
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param schema metadata field schema
+     * @param element metadata field element
+     * @param qualifier metadata field qualifier
+     * @param forceCreate if true, force addinga schema or metadata field
+     * @return metadata field
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
+     * @throws CrosswalkException
+     *     Superclass for more-specific crosswalk exceptions.
      */
     public MetadataField checkMetadata(Context context, String schema, String element, String qualifier, boolean forceCreate) throws SQLException, AuthorizeException, CrosswalkException {
-        if(!validatedBefore(schema, element, qualifier)) {
+        if (!validatedBefore(schema, element, qualifier)) {
             // Verify that the schema exists
             MetadataSchema mdSchema = metadataSchemaService.find(context, schema);
             MetadataField mdField = null;

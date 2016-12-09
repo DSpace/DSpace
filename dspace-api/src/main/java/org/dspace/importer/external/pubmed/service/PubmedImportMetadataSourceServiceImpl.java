@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
- * Implements a data source for querying pubmed central
+ * Implements a data source for querying PubMed Central
  *
  * @author Roeland Dillen (roeland at atmire dot com)
  */
@@ -41,67 +41,74 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     private WebTarget pubmedWebTarget;
 
-    /** Find the number of records matching a query;
+    /**
+     * Find the number of records matching a query;
      *
      * @param query a query string to base the search on.
      * @return the sum of the matching records over this import source
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
     public int getNbRecords(String query) throws MetadataSourceException {
         return retry(new GetNbRecords(query));
     }
 
-    /** Find the number of records matching a query;
+    /**
+     * Find the number of records matching a query;
      *
      * @param query a query object to base the search on.
      * @return the sum of the matching records over this import source
-     * @throws MetadataSourceException
-     */    @Override
+     * @throws MetadataSourceException if the underlying methods throw any exception.
+     */
+    @Override
     public int getNbRecords(Query query) throws MetadataSourceException {
         return retry(new GetNbRecords(query));
     }
 
-    /**  Find the number of records matching a string query. Supports pagination
+    /**
+     *  Find the number of records matching a string query. Supports pagination
      *
      * @param query a query string to base the search on.
      * @param start offset to start at
      * @param count number of records to retrieve.
      * @return a set of records. Fully transformed.
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
     public Collection<ImportRecord> getRecords(String query, int start, int count) throws MetadataSourceException {
         return retry(new GetRecords(query, start, count));
     }
 
-    /** Find records based on a object query.
+    /**
+     * Find records based on a object query.
      *
      * @param query a query object to base the search on.
      * @return a set of records. Fully transformed.
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
     public Collection<ImportRecord> getRecords(Query query) throws MetadataSourceException {
         return retry(new GetRecords(query));
     }
 
-    /** Get a single record from the source.
-     * The first match will be returned
+    /**
+     * Get a single record from the source.
+     *
      * @param id identifier for the record
-     * @return a matching record
-     * @throws MetadataSourceException
+     * @return the first matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
     public ImportRecord getRecord(String id) throws MetadataSourceException {
         return retry(new GetRecord(id));
     }
 
-    /** Get a single record from the source.
-     * The first match will be returned
+    /**
+     * Get a single record from the source.
+     *
      * @param query a query matching a single record
-     * @return a matching record
-     * @throws MetadataSourceException
+     * @return the first matching record
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
     public ImportRecord getRecord(Query query) throws MetadataSourceException {
@@ -110,6 +117,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     /**
      * The string that identifies this import implementation. Preferable a URI
+     *
      * @return the identifying uri
      */
     @Override
@@ -117,7 +125,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         return "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
     }
 
-    /** Finds records based on an item
+    /**
+     * Finds records based on an item
+     *
      * @param item an item to base the search on
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
      * @throws MetadataSourceException if the underlying methods throw any exception.
@@ -127,11 +137,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
         return retry(new FindMatchingRecords(item));
     }
 
-    /** Finds records based on query object.
+    /**
+     * Finds records based on query object.
      *  Delegates to one or more MetadataSource implementations based on the uri.  Results will be aggregated.
+     *
      * @param query a query object to base the search on.
      * @return a collection of import records. Only the identifier of the found records may be put in the record.
-     * @throws MetadataSourceException
+     * @throws MetadataSourceException if the underlying methods throw any exception.
      */
     @Override
     public Collection<ImportRecord> findMatchingRecords(Query query) throws MetadataSourceException {
@@ -140,7 +152,8 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     /**
      * Initialize the class
-     * @throws Exception
+     *
+     * @throws Exception on generic exception
      */
     @Override
     public void init() throws Exception {
@@ -151,6 +164,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     /**
      * Return the baseAddress set to this object
+     *
      * @return The String object that represents the baseAddress of this object
      */
     public String getBaseAddress() {
@@ -159,6 +173,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     /**
      * Set the baseAddress to this object
+     *
      * @param baseAddress The String object that represents the baseAddress of this object
      */
     public void setBaseAddress(String baseAddress) {
@@ -278,6 +293,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             return records;
         }
     }
+
     private List<OMElement> splitToRecords(String recordsSrc) {
         OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
         OMElement element = records.getDocumentElement();

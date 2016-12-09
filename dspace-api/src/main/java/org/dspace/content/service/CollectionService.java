@@ -77,8 +77,11 @@ public interface CollectionService extends DSpaceObjectService<Collection>, DSpa
     /**
      * Get all collections in the system. Adds support for limit and offset.
      * @param context
+     *     The relevant DSpace Context.
      * @param limit
+     *     paging limit
      * @param offset
+     *     paging offset
      * @return List of Collections
      * @throws SQLException if database error
      */

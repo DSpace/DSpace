@@ -30,10 +30,12 @@ public class XmlName {
     
     /**
      * Create a new instance with the specified prefix and local name.
+     *
      * @param prefix     The namespace prefix.
      * @param localName  The element's local name. 
+     * @param namespace  The element's namespace. 
      */
-    public XmlName(String prefix, String localName, String namespace )
+    public XmlName(String prefix, String localName, String namespace)
     {
         this.prefix = prefix;
         this.localName = localName;
@@ -111,7 +113,7 @@ public class XmlName {
     public String getQualifiedName()
     {
         String qName = "";
-        if( prefix != null && prefix.trim().length() > 0 )
+        if ( prefix != null && prefix.trim().length() > 0 )
         {
            qName = prefix + ":";
         }
@@ -123,7 +125,7 @@ public class XmlName {
     public boolean equals(Object other)
     {
 
-        if( other instanceof XmlName )
+        if ( other instanceof XmlName )
         {
             XmlName otherName = (XmlName) other;
             return StringUtils.equals(this.namespace, otherName.namespace) &&

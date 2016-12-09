@@ -62,12 +62,15 @@ public class HarvestedItem implements ReloadableEntity<Integer>
         return item;
     }
 
+    // FIXME: duplicate below?
     void setOaiId(String oaiId) {
         this.oaiId = oaiId;
     }
 
     /**
      * Get the oai_id associated with this item 
+     *
+     * @return itemOaiID item's OAI identifier
      */
     public String getOaiID()
     {
@@ -76,6 +79,8 @@ public class HarvestedItem implements ReloadableEntity<Integer>
     
     /**
      * Set the oai_id associated with this item 
+     *
+     * @param itemOaiID item's OAI identifier
      */
     public void setOaiID(String itemOaiID)
     {

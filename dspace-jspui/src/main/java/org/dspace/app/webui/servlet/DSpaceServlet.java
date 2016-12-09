@@ -84,9 +84,14 @@ public class DSpaceServlet extends HttpServlet
      * Process an incoming request
      * 
      * @param request
-     *            the request object
+     *            the HTTP request
      * @param response
-     *            the response object
+     *            the HTTP response
+     * 
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     private void processRequest(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
@@ -203,10 +208,15 @@ public class DSpaceServlet extends HttpServlet
      * @param response
      *            the HTTP response
      * 
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
-     *             if a database error occurs
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
-     *             if some authorization error occurs
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -229,10 +239,15 @@ public class DSpaceServlet extends HttpServlet
      * @param response
      *            the HTTP response
      * 
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
-     *             if a database error occurs
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
-     *             if some authorization error occurs
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected void doDSPost(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,

@@ -236,11 +236,11 @@ public class JSPUploadStep extends JSPStep
             
             for (Bundle bnd : bundles)
             {
-            	fileAlreadyUploaded = bnd.getBitstreams().size() > 0;
-            	if (fileAlreadyUploaded)
-            	{
-            		break;
-            	}
+                fileAlreadyUploaded = bnd.getBitstreams().size() > 0;
+                if (fileAlreadyUploaded)
+                {
+                    break;
+                }
             }
             
             // if user already has uploaded at least one file
@@ -255,7 +255,7 @@ public class JSPUploadStep extends JSPStep
         }
         
         //If upload failed in JSPUI (just came from upload-error.jsp), user can retry the upload
-        if(buttonPressed.equalsIgnoreCase("submit_retry"))
+        if (buttonPressed.equalsIgnoreCase("submit_retry"))
         {
             showUploadPage(context, request, response, subInfo, false);
         }
@@ -278,7 +278,7 @@ public class JSPUploadStep extends JSPStep
                 // There was a problem uploading the file!
 
                 //First, check if we just removed our uploaded file
-                if(buttonPressed.startsWith("submit_remove_"))
+                if (buttonPressed.startsWith("submit_remove_"))
                 {
                     //if file was just removed, go back to upload page
                     showUploadPage(context, request, response, subInfo, false);
@@ -468,6 +468,12 @@ public class JSPUploadStep extends JSPStep
      *            the SubmissionInfo object
      * @param justUploaded
      *            true, if the user just finished uploading a file
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void showUploadPage(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo,
@@ -481,14 +487,14 @@ public class JSPUploadStep extends JSPStep
         
         if (!justUploaded)
         {
-	        for (Bundle bnd : bundles)
-	        {
-	        	fileAlreadyUploaded = bnd.getBitstreams().size() > 0;
-	        	if (fileAlreadyUploaded)
-	        	{
-	        		break;
-	        	}
-	        }
+            for (Bundle bnd : bundles)
+            {
+                fileAlreadyUploaded = bnd.getBitstreams().size() > 0;
+                if (fileAlreadyUploaded)
+                {
+                    break;
+                }
+            }
         }
         
         // if user already has uploaded at least one file
@@ -496,7 +502,7 @@ public class JSPUploadStep extends JSPStep
         {
             // The item already has files associated with it.
             showUploadFileList(context, request, response, subInfo,
-                    justUploaded, false);
+                justUploaded, false);
         }
         else
         {
@@ -516,6 +522,12 @@ public class JSPUploadStep extends JSPStep
      *            the response object
      * @param subInfo
      *            the SubmissionInfo object
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void showChooseFile(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
@@ -525,10 +537,9 @@ public class JSPUploadStep extends JSPStep
                 "webui.submission.sherparomeo-policy-enabled", true))
         {
             SHERPASubmitService sherpaSubmitService = new DSpace()
-                    .getSingletonService(SHERPASubmitService.class);
+                .getSingletonService(SHERPASubmitService.class);
             request.setAttribute("sherpa", sherpaSubmitService
-                    .hasISSNs(context, subInfo.getSubmissionItem()
-                            .getItem()));
+                .hasISSNs(context, subInfo.getSubmissionItem().getItem()));
         }
 
         // set to null the bitstream in subInfo, we need to process a new file
@@ -558,6 +569,12 @@ public class JSPUploadStep extends JSPStep
      *            pass in true if the user just successfully uploaded a file
      * @param showChecksums
      *            pass in true if checksums should be displayed
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void showUploadFileList(Context context,
             HttpServletRequest request, HttpServletResponse response,
@@ -598,6 +615,12 @@ public class JSPUploadStep extends JSPStep
      *            the response object
      * @param subInfo
      *            the SubmissionInfo object
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void showGetFileFormat(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
@@ -617,8 +640,8 @@ public class JSPUploadStep extends JSPStep
         request.setAttribute("bitstream.formats", formats);
 
         // What does the system think it is?
-        BitstreamFormat guess = bitstreamFormatService.guessFormat(context, subInfo
-                .getBitstream());
+        BitstreamFormat guess = bitstreamFormatService.guessFormat(context,
+            subInfo.getBitstream());
 
         request.setAttribute("guessed.format", guess);
 
@@ -638,6 +661,12 @@ public class JSPUploadStep extends JSPStep
      *            the response object
      * @param subInfo
      *            the SubmissionInfo object
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void showFileDescription(Context context,
             HttpServletRequest request, HttpServletResponse response,

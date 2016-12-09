@@ -37,6 +37,7 @@ public class AuthorizeException extends Exception
      * create an exception with only a message
      * 
      * @param message
+     *     Exception message
      */
     public AuthorizeException(String message)
     {

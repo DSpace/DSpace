@@ -32,37 +32,40 @@ import org.xml.sax.SAXException;
 public class CompletedStep extends AbstractSubmissionStep
 {
 
-	/** Language Strings **/ 
-	protected static final Message T_head = 
+    /** Language Strings **/ 
+    protected static final Message T_head = 
         message("xmlui.Submission.submit.CompletedStep.head"); 
-	protected static final Message T_info1 = 
+    protected static final Message T_info1 = 
         message("xmlui.Submission.submit.CompletedStep.info1"); 
     protected static final Message T_go_submission = 
         message("xmlui.Submission.submit.CompletedStep.go_submission");
-	protected static final Message T_submit_again = 
+    protected static final Message T_submit_again = 
         message("xmlui.Submission.submit.CompletedStep.submit_again"); 
 
-	/**
-	 * Establish our required parameters, abstractStep will enforce these.
-	 */
-	public CompletedStep()
-	{
-		this.requireHandle = true;
-	}
+    /**
+     * Establish our required parameters, abstractStep will enforce these.
+     */
+    public CompletedStep()
+    {
+        this.requireHandle = true;
+    }
 
-	public void addBody(Body body) throws SAXException, WingException,
-	UIException, SQLException, IOException, AuthorizeException
-	{	
-		Division div = body.addInteractiveDivision("submit-complete",contextPath+"/handle/"+handle+"/submit", Division.METHOD_POST,"primary submission");
-		div.setHead(T_head);
-		
-		div.addPara(T_info1);
-		
-		div.addPara().addXref(contextPath+"/submissions",T_go_submission);
-	     
-	    div.addPara().addButton("submit_again").setValue(T_submit_again);
-	    div.addHidden("handle").setValue(handle);
-	}
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {    
+        Division div = body.addInteractiveDivision("submit-complete",
+            contextPath + "/handle/" + handle + "/submit", Division.METHOD_POST,
+            "primary submission");
+        div.setHead(T_head);
+        
+        div.addPara(T_info1);
+        
+        div.addPara().addXref(contextPath + "/submissions", T_go_submission);
+         
+        div.addPara().addButton("submit_again").setValue(T_submit_again);
+        div.addHidden("handle").setValue(handle);
+    }
     
     /** 
      * Each submission step must define its own information to be reviewed
@@ -83,9 +86,9 @@ public class CompletedStep extends AbstractSubmissionStep
      *      all the reviewable information.  If this step has nothing to
      *      review, then return null!   
      */
-    public List addReviewSection(List reviewList) throws SAXException,
-        WingException, UIException, SQLException, IOException,
-        AuthorizeException
+    public List addReviewSection(List reviewList)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
         //nothing to review, since submission is now Completed!
         return null;

@@ -96,6 +96,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
      * Return true if this object equals obj, false otherwise.
      *
      * @param obj
+     *     object to compare (eperson, group, start date, end date, ...)
      * @return true if ResourcePolicy objects are equal
      */
     @Override
@@ -144,23 +145,22 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     {
         int hash = 7;
         hash = 19 * hash + this.getAction();
-        if(this.getGroup() != null)
+        if (this.getGroup() != null)
         {
             hash = 19 * hash + this.getGroup().hashCode();
-        }else{
+        } else {
             hash = 19 * hash + -1;
         }
 
-        if(this.getEPerson() != null)
+        if (this.getEPerson() != null)
         {
             hash = 19 * hash + this.getEPerson().hashCode();
-        }else{
+        } else {
             hash = 19 * hash + -1;
-
         }
 
-        hash = 19 * hash + (this.getStartDate() != null? this.getStartDate().hashCode():0);
-        hash = 19 * hash + (this.getEndDate() != null? this.getEndDate().hashCode():0);
+        hash = 19 * hash + (this.getStartDate() != null ? this.getStartDate().hashCode() : 0);
+        hash = 19 * hash + (this.getEndDate() != null ? this.getEndDate().hashCode() : 0);
         return hash;
     }
 
@@ -185,7 +185,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     /**
      * set the action this policy authorizes
      *
-     * @param myid  action ID from <code>org.dspace.core.Constants</code>
+     * @param myid  action ID from {@link org.dspace.core.Constants#Constants Constants}
      */
     public void setAction(int myid)
     {
@@ -279,24 +279,24 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
         this.endDate = d;
     }
 
-    public String getRpName(){
+    public String getRpName() {
         return rpname;
     }
-    public void setRpName(String name){
+    public void setRpName(String name) {
         this.rpname = name;
     }
 
-    public String getRpType(){
+    public String getRpType() {
         return rptype;
     }
-    public void setRpType(String type){
+    public void setRpType(String type) {
         this.rptype = type;
     }
 
-    public String getRpDescription(){
+    public String getRpDescription() {
         return rpdescription;
     }
-    public void setRpDescription(String description){
+    public void setRpDescription(String description) {
         this.rpdescription = description;
     }
 }

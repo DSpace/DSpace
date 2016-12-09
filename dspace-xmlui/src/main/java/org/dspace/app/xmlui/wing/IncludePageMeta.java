@@ -107,8 +107,8 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
      */
     @Override
     public void setup(SourceResolver resolver, Map objectModel, String src,
-            Parameters parameters) throws ProcessingException, SAXException,
-            IOException
+        Parameters parameters)
+        throws ProcessingException, SAXException, IOException
     {
         try
         {
@@ -116,10 +116,10 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
             metadataList = new ArrayList<>();
             for (String name : names)
             {
-            	String[] nameParts = name.split("#");
+                String[] nameParts = name.split("#");
 
-            	String dcName = null;
-            	int order = -1;
+                String dcName = null;
+                int order = -1;
                 switch (nameParts.length)
                 {
                 case 1:
@@ -158,7 +158,8 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
 
                 String value = parameters.getParameter(name);
 
-                Metadata metadata = new Metadata(element,qualifier,language,order,value);
+                Metadata metadata = new Metadata(
+                    element, qualifier, language, order, value);
                 metadataList.add(metadata);
             }
 
@@ -180,7 +181,9 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         }
 
         // concatenation
-        if (DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.theme.enableConcatenation",false)) {
+        if (DSpaceServicesFactory.getInstance().getConfigurationService()
+            .getBooleanProperty("xmlui.theme.enableConcatenation", false))
+        {
             metadataList = enableConcatenation();
         }
     }
@@ -198,13 +201,16 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         {
             // only try to concatenate css and js
             String curfile = metadata.getValue();
-            if (curfile.lastIndexOf('?') != -1) {
+            if (curfile.lastIndexOf('?') != -1)
+            {
                 curfile = curfile.substring(0, curfile.lastIndexOf('?'));
             }
-            if (curfile.endsWith(".css") || curfile.endsWith(".js") || curfile.endsWith(".json")) {
+            if (curfile.endsWith(".css") || curfile.endsWith(".js") || curfile.endsWith(".json"))
+            {
                 String curval = metadata.getValue();
                 // check if this metadata and the last one are compatible
-                if(last != null && checkConcatenateMerge(last, metadata)) {
+                if (last != null && checkConcatenateMerge(last, metadata))
+                {
                     // merge
                     String lastval = last.getValue();
                     curval = metadata.getValue();
@@ -212,28 +218,38 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
                     newval += curval.substring(curval.lastIndexOf('/')+1,curval.lastIndexOf('.'));
                     newval += lastval.substring(lastval.lastIndexOf('.'));
                     last.value = newval;
-                } else {
+                }
+                else
+                {
                     // no merge, so add to list
                     newMetadataList.add(metadata);
                     // handle query string cases
-                    if(curval.lastIndexOf('?') != -1) {
-                        if(curval.substring(curval.lastIndexOf('?')).equals("?nominify")) {
+                    if (curval.lastIndexOf('?') != -1)
+                    {
+                        if (curval.substring(curval.lastIndexOf('?')).equals("?nominify"))
+                        {
                             // concat should still be possible, so set last
                             last = metadata;
-                        } else if(curval.substring(curval.lastIndexOf('?')).equals("?noconcat")) {
+                        }
+                        else if (curval.substring(curval.lastIndexOf('?')).equals("?noconcat"))
+                        {
                             // no concat should be possible so set last to null
                             last = null;
                             // query string can be removed
                             curval = curval.substring(0, curval.lastIndexOf('?'));
                             metadata.value = curval;
-                        } else {
+                        }
+                        else
+                        {
                             // no concat should be possible so set last to null
                             last = null;
                             // query string should be set to "nominify"
                             curval = curval.substring(0, curval.lastIndexOf('?')) + "?nominify";
                             metadata.value = curval;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         // multiple possibilities:
                         // * last == null, so set it
                         // * no merge is possible, so change last to this metadata
@@ -241,7 +257,9 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
                         last = metadata;
                     }
                 }
-            } else {
+            }
+            else
+            {
                 // wrong extension
                 newMetadataList.add(metadata);
             }
@@ -251,27 +269,39 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
 
     private boolean checkConcatenateMerge(Metadata last, Metadata current) {
         // check if elements are equal
-        if(last.getElement() == null) {
-            if(current.getElement() != null) {
+        if (last.getElement() == null)
+        {
+            if (current.getElement() != null)
+            {
                 return false;
             }
-        } else if(!last.getElement().equals(current.getElement())) {
+        }
+        else if (!last.getElement().equals(current.getElement()))
+        {
             return false;
         }
         // check if qualifiers are equal
-        if(last.getQualifier() == null) {
-            if(current.getQualifier() != null) {
+        if (last.getQualifier() == null)
+        {
+            if (current.getQualifier() != null)
+            {
                 return false;
             }
-        } else if(!last.getQualifier().equals(current.getQualifier())) {
+        }
+        else if (!last.getQualifier().equals(current.getQualifier()))
+        {
             return false;
         }
         // check if languages are equal
-        if(last.getLanguage() == null) {
-            if(current.getLanguage() != null) {
+        if (last.getLanguage() == null)
+        {
+            if (current.getLanguage() != null)
+            {
                 return false;
             }
-        } else if(!last.getLanguage().equals(current.getLanguage())) {
+        }
+        else if (!last.getLanguage().equals(current.getLanguage()))
+        {
             return false;
         }
 
@@ -279,36 +309,40 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         String curval = current.getValue();
         String lastval = last.getValue();
         // check if extensions and query strings are equal
-        if(!lastval.substring(lastval.lastIndexOf('.')).equals(curval.substring(curval.lastIndexOf('.')))) {
+        if (!lastval.substring(lastval.lastIndexOf('.'))
+            .equals(curval.substring(curval.lastIndexOf('.'))))
+        {
             return false;
         }
         // check if paths are equal
-        if(!lastval.substring(0,lastval.lastIndexOf('/')+1).equals(curval.substring(0,curval.lastIndexOf('/')+1))) {
+        if (!lastval.substring(0, lastval.lastIndexOf('/') + 1)
+            .equals(curval.substring(0, curval.lastIndexOf('/') + 1)))
+        {
             return false;
         }
 
         // only valid nonempty query string is "nominify"
-        return !(curval.lastIndexOf('?') != -1
-                && !"?nominify".equals(curval.substring(curval.lastIndexOf('?'))));
-
+        return !(curval.lastIndexOf('?') != -1 &&
+            !"?nominify".equals(curval.substring(curval.lastIndexOf('?'))));
     }
     /**
      * Include the metadata in the page metadata.
      * @throws org.dspace.app.xmlui.wing.WingException passed through.
      */
     @Override
-    public void addPageMeta(PageMeta pageMeta) throws WingException
+    public void addPageMeta(PageMeta pageMeta)
+        throws WingException
     {
         for (Metadata metadata : metadataList)
         {
-        	String element = metadata.getElement();
-        	String qualifier = metadata.getQualifier();
-        	String language = metadata.getLanguage();
+            String element = metadata.getElement();
+            String qualifier = metadata.getQualifier();
+            String language = metadata.getLanguage();
             String value = metadata.getValue();
 
             // Add our new metadata.
             pageMeta.addMetadata(element, qualifier, language)
-                    .addContent(value);
+                .addContent(value);
         }
     }
 
@@ -318,87 +352,86 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
      */
     static class Metadata implements Comparable<Metadata> {
 
-    	private final String element;
-    	private final String qualifier;
-    	private final String language;
-    	private final int order;
-    	private String value;
+        private final String element;
+        private final String qualifier;
+        private final String language;
+        private final int order;
+        private String value;
 
-    	public Metadata(String element,String qualifier, String language, int order, String value)
-    	{
-    		this.element = element;
-    		this.qualifier = qualifier;
-    		this.language = language;
-    		this.order = order;
-    		this.value = value;
-    	}
+        public Metadata(String element,String qualifier, String language, int order, String value)
+        {
+            this.element = element;
+            this.qualifier = qualifier;
+            this.language = language;
+            this.order = order;
+            this.value = value;
+        }
 
-    	public String getElement()
-    	{
-    		return this.element;
-    	}
+        public String getElement()
+        {
+            return this.element;
+        }
 
-    	public String getQualifier()
-    	{
-    		return this.qualifier;
-    	}
+        public String getQualifier()
+        {
+            return this.qualifier;
+        }
 
-    	public String getLanguage()
-    	{
-    		return this.language;
-    	}
+        public String getLanguage()
+        {
+            return this.language;
+        }
 
-    	public int getOrder()
-    	{
-    		return this.order;
-    	}
+        public int getOrder()
+        {
+            return this.order;
+        }
 
-    	public String getName()
-    	{
-    		String name = this.element;
-    		if (this.qualifier != null)
-    		{
-    			name += "." + this.qualifier;
-    			if (this.language != null)
-    			{
-    				name += "." + this.language;
-    			}
-    		}
+        public String getName()
+        {
+            String name = this.element;
+            if (this.qualifier != null)
+            {
+                name += "." + this.qualifier;
+                if (this.language != null)
+                {
+                    name += "." + this.language;
+                }
+            }
 
-    		name += "#" + order;
-    		return name;
-    	}
+            name += "#" + order;
+            return name;
+        }
 
-    	public String getValue()
-    	{
-    		return this.value;
-    	}
+        public String getValue()
+        {
+            return this.value;
+        }
 
         @Override
-    	public int compareTo(Metadata other)
-    	{
-    		String myName = this.element     + "." +this.qualifier   + "." + this.language;
-    		String otherName = other.element + "." + other.qualifier + "." + other.language;
+        public int compareTo(Metadata other)
+        {
+            String myName = this.element     + "." + this.qualifier  + "." + this.language;
+            String otherName = other.element + "." + other.qualifier + "." + other.language;
 
-    		int result = myName.compareTo(otherName);
-    		if (result == 0)
-    		{
-    			if (this.order == other.order )
-    			{
-    				result = 0; // These two metadata element's names are completely identical.
-    			}
-    			else if (this.order > other.order)
-    			{
-    				result = 1; // The other metadata element belongs AFTER this element.
-    			}
-    			else
-    			{
-    				result = -1; // The other metadata element belongs BEFORE this element.
-    			}
-    		}
+            int result = myName.compareTo(otherName);
+            if (result == 0)
+            {
+                if (this.order == other.order )
+                {
+                    result = 0; // These two metadata element's names are completely identical.
+                }
+                else if (this.order > other.order)
+                {
+                    result = 1; // The other metadata element belongs AFTER this element.
+                }
+                else
+                {
+                    result = -1; // The other metadata element belongs BEFORE this element.
+                }
+            }
 
-    		return result;
-    	}
+            return result;
+        }
     }
-
 }

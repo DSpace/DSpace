@@ -92,7 +92,7 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * dc.identifier.uri(link) = DC identifier.uri, render as a link
  * dc.date.issued(date) = DC date.issued, render as a date
  * dc.identifier.doi(doi) = DC identifier.doi, render as link to http://dx.doi.org
- * dc.identifier.hdl(handle) = DC identifier.hanlde, render as link to http://hdl.handle.net
+ * dc.identifier.hdl(handle) = DC identifier.handle, render as link to http://hdl.handle.net
  * dc.relation.isPartOf(resolver) = DC relation.isPartOf, render as link to the base url of the resolver 
  *                                  according to the specified urn in the metadata value (doi:xxxx, hdl:xxxxx, 
  *                                  urn:issn:xxxx, etc.)
@@ -101,8 +101,8 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * 
  * <P>
  * When using "resolver" in webui.itemdisplay to render identifiers as resolvable
- * links, the base URL is taken from <code>webui.resolver.<n>.baseurl</code> 
- * where <code>webui.resolver.<n>.urn</code> matches the urn specified in the metadata value.
+ * links, the base URL is taken from <code>webui.resolver.&lt;n&gt;.baseurl</code> 
+ * where <code>webui.resolver.&lt;n&gt;.urn</code> matches the urn specified in the metadata value.
  * The value is appended to the "baseurl" as is, so the baseurl need to end with slash almost in any case.
  * If no urn is specified in the value it will be displayed as simple text.
  * 
@@ -115,14 +115,13 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * 
  * </PRE>
  * 
+ * <P>
  * For the doi and hdl urn defaults values are provided, respectively http://dx.doi.org/ and 
  * http://hdl.handle.net/ are used.<br> 
  * 
  * If a metadata value with style: "doi", "handle" or "resolver" matches a URL
  * already, it is simply rendered as a link with no other manipulation.
  * </P>
- * 
- * <PRE>
  * 
  * <P>
  * If an item has no value for a particular field, it won't be displayed. The
@@ -137,9 +136,11 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * e.g. &quot;metadata.thesis.dc.title&quot; &quot;metadata.thesis.dc.contributor.*&quot;
  * &quot;metadata.thesis.dc.date.issued&quot;
  * 
+ * </PRE>
  * 
  * if this key is not found will be used the more general one
  * 
+ * <PRE>
  * &quot;metadata.&lt;field&gt;&quot;
  * 
  * e.g. &quot;metadata.dc.title&quot; &quot;metadata.dc.contributor.*&quot;

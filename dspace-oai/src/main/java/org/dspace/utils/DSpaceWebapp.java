@@ -13,7 +13,7 @@ import org.dspace.app.util.AbstractDSpaceWebapp;
 /**
  * An MBean to identify this web application.
  *
- * @author Christian Scheible <christian.scheible@uni-konstanz.de>
+ * @author Christian Scheible (christian.scheible at uni-konstanz dot de)
  */
 public class DSpaceWebapp
         extends AbstractDSpaceWebapp

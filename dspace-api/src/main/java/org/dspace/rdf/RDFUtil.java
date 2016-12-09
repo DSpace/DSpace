@@ -89,6 +89,7 @@ public class RDFUtil {
      * the DSpace configuration.  Close the model
      * ({@link com.hp.hpl.jena.rdf.model.Model#close() Model.close()}) as soon 
      * as possible to free system resources.
+     *
      * @param identifier A URI representing the object you want to load data about.
      * @return A model containing the RDF data to the specified identifier or 
      *         null if no data could be found.
@@ -105,12 +106,15 @@ public class RDFUtil {
      * Please note that URIs can be generated for DSpaceObjects of the 
      * type SITE, COMMUNITY, COLLECTION or ITEM only. Currently dspace-rdf 
      * doesn't support Bundles or Bitstreams as independent entity.
+     *
      * @param context DSpace Context.
      * @param dso DSpace Object you want to get an identifier for.
      * @return URI to identify the DSO or null if no URI could be generated.
      *         This can happen f.e. if you use a URIGenerator that uses
      *         persistent identifier like DOIs or Handles but there is no such
      *         identifier assigned to the provided DSO.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static String generateIdentifier(Context context, DSpaceObject dso)
             throws SQLException
@@ -125,15 +129,20 @@ public class RDFUtil {
      * Please note that URIs can be generated for DSpaceObjects of the 
      * type SITE, COMMUNITY, COLLECTION or ITEM only. Currently dspace-rdf 
      * doesn't support Bundles or Bitstreams as independent entity.
+     *
      * @param context DSpace Context.
      * @param type Type of the DSpaceObject you want to generate a URI for (e.g. 
      *             {@link org.dspace.core.Constants#ITEM Constants.ITEM}.
      * @param id UUID of the DSpaceObject you want to generate a URI for.
      * @param handle Handle of the DSpaceObject you want to generate a URI for.
+     * @param identifier identifiers of the object.
+     *     
      * @return URI to identify the DSO or null if no URI could be generated.
      *         This can happen f.e. if you use a URIGenerator that uses
      *         persistent identifier like DOIs or Handles but there is no such
      *         identifier assigned to the provided DSO.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static String generateIdentifier(Context context, int type, UUID id,
             String handle, List<String> identifier)
@@ -147,6 +156,7 @@ public class RDFUtil {
      * Please note that dspace-rdf doesn't support Bundles or Bitstreams as 
      * independent entity. You can convert DSpaceObjects of type SITE,
      * COMMUNITY, COLLECTION or ITEM.
+     *
      * @param context Consider that the converted data will be stored in a
      *                triple store, that is outside the range of the DSpace
      *                authorization mechanism. Unless you are really sure what 
@@ -209,6 +219,7 @@ public class RDFUtil {
      * Please note that dspace-rdf doesn't support Bundles or Bitstreams as 
      * independent entity. You can convert DSpaceObjects of type SITE,
      * COMMUNITY, COLLECTION or ITEM.
+     *
      * @param context Consider that the converted data will be stored in a
      *                triple store, that is outside the range of the DSpace
      *                authorization mechanism. Unless you are really sure what 
@@ -305,6 +316,7 @@ public class RDFUtil {
      * Does the same as {@link #isPublic(Context, DSpaceObject) 
      * isPublic(Context, DSpaceObject)} but returns a boolean instead of throwing
      * exceptions. For those who don't want to deal with catching exceptions.
+     *
      * @param context Consider that the converted data will be stored in a
      *                triple store, that is outside the range of the DSpace
      *                authorization mechanism. Unless you are really sure what 
@@ -331,6 +343,7 @@ public class RDFUtil {
     
     /**
      * Deletes the data identified by the URI from the triple store.
+     *
      * @param uri URI to identify the named graph to delete.
      */
     public static void delete(String uri)
@@ -341,10 +354,13 @@ public class RDFUtil {
     /**
      * This is a shortcut to generate an RDF identifier for a DSpaceObject and
      * to delete the identified data from the named graph.
+     *
      * @param ctx
+     *     The relevant DSpace Context.
      * @param type DSpaceObject type (e.g. {@link Constants#ITEM Constants.ITEM}).
      * @param id Id of the DspaceObject.
      * @param handle Handle of the DSpaceObject.
+     * @param identifiers list of identifiers
      * @throws SQLException if database error
      * @throws RDFMissingIdentifierException In case that no Identifier could be generated.
      */

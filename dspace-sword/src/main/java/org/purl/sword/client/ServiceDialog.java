@@ -57,183 +57,183 @@ import javax.swing.JPasswordField;
  */
 public class ServiceDialog 
 {
-   /**
-    * The username. 
-    */
-   private SWORDComboBox username;
-   
-   /**
-    * The password.
-    */
-   private JPasswordField password;
-   
-   /**
-    * Holds the URL for the collection. 
-    */
-   private SWORDComboBox location;
-   
-   /**
-    * The combo box that shows the list of onBehalfOf items. 
-    */
-   private SWORDComboBox onBehalfOf;
+    /**
+     * The username. 
+     */
+    private SWORDComboBox username;
     
-   /**
-    * Parent frame for the dialog. 
-    */
-   private JFrame parentFrame = null; 
-
-   /**
-    * The panel that holds the controls. 
-    */
-   private JPanel controls = null;
-
-   /**
-    * List of buttons. 
-    */
-   private static Object[] options = {"Get Service Document", "Cancel" };
+    /**
+     * The password.
+     */
+    private JPasswordField password;
+    
+    /**
+     * Holds the URL for the collection. 
+     */
+    private SWORDComboBox location;
+    
+    /**
+     * The combo box that shows the list of onBehalfOf items. 
+     */
+    private SWORDComboBox onBehalfOf;
+     
+    /**
+     * Parent frame for the dialog. 
+     */
+    private JFrame parentFrame = null; 
+ 
+    /**
+     * The panel that holds the controls. 
+     */
+    private JPanel controls = null;
+ 
+    /**
+     * List of buttons. 
+     */
+    private static Object[] options = {"Get Service Document", "Cancel" };
+    
+    /**
+     * Create a new instance. 
+     * 
+     * @param parentFrame The parent frame. The dialog will be shown over the 
+     *                    centre of this frame. 
+     */
+    public ServiceDialog(JFrame parentFrame)
+    {
+       this.parentFrame = parentFrame; 
+       controls = createControls(); 
+    }
+    
+    /**
+     * Show the dialog. 
+     * 
+     * @return The close option. This is one of the dialog options from 
+     * JOptionPane. 
+     */
+    public int show( )
+    {
+        int result =  JOptionPane.showOptionDialog(parentFrame,
+            controls,
+            "Get Service Document",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE,
+            null,
+            options,
+            options[1]);
+         
+        if ( result == JOptionPane.OK_OPTION )
+        {
+           // update the combo boxes with the values 
+           username.updateList();
+           location.updateList();
+           onBehalfOf.updateList();
+        }
+        
+        return result; 
+    }
+    
+    /**
+     * Create the controls that are displayed in the dialog. 
+     * 
+     * @return The panel that contains the controls. 
+     */
+    protected final JPanel createControls( )
+    {
+       username = new SWORDComboBox();
+       username.setEditable(true);
+       password = new JPasswordField();
+       location = new SWORDComboBox();
+       location.setEditable(true);
+       onBehalfOf = new SWORDComboBox();
+       onBehalfOf.setEditable(true);
+       
+       JLabel userLabel = new JLabel("Username:", JLabel.TRAILING);
+       JLabel passwordLabel = new JLabel("Password:", JLabel.TRAILING);
+       JLabel locationLabel = new JLabel("Location:", JLabel.TRAILING);
+       JLabel onBehalfOfLabel = new JLabel("On Behalf Of:", JLabel.TRAILING);
+       
+       SWORDFormPanel panel = new SWORDFormPanel(); 
+       panel.addFirstRow(userLabel, username);
+       panel.addRow(passwordLabel, password);
+       panel.addRow(locationLabel, location);
+       panel.addRow(onBehalfOfLabel, onBehalfOf);
+       
+       return panel; 
+    }
+    
+    /**
+     * Get the username from the controls on the dialog. 
+     * 
+     * @return The username. 
+     */
+    public String getUsername()
+    {
+       return username.getText();    
+    }
+    
+    /**
+     * Get the password from the dialog. 
+     * 
+     * @return The password. 
+     */
+    public String getPassword()
+    {
+       return new String(password.getPassword());
+    }
+    
+    /**
+     * The location from the dialog. 
+     * 
+     * @return The location. 
+     */
+    public String getLocation() 
+    {
+       return location.getText();     
+    }
+    
+    /**
+     * The onBehalfOf value from the dialog. 
+     * 
+     * @return The onBehalfOf value. 
+     */
+    public String getOnBehalfOf()
+    {
+       String text = onBehalfOf.getText().trim();
+       if ( text.length() == 0 )
+       {
+          return null;
+       }
+       return text;
+    }
+    
+    /**
+     * Add the list of user ids to the dialog. 
+     * 
+     * @param users The list of user ids. 
+     */
+    public void addUserIds(String[] users)
+    {
+        username.insertItems(users);
+    }
+    
+    /** 
+     * Add the list of service URLs. 
+     * 
+     * @param services The service URLs. 
+     */
+    public void addServiceUrls(String[] services)
+    {
+        location.insertItems(services);
+    }
+    
+    /**
+     * Add a list of onBehalfOf names. 
+     * 
+     * @param users The list of onBehalfOf items. 
+     */
+    public void addOnBehalfOf(String[] users)
+    {
+        onBehalfOf.insertItems(users);
+    }
    
-   /**
-    * Create a new instance. 
-    * 
-    * @param parentFrame The parent frame. The dialog will be shown over the 
-    *                    centre of this frame. 
-    */
-   public ServiceDialog(JFrame parentFrame)
-   {
-      this.parentFrame = parentFrame; 
-      controls = createControls(); 
-   }
-   
-   /**
-    * Show the dialog. 
-    * 
-    * @return The close option. This is one of the dialog options from 
-    * JOptionPane. 
-    */
-   public int show( )
-   {
-     int result =  JOptionPane.showOptionDialog(parentFrame,
-	     controls,
-	     "Get Service Document",
-	     JOptionPane.OK_CANCEL_OPTION,
-	     JOptionPane.PLAIN_MESSAGE,
-	     null,
-	     options,
-	     options[1]);
-	  
-	  if( result == JOptionPane.OK_OPTION )
-	  {
-	     // update the combo boxes with the values 
-	     username.updateList();
-	     location.updateList();
-	     onBehalfOf.updateList();
-	  }
-	  
-	  return result; 
-   }
-   
-   /**
-    * Create the controls that are displayed in the dialog. 
-    * 
-    * @return The panel that contains the controls. 
-    */
-   protected final JPanel createControls( )
-   {
-      username = new SWORDComboBox();
-      username.setEditable(true);
-      password = new JPasswordField();
-      location = new SWORDComboBox();
-      location.setEditable(true);
-      onBehalfOf = new SWORDComboBox();
-      onBehalfOf.setEditable(true);
-      
-      JLabel userLabel = new JLabel("Username:", JLabel.TRAILING);
-      JLabel passwordLabel = new JLabel("Password:", JLabel.TRAILING);
-      JLabel locationLabel = new JLabel("Location:", JLabel.TRAILING);
-      JLabel onBehalfOfLabel = new JLabel("On Behalf Of:", JLabel.TRAILING);
-      
-      SWORDFormPanel panel = new SWORDFormPanel(); 
-      panel.addFirstRow(userLabel, username);
-      panel.addRow(passwordLabel, password);
-      panel.addRow(locationLabel, location);
-      panel.addRow(onBehalfOfLabel, onBehalfOf);
-      
-      return panel; 
-   }
-   
-   /**
-    * Get the username from the controls on the dialog. 
-    * 
-    * @return The username. 
-    */
-   public String getUsername()
-   {
-      return username.getText();    
-   }
-   
-   /**
-    * Get the password from the dialog. 
-    * 
-    * @return The password. 
-    */
-   public String getPassword()
-   {
-      return new String(password.getPassword());
-   }
-   
-   /**
-    * The location from the dialog. 
-    * 
-    * @return The location. 
-    */
-   public String getLocation() 
-   {
-      return location.getText();     
-   }
-   
-   /**
-    * The onBehalfOf value from the dialog. 
-    * 
-    * @return The onBehalfOf value. 
-    */
-   public String getOnBehalfOf()
-   {
-      String text = onBehalfOf.getText().trim();
-      if( text.length() == 0 )
-      {
-         return null;
-      }
-      return text;
-   }
-   
-   /**
-    * Add the list of user ids to the dialog. 
-    * 
-    * @param users The list of user ids. 
-    */
-   public void addUserIds(String[] users)
-   {
-	   username.insertItems(users);
-   }
-   
-   /** 
-    * Add the list of service URLs. 
-    * 
-    * @param services The service URLs. 
-    */
-   public void addServiceUrls(String[] services)
-   {
-	   location.insertItems(services);
-   }
-   
-   /**
-    * Add a list of onBehalfOf names. 
-    * 
-    * @param users The list of onBehalfOf items. 
-    */
-   public void addOnBehalfOf(String[] users)
-   {
-	   onBehalfOf.insertItems(users);
-   }
-  
 }

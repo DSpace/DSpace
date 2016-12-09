@@ -31,28 +31,28 @@ public class SearchUtils {
 
     public static SearchService getSearchService()
     {
-        if(searchService ==  null){
+        if (searchService ==  null) {
             org.dspace.kernel.ServiceManager manager = DSpaceServicesFactory.getInstance().getServiceManager();
             searchService = manager.getServiceByName(SearchService.class.getName(),SearchService.class);
         }
         return searchService;
     }
 
-    public static DiscoveryConfiguration getDiscoveryConfiguration(){
+    public static DiscoveryConfiguration getDiscoveryConfiguration() {
         return getDiscoveryConfiguration(null);
     }
 
-    public static DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso){
+    public static DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso) {
         DiscoveryConfigurationService configurationService = getConfigurationService();
 
         DiscoveryConfiguration result = null;
-        if(dso == null){
+        if (dso == null) {
             result = configurationService.getMap().get("site");
         }else{
             result = configurationService.getMap().get(dso.getHandle());
         }
 
-        if(result == null){
+        if (result == null) {
             //No specific configuration, get the default one
             result = configurationService.getMap().get("default");
         }
@@ -73,8 +73,11 @@ public class SearchUtils {
     /**
      * Method that retrieves a list of all the configuration objects from the given item
      * A configuration object can be returned for each parent community/collection
+     *
      * @param item the DSpace item
      * @return a list of configuration objects
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static List<DiscoveryConfiguration> getAllDiscoveryConfigurations(Item item) throws SQLException {
         Map<String, DiscoveryConfiguration> result = new HashMap<String, DiscoveryConfiguration>();
@@ -82,14 +85,14 @@ public class SearchUtils {
         List<Collection> collections = item.getCollections();
         for (Collection collection : collections) {
             DiscoveryConfiguration configuration = getDiscoveryConfiguration(collection);
-            if(!result.containsKey(configuration.getId())){
+            if (!result.containsKey(configuration.getId())) {
                 result.put(configuration.getId(), configuration);
             }
         }
 
         //Also add one for the default
         DiscoveryConfiguration configuration = getDiscoveryConfiguration(null);
-        if(!result.containsKey(configuration.getId())){
+        if (!result.containsKey(configuration.getId())) {
             result.put(configuration.getId(), configuration);
         }
 

@@ -32,7 +32,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
 
     /**
      * Return prefixToNamespaceMapping
-     * @return Map<String, String> prefixToNamespaceMapping
+     * @return a prefixToNamespaceMapping map
      */
     public Map<String, String> getPrefixToNamespaceMapping() {
         return prefixToNamespaceMapping;
@@ -42,7 +42,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
 
     /**
      * Return metadataFieldMapping
-     * @return MetadataFieldMapping<OMElement,MetadataContributor<OMElement>> metadataFieldMapping
+     * @return MetadataFieldMapping
      */
     public MetadataFieldMapping<OMElement,MetadataContributor<OMElement>> getMetadataFieldMapping() {
         return metadataFieldMapping;
@@ -50,7 +50,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
 
     /**
      * Set the metadataFieldMapping of this SimpleXpathMetadatumContributor
-     * @param metadataFieldMapping
+     * @param metadataFieldMapping the new mapping.
      */
     public void setMetadataFieldMapping(MetadataFieldMapping<OMElement,MetadataContributor<OMElement>> metadataFieldMapping) {
         this.metadataFieldMapping = metadataFieldMapping;
@@ -58,7 +58,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
 
     /**
      * Set the prefixToNamespaceMapping for this object,
-     * @param prefixToNamespaceMapping
+     * @param prefixToNamespaceMapping the new mapping.
      */
     @Resource(name="isiFullprefixMapping")
     public void setPrefixToNamespaceMapping(Map<String, String> prefixToNamespaceMapping) {
@@ -68,10 +68,13 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
     private Map<String,String> prefixToNamespaceMapping;
 
     /**
-     * Initialize SimpleXpathMetadatumContributor with a query, Map<String, String>(prefixToNamespaceMapping) and MetadataFieldConfig(field)
-     * @param query String
-     * @param prefixToNamespaceMapping Map<String, String>
-     * @param field MetadataFieldConfig
+     * Initialize SimpleXpathMetadatumContributor with a query, prefixToNamespaceMapping and MetadataFieldConfig
+     * @param query
+     *     query string
+     * @param prefixToNamespaceMapping
+     *     metadata prefix to namespace mapping
+     * @param field
+     *     <a href="https://github.com/DSpace/DSpace/tree/master/dspace-api/src/main/java/org/dspace/importer/external#metadata-mapping-">MetadataFieldConfig</a>
      */
     public SimpleXpathMetadatumContributor(String query, Map<String, String> prefixToNamespaceMapping, MetadataFieldConfig field) {
         this.query = query;
@@ -95,6 +98,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
     public MetadataFieldConfig getField() {
         return field;
     }
+
     /**
      * Setting the MetadataFieldConfig
      * @param field MetadataFieldConfig used while retrieving MetadatumDTO
@@ -111,6 +115,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
     public String getQuery() {
         return query;
     }
+
     @Required
     public void setQuery(String query) {
         this.query = query;

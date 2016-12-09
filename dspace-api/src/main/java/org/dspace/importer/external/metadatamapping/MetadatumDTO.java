@@ -32,7 +32,7 @@ public class MetadatumDTO {
     /**
      * Retrieve the schema set to this MetadatumDTO.
      * Returns <tt>null</tt> of no schema is set
-     * @return schema
+     * @return metadata field schema
      */
     public String getSchema() {
         return schema;
@@ -40,7 +40,7 @@ public class MetadatumDTO {
 
     /**
      * Set the schema to this MetadatumDTO
-     * @param schema
+     * @param schema metadata field schema
      */
     public void setSchema(String schema) {
         this.schema = schema;
@@ -49,7 +49,7 @@ public class MetadatumDTO {
     /**
      * Retrieve the element set to this MetadatumDTO.
      * Returns <tt>null</tt> of no element is set
-     * @return element
+     * @return metadata field element
      */
     public String getElement() {
         return element;
@@ -57,7 +57,7 @@ public class MetadatumDTO {
 
     /**
      * Set the element to this MetadatumDTO
-     * @param element
+     * @param element metadata field element
      */
     public void setElement(String element) {
         this.element = element;
@@ -66,7 +66,7 @@ public class MetadatumDTO {
     /**
      * Retrieve the qualifier set to this MetadatumDTO.
      * Returns <tt>null</tt> of no qualifier is set
-     * @return qualifier
+     * @return metadata field qualifier
      */
     public String getQualifier() {
         return qualifier;
@@ -74,7 +74,7 @@ public class MetadatumDTO {
 
     /**
      * Set the qualifier to this MetadatumDTO
-     * @param qualifier
+     * @param qualifier metadata field qualifier
      */
     public void setQualifier(String qualifier) {
         this.qualifier = qualifier;
@@ -83,12 +83,16 @@ public class MetadatumDTO {
     /**
      * Retrieve the value set to this MetadatumDTO.
      * Returns <tt>null</tt> of no value is set
-     * @return value
+     * @return metadata field value
      */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Set the MetadatumDTO to this value.
+     * @param value metadata field value
+     */
     public void setValue(String value) {
         this.value = value;
     }

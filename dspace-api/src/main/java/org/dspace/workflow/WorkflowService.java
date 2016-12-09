@@ -26,6 +26,7 @@ import java.util.List;
  * are required to have.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> some implementation of workflow item.
  */
 public interface WorkflowService<T extends WorkflowItem> {
 
@@ -36,10 +37,18 @@ public interface WorkflowService<T extends WorkflowItem> {
      * the PersonalWorkspace entry and turn it into a WorkflowItem.
      *
      * @param context
-     *            Context
+     *     The relevant DSpace Context.
      * @param wsi
-     *            The WorkspaceItem to convert to a workflow item
+     *     The WorkspaceItem to convert to a workflow item
      * @return The resulting workflow item
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws WorkflowException if workflow error
      */
     public T start(Context context, WorkspaceItem wsi) throws SQLException, AuthorizeException, IOException, WorkflowException;
 
@@ -47,6 +56,20 @@ public interface WorkflowService<T extends WorkflowItem> {
      * startWithoutNotify() starts the workflow normally, but disables
      * notifications (useful for large imports,) for the first workflow step -
      * subsequent notifications happen normally
+     *
+     * @param c
+     *     The relevant DSpace Context.
+     * @param wsi
+     *     workspace item
+     * @return the resulting workflow item.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws WorkflowException if workflow error
      */
     public T startWithoutNotify(Context c, WorkspaceItem wsi) throws SQLException, AuthorizeException, IOException, WorkflowException;
 
@@ -58,11 +81,19 @@ public interface WorkflowService<T extends WorkflowItem> {
      * the user's PersonalWorkspace
      *
      * @param c
-     *            Context
+     *     The relevant DSpace Context.
      * @param wi
-     *            WorkflowItem to operate on
+     *     WorkflowItem to operate on
      * @param e
-     *            EPerson doing the operation
+     *     EPerson doing the operation
+     * @return workspace item returned to workspace
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public WorkspaceItem abort(Context c, T wi, EPerson e) throws SQLException, AuthorizeException, IOException;
 

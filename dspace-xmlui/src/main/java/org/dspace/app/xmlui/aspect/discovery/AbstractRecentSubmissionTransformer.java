@@ -84,34 +84,36 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
      */
     public SourceValidity getValidity()
     {
-    	if (this.validity == null)
-    	{
-	        try
-	        {
-	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        if (this.validity == null)
+        {
+            try
+            {
+                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-	            DSpaceValidity validity = new DSpaceValidity();
+                DSpaceValidity validity = new DSpaceValidity();
 
-	            // Add the actual collection;
-	            validity.add(context, dso);
+                // Add the actual collection;
+                validity.add(context, dso);
 
                 getRecentlySubmittedItems(dso);
-                if(queryResults != null){
+                if (queryResults != null)
+                {
                     List<DSpaceObject> resultingObjects = queryResults.getDspaceObjects();
-                    for(DSpaceObject resultObject : resultingObjects){
+                    for (DSpaceObject resultObject : resultingObjects)
+                    {
                         validity.add(context, resultObject);
                     }
                     validity.add("numFound:" + resultingObjects.size());
                 }
 
-	            this.validity = validity.complete();
-	        }
-	        catch (Exception e)
-	        {
-	            // Just ignore all errors and return an invalid cache.
-	        }
-    	}
-    	return this.validity;
+                this.validity = validity.complete();
+            }
+            catch (Exception e)
+            {
+                // Just ignore all errors and return an invalid cache.
+            }
+        }
+        return this.validity;
     }
 
     /**
@@ -121,12 +123,13 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
      */
     protected void getRecentlySubmittedItems(DSpaceObject dso) {
 
-        if(queryResults != null)
+        if (queryResults != null)
         {
             return; // queryResults;
         }
 
-        try {
+        try
+        {
             DiscoverQuery queryArgs = new DiscoverQuery();
 
             //Add the default filter queries
@@ -135,12 +138,17 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
             queryArgs.addFilterQueries(defaultFilterQueries.toArray(new String[defaultFilterQueries.size()]));
             queryArgs.setDSpaceObjectFilter(Constants.ITEM);
 
-            DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration = discoveryConfiguration.getRecentSubmissionConfiguration();
-            if(recentSubmissionConfiguration != null){
+            DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration =
+                discoveryConfiguration.getRecentSubmissionConfiguration();
+            if (recentSubmissionConfiguration != null)
+            {
                 maxRecentSubmissions = recentSubmissionConfiguration.getMax();
                 queryArgs.setMaxResults(maxRecentSubmissions);
-                String sortField = SearchUtils.getSearchService().toSortFieldIndex(recentSubmissionConfiguration.getMetadataSortField(), recentSubmissionConfiguration.getType());
-                if(sortField != null){
+                String sortField = SearchUtils.getSearchService().toSortFieldIndex(
+                    recentSubmissionConfiguration.getMetadataSortField(),
+                    recentSubmissionConfiguration.getType());
+                if (sortField != null)
+                {
                     queryArgs.setSortField(
                             sortField,
                             DiscoverQuery.SORT_ORDER.desc
@@ -148,12 +156,18 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
                 }
                 SearchService service = SearchUtils.getSearchService();
                 queryResults = service.search(context, dso, queryArgs);
-            }else{
+            }
+            else
+            {
                 //No configuration, no results
                 queryResults = null;
             }
-        }catch (SearchServiceException se){
-            log.error("Caught SearchServiceException while retrieving recent submission for: " + (dso == null ? "home page" : dso.getHandle()), se);
+        }
+        catch (SearchServiceException se)
+        {
+            log.error(
+            "Caught SearchServiceException while retrieving recent submission for: "
+            + (dso == null ? "home page" : dso.getHandle()), se);
         }
     }
 
@@ -163,9 +177,11 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
      * @param dso the site/community/collection on who's home page we are
      * @throws WingException ...
      */
-    protected void addViewMoreLink(Division recentSubmissionDiv, DSpaceObject dso) throws WingException {
+    protected void addViewMoreLink(Division recentSubmissionDiv, DSpaceObject dso)
+        throws WingException
+    {
         String url = contextPath;
-        if(dso != null)
+        if (dso != null)
         {
             url += "/handle/" + dso.getHandle();
         }
@@ -180,5 +196,4 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
         maxRecentSubmissions = 0;
         super.recycle();
     }
-
 }

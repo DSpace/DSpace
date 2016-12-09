@@ -45,6 +45,10 @@ public class JSPManager
      *            current servlet response object
      * @param jsp
      *            the JSP page to display, relative to the webapps directory
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void showJSP(HttpServletRequest request,
             HttpServletResponse response, String jsp) throws ServletException,
@@ -53,7 +57,7 @@ public class JSPManager
         if (log.isDebugEnabled())
         {
             log.debug(LogManager.getHeader((Context) request
-                    .getAttribute("dspace.context"), "view_jsp", jsp));
+                .getAttribute("dspace.context"), "view_jsp", jsp));
         }
         try {
             // For the moment, a simple forward
@@ -70,6 +74,10 @@ public class JSPManager
      *            the HTTP request
      * @param response
      *            the HTTP response
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void showInternalError(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
@@ -86,6 +94,10 @@ public class JSPManager
      *            the HTTP request
      * @param response
      *            the HTTP response
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void showIntegrityError(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
@@ -105,6 +117,10 @@ public class JSPManager
      * @param exception
      *            the AuthorizeException leading to this error, passing in
      *            <code>null</code> will display default error message
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void showAuthorizeError(HttpServletRequest request,
             HttpServletResponse response, AuthorizeException exception)
@@ -130,6 +146,10 @@ public class JSPManager
      *            the type of object, from
      *            <code>org.dspace.core.Constants</code>, or <code>-1</code>
      *            for a default message
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void showInvalidIDError(HttpServletRequest request,
             HttpServletResponse response, String badID, int type)
@@ -150,13 +170,21 @@ public class JSPManager
      * Display a "file upload was too large" error message. Passing in information
      * about the size of the file uploaded, and the maximum file size limit so
      * the user knows why they encountered an error.
+     *
      * @param request
+     *     Servlet's HTTP request object.
      * @param response
+     *     Servlet's HTTP response object.
      * @param message
+     *     Error message
      * @param actualSize
+     *     The actual file size.
      * @param permittedSize
+     *     Maximum allowed file size.
      * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void showFileSizeLimitExceededError(HttpServletRequest request,
             HttpServletResponse response, String message, long actualSize, long permittedSize) throws ServletException, IOException

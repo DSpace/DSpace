@@ -72,7 +72,7 @@ public class MetadataFieldConfig {
     /**
      * Create a MetadataFieldConfig based on a given MetadatumDTO
      * This MetadatumDTO object contains the schema, element and qualifier needed to initialize the MetadataFieldConfig
-     * @param value
+     * @param value the DTO.
      */
     public MetadataFieldConfig(MetadatumDTO value) {
         this.schema = value.getSchema();

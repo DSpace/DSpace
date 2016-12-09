@@ -81,7 +81,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public String register(Context context, DSpaceObject dso) {
-        try{
+        try {
             String id = mint(context, dso);
 
             // move canonical to point the latest version
@@ -92,7 +92,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
             }
 
             return id;
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID(), e);
         }
@@ -100,14 +100,14 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public void register(Context context, DSpaceObject dso, String identifier) {
-        try{
+        try {
             handleService.createHandle(context, dso, identifier);
             if(dso instanceof Item)
             {
                 Item item = (Item)dso;
                 populateHandleMetadata(context, item, identifier);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID(), e);
         }
@@ -116,9 +116,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier) {
-        try{
+        try {
             handleService.createHandle(context, dso, identifier);
-        }catch(Exception e){
+        } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
@@ -131,7 +131,6 @@ public class HandleIdentifierProvider extends IdentifierProvider {
      * @param context DSpace context
      * @param dso The DSpaceObject to create a handle for
      * @return The newly created handle
-     * @exception java.sql.SQLException If a database error occurs
      */
     @Override
     public String mint(Context context, DSpaceObject dso) {
@@ -140,9 +139,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
             return dso.getHandle();
         }
 
-        try{
+        try {
             return handleService.createHandle(context, dso);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to create handle", "Item id: " + dso.getID()), e);
             throw new RuntimeException("Error while attempting to create identifier for Item id: " + dso.getID());
         }
@@ -154,7 +153,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         try
         {
             return handleService.resolveToObject(context, identifier);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while resolving handle to item", "handle: " + identifier), e);
         }
 //        throw new IllegalStateException("Unsupported Handle Type "
@@ -168,7 +167,7 @@ public class HandleIdentifierProvider extends IdentifierProvider {
         try
         {
             return handleService.findHandle(context, dso);
-        }catch(SQLException sqe){
+        } catch (SQLException sqe) {
             throw new IdentifierNotResolvableException(sqe.getMessage(),sqe);
         }
     }
@@ -180,9 +179,9 @@ public class HandleIdentifierProvider extends IdentifierProvider {
 
     @Override
     public void delete(Context context, DSpaceObject dso) throws IdentifierException {
-        try{
+        try {
             handleService.unbindHandle(context, dso);
-        }catch(SQLException sqe)
+        } catch (SQLException sqe)
         {
             throw new IdentifierException(sqe.getMessage(),sqe);
         }

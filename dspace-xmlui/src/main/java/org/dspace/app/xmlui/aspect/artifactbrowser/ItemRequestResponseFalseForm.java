@@ -45,40 +45,40 @@ import org.xml.sax.SAXException;
 
 /**
  * Display to the user a simple form to send a message rejecting the file send.
- * 
+ *
  * Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
  * Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
- * 
+ *
  * @author Adán Román Ruiz at arvo.es (added request item support)
  */
 public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-	 /** Language Strings */
+     /** Language Strings */
     private static final Message T_title =
         message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.title");
-    
+
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
-    
+
     private static final Message T_trail =
         message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.trail");
-    
-    private static final Message T_head = 
+
+    private static final Message T_head =
         message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.head");
-    
+
     private static final Message T_para1 =
         message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.para1");
-    
+
     private static final Message T_mail =
         message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.mail");
 
     private static final Message T_back =
         message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.back");
-    
-    private static final Message T_message = 
+
+    private static final Message T_message =
         message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.message");
-    
-    private static final Message T_subject = 
+
+    private static final Message T_subject =
             message("xmlui.ArtifactBrowser.ItemRequestResponseFalseForm.subject");
 
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
@@ -91,71 +91,77 @@ public class ItemRequestResponseFalseForm extends AbstractDSpaceTransformer impl
      */
     public Serializable getKey() {
 
-		String token = parameters.getParameter("token", "");
-		String decision = parameters.getParameter("decision", "");
+        String token = parameters.getParameter("token", "");
+        String decision = parameters.getParameter("decision", "");
 
-		return HashUtil.hash(token+"-"+decision);
+        return HashUtil.hash(token+"-"+decision);
     }
 
     /**
      * Generate the cache validity object.
      */
-    public SourceValidity getValidity() 
+    public SourceValidity getValidity()
     {
         return NOPValidity.SHARED_INSTANCE;
     }
-    
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-            WingException, UIException, SQLException, IOException,
-            AuthorizeException
-    {       
+
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
         pageMeta.addMetadata("title").addContent(T_title);
- 
+
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         pageMeta.addTrail().addContent(T_trail);
     }
 
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+    public void addBody(Body body)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
     {
-    	Request request = ObjectModelHelper.getRequest(objectModel);
-    	Context context = ContextUtil.obtainContext(objectModel);
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        Context context = ContextUtil.obtainContext(objectModel);
 
         String token = (String) request.getAttribute("token");
         RequestItem requestItem = requestItemService.findByToken(context, token);
 
-		String title;
-		Item item = requestItem.getItem();
-		String titleDC = item.getName();
-		if (StringUtils.isNotBlank(titleDC))
-			title = titleDC;
-		else
-			title = "untitled";
-		
-		RequestItemAuthor author = DSpaceServicesFactory.getInstance().getServiceManager()
-				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
-						RequestItemAuthorExtractor.class)
-				.getRequestItemAuthor(context, item);
+        String title;
+        Item item = requestItem.getItem();
+        String titleDC = item.getName();
+        if (StringUtils.isNotBlank(titleDC))
+        {
+            title = titleDC;
+        }
+        else
+        {
+            title = "untitled";
+        }
 
-		Object[] args = new String[]{
-					requestItem.getReqName(), // User
-                    handleService.getCanonicalForm(item.getHandle()), // URL
-					title, // request item title
-					author.getFullName(),
-					author.getEmail()
-				};
-		
-		String subject = I18nUtil.getMessage("itemRequest.response.subject.reject", context);
-		String messageTemplate = MessageFormat.format(I18nUtil.getMessage("itemRequest.response.body.reject", context), args);        
+        RequestItemAuthor author = DSpaceServicesFactory.getInstance().getServiceManager()
+            .getServiceByName(RequestItemAuthorExtractor.class.getName(),
+                RequestItemAuthorExtractor.class)
+            .getRequestItemAuthor(context, item);
+
+        Object[] args = new String[]{
+            requestItem.getReqName(), // User
+            handleService.getCanonicalForm(item.getHandle()), // URL
+            title, // request item title
+            author.getFullName(),
+            author.getEmail()
+        };
+
+        String subject = I18nUtil.getMessage("itemRequest.response.subject.reject", context);
+        String messageTemplate = MessageFormat.format(I18nUtil.getMessage(
+            "itemRequest.response.body.reject", context), args);
 
         Division itemRequest = body.addInteractiveDivision("itemRequest-form",
-                request.getRequestURI(),Division.METHOD_POST,"primary");
+            request.getRequestURI(),Division.METHOD_POST,"primary");
         itemRequest.setHead(T_head);
-        
+
         itemRequest.addPara(T_para1);
-                
+
         List form = itemRequest.addList("form",List.TYPE_FORM);
-        
+
         Text subj = form.addItem().addText("subject");
         subj.setLabel(T_subject);
         subj.setValue(subject);

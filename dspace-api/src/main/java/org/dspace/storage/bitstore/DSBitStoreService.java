@@ -80,7 +80,7 @@ public class DSBitStoreService implements BitStoreService
      * 
      * @param bitstream
      *            The ID of the asset to retrieve
-     * @exception java.io.IOException
+     * @throws java.io.IOException
      *                If a problem occurs while retrieving the bits
      *
      * @return The stream of bits, or null
@@ -106,7 +106,7 @@ public class DSBitStoreService implements BitStoreService
      *
      * @param in
      *            The stream of bits to store
-     * @exception java.io.IOException
+     * @throws java.io.IOException
      *             If a problem occurs while storing the bits
      */
 	public void put(Bitstream bitstream, InputStream in) throws IOException
@@ -156,7 +156,7 @@ public class DSBitStoreService implements BitStoreService
      * @param attrs
      *            A Map whose keys consist of desired metadata fields
      *
-     * @exception java.io.IOException
+     * @throws java.io.IOException
      *            If a problem occurs while obtaining metadata
      * @return attrs
      *            A Map with key/value pairs of desired metadata
@@ -209,7 +209,7 @@ public class DSBitStoreService implements BitStoreService
      *
      * @param bitstream
      *            The asset to delete
-     * @exception java.io.IOException
+     * @throws java.io.IOException
      *             If a problem occurs while removing the asset
      */
 	public void remove(Bitstream bitstream) throws IOException
@@ -274,7 +274,7 @@ public class DSBitStoreService implements BitStoreService
      *
      * @return The corresponding file in the file system, or <code>null</code>
      *
-     * @exception IOException
+     * @throws IOException
      *                If a problem occurs while determining the file
      */
     protected File getFile(Bitstream bitstream) throws IOException
