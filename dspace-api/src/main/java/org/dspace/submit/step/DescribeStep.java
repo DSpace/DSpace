@@ -181,10 +181,13 @@ public class DescribeStep extends AbstractProcessingStep
         	switch (wfState){
         		case WorkflowManager.WFSTATE_STEP1:
         			scope = DCInput.WORKFLOW_STEP1_SCOPE;
+        			break;
         		case WorkflowManager.WFSTATE_STEP2:
         			scope = DCInput.WORKFLOW_STEP2_SCOPE;
+        			break;
         		case WorkflowManager.WFSTATE_STEP3:
-            			scope = DCInput.WORKFLOW_STEP3_SCOPE;
+        		    scope = DCInput.WORKFLOW_STEP3_SCOPE;
+        		    break;
                 default:
                 	scope = DCInput.WORKFLOW_SCOPE;
         	}
