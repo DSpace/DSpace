@@ -15,7 +15,6 @@
   -    submission.inputs - the DCInputSet
   -    submission.page   - the step in submission
   --%>
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.ArrayList" %>
@@ -55,7 +54,7 @@
 <%@ page import="org.dspace.workflow.WorkflowItem" %>
 <%@ page import="java.util.Calendar"%>
 <%@ page import="java.util.Locale"%>
-<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@page import="org.apache.commons.lang3.StringUtils"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -1235,14 +1234,14 @@
 
             //flag that lets us know when we are in Column2
             boolean inColumn2 = false;
-            
+            boolean notSet = false;
             //loop through all values
             for (int i = 0; i < valueList.size(); i += 2)
             {
                    //get display value and actual value
 	               display = (String)valueList.get(i);
                    value = (String)valueList.get(i+1);
-         
+
                    boolean checked = false;
                    //check if this value has been selected previously
                    for (j = 0; j < defaults.length; j++)
@@ -1253,21 +1252,34 @@
                         	break;
                         }
 	               }
+                   
+         		   if(!checked && i==0 && StringUtils.isBlank(value)) {
+         		       notSet = true;
+         		       continue;
+         		   }
            
                    // print input field
                    sb.append("<div class=\"input-group\"><span class=\"input-group-addon\">");
                    sb.append("<input type=\"");
                    
                    //if repeatable, print a Checkbox, otherwise print Radio buttons
-                   if(repeatable)
+                   if(repeatable) {
                       sb.append("checkbox");
-                   else
+                   }
+                   else {
                       sb.append("radio");
+                   }
+                   sb.append("\"");
+                           
                    if (readonly)
                    {
-                       sb.append("\" disabled=\"disabled");
+                       sb.append(" disabled=\"disabled\"");
                    }
-                   sb.append("\" name=\"")
+                   if (!checked && i==0 && !notSet)
+                   {
+                       sb.append(" checked");
+                   }
+                   sb.append(" name=\"")
                      .append(fieldName)
                      .append("\"")
                      .append(j < defaults.length ? " checked=\"checked\" " : "")
