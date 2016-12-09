@@ -394,6 +394,7 @@ public class CrisConsumer implements Consumer
             {
                 if(!filler.isAppendMode()) {
                     rp.setAnagrafica(null);
+                    applicationService.saveOrUpdate(rp.getCRISTargetClass(), rp, false);
                     ResearcherPageUtils.buildTextValue(rp,
                             toBuild.get(authorityKey).get(0).value,
                             ((rp.getType()>CrisConstants.CRIS_DYNAMIC_TYPE_ID_START?rp.getAuthorityPrefix():"") + rp.getMetadataFieldTitle()));

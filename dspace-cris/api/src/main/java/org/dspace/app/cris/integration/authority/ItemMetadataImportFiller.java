@@ -279,6 +279,11 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
         {
             dcvalue = applicationService.getEntityByCrisId(value.authority);
         }
+        else if (details.isFormatAsInteger()) {
+            if(StringUtils.isNotBlank(value.value)) {
+                dcvalue = Integer.parseInt(value.value);
+            }
+        }
         return dcvalue;
     }
 

@@ -44,6 +44,7 @@ public class ItemMetadataImportFillerConfiguration {
 		private Integer visibility;
 		
 		private boolean formatAsDate;
+		private boolean formatAsInteger;
 		
 		private String startDate;
 		private String endDate;
@@ -92,6 +93,16 @@ public class ItemMetadataImportFillerConfiguration {
         public void setEndDate(String endDate)
         {
             this.endDate = endDate;
+        }
+
+        public boolean isFormatAsInteger()
+        {
+            return formatAsInteger;
+        }
+
+        public void setFormatAsInteger(boolean formatAsInteger)
+        {
+            this.formatAsInteger = formatAsInteger;
         }
 	}
 
