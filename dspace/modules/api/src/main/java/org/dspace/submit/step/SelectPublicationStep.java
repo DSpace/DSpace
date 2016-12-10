@@ -90,6 +90,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             log.error("couldn't find cart for item " + item.getID());
         }
 
+        item.clearMetadata("dryad.fundingEntity");
+        item.update();
         String fundingStatus = request.getParameter("funding-status");
         String grantInfo = request.getParameter("grant-info");
         int confidence = 0;
@@ -159,9 +161,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         return doc.getRootElement();
     }
 
-    private void addEmailsAndEmbargoSettings(DryadJournalConcept journalConcept, Item item) {
+    private void addEmailsAndEmbargoSettings(DryadJournalConcept journalConcept, Item item) throws AuthorizeException, SQLException {
         ArrayList<String> reviewEmailList = journalConcept.getEmailsToNotifyOnReview();
         String[] reviewEmails = reviewEmailList.toArray(new String[reviewEmailList.size()]);
+        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", Item.ANY);
+        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", Item.ANY);
+        item.clearMetadata("internal", "submit", "showEmbargo", Item.ANY);
+        item.update();
 
         if(reviewEmails != null) {
             item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails);
@@ -229,10 +235,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             }
         }
 
+        DCValue[] dcValues = item.getMetadata("prism.publicationName");
+        item.clearMetadata("prism.publicationName");
+        item.update();
+
         String journal = null;
         if (journalConcept == null) {
             // look in the item's metadata, in case the journal name was loaded by a crosswalk.
-            DCValue[] dcValues = item.getMetadata("prism.publicationName");
             if (dcValues.length > 0) {
                 journal = dcValues[0].value;
                 item.clearMetadata("prism.publicationName");
@@ -285,6 +294,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }
 
         request.getSession().setAttribute("submit_error", "");
+        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
+        item.update();
         if (journalConcept.getIntegrated()) {
             addEmailsAndEmbargoSettings(journalConcept, item);
             if (manuscriptNumber != null && manuscriptNumber.equals("")) {
@@ -303,12 +314,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         // the Article Status chosen must match the specified manuscript's status. Otherwise, it's invalid.
                         if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_ACCEPTED) {
                             if (manuscript.isAccepted() || manuscript.isPublished()) {
-                                item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "true");
                             }
                         } else if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_IN_REVIEW) {
                             if (manuscript.isSubmitted() || manuscript.isNeedsRevision()) {
-                                item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
                             }
                         }
@@ -330,7 +339,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         // at this point, the item has been populated with metadata for the journal concept and any manuscript metadata.
         // submitted manuscripts go through the review workflow, so don't skipReviewStage
         if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW) {
-            item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
             item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
         }
 
