@@ -3,7 +3,6 @@ package org.dspace.workflow;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Author;
-import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;

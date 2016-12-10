@@ -251,7 +251,7 @@ public class DryadEmailSubmission extends HttpServlet {
         List<String> dryadContent = new ArrayList<String>();
         Scanner emailScanner = new Scanner(message);
         String journalName = null;
-        String journalCode = null;
+        String journalID = null;
         EmailParser parser = null;
         Manuscript manuscript = null;
         boolean dryadContentStarted = false;
@@ -280,7 +280,7 @@ public class DryadEmailSubmission extends HttpServlet {
 
             Matcher journalCodeMatcher = Pattern.compile("^\\s*>*\\s*(Journal Code):\\s*(.+)", Pattern.CASE_INSENSITIVE).matcher(line);
             if (journalCodeMatcher.find()) {
-                journalCode = JournalUtils.cleanJournalCode(journalCodeMatcher.group(2));
+                journalID = JournalUtils.cleanJournalCode(journalCodeMatcher.group(2));
                 dryadContentStarted = true;
             }
 
@@ -297,26 +297,26 @@ public class DryadEmailSubmission extends HttpServlet {
         }
         // After reading the entire message, attempt to find the journal by
         // Journal Code.  If Journal Code is not present, fall back to Journal Name
-        if (journalCode == null) {
+        if (journalID == null) {
             LOGGER.debug("Journal Code not found in message, trying by journal name: " + journalName);
             if (journalName != null) {
                 journalConcept = JournalUtils.getJournalConceptByJournalName(journalName);
-                journalCode = journalConcept.getJournalID();
+                journalID = journalConcept.getJournalID();
 
             } else {
                 throw new SubmissionException("Journal Code not present and Journal Name not found in message");
             }
         }
 
-        // if journalCode is still null, throw an exception.
-        if (journalCode == null) {
+        // if journalID is still null, throw an exception.
+        if (journalID == null) {
             throw new SubmissionException("Journal Name " + journalName + " did not match a known Journal Name");
         }
         // find the associated concept and initialize the parser variable.
-        journalConcept = JournalUtils.getJournalConceptByJournalID(journalCode);
+        journalConcept = JournalUtils.getJournalConceptByJournalID(journalID);
 
         if (journalConcept == null) {
-            throw new SubmissionException("Concept not found for journal " + journalCode);
+            throw new SubmissionException("Concept not found for journal " + journalID);
         }
 
         // at this point, concept is not null.
@@ -326,7 +326,7 @@ public class DryadEmailSubmission extends HttpServlet {
             parser.parseMessage(dryadContent);
             manuscript = parser.getManuscript();
         } catch (SubmissionException e) {
-            throw new SubmissionException("Journal " + journalCode + " parsing scheme not found");
+            throw new SubmissionException("Journal " + journalID + " parsing scheme not found");
         }
         if ((manuscript != null) && (manuscript.isValid())) {
             // edit the manuscript ID to the canonical one:

@@ -62,7 +62,7 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         manuscript.setManuscriptId(TEST_MANUSCRIPT_ID_1);
         try {
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_1);
-            TableRow manuscriptRow = ManuscriptDatabaseStorageImpl.tableRowFromManuscript(manuscript, journal.conceptID);
+            TableRow manuscriptRow = ManuscriptDatabaseStorageImpl.tableRowFromManuscript(manuscript, journal.getConceptID());
             manuscriptRow.setColumn(ManuscriptDatabaseStorageImpl.COLUMN_VERSION, 1);
             manuscriptRow.setColumn(ManuscriptDatabaseStorageImpl.COLUMN_ACTIVE, ManuscriptDatabaseStorageImpl.ACTIVE_TRUE);
             DatabaseManager.insert(context, manuscriptRow);

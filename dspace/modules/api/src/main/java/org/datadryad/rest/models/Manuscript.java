@@ -37,7 +37,6 @@ import org.dspace.content.authority.Choices;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Manuscript {
     // article-specific data:
-    public static final String MANUSCRIPT_ID = "manuscriptId";
     public static final String JOURNAL_CODE = "Journal_Code";
     public static final String JOURNAL = "Journal";
     public static final String ABSTRACT = "Abstract";
