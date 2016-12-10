@@ -58,6 +58,9 @@ public class StoragePath extends ArrayList<StoragePathElement> {
         return path;
     }
 
+    public static StoragePath createPackagesPath(String journalRef) {
+        return createManuscriptPath(journalRef, "packages");
+    }
 
     public void setJournalCode(String journalRef) {
         if (getJournalRef() == null) {   // can't add ManuscriptId to a path that doesn't have an journal
