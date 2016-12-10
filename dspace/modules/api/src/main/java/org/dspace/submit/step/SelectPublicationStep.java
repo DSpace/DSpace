@@ -12,8 +12,11 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
+import org.dspace.paymentsystem.PaymentSystemService;
+import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.usagelogging.EventLogger;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowRequirementsManager;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -73,6 +76,18 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         if (!processJournal(item, context, request)) {
             EventLogger.log(context, "submission-select-publication", "error=no_journal_selected");
             return ERROR_SELECT_JOURNAL;
+        }
+
+        // clear the sponsor from the shoppingcart:
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        ShoppingCart shoppingCart = null;
+        try {
+            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+            if (shoppingCart != null) {
+                shoppingCart.setSponsoringOrganization(null);
+            }
+        } catch (Exception e) {
+            log.error("couldn't find cart for item " + item.getID());
         }
 
         String fundingStatus = request.getParameter("funding-status");
