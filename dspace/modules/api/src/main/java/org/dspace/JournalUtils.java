@@ -20,6 +20,8 @@ import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.DryadWorkflowUtils;
 
 import java.io.File;
@@ -46,6 +48,13 @@ public class JournalUtils {
 
     public final static String crossRefApiRoot = "http://api.crossref.org/";
     public final static String nsfApiRoot = "http://api.nsf.gov/services/v1/awards/";
+
+    public static final String archivedDataPackageIds    = "SELECT * FROM ArchivedPackageItemIdsByJournal(?,?);";
+    public static final String archivedDataPackageIdsCol =               "archivedpackageitemidsbyjournal";
+
+    public static final String fmtDateView = "yyyy-MM-dd";
+    public static final String dcDateAccessioned = "dc.date.accessioned";
+    private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
 
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByConceptIdentifier = new HashMap<String, DryadJournalConcept>();
 
@@ -412,6 +421,34 @@ public class JournalUtils {
         }
         return result;
     }
+
+    /**
+     * Return a sorted map of archived data packages (Item objects) for the journal
+     * associated with this object. The data packages are sorted according to
+     * date-accessioned, with most recently accessioned package first.
+     * @param max total number of items to return
+     * @return List<org.dspace.content.Item> data packages
+     * @throws SQLException
+     */
+    public static LinkedHashMap<Item,String> getArchivedPackagesSortedRecent(Context context, String journalName, int max)
+            throws SQLException
+    {
+        LinkedHashMap<Item,String> dataPackages = new LinkedHashMap<Item,String>(max);
+        try {
+            TableRowIterator tri = DatabaseManager.query(context, archivedDataPackageIds, journalName, max);
+            while (tri.hasNext() && dataPackages.size() < max) {
+                int itemId = tri.next().getIntColumn(archivedDataPackageIdsCol);
+                Item dso = Item.find(context, itemId);
+                DCValue[] dateAccessioned = dso.getMetadata(dcDateAccessioned);
+                String dateStr = fmt.format(fmt.parse(dateAccessioned[0].value));
+                dataPackages.put(dso, dateStr);
+            }
+        } catch (Exception e)  {
+            throw new SQLException(e.getMessage());
+        }
+        return dataPackages;
+    }
+
 
     public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript) {
         String crossRefURL = null;
