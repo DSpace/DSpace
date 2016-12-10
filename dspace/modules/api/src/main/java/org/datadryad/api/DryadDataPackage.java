@@ -76,6 +76,10 @@ public class DryadDataPackage extends DryadObject {
     private static final String KEYWORD_SCHEMA = "dc";
     private static final String KEYWORD_ELEMENT = "subject";
 
+    private static final String AUTHOR_SCHEMA = "dc";
+    private static final String AUTHOR_ELEMENT = "contributor";
+    private static final String AUTHOR_QUALIFIER = "author";
+
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -528,7 +532,13 @@ public class DryadDataPackage extends DryadObject {
     public void setKeywords(List<String> keywords) throws SQLException {
         addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
+
     public void addKeywords(List<String> keywords) throws SQLException {
         addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
+
+    public List<String> getAuthors() throws SQLException {
+        return getMultipleMetadataValues(AUTHOR_SCHEMA, AUTHOR_ELEMENT, AUTHOR_QUALIFIER);
+    }
+
 }
