@@ -51,6 +51,8 @@ public interface PaymentSystemService
 
     public void setCurrency(ShoppingCart shoppingCart,String currency)throws SQLException;
 
+    public String getWaiverMessage(Context context, ShoppingCart shoppingCart);
+
     public int getWaiver(Context context, ShoppingCart shoppingcart)throws SQLException;
     public boolean getCountryWaiver(Context context, ShoppingCart transaction) throws SQLException;
 

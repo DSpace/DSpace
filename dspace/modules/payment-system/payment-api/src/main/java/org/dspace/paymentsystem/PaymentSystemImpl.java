@@ -362,6 +362,26 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return ShoppingCart.NO_WAIVER;
     }
 
+    public String getWaiverMessage(Context context, ShoppingCart shoppingCart) {
+        String result = "";
+        try {
+            switch (getWaiver(context, shoppingCart)) {
+                case ShoppingCart.COUNTRY_WAIVER:
+                    result = "Data Publishing Charge has been waived due to submitter's association with " + shoppingCart.getCountry() + ".";
+                    break;
+                case ShoppingCart.JOUR_WAIVER:
+                    result = shoppingCart.getJournal() + " will cover the Data Publishing Charge for this associated submission.";
+                    break;
+                case ShoppingCart.VOUCHER_WAIVER:
+                    result = "Voucher code applied to Data Publishing Charge.";
+                    break;
+            }
+        } catch (SQLException e) {
+            log.error("Exception getting waiver for cart " + shoppingCart.getID());
+        }
+        return result;
+    }
+
     public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart) throws SQLException {
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         Properties countryArray = manager.getAllCountryProperty();
@@ -439,17 +459,8 @@ public class PaymentSystemImpl implements PaymentSystemService {
             //add the final total price
             result += format("Total", symbol + Double.toString(shoppingCart.getTotal()));
 
-            switch (getWaiver(c, shoppingCart)) {
-                case ShoppingCart.COUNTRY_WAIVER:
-                    format("Waiver Details", "Data Publishing Charge has been waived due to submitter's association with " + shoppingCart.getCountry() + ".");
-                    break;
-                case ShoppingCart.JOUR_WAIVER:
-                    format("Waiver Details", "Your Data Publishing Charge is covered by " + shoppingCart.getSponsoringOrganization(c).getFullName() + ".");
-                    break;
-                case ShoppingCart.VOUCHER_WAIVER:
-                    format("Waiver Details", "Voucher code applied to Data Publishing Charge.");
-                    break;
-            }
+            // add waiver information
+            result += format("Waiver Details", getWaiverMessage(c, shoppingCart));
 
             if (shoppingCart.getTransactionId() != null && "".equals(shoppingCart.getTransactionId().trim())) {
                 format("Transaction ID", shoppingCart.getTransactionId());
@@ -633,19 +644,8 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
     private void generatePrice(Context context, org.dspace.app.xmlui.wing.element.List info, PaymentSystemConfigurationManager manager, ShoppingCart shoppingCart) throws WingException, SQLException {
-        String waiverMessage = "";
+        String waiverMessage = getWaiverMessage(context, shoppingCart);
         String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
-        switch (this.getWaiver(context, shoppingCart)) {
-            case ShoppingCart.COUNTRY_WAIVER:
-                waiverMessage = "Data Publishing Charge has been waived due to submitter's association with " + shoppingCart.getCountry() + ".";
-                break;
-            case ShoppingCart.JOUR_WAIVER:
-                waiverMessage = "Your Data Publishing Charge is covered by " + shoppingCart.getSponsoringOrganization(context).getFullName() + ".";
-                break;
-            case ShoppingCart.VOUCHER_WAIVER:
-                waiverMessage = "Voucher code applied to Data Publishing Charge.";
-                break;
-        }
         info.addLabel(T_Price);
         if (this.dpcIsCovered(context, shoppingCart)) {
             info.addItem("price", "price").addContent(symbol + "0");
