@@ -82,17 +82,25 @@ public class AuthorizationDatabaseStorageImpl implements AuthorizationStorageInt
 
     private List<AuthorizationTuple> getTuplesToCheck(AuthorizationTuple tuple) throws SQLException {
         List<AuthorizationTuple> tuples = new ArrayList<AuthorizationTuple>();
-            String query = "SELECT * FROM " + AUTHZ_TABLE + " WHERE " +
-                    COLUMN_EPERSON_ID + " = ? AND " +
-                    COLUMN_HTTP_METHOD + " = ?";
-            Context context = getContext();
-            TableRowIterator rowIterator = DatabaseManager.queryTable(context, AUTHZ_TABLE, query, tuple.ePersonId, tuple.httpMethod);
-            while(rowIterator.hasNext()) {
-                TableRow row = rowIterator.next();
-                AuthorizationTuple databaseTuple = authTupleFromTableRow(row);
-                tuples.add(databaseTuple);
-            }
-            completeContext(context);
+        // the journals resource path is always authorized.
+        AuthorizationTuple journalsTuple = new AuthorizationTuple(0, "", AuthorizationTuple.JOURNAL_PATH);
+        tuples.add(journalsTuple);
+        if (tuple.ePersonId == -1) {
+            log.info("no eperson provided");
+            return tuples;
+        }
+
+        String query = "SELECT * FROM " + AUTHZ_TABLE + " WHERE " +
+                COLUMN_EPERSON_ID + " = ? AND " +
+                COLUMN_HTTP_METHOD + " = ?";
+        Context context = getContext();
+        TableRowIterator rowIterator = DatabaseManager.queryTable(context, AUTHZ_TABLE, query, tuple.ePersonId, tuple.httpMethod);
+        while(rowIterator.hasNext()) {
+            TableRow row = rowIterator.next();
+            AuthorizationTuple databaseTuple = authTupleFromTableRow(row);
+            tuples.add(databaseTuple);
+        }
+        completeContext(context);
         return tuples;
     }
 

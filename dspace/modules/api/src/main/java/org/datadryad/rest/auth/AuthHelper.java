@@ -84,12 +84,6 @@ public class AuthHelper {
         if(tuple == null) {
             return Boolean.FALSE;
         }
-        if(!tuple.isComplete()) {
-            return Boolean.FALSE;
-        }
-        if(tuple.ePersonId == OAuthToken.INVALID_PERSON_ID) {
-            return Boolean.FALSE;
-        }
         try {
             return authzStorage.isAuthorized(tuple);
         } catch(StorageException ex) {

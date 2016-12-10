@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class AuthorizationTuple {
+    public static final String JOURNAL_PATH = "journals";
     public final Integer ePersonId;
     public final String httpMethod;
     public final String path;
@@ -56,5 +57,9 @@ public class AuthorizationTuple {
             // this.path is more specific (more path components) than other
             return Boolean.FALSE;
         }
+    }
+
+    public String toString() {
+        return "ePerson is " + ePersonId + ", http method is " + httpMethod + ", path is " + path;
     }
 }
