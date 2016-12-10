@@ -2,13 +2,15 @@
  */
 package org.datadryad.rest.auth;
 
-import com.sun.istack.logging.Logger;
+
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import org.apache.oltu.oauth2.common.error.OAuthError;
+
+import org.apache.log4j.Logger;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.ParameterStyle;
