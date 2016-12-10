@@ -11,8 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
-import org.datadryad.rest.models.Journal;
-import org.datadryad.rest.storage.AbstractJournalStorage;
+import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.core.ConfigurationManager;
@@ -25,8 +24,8 @@ import org.dspace.JournalUtils;
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
-public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
-    private static Logger log = Logger.getLogger(JournalDatabaseStorageImpl.class);
+public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConceptStorage {
+    private static Logger log = Logger.getLogger(JournalConceptDatabaseStorageImpl.class);
 
     static final String JOURNAL_TABLE = "journal";
 
@@ -41,11 +40,11 @@ public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
             COLUMN_ISSN
     );
 
-    public JournalDatabaseStorageImpl(String configFileName) {
+    public JournalConceptDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
     }
 
-    public JournalDatabaseStorageImpl() {
+    public JournalConceptDatabaseStorageImpl() {
         // For use when ConfigurationManager is already configured
     }
 
@@ -85,32 +84,22 @@ public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
         }
     }
 
-    static Journal journalFromTableRow(TableRow row) {
-        if(row != null) {
-            Journal journal = new Journal();
-            journal.conceptID = row.getIntColumn(COLUMN_ID);
-            journal.journalCode = row.getStringColumn(COLUMN_CODE);
-            journal.fullName = row.getStringColumn(COLUMN_NAME);
-            journal.issn = row.getStringColumn(COLUMN_ISSN);
-            if (journal.issn == null) {
-                journal.issn = "";
-            }
-            return journal;
-        } else {
-            return null;
-        }
-    }
-
-    public static Journal getJournalByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
+    public static DryadJournalConcept getJournalConceptByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
         String query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE UPPER(" + COLUMN_CODE + ") = UPPER(?) OR UPPER(" + COLUMN_ISSN + ") = UPPER(?)";
         TableRow row = DatabaseManager.querySingleTable(context, JOURNAL_TABLE, query, codeOrISSN, codeOrISSN);
-        return journalFromTableRow(row);
+        if (row != null) {
+            return DryadJournalConcept.getJournalConceptMatchingConceptID(context, row.getIntColumn(COLUMN_ID));
+        }
+        return null;
     }
 
-    public static Journal getJournalByConceptID(Context context, int conceptID) throws SQLException {
+    public static DryadJournalConcept getJournalConceptByConceptID(Context context, int conceptID) throws SQLException {
         String query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE " + COLUMN_ID + " = ?";
         TableRow row = DatabaseManager.querySingleTable(context, JOURNAL_TABLE, query, conceptID);
-        return journalFromTableRow(row);
+        if (row != null) {
+            return DryadJournalConcept.getJournalConceptMatchingConceptID(context, row.getIntColumn(COLUMN_ID));
+        }
+        return null;
     }
 
     @Override
@@ -185,21 +174,16 @@ public class JournalDatabaseStorageImpl extends AbstractJournalStorage {
 
     @Override
     protected DryadJournalConcept readObject(StoragePath path) throws StorageException {
-        String journalCode = path.getJournalCode();
+        DryadJournalConcept journalConcept = null;
         Context context = null;
         try {
             context = getContext();
-            Journal journal = getJournalByCodeOrISSN(context, journalCode);
-            if (journalCode.equals(journal.issn)) {
-                // this is an ISSN, replace journalCode with the journal's code.
-                journalCode = journal.journalCode;
-            }
+            journalConcept = getJournalConceptByCodeOrISSN(context, path.getJournalRef());
             completeContext(context);
         } catch (Exception e) {
             abortContext(context);
-            throw new StorageException("Exception reading journal: " + e.getMessage());
+            throw new StorageException("Exception reading journal concept: " + e.getMessage());
         }
-        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(journalCode);
         return journalConcept;
     }
 

@@ -125,8 +125,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             }
             try {
                 Context context = getContext();
-                Journal journal = JournalDatabaseStorageImpl.getJournalByConceptID(context, journalConceptID);
-                manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(journal.issn));
+                DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByConceptID(context, journalConceptID);
+                manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(journal.getISSN()));
                 completeContext(context);
             } catch (SQLException e) {
                 log.error("couldn't find journal concept " + journalConceptID);
@@ -172,8 +172,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         return manuscript;
     }
 
-    private static TableRow getTableRowByManuscriptId(Context context, String msid, String journalCode) throws SQLException, IOException {
-        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, journalCode);
+    private static TableRow getTableRowByManuscriptId(Context context, String msid, String journalRef) throws SQLException, IOException {
+        DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, journalRef);
         if (journal == null) {
             return null;
         } else {
@@ -241,7 +241,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static List<Manuscript> getManuscripts(Context context, String journalCode, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, journalCode);
+        DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, journalRef);
         if (journal == null) {
             return manuscripts;
         } else {
@@ -259,7 +259,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static List<Manuscript> getManuscriptsMatchingQuery(Context context, String journalCode, String searchParam, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, journalCode);
+        DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, journalRef);
         if (journal == null) {
             return manuscripts;
         } else {
@@ -282,7 +282,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         String manuscriptID = path.getManuscriptId();
         try {
             Context context = getContext();
-            Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, path.getJournalCode());
+            DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
             if (journal != null) {
                 Integer journalConceptID = journal.conceptID;
                 TableRowIterator rows = null;
@@ -321,8 +321,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         return manuscripts;
     }
 
-    private static void insertManuscript(Context context, Manuscript manuscript, String journalCode) throws SQLException, IOException {
-        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, journalCode);
+    private static void insertManuscript(Context context, Manuscript manuscript, String journalRef) throws SQLException, IOException {
+        DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, journalRef);
         if (journal != null) {
             Integer journalConceptID = journal.conceptID;
             TableRow row = tableRowFromManuscript(manuscript, journalConceptID);
@@ -347,7 +347,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         if(manuscript.getManuscriptId() == null) {
             throw new SQLException("NULL ID");
         }
-        Journal journal = JournalDatabaseStorageImpl.getJournalByCodeOrISSN(context, journalCode);
+        DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, journalRef);
         if (journal != null) {
             Integer journalConceptID = journal.conceptID;
             Integer manuscriptId = getManuscriptInternalId(context, manuscript.getManuscriptId(), journalConceptID);
@@ -388,6 +388,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
         try {
             Context context = getContext();
+            DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
             if (manuscriptId != null) {
                 Manuscript manuscript = getManuscriptById(context, manuscriptId, journalCode);
                 if (manuscript != null) {

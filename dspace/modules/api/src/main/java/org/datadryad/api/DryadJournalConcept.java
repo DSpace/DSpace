@@ -7,7 +7,6 @@ import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.storage.StorageException;
 import org.dspace.JournalUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,7 +36,6 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
     public static final String NOTIFY_WEEKLY = "notifyWeekly";
     public static final String PUBLICATION_BLACKOUT = "publicationBlackout";
-    public static final String PAYMENT_PLAN = "paymentPlanType";
 
     // Journal Concepts can also have the following fields:
     public static final String ISSN = "issn";
@@ -437,13 +435,14 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         return Concept.Status.ACCEPTED.name().equals(getStatus());
     }
 
-    @JsonIgnore
-    public Journal getJournalFromJournalConcept() {
-        Journal journal = new Journal();
-        journal.conceptID = getUnderlyingConcept().getID();
-        journal.journalCode = getJournalID();
-        journal.fullName = getFullName();
-        journal.issn = getISSN();
-        return journal;
+    public static DryadJournalConcept getJournalConceptMatchingConceptID(Context context, int conceptID) {
+        DryadJournalConcept journalConcept = null;
+        try {
+            Concept concept = Concept.find(context, conceptID);
+            journalConcept = new DryadJournalConcept(context, concept);
+        } catch (SQLException e) {
+            log.error("couldn't find a journal concept: " + e.getMessage());
+        }
+        return journalConcept;
     }
 }
