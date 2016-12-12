@@ -118,6 +118,7 @@ import it.cilea.osd.jdyna.web.Box;
 import it.cilea.osd.jdyna.web.Tab;
 import it.cilea.osd.jdyna.widget.WidgetBoolean;
 import it.cilea.osd.jdyna.widget.WidgetCheckRadio;
+import it.cilea.osd.jdyna.widget.WidgetCustomPointer;
 import it.cilea.osd.jdyna.widget.WidgetDate;
 import it.cilea.osd.jdyna.widget.WidgetFile;
 import it.cilea.osd.jdyna.widget.WidgetLink;
@@ -1352,6 +1353,51 @@ public class ImportExportUtils {
                     modifiedReturn = modifiedTmp;
                 }
             }
+
+            if (rpPD.getRendering() instanceof WidgetCustomPointer)
+            {
+                if (rpPD.isRepeatable())
+                {
+                    // NodeList nodeslist = (NodeList) xpath.evaluate(
+                    // xpathExpression, node,
+                    // XPathConstants.NODESET);
+                    IBulkChangeField nodeslist = bulkChange
+                            .getFieldChanges(shortName);
+
+                    for (int y = 0; y < nodeslist.size(); y++)
+                    {
+                        if (update == true && y == 0)
+                        {
+                            dto.getAnagraficaProperties().get(shortName)
+                                    .clear();
+                        }
+                        IBulkChangeFieldValue nodeFile = nodeslist.get(y);
+                        String control_value = nodeFile.getValue();
+                        if (StringUtils.isNotBlank(control_value))
+                        {
+                            modifiedTmp = workOnCustomPointer(applicationService, rpPD, values,
+                                    oldValues, nodeFile);
+                        }
+                    }
+                }
+                else
+                {
+                    // Node nodeLink = (Node) xpath.evaluate(
+                    // xpathExpression, node, XPathConstants.NODE);
+                    IBulkChangeField nodeslist = bulkChange
+                            .getFieldChanges(shortName);
+                    IBulkChangeFieldValue nodeFile = nodeslist.get(0);
+                    String control_value = nodeFile.getValue();
+                    if (StringUtils.isNotBlank(control_value))
+                    {
+                        modifiedTmp = workOnCustomPointer(applicationService, rpPD, values, oldValues,
+                                nodeFile);
+                    }
+                }
+                if(modifiedTmp) {
+                    modifiedReturn = modifiedTmp;
+                }
+            }
         }
 		return modifiedReturn;
 	}
@@ -1601,7 +1647,7 @@ public class ImportExportUtils {
                 ValoreDTO valueDTO = new ValoreDTO(pe.getValue());
                 remapVisibility(applicationService, rpPD, old, nodetext, vis, valueDTO);
                 values.add(valueDTO);
-                log.debug("Write text field " + rpPD.getShortName()
+                log.debug("Write boolean field " + rpPD.getShortName()
                         + " with value: " + nodetext + " visibility: "
                         + valueDTO.getVisibility());
                 return true;
@@ -1634,7 +1680,7 @@ public class ImportExportUtils {
                 // old, nodetext, valueDTO.getVisibility());
                 // if(oldValue==null) {
                 values.add(valueDTO);
-                log.debug("Write text field " + rpPD.getShortName()
+                log.debug("Write checkradio field " + rpPD.getShortName()
                         + " with value: " + nodetext + " visibility: "
                         + valueDTO.getVisibility());
                 return true;
@@ -1714,6 +1760,33 @@ public class ImportExportUtils {
 		return false;
 	}
 
+    private static <TP extends PropertiesDefinition> boolean workOnCustomPointer(
+            ApplicationService applicationService, TP rpPD,
+            List<ValoreDTO> values, List<ValoreDTO> old,
+            IBulkChangeFieldValue node)
+    {
+        if (node != null)
+        {
+
+            String nodetext = node.getValue();
+            String vis = node.getVisibility();
+
+            if (nodetext != null && !nodetext.isEmpty())
+            {
+                PropertyEditor pe = rpPD.getRendering().getPropertyEditor(applicationService);
+                pe.setAsText(nodetext);
+                ValoreDTO valueDTO = new ValoreDTO(pe.getValue());
+                remapVisibility(applicationService, rpPD, old, nodetext, vis, valueDTO);
+                values.add(valueDTO);
+                log.debug("Write custom pointer field " + rpPD.getShortName()
+                        + " with value: " + nodetext + " visibility: "
+                        + valueDTO.getVisibility());
+                return true;
+            }
+        }
+        return false;
+    }
+    
 	/**
 	 * 
 	 * Check old visibility on dynamic field
