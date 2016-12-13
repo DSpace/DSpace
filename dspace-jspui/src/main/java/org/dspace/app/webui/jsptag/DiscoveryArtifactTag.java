@@ -20,10 +20,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
-import javax.servlet.jsp.tagext.TagSupport;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.webui.util.DateDisplayStrategy;
 import org.dspace.app.webui.util.DefaultDisplayStrategy;
@@ -33,8 +30,8 @@ import org.dspace.app.webui.util.ResolverDisplayStrategy;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -44,8 +41,6 @@ import org.dspace.discovery.DiscoverResult.DSpaceObjectHighlightResult;
 import org.dspace.discovery.IGlobalSearchResult;
 import org.dspace.discovery.configuration.DiscoveryViewConfiguration;
 import org.dspace.discovery.configuration.DiscoveryViewFieldConfiguration;
-
-import com.coverity.security.Escape;
 
 /**
  * 
@@ -154,7 +149,11 @@ public class DiscoveryArtifactTag extends BodyTagSupport {
 
 					printDefault(out, request, context, browseIndex, viewFull, "cristitle", "fullName");
 
-				} else if (artifact.getType() > 9 && artifact.getType() < 1000) {
+				} else if (artifact.getType() == 10) {
+
+                    printDefault(out, request, context, browseIndex, viewFull, "cristitle", "title");
+
+                } else if (artifact.getType() > 10 && artifact.getType() < 1000) {
 
 					printDefault(out, request, context, browseIndex, viewFull, "cristitle", "name");
 
