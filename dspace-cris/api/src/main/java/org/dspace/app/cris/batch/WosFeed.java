@@ -34,6 +34,7 @@ import org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator;
 import org.dspace.app.cris.batch.dao.ImpRecordDAO;
 import org.dspace.app.cris.batch.dao.ImpRecordDAOFactory;
 import org.dspace.app.cris.batch.dto.DTOImpRecord;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -77,7 +78,7 @@ public class WosFeed
 
     public static void main(String[] args)
             throws SQLException, BadTransformationSpec,
-            MalformedSourceException, HttpException, IOException
+            MalformedSourceException, HttpException, IOException, AuthorizeException
     {
 
         String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
@@ -151,9 +152,23 @@ public class WosFeed
             System.exit(1);
         }
 
-        EPerson eperson = EPerson.find(context,
-                Integer.parseInt(line.getOptionValue("p")));
-        context.setCurrentUser(eperson);
+        String person = line.getOptionValue("p");
+    	EPerson eperson = null;
+        if(StringUtils.isNumeric(person)){
+        	eperson = EPerson.find(context,
+                    Integer.parseInt(person));
+        	
+        }else {
+        	eperson = EPerson.findByEmail(context, person);
+        }
+        
+        
+        if(eperson != null){
+        	context.setCurrentUser(eperson);
+        }else{
+            formatter.printHelp(usage, "No user found", options, "");
+            System.exit(1);
+        }
 
         int collection_id = Integer.parseInt(line.getOptionValue("c"));
         boolean forceCollectionId = line.hasOption("f");
