@@ -65,8 +65,8 @@ public class PublicationUpdater extends HttpServlet {
                          HttpServletResponse aResponse) throws ServletException, IOException {
         String requestURI = aRequest.getRequestURI();
         if (requestURI.contains("retrieve")) {
-            LOGGER.info("manually checking publications");
             String queryString = aRequest.getQueryString();
+            LOGGER.info("Automatic Publication Updater running with query " + queryString);
             if (queryString != null) {
                 List<NameValuePair> queryParams = null;
                 try {
@@ -93,6 +93,7 @@ public class PublicationUpdater extends HttpServlet {
                     aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "no or incorrect authorization token provided");
                 }
             }
+            LOGGER.info("Automatic Publication Updater finished");
         } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "parameter not available for GET");
         }
