@@ -13,7 +13,6 @@ import org.apache.cocoon.servlet.multipart.PartOnDisk;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.itemimport.ItemImportServiceImpl;
 import org.dspace.app.itemimport.factory.ItemImportServiceFactory;
 import org.dspace.app.itemimport.service.ItemImportService;
 import org.dspace.app.xmlui.wing.Message;
@@ -21,7 +20,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 
@@ -51,7 +49,7 @@ public class FlowBatchImportUtils {
     private static final Message T_failed_no_collection = new Message("default", "xmlui.administrative.batchimport.flow.failed_no_collection");
 
     // Other variables
-    private static Logger log = Logger.getLogger(FlowBatchImportUtils.class);
+    private static final Logger log = Logger.getLogger(FlowBatchImportUtils.class);
 
     protected static final HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected static final ItemImportService itemImportService = ItemImportServiceFactory.getInstance().getItemImportService();
@@ -138,17 +136,19 @@ public class FlowBatchImportUtils {
                 File mapFile = null;
                 try {
                     mapFile = File.createTempFile(file.getName(), ".map", itemImportService.getTempWorkDirFile());
+                    log.debug("Temporary map file " + mapFile.getAbsolutePath());
                 } catch (IOException e) {
                     log.error("BatchImportUI Unable to create mapfile", e);
                     result.setContinue(false);
                     result.setOutcome(false);
                     result.setMessage(T_import_failed);
+                    result.setCharacters("On server:  " + e.getMessage());
                     return result;
                 }
 
 
                 log.info("Attempt UIBatchImport to collection: " + collections.get(0).getName()
-                        + ", zip: " + file.getName()
+                        + ", zip: " + file.getAbsolutePath()
                         + ", map: " + mapFile.getAbsolutePath());
 
             /*
@@ -176,6 +176,7 @@ public class FlowBatchImportUtils {
                 String sourceBatchDir = null;
                 try {
                     sourceBatchDir = itemImportService.unzip(file);
+                    log.debug("Unzipped to " + sourceBatchDir);
                 } catch (IOException e) {
                     log.error("BatchImportUI Unable to unzip", e);
                     result.setContinue(false);
