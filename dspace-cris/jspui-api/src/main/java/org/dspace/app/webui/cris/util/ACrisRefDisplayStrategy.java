@@ -139,11 +139,10 @@ public abstract class ACrisRefDisplayStrategy<P extends Property<TP>, TP extends
                 }
                 catch (Exception e)
                 {
-                    log.error(
+                    log.warn(
                             "Error when build icon (perhaps missing this configuration: on cris module key:researcher.cris."
                                     + publicPath
-                                    + ".ref.display.strategy.metadata.icon)",
-                            e);
+                                    + ".ref.display.strategy.metadata.icon)");
                     try
                     {
                         icon = I18nUtil.getMessage("ItemCrisRefDisplayStrategy."
