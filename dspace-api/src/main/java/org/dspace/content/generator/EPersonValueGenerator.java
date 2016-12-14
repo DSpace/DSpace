@@ -31,7 +31,7 @@ public class EPersonValueGenerator implements TemplateValueGenerator
         String[] params = StringUtils.split(extraParams, "\\.");
         String prefix = params[0];
         String suffix = "";
-        if (params.length > 0)
+        if (params.length > 1)
         {
             suffix = params[1];
         }
