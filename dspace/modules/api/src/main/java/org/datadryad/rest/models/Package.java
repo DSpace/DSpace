@@ -77,13 +77,9 @@ public class Package {
 
     @JsonIgnore
     private List<Author> getAuthorList() {
-        ArrayList<Author> authors = new ArrayList<Author>();
+        List<Author> authors = new ArrayList<Author>();
         try {
-            List<String> authorStrings = dataPackage.getAuthors();
-            for (String a : authorStrings) {
-                Author author = new Author(a);
-                authors.add(author);
-            }
+            authors = dataPackage.getAuthors();
         } catch (SQLException e) {
             log.error("couldn't find authors for item " + itemID);
         }

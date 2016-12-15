@@ -8,16 +8,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.rest.models.Author;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -537,8 +533,13 @@ public class DryadDataPackage extends DryadObject {
         addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
 
-    public List<String> getAuthors() throws SQLException {
-        return getMultipleMetadataValues(AUTHOR_SCHEMA, AUTHOR_ELEMENT, AUTHOR_QUALIFIER);
+    public List<Author> getAuthors() throws SQLException {
+        ArrayList<Author> authors = new ArrayList<Author>();
+        DCValue[] metadata = item.getMetadata(AUTHOR_SCHEMA, AUTHOR_ELEMENT, AUTHOR_QUALIFIER, Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        return authors;
     }
 
 }

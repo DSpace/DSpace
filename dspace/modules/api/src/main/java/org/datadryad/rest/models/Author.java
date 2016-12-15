@@ -5,6 +5,8 @@ package org.datadryad.rest.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.content.DCValue;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import java.lang.String;
 import java.text.Normalizer;
@@ -26,6 +28,17 @@ public class Author {
     public Author(String familyName, String givenNames) {
         setFamilyName(familyName);
         setGivenNames(givenNames);
+    }
+
+    public Author(DCValue authorMetadata) {
+        this(authorMetadata.value);
+        if (authorMetadata.authority != null) {
+            Matcher orcidpattern = Pattern.compile("will be generated::orcid::(.+)$").matcher(authorMetadata.authority);
+            if (orcidpattern.find()) {
+                setIdentifier(orcidpattern.group(1));
+                setIdentifierType("ORCID");
+            }
+        }
     }
 
     public Author(String authorString) {
