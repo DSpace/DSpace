@@ -361,7 +361,8 @@ public class CrisSearchService extends SolrServiceImpl
         if (value instanceof DateValue)
         {
             // TODO: make this date format configurable !
-            svalue = DateFormatUtils.formatUTC(((DateValue) value).getObject(),
+            // WARN: please note that the date in cris objects are assumed to be in UTC format 
+            svalue = DateFormatUtils.format(((DateValue) value).getObject(),
                     "yyyy-MM-dd");
         }
 
