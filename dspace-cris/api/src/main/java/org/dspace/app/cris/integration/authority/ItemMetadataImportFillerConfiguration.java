@@ -48,7 +48,19 @@ public class ItemMetadataImportFillerConfiguration {
 		
 		private String startDate;
 		private String endDate;
-		
+
+		private boolean appendMode = false;
+
+	    public boolean isAppendMode()
+	    {
+	        return appendMode;
+	    }
+
+	    public void setAppendMode(boolean appendMode)
+	    {
+	        this.appendMode = appendMode;
+	    }
+
 		public void setFormatAsDate(boolean isDate) {
 			this.formatAsDate = isDate;
 		}

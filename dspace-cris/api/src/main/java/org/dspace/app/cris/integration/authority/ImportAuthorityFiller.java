@@ -19,5 +19,4 @@ public interface ImportAuthorityFiller {
 
 	boolean allowsUpdate(Context ctx, Item item, List<Metadatum> metadatumList, String authorityKey, ACrisObject rp);
 	
-	boolean isAppendMode();
 }

@@ -392,14 +392,6 @@ public class CrisConsumer implements Consumer
             if (filler != null && (!isUpdate || filler.allowsUpdate(ctx, item,
                     toBuild.get(authorityKey), authorityKey, rp)))
             {
-                if(!filler.isAppendMode()) {
-                    rp.setAnagrafica(null);
-                    applicationService.saveOrUpdate(rp.getCRISTargetClass(), rp, false);
-                    ResearcherPageUtils.buildTextValue(rp,
-                            toBuild.get(authorityKey).get(0).value,
-                            ((rp.getType()>CrisConstants.CRIS_DYNAMIC_TYPE_ID_START?rp.getAuthorityPrefix():"") + rp.getMetadataFieldTitle()));
-                    applicationService.saveOrUpdate(rp.getCRISTargetClass(), rp);
-                }
                 filler.fillRecord(ctx, item, toBuild.get(authorityKey),
                         authorityKey, rp);
                 extraUpdateObjects.put(authorityKey, rp);
