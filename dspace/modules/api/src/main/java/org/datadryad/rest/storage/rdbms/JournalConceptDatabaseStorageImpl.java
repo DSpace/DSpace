@@ -9,6 +9,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
@@ -85,8 +88,14 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
     }
 
     public static DryadJournalConcept getJournalConceptByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
-        String query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE UPPER(" + COLUMN_CODE + ") = UPPER(?) OR UPPER(" + COLUMN_ISSN + ") = UPPER(?)";
-        TableRow row = DatabaseManager.querySingleTable(context, JOURNAL_TABLE, query, codeOrISSN, codeOrISSN);
+        boolean isISSN = Pattern.compile("\\d{4}-\\p{Alnum}{4}").matcher(codeOrISSN).matches();
+        String query;
+        if (isISSN) {
+            query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE " + COLUMN_ISSN + " = UPPER(?)";
+        } else {
+            query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE UPPER(" + COLUMN_CODE + ") = UPPER(?)";
+        }
+        TableRow row = DatabaseManager.querySingleTable(context, JOURNAL_TABLE, query, codeOrISSN);
         if (row != null) {
             return DryadJournalConcept.getJournalConceptMatchingConceptID(context, row.getIntColumn(COLUMN_ID));
         }
