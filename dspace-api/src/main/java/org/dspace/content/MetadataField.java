@@ -54,6 +54,7 @@ public class MetadataField
 
     // cache of field by ID (Integer)
     private static Map<Integer, MetadataField> id2field = null;
+    private static Map<String, MetadataField> term2field = null;
 
 
     /**
@@ -301,48 +302,68 @@ public class MetadataField
     public static MetadataField findByElement(Context context, int schemaID,
             String element, String qualifier) throws SQLException
     {
-        // Grab rows from DB
-        TableRowIterator tri;
-        if (qualifier == null)
-        {
-        	tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
-                    "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " + 
-                    "AND element= ?  AND qualifier is NULL ",
-                    schemaID, element);
-        } 
-        else
-        {
-        	tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
-                    "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " + 
-                    "AND element= ?  AND qualifier= ? ",
-                    schemaID, element, qualifier);
+        MetadataField result = null;
+        // check cache first
+        if (term2field != null) {
+            String temp_qualifier = qualifier;
+            if (qualifier != null && qualifier.equals(Item.ANY)) {
+                temp_qualifier = "null";
+            }
+            result = term2field.get(String.join(".", MetadataSchema.find(context,schemaID).getName(), element, temp_qualifier));
         }
-        
-        TableRow row = null;
-        try
-        {
-            if (tri.hasNext())
-            {
-                row = tri.next();
+        // if no result from cache, ask DB.
+        if (result == null) {
+            // Grab rows from DB
+            TableRowIterator tri;
+            if (qualifier == null) {
+                tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
+                        "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
+                                "AND element= ?  AND qualifier is NULL ",
+                        schemaID, element);
+            } else {
+                tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
+                        "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
+                                "AND element= ?  AND qualifier= ? ",
+                        schemaID, element, qualifier);
+            }
+
+            TableRow row = null;
+            try {
+                if (tri.hasNext()) {
+                    row = tri.next();
+                }
+            } finally {
+                // close the TableRowIterator to free up resources
+                if (tri != null) {
+                    tri.close();
+                }
+            }
+
+            if (row != null) {
+                result = new MetadataField(row);
             }
         }
-        finally
-        {
+        return result;
+    }
+
+    private static List<TableRow> findAllRows(Context context) throws SQLException {
+        ArrayList<TableRow> rows = new ArrayList<TableRow>();
+        // Get all the metadatafieldregistry rows
+        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
+                "SELECT mfr.* FROM MetadataFieldRegistry mfr, MetadataSchemaRegistry msr where mfr.metadata_schema_id= msr.metadata_schema_id ORDER BY msr.short_id,  mfr.element, mfr.qualifier");
+
+        try {
+            // Make into DC Type objects
+            while (tri.hasNext()) {
+                rows.add(tri.next());
+            }
+        } finally {
             // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
+            if (tri != null) {
                 tri.close();
             }
         }
-
-        if (row == null)
-        {
-            return null;
-        }
-        else
-        {
-            return new MetadataField(row);
-        }
+        return rows;
     }
 
     /**
@@ -355,26 +376,9 @@ public class MetadataField
     public static MetadataField[] findAll(Context context) throws SQLException
     {
         List<MetadataField> fields = new ArrayList<MetadataField>();
-
-        // Get all the metadatafieldregistry rows
-        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
-                               "SELECT mfr.* FROM MetadataFieldRegistry mfr, MetadataSchemaRegistry msr where mfr.metadata_schema_id= msr.metadata_schema_id ORDER BY msr.short_id,  mfr.element, mfr.qualifier");
-
-        try
-        {
-            // Make into DC Type objects
-            while (tri.hasNext())
-            {
-                fields.add(new MetadataField(tri.next()));
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
+        List<TableRow> tableRows = findAllRows(context);
+        for (TableRow tableRow : tableRows) {
+            fields.add(new MetadataField(tableRow));
         }
 
         // Convert list into an array
@@ -653,6 +657,7 @@ public class MetadataField
         if (!isCacheInitialized())
         {
             Map<Integer, MetadataField> new_id2field = new HashMap<Integer, MetadataField>();
+            Map<String, MetadataField> new_term2field = new HashMap<String, MetadataField>();
             log.info("Loading MetadataField elements into cache.");
 
             // Grab rows from DB
@@ -665,7 +670,11 @@ public class MetadataField
                 {
                     TableRow row = tri.next();
                     int fieldID = row.getIntColumn("metadata_field_id");
-                    new_id2field.put(Integer.valueOf(fieldID), new MetadataField(row));
+                    MetadataField mf = new MetadataField(row);
+                    String term = String.join(".", MetadataSchema.find(context, mf.schemaID).getName(), mf.getElement(), mf.getQualifier());
+                    log.info("adding field " + fieldID + " with term " + term);
+                    new_id2field.put(Integer.valueOf(fieldID), mf);
+                    new_term2field.put(term, mf);
                 }
             }
             finally
@@ -678,6 +687,7 @@ public class MetadataField
             }
 
             id2field = new_id2field;
+            term2field = new_term2field;
         }
     }
 
@@ -685,7 +695,7 @@ public class MetadataField
      * Return <code>true</code> if <code>other</code> is the same MetadataField
      * as this object, <code>false</code> otherwise
      *
-     * @param other
+     * @param obj
      *            object to compare to
      *
      * @return <code>true</code> if object passed in represents the same
