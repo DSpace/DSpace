@@ -92,10 +92,6 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
             context = new Context();
             create(context);
             context.commit();
-            for (String prop : metadataProperties.stringPropertyNames()) {
-                String mdString = metadataProperties.getProperty(prop);
-                this.setConceptMetadataValue(mdString, defaultMetadataValues.getProperty(mdString));
-            }
         } catch (Exception e) {
             log.error("Couldn't make new concept: " + e.getMessage());
             if (context != null) {
@@ -130,6 +126,10 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
             JournalUtils.addDryadJournalConcept(context, this);
             context.commit();
             context.restoreAuthSystemState();
+            for (String prop : metadataProperties.stringPropertyNames()) {
+                String mdString = metadataProperties.getProperty(prop);
+                this.setConceptMetadataValue(mdString, defaultMetadataValues.getProperty(mdString));
+            }
         } catch (Exception e) {
             log.error("Couldn't make new concept: " + e.getMessage());
         }
