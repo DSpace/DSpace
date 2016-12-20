@@ -85,8 +85,8 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
         try {
             context = getContext();
             DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
-            LinkedHashMap<Item, String> packages = JournalUtils.getArchivedPackagesSortedRecent(context, journal.getFullName(), limit);
-            for (Item item : packages.keySet()) {
+            List<Item> packages = JournalUtils.getArchivedPackagesFromKeyset(context, journal.getFullName(), limit, 0);
+            for (Item item : packages) {
                 Package dataPackage = new Package(new DryadDataPackage(item));
                 packageList.add(dataPackage);
             }
