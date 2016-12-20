@@ -16,12 +16,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -39,7 +42,14 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.ParseException;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.log.Log4JLogChute;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -120,37 +130,54 @@ public class Email {
     /**
      * The arguments to fill out
      */
-    private List<Object> arguments;
+    private final List<Object> arguments;
 
     /**
      * The recipients
      */
-    private List<String> recipients;
+    private final List<String> recipients;
 
     /**
      * Reply to field, if any
      */
     private String replyTo;
 
-    private List<FileAttachment> attachments;
-    private List<InputStreamAttachment> moreAttachments;
+    private final List<FileAttachment> attachments;
+    private final List<InputStreamAttachment> moreAttachments;
 
     /**
      * The character set this message will be sent in
      */
     private String charset;
 
-    private static final Logger log = org.apache.logging.log4j.LogManager.getLogger(Email.class);
+    private static final Logger LOG = LogManager.getLogger();
+
+    /** Velocity template settings. */
+    private static final Properties VELOCITY_PROPERTIES = new Properties();
+    static {
+        VELOCITY_PROPERTIES.put("runtime.log.logsystem.class",
+                Log4JLogChute.class.getCanonicalName());
+        VELOCITY_PROPERTIES.put("resource.loader", "classpath");
+        VELOCITY_PROPERTIES.put("classpath.resource.loader.description",
+                "Velocity Classpath Resource Loader");
+        VELOCITY_PROPERTIES.put("classpath.resource.loader.class",
+                ClasspathResourceLoader.class.getCanonicalName());
+        VELOCITY_PROPERTIES.put("classpath.resource.loader.cache", "true");
+    }
+
+    /** Velocity template for a message body */
+    private Template template;
 
     /**
      * Create a new email message.
      */
     public Email() {
-        arguments = new ArrayList<Object>(50);
-        recipients = new ArrayList<String>(50);
-        attachments = new ArrayList<FileAttachment>(10);
-        moreAttachments = new ArrayList<InputStreamAttachment>(10);
+        arguments = new ArrayList<>(50);
+        recipients = new ArrayList<>(50);
+        attachments = new ArrayList<>(10);
+        moreAttachments = new ArrayList<>(10);
         subject = "";
+        template = null;
         content = "";
         replyTo = null;
         charset = null;
@@ -166,15 +193,15 @@ public class Email {
     }
 
     /**
-     * Set the content of the message. Setting this "resets" the message
-     * formatting -<code>addArgument</code> will start. Comments and any
+     * Set the content of the message. Setting this also "resets" the message
+     * formatting - <code>addArgument</code> will start over. Comments and any
      * "Subject:" line must be stripped.
      *
      * @param cnt the content of the message
      */
     public void setContent(String cnt) {
         content = cnt;
-        arguments = new ArrayList<Object>();
+        arguments.clear();
     }
 
     /**
@@ -235,14 +262,14 @@ public class Email {
     }
 
     /**
-     * "Reset" the message. Clears the arguments and recipients, but leaves the
-     * subject and content intact.
+     * "Reset" the message. Clears the arguments, attachments and recipients,
+     * but leaves the subject and content intact.
      */
     public void reset() {
-        arguments = new ArrayList<Object>(50);
-        recipients = new ArrayList<String>(50);
-        attachments = new ArrayList<FileAttachment>(10);
-        moreAttachments = new ArrayList<InputStreamAttachment>(10);
+        arguments.clear();
+        recipients.clear();
+        attachments.clear();
+        moreAttachments.clear();
         replyTo = null;
         charset = null;
     }
@@ -254,7 +281,8 @@ public class Email {
      * @throws IOException        if IO error
      */
     public void send() throws MessagingException, IOException {
-        ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
+        ConfigurationService config
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
 
         // Get the mail configuration properties
         String from = config.getProperty("mail.from.address");
@@ -280,15 +308,35 @@ public class Email {
         }
 
         // Format the mail message
-        Object[] args = arguments.toArray();
-        String fullMessage = MessageFormat.format(content, args);
-        Date date = new Date();
+        VelocityEngine templateEngine = new VelocityEngine();
+        templateEngine.init(VELOCITY_PROPERTIES);
 
+        org.apache.velocity.context.Context ctx = new VelocityContext();
+        ctx.put("config", new UnmodifiableConfigurationService(config));
+        ctx.put("params", Collections.unmodifiableList(arguments));
+
+        if (null == template) { // No template, so look for a String of content.
+            if (null == content) { // SNH -- see constructor.
+                // No template and no content -- PANIC!!!
+                LOG.error("Email has no body");
+                template = new Template();
+                template.setData("No content.");
+            } else {   // Turn content into a template.
+                template = new Template();
+                template.setData(content);
+            }
+        }
+
+        StringWriter writer = new StringWriter();
+        template.merge(ctx, writer);
+        String fullMessage = writer.toString();
+
+        Date date = new Date();
         message.setSentDate(date);
         message.setFrom(new InternetAddress(from));
 
         // Set the subject of the email (may contain parameters)
-        String fullSubject = MessageFormat.format(subject, args);
+        String fullSubject = MessageFormat.format(subject, arguments.toArray());
         if (charset != null) {
             message.setSubject(fullSubject, charset);
         } else {
@@ -309,35 +357,24 @@ public class Email {
             BodyPart messageBodyPart = new MimeBodyPart();
             messageBodyPart.setText(fullMessage);
             multipart.addBodyPart(messageBodyPart);
-            if (!attachments.isEmpty()) {
-                for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext(); ) {
-                    FileAttachment f = iter.next();
-                    // add the file
-                    messageBodyPart = new MimeBodyPart();
-                    messageBodyPart.setDataHandler(new DataHandler(
-                        new FileDataSource(f.file)));
-                    messageBodyPart.setFileName(f.name);
-                    multipart.addBodyPart(messageBodyPart);
-                }
-                message.setContent(multipart);
+            for (FileAttachment attachment : attachments) {
+                // add the file
+                messageBodyPart = new MimeBodyPart();
+                messageBodyPart.setDataHandler(new DataHandler(
+                        new FileDataSource(attachment.file)));
+                messageBodyPart.setFileName(attachment.name);
+                multipart.addBodyPart(messageBodyPart);
             }
-            if (!moreAttachments.isEmpty()) {
-                for (Iterator<InputStreamAttachment> iter = moreAttachments.iterator(); iter.hasNext(); ) {
-                    InputStreamAttachment isa = iter.next();
-                    // add the stream
-                    messageBodyPart = new MimeBodyPart();
-                    messageBodyPart.setDataHandler(
-                        new DataHandler(new InputStreamDataSource(
-                            isa.name,
-                            isa.mimetype,
-                            isa.is)
-                        )
-                    );
-                    messageBodyPart.setFileName(isa.name);
-                    multipart.addBodyPart(messageBodyPart);
-                }
-                message.setContent(multipart);
+            message.setContent(multipart);
+            for (InputStreamAttachment attachment : moreAttachments) {
+                // add the stream
+                messageBodyPart = new MimeBodyPart();
+                messageBodyPart.setDataHandler(new DataHandler(
+                        new InputStreamDataSource(attachment.name,attachment.mimetype,attachment.is)));
+                messageBodyPart.setFileName(attachment.name);
+                multipart.addBodyPart(messageBodyPart);
             }
+            message.setContent(multipart);
         }
 
         if (replyTo != null) {
@@ -365,15 +402,15 @@ public class Email {
 
             text.append('\n').append(fullMessage);
 
-            log.info(text);
+            LOG.info(text);
         } else {
             Transport.send(message);
         }
     }
 
     /**
-     * Get the template for an email message. The message is suitable for
-     * inserting values using <code>java.text.MessageFormat</code>.
+     * Get the plain-text template for an email message. The message is suitable for
+     * inserting values using {@link java.text.MessageFormat}.
      *
      * @param emailFile full name for the email template, for example "/dspace/config/emails/register".
      * @return the email object, with the content and subject filled out from
@@ -450,6 +487,18 @@ public class Email {
      */
 
     /**
+     * Associate the message with an external Velocity
+     * {@link org.apache.velocity.Template}.  You should also supply a subject
+     * using {@link #setSubject(java.lang.String)}.
+     *
+     * @param templateName simple name to be looked up in the Velocity template
+     *                      resources.
+     */
+    public void setTemplate(String templateName) {
+        template = Velocity.getTemplate(templateName);
+    }
+
+    /**
      * Test method to send an email to check email server settings
      *
      * @param args the command line arguments given
@@ -479,15 +528,9 @@ public class Email {
                 return;
             }
             e.send();
-        } catch (MessagingException me) {
+        } catch (MessagingException | IOException me) {
             System.err.println("\nError sending email:");
             System.err.println(" - Error: " + me);
-            System.err.println("\nPlease see the DSpace documentation for assistance.\n");
-            System.err.println("\n");
-            System.exit(1);
-        } catch (IOException e1) {
-            System.err.println("\nError sending email:");
-            System.err.println(" - Error: " + e1);
             System.err.println("\nPlease see the DSpace documentation for assistance.\n");
             System.err.println("\n");
             System.exit(1);
@@ -532,9 +575,9 @@ public class Email {
      * @author arnaldo
      */
     public class InputStreamDataSource implements DataSource {
-        private String name;
-        private String contentType;
-        private ByteArrayOutputStream baos;
+        private final String name;
+        private final String contentType;
+        private final ByteArrayOutputStream baos;
 
         InputStreamDataSource(String name, String contentType, InputStream inputStream) throws IOException {
             this.name = name;
@@ -568,4 +611,29 @@ public class Email {
         }
     }
 
+    /**
+     * Wrap ConfigurationService to prevent templates from modifying the configuration.
+     */
+    private class UnmodifiableConfigurationService {
+        private final ConfigurationService configurationService;
+
+        /**
+         * Swallow an instance of ConfigurationService.
+         *
+         * @param cs the real instance, to be wrapped.
+         */
+        public UnmodifiableConfigurationService(ConfigurationService cs) {
+            configurationService = cs;
+        }
+
+        /**
+         * Look up a key in the actual ConfigurationService.
+         *
+         * @param key to be looked up in the DSpace configuration.
+         * @return whatever value ConfigurationService associates with {@code key}.
+         */
+        public String get(String key) {
+            return configurationService.getProperty(key);
+        }
+    }
 }
