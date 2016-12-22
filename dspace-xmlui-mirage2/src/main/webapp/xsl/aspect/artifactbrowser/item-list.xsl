@@ -190,7 +190,11 @@
                             <xsl:value-of select="mets:fileGrp[@USE='THUMBNAIL']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                         </xsl:variable>
                         <xsl:choose>
-                            <xsl:when test="contains($src,'isAllowed=n')"/>
+                            <xsl:when test="contains($src,'isAllowed=n')">
+                                <div style="width: 100%; text-align: center">
+                                    <i aria-hidden="true" class="glyphicon  glyphicon-lock"></i>
+                                </div>
+                            </xsl:when>
                             <xsl:otherwise>
                                 <img class="img-responsive img-thumbnail" alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
                                     <xsl:attribute name="src">
