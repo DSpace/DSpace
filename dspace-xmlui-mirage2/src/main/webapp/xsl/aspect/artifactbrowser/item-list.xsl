@@ -186,9 +186,19 @@
                 <xsl:choose>
                     <xsl:when test="mets:fileGrp[@USE='THUMBNAIL']">
                         <img class="img-responsive img-thumbnail" alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
+                            <xsl:variable name="src">
+                                <xsl:value-of select="mets:fileGrp[@USE='THUMBNAIL']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                            </xsl:variable>
                             <xsl:attribute name="src">
-                                <xsl:value-of
-                                        select="mets:fileGrp[@USE='THUMBNAIL']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                                <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
+                                <xsl:choose>
+                                    <xsl:when test="contains($src,'isAllowed=n')">
+                                        <xsl:value-of select="concat($theme-path,'/images/restricted.png')"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="$src"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </xsl:attribute>
                         </img>
                     </xsl:when>

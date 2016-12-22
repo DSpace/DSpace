@@ -183,7 +183,15 @@
                     </xsl:variable>
                     <img class="img-thumbnail" alt="Thumbnail">
                         <xsl:attribute name="src">
-                            <xsl:value-of select="$src"/>
+                            <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
+                            <xsl:choose>
+                                <xsl:when test="contains($src,'isAllowed=n')">
+                                    <xsl:value-of select="concat($theme-path,'/images/restricted.png')"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="$src"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:attribute>
                     </img>
                 </xsl:when>
