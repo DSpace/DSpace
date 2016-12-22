@@ -181,17 +181,17 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:variable>
-                    <img class="img-thumbnail" alt="Thumbnail">
-                        <xsl:attribute name="src">
-                            <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
-                            <xsl:choose>
-                                <xsl:when test="contains($src,'isAllowed=n')"/>
-                                <xsl:otherwise>
+                    <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
+                    <xsl:choose>
+                        <xsl:when test="contains($src,'isAllowed=n')"/>
+                        <xsl:otherwise>
+                            <img class="img-thumbnail" alt="Thumbnail">
+                                <xsl:attribute name="src">
                                     <xsl:value-of select="$src"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:attribute>
-                    </img>
+                                </xsl:attribute>
+                            </img>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:when>
                 <xsl:otherwise>
                     <img class="img-thumbnail" alt="Thumbnail">
