@@ -81,6 +81,17 @@ public class FormRPDynamicMetadataController
                 .getTabsByVisibility(EditTabResearcherPage.class,
                         isAdmin);
 
+        EPerson currentUser = context.getCurrentUser();
+        
+        // if admin but also owner of the profile add the reserved tabs as well
+		if (isAdmin && anagraficaObjectDTO.getEpersonID() != null
+				&& currentUser.getID() == anagraficaObjectDTO.getEpersonID()) {
+			List<EditTabResearcherPage> extratabs = getApplicationService().getTabsByAccessLevel(EditTabResearcherPage.class, VisibilityTabConstant.LOW);
+			if (extratabs != null) {
+				tabs.addAll(extratabs);
+			}
+        }
+        
         // check if request tab from view is active (check on collection before)
         EditTabResearcherPage editT = getApplicationService().get(
                 EditTabResearcherPage.class,
@@ -117,7 +128,6 @@ public class FormRPDynamicMetadataController
         {
             if (isAdmin)
             {
-                EPerson currentUser = context.getCurrentUser();
                 if ((currentUser!=null && (anagraficaObjectDTO.getEpersonID()!=null && currentUser.getID()==anagraficaObjectDTO.getEpersonID()))
                        || !propertyHolder.getVisibility().equals(
                                VisibilityTabConstant.LOW))              
