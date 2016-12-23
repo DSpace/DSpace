@@ -45,71 +45,41 @@
 	int offset = ((Integer)request.getAttribute("offset")).intValue();
 	
 	// Make sure we won't run over end of list
-		int last;
-	if (search != null && !search.equals(""))
-	{
-		last = offset + PAGESIZE;	
-	}
-	else 
-	{
-	  last = first + PAGESIZE;
-	}
-	if (last >= groups.length) last = groups.length - 1;
+    int last = first + PAGESIZE;
+    if (last >= groups.length)
+        last = groups.length - 1;
 
-	// Index of first group on last page
-	int jumpEnd = ((groups.length - 1) / PAGESIZE) * PAGESIZE;
+    // Index of first group on last page
+    int jumpEnd = ((groups.length - 1) / PAGESIZE) * PAGESIZE;
 
-	// Now work out values for next/prev page buttons
-	int jumpFiveBack;
-	if (search != null && !search.equals(""))
-	{
-	    jumpFiveBack = offset - PAGESIZE * 5;
-	}
-	else
-	{
-		jumpFiveBack = first - PAGESIZE * 5;
-	}
-	if (jumpFiveBack < 0) jumpFiveBack = 0;
+    // Now work out values for next/prev page buttons
+    int jumpFiveBack = first - PAGESIZE * 5;
+    if (jumpFiveBack < 0)
+        jumpFiveBack = 0;
 
-	int jumpOneBack;
-	if (search != null && !search.equals(""))
-	{
-		jumpOneBack = offset - PAGESIZE;		
-	}
-	else
-	{
-	   jumpOneBack = first - PAGESIZE;
-	}
-	if (jumpOneBack < 0) jumpOneBack = 0;
-	
-	int jumpOneForward;
-	if (search != null && !search.equals(""))
-	{
-		jumpOneForward = offset + PAGESIZE;
-	}
-	else
-	{
-		jumpOneForward = first + PAGESIZE;
-	}
-	if (jumpOneForward > groups.length) jumpOneForward = jumpEnd;
+    int jumpOneBack = first - PAGESIZE;
+    if (jumpOneBack < 0)
+        jumpOneBack = 0;
 
-	int jumpFiveForward;
-	if (search != null && !search.trim().equals(""))
-	{
-		jumpFiveForward = offset + PAGESIZE * 5;
-	}
-	else 
-	{
-		jumpFiveForward = first + PAGESIZE * 5;
-	}
-	if (jumpFiveForward > groups.length) jumpFiveForward = jumpEnd;
-	
-	// What's the link?
-	String sortByParam = "name";
-	if (sortBy == Group.ID)   sortByParam = "id";
+    int jumpOneForward = first + PAGESIZE;
+    if (jumpOneForward > groups.length)
+        jumpOneForward = jumpEnd;
 
-	String jumpLink = request.getContextPath() + "/tools/group-select-list?multiple=" + multiple + "&sortby=" + sortByParam + "&first=";
-	String sortLink = request.getContextPath() + "/tools/group-select-list?multiple=" + multiple + "&first=" + first + "&sortby=";
+    int jumpFiveForward = first + PAGESIZE * 5;
+    if (jumpFiveForward > groups.length)
+        jumpFiveForward = jumpEnd;
+
+    // What's the link?
+    String sortByParam = "name";
+    if (sortBy == Group.ID)
+        sortByParam = "id";
+
+    String jumpLink = request.getContextPath()
+            + "/tools/group-select-list?search=" + search + "&multiple="
+            + multiple + "&sortby=" + sortByParam + "&first=";
+    String sortLink = request.getContextPath()
+            + "/tools/group-select-list?search=" + search + "&multiple="
+            + multiple + "&first=" + first + "&sortby=";
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -170,7 +140,7 @@ function clearGroups()
 	    <input type="hidden" name="sortby" value="<%= sortBy %>" />
 	    <input type="hidden" name="multiple" value="<%= multiple %>" />    
 	    <label for="search"><fmt:message key="jsp.tools.eperson-list.search.query"/></label>
-	    <input class="form-control" style="width:200px;"type="text" name="search" value="<%= search %>"/>
+	    <input class="form-control" style="width:200px;" type="text" name="search" value="<%= search %>"/>
 	    <input class="btn btn-success" type="submit" value="<fmt:message key="jsp.tools.eperson-list.search.submit" />" />
 	<%
 	    if (search != null && !search.equals("")){   %>
@@ -230,7 +200,7 @@ function clearGroups()
 	String closeWindow = (multiple ? "" : "window.close();");
 
 
-    for (int i = (search != null && !search.equals(""))?offset:first; i <= last; i++)
+    for (int i = first; i <= last; i++)
     {
         Group g = groups[i];
 		// Make sure no quotes in full name will mess up our Javascript
