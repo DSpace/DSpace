@@ -2469,6 +2469,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     	{
             return null;
     	}
+        if(field.equals("location.comm") || field.equals("location.coll"))
+        {
+        	return value;
+        }
     	if (field.endsWith("_filter") || field.endsWith("_ac")
                 || field.endsWith("_acid"))
         {
