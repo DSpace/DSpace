@@ -102,7 +102,6 @@ public class ItemCountDAOSolr implements ItemCountDAO
     public int getCount(DSpaceObject dso) throws ItemCountException
     {
     	loadCount();
-    	DiscoverQuery query = new DiscoverQuery();
     	Integer val = null;
     	if (dso instanceof Collection)
         {
