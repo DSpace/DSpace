@@ -425,6 +425,7 @@ public class OAIHarvester {
     	String itemOaiID = record.getChild("header", OAI_NS).getChild("identifier", OAI_NS).getText();
     	Element header = record.getChild("header",OAI_NS);
 
+    	ourContext.turnOffItemWrapper();
     	// look up the item corresponding to the OAI identifier
     	Item item = HarvestedItem.getItemByOAIId(ourContext, itemOaiID, targetCollection.getID());
 
@@ -462,9 +463,7 @@ public class OAIHarvester {
     		log.debug("Item " + item.getHandle() + " was found locally. Using it to harvest " + itemOaiID + ".");
 
     		// FIXME: check for null pointer if for some odd reason we don't have a matching hi
-    		ourContext.turnOffItemWrapper();
     		hi = HarvestedItem.find(ourContext, item.getID());
-    		ourContext.restoreItemWrapperState();
 
     		// Compare last-harvest on the item versus the last time the item was updated on the OAI provider side
 			// If ours is more recent, forgo this item, since it's probably a left-over from a previous harvesting attempt
@@ -604,6 +603,7 @@ public class OAIHarvester {
 
     	// Stop ignoring authorization
     	ourContext.restoreAuthSystemState();
+    	ourContext.restoreItemWrapperState();
     }
 
 
