@@ -254,15 +254,6 @@
      },
      {
         "integrated" : "Y",
-        "submission" : "A",
-        "issn" : "2325-1026",
-        "embargo" : "Y",
-        "hidden" : "Y",
-        "title" : "Elementa: Science of the Anthropocene",
-        "sponsor" : "BioOne"
-     },
-     {
-        "integrated" : "Y",
         "hidden" : "Y",
         "submission" : "R",
         "issn" : "2050-084X",
