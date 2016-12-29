@@ -189,9 +189,9 @@ public class FullTextContentStreams extends ContentStreamBase
         }
 
         public InputStream nextElement() {
-            InputStream inputStream;
-
+            InputStream inputStream = null;
             FullTextBitstream bitstream = null;
+
             try {
                 bitstream = fulltextIterator.next();
                 inputStream = bitstream.getInputStream();
@@ -203,7 +203,8 @@ public class FullTextContentStreams extends ContentStreamBase
                 inputStream = new ByteArrayInputStream((e.getClass() + ": " + e.getMessage()).getBytes(StandardCharsets.UTF_8));
             }
 
-            return new SequenceInputStream(new ByteArrayInputStream("\n".getBytes(Charsets.UTF_8)), inputStream);
+            return inputStream == null ? null : new SequenceInputStream(
+                    new ByteArrayInputStream("\n".getBytes(Charsets.UTF_8)), inputStream);
         }
     }
 
