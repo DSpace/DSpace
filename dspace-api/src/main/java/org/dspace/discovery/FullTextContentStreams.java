@@ -10,6 +10,7 @@ package org.dspace.discovery;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.util.ContentStreamBase;
@@ -43,19 +44,25 @@ public class FullTextContentStreams extends ContentStreamBase
     public static final String FULLTEXT_BUNDLE = "TEXT";
 
     protected final Context context;
-    protected final List<FullTextBitstream> fullTextStreams;
+    protected List<FullTextBitstream> fullTextStreams;
     protected BitstreamService bitstreamService;
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
+        init(parentItem);
+    }
+
+    protected void init(Item parentItem) {
         fullTextStreams = new LinkedList<>();
-        sourceInfo = parentItem.getHandle();
-        bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
-        //extracted full text is always extracted as plain text
-        contentType = "text/plain";
+        if(parentItem != null) {
+            sourceInfo = parentItem.getHandle();
 
-        buildFullTextList(parentItem);
+            //extracted full text is always extracted as plain text
+            contentType = "text/plain";
+
+            buildFullTextList(parentItem);
+        }
     }
 
     private void buildFullTextList(Item parentItem) {
@@ -123,12 +130,19 @@ public class FullTextContentStreams extends ContentStreamBase
             return new SequenceInputStream(new FullTextEnumeration(fullTextStreams.iterator()));
         } catch (Exception e) {
             log.error("Unable to add full text bitstreams to SOLR for item " + sourceInfo + ": " + e.getMessage(), e);
-            return new ByteArrayInputStream(e.getMessage().getBytes(StandardCharsets.UTF_8));
+            return new ByteArrayInputStream((e.getClass() + ": " + e.getMessage()).getBytes(StandardCharsets.UTF_8));
         }
     }
 
     public boolean isEmpty() {
         return CollectionUtils.isEmpty(fullTextStreams);
+    }
+
+    private BitstreamService getBitstreamService() {
+        if(bitstreamService == null) {
+            bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        }
+        return bitstreamService;
     }
 
     private class FullTextBitstream {
@@ -154,7 +168,7 @@ public class FullTextContentStreams extends ContentStreamBase
         }
 
         public InputStream getInputStream() throws SQLException, IOException, AuthorizeException {
-            return bitstreamService.retrieve(context, bitstream);
+            return getBitstreamService().retrieve(context, bitstream);
         }
 
         public String getItemHandle() {
@@ -186,10 +200,10 @@ public class FullTextContentStreams extends ContentStreamBase
                         bitstream.getFileName() + " for item " + bitstream.getItemHandle())
                         + " to SOLR:" + e.getMessage(), e);
 
-                inputStream = new ByteArrayInputStream(e.getMessage().getBytes(StandardCharsets.UTF_8));
+                inputStream = new ByteArrayInputStream((e.getClass() + ": " + e.getMessage()).getBytes(StandardCharsets.UTF_8));
             }
 
-            return inputStream;
+            return new SequenceInputStream(new ByteArrayInputStream("\n".getBytes(Charsets.UTF_8)), inputStream);
         }
     }
 

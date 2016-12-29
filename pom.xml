@@ -1411,6 +1411,11 @@
                 <version>3.0.1u2</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>1.10.19</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
