@@ -1417,8 +1417,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         log.debug("  Added Grouping");
 
-        FullTextContentStreams textContentStreams = new FullTextContentStreams(context, item);
-
         //Do any additional indexing, depends on the plugins
         List<SolrServiceIndexPlugin> solrServiceIndexPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
         for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
@@ -1428,7 +1426,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         // write the index and close the inputstreamreaders
         try {
-            writeDocument(doc, textContentStreams);
+            writeDocument(doc, new FullTextContentStreams(context, item));
             log.info("Wrote Item: " + handle + " to Index");
         } catch (RuntimeException e)
         {
