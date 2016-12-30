@@ -26,6 +26,23 @@
 
     <dc-type>
     	<schema>bitstream</schema>
+        <element>toc</element>
+        <scope_note>Metadata field used to store the Section of the TOC that
+					starts with such bitstream</scope_note>
+    </dc-type>
+
+	<dc-type>
+    	<schema>bitstream</schema>
+        <element>toc</element>
+        <qualifier>fragment</qualifier>
+        <scope_note>Metadata field used to store the URL IIIF Fragment
+        			related to the bitstream toc. Useful when a page contains 
+        			more than one section, the value must be in the form 
+        			#xywh=40,50,1200,1800</scope_note>
+    </dc-type>
+    
+    <dc-type>
+    	<schema>bitstream</schema>
         <element>iiif</element>
         <qualifier>canvasindex</qualifier>
         <scope_note>Metadata field used to store the initial canvas within the sequence 
