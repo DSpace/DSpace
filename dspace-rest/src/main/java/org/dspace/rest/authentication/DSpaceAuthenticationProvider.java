@@ -75,7 +75,7 @@ public class DSpaceAuthenticationProvider implements AuthenticationProvider {
                     return createAuthenticationToken(password, context, grantedAuthorities);
 
                 } else {
-                    log.info(LogManager.getHeader(context, "failed_login", "email="
+                    log.info(LogManager.getHeader(context, "failed_login", "user="
                             + name + ", result="
                             + authenticateResult));
                     throw new BadCredentialsException("Login failed");
