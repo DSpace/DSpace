@@ -165,10 +165,36 @@ public class RestIndex {
     @POST
     @Path("/login")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response login(@QueryParam("user") String email, @QueryParam("password") String password) {
-
+    public Response login(@QueryParam("user") String user, @QueryParam("password") String password)
+    {
         //If you can get here, you should be authenticated, the actual login is handled by spring security.
         //If not, the provided credentials are invalid.
+
+        return getLoginResponse("Authentication failed for user " + user + ": The credentials you provided are not valid.");
+    }
+
+    @GET
+    @Path("/shibboleth-login")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response shibbolethLogin()
+    {
+        //If you can get here, you should be authenticated, the actual login is handled by spring security.
+        //If not, no valid Shibboleth session is present or Shibboleth config is missing.
+
+        /* Make sure to apply
+           - AuthType shibboleth
+           - ShibRequireSession On
+           - ShibUseHeaders On
+           - require valid-user
+           to this endpoint. The Shibboleth daemon will then take care of redirecting you to the login page if
+           necessary.
+         */
+
+        return getLoginResponse("Shibboleth authentication failed: No valid Shibboleth session could be found.");
+    }
+
+    protected Response getLoginResponse(String failedMessage) {
+        //Get the context and check if we have an authenticated eperson
 
         org.dspace.core.Context context = null;
         try {
@@ -180,66 +206,19 @@ public class RestIndex {
             log.error("Unable to load user information from the database: " + e.getMessage(), e);
             return Response.serverError().entity(e.getMessage()).build();
         } catch (WebApplicationException e) {
-            log.warn("REST API authentication for user " + email + " failed.");
+            log.warn("REST API authentication failed.");
             context = null;
         }
 
         if(context == null || context.getCurrentUser() == null) {
             return Response.status(Response.Status.FORBIDDEN)
-                    .entity("Authentication failed. The credentials you provided are not valid.")
+                    .entity(failedMessage)
                     .build();
         } else {
             //We have a user, so the login was successful.
             return Response.ok().build();
         }
     }
-
-
-	@GET
-	@Path("/shibboleth-login")
-	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response shibbolethLogin()
-	{
-		//If you can get here, you are authenticated, the actual login is handled by spring security
-		return Response.ok().build();
-	}
-
-	@GET
-	@Path("/login-shibboleth")
-	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response shibbolethLoginEndPoint()
-	{
-		org.dspace.core.Context context = null;
-		try {
-			context = Resource.createContext();
-			AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-			Iterator<AuthenticationMethod> authenticationMethodIterator = authenticationService.authenticationMethodIterator();
-			while(authenticationMethodIterator.hasNext())
-            {
-                AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
-				if(authenticationMethod instanceof ShibAuthentication)
-				{
-					//TODO: Perhaps look for a better way of handling this ?
-					org.dspace.services.model.Request currentRequest = new DSpace().getRequestService().getCurrentRequest();
-					String loginPageURL = authenticationMethod.loginPageURL(context, currentRequest.getHttpServletRequest(), currentRequest.getHttpServletResponse());
-					if(StringUtils.isNotBlank(loginPageURL))
-					{
-						currentRequest.getHttpServletResponse().sendRedirect(loginPageURL);
-					}
-				}
-            }
-			context.abort();
-		} catch (ContextException | SQLException | IOException e) {
-			Resource.processException("Shibboleth endpoint error:  " + e.getMessage(), context);
-		} finally {
-			if(context != null && context.isValid())
-			{
-				context.abort();
-			}
-
-		}
-		return Response.ok().build();
-	}
 
     /**
      * Method to logout a user from DSpace REST API. Removes the token and user from
