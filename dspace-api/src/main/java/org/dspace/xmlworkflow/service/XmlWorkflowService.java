@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.service;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowService;
@@ -58,6 +59,10 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
             throws SQLException, AuthorizeException;
 
     public void createOwnedTask(Context context, XmlWorkflowItem wi, Step step, WorkflowActionConfig action, EPerson e) throws SQLException, AuthorizeException;
+
+    public void grantUserAllItemPolicies(Context context, Item item, EPerson epa) throws AuthorizeException, SQLException;
+
+    public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException;
 
     public String getEPersonName(EPerson ePerson);
 }
