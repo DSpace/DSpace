@@ -13,11 +13,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Context;
 
@@ -172,11 +168,35 @@ public class RestIndex {
     @POST
     @Path("/login")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response login()
-    {
-        //If you can get here, you are authenticated, the actual login is handled by spring security
-        return Response.ok().build();
+    public Response login(@QueryParam("user") String email, @QueryParam("password") String password) {
+
+        //If you can get here, you should be authenticated, the actual login is handled by spring security.
+        //If not, the provided credentials are invalid.
+
+        org.dspace.core.Context context = null;
+        try {
+            context = Resource.createContext();
+        } catch (ContextException e) {
+            log.error("Unable to create context: " + e.getMessage(), e);
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (SQLException e) {
+            log.error("Unable to load user information from the database: " + e.getMessage(), e);
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (WebApplicationException e) {
+            log.warn("REST API authentication for user " + email + " failed.");
+            context = null;
+        }
+
+        if(context == null || context.getCurrentUser() == null) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("Authentication failed. The credentials you provided are not valid.")
+                    .build();
+        } else {
+            //We have a user, so the login was successful.
+            return Response.ok().build();
+        }
     }
+
 
     @GET
     @Path("/shibboleth-login")
