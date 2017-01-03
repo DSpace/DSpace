@@ -46,71 +46,73 @@ public class RestIndex {
     	// TODO Better graphics, add arguments to all methods. (limit, offset, item and so on)
         return "<html><title>DSpace REST - index</title>" +
                 "<body>"
-                	+ "<h1>DSpace REST API</h1>" +
-                	"Server path: " + servletContext.getContextPath() +
-                	"<h2>Index</h2>" +
-                		"<ul>" +
-                			"<li>GET / - Return this page.</li>" +
-                			"<li>GET /test - Return the string \"REST api is running\" for testing purposes.</li>" +
-                			"<li>POST /login - Method for logging into the DSpace RESTful API. You must post User class. Example: {\"email\":\"test@dspace\",\"password\":\"pass\"}. Returns a token which must be included in future requests in the \"rest-dspace-token\" header.</li>" +
-                			"<li>POST /logout - Method for logging out of the DSpace RESTful API. The request must include the \"rest-dspace-token\" token</li> header." +
-                		"</ul>" +
-                	"<h2>Communities</h2>" +
-                		"<ul>" +
-                			"<li>GET /communities - Return an array of all communities in DSpace.</li>" +
-                			"<li>GET /communities/top-communities - Returns an array of all top-leve communities in DSpace.</li>" +
-                			"<li>GET /communities/{communityId} - Returns a community with the specified ID.</li>" +
-                			"<li>GET /communities/{communityId}/collections - Returns an array of collections of the specified community.</li>" +
-                			"<li>GET /communities/{communityId}/communities - Returns an array of subcommunities of the specified community.</li>" +
-                			"<li>POST /communities - Create a new top-level community. You must post a community.</li>" +
-                			"<li>POST /communities/{communityId}/collections - Create a new collection in the specified community. You must post a collection.</li>" +
-                			"<li>POST /communities/{communityId}/communities - Create a new subcommunity in the specified community. You must post a community.</li>" +
-                			"<li>PUT /communities/{communityId} - Update the specified community.</li>" +
-                			"<li>DELETE /communities/{communityId} - Delete the specified community.</li>" +
-                			"<li>DELETE /communities/{communityId}/collections/{collectionId} - Delete the specified collection in the specified community.</li>" +
-                			"<li>DELETE /communities/{communityId}/communities/{communityId2} - Delete the specified subcommunity (communityId2) in the specified community (communityId).</li>" +
-                		"</ul>" +
-                	"<h2>Collections</h2>" +
-                	"<ul>" +
-                  		"<li>GET /collections - Return all DSpace collections in array.</li>" +
-                  		"<li>GET /collections/{collectionId} - Return a collection with the specified ID.</li>" +
-                  		"<li>GET /collections/{collectionId}/items - Return all items of the specified collection.</li>" +
-                  		"<li>POST /collections/{collectionId}/items - Create an item in the specified collection. You must post an item.</li>" +
-                  		"<li>POST /collections/find-collection - Find a collection by name.</li>" +
-                  		"<li>PUT /collections/{collectionId} </li> - Update the specified collection. You must post a collection." +
-                  		"<li>DELETE /collections/{collectionId} - Delete the specified collection from DSpace.</li>" +
-                  		"<li>DELETE /collections/{collectionId}/items/{itemId} - Delete the specified item (itemId) in the specified collection (collectionId). </li>" +
-                  	"</ul>" +
-                  	"<h2>Items</h2>" +
-                  	"<ul>" +
-                  		"<li>GET /items - Return a list of items.</li>" +
-                  		"<li>GET /items/{item id} - Return the specified item.</li>" +
-                  		"<li>GET /items/{item id}/metadata - Return metadata of the specified item.</li>" +
-                  		"<li>GET /items/{item id}/bitstreams - Return bitstreams of the specified item.</li>" +
-                  		"<li>POST /items/find-by-metadata-field - Find items by the specified metadata value.</li>" +
-                  		"<li>POST /items/{item id}/metadata - Add metadata to the specified item.</li>" +
-                  		"<li>POST /items/{item id}/bitstreams - Add a bitstream to the specified item.</li>" +
-                  		"<li>PUT /items/{item id}/metadata - Update metadata in the specified item.</li>" +
-                  		"<li>DELETE /items/{item id} - Delete the specified item.</li>" +
-                  		"<li>DELETE /items/{item id}/metadata - Clear metadata of the specified item.</li>" +
-                  		"<li>DELETE /items/{item id}/bitstreams/{bitstream id} - Delete the specified bitstream of the specified item.</li>" +
-                  	"</ul>" +
-                  	"<h2>Bitstreams</h2>" +
-                  	"<ul>" +
-                  		"<li>GET /bitstreams - Return all bitstreams in DSpace.</li>" +
-                  		"<li>GET /bitstreams/{bitstream id} - Return the specified bitstream.</li>" +
-                  		"<li>GET /bitstreams/{bitstream id}/policy - Return policies of the specified bitstream.</li>" +
-                  		"<li>GET /bitstreams/{bitstream id}/retrieve - Return the contents of the specified bitstream.</li>" +
-                  		"<li>POST /bitstreams/{bitstream id}/policy - Add a policy to the specified bitstream.</li>" +
-                  		"<li>PUT /bitstreams/{bitstream id}/data - Update the contents of the specified bitstream.</li>" +
-                  		"<li>PUT /bitstreams/{bitstream id} - Update metadata of the specified bitstream.</li>" +
-                  		"<li>DELETE /bitstreams/{bitstream id} - Delete the specified bitstream from DSpace.</li>" +
-                  		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete the specified bitstream policy.</li>" +
-                  	"</ul>" +
-                  	"<h2>Hierarchy</h2>" +
-                  	"<ul>" +
-                  		"<li>GET /hierarchy - Return hierarchy of communities and collections in tree form. Each object is minimally populated (name, handle, id) for efficient retrieval.</li>" +
-                  	"</ul>" +
+                    + "<h1>DSpace REST API</h1>" +
+                    "Server path: " + servletContext.getContextPath() +
+                    "<h2>Index</h2>" +
+                        "<ul>" +
+                            "<li>GET / - Return this page.</li>" +
+                            "<li>GET /test - Return the string \"REST api is running\" for testing purposes.</li>" +
+                            "<li>GET /login - Method for logging into the DSpace RESTful API. You must provide the user and password, e.g. /login?user=john@doe.com&password=secretpassword. This will return you a JSESSIONID cookie which must be included in future requests.</li>" +
+                            "<li>GET /shibboleth-login - Method for logging into the DSpace RESTful API with Shibboleth. You must configure Shibboleth to pass the Shibboleth session to this endpoint. This will return you a JSESSIONID cookie which must be included in future requests.</li>" +
+                            "<li>GET /status - Method for retrieving information on the current authenticated user. The request must include the JSESSIONID cookie.</li>" +
+                            "<li>GET /logout - Method for logging out of the DSpace RESTful API. The request must include the JSESSIONID cookie.</li>" +
+                        "</ul>" +
+                    "<h2>Communities</h2>" +
+                        "<ul>" +
+                            "<li>GET /communities - Return an array of all communities in DSpace.</li>" +
+                            "<li>GET /communities/top-communities - Returns an array of all top-leve communities in DSpace.</li>" +
+                            "<li>GET /communities/{communityId} - Returns a community with the specified ID.</li>" +
+                            "<li>GET /communities/{communityId}/collections - Returns an array of collections of the specified community.</li>" +
+                            "<li>GET /communities/{communityId}/communities - Returns an array of subcommunities of the specified community.</li>" +
+                            "<li>POST /communities - Create a new top-level community. You must post a community.</li>" +
+                            "<li>POST /communities/{communityId}/collections - Create a new collection in the specified community. You must post a collection.</li>" +
+                            "<li>POST /communities/{communityId}/communities - Create a new subcommunity in the specified community. You must post a community.</li>" +
+                            "<li>PUT /communities/{communityId} - Update the specified community.</li>" +
+                            "<li>DELETE /communities/{communityId} - Delete the specified community.</li>" +
+                            "<li>DELETE /communities/{communityId}/collections/{collectionId} - Delete the specified collection in the specified community.</li>" +
+                            "<li>DELETE /communities/{communityId}/communities/{communityId2} - Delete the specified subcommunity (communityId2) in the specified community (communityId).</li>" +
+                        "</ul>" +
+                    "<h2>Collections</h2>" +
+                    "<ul>" +
+                          "<li>GET /collections - Return all DSpace collections in array.</li>" +
+                          "<li>GET /collections/{collectionId} - Return a collection with the specified ID.</li>" +
+                          "<li>GET /collections/{collectionId}/items - Return all items of the specified collection.</li>" +
+                          "<li>POST /collections/{collectionId}/items - Create an item in the specified collection. You must post an item.</li>" +
+                          "<li>POST /collections/find-collection - Find a collection by name.</li>" +
+                          "<li>PUT /collections/{collectionId} </li> - Update the specified collection. You must post a collection." +
+                          "<li>DELETE /collections/{collectionId} - Delete the specified collection from DSpace.</li>" +
+                          "<li>DELETE /collections/{collectionId}/items/{itemId} - Delete the specified item (itemId) in the specified collection (collectionId). </li>" +
+                      "</ul>" +
+                      "<h2>Items</h2>" +
+                      "<ul>" +
+                          "<li>GET /items - Return a list of items.</li>" +
+                          "<li>GET /items/{item id} - Return the specified item.</li>" +
+                          "<li>GET /items/{item id}/metadata - Return metadata of the specified item.</li>" +
+                          "<li>GET /items/{item id}/bitstreams - Return bitstreams of the specified item.</li>" +
+                          "<li>POST /items/find-by-metadata-field - Find items by the specified metadata value.</li>" +
+                          "<li>POST /items/{item id}/metadata - Add metadata to the specified item.</li>" +
+                          "<li>POST /items/{item id}/bitstreams - Add a bitstream to the specified item.</li>" +
+                          "<li>PUT /items/{item id}/metadata - Update metadata in the specified item.</li>" +
+                          "<li>DELETE /items/{item id} - Delete the specified item.</li>" +
+                          "<li>DELETE /items/{item id}/metadata - Clear metadata of the specified item.</li>" +
+                          "<li>DELETE /items/{item id}/bitstreams/{bitstream id} - Delete the specified bitstream of the specified item.</li>" +
+                      "</ul>" +
+                      "<h2>Bitstreams</h2>" +
+                      "<ul>" +
+                          "<li>GET /bitstreams - Return all bitstreams in DSpace.</li>" +
+                          "<li>GET /bitstreams/{bitstream id} - Return the specified bitstream.</li>" +
+                          "<li>GET /bitstreams/{bitstream id}/policy - Return policies of the specified bitstream.</li>" +
+                          "<li>GET /bitstreams/{bitstream id}/retrieve - Return the contents of the specified bitstream.</li>" +
+                          "<li>POST /bitstreams/{bitstream id}/policy - Add a policy to the specified bitstream.</li>" +
+                          "<li>PUT /bitstreams/{bitstream id}/data - Update the contents of the specified bitstream.</li>" +
+                          "<li>PUT /bitstreams/{bitstream id} - Update metadata of the specified bitstream.</li>" +
+                          "<li>DELETE /bitstreams/{bitstream id} - Delete the specified bitstream from DSpace.</li>" +
+                          "<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete the specified bitstream policy.</li>" +
+                      "</ul>" +
+                      "<h2>Hierarchy</h2>" +
+                      "<ul>" +
+                          "<li>GET /hierarchy - Return hierarchy of communities and collections in tree form. Each object is minimally populated (name, handle, id) for efficient retrieval.</li>" +
+                      "</ul>" +
                     "<h2>Metadata and Schema Registry</h2>" +
                     "<ul>" +
                         "<li>GET /registries/schema - Return the list of metadata schemas in the registry</li>" +
