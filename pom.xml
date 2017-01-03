@@ -598,21 +598,6 @@
         </profile>
 
         <!--
-           Builds JSPUI WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-jspui</id>
-            <activation>
-                <file>
-                    <exists>dspace-jspui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>dspace-jspui</module>
-            </modules>
-        </profile>
-
-        <!--
              Builds RDF API and Data Provider WAR for DSpace
         -->
         <profile>
@@ -688,36 +673,6 @@
         </profile>
 
         <!--
-           Builds MIRAGE2 WAR for DSpace
-        -->
-        <profile>
-           <id>dspace-xmlui-mirage2</id>
-           <activation>
-               <file>
-                   <exists>dspace-xmlui-mirage2/pom.xml</exists>
-               </file>
-           </activation>
-           <modules>
-               <module>dspace-xmlui-mirage2</module>
-           </modules>
-        </profile>
-        
-        <!--
-           Builds XMLUI WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-xmlui</id>
-            <activation>
-                <file>
-                    <exists>dspace-xmlui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>dspace-xmlui</module>
-            </modules>
-        </profile>
-
-        <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
          This profile contains settings which are ONLY enabled when performing
@@ -732,7 +687,6 @@
                  as it does not include any Java source code to release. -->
             <modules>
                 <module>dspace-api</module>
-                <module>dspace-jspui</module>
                 <module>dspace-oai</module>
                 <module>dspace-rdf</module>
                 <module>dspace-rest</module>
@@ -740,8 +694,6 @@
                 <module>dspace-solr</module>
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
-                <module>dspace-xmlui-mirage2</module>
-                <module>dspace-xmlui</module>
             </modules>
             <build>
                 <plugins>
@@ -856,19 +808,6 @@
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
-                <artifactId>dspace-jspui</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-jspui</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
                 <version>7.0-SNAPSHOT</version>
                 <type>jar</type>
@@ -877,19 +816,6 @@
             <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-oai</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-xmlui</artifactId>
-                <version>7.0-SNAPSHOT</version>
-                <type>jar</type>
-                <classifier>classes</classifier>
-            </dependency>
-            <dependency>
-                <groupId>org.dspace</groupId>
-                <artifactId>dspace-xmlui</artifactId>
                 <version>7.0-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
