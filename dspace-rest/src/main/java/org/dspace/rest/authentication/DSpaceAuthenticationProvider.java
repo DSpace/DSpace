@@ -35,10 +35,9 @@ import java.util.List;
  * @author Roeland Dillen (roeland at atmire dot com)
  * @author kevinvandevelde at atmire.com
  *
- * @deprecated This provider handles both the authorization as well as the authentication,
+ * FIXME This provider handles both the authorization as well as the authentication,
  * due to the way that the DSpace authentication is implemented there is currently no other way to do this.
  */
-@Deprecated
 public class DSpaceAuthenticationProvider implements AuthenticationProvider {
 
     private static Logger log = Logger.getLogger(DSpaceAuthenticationProvider.class);
