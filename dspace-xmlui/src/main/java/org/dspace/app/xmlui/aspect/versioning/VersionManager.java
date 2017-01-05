@@ -73,6 +73,9 @@ public class VersionManager {
                 Version version = versioningService.createNewVersion(context, item, summary);
                 WorkspaceItem wsi = workspaceItemService.findByItem(context, version.getItem());
 
+                //Force data to be written to the database
+                context.commit();
+
                 result.setParameter("wsid", wsi.getID());
                 result.setOutcome(true);
                 result.setContinue(true);
