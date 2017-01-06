@@ -7,32 +7,20 @@
  */
 package org.dspace.rest;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
-import java.util.Iterator;
 
 import javax.servlet.ServletContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Context;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.authenticate.AuthenticationMethod;
-import org.dspace.authenticate.ShibAuthentication;
-import org.dspace.authenticate.factory.AuthenticateServiceFactory;
-import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.exceptions.ContextException;
-import org.dspace.utils.DSpace;
 
 /**
  * Root of RESTful api. It provides login and logout. Also have method for
@@ -67,8 +55,10 @@ public class RestIndex {
                         "<ul>" +
                             "<li>GET / - Return this page.</li>" +
                             "<li>GET /test - Return the string \"REST api is running\" for testing purposes.</li>" +
-                            "<li>POST /login - Method for logging into the DSpace RESTful API. You must post User class. Example: {\"email\":\"test@dspace\",\"password\":\"pass\"}. Returns a token which must be included in future requests in the \"rest-dspace-token\" header.</li>" +
-                            "<li>POST /logout - Method for logging out of the DSpace RESTful API. The request must include the \"rest-dspace-token\" token</li> header." +
+                            "<li>GET /login - Method for logging into the DSpace RESTful API. You must provide the user and password, e.g. /login?user=john@doe.com&password=secretpassword. This will return you a JSESSIONID cookie which must be included in future requests.</li>" +
+                            "<li>GET /shibboleth-login - Method for logging into the DSpace RESTful API with Shibboleth. You must configure Shibboleth to pass the Shibboleth session to this endpoint. This will return you a JSESSIONID cookie which must be included in future requests.</li>" +
+                            "<li>GET /status - Method for retrieving information on the current authenticated user. The request must include the JSESSIONID cookie.</li>" +
+                            "<li>GET /logout - Method for logging out of the DSpace RESTful API. The request must include the JSESSIONID cookie.</li>" +
                         "</ul>" +
                     "<h2>Communities</h2>" +
                         "<ul>" +
@@ -172,10 +162,12 @@ public class RestIndex {
     @POST
     @Path("/login")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response login()
+    public Response login(@QueryParam("user") String user, @QueryParam("password") String password)
     {
-        //If you can get here, you are authenticated, the actual login is handled by spring security
-        return Response.ok().build();
+        //If you can get here, you should be authenticated, the actual login is handled by spring security.
+        //If not, the provided credentials are invalid.
+
+        return getLoginResponse("Authentication failed for user " + user + ": The credentials you provided are not valid.");
     }
 
     @GET
@@ -183,50 +175,46 @@ public class RestIndex {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response shibbolethLogin()
     {
-        //If you can get here, you are authenticated, the actual login is handled by spring security
-        return Response.ok().build();
+        //If you can get here, you should be authenticated, the actual login is handled by spring security.
+        //If not, no valid Shibboleth session is present or Shibboleth config is missing.
+
+        /* Make sure to apply
+           - AuthType shibboleth
+           - ShibRequireSession On
+           - ShibUseHeaders On
+           - require valid-user
+           to this endpoint. The Shibboleth daemon will then take care of redirecting you to the login page if
+           necessary.
+         */
+
+        return getLoginResponse("Shibboleth authentication failed: No valid Shibboleth session could be found.");
     }
 
-    @GET
-    @Path("/login-shibboleth")
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response shibbolethLoginEndPoint()
-    {
-        org.dspace.core.Context context = null;
-        try
-        {
-            context = Resource.createContext();
-            AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
-            Iterator<AuthenticationMethod> authenticationMethodIterator = authenticationService.authenticationMethodIterator();
-            while (authenticationMethodIterator.hasNext())
-            {
-                AuthenticationMethod authenticationMethod = authenticationMethodIterator.next();
-                if (authenticationMethod instanceof ShibAuthentication)
-                {
-                    //TODO: Perhaps look for a better way of handling this ?
-                    org.dspace.services.model.Request currentRequest = new DSpace().getRequestService().getCurrentRequest();
-                    String loginPageURL = authenticationMethod.loginPageURL(context, currentRequest.getHttpServletRequest(), currentRequest.getHttpServletResponse());
-                    if (StringUtils.isNotBlank(loginPageURL))
-                    {
-                        currentRequest.getHttpServletResponse().sendRedirect(loginPageURL);
-                    }
-                }
-            }
-            context.abort();
-        }
-        catch (ContextException | SQLException | IOException e)
-        {
-            Resource.processException("Shibboleth endpoint error:  " + e.getMessage(), context);
-        }
-        finally
-        {
-            if (context != null && context.isValid())
-            {
-                context.abort();
-            }
+    protected Response getLoginResponse(String failedMessage) {
+        //Get the context and check if we have an authenticated eperson
 
+        org.dspace.core.Context context = null;
+        try {
+            context = Resource.createContext();
+        } catch (ContextException e) {
+            log.error("Unable to create context: " + e.getMessage(), e);
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (SQLException e) {
+            log.error("Unable to load user information from the database: " + e.getMessage(), e);
+            return Response.serverError().entity(e.getMessage()).build();
+        } catch (WebApplicationException e) {
+            log.warn("REST API authentication failed.");
+            context = null;
         }
-        return Response.ok().build();
+
+        if(context == null || context.getCurrentUser() == null) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity(failedMessage)
+                    .build();
+        } else {
+            //We have a user, so the login was successful.
+            return Response.ok().build();
+        }
     }
 
     /**
