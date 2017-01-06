@@ -105,6 +105,9 @@ public class EASEresponse extends CosignServletCallbackHandler
                     }
                     else
                     {
+                        // clear any interrupted requests
+                        request.getSession().setAttribute(AuthenticationUtil.REQUEST_INTERRUPTED, null);
+                        
                         // unable to automatically create account go to registration
                         url = response.encodeRedirectURL(request.getContextPath() +
                                 "/register?uun=" + uun);
