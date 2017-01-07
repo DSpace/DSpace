@@ -119,7 +119,7 @@ public class AssociationAnywhere {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
                     + "/CENCREDWEBSVCLIB.GET_CREDITS_XML?p_input_xml_doc="
 		+ URLEncoder.encode(createRequest(context, customerId,"sync credits", "load-credit"));
-	    log.debug("AA URL is " + requestUrl);
+            log.debug("AA URL was made from customerID " + customerId + ", sync credits");
 
             Process p = Runtime.getRuntime().exec("curl " + requestUrl);
             p.waitFor();
@@ -179,7 +179,7 @@ public class AssociationAnywhere {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
 		+ "/CENSSAWEBSVCLIB.GET_CUST_INFO_XML?p_input_xml_doc="
 		+ URLEncoder.encode(createRequest(context, customerId,"load customer info", "customer-info"));
-	    log.debug("AA URL is " + requestUrl);
+            log.debug("AA URL was made from customerID " + customerId + ", load customer info");
 
             Process p = Runtime.getRuntime().exec("curl " + requestUrl);
             p.waitFor();
@@ -247,7 +247,7 @@ public class AssociationAnywhere {
             String requestUrl =  ConfigurationManager.getProperty("association.anywhere.url")
 		+ "/CENCREDWEBSVCLIB.INS_CREDIT_XML?p_input_xml_doc="
 		+ URLEncoder.encode(createRequest(context, customerId, dataPackageDOI, "update-credit"));
-	    log.debug("AA URL is " + requestUrl);
+	    log.debug("AA URL was made from customerID " + customerId + ", packageDOI " + dataPackageDOI);
 
             Process p = Runtime.getRuntime().exec("curl " + requestUrl);
             p.waitFor();
@@ -306,7 +306,7 @@ public class AssociationAnywhere {
     /**
      * Update Credit for a specific customer id.
      * @param context
-     * @param customerId
+     * @param journalConcept
      * @throws Exception
      */
     private static void updateConcept(Context context, DryadJournalConcept journalConcept) throws Exception {
