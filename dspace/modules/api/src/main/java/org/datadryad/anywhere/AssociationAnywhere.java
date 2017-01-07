@@ -261,7 +261,7 @@ public class AssociationAnywhere {
             }
 
             Document doc = getResponseAsDocument(sb.toString());
-            
+            log.debug("AA responded with " + sb.toString());
             status = getStringValue(doc, "//status");
 
             return status;
