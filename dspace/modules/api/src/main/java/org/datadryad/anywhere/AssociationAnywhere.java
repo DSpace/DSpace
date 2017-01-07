@@ -291,6 +291,7 @@ public class AssociationAnywhere {
         }
         catch (Exception e)
         {
+            log.debug("AA threw an exception for " + customerId + ": " + e.getMessage());
             throw new AssociationAnywhereException("unable to deduct credits for " + customerId, e);
         }
 
