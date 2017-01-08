@@ -64,6 +64,14 @@
         <scope_note>Metadata field used to store the endpoint of the IIIF Search API 
         			Autocomplete service</scope_note>
     </dc-type>
+
+    <dc-type>
+    	<schema>bundle</schema>
+        <element>iiif</element>
+        <qualifier>ocrid</qualifier>
+        <scope_note>Metadata field used to store the endpoint of the OCR API 
+        			service</scope_note>
+    </dc-type>
     
     <dc-type>
     	<schema>bitstream</schema>
