@@ -8,6 +8,7 @@
 package org.dspace;
 
 import org.databene.contiperf.junit.ContiPerfRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 
 /**
@@ -20,6 +21,7 @@ import org.junit.Rule;
  *
  * @author pvillega
  */
+@Ignore
 public class AbstractIntegrationTest extends AbstractUnitTest
 {
 
