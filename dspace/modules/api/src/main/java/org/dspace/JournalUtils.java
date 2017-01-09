@@ -453,20 +453,20 @@ public class JournalUtils {
     /**
      * Return a list of archived packages for a journal, starting with a particular item as a keyset
      * @param context
-     * @param journalName
+     * @param journalConcept
      * @param limit
      * @param keyset
      * @return
      * @throws SQLException
      */
-    public static List<Item> getArchivedPackagesFromKeyset(Context context, String journalName, int limit, int keyset) throws SQLException {
+    public static List<Item> getArchivedPackagesFromKeyset(Context context, DryadJournalConcept journalConcept, int limit, int keyset) throws SQLException {
         ArrayList<Item> dataPackages = new ArrayList<Item>();
         try {
             log.error("starting search");
             int pubNameFieldID = MetadataField.findByElement(context,"prism.publicationName").getFieldID();
             int dateAccFieldID = MetadataField.findByElement(context,"dc.date.accessioned").getFieldID();
             String querystring = "select * from ArchivedPackagesForJournal(?, ?, ?) where item_id > ? limit ?";
-            TableRowIterator tri = DatabaseManager.query(context, querystring, journalName, pubNameFieldID, dateAccFieldID, keyset, limit);
+            TableRowIterator tri = DatabaseManager.query(context, querystring, journalConcept.getFullName(), pubNameFieldID, dateAccFieldID, keyset, limit);
             while (tri.hasNext()) {
                 int itemId = tri.next().getIntColumn("item_id");
                 log.error("item " + itemId);
