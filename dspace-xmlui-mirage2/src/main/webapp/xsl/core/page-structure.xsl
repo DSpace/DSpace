@@ -336,7 +336,7 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/DSpace-logo-line.svg" />
+                            <img src="{$theme-path}images/DSpace-logo-line.svg" />
                         </a>
 
 
@@ -721,8 +721,8 @@
                         <div class="pull-right">
                             <span class="theme-by">Theme by&#160;</span>
                             <br/>
-                            <a title="@mire NV" target="_blank" href="http://atmire.com">
-                                <img alt="@mire NV" src="{concat($theme-path, '/images/@mirelogo-small.png')}"/>
+                            <a title="Atmire NV" target="_blank" href="http://atmire.com">
+                                <img alt="Atmire NV" src="{concat($theme-path, 'images/@mirelogo-small.png')}"/>
                             </a>
                         </div>
 
