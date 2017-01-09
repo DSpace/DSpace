@@ -27,6 +27,7 @@ public class Package {
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private AuthorsList authors = new AuthorsList();
     private CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
+
     private Integer itemID;
 
     @JsonIgnore
@@ -47,6 +48,10 @@ public class Package {
     public Package(DryadDataPackage dataPackage) {
         this.dataPackage = dataPackage;
         this.itemID = dataPackage.getItem().getID();
+    }
+
+    public Integer getItemID() {
+        return itemID;
     }
 
     public String getPublicationDOI() {
