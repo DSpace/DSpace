@@ -159,7 +159,7 @@ public class RestIndex {
     @POST
     @Path("/login")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response login(@QueryParam("user") String user, @QueryParam("password") String password)
+    public Response login(@QueryParam("email") String user, @QueryParam("password") String password)
     {
         //If you can get here, you should be authenticated, the actual login is handled by spring security.
         //If not, the provided credentials are invalid.
