@@ -38,7 +38,7 @@
         <property name="authenticationManager" ref="dspaceAuthenticationManager"/>
         <!-- Ensures that after login no redirect is made to the home page, the rest will return a 200 status code -->
         <property name="authenticationSuccessHandler" ref="org.dspace.rest.authentication.NoRedirectAuthenticationLoginSuccessHandler"/>
-        <property name="usernameParameter" value="user"/>
+        <property name="usernameParameter" value="email"/>
         <property name="passwordParameter" value="password"/>
         <property name="postOnly" value="false"/>
         <!--Match on any request-->
