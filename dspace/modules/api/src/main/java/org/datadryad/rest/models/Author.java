@@ -2,6 +2,8 @@
  */
 package org.datadryad.rest.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -15,6 +17,7 @@ import java.util.regex.Pattern;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Author {
     private String familyName;
     private String givenNames;
@@ -81,6 +84,7 @@ public class Author {
         this.givenNames = StringEscapeUtils.escapeHtml(givenNames);
     }
 
+    @JsonIgnore
     public final String getUnicodeFullName() {
         String name = getUnicodeFamilyName();
         if (!"".equals(getUnicodeGivenNames())) {
@@ -89,14 +93,21 @@ public class Author {
         return name;
     }
 
+    @JsonIgnore
     public String getUnicodeFamilyName() {
         return StringEscapeUtils.unescapeHtml(familyName);
     }
 
+    @JsonIgnore
     public String getUnicodeGivenNames() {
         return StringEscapeUtils.unescapeHtml(givenNames);
     }
 
+    public String getFullName() {
+        return getUnicodeFullName();
+    }
+
+    @JsonIgnore
     public final String getHTMLFullName() {
         String name = getHTMLFamilyName();
         if (!"".equals(getHTMLGivenNames())) {
@@ -105,10 +116,12 @@ public class Author {
         return name;
     }
 
+    @JsonIgnore
     public String getHTMLFamilyName() {
         return StringEscapeUtils.unescapeHtml(familyName);
     }
 
+    @JsonIgnore
     public String getHTMLGivenNames() {
         return StringEscapeUtils.unescapeHtml(givenNames);
     }
@@ -117,14 +130,17 @@ public class Author {
         this.identifier = identifier;
     }
 
+    @JsonIgnore
     public String getNormalizedFamilyName() {
         return Normalizer.normalize(getUnicodeFamilyName(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
 
+    @JsonIgnore
     public String getNormalizedGivenNames() {
         return Normalizer.normalize(getUnicodeGivenNames(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
 
+    @JsonIgnore
     public String getNormalizedFullName() {
         return Normalizer.normalize(getUnicodeFullName(), Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
