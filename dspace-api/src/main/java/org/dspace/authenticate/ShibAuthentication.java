@@ -298,9 +298,14 @@ public class ShibAuthentication implements AuthenticationMethod
 			}
 
 			// Get the Shib supplied affiliation or use the default affiliation
-                        List<String> affiliations = new ArrayList<String>();
-                        if (context.getCurrentUser().getMetadata(roleHeader) != null) {
-				affiliations.add(context.getCurrentUser().getMetadata(roleHeader));
+			List<String> affiliations = findMultipleAttributes(request, roleHeader);
+                        // Use EPerson Metadata as a fallback
+                        String metadataRoleAttribute = ConfigurationManager.getProperty("authentication-shibboleth","metadataRoleAttribute");
+                        if ( metadataRoleAttribute != null && (affiliations == null || (affiliations != null && affiliations.isEmpty())) ) {
+                                affiliations = new ArrayList<String>();
+                                if (context.getCurrentUser().getMetadata(metadataRoleAttribute) != null) {
+                                        affiliations.add(context.getCurrentUser().getMetadata(metadataRoleAttribute));
+                                }
                         }
 			if (affiliations == null) {
 				if (defaultRoles != null)
@@ -328,8 +333,6 @@ public class ShibAuthentication implements AuthenticationMethod
 							affiliation = affiliation.substring(index+1, affiliation.length());
 						}
 					} 
-                                        // Replace spaces with underscores
-					affiliation = affiliation.replace(" ", "_");
 
 					// Get the group names
 					String groupNames = ConfigurationManager.getProperty("authentication-shibboleth","role." + affiliation);
