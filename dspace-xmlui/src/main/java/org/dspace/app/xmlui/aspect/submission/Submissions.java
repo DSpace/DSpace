@@ -110,11 +110,12 @@ public class Submissions extends AbstractDSpaceTransformer
     protected SupervisedItemService supervisedItemService = ContentServiceFactory.getInstance().getSupervisedItemService();
 
     @Override
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-	WingException, UIException, SQLException, IOException,
-	AuthorizeException
-	{
-            pageMeta.addMetadata("title").addContent(T_title);
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        pageMeta.addMetadata("title").addContent(T_title);
+        pageMeta.addMetadata("javascript", "static").addContent("static/js/workflow-multiSelect.js");
 
             pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
             pageMeta.addTrailLink(null,T_trail);
