@@ -1,6 +1,7 @@
 package org.datadryad.publication;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.*;
 import org.dspace.content.*;
@@ -25,10 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.*;
 import java.lang.RuntimeException;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 /**
  * Updates items' associated publication metadata with the latest metadata from either journal-provided metadata or from CrossRef.
@@ -62,24 +65,63 @@ public class PublicationUpdater extends HttpServlet {
                          HttpServletResponse aResponse) throws ServletException, IOException {
         String requestURI = aRequest.getRequestURI();
         if (requestURI.contains("retrieve")) {
-            LOGGER.info("manually checking publications");
             String queryString = aRequest.getQueryString();
+            LOGGER.info("Automatic Publication Updater running with query " + queryString);
             if (queryString != null) {
-                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(queryString);
-                if (journalConcept == null) {
-                    journalConcept = JournalUtils.getJournalConceptByISSN(queryString);
+                List<NameValuePair> queryParams = null;
+                try {
+                    queryParams = URLEncodedUtils.parse(queryString, Charset.defaultCharset());
+                } catch (Exception e) {
+                    aResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "could not parse query string");
                 }
-                if (journalConcept != null) {
-                    checkSinglePublication(journalConcept);
+                if (isAuthorized(queryParams)) {
+                    String issn = getISSN(queryParams);
+                    if (issn != null) {
+                        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(issn);
+                        if (journalConcept == null) {
+                            journalConcept = JournalUtils.getJournalConceptByISSN(issn);
+                        }
+                        if (journalConcept != null) {
+                            checkSinglePublication(journalConcept);
+                        } else {
+                            aResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "no journal concept found by the identifier " + issn);
+                        }
+                    } else {
+                        checkPublications();
+                    }
                 } else {
-                    aResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "no journal concept found by the identifier " + queryString);
+                    aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "no or incorrect authorization token provided");
                 }
-            } else {
-                checkPublications();
             }
+            LOGGER.info("Automatic Publication Updater finished");
         } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "parameter not available for GET");
         }
+    }
+
+    private boolean isAuthorized(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("auth")) {
+                String token = ConfigurationManager.getProperty("publication.updater.token");
+                if (token != null && param.getValue() != null) {
+                    if (token.equals(param.getValue())) {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String getISSN(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("issn")) {
+                return param.getValue();
+            }
+        }
+        return null;
     }
 
     private void checkPublications() {
