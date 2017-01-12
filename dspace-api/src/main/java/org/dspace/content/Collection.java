@@ -13,13 +13,13 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.*;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Class representing a collection.
@@ -88,7 +88,8 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
             joinColumns = {@JoinColumn(name = "collection_id") },
             inverseJoinColumns = {@JoinColumn(name = "community_id") }
     )
-    private final List<Community> communities = new ArrayList<>();
+    @Sort(type = SortType.COMPARATOR, comparator = NameAscendingComparator.class)
+    private Set<Community> communities = new TreeSet<>(new NameAscendingComparator());
 
     @Transient
     private transient CollectionService collectionService;
@@ -268,8 +269,8 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      */
     public List<Community> getCommunities() throws SQLException
     {
-        Collections.sort(communities, new NameAscendingComparator());
-        return communities;
+        // We return a copy because we do not want people to add elements to this collection directly.
+        return Arrays.asList(communities.toArray(new Community[]{}));
     }
 
     void addCommunity(Community community) {
