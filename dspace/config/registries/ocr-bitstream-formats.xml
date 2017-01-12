@@ -16,7 +16,7 @@
 
   <!-- Used by system: do not remove -->
   <bitstream-type>
-    <mimetype>text/xml</mimetype>
+    <mimetype>text/vnd.hocr+xml</mimetype>
     <short_description>hOCR</short_description>
     <description>hOCR is an open standard of data representation for
 		formatted text obtained from optical character recognition (OCR). The
@@ -31,7 +31,7 @@
 
   <!-- Used by system: do not remove -->
   <bitstream-type>
-    <mimetype>text/xml</mimetype>
+    <mimetype>application/vnd.dspace-pdfTextExtracted+xml</mimetype>
     <short_description>PDFTextLocation</short_description>
 	<description>This is an internal XML format used to collect detailed
 		information about text location in a PDF page
