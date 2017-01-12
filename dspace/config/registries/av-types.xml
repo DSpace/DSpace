@@ -1,0 +1,80 @@
+<dspace-dc-types>
+
+	<dspace-header>
+		<title>Audio Video Streaming Plugin</title>
+		<contributor.author>Andrea Bollini</contributor.author>
+		<contributor.author>Luigi Andrea Pascarelli</contributor.author>
+		<contributor.author>Riccardo Fazio</contributor.author>
+	</dspace-header>
+
+
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>dashbundle</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>streamurl</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>height</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>width</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>duration</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>format</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>codec</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>fps</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>audioformat</qualifier>
+		<scope_note></scope_note>
+	</dc-type>
+	
+	<dc-type>
+		<schema>bitstream</schema>
+		<element>video</element>
+		<qualifier>audiocodec</qualifier>
+		<scope_note></scope_note>
+	</dc-type>	
+</dspace-dc-types>
