@@ -750,8 +750,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         while (owningCommunities.hasNext())
         {
             Community owningCommunity = owningCommunities.next();
-            owningCommunities.remove();
-            owningCommunity.getCollections().remove(collection);
+            collection.removeCommunity(owningCommunity);
+            owningCommunity.removeCollection(collection);
         }
 
         collectionDAO.delete(context, collection);
