@@ -47,6 +47,7 @@
 		<annoiiif.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</annoiiif.addon.modules>
 		<ocr.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</ocr.addon.modules>
 		<docviewer.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</docviewer.addon.modules>		
+		<av.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</av.addon.modules>
 		
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.7</java.version>
@@ -828,7 +829,30 @@
 			        </dependency>			        
 		        </dependencies>		                    
             </dependencyManagement>
-        </profile>                        
+        </profile>
+        
+        <profile>
+            <id>addon-av-streaming</id>
+			<activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>            
+            <dependencyManagement>
+            	<dependencies>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-video-api</artifactId>
+						 <version>${av.addon.modules}</version>
+						 <type>jar</type>
+			        </dependency>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-video-jspui</artifactId>
+						 <version>${av.addon.modules}</version>
+						 <type>war</type>
+			        </dependency>			        
+		        </dependencies>		                    
+            </dependencyManagement>
+        </profile>                                
       <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.

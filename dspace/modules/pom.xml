@@ -240,6 +240,29 @@
 					<type>jar</type>
 				</dependency>
 			</dependencies>
-		</profile>                
+		</profile>
+		
+		<profile>
+			<id>addon-av-streaming</id>
+            <activation>
+                <property>
+                    <name>audiovideo.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-video-api</artifactId>
+					<version>${av.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-video-jspui</artifactId>
+					<version>${av.addon.modules}</version>
+					<type>war</type>
+				</dependency>
+			</dependencies>
+		</profile>		                
     </profiles>
 </project>
