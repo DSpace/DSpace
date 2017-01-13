@@ -43,7 +43,6 @@
     <!-- authorLookup and its dependencies -->
     <script src="vendor/datatables/media/js/jquery.dataTables.js">&#160;</script>
     <script src="scripts/person-lookup.js">&#160;</script>
-    <script src="scripts/workflow-multiSelect.js">&#160;</script>
 
     <!-- endbuild -->
 
