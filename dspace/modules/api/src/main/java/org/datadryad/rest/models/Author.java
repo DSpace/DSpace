@@ -107,6 +107,15 @@ public class Author {
         return getUnicodeFullName();
     }
 
+    public String getFamilyName() {
+        return getUnicodeFamilyName();
+    }
+
+    public String getGivenNames() {
+        return getUnicodeGivenNames();
+    }
+
+
     @JsonIgnore
     public final String getHTMLFullName() {
         String name = getHTMLFamilyName();
