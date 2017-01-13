@@ -145,17 +145,14 @@ public final class ResultsPruner
                 throw new IllegalStateException("Problem parsing duration: "
                         + e.getMessage(), e);
             }
-            ChecksumResultCode code = ChecksumResultCode.valueOf(resultCode);
-            if(code == null)
-            {
-                throw new IllegalStateException("Checksum result code not found: " + resultCode);
-            }
-            if ("default".equals(resultCode))
-            {
+            if ("default".equals(resultCode)) {
                 rp.setDefaultDuration(duration);
-            }
-            else
-            {
+            } else {
+                ChecksumResultCode code = ChecksumResultCode.valueOf(resultCode);
+                if (code == null) {
+                    throw new IllegalStateException("Checksum result code not found: " + resultCode);
+                }
+
                 rp.addInterested(code, duration);
             }
         }
