@@ -58,7 +58,7 @@
 
 			<!-- ********** Version ********** -->
 			<xsl:variable name="version">
-				<xsl:call-template name="version-number"><xsl:with-param name="working" select="dspace:field[@element='identifier'][@mdschema='dc']"/></xsl:call-template>
+				<xsl:call-template name="find-version"><xsl:with-param name="working" select="dspace:field[@element='identifier'][@mdschema='dc']"/></xsl:call-template>
 			</xsl:variable>
 			<version>
 				<xsl:value-of select="$version"/>
@@ -292,6 +292,29 @@
 				</descriptions>
 			</xsl:if>
         </resource>
+	</xsl:template>
+	<xsl:template name="find-version">
+		<xsl:param name="working"/>
+		<xsl:variable name="suffix">
+			<xsl:choose>
+				<xsl:when test="contains($working, 'DRYAD')">
+					<xsl:value-of select="substring-after($working, 'DRYAD.')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="substring-after($working, 'dryad.')"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="contains($suffix, '.')">
+				<xsl:call-template name="version-number">
+					<xsl:with-param name="working" select="$suffix"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>1</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="version-number">
