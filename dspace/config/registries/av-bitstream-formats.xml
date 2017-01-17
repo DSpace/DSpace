@@ -1,27 +1,133 @@
 <?xml version="1.0"?>
 
-<!--
-  - av-bitstream-formats.xml
-  -
-  - Version:  $Revision$
-  -
-  - Date:     $Date$
-  -
-  - Additional bitstream format used by the Audio Video integration
-  -
-  -->
+<!-- - av-bitstream-formats.xml - - Version: $Revision$ - - Date: $Date$ 
+	- - Additional bitstream format used by the Audio Video integration - -->
 
 
 <dspace-bitstream-types>
 
-  <!-- Used by system: do not remove -->
-  <bitstream-type>
-    <mimetype>video/avi</mimetype>
-    <short_description>AVI</short_description>
-    <description></description>
-    <support_level>1</support_level>
-    <internal>true</internal>
-    <extension>avi</extension>
-  </bitstream-type>
+	<!-- Used by system: do not remove -->
+	<bitstream-type>
+		<mimetype>video/avi</mimetype>
+		<short_description>AVI</short_description>
+		<description>Audio Video Interleaved</description>
+		<support_level>1</support_level>
+		<extension>avi</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>video/mp4</mimetype>
+		<short_description>MP4</short_description>
+		<description>Moving Picture Expert Group</description>
+		<support_level>1</support_level>
+		<extension>mp4</extension>
+		<extension>m4v</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>video/x-divx</mimetype>
+		<short_description>DIVX</short_description>
+		<description></description>
+		<support_level>1</support_level>
+		<extension>divx</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>video/webm</mimetype>
+		<short_description>WEBM</short_description>
+		<description>WebM Project</description>
+		<support_level>1</support_level>
+		<extension>webm</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>video/x-flv</mimetype>
+		<short_description>FLV</short_description>
+		<description>Flash Live Video</description>
+		<support_level>1</support_level>
+		<extension>flv</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>video/3gpp</mimetype>
+		<short_description>3GP</short_description>
+		<description>3GP Mobile</description>
+		<support_level>1</support_level>
+		<extension>3gp</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>video/x-xvid</mimetype>
+		<short_description>XVID</short_description>
+		<description></description>
+		<support_level>1</support_level>
+		<extension>xvid</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>video/x-matroska</mimetype>
+		<short_description>MKV</short_description>
+		<description></description>
+		<support_level>1</support_level>
+		<extension>mkv</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>audio/aac</mimetype>
+		<short_description>AAC</short_description>
+		<description>Advanced Audio Coding</description>
+		<support_level>1</support_level>
+		<extension>aac</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>audio/ac3</mimetype>
+		<short_description>AC3</short_description>
+		<description>Dolby Digital audio file</description>
+		<support_level>1</support_level>
+		<extension>ac3</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>audio/flac</mimetype>
+		<short_description>FLAC</short_description>
+		<description></description>
+		<support_level>1</support_level>
+		<extension>flac</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>audio/mp4</mimetype>
+		<short_description>M4A</short_description>
+		<description></description>
+		<support_level>1</support_level>
+		<extension>mp4</extension>
+		<extension>m4a</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>audio/mpeg</mimetype>
+		<short_description>MP3</short_description>
+		<description>MPEG Audio</description>
+		<support_level>1</support_level>
+		<extension>mp3</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>audio/ogg</mimetype>
+		<short_description>OGG</short_description>
+		<description></description>
+		<support_level>1</support_level>
+		<extension>oga</extension>
+		<extension>ogg</extension>
+	</bitstream-type>
+
+	<bitstream-type>
+		<mimetype>audio/x-ms-wma</mimetype>
+		<short_description>WMA</short_description>
+		<description>Windows Media Audio</description>
+		<support_level>1</support_level>
+		<extension>wma</extension>
+	</bitstream-type>
 
 </dspace-bitstream-types>
