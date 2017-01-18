@@ -69,7 +69,7 @@ public class ShoppingCartConsumer implements Consumer {
             {
                Double oldPrice = shoppingCart.getTotal();
                //recaculate based on the current rate
-               Double newPrice = paymentSystemService.calculateShoppingCartTotal(ctx,shoppingCart,journal[0].value);
+               Double newPrice = paymentSystemService.calculateShoppingCartTotal(ctx,shoppingCart);
 
                Double oversized = paymentSystemService.getSurchargeLargeFileFee(ctx,shoppingCart);
 

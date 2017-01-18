@@ -224,7 +224,7 @@ public class DatabaseManager
             retTRI.setStatement(statement);
             return retTRI;
         } catch (SQLException sqle) {
-            log.error("problem running query: " + query, sqle);
+            log.error("problem running query for connection " + context.getDBConnection().hashCode() +": " + query, sqle);
             if (statement != null) {
                 try {
                     statement.close();
@@ -583,7 +583,7 @@ public class DatabaseManager
         }
         catch (SQLException e)
         {
-            log.error("unable to close connection", e);
+            log.error("unable to close connection " + c.hashCode(), e);
         }
     }
 

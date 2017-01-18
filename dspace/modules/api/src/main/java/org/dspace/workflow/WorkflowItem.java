@@ -1,7 +1,9 @@
 package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Author;
+import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -270,7 +272,8 @@ public class WorkflowItem implements InProgressSubmission {
     }
 
     public static List<WorkflowItem> findAllByManuscript(Context context, Manuscript manuscript) throws ApproveRejectReviewItemException {
-        String journalCode = manuscript.getJournalConcept().getJournalID();
+        DryadJournalConcept journalConcept = manuscript.getJournalConcept();
+        String journalCode = journalConcept.getJournalID();
         WorkflowItem[] workflowItems = null;
         ArrayList<WorkflowItem> matchingItems = new ArrayList<WorkflowItem>();
 
@@ -283,9 +286,14 @@ public class WorkflowItem implements InProgressSubmission {
                 // check to see if this matches by msid:
                 DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
                 for (int j=0; j<msids.length; j++) {
-                    if (manuscript.getManuscriptId().equals(msids[j].value)) {
-                        log.debug("matched " + item.getID() + " by msid");
-                        matched = true;
+                    try {
+                        String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msids[j].value, journalConcept);
+                        if (manuscript.getManuscriptId().equals(canonicalMSID)) {
+                            log.debug("matched " + item.getID() + " by msid");
+                            matched = true;
+                        }
+                    } catch (Exception e) {
+                        log.error("couldn't parse msid " + msids[j].value);
                     }
 
                     // TEMPORARY FIX: manuscript numbers from metadata files had the JournalCode prefixed onto the manuscript number as well.
@@ -303,9 +311,9 @@ public class WorkflowItem implements InProgressSubmission {
                         int numMatched = 0;
                         for (int j = 0; j < itemAuthors.length; j++) {
                             for (Author a : manuscript.getAuthorList()) {
-                                double score = JournalUtils.getHamrScore(itemAuthors[j].value, a.fullName());
+                                double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value), a.getNormalizedFullName());
                                 if (score > 0.7) {
-                                    log.debug("author " + itemAuthors[j].value + " matched " + a.fullName() + " with a score of " + score);
+                                    log.debug("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score);
                                     numMatched++;
                                     break;
                                 }

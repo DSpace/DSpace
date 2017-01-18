@@ -15,7 +15,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -39,6 +38,7 @@ import java.util.List;
 public class Concept extends AuthorityObject
 {
     public static String TABLE = "concept";
+    private static String CONCEPT_METADATA_TABLE = "conceptmetadatavalue";
 
     public enum Status {
         CANDIDATE,
@@ -419,6 +419,30 @@ public class Concept extends AuthorityObject
             throws SQLException
     {
         return search(context, query, -1, -1,null);
+    }
+
+    public static Concept[] searchByMetadata(Context context, String metadatafield, String metadataValue) {
+        ArrayList<Concept> conceptArrayList = new ArrayList<Concept>();
+        // find the metadata field id from the registry:
+        try {
+            MetadataField mdf = MetadataField.findByElement(context, metadatafield);
+            TableRowIterator tri = DatabaseManager.queryTable(context, CONCEPT_METADATA_TABLE, "SELECT * FROM " + CONCEPT_METADATA_TABLE + " where field_id = ?", mdf.getFieldID());
+            while (tri.hasNext()) {
+                TableRow row = tri.next();
+                if (metadataValue.equals(row.getStringColumn("text_value"))) {
+                    int conceptID = row.getIntColumn("parent_id");
+                    Concept concept = find(context, conceptID);
+                    if (concept != null) {
+                        conceptArrayList.add(concept);
+                    }
+                }
+            }
+            tri.close();
+        } catch (SQLException e) {
+            log.error("couldn't find metadata field " + metadatafield);
+        }
+
+        return conceptArrayList.toArray(new Concept[conceptArrayList.size()]);
     }
 
     /**
@@ -821,7 +845,7 @@ public class Concept extends AuthorityObject
 
     @Override
     public String getMetadataTable() {
-        return "ConceptMetadataValue";
+        return CONCEPT_METADATA_TABLE;
     }
 
     public Term[] getPreferredTerms() throws SQLException {

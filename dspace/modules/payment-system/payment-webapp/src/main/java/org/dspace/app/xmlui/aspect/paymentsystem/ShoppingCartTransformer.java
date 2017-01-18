@@ -12,37 +12,21 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.app.xmlui.aspect.submission.FlowUtils;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 
 import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.*;
-import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
@@ -114,7 +98,7 @@ public class ShoppingCartTransformer extends AbstractDSpaceTransformer {
             ShoppingCart shoppingCart = null;
             //create new transaction or update transaction id with item
             shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
-            paymentSystemService.updateTotal(context,shoppingCart,null);
+            paymentSystemService.updateTotal(context,shoppingCart);
 
             //add the order summary form (wrapped in div.ds-option-set for proper sidebar style)
 

@@ -1,6 +1,7 @@
 package org.datadryad.publication;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.NameValuePair;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.*;
 import org.dspace.content.*;
@@ -25,10 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.*;
 import java.lang.RuntimeException;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import org.apache.http.client.utils.URLEncodedUtils;
 
 /**
  * Updates items' associated publication metadata with the latest metadata from either journal-provided metadata or from CrossRef.
@@ -62,24 +65,63 @@ public class PublicationUpdater extends HttpServlet {
                          HttpServletResponse aResponse) throws ServletException, IOException {
         String requestURI = aRequest.getRequestURI();
         if (requestURI.contains("retrieve")) {
-            LOGGER.info("manually checking publications");
             String queryString = aRequest.getQueryString();
+            LOGGER.info("Automatic Publication Updater running with query " + queryString);
             if (queryString != null) {
-                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(queryString);
-                if (journalConcept == null) {
-                    journalConcept = JournalUtils.getJournalConceptByISSN(queryString);
+                List<NameValuePair> queryParams = null;
+                try {
+                    queryParams = URLEncodedUtils.parse(queryString, Charset.defaultCharset());
+                } catch (Exception e) {
+                    aResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "could not parse query string");
                 }
-                if (journalConcept != null) {
-                    checkSinglePublication(journalConcept);
+                if (isAuthorized(queryParams)) {
+                    String issn = getISSN(queryParams);
+                    if (issn != null) {
+                        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(issn);
+                        if (journalConcept == null) {
+                            journalConcept = JournalUtils.getJournalConceptByISSN(issn);
+                        }
+                        if (journalConcept != null) {
+                            checkSinglePublication(journalConcept);
+                        } else {
+                            aResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "no journal concept found by the identifier " + issn);
+                        }
+                    } else {
+                        checkPublications();
+                    }
                 } else {
-                    aResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "no journal concept found by the identifier " + queryString);
+                    aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "no or incorrect authorization token provided");
                 }
-            } else {
-                checkPublications();
             }
+            LOGGER.info("Automatic Publication Updater finished");
         } else {
             aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "parameter not available for GET");
         }
+    }
+
+    private boolean isAuthorized(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("auth")) {
+                String token = ConfigurationManager.getProperty("publication.updater.token");
+                if (token != null && param.getValue() != null) {
+                    if (token.equals(param.getValue())) {
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String getISSN(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("issn")) {
+                return param.getValue();
+            }
+        }
+        return null;
     }
 
     private void checkPublications() {
@@ -223,12 +265,10 @@ public class PublicationUpdater extends HttpServlet {
             if (matchedManuscript != null) {
                 // update the item's metadata
                 String score = matchedManuscript.optionalProperties.get("crossref-score");
-                message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                updateItemMetadataFromManuscript(item, matchedManuscript, context, message);
-            }
-
-            if (!"".equals(message)) {
-                updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
+                    message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
+                    updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                }
             }
         }
 
@@ -250,27 +290,43 @@ public class PublicationUpdater extends HttpServlet {
             return items;
         }
 
-        // Query for packages in archive (owning_collection = 2) that don't have a metadatavalue for publication doi (dc.relation.isreferencedby)
-        MetadataField pubDoiField = null;
+        // Find metadata field for citation:
+        MetadataField citationField = null;
         try {
-            pubDoiField = MetadataField.findByElement(context, PUBLICATION_DOI);
+            citationField = MetadataField.findByElement(context, FULL_CITATION);
         } catch (SQLException e) {
-            LOGGER.error("couldn't find " + PUBLICATION_DOI);
+            LOGGER.error("couldn't find " + FULL_CITATION);
             return items;
         }
-        if (pubDoiField != null) {
+
+        // The items that have incomplete citations are of the following types:
+        //   1) items without a FULL_CITATION:
+        //       a) if these match to a reference, we will set CITATION_IN_PROGRESS to TRUE and add a citation
+        //       b) if these don't match, leave them alone
+        //   2) items with a FULL_CITATION && CITATION_IN_PROGRESS exists && CITATION_IN_PROGRESS == TRUE
+        //       a) if these match to a reference, we will set CITATION_IN_PROGRESS to TRUE and update the citation
+        //       b) if these don't match, leave them alone
+        //   3) items with a FULL_CITATION && no CITATION_IN_PROGRESS: these are done
+        //   4) items with a FULL CITATION && CITATION_IN_PROGRESS == FALSE: these are done
+
+        // Look for items without a full citation
+        if (citationField != null) {
             try {
-                String query = "SELECT item_id FROM item WHERE in_archive = 't' AND owning_collection = 2 AND NOT EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND metadatavalue.item_id = item.item_id) AND EXISTS (SELECT * from metadatavalue where metadata_field_id = ? and text_value = ? AND metadatavalue.item_id = item.item_id)";
-                TableRowIterator noPubDOIRows = DatabaseManager.query(context, query, pubDoiField.getFieldID(), pubNameField.getFieldID(), dryadJournalConcept.getFullName());
+                String query = "SELECT item_id FROM item WHERE in_archive = 't' AND owning_collection = 2 AND EXISTS (SELECT * from metadatavalue where metadata_field_id = ? and text_value = ? AND metadatavalue.item_id = item.item_id) " +
+                        "AND NOT EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND metadatavalue.item_id = item.item_id)";
+                TableRowIterator noPubDOIRows = DatabaseManager.query(context, query, pubNameField.getFieldID(), dryadJournalConcept.getFullName(), citationField.getFieldID());
                 if (noPubDOIRows != null) {
                     rows.addAll(noPubDOIRows.toList());
                 }
             } catch (SQLException e) {
-                LOGGER.error("couldn't find items without pub DOIs");
-                return items;
+                LOGGER.error("couldn't find items without citations");
             }
+        } else {
+            LOGGER.error("no metadata field for FULL_CITATION");
+            return items;
         }
 
+        // Add these items to the incomplete list
         try {
             for (TableRow row : rows) {
                 int itemID = row.getIntColumn("item_id");
@@ -281,7 +337,7 @@ public class PublicationUpdater extends HttpServlet {
             LOGGER.error("couldn't find item");
         }
 
-        // Query for packages in archive (owning_collection = 2) that have citations in progress (dryad.citationInProgress exists)
+        // Look for items with a FULL_CITATION && CITATION_IN_PROGRESS exists && CITATION_IN_PROGRESS == TRUE
         MetadataField citationInProgressField = null;
         try {
             citationInProgressField = MetadataField.findByElement(context, CITATION_IN_PROGRESS);
@@ -290,8 +346,13 @@ public class PublicationUpdater extends HttpServlet {
         }
         if (citationInProgressField != null) {
             try {
-                String query = "SELECT item_id FROM item WHERE in_archive = 't' AND owning_collection = 2 AND EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND metadatavalue.item_id = item.item_id) AND EXISTS (SELECT * from metadatavalue where metadata_field_id = ? and text_value = ? AND metadatavalue.item_id = item.item_id)";
-                TableRowIterator inProgressRows = DatabaseManager.query(context, query, citationInProgressField.getFieldID(), pubNameField.getFieldID(), dryadJournalConcept.getFullName());
+                String query = "SELECT item_id FROM item WHERE in_archive = 't' AND owning_collection = 2 AND EXISTS (SELECT * from metadatavalue where metadata_field_id = ? and text_value = ? AND metadatavalue.item_id = item.item_id) " +
+                        "AND EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND metadatavalue.item_id = item.item_id) " +  // has a FULL_CITATION
+                        "AND EXISTS (SELECT * FROM metadatavalue WHERE metadata_field_id = ? AND text_value like '%rue' AND metadatavalue.item_id = item.item_id)";  // has a TRUE CITATION_IN_PROGRESS field
+                TableRowIterator inProgressRows = DatabaseManager.query(context, query, pubNameField.getFieldID(), dryadJournalConcept.getFullName(),
+                        citationField.getFieldID(),
+                        citationInProgressField.getFieldID()
+                );
                 if (inProgressRows != null) {
                     rows.addAll(inProgressRows.toList());
                 }
@@ -443,7 +504,7 @@ public class PublicationUpdater extends HttpServlet {
         }
 
         LOGGER.debug("scheduling publication checker");
-        myPublicationUpdaterTimer = new Timer();
+//        myPublicationUpdaterTimer = new Timer();
         // schedule harvesting to the number of days set in the configuration:
         // timers are set in units of milliseconds.
 //        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("publication.updater.timer"));

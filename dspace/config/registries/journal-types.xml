@@ -2,6 +2,9 @@
 
 <dspace-dc-types>
 
+<!-- The Journal schema reflects metadata specific to DryadJournalConcepts.
+Metadata that applies to journals may also be found in the Organization schema.-->
+
     <dc-schema>
         <name>journal</name>
         <namespace>http://purl.org/dspace/models/journal</namespace>
@@ -11,10 +14,6 @@
     <dc-type>
         <schema>journal</schema>
         <element>journalID</element>
-    </dc-type>
-    <dc-type>
-        <schema>journal</schema>
-        <element>fullname</element>
     </dc-type>
 
     <dc-type>
@@ -66,24 +65,10 @@
         <schema>journal</schema>
         <element>notifyWeekly</element>
     </dc-type>
-    <dc-type>
-        <schema>journal</schema>
-        <element>paymentPlanType</element>
-    </dc-type>
-
-    <dc-type>
-        <schema>journal</schema>
-        <element>customerID</element>
-    </dc-type>
 
     <dc-type>
         <schema>journal</schema>
         <element>canonicalManuscriptNumberPattern</element>
-    </dc-type>
-
-    <dc-type>
-        <schema>journal</schema>
-        <element>description</element>
     </dc-type>
 
     <dc-type>
@@ -99,11 +84,6 @@
     <dc-type>
         <schema>journal</schema>
         <element>hasJournalPage</element>
-    </dc-type>
-
-    <dc-type>
-        <schema>journal</schema>
-        <element>website</element>
     </dc-type>
 
     <dc-type>

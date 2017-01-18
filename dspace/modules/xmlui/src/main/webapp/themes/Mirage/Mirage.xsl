@@ -375,19 +375,21 @@
             <!-- START MAILING LIST-->
             <div class="home-col-2">
                 <h1 class="ds-div-head">Mailing list</h1>
-                <div id="file_news_div_mailing_list" class="ds-static-div primary" style="height: 100px; overflow: hidden;">
-                    <form xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
-                          id="aspect_discovery_SiteViewer_div_front-page-file_news_div_mailing_list"
-                          class="ds-interactive-div primary" action="/subscribe"
-                          style="margin-bottom: 0px;"
-                          onsubmit="return subscribeMailingList(this);">
-                        <p class="ds-paragraph" style="text-align: left; margin-bottom: 2px;">
-                            <xsl:text>Sign up for announcements.</xsl:text>
-                            <label for="file_news_div_mailing_list_input_email" class="accessibly-hidden">Your email address</label>
-                            <input placeholder="Your e-mail" title="Your e-mail" type="text" name="email" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email" />
-                        </p>
+                <div id="file_news_div_mailing_list" class="ds-static-div primary" style="height: 100px;">
+                    <!--This form is modified from the iContact sign-up form for Announcements -->
+                    <form id="ic_signupform" method="POST" action="https://app.icontact.com/icp/core/mycontacts/signup/designer/form/?id=96&amp;cid=1548100&amp;lid=23049">
+                        <p style="margin-bottom: 0px;">Sign up for announcements:</p>
+                        <div class="formEl fieldtype-input required" data-validation-type="1" data-label="Email" style="display: inline-block; width: 100%;">
+                            <input type="text" placeholder="Your e-mail" title="Your e-mail" name="data[email]" class="ds-text-field" style="width: 240px; margin-top: 8px;" id="file_news_div_mailing_list_input_email"/>
+                        </div>
+                        <div class="formEl fieldtype-checkbox required" dataname="listGroups" data-validation-type="1" data-label="Lists" style="display: none;">
+                            <label class="checkbox"><input type="checkbox" alt="" name="data[listGroups][]" value="42588" checked="checked"/>
+                                Dryad-announce
+                            </label>
+                        </div>
                         <input value="Subscribe" type="submit" name="submit" class="ds-button-field" id="file_news_div_mailing_list_input_subscribe" />
                     </form>
+                    <img src="//app.icontact.com/icp/core/signup/tracking.gif?id=96&amp;cid=1548100&amp;lid=23049"/>
                 </div>
             </div>
 
@@ -396,14 +398,17 @@
                 <h1 class="ds-div-head">Recently integrated journals</h1>
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
-                        <!-- ERJ Open Research -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aerj%5C+open%5C+research%5C%7C%5C%7C%5C%7CERJ%5C+Open%5C+Research"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJOR.png" alt="ERJ Open Research" /></a>
-                        <!-- European Respiratory Journal -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aeuropean%5C+respiratory%5C+journal%5C%7C%5C%7C%5C%7CEuropean%5C+Respiratory%5C+Journal"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ERJ.png" alt="European Respiratory Journal" /></a>
-                        <!-- Applications in Plant Sciences -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aapplications%5C+in%5C+plant%5C+sciences%5C%7C%5C%7C%5C%7CApplications%5C+in%5C+Plant%5C+Sciences"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-APPS.png" alt="Applications in Plant Sciences" /></a>
-                        <!-- Journal of Systematics and Evolution -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+systematics%5C+and%5C+evolution%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Systematics%5C+and%5C+Evolution"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JSE_Cover.png" alt="Journal of Systematics and Evolution" /></a>
+                        <!-- Annals of the Entomological Society of America -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aannals%5C+of%5C+the%5C+entomological%5C+society%5C+of%5C+america%5C%7C%5C%7C%5C%7CAnnals%5C+of%5C+the%5C+Entomological%5C+Society%5C+of%5C+America"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-AESAME.png" alt="Annals of the Entomological Society of America" /></a>
+
+                        <!-- Environmental Entomology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aenvironmental%5C+entomology%5C%7C%5C%7C%5C%7CEnvironmental%5C+Entomology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ENVENT.png" alt="Environmental Entomology" /></a>
+
+                        <!-- Journal of Economic Entomology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+economic%5C+entomology%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Economic%5C+Entomology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JEENTO.png" alt="Journal of Economic Entomology" /></a>
+
+                        <!-- Journal of Insect Science -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+insect%5C+science%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Insect%5C+Science"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JISESA.png" alt="Journal of Insect Science" /></a>
 
                     </div>
                 </div>

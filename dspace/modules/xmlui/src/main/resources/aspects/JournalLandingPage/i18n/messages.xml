@@ -19,15 +19,16 @@
     <message key="xmlui.JournalLandingPage.JournalStats.panel_head">Most recent deposits</message>
     <message key="xmlui.JournalLandingPage.JournalStats.date">Released date</message>
     <message key="xmlui.JournalLandingPage.JournalStats.rec_pub">Recently published</message>
+    <message key="xmlui.JournalLandingPage.JournalStats.rec_pub_desc">Data package</message>
     <message key="xmlui.JournalLandingPage.JournalStats.panel_head">Browse for data</message>
     <message key="xmlui.JournalLandingPage.JournalStats.empty"></message>
     <message key="xmlui.JournalLandingPage.JournalStats.val_head">Downloads</message>
 
-    <message key="xmlui.JournalLandingPage.JournalSearch.panel_head">Search data in Dryad associated with {0}</message>
+    <message key="xmlui.JournalLandingPage.JournalSearch.panel_head">Find data in Dryad associated with {0}</message>
 
     <message key="xmlui.JournalLandingPage.Banner.mem">Member</message>
     <message key="xmlui.JournalLandingPage.Banner.spo">Sponsorship</message>
-    <message key="xmlui.JournalLandingPage.Banner.int">Submission integration</message>
+    <message key="xmlui.JournalLandingPage.Banner.int">Submission integration with Dryad</message>
     <message key="xmlui.JournalLandingPage.Banner.aut">When authors submit data</message>
     <message key="xmlui.JournalLandingPage.Banner.dat">Data embargo</message>
     <message key="xmlui.JournalLandingPage.Banner.met">Metadata hidden until article publication</message>
@@ -42,8 +43,11 @@
     <message key="xmlui.JournalLandingPage.Banner.onReview">On article review</message>
 
     <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month">Popular (month)</message>
+    <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.month_desc">Most-downloaded data files in the past month</message>
     <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year">Popular (year)</message>
+    <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.year_desc">Most-downloaded data files in the past year</message>
     <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime">Popular (all-time)</message>
+    <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.alltime_desc">Most-downloaded data files associated with this journal</message>
 
     <message key="xmlui.JournalLandingPage.JournalLandingTabbedTransformer.noDataAvailable">No data available</message>
 

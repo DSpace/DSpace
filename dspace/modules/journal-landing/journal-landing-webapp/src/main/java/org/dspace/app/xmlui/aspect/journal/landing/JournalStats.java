@@ -131,7 +131,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         tb1.n = JOURNAL_STATS_DEPS;
         tb1.buttonLabel = T_btnRecPub;
         tb1.dateFilter = solrDatePastMonth;
-        tb1.refHead = T_mostRecent;
+        tb1.refHead = T_desc_RecPub;
         tb1.valHead = T_date;
         tb1.queryType = QueryType.DEPOSITS;
 
@@ -139,7 +139,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         tb2.rend = solrQueryMonth;
         tb2.buttonLabel = T_btn_month;
         tb2.dateFilter = solrDatePastMonth;
-        tb2.refHead = T_empty;
+        tb2.refHead = T_desc_month;
         tb2.valHead = T_ref_head;
         tb2.queryType = QueryType.DOWNLOADS;
         tb2.facetQueryField = facetQueryField;
@@ -148,7 +148,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         tb3.rend = solrQueryYear;
         tb3.buttonLabel = T_btn_year;
         tb3.dateFilter = solrDatePastYear;
-        tb3.refHead = T_empty;
+        tb3.refHead = T_desc_year;
         tb3.valHead = T_ref_head;
         tb3.queryType = QueryType.DOWNLOADS;
         tb3.facetQueryField = facetQueryField;
@@ -157,7 +157,7 @@ public class JournalStats extends AbstractDSpaceTransformer
         tb4.rend = solrQueryAlltime;
         tb4.buttonLabel = T_btn_alltime;
         tb4.dateFilter = solrDateAllTime;
-        tb4.refHead = T_empty;
+        tb4.refHead = T_desc_alltime;
         tb4.valHead = T_ref_head;
         tb4.queryType = QueryType.DOWNLOADS;
         tb4.facetQueryField = facetQueryField;
@@ -305,6 +305,8 @@ public class JournalStats extends AbstractDSpaceTransformer
         pageMeta.addMetadata("request","journalISSN").addContent(journalISSN);
         pageMeta.addMetadata("request","journalName").addContent(journalName);
         pageMeta.addMetadata("request","journalAbbr").addContent(journalAbbr);
+        pageMeta.addMetadata("request","journalCover").addContent(journalConcept.getCoverImage());
+        pageMeta.addMetadata("request","journalWebsite").addContent(journalConcept.getWebsite());
 
     }
 
@@ -337,7 +339,8 @@ public class JournalStats extends AbstractDSpaceTransformer
         Division wrapper = outer.addDivision(t.n, t.rend);
         Division items = wrapper.addDivision(ITEMS);
         ReferenceSet itemsContainer = items.addReferenceSet(t.n, ReferenceSet.TYPE_SUMMARY_LIST);
-        itemsContainer.setHead(t.refHead);
+        // The header is actually set in JournalDownloads.java.
+//        itemsContainer.setHead(t.refHead);
         Division vals = wrapper.addDivision(VALS);
         List valsList = vals.addList(t.n, List.TYPE_SIMPLE, t.n);
         valsList.setHead(t.valHead);

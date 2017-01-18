@@ -167,9 +167,9 @@ public class EmailParser {
         CorrespondingAuthor correspondingAuthor = manuscript.getCorrespondingAuthor();
         correspondingAuthor.author = new Author((String) dataForXML.remove(Manuscript.CORRESPONDING_AUTHOR));
         correspondingAuthor.email = parseEmailAddress((String) dataForXML.remove(Manuscript.EMAIL));
-        correspondingAuthor.author.identifier = (String) dataForXML.remove(Manuscript.CORRESPONDING_AUTHOR_ORCID);
-        if (correspondingAuthor.author.identifier != null) {
-            correspondingAuthor.author.identifierType = "ORCID";
+        correspondingAuthor.author.setIdentifier((String) dataForXML.remove(Manuscript.CORRESPONDING_AUTHOR_ORCID));
+        if (correspondingAuthor.author.getIdentifier() != null) {
+            correspondingAuthor.author.setIdentifierType("ORCID");
         }
 
         correspondingAuthor.address = new Address();

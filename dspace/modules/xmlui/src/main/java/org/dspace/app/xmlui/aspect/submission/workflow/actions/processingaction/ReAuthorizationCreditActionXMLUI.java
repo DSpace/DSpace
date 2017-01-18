@@ -21,7 +21,6 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.paymentsystem.PaymentSystemService;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.utils.DSpace;
-import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 
 import java.util.Date;
@@ -97,7 +96,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
             // if journal-based subscription is in place, transaction is paid
-            if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)&&shoppingCart.getJournalSub()) {
+            if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)&&shoppingCart.hasSubscription()) {
                 log.info("processed journal subscription for Item " + item.getHandle() + ", journal = " + shoppingCart.getJournal());
                 log.debug("tally credit for journal = "+shoppingCart.getJournal());
 

@@ -79,6 +79,24 @@
 				</subject>
 			</subjects>
 
+			<!-- ************ Funding information ************** -->
+			<xsl:if test="dspace:field[@element='fundingEntity']">
+				<contributors>
+					<xsl:for-each select="dspace:field[@element='fundingEntity']">
+						<xsl:variable name="funderName" select="substring-after(.,'@')"/>
+						<xsl:variable name="funderID" select="substring-after(./@authority, 'http://dx.doi.org/')"/>
+						<contributor contributorType="Funder">
+							<contributorName>
+								<xsl:value-of select="$funderName"/>
+							</contributorName>
+							<nameIdentifier nameIdentifierScheme="FundRef">
+								<xsl:value-of select="$funderID"/>
+							</nameIdentifier>
+						</contributor>
+					</xsl:for-each>
+				</contributors>
+			</xsl:if>
+
 			<!-- ************ Dates - Only for Data Files ************** -->
 			<xsl:if test="$datatype='DataFile'">
 				<xsl:variable name="embargoedUntil"
