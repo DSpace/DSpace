@@ -39,7 +39,7 @@ public class CompletePaymentAction extends ProcessingAction {
     @Override
     public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
         int itemID =  wfi.getItem().getID();
-        log.info("Verifying payment status of Item " + itemID);
+        log.info("Completing payment status of Item " + itemID);
 
         try{
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
