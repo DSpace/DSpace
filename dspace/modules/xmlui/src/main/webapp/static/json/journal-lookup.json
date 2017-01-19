@@ -52,7 +52,7 @@
         "submission" : "A",
         "hidden" : "Y",
         "title" : "Biodiversity Data Journal",
-        "sponsor" : "Pensoft"
+        "sponsor" : "$120"
      },
      {
         "embargo" : "Y",
@@ -88,7 +88,7 @@
         "submission" : "A",
         "hidden" : "N",
         "title" : "BioRisk",
-        "sponsor" : "Pensoft"
+        "sponsor" : "$120"
      },
      {
         "sponsor" : "$120",
@@ -163,7 +163,7 @@
         "title" : "Bone & Joint360"
      },
      {
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "title" : "Comparative Cytogenetics",
         "integrated" : "Y",
         "hidden" : "N",
@@ -173,7 +173,7 @@
      },
      {
         "title" : "Deutsche Entomologische Zeitschrift",
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "submission" : "A",
         "issn" : "0012-0073",
         "embargo" : "N",
@@ -573,7 +573,7 @@
         "issn" : "1070-9428",
         "embargo" : "Y",
         "integrated" : "Y",
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "title" : "Journal of Hymenoptera Research"
      },
      {
@@ -659,7 +659,7 @@
      },
      {
         "title" : "MycoKeys",
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "issn" : "1314-4049",
         "embargo" : "Y",
         "submission" : "A",
@@ -667,7 +667,7 @@
         "integrated" : "Y"
      },
      {
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "title" : "Nature Conservation",
         "integrated" : "Y",
         "hidden" : "N",
@@ -676,7 +676,7 @@
         "submission" : "A"
      },
      {
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "title" : "NeoBiota",
         "integrated" : "Y",
         "hidden" : "N",
@@ -703,7 +703,7 @@
         "sponsor" : "US Fish & Wildlife Service"
      },
      {
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "title" : "Nota Lepidopterologica",
         "integrated" : "Y",
         "hidden" : "Y",
@@ -794,7 +794,7 @@
      },
      {
         "title" : "PhytoKeys",
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "integrated" : "Y",
         "submission" : "A",
         "issn" : "1314-2003",
@@ -925,7 +925,7 @@
         "submission" : "A",
         "hidden" : "Y",
         "title" : "Subterranean Biology",
-        "sponsor" : "Pensoft"
+        "sponsor" : "$120"
      },
      {
         "integrated" : "Y",
@@ -983,7 +983,7 @@
      },
      {
         "title" : "ZooKeys",
-        "sponsor" : "Pensoft",
+        "sponsor" : "$120",
         "integrated" : "Y",
         "embargo" : "Y",
         "issn" : "1313-2970",
@@ -997,7 +997,7 @@
         "submission" : "A",
         "hidden" : "Y",
         "title" : "Zoosystematics and Evolution",
-        "sponsor" : "Pensoft"
+        "sponsor" : "$120"
      }
   ]
 }
