@@ -14,7 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.hadoop.security.authorize.AuthorizationException;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.IViewer;
 import org.dspace.app.webui.services.ViewerConfigurationService;
@@ -71,7 +70,7 @@ public class ExploreServlet extends DSpaceServlet {
 		String filename = bitstream.getName();
 
 		if (!bitstream.getMetadataValue(IViewer.METADATA_STRING_PROVIDER).contains(viewname)) {
-			throw new AuthorizationException(LogManager.getHeader(context, "explore",
+			throw new AuthorizeException(LogManager.getHeader(context, "explore",
 					"Attempt to access a bitstream with an unregistered view. Bistream ID: " + bitstreamID
 							+ " viewprovider: " + viewname));
 		}
