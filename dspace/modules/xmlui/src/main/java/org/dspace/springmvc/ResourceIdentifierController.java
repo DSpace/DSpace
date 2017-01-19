@@ -26,6 +26,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -85,10 +87,11 @@ public class ResourceIdentifierController {
     @RequestMapping("/**/mets.xml")
     public String processMETSHandle(HttpServletRequest request) {
         String path = (String) request.getAttribute( HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE );
-        String pattern = (String) request.getAttribute( HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
-
-        AntPathMatcher apm = new AntPathMatcher();
-        String resourceIdentifier = apm.extractPathWithinPattern(pattern, path);
+        Matcher m = Pattern.compile(".*resource/(.*)/mets.xml").matcher(path);
+        String resourceIdentifier = path;
+        if (m.matches()) {
+            resourceIdentifier = m.group(1);
+        }
         try {
             Context context = ContextUtil.obtainContext(request);
 
@@ -115,10 +118,11 @@ public class ResourceIdentifierController {
     @RequestMapping("/**/DRI")
     public String processDRIHandle(HttpServletRequest request) {
         String path = (String) request.getAttribute( HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE );
-        String pattern = (String) request.getAttribute( HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE );
-
-        AntPathMatcher apm = new AntPathMatcher();
-        String resourceIdentifier = apm.extractPathWithinPattern(pattern, path);
+        Matcher m = Pattern.compile(".*resource/(.*)/DRI").matcher(path);
+        String resourceIdentifier = path;
+        if (m.matches()) {
+            resourceIdentifier = m.group(1);
+        }
         try {
             Context context = ContextUtil.obtainContext(request);
 

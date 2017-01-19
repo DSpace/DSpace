@@ -38,9 +38,8 @@
 			</xsl:choose>
 		</xsl:variable>
 
-        <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
-                  lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
+        <resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 
 			<xsl:variable name="identifier-doi" select="dspace:field[@element='identifier' and not(@qualifier)]" />
 			<!-- ********** Identifiers ********** -->
@@ -158,7 +157,7 @@
 			<xsl:if test="dspace:field[@element='format' and @qualifier='extent']">
 				<sizes>
 					<xsl:for-each select="dspace:field[@element='format' and @qualifier='extent']">
-						<size xmlns="http://datacite.org/schema/kernel-2.2">
+						<size xmlns="http://datacite.org/schema/kernel-4">
 							<xsl:text>(:tba)</xsl:text>
 						</size>
 					</xsl:for-each>
@@ -169,15 +168,21 @@
 			<!--  All data package DOIs include a CC0 statement. -->
 
 			<xsl:if test="$datatype='DataPackage'">
-				<rights>
-					<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
-				</rights>
+				<rightsList>
+					<rights>
+						<xsl:attribute name="rightsURI">
+							<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
+						</xsl:attribute>
+					</rights>
+				</rightsList>
 			</xsl:if>
 
 			<xsl:if test="$datatype='DataFile'">
-				<rights>
-					<xsl:text>(:tba)</xsl:text>
-				</rights>
+				<rightsList>
+					<rights>
+						<xsl:text>(:tba)</xsl:text>
+					</rights>
+				</rightsList>
 			</xsl:if>
 			
 			<!-- *********** Description - Only for data files ********* -->

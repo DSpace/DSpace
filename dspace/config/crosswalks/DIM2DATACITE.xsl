@@ -42,26 +42,43 @@
 		<xsl:variable name="dateAccepted" select="dspace:field[@element='date' and @qualifier='issued']"/>
 
 
-        <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
-                  lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
+        <resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
+
+			<xsl:variable name="doi">
+				<xsl:call-template name="get_identifier"/>
+			</xsl:variable>
+
+			<xsl:variable name="identifier" select="translate(substring-after($doi,'doi:'), $smallcase, $uppercase)"/>
 
 			<!-- ********** Identifiers ********** -->
 			<identifier identifierType="DOI">
-				<xsl:variable name="doi">
-					<xsl:call-template name="get_identifier"/>
-				</xsl:variable>
-				<xsl:value-of select="translate(substring-after($doi,'doi:'), $smallcase, $uppercase)"/>
+				<xsl:value-of select="$identifier"/>
 			</identifier>
+
+			<!-- ********** Version ********** -->
+			<xsl:variable name="version">
+				<xsl:call-template name="find-version"><xsl:with-param name="working" select="dspace:field[@element='identifier'][@mdschema='dc']"/></xsl:call-template>
+			</xsl:variable>
+			<version>
+				<xsl:value-of select="$version"/>
+			</version>
+
 		    <!-- ********** Creators ************* -->
 		    <creators>
 				<xsl:choose>
 		            <xsl:when test="dspace:field[@element ='contributor' and @qualifier='author']">
 						<xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
+							<xsl:variable name="orcid" select="substring-after(./@authority, 'orcid::')"/>
 							<creator>
 								<creatorName>
 								  <xsl:value-of select="."/>
 								</creatorName>
+								<xsl:if test="$orcid">
+									<nameIdentifier nameIdentifierScheme="ORCID">
+										<xsl:value-of select="$orcid"/>
+									</nameIdentifier>
+								</xsl:if>
 							</creator>
 						</xsl:for-each>
 		            </xsl:when>
@@ -206,6 +223,16 @@
 							</xsl:if>
 						</relatedIdentifier>
 				    </xsl:for-each>
+					<xsl:if test="$version > 1">
+						<xsl:variable name="canonical-doi">
+							<xsl:call-template name="canonical-doi"><xsl:with-param name="working" select="$identifier"/></xsl:call-template>
+						</xsl:variable>
+
+						<xsl:call-template name="related-identifiers">
+							<xsl:with-param name="canonical-doi" select="$canonical-doi"/>
+							<xsl:with-param name="current-version" select="$version - 1"/>
+						</xsl:call-template>
+					</xsl:if>
 				</relatedIdentifiers>
 			</xsl:if>
 			
@@ -214,7 +241,7 @@
 			<xsl:if test="dspace:field[@element='format' and @qualifier='extent']">
 				<sizes>
 					<xsl:for-each select="dspace:field[@element='format' and @qualifier='extent']">
-						<size xmlns="http://datacite.org/schema/kernel-2.2">
+						<size xmlns="http://datacite.org/schema/kernel-4">
 							<xsl:value-of select="."/>
 							<xsl:text> bytes</xsl:text>
 						</size>
@@ -225,12 +252,17 @@
 			<!-- ************ Rights *************** -->
 			<xsl:if test="$datatype='DataPackage'">
 				<!--  All data package DOIs include a CC0 statement. -->
+				<rightsList>
 				<rights>
-					<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
+					<xsl:attribute name="rightsURI">
+						<xsl:text>http://creativecommons.org/publicdomain/zero/1.0/</xsl:text>
+					</xsl:attribute>
 				</rights>
+				</rightsList>
 			</xsl:if>
 
 			<xsl:if test="$datatype='DataFile'">
+				<rightsList>
 				<rights>
 					<xsl:variable name="embargoType" select="dspace:field[@element='type' and @qualifier='embargo']"/>
 
@@ -259,10 +291,13 @@
 		                    </xsl:choose>
 		                </xsl:when>
 		                <xsl:otherwise>
+							<xsl:attribute name="rightsURI">
 		                    <xsl:value-of select="dspace:field[@element='rights']"/>
+							</xsl:attribute>
 		                </xsl:otherwise>
 		            </xsl:choose>
 				</rights>
+				</rightsList>
 			</xsl:if>
 
 			<!-- *********** Description - Only for data files ********* -->
@@ -276,4 +311,125 @@
 			</xsl:if>
         </resource>
 	</xsl:template>
+	<xsl:template name="find-version">
+		<xsl:param name="working"/>
+		<xsl:variable name="suffix">
+			<xsl:choose>
+				<xsl:when test="contains($working, 'DRYAD')">
+					<xsl:value-of select="substring-after($working, 'DRYAD.')"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="substring-after($working, 'dryad.')"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="contains($suffix, '.')">
+				<xsl:call-template name="version-number">
+					<xsl:with-param name="working" select="$suffix"/>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>1</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="version-number">
+		<xsl:param name="working"/>
+		<xsl:variable name="remnant" select="substring-after($working, '.')"/>
+		<xsl:choose>
+			<xsl:when test="string-length($remnant)=0">
+				<!-- if $working is just a number, that's the version. Otherwise, version is 1.-->
+				<xsl:choose>
+					<xsl:when test="string(number($working))=$working">
+						<xsl:value-of select="$working"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>1</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="version-number">
+					<xsl:with-param name="working" select="$remnant"/>
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="canonical-doi">
+		<xsl:param name="working"/>
+		<xsl:variable name="prefix" select="concat(substring-before($working, 'DRYAD.'),'DRYAD.')"/>
+		<xsl:variable name="suffix" select="substring-after($working, 'DRYAD.')"/>
+
+		<!-- if it's a file, there will still be a slash in the suffix -->
+		<xsl:choose>
+			<xsl:when test="contains($suffix, '/')">
+				<xsl:variable name="file-suffix" select="substring-after($suffix, '/')"/>
+				<xsl:variable name="package-suffix" select="substring-before($suffix, '/')"/>
+				<!-- look for a dot in the file suffix -->
+				<xsl:choose>
+					<xsl:when test="contains($file-suffix, '.')">
+						<!-- both the file and package suffixes need to be canonicalized -->
+						<xsl:value-of select="concat($prefix, substring-before($package-suffix, '.'), '.1', '/', substring-before($file-suffix, '.'), '.1')"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$working"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- look for a dot in the package suffix -->
+				<xsl:choose>
+					<xsl:when test="contains($suffix, '.')">
+						<!-- the package suffix needs to be canonicalized -->
+						<xsl:value-of select="concat($prefix, substring-before($suffix, '.'), '.1')"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="$working"/>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="versioned-doi">
+		<xsl:param name="canonical-doi"/>
+		<xsl:param name="version"/>
+		<xsl:variable name="prefix" select="concat(substring-before($canonical-doi, 'DRYAD.'),'DRYAD.')"/>
+		<xsl:variable name="suffix" select="substring-after($canonical-doi, 'DRYAD.')"/>
+
+		<!-- if it's a file, there will still be a slash in the suffix -->
+		<xsl:choose>
+			<xsl:when test="contains($suffix, '/')">
+				<xsl:variable name="file-suffix" select="substring-after($suffix, '/')"/>
+				<xsl:variable name="package-suffix" select="substring-before($suffix, '/')"/>
+				<!-- both the file and package suffixes need to be versioned -->
+				<xsl:value-of select="concat($prefix, substring-before($package-suffix, '.'), '.', $version, '/', substring-before($file-suffix, '.'), '.', $version)"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- the package suffix needs to be versioned -->
+				<xsl:value-of select="concat($prefix, substring-before($suffix, '.'), '.', $version)"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="related-identifiers">
+		<xsl:param name="canonical-doi"/>
+		<xsl:param name="current-version"/>
+		<xsl:if test="$current-version &gt; 0">
+			<relatedIdentifier xmlns="http://datacite.org/schema/kernel-4" relatedIdentifierType="DOI" relationType="IsNewVersionOf">
+				<xsl:call-template name="versioned-doi">
+					<xsl:with-param name="canonical-doi" select="$canonical-doi"/>
+					<xsl:with-param name="version" select="$current-version"/>
+				</xsl:call-template>
+			</relatedIdentifier>
+			<xsl:call-template name="related-identifiers">
+				<xsl:with-param name="canonical-doi" select="$canonical-doi"/>
+				<xsl:with-param name="current-version" select="$current-version - 1"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
+
 </xsl:stylesheet>
