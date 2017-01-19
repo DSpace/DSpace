@@ -9,12 +9,18 @@
             <map>
                 <entry key="0" value-ref="localStore"/>
                 <!--<entry key="1" value-ref="s3Store"/>-->
+		<!--<entry key="2" value-ref="gcsStore">-->
             </map>
         </property>
     </bean>
 
     <bean name="localStore" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
         <property name="baseDir" value="${dspace.dir}/assetstore"/>
+    </bean>
+
+    <bean name="gcsStore" class="org.dspace.storage.bitstore.GCSBitStoreService" scope="singleton">
+        <!-- GCS bucket name to store assets in. example: gcs-dspace-bucket -->
+        <property name="bucketName" value=""/>
     </bean>
 
     <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton">
