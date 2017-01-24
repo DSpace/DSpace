@@ -1316,9 +1316,13 @@ public class SolrLogger
             String coreName = "statistics-" + dcStart.getYear();
             
             HttpSolrServer statisticsYearServer = null;
-            if (statisticYearCores.contains(coreName)) {
-                statisticsYearServer = getCore(solr, coreName);
-            } else {
+            for(String s: statisticYearCores) {
+                if (s.equals(coreName)) {
+                    statisticsYearServer = getCore(solr, coreName);
+                    break;
+                }
+            }
+            if (statisticsYearServer == null) {
                 statisticsYearServer = createCore(solr, coreName);                
             }
 
