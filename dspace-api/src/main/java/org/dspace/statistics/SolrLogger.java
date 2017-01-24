@@ -1315,18 +1315,7 @@ public class SolrLogger
             //Start by creating a new core
             String coreName = "statistics-" + dcStart.getYear();
             
-            HttpSolrServer statisticsYearServer = null;
-            log.info("TBTB Cores "+statisticYearCores.size());
-            for(String s: statisticYearCores) {
-                log.info("TBTB "+s);
-                if (s.endsWith("/"+coreName)) {
-                    statisticsYearServer = getCore(solr, coreName);
-                    break;
-                }
-            }
-            if (statisticsYearServer == null) {
-                statisticsYearServer = createCore(solr, coreName);                
-            }
+            HttpSolrServer statisticsYearServer = createCore(solr, coreName);                
 
             System.out.println("Moving: " + totalRecords + " into core " + coreName);
             log.info("Moving: " + totalRecords + " records into core " + coreName);
@@ -1374,6 +1363,9 @@ public class SolrLogger
     private static HttpSolrServer createCore(HttpSolrServer solr, String coreName) throws IOException, SolrServerException {
         String solrDir = ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr" +File.separator;
         String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
+        HttpSolrServer returnServer = new HttpSolrServer(baseSolrUrl + "/" + coreName);
+        System.out.println("TBTB "+baseSolrUrl + "/" + coreName);
+        System.out.println("TBTB "+returnServer.ping());
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
         create.setInstanceDir("statistics");
