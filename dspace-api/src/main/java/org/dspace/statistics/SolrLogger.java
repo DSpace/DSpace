@@ -1364,14 +1364,13 @@ public class SolrLogger
     private static HttpSolrServer createCore(HttpSolrServer solr, String coreName) throws IOException, SolrServerException {
         String solrDir = ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr" +File.separator;
         String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
-        log.info("TBTB "+baseSolrUrl + "/" + coreName);
         HttpSolrServer returnServer = new HttpSolrServer(baseSolrUrl + "/" + coreName);
         try {
             SolrPingResponse ping = returnServer.ping();
-            log.info("TBTB Ping: "+ping);
+            log.debug(String.format("Ping of Solr Core [%s] Returned with Status [%d]", coreName, ping.getStatus()));
             return returnServer;
         } catch(Exception e) {
-            log.info("TBTB Ping Error: "+e.getClass().getName());
+            log.debug(String.format("Ping of Solr Core [%s] Failed with [%s].  New Core Will be Created", coreName, e.getClass().getName()));
         }
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
@@ -1381,11 +1380,6 @@ public class SolrLogger
         create.process(solrServer);
         log.info("Created core with name: " + coreName);
         return returnServer;
-    }
-
-    private static HttpSolrServer getCore(HttpSolrServer solr, String coreName) throws IOException, SolrServerException {
-        String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
-        return new HttpSolrServer(baseSolrUrl + "/" + coreName);
     }
 
     public static void reindexBitstreamHits(boolean removeDeletedBitstreams) throws Exception {
