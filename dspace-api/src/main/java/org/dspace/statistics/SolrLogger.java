@@ -1316,6 +1316,7 @@ public class SolrLogger
             String coreName = "statistics-" + dcStart.getYear();
             
             HttpSolrServer statisticsYearServer = null;
+            log.info("TBTB Cores "+statisticYearCores.size());
             for(String s: statisticYearCores) {
                 log.info("TBTB "+s);
                 if (s.endsWith("/"+coreName)) {
