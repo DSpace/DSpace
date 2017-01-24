@@ -310,6 +310,7 @@ public class SolrImportExport
 			try
 			{
 				// export from the actual core (from temp core name, actual data dir)
+			    // set overwrite to false (possibly consider allowing -o for a re-index)
 				exportIndex(indexName, exportDir, tempSolrUrl, timeField, false);
 
 				// clear actual core (temp core name, clearing actual data dir) & import
@@ -335,6 +336,7 @@ public class SolrImportExport
 
 			// export all docs from now-temp core into export directory -- this won't cause name collisions with the actual export
 			// because the core name for the temporary export has -temp in it while the actual core doesn't
+            // set overwrite to false (possibly consider allowing -o for a re-index)
 			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField, false);
 			// ...and import them into the now-again-actual core *without* clearing
 			importIndex(tempIndexName, exportDir, origSolrUrl, false, true);
