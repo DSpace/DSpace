@@ -1367,9 +1367,10 @@ public class SolrLogger
         HttpSolrServer returnServer = new HttpSolrServer(baseSolrUrl + "/" + coreName);
         try {
             SolrPingResponse ping = returnServer.ping();
-            log.info(ping);
-        } catch(Exception e) {
+            log.info("TBTB Ping: "+ping);
             return returnServer;
+        } catch(Exception e) {
+            log.info("TBTB Ping Error: "+e.getClass().getName());
         }
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
