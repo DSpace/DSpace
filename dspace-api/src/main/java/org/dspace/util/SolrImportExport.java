@@ -168,7 +168,8 @@ public class SolrImportExport
 				{
 					try {
 						boolean keepExport = line.hasOption(KEEP_OPTION);
-						reindex(indexName, directoryName, keepExport);
+                        boolean overwrite = line.hasOption(OVERWRITE_OPTION);
+						reindex(indexName, directoryName, keepExport, overwrite);
 					} catch (IOException | SolrServerException | SolrImportExportException e) {
 						e.printStackTrace();
 					}
@@ -191,7 +192,7 @@ public class SolrImportExport
 		Options options = new Options();
 		options.addOption(ACTION_OPTION, "action", true, "The action to perform: import, export or reindex. Default: export.");
 		options.addOption(CLEAR_OPTION, "clear", false, "When importing, also clear the index first. Ignored when action is export or reindex.");
-        options.addOption(OVERWRITE_OPTION, "clear", false, "When importing, ignore the _version field.  When exporting, overwrite existing export files");
+        options.addOption(OVERWRITE_OPTION, "clear", false, "When importing, ignore the _version field.  When exporting or re-indexing, allow overwrite existing export files");
 		options.addOption(DIRECTORY_OPTION, "directory", true,
 				                 "The absolute path for the directory to use for import or export. If omitted, [dspace]/solr-export is used.");
 		options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
@@ -215,8 +216,9 @@ public class SolrImportExport
 	 * @param exportDirName the name of the directory to use for export. If this directory doesn't exist, it will be created.
 	 * @param keepExport whether to keep the contents of the exportDir after the reindex. If keepExport is false and the
 	 *                      export directory was created by this method, the export directory will be deleted at the end of the reimport.
+     * @param overwrite allow export files to be overwritten during re-index
 	 */
-	private static void reindex(String indexName, String exportDirName, boolean keepExport)
+	private static void reindex(String indexName, String exportDirName, boolean keepExport, boolean overwrite)
 			throws IOException, SolrServerException, SolrImportExportException {
 		String tempIndexName = indexName + "-temp";
 
@@ -310,8 +312,7 @@ public class SolrImportExport
 			try
 			{
 				// export from the actual core (from temp core name, actual data dir)
-			    // set overwrite to false (possibly consider allowing -o for a re-index)
-				exportIndex(indexName, exportDir, tempSolrUrl, timeField, false);
+				exportIndex(indexName, exportDir, tempSolrUrl, timeField, overwrite);
 
 				// clear actual core (temp core name, clearing actual data dir) & import
 				importIndex(indexName, exportDir, tempSolrUrl, true, true);
@@ -336,8 +337,7 @@ public class SolrImportExport
 
 			// export all docs from now-temp core into export directory -- this won't cause name collisions with the actual export
 			// because the core name for the temporary export has -temp in it while the actual core doesn't
-            // set overwrite to false (possibly consider allowing -o for a re-index)
-			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField, false);
+			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField, overwrite);
 			// ...and import them into the now-again-actual core *without* clearing
 			importIndex(tempIndexName, exportDir, origSolrUrl, false, true);
 
