@@ -1314,7 +1314,13 @@ public class SolrLogger
 
             //Start by creating a new core
             String coreName = "statistics-" + dcStart.getYear();
-            HttpSolrServer statisticsYearServer = createCore(solr, coreName);
+            
+            HttpSolrServer statisticsYearServer = null;
+            if (statisticYearCores.contains(coreName)) {
+                statisticsYearServer = getCore(solr, coreName);
+            } else {
+                statisticsYearServer = createCore(solr, coreName);                
+            }
 
             System.out.println("Moving: " + totalRecords + " into core " + coreName);
             log.info("Moving: " + totalRecords + " records into core " + coreName);
@@ -1372,6 +1378,10 @@ public class SolrLogger
         return new HttpSolrServer(baseSolrUrl + "/" + coreName);
     }
 
+    private static HttpSolrServer getCore(HttpSolrServer solr, String coreName) throws IOException, SolrServerException {
+        String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
+        return new HttpSolrServer(baseSolrUrl + "/" + coreName);
+    }
 
     public static void reindexBitstreamHits(boolean removeDeletedBitstreams) throws Exception {
         Context context = new Context();
