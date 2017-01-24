@@ -1317,7 +1317,8 @@ public class SolrLogger
             
             HttpSolrServer statisticsYearServer = null;
             for(String s: statisticYearCores) {
-                if (s.equals(coreName)) {
+                log.info("TBTB "+s);
+                if (s.endsWith("/"+coreName)) {
                     statisticsYearServer = getCore(solr, coreName);
                     break;
                 }
