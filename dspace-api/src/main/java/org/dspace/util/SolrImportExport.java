@@ -74,6 +74,7 @@ public class SolrImportExport
 
 	private static final String ACTION_OPTION = "a";
 	private static final String CLEAR_OPTION = "c";
+    private static final String OVERWRITE_OPTION = "o";
 	private static final String DIRECTORY_OPTION = "d";
 	private static final String HELP_OPTION = "h";
 	private static final String INDEX_NAME_OPTION = "i";
@@ -132,7 +133,9 @@ public class SolrImportExport
 					{
 						String solrUrl = makeSolrUrl(indexName);
 						boolean clear = line.hasOption(CLEAR_OPTION);
-						importIndex(indexName, importDir, solrUrl, clear, clear);
+						//Set overwrite to true if clear is true
+                        boolean overwrite = line.hasOption(OVERWRITE_OPTION) || clear;
+						importIndex(indexName, importDir, solrUrl, clear, overwrite);
 					}
 					catch (IOException | SolrServerException | SolrImportExportException e)
 					{
@@ -170,7 +173,7 @@ public class SolrImportExport
 					{
 						String solrUrl = makeSolrUrl(indexName);
 						String timeField = makeTimeField(indexName);
-						exportIndex(indexName, exportDir, solrUrl, timeField, lastValue);
+						exportIndex(indexName, exportDir, solrUrl, timeField, lastValue, line.hasOption(OVERWRITE_OPTION));
 					}
 					catch (SolrServerException | IOException | SolrImportExportException e)
 					{
@@ -185,7 +188,8 @@ public class SolrImportExport
 				{
 					try {
 						boolean keepExport = line.hasOption(KEEP_OPTION);
-						reindex(indexName, directoryName, keepExport);
+                        boolean overwrite = line.hasOption(OVERWRITE_OPTION);
+						reindex(indexName, directoryName, keepExport, overwrite);
 					} catch (IOException | SolrServerException | SolrImportExportException e) {
 						e.printStackTrace();
 					}
@@ -208,6 +212,7 @@ public class SolrImportExport
 		Options options = new Options();
 		options.addOption(ACTION_OPTION, "action", true, "The action to perform: import, export or reindex. Default: export.");
 		options.addOption(CLEAR_OPTION, "clear", false, "When importing, also clear the index first. Ignored when action is export or reindex.");
+        options.addOption(OVERWRITE_OPTION, "clear", false, "When importing, ignore the _version field.  When exporting or re-indexing, allow overwrite existing export files");
 		options.addOption(DIRECTORY_OPTION, "directory", true,
 				                 "The absolute path for the directory to use for import or export. If omitted, [dspace]/solr-export is used.");
 		options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
@@ -231,8 +236,9 @@ public class SolrImportExport
 	 * @param exportDirName the name of the directory to use for export. If this directory doesn't exist, it will be created.
 	 * @param keepExport whether to keep the contents of the exportDir after the reindex. If keepExport is false and the
 	 *                      export directory was created by this method, the export directory will be deleted at the end of the reimport.
+     * @param overwrite allow export files to be overwritten during re-index
 	 */
-	private static void reindex(String indexName, String exportDirName, boolean keepExport)
+	private static void reindex(String indexName, String exportDirName, boolean keepExport, boolean overwrite)
 			throws IOException, SolrServerException, SolrImportExportException {
 		String tempIndexName = indexName + "-temp";
 
@@ -326,7 +332,7 @@ public class SolrImportExport
 			try
 			{
 				// export from the actual core (from temp core name, actual data dir)
-				exportIndex(indexName, exportDir, tempSolrUrl, timeField);
+				exportIndex(indexName, exportDir, tempSolrUrl, timeField, overwrite);
 
 				// clear actual core (temp core name, clearing actual data dir) & import
 				importIndex(indexName, exportDir, tempSolrUrl, true, true);
@@ -351,7 +357,7 @@ public class SolrImportExport
 
 			// export all docs from now-temp core into export directory -- this won't cause name collisions with the actual export
 			// because the core name for the temporary export has -temp in it while the actual core doesn't
-			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField);
+			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField, overwrite);
 			// ...and import them into the now-again-actual core *without* clearing
 			importIndex(tempIndexName, exportDir, origSolrUrl, false, true);
 
@@ -385,13 +391,14 @@ public class SolrImportExport
 	 * @param toDir The target directory for the export. Will be created if it doesn't exist yet. The directory must be writeable.
 	 * @param solrUrl The solr URL for the index to export. Must not be null.
 	 * @param timeField The time field to use for sorting the export. Must not be null.
+     * @param overwrite If set, allow export files to be overwritten
 	 * @throws SolrServerException if there is a problem with exporting the index.
 	 * @throws IOException if there is a problem creating the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem in communicating with Solr.
 	 */
-	public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField)
+	public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, boolean overwrite)
 			throws SolrServerException, SolrImportExportException, IOException {
-		exportIndex(indexName, toDir, solrUrl, timeField, null);
+		exportIndex(indexName, toDir, solrUrl, timeField, null, overwrite);
 	}
 
 	/**
@@ -524,11 +531,12 @@ public class SolrImportExport
 	 * @param solrUrl The solr URL for the index to export. Must not be null.
 	 * @param timeField The time field to use for sorting the export. Must not be null.
 	 * @param fromWhen Optionally, from when to export. See options for allowed values. If null or empty, all documents will be exported.
+	 * @param overwrite If set, allow export files to be overwritten
 	 * @throws SolrServerException if there is a problem with exporting the index.
 	 * @throws IOException if there is a problem creating the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem in communicating with Solr.
 	 */
-	public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, String fromWhen)
+	public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, String fromWhen, boolean overwrite)
 			throws SolrServerException, IOException, SolrImportExportException
 	{
 		if (StringUtils.isBlank(solrUrl))
@@ -607,7 +615,7 @@ public class SolrImportExport
 				URL url = new URL(solrUrl + "/select?" + monthQuery.toString());
 
 				File file = new File(toDir.getCanonicalPath(), makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
-				if (file.createNewFile())
+                if (file.createNewFile() || overwrite)
 				{
 					FileUtils.copyURLToFile(url, file);
 					String message = String.format("Solr export to file [%s] complete.  Export for Index [%s] Month [%s] Batch [%d] Num Docs [%d]", 
