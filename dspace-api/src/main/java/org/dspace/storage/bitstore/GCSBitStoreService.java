@@ -7,20 +7,16 @@
  */
 package org.dspace.storage.bitstore;
 
-import java.util.HashMap;
+import com.google.auth.oauth2.ServiceAccountCredentials;
 import java.io.FileInputStream;
 import java.io.ByteArrayInputStream;
-import com.google.cloud.storage.Acl;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Bucket;
-import com.google.cloud.storage.BucketInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.core.ConfigurationManager;
@@ -54,11 +50,23 @@ public class GCSBitStoreService implements BitStoreService
     /** GCP storage */
     private Storage storage = null;
 
+    /** GCP project ID */
+    private String projectID = null;
+
+    /** Secret key json file path */
+    private String secretFile = null;
+
     public GCSBitStoreService()
     {
     }
 
-    public void init() throws IOException {}
+    public void init() throws IOException {
+	 storage = StorageOptions.newBuilder()
+		.setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream(secretFile)))
+		.setProjectId(projectID)
+		.build()
+		.getService();
+    }
     
 
     /**
@@ -86,8 +94,6 @@ public class GCSBitStoreService implements BitStoreService
     {
         String key = getFullKey(bitstream.getInternalId());
         try {
-	  Storage storage = StorageOptions.getDefaultInstance().getService();
-	
 	Blob blob = storage.get(bucketName, key);
 	if(blob != null){
 		return new ByteArrayInputStream(blob.getContent());
@@ -123,7 +129,6 @@ public class GCSBitStoreService implements BitStoreService
             FileUtils.copyInputStreamToFile(in, scratchFile);
             Long contentLength = Long.valueOf(scratchFile.length());
 
-	    Storage storage = StorageOptions.getDefaultInstance().getService();
 	    BlobId blobId = BlobId.of(bucketName, bitstream.getInternalId());
        	    BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
 	    InputStream targetStream = new FileInputStream(scratchFile);
@@ -148,7 +153,7 @@ public class GCSBitStoreService implements BitStoreService
     /**
      * Obtain technical metadata about an asset in the asset store.
      *
-     * Checksum used is (ETag) hex encoded 128-bit MD5 digest of an object's content as calculated by Amazon S3
+     * Checksum used is (ETag) hex encoded 128-bit MD5 digest of an object's content
      * (Does not use getContentMD5, as that is 128-bit MD5 digest calculated on caller's side)
      *
      * @param bitstream
@@ -166,9 +171,7 @@ public class GCSBitStoreService implements BitStoreService
     {
         String key = getFullKey(bitstream.getInternalId());
         try {
-		Storage storage = StorageOptions.getDefaultInstance().getService();
 		Blob blob = storage.get(bucketName, key);
-
 		if(blob != null){
 			BlobInfo blobInfo = blob.toBuilder().build();
 			if (attrs.containsKey("size_bytes")) {
@@ -200,7 +203,6 @@ public class GCSBitStoreService implements BitStoreService
      */
     public void remove(Bitstream bitstream) throws IOException
     {
-	Storage storage = StorageOptions.getDefaultInstance().getService();
         String key = getFullKey(bitstream.getInternalId());
 	try {
             BlobId blobId = BlobId.of(bucketName, key);
@@ -228,6 +230,24 @@ public class GCSBitStoreService implements BitStoreService
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    @Required
+    public String getProjectID() {
+        return projectID;
+    }
+
+    public void setProjectID(String projectID) {
+        this.projectID = projectID;
+    }
+
+    @Required
+    public String getSecretFile() {
+        return secretFile;
+    }
+
+    public void setSecretFile(String secretFile) {
+        this.secretFile = secretFile;
     }
 
     /**
