@@ -38,8 +38,8 @@
 			</xsl:choose>
 		</xsl:variable>
 
-        <resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
+        <resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
 
 			<xsl:variable name="identifier-doi" select="dspace:field[@element='identifier' and not(@qualifier)]" />
 			<!-- ********** Identifiers ********** -->
@@ -157,7 +157,7 @@
 			<xsl:if test="dspace:field[@element='format' and @qualifier='extent']">
 				<sizes>
 					<xsl:for-each select="dspace:field[@element='format' and @qualifier='extent']">
-						<size xmlns="http://datacite.org/schema/kernel-4">
+						<size xmlns="http://datacite.org/schema/kernel-3">
 							<xsl:text>(:tba)</xsl:text>
 						</size>
 					</xsl:for-each>
