@@ -902,12 +902,49 @@
             <artifactId>dspace-api</artifactId>
             <version>${project.version}</version>
          </dependency>
-         <dependency>
-            <groupId>org.dspace.modules</groupId>
-            <artifactId>additions</artifactId>
+   		 <dependency>
+			<groupId>org.dspace.modules</groupId>
+			<artifactId>additions</artifactId>
 			<version>${project.version}</version>
-         </dependency>
-
+			<exclusions>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-ckan-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-ckan-jspui</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-iiif-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-iiif-jspui</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-ocr-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-annoiiif-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-docviewer-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-video-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-video-jspui</artifactId>
+				</exclusion>
+			</exclusions>
+		 </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>

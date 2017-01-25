@@ -66,6 +66,119 @@
          </dependencies>
       </profile>
 
+        <profile>
+            <id>addon-ckan</id>
+			<activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-ckan-api</artifactId>
+						 <version>${ckan.addon.modules}</version>
+						 <type>jar</type>
+			        </dependency>
+			        <dependency>
+			             <groupId>it.4science.dspace</groupId>
+						 <artifactId>addon-ckan-jspui</artifactId>
+						 <version>${ckan.addon.modules}</version>
+						 <type>war</type>
+			        </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>addon-iiif</id>
+            <activation>
+                <property>
+                    <name>iiif.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-iiif-api</artifactId>
+					<version>${iiif.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-iiif-jspui</artifactId>
+					<version>${iiif.addon.modules}</version>
+					<type>war</type>
+				</dependency>
+			</dependencies>		                    
+	    </profile>
+	
+		<profile>
+			<id>addon-ocr</id>
+            <activation>
+                <property>
+                    <name>ocr.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-ocr-api</artifactId>
+					<version>${ocr.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-annoiiif-api</artifactId>
+					<version>${annoiiif.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</profile>
+	
+		<profile>
+			<id>addon-document-viewer</id>
+            <activation>
+                <property>
+                    <name>docviewer.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-docviewer-api</artifactId>
+					<version>${docviewer.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-annoiiif-api</artifactId>
+					<version>${annoiiif.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+			</dependencies>
+		</profile>
+		
+		<profile>
+			<id>addon-av-streaming</id>
+            <activation>
+                <property>
+                    <name>audiovideo.on</name>
+                </property>
+            </activation>
+			<dependencies>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-video-api</artifactId>
+					<version>${av.addon.modules}</version>
+					<type>jar</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-video-jspui</artifactId>
+					<version>${av.addon.modules}</version>
+					<type>war</type>
+				</dependency>
+			</dependencies>
+		</profile>		                
+
    </profiles>
 
    <!--
