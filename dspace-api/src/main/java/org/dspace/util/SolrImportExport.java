@@ -226,7 +226,10 @@ public class SolrImportExport
 		String baseSolrUrl = StringUtils.substringBeforeLast(origSolrUrl, "/"); // need to get non-core solr URL
 		String tempSolrUrl = baseSolrUrl + "/" + tempIndexName;
 
-		String solrInstanceDir = ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr" + File.separator + indexName;
+        //The configuration details for the statistics shards reside within the "statistics" folder
+        String instanceIndexName = indexName.startsWith("statistics-") ? "statistics" : indexName;
+
+        String solrInstanceDir = ConfigurationManager.getProperty("dspace.dir") + File.separator + "solr" + File.separator + instanceIndexName;
 		// the [dspace]/solr/[indexName]/conf directory needs to be available on the local machine for this to work
 		// -- we need access to the schema.xml and solrconfig.xml file, plus files referenced from there
 		// if this directory can't be found, output an error message and skip this index
