@@ -34,6 +34,10 @@
     </dc-type>
     <dc-type>
         <schema>dryad</schema>
+        <element>citationMismatchedDOI</element>
+    </dc-type>
+    <dc-type>
+        <schema>dryad</schema>
         <element>fundingEntity</element>
     </dc-type>
     <dc-type>
