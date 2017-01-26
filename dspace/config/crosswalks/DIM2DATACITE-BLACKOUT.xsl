@@ -143,12 +143,17 @@
 				        </relatedIdentifier>
 				    </xsl:for-each>
 				    <xsl:for-each select="dspace:field[@element='relation' and @qualifier='isreferencedby']">
-						<relatedIdentifier relatedIdentifierType="DOI" relationType="IsReferencedBy">
-							<xsl:variable name="id" select="."/>
-							<xsl:if test="starts-with($id,'doi')">
-								<xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
-							</xsl:if>
-						</relatedIdentifier>
+				      <xsl:variable name="id" select="."/>
+				      <xsl:if test="starts-with($id,'doi')">
+					<relatedIdentifier relatedIdentifierType="DOI" relationType="IsReferencedBy">
+					  <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+					</relatedIdentifier>
+				      </xsl:if>
+				      <xsl:if test="starts-with($id,'PMID')">
+					<relatedIdentifier relatedIdentifierType="PMID" relationType="IsReferencedBy">
+					  <xsl:value-of select="translate(substring-after($id,'PMID:'), $smallcase, $uppercase)"/>
+					</relatedIdentifier>
+				      </xsl:if>
 				    </xsl:for-each>
 				</relatedIdentifiers>
 			</xsl:if>
