@@ -244,6 +244,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return true;
         }
 
+        // If authorization was given before and cached
+        Boolean cachedResult = c.getCachedAuthorizationResult(o, action, e);
+        if (cachedResult != null) {
+            return cachedResult.booleanValue();
+        }
+
         // is eperson set? if not, userToCheck = null (anonymous)
         EPerson userToCheck = null;
         if (e != null)
@@ -256,6 +262,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
             if (isAdmin(c, adminObject))
             {
+                c.cacheAuthorizedAction(o, action, e, true);
                 return true;
             }
         }
@@ -305,6 +312,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
             {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(userToCheck))
                 {
+                    c.cacheAuthorizedAction(o, action, e, true);
                     return true; // match
                 }
 
@@ -313,12 +321,14 @@ public class AuthorizeServiceImpl implements AuthorizeService
                 {
                     // group was set, and eperson is a member
                     // of that group
+                    c.cacheAuthorizedAction(o, action, e, true);
                     return true;
                 }
             }
         }
 
         // default authorization is denial
+        c.cacheAuthorizedAction(o, action, e, false);
         return false;
     }
 

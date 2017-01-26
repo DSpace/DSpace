@@ -7,7 +7,6 @@
  */
 package org.dspace.core;
 
-import org.dspace.content.DSpaceObject;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.hibernate4.SessionFactoryUtils;
 
 import javax.sql.DataSource;
-import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -37,12 +35,13 @@ public class HibernateDBConnection implements DBConnection<Session> {
     private SessionFactory sessionFactory;
 
     private boolean batchModeEnabled = false;
+    private boolean readOnlyEnabled = false;
 
     @Override
     public Session getSession() throws SQLException {
         if(!isTransActionAlive()){
             sessionFactory.getCurrentSession().beginTransaction();
-            configureBatchMode();
+            configureDatabaseMode();
         }
         return sessionFactory.getCurrentSession();
     }
@@ -137,7 +136,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Override
     public void setOptimizedForBatchProcessing(final boolean batchOptimized) throws SQLException {
         this.batchModeEnabled = batchOptimized;
-        configureBatchMode();
+        configureDatabaseMode();
     }
 
     @Override
@@ -145,9 +144,17 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return batchModeEnabled;
     }
 
-    private void configureBatchMode() throws SQLException {
+    @Override
+    public void setReadOnly(boolean readOnlyOptimized) throws SQLException {
+        this.readOnlyEnabled = readOnlyOptimized;
+        configureDatabaseMode();
+    }
+
+    private void configureDatabaseMode() throws SQLException {
         if(batchModeEnabled) {
             getSession().setFlushMode(FlushMode.ALWAYS);
+        } else if(readOnlyEnabled) {
+            getSession().setFlushMode(FlushMode.MANUAL);
         } else {
             getSession().setFlushMode(FlushMode.AUTO);
         }

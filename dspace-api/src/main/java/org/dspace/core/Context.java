@@ -7,7 +7,10 @@
  */
 package org.dspace.core;
 
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
+import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -77,12 +80,22 @@ public class Context
     /** Event dispatcher name */
     private String dispName = null;
 
-    /** options */
-    private short options = 0;
+    /** Context mode */
+    private Mode mode = Mode.READ_WRITE;
+
+    /** Authorized actions cache that is used when the context is in READ_ONLY mode.
+     * The key of the cache is: DSpace Object ID, action ID, Eperson ID. */
+    private final HashMap<Triple<String, Integer, String>, Boolean> authorizedActionsCache = new HashMap<>();
 
     protected EventService eventService;
 
     private DBConnection dbConnection;
+
+    public enum Mode {
+        READ_ONLY,
+        READ_WRITE,
+        BATCH_EDIT
+    }
 
     static
     {
@@ -116,14 +129,14 @@ public class Context
     }
 
     /**
-     * Construct a new context object with passed options. A database connection is opened.
+     * Construct a new context object with the given mode enabled. A database connection is opened.
      * No user is authenticated.
      * 
-     * @param options   context operation flags
+     * @param mode   The mode to use when opening the context.
      */
-    public Context(short options)
+    public Context(Mode mode)
     {
-        this.options = options;
+        this.mode = mode;
         init();
     }
 
@@ -564,7 +577,7 @@ public class Context
      */
     public boolean isReadOnly()
     {
-        return (options & READ_ONLY) > 0;
+        return mode != null && mode == Mode.READ_ONLY;
     }
 
     public void setSpecialGroup(UUID groupID)
@@ -632,7 +645,7 @@ public class Context
     /**
      * Returns the size of the cache of all object that have been read from the database so far. A larger number
      * means that more memory is consumed by the cache. This also has a negative impact on the query performance. In
-     * that case you should consider clearing the cache (see {@link Context#clearCache() clearCache}).
+     * that case you should consider uncaching entities when they are no longer needed (see {@link Context#uncacheEntity(ReloadableEntity)} () uncacheEntity}).
      *
      * @throws SQLException When connecting to the active cache fails.
      */
@@ -641,27 +654,46 @@ public class Context
     }
 
     /**
-     * Enable or disable "batch processing mode" for this context.
+     * Change the mode of this current context.
      *
-     * Enabling batch processing mode means that the database connection is configured so that it is optimized to
+     * BATCH_EDIT: Enabling batch edit mode means that the database connection is configured so that it is optimized to
      * process a large number of records.
      *
-     * Disabling batch processing mode restores the normal behaviour that is optimal for querying and updating a
+     * READ_ONLY: READ ONLY mode will tell the database we are nog going to do any updates. This means it can disable
+     * optimalisations for delaying or grouping updates.
+     *
+     * READ_WRITE: This is the default mode and enables the normal database behaviour. This behaviour is optimal for querying and updating a
      * small number of records.
      *
-     * @param batchModeEnabled When true, batch processing mode will be enabled. If false, it will be disabled.
+     * @param mode The mode to put this context in
      * @throws SQLException When configuring the database connection fails.
      */
-    public void enableBatchMode(boolean batchModeEnabled) throws SQLException {
-        dbConnection.setOptimizedForBatchProcessing(batchModeEnabled);
+    public void setMode(Mode mode) throws SQLException {
+        
+        switch (mode) {
+            case BATCH_EDIT:
+                dbConnection.setOptimizedForBatchProcessing(true);
+                dbConnection.setReadOnly(false);
+                break;
+            case READ_ONLY:
+                dbConnection.setReadOnly(true);
+                dbConnection.setOptimizedForBatchProcessing(false);
+                break;
+            case READ_WRITE:
+                dbConnection.setOptimizedForBatchProcessing(false);
+                dbConnection.setReadOnly(false);
+            default:
+                log.warn("New context mode detected that has nog been configured.");
+                break;
+        }
     }
 
     /**
-     * Check if "batch processing mode" is enabled for this context.
-     * @return True if batch processing mode is enabled, false otherwise.
+     * The current database mode of this context.
+     * @return The current mode
      */
-    public boolean isBatchModeEnabled() {
-        return dbConnection.isOptimizedForBatchProcessing();
+    public Mode getCurrentMode() {
+        return mode;
     }
 
     /**
@@ -690,7 +722,26 @@ public class Context
         dbConnection.uncacheEntity(entity);
     }
 
-    
+    public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
+        if(mode == Mode.READ_ONLY) {
+            return authorizedActionsCache.get(buildAuthorizedActionKey(dspaceObject, action, eperson));
+        } else {
+            return false;
+        }
+    }
+
+    public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result) {
+        if(mode == Mode.READ_ONLY) {
+            authorizedActionsCache.put(buildAuthorizedActionKey(dspaceObject, action, eperson), result);
+        }
+    }
+
+    private ImmutableTriple<String, Integer, String> buildAuthorizedActionKey(DSpaceObject dspaceObject, int action, EPerson eperson) {
+        return new ImmutableTriple<>(dspaceObject == null ? "" : dspaceObject.getID().toString(),
+                Integer.valueOf(action),
+                eperson == null ? "" : eperson.getID().toString());
+    }
+
     /**
      * Reload all entities related to this context.
      * @throws SQLException When reloading one of the entities fails.

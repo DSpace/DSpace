@@ -44,6 +44,8 @@ public interface DBConnection<T> {
 
     public boolean isOptimizedForBatchProcessing();
 
+    public void setReadOnly(boolean readOnlyOptimized) throws SQLException;
+
     public long getCacheSize() throws SQLException;
 
     /**
