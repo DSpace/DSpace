@@ -66,9 +66,11 @@
     
     boolean networkModuleEnabled = ConfigurationManager.getBooleanProperty(NetworkPlugin.CFG_MODULE,"network.enabled");
     boolean changeStatusAdmin = ConfigurationManager.getBooleanProperty("cris","rp.changestatus.admin");
+    boolean claimEnabled = ConfigurationManager.getBooleanProperty("cris","rp.claim.enabled");
 %>
 <c:set var="admin" scope="request"><%=isAdmin%></c:set>
 <c:set var="statusAdmin" scope="request"><%=changeStatusAdmin%></c:set>
+<c:set var="claim" scope="request"><%=claimEnabled%></c:set>
 <c:set var="req" value="${pageContext.request}" />
 <c:set var="baseURL" value="${fn:replace(req.requestURL, fn:substring(req.requestURI, 0, fn:length(req.requestURI)), req.contextPath)}" />
 <c:set var="metaprofilename"><c:choose><c:when test="${!empty entity.preferredName.value}">${entity.preferredName.value}</c:when><c:otherwise>${entity.fullName}</c:otherwise></c:choose></c:set>
@@ -311,14 +313,14 @@
 						<a class="btn btn-default" href="${root}/cris/uuid/${researcher.uuid}/relMgmt/publications"><i class="fa fa-book"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.manage-publication"/></a>
 					</div> --%>
 				</c:if>
-				<c:if test="${empty researcher.epersonID}" >
+				<c:if test="${claim && !admin}" >
 				<div class="btn-group">				
 				<c:choose>				
-					<c:when test="${empty researcher.email.value}">
-						<a class="btn btn-primary" href="<%= request.getContextPath() %>/feedback?claimProfile=${researcher.crisID}"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></a>
+					<c:when test="${!empty researcher.email.value && empty researcher.epersonID }">
+						<span id="claim-rp" class="btn btn-primary"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></span>
 					</c:when>
 					<c:otherwise>
-						<span id="claim-rp" class="btn btn-primary"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></span>
+						<a class="btn btn-primary" href="<%= request.getContextPath() %>/feedback?claimProfile=${researcher.crisID}"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></a>
 					</c:otherwise>
 				</c:choose>
 				</div>
