@@ -9,6 +9,7 @@ package org.dspace.utils.servlet;
 
 import java.io.IOException;
 
+import javax.annotation.Priority;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -31,6 +32,7 @@ import org.dspace.services.RequestService;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
+@Priority(1)
 public final class DSpaceWebappServletFilter implements Filter {
 
     /* (non-Javadoc)

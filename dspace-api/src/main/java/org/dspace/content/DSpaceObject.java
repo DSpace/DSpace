@@ -147,7 +147,7 @@ public abstract class DSpaceObject implements Serializable, ReloadableEntity<jav
         return handles;
     }
 
-    protected List<MetadataValue> getMetadata() {
+    public List<MetadataValue> getMetadata() {
         return metadata;
     }
 

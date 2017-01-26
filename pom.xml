@@ -33,7 +33,8 @@
             Upgrading the spring version will make the XMLUI crash
         -->
         <hibernate.version>5.0.11.Final</hibernate.version>
-        <spring.version>4.3.5.RELEASE</spring.version>
+        <spring.version>4.3.6.RELEASE</spring.version>
+        <!-- <spring.version>4.2.4.RELEASE</spring.version> -->
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -672,6 +673,17 @@
             </modules>
         </profile>
 
+		<profile>
+            <id>dspace-spring-rest</id>
+            <activation>
+                <file>
+                    <exists>dspace-spring-rest/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-spring-rest</module>
+            </modules>
+        </profile>
         <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
@@ -694,6 +706,7 @@
                 <module>dspace-solr</module>
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
+                <module>dspace-spring-rest</module>
             </modules>
             <build>
                 <plugins>

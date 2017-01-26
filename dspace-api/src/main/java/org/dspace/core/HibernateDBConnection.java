@@ -37,14 +37,6 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
     
-    @Autowired(required = true)
-    private EntityManagerFactory entityManagerFactory;
-
-    @Override
-    public EntityManagerFactory getEntityManagerFactory() {
-		return entityManagerFactory;
-	}
-    
     private boolean batchModeEnabled = false;
 
     @Override
