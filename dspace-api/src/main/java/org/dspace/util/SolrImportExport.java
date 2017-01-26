@@ -591,7 +591,7 @@ public class SolrImportExport
 			monthQuery.setRows(ROWS_PER_FILE);
 			monthQuery.set("wt", "csv");
 			monthQuery.set("fl", "*");
-			monthQuery.setParam("csv.mv.separator", MULTIPLE_VALUES_SPLITTER);
+			monthQuery.setParam("csv.mv.separator", MULTIPLE_VALUES_SPLITTER); 
 
 			monthQuery.addFilterQuery(timeField + ":[" +monthStart + " TO " + monthStart + "+1MONTH]");
 
