@@ -12,8 +12,11 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
+import org.dspace.paymentsystem.PaymentSystemService;
+import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.usagelogging.EventLogger;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowRequirementsManager;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -75,6 +78,20 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return ERROR_SELECT_JOURNAL;
         }
 
+        // clear the sponsor from the shoppingcart:
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        ShoppingCart shoppingCart = null;
+        try {
+            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+            if (shoppingCart != null) {
+                shoppingCart.setSponsoringOrganization(null);
+            }
+        } catch (Exception e) {
+            log.error("couldn't find cart for item " + item.getID());
+        }
+
+        item.clearMetadata("dryad.fundingEntity");
+        item.update();
         String fundingStatus = request.getParameter("funding-status");
         String grantInfo = request.getParameter("grant-info");
         int confidence = 0;
@@ -144,9 +161,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         return doc.getRootElement();
     }
 
-    private void addEmailsAndEmbargoSettings(DryadJournalConcept journalConcept, Item item) {
+    private void addEmailsAndEmbargoSettings(DryadJournalConcept journalConcept, Item item) throws AuthorizeException, SQLException {
         ArrayList<String> reviewEmailList = journalConcept.getEmailsToNotifyOnReview();
         String[] reviewEmails = reviewEmailList.toArray(new String[reviewEmailList.size()]);
+        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", Item.ANY);
+        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", Item.ANY);
+        item.clearMetadata("internal", "submit", "showEmbargo", Item.ANY);
+        item.update();
 
         if(reviewEmails != null) {
             item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails);
@@ -214,10 +235,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             }
         }
 
+        DCValue[] dcValues = item.getMetadata("prism.publicationName");
+        item.clearMetadata("prism.publicationName");
+        item.update();
+
         String journal = null;
         if (journalConcept == null) {
             // look in the item's metadata, in case the journal name was loaded by a crosswalk.
-            DCValue[] dcValues = item.getMetadata("prism.publicationName");
             if (dcValues.length > 0) {
                 journal = dcValues[0].value;
                 item.clearMetadata("prism.publicationName");
@@ -270,6 +294,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }
 
         request.getSession().setAttribute("submit_error", "");
+        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
+        item.update();
         if (journalConcept.getIntegrated()) {
             addEmailsAndEmbargoSettings(journalConcept, item);
             if (manuscriptNumber != null && manuscriptNumber.equals("")) {
@@ -288,12 +314,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         // the Article Status chosen must match the specified manuscript's status. Otherwise, it's invalid.
                         if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_ACCEPTED) {
                             if (manuscript.isAccepted() || manuscript.isPublished()) {
-                                item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "true");
                             }
                         } else if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_IN_REVIEW) {
                             if (manuscript.isSubmitted() || manuscript.isNeedsRevision()) {
-                                item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
                                 item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
                             }
                         }
@@ -315,7 +339,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         // at this point, the item has been populated with metadata for the journal concept and any manuscript metadata.
         // submitted manuscripts go through the review workflow, so don't skipReviewStage
         if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW) {
-            item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
             item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
         }
 

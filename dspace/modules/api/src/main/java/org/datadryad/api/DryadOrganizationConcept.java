@@ -71,16 +71,6 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     public DryadOrganizationConcept() {
     } // JAXB needs this
 
-    public DryadOrganizationConcept(Context context, String fullName) throws StorageException {
-        this();
-        this.setFullName(fullName);
-        try {
-            context.commit();
-        } catch (Exception e) {
-            log.error("exception " + e.getMessage());
-        }
-    }
-
     public DryadOrganizationConcept(Context context, Concept concept) {
         this();
         setUnderlyingConcept(context, concept);

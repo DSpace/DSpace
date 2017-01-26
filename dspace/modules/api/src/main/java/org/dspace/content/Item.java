@@ -1078,7 +1078,6 @@ public class Item extends DSpaceObject
                 values.add(dcv);
             }
         }
-
         // Now swap the old list of values for the new, unremoved values
         dublinCore.setMetadata(values);
         dublinCore.metadataChanged = true;
@@ -1099,7 +1098,7 @@ public class Item extends DSpaceObject
         if (tokens[2] != null) {
             qualifier = tokens[2];
         }
-        clearMetadata(schema, element, qualifier, null);
+        clearMetadata(schema, element, qualifier, Item.ANY);
     }
 
 
