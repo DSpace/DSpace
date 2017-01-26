@@ -43,7 +43,7 @@ public class EmailParser {
         fieldToXMLTagMap.put("journal code", Manuscript.JOURNAL_CODE);
         fieldToXMLTagMap.put("article status", Manuscript.ARTICLE_STATUS);
         fieldToXMLTagMap.put("manuscript number", Manuscript.MANUSCRIPT);
-        fieldToXMLTagMap.put("ms dryad id", Manuscript.MANUSCRIPT);
+//        fieldToXMLTagMap.put("ms dryad id", Manuscript.MANUSCRIPT);
         fieldToXMLTagMap.put("ms reference number", Manuscript.MANUSCRIPT);
         fieldToXMLTagMap.put("ms title", Manuscript.ARTICLE_TITLE);
         fieldToXMLTagMap.put("article title", Manuscript.ARTICLE_TITLE);
