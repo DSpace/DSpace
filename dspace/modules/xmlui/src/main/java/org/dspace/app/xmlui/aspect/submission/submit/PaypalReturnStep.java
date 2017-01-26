@@ -94,6 +94,7 @@ public class PaypalReturnStep extends AbstractStep {
                                      shoppingCart.setStatus(ShoppingCart.STATUS_VERIFIED);
                                  } else
                                  {
+                                     log.debug("marking cart for item " + itemId + " completed, paypal result=" + result + ", message=\"" + message + "\"");
                                      shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                                      Date now = new Date();
                                      shoppingCart.setPaymentDate(now);
