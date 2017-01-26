@@ -64,6 +64,8 @@ public class SolrImportExport
 
 	public static final int ROWS_PER_FILE = 10_000;
 
+	private static final String MULTIPLE_VALUES_SPLITTER = ",";
+	
 	private static final Logger log = Logger.getLogger(SolrImportExport.class);
 
 	/**
@@ -449,7 +451,7 @@ public class SolrImportExport
 			}
 			for (String mvField : multivaluedFields) {
 				contentStreamUpdateRequest.setParam("f." + mvField + ".split", "true");
-				contentStreamUpdateRequest.setParam("f." + mvField + ".escape", "\\");
+				contentStreamUpdateRequest.setParam("f." + mvField + ".separator", MULTIPLE_VALUES_SPLITTER);
 			}
 			contentStreamUpdateRequest.setParam("stream.contentType", "text/csv;charset=utf-8");
 			contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
@@ -589,6 +591,7 @@ public class SolrImportExport
 			monthQuery.setRows(ROWS_PER_FILE);
 			monthQuery.set("wt", "csv");
 			monthQuery.set("fl", "*");
+			monthQuery.setParam("csv.mv.separator", MULTIPLE_VALUES_SPLITTER);
 
 			monthQuery.addFilterQuery(timeField + ":[" +monthStart + " TO " + monthStart + "+1MONTH]");
 
