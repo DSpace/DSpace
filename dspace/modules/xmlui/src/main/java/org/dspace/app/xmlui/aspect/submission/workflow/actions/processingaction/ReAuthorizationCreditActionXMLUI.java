@@ -105,6 +105,7 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
                 if(concepts!=null&&concepts.length!=0){
                     AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerID", Item.ANY);
                     if(metadataValues!=null&&metadataValues.length>0){
+                        log.debug("marking cart for item " + item.getHandle() + " completed based on journal");
                         shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                         shoppingCart.setPaymentDate(new Date());
                         shoppingCart.update();

@@ -189,6 +189,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 // this item must've been created before the payment system was in place.
                 // We should create a completed placeholder cart for the original item, but make sure it is marked
                 // that it was created for versioning and should not be re-charged.
+                log.debug("creating a completed shopping cart for new version of item " + itemId);
                 ShoppingCart versionCart = createNewShoppingCart(context, itemId, context.getCurrentUser().getID(), "", ShoppingCart.CURRENCY_US, ShoppingCart.STATUS_COMPLETED);
                 versionCart.setNote("cart created for versioning; do not charge");
                 versionCart.update();
