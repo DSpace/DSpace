@@ -315,6 +315,7 @@ public class Packager
 
         // find the EPerson, assign to context
         Context context = new Context();
+        context.turnOffItemWrapper();
         EPerson myEPerson = null;
         myEPerson = EPerson.findByEmail(context, eperson);
         if (myEPerson == null)
