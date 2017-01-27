@@ -259,7 +259,12 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     public String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
-        String dmdTypes = ConfigurationManager.getProperty("aip.disseminate.dmd");
+        
+        String dmdTypes = ConfigurationManager.getProperty(dso.getTypeText().toLowerCase()+".aip.disseminate.dmd");
+        if (dmdTypes == null)
+        {
+            dmdTypes = ConfigurationManager.getProperty("aip.disseminate.dmd");
+        }
         if (dmdTypes == null)
         {
             String result[] = new String[2];
@@ -291,7 +296,11 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
-        String techTypes = ConfigurationManager.getProperty("aip.disseminate.techMD");
+        String techTypes = ConfigurationManager.getProperty(dso.getTypeText().toLowerCase()+".aip.disseminate.techMD");
+        if (techTypes == null)
+        {
+            techTypes = ConfigurationManager.getProperty("aip.disseminate.techMD");
+        }
         if (techTypes == null)
         {
             if (dso.getType() == Constants.BITSTREAM)
@@ -333,7 +342,12 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     public String[] getSourceMdTypes(Context context, DSpaceObject dso, PackageParameters params)
         throws SQLException, IOException, AuthorizeException
     {
-        String sourceTypes = ConfigurationManager.getProperty("aip.disseminate.sourceMD");
+        String sourceTypes = ConfigurationManager.getProperty(dso.getTypeText().toLowerCase()+".aip.disseminate.sourceMD");
+        if (sourceTypes == null)
+        {
+            sourceTypes = ConfigurationManager.getProperty("aip.disseminate.sourceMD");
+        }
+        
         if (sourceTypes == null)
         {
             String result[] = new String[1];
