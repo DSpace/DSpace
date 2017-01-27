@@ -62,7 +62,7 @@ public class FinalPaymentAction extends ProcessingAction {
 
             // if fee waiver is in place, transaction is paid
             if (shoppingCart.getCountry() != null && shoppingCart.getCountry().length() > 0) {
-                log.info("processed fee waiver for Item " + itemID + ", country = " + shoppingCart.getCountry());
+                log.info("processed fee waiver for Item " + itemID + ", country = " + shoppingCart.getCountry() + ", marking cart complete");
                 return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
             }
 
@@ -76,7 +76,7 @@ public class FinalPaymentAction extends ProcessingAction {
                     voucher.setStatus(Voucher.STATUS_USED);
                     voucher.update();
                     c.commit();
-                    log.info("processed voucher for Item " + itemID + ", voucherID = " + voucher.getID());
+                    log.info("processed voucher for Item " + itemID + ", voucherID = " + voucher.getID() + ", marking cart complete");
                     return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
                 }
             }
@@ -85,7 +85,8 @@ public class FinalPaymentAction extends ProcessingAction {
             // if journal-based subscription is in place, transaction is paid
             if (organizationConcept != null) {
                 if (shoppingCart.hasSubscription()) {
-                    log.info("processed journal subscription for Item " + itemID + ", journal = " + organizationConcept.getFullName());
+                    log.info("processed journal subscription for Item " + itemID + ", journal = " +
+                             organizationConcept.getFullName() + ", marking cart complete");
                     log.debug("tally credit for journal = " + organizationConcept.getFullName());
 
                     if (organizationConcept.getCustomerID() != null) {
@@ -114,7 +115,7 @@ public class FinalPaymentAction extends ProcessingAction {
             // process payment via PayPal
             PaymentService paymentService = new DSpace().getSingletonService(PaymentService.class);
             if (paymentService.submitReferenceTransaction(c, wfi, request)) {
-                log.info("processed PayPal payment for Item " + itemID);
+                log.info("processed PayPal payment for Item " + itemID + ", marking cart complete");
                 return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
             }
 

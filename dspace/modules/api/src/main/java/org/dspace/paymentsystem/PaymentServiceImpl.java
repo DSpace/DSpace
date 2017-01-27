@@ -304,6 +304,8 @@ public class PaymentServiceImpl implements PaymentService {
                         //TODO: ignore the error from paypal server, add the error check after figure out the correct way to process the credit card info
                         if (result[0].contains("RESULT") && result[1].equals("0")) {
                             //successfull
+                            log.debug("marking cart for item " + shoppingCart.getItem() +
+                                      " complete, due to paypal result " + temp);
                             shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                             Date date = new Date();
                             shoppingCart.setPaymentDate(date);
@@ -495,7 +497,6 @@ public class PaymentServiceImpl implements PaymentService {
                     log.debug("nsf pays");
                     DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, authority);
                     shoppingCart.setSponsoringOrganization(funderConcept);
-//                    shoppingCart.setStatus(ShoppingCart.STATUS_COMPLETED);
                     shoppingCart.update();
                     paymentSystemService.updateTotal(context, shoppingCart);
                     mainDiv.addPara(T_funding_valid);
