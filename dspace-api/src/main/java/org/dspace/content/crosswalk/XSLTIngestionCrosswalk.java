@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -61,7 +62,7 @@ public class XSLTIngestionCrosswalk
     }
 
     // apply metadata values returned in DIM to the target item.
-    private static void applyDim(List<Element> dimList, Item item)
+    private static void applyDim(List<Element> dimList, DSpaceObject item)
         throws MetadataValidationException
     {
         for (Element elt : dimList)
@@ -84,7 +85,7 @@ public class XSLTIngestionCrosswalk
     }
 
     // adds the metadata element from one <field>
-    private static void applyDimField(Element field, Item item)
+    private static void applyDimField(Element field, DSpaceObject item)
     {
         String schema = field.getAttributeValue("mdschema");
         String element = field.getAttributeValue("element");
@@ -92,24 +93,34 @@ public class XSLTIngestionCrosswalk
         String lang = field.getAttributeValue("lang");
         String authority = field.getAttributeValue("authority");
         String sconf = field.getAttributeValue("confidence");
-
-        // sanity check: some XSL puts an empty string in qualifier,
-        // change it to null so we match the unqualified DC field:
-        if (qualifier != null && qualifier.equals(""))
+        if ((Constants.BITSTREAM == item.getType()
+                || Constants.BUNDLE == item.getType()) && "dc".equals(schema)
+                && "title".equals(element) && StringUtils.isBlank(qualifier))
         {
-            qualifier = null;
-        }
-        
-        if ((authority != null && authority.length() > 0) ||
-            (sconf != null && sconf.length() > 0))
-        {
-            int confidence = (sconf != null && sconf.length() > 0) ?
-                    Choices.getConfidenceValue(sconf) : Choices.CF_UNSET;
-            item.addMetadata(schema, element, qualifier, lang, field.getText(), authority, confidence);
+            // NOTHING TO DO
         }
         else
         {
-            item.addMetadata(schema, element, qualifier, lang, field.getText());
+            // sanity check: some XSL puts an empty string in qualifier,
+            // change it to null so we match the unqualified DC field:
+            if (qualifier != null && qualifier.equals(""))
+            {
+                qualifier = null;
+            }
+
+            if ((authority != null && authority.length() > 0)
+                    || (sconf != null && sconf.length() > 0))
+            {
+                int confidence = (sconf != null && sconf.length() > 0)
+                        ? Choices.getConfidenceValue(sconf) : Choices.CF_UNSET;
+                item.addMetadata(schema, element, qualifier, lang,
+                        field.getText(), authority, confidence);
+            }
+            else
+            {
+                item.addMetadata(schema, element, qualifier, lang,
+                        field.getText());
+            }
         }
     }
 
@@ -206,10 +217,9 @@ public class XSLTIngestionCrosswalk
                IOException, SQLException, AuthorizeException
     {
         int type = dso.getType();
-        if (type == Constants.ITEM)
+        if (type == Constants.ITEM || type == Constants.BITSTREAM || type == Constants.BUNDLE)
         {
-            Item item = (Item)dso;
-            applyDim(fields, item);
+            applyDim(fields, dso);
         }
         else if (type == Constants.COLLECTION ||
                  type == Constants.COMMUNITY)

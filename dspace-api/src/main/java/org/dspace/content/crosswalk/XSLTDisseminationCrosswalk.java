@@ -7,7 +7,6 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,11 +19,13 @@ import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
-import org.dspace.content.DSpaceObject;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Site;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
@@ -195,14 +196,6 @@ public class XSLTDisseminationCrosswalk
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        int type = dso.getType();
-        if (!(type == Constants.ITEM ||
-              type == Constants.COLLECTION ||
-              type == Constants.COMMUNITY))
-        {
-            throw new CrosswalkObjectNotSupported("XSLTDisseminationCrosswalk can only crosswalk items, collections, and communities.");
-        }
-
         init();
 
         XSLTransformer xform = getTransformer(DIRECTION);
@@ -235,13 +228,6 @@ public class XSLTDisseminationCrosswalk
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        int type = dso.getType();
-        if (!(type == Constants.ITEM ||
-              type == Constants.COLLECTION ||
-              type == Constants.COMMUNITY))
-        {
-            throw new CrosswalkObjectNotSupported("XSLTDisseminationCrosswalk can only crosswalk a items, collections, and communities.");
-        }
 
         init();
 
@@ -269,7 +255,7 @@ public class XSLTDisseminationCrosswalk
      */
     public boolean canDisseminate(DSpaceObject dso)
     {
-        return dso.getType() == Constants.ITEM;
+        return dso.getType() == Constants.ITEM || dso.getType() == Constants.BITSTREAM || dso.getType() == Constants.BUNDLE;
     }
 
     /**
@@ -324,6 +310,14 @@ public class XSLTDisseminationCrosswalk
         {
             Item item = (Item) dso;
             return createDIM(dso, item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY));
+        }
+        else if(dso.getType() == Constants.BITSTREAM) {
+            Bitstream bitstream = (Bitstream)dso;
+            return createDIM(dso, bitstream.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY));
+        }
+        else if(dso.getType() == Constants.BUNDLE) {
+            Bundle bundle = (Bundle)dso;
+            return createDIM(dso, bundle.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY));            
         }
         else
         {
