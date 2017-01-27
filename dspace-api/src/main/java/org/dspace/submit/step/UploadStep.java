@@ -614,7 +614,7 @@ public class UploadStep extends AbstractProcessingStep
                 if (configurationService.getBooleanProperty("submission-curation.virus-scan"))
                 {
                     Curator curator = new Curator();
-                    curator.addTask("vscan").curate(item);
+                    curator.addTask("vscan").curate(context, item.getHandle());
                     int status = curator.getStatus("vscan");
                     if (status == Curator.CURATE_ERROR)
                     {
