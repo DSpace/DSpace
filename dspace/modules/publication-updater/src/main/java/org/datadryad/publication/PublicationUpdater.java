@@ -31,6 +31,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.http.client.utils.URLEncodedUtils;
 
 /**
@@ -456,6 +459,13 @@ public class PublicationUpdater extends HttpServlet {
 
     private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, String provenance) {
         boolean changed = false;
+
+        // first, check to see if this is one of the known mismatches:
+        if (isManuscriptMismatchForItem(item, manuscript)) {
+            LOGGER.error("pub " + manuscript.getPublicationDOI() + " is known to be a mismatch for " + item.getID());
+            return false;
+        }
+
         if (!"".equals(manuscript.getPublicationDOI()) && !item.hasMetadataEqualTo(PUBLICATION_DOI, manuscript.getPublicationDOI())) {
             changed = true;
             item.clearMetadata(PUBLICATION_DOI);
@@ -498,6 +508,30 @@ public class PublicationUpdater extends HttpServlet {
             }
         }
         return changed;
+    }
+
+    private boolean isManuscriptMismatchForItem(Item item, Manuscript manuscript) {
+        // normalize the pubDOI from the manuscript: remove leading "doi:" or "dx.doi.org/"
+        String msDOI = null;
+        Pattern doi = Pattern.compile(".*(10.\\d+/.+)");
+        Matcher m = doi.matcher(manuscript.getPublicationDOI().toLowerCase());
+        if (m.matches()) {
+            msDOI = m.group(1);
+        }
+
+        DCValue[] itemMismatches = item.getMetadata("dryad", "citationMismatchedDOI", Item.ANY, Item.ANY);
+        if (itemMismatches.length > 0) {
+            for (DCValue dcv : itemMismatches) {
+                m = doi.matcher(dcv.value.toLowerCase());
+                if (m.matches()) {
+                    if (msDOI.equals(m.group(1))) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
