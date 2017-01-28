@@ -226,21 +226,24 @@ public class PublicationUpdater extends HttpServlet {
                     // look for this item in crossref:
                     Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
                     if (matchedManuscript != null) {
-                        // update the item's metadata
-                        message = "Associated publication (match score " + matchedManuscript.optionalProperties.get("crossref-score") + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                        if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
-                            updatedItems.add(buildItemSummary(item) + "\n\t" + message);
-                        }
-                        // was there a manuscript record saved for this? If so, update it.
-                        if (databaseManuscript != null) {
-                            databaseManuscript.setPublicationDOI(matchedManuscript.getPublicationDOI());
-                            databaseManuscript.setPublicationDate(matchedManuscript.getPublicationDate());
-                            databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
-                            try {
-                                LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
-                                JournalUtils.writeManuscriptToDB(databaseManuscript);
-                            } catch (Exception e) {
-                                LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
+                        // does this manuscript have the same authors?
+                        if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript)) {
+                            // update the item's metadata
+                            message = "Associated publication (match score " + matchedManuscript.optionalProperties.get("crossref-score") + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
+                            if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
+                                updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                            }
+                            // was there a manuscript record saved for this? If so, update it.
+                            if (databaseManuscript != null) {
+                                databaseManuscript.setPublicationDOI(matchedManuscript.getPublicationDOI());
+                                databaseManuscript.setPublicationDate(matchedManuscript.getPublicationDate());
+                                databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
+                                try {
+                                    LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
+                                    JournalUtils.writeManuscriptToDB(databaseManuscript);
+                                } catch (Exception e) {
+                                    LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
+                                }
                             }
                         }
                     }
@@ -263,11 +266,14 @@ public class PublicationUpdater extends HttpServlet {
             // look for this item in crossref:
             Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
             if (matchedManuscript != null) {
-                // update the item's metadata
-                String score = matchedManuscript.optionalProperties.get("crossref-score");
-                message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
-                    updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                // does the matched manuscript have the same authors?
+                if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript)) {
+                    // update the item's metadata
+                    String score = matchedManuscript.optionalProperties.get("crossref-score");
+                    message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
+                    if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
+                        updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                    }
                 }
             }
         }
