@@ -265,8 +265,8 @@ public class PublicationUpdater extends HttpServlet {
             if (matchedManuscript != null) {
                 // update the item's metadata
                 String score = matchedManuscript.optionalProperties.get("crossref-score");
+                message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
                 if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
-                    message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
                     updatedItems.add(buildItemSummary(item) + "\n\t" + message);
                 }
             }
