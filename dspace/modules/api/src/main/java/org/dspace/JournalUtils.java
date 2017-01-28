@@ -469,7 +469,9 @@ public class JournalUtils {
 
         // sanity check:
         if (matchedManuscript != null) {
-            double matchScore = getHamrScore(queryManuscript.getTitle(), matchedManuscript.getTitle());
+            double matchScore = getHamrScore(queryManuscript.getTitle().toLowerCase(), matchedManuscript.getTitle().toLowerCase());
+            matchedManuscript.optionalProperties.put("crossref-score", String.valueOf(matchScore));
+            // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
             if (matchScore < 0.5) {
                 log.error(queryManuscript.getTitle() + " matched " + matchedManuscript.getTitle() + " with score " + matchScore);
                 log.error("crossref url was " + crossRefURL);
