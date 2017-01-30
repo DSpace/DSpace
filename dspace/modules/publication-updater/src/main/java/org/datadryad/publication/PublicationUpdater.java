@@ -491,11 +491,10 @@ public class PublicationUpdater extends HttpServlet {
                 item.addMetadata(PUBLICATION_DATE, null, dateString, null, -1);
             }
         }
-
         if (changed) {
             item.clearMetadata(CITATION_IN_PROGRESS);
             item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
-
+            LOGGER.info("writing provenance for item " + item.getID() + ": " + provenance);
             if (!"".equals(provenance)) {
                 item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + provenance + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
             }
@@ -518,19 +517,20 @@ public class PublicationUpdater extends HttpServlet {
         if (m.matches()) {
             msDOI = m.group(1);
         }
-
+        LOGGER.error("looking for mismatches for " + msDOI);
         DCValue[] itemMismatches = item.getMetadata("dryad", "citationMismatchedDOI", Item.ANY, Item.ANY);
         if (itemMismatches.length > 0) {
             for (DCValue dcv : itemMismatches) {
                 m = doi.matcher(dcv.value.toLowerCase());
                 if (m.matches()) {
                     if (msDOI.equals(m.group(1))) {
+                        LOGGER.error("found a mismatch: " + m.group(1));
                         return true;
                     }
                 }
             }
         }
-
+        LOGGER.error("no mismatches");
         return false;
     }
 
@@ -543,7 +543,7 @@ public class PublicationUpdater extends HttpServlet {
             ConfigurationManager.loadConfig(config);
         }
 
-        LOGGER.debug("scheduling publication checker");
+//        LOGGER.debug("scheduling publication checker");
 //        myPublicationUpdaterTimer = new Timer();
         // schedule harvesting to the number of days set in the configuration:
         // timers are set in units of milliseconds.
