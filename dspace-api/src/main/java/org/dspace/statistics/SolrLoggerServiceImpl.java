@@ -28,6 +28,7 @@ import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.RangeFacet;
+import org.apache.solr.client.solrj.response.SolrPingResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -84,7 +85,8 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected boolean useProxies;
 
     private static List<String> statisticYearCores = new ArrayList<String>();
-
+    private static boolean statisticYearCoresInit = false;
+    
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
@@ -126,28 +128,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             try
             {
                 server = new HttpSolrServer(configurationService.getProperty("solr-statistics.server"));
-
-                //Attempt to retrieve all the statistic year cores
-                File solrDir = new File(configurationService.getProperty("dspace.dir") + File.separator + "solr" + File.separator);
-                File[] solrCoreFiles = solrDir.listFiles(new FileFilter() {
-
-                    @Override
-                    public boolean accept(File file) {
-                        //Core name example: statistics-2008
-                        return file.getName().matches("statistics-\\d\\d\\d\\d");
-                    }
-                });
-                //Base url should like : http://localhost:{port.number}/solr
-                String baseSolrUrl = server.getBaseURL().replace("statistics", "");
-                for (File solrCoreFile : solrCoreFiles) {
-                    log.info("Loading core with name: " + solrCoreFile.getName());
-
-                    createCore(server, solrCoreFile.getName());
-                    //Add it to our cores list so we can query it !
-                    statisticYearCores.add(baseSolrUrl.replace("http://", "").replace("https://", "") + solrCoreFile.getName());
-                }
-                //Also add the core containing the current year !
-                statisticYearCores.add(server.getBaseURL().replace("http://", "").replace("https://", ""));
             } catch (Exception e) {
             	log.error(e.getMessage(), e);
             }
@@ -1286,14 +1266,29 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     protected HttpSolrServer createCore(HttpSolrServer solr, String coreName) throws IOException, SolrServerException {
         String solrDir = configurationService.getProperty("dspace.dir") + File.separator + "solr" +File.separator;
         String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
+        
+        //DS-3458: Test to see if a solr core already exists.  If it exists, return that server.  Otherwise create a new one.
+        HttpSolrServer returnServer = new HttpSolrServer(baseSolrUrl + "/" + coreName);
+        try {
+            SolrPingResponse ping = returnServer.ping();
+            log.debug(String.format("Ping of Solr Core [%s] Returned with Status [%d]", coreName, ping.getStatus()));
+            return returnServer;
+        } catch(Exception e) {
+            log.debug(String.format("Ping of Solr Core [%s] Failed with [%s].  New Core Will be Created", coreName, e.getClass().getName()));
+        }
+        
+        //Unfortunately, this class is documented as "experimental and subject to change" on the Lucene website.
+        //http://lucene.apache.org/solr/4_4_0/solr-solrj/org/apache/solr/client/solrj/request/CoreAdminRequest.html
         CoreAdminRequest.Create create = new CoreAdminRequest.Create();
         create.setCoreName(coreName);
+        
+        //The config files for a statistics shard reside wihtin the statistics repository
         create.setInstanceDir("statistics");
         create.setDataDir(solrDir + coreName + File.separator + "data");
         HttpSolrServer solrServer = new HttpSolrServer(baseSolrUrl);
         create.process(solrServer);
         log.info("Created core with name: " + coreName);
-        return new HttpSolrServer(baseSolrUrl + "/" + coreName);
+        return returnServer;
     }
 
 
@@ -1516,10 +1511,49 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     protected void addAdditionalSolrYearCores(SolrQuery solrQuery){
         //Only add if needed
+        initSolrYearCores();
         if(0 < statisticYearCores.size()){
             //The shards are a comma separated list of the urls to the cores
             solrQuery.add(ShardParams.SHARDS, StringUtils.join(statisticYearCores.iterator(), ","));
         }
 
+    }
+    
+    /*
+     * The statistics shards should not be initialized until all tomcat webapps are fully initialized.
+     * DS-3457 uncovered an issue in DSpace 6x in which this code triggered tomcat to hang when statistics shards are present.
+     * This code is synchonized in the event that 2 threads trigger the initialization at the same time.
+     */
+    protected synchronized void initSolrYearCores() {
+        if (statisticYearCoresInit) {
+            return;
+        }
+        try
+        {
+            //Attempt to retrieve all the statistic year cores
+            File solrDir = new File(configurationService.getProperty("dspace.dir") + File.separator + "solr" + File.separator);
+            File[] solrCoreFiles = solrDir.listFiles(new FileFilter() {
+
+                @Override
+                public boolean accept(File file) {
+                    //Core name example: statistics-2008
+                    return file.getName().matches("statistics-\\d\\d\\d\\d");
+                }
+            });
+            //Base url should like : http://localhost:{port.number}/solr
+            String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
+            for (File solrCoreFile : solrCoreFiles) {
+                log.info("Loading core with name: " + solrCoreFile.getName());
+
+                createCore(solr, solrCoreFile.getName());
+                //Add it to our cores list so we can query it !
+                statisticYearCores.add(baseSolrUrl.replace("http://", "").replace("https://", "") + solrCoreFile.getName());
+            }
+            //Also add the core containing the current year !
+            statisticYearCores.add(solr.getBaseURL().replace("http://", "").replace("https://", ""));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        statisticYearCoresInit = true;
     }
 }
