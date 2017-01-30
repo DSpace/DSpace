@@ -29,7 +29,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
@@ -47,7 +46,6 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.submit.AbstractProcessingStep
  * 
  * @author Tim Donohue
- * @version $Revision$
  */
 public class UploadStep extends AbstractProcessingStep
 {
@@ -614,7 +612,7 @@ public class UploadStep extends AbstractProcessingStep
                 if (configurationService.getBooleanProperty("submission-curation.virus-scan"))
                 {
                     Curator curator = new Curator();
-                    curator.addTask("vscan").curate(item);
+                    curator.addTask("vscan").curate(context, item);
                     int status = curator.getStatus("vscan");
                     if (status == Curator.CURATE_ERROR)
                     {

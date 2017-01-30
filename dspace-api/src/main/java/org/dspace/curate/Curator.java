@@ -52,12 +52,12 @@ public class Curator
     // transaction scopes
     public static enum TxScope { OBJECT, CURATION, OPEN };
 
-    private static Logger log = Logger.getLogger(Curator.class);
+    private static final Logger log = Logger.getLogger(Curator.class);
     
-    protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<Context>();
+    protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
     
-    protected Map<String, TaskRunner> trMap = new HashMap<String, TaskRunner>();
-    protected List<String> perfList = new ArrayList<String>();
+    protected Map<String, TaskRunner> trMap = new HashMap<>();
+    protected List<String> perfList = new ArrayList<>();
     protected TaskQueue taskQ = null;
     protected String reporter = null;
     protected Invoked iMode = null;
@@ -268,7 +268,22 @@ public class Curator
             }
         }
     }
-    
+
+    /**
+     * Performs all configured tasks upon DSpace object
+     * (Community, Collection or Item).
+     *
+     * @param c session context in which curation takes place.
+     * @param dso the single object to be curated.
+     * @throws java.io.IOException passed through.
+     */
+    public void curate(Context c, DSpaceObject dso)
+            throws IOException
+    {
+        curationCtx.set(c);
+        curate(dso);
+    }
+
     /**
      * Places a curation request for the object identified by id on a
      * managed queue named by the queueId.
