@@ -181,6 +181,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         {
             return;
         }
+        initSolrYearCores();
 
 
         try
@@ -215,38 +216,38 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
     }
     
     @Override
-    public void postView(DSpaceObject dspaceObject,
-            String ip, String userAgent, String xforwardedfor, EPerson currentUser) {
-        if (solr == null || locationService == null) {
-            return;
-        }
+	public void postView(DSpaceObject dspaceObject,
+			String ip, String userAgent, String xforwardedfor, EPerson currentUser) {
+		if (solr == null || locationService == null) {
+			return;
+		}
+        initSolrYearCores();
 
-        try {
-            SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, ip, userAgent, xforwardedfor,
-                    currentUser);
-            if (doc1 == null)
-                return;
-            if (dspaceObject instanceof Bitstream) {
-                Bitstream bit = (Bitstream) dspaceObject;
-                List<Bundle> bundles = bit.getBundles();
-                for (Bundle bundle : bundles) {
-                    doc1.addField("bundleName", bundle.getName());
-                }
-            }
+		try {
+			SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, ip, userAgent, xforwardedfor,
+					currentUser);
+			if (doc1 == null)
+				return;
+			if (dspaceObject instanceof Bitstream) {
+				Bitstream bit = (Bitstream) dspaceObject;
+				List<Bundle> bundles = bit.getBundles();
+				for (Bundle bundle : bundles) {
+					doc1.addField("bundleName", bundle.getName());
+				}
+			}
 
-            doc1.addField("statistics_type", StatisticsType.VIEW.text());
+			doc1.addField("statistics_type", StatisticsType.VIEW.text());
 
-            solr.add(doc1);
-            // commits are executed automatically using the solr autocommit
-            // solr.commit(false, false);
+			solr.add(doc1);
+			// commits are executed automatically using the solr autocommit
+			// solr.commit(false, false);
 
-        } catch (RuntimeException re) {
-            throw re;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-    
+		} catch (RuntimeException re) {
+			throw re;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 
     /**
      * Returns a solr input document containing common information about the statistics
@@ -445,6 +446,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         {
             SolrInputDocument solrDoc = getCommonSolrDoc(resultObject, request, currentUser);
             if (solrDoc == null) return;
+            initSolrYearCores();
 
             for (String query : queries) {
                 solrDoc.addField("query", query);
@@ -491,6 +493,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void postWorkflow(UsageWorkflowEvent usageWorkflowEvent) throws SQLException {
+        initSolrYearCores();
         try {
             SolrInputDocument solrDoc = getCommonSolrDoc(usageWorkflowEvent.getObject(), null, null);
 
