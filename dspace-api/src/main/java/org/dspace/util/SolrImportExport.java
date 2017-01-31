@@ -46,7 +46,8 @@ public class SolrImportExport
 	private static final DateFormat SOLR_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 	private static final DateFormat SOLR_DATE_FORMAT_NO_MS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	private static final DateFormat EXPORT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM");
-
+	private static final String EXPORT_SEP = "_export_";
+	
 	static
 	{
 		SOLR_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -428,7 +429,7 @@ public class SolrImportExport
 			@Override
 			public boolean accept(File dir, String name)
 			{
-				return name.startsWith(indexName) && name.endsWith(".csv");
+				return name.startsWith(indexName+EXPORT_SEP) && name.endsWith(".csv");
 			}
 		});
 
@@ -677,7 +678,7 @@ public class SolrImportExport
 			exportFileNumber = StringUtils.leftPad("" + (index / ROWS_PER_FILE), (int) Math.ceil(Math.log10(totalRecords / ROWS_PER_FILE)), "0");
 		}
 		return indexName
-				       + "_export_"
+				       + EXPORT_SEP
 					   + EXPORT_DATE_FORMAT.format(exportStart)
 					   + (StringUtils.isNotBlank(exportFileNumber) ? "_" + exportFileNumber : "")
 				       + ".csv";
