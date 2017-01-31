@@ -181,6 +181,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         {
             return;
         }
+        initSolrYearCores();
 
 
         try
@@ -220,6 +221,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 		if (solr == null || locationService == null) {
 			return;
 		}
+        initSolrYearCores();
 
 		try {
 			SolrInputDocument doc1 = getCommonSolrDoc(dspaceObject, ip, userAgent, xforwardedfor,
@@ -445,6 +447,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         {
             SolrInputDocument solrDoc = getCommonSolrDoc(resultObject, request, currentUser);
             if (solrDoc == null) return;
+            initSolrYearCores();
 
             for (String query : queries) {
                 solrDoc.addField("query", query);
@@ -491,6 +494,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void postWorkflow(UsageWorkflowEvent usageWorkflowEvent) throws SQLException {
+        initSolrYearCores();
         try {
             SolrInputDocument solrDoc = getCommonSolrDoc(usageWorkflowEvent.getObject(), null, null);
 
