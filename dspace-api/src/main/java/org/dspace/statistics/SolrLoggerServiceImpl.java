@@ -1285,7 +1285,12 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         //The config files for a statistics shard reside wihtin the statistics repository
         create.setInstanceDir("statistics");
         create.setDataDir(solrDir + coreName + File.separator + "data");
+        //It is unclear why a separate solr server using the baseSolrUrl is required.
+        //Based on testing while working on DS-3457, this appears to be necessary.
         HttpSolrServer solrServer = new HttpSolrServer(baseSolrUrl);
+        
+        //DS-3457: The invocation of this method will cause tomcat to hang if this method is invoked before the solr webapp has fully initialized.
+        //Also, any attempt to ping a repository before solr is fully initialized will also cause tomcat to hang.
         create.process(solrServer);
         log.info("Created core with name: " + coreName);
         return returnServer;
