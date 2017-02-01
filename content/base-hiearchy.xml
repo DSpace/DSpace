@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<!-- docs: https://wiki.duraspace.org/display/DSDOC5x/Importing+Community+and+Collection+Hierarchy -->
+
+<import_structure>
+        <community>
+                <name>VSim</name>
+                <description>The VSim community is a repository and archive to facilitate peer review and dissemination of academically generated 3D content. Collections in this community deliver 3D content in a standardized file format for desktop use, allow for the aggregation of multi-media support material, and make academically generated 3D content available for educational use.</description>
+                <intro>Introductory text</intro>
+                <copyright>Special copyright notice</copyright>
+                <sidebar>Sidebar text</sidebar>
+         </community>
+ </import_structure>

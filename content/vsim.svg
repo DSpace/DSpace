@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="468"
+   height="60"
+   id="svg3460"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   viewBox="0 0 468 60"
+   sodipodi:docname="vsim.svg">
+  <defs
+     id="defs3462" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.0790598"
+     inkscape:cx="234"
+     inkscape:cy="21.666667"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1113"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3465">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <g
+       transform="matrix(1.6880001,0,0,1.8930328,-652.39003,-717.86113)"
+       id="g3400">
+      <g
+         id="g3402">
+        <polygon
+           points="419,401 415.953,397.082 405,402.559 394.047,397.082 391,401 405,408 "
+           id="polygon3404" />
+        <polygon
+           points="405,389.441 408.607,387.639 405,383 401.393,387.639 "
+           id="polygon3406" />
+        <polygon
+           points="405,395.441 411.967,391.957 409.233,388.443 405,390.559 400.767,388.443 398.033,391.957 "
+           id="polygon3408" />
+        <polygon
+           points="405,401.441 415.327,396.277 412.593,392.764 405,396.559 397.407,392.764 394.673,396.277 "
+           id="polygon3410" />
+      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="49.799564"
+       y="44.166668"
+       id="text3484"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3486"
+         x="49.799564"
+         y="44.166668"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Days;-inkscape-font-specification:Days">VSim</tspan></text>
+  </g>
+</svg>
