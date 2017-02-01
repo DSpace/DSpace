@@ -62,9 +62,9 @@ public class DSpaceExcludeSetFilter extends DSpaceFilter {
         List<String> excludeSets = this.getExcludeSets();
         for (int i = 0; i < excludeSets.size(); i++) {
             // TODO: distinguish communities/collections
-            if (excludeSets.get(i).substring(0, 4) == "col_") {
+            if (excludeSets.get(i).substring(0, 4).equals("col_")) {
                 cond.append("item.collections:");
-            } else if (excludeSets.get(i).substring(0, 4) == "com_") {
+            } else if (excludeSets.get(i).substring(0, 4).equals("com_")) {
                 cond.append("item.communities:");
             } else {
                 throw new UnsupportedOperationException("DSpaceExcludeSetFilter: Unexpected set prefix " + excludeSets.get(i).substring(0, 4));
