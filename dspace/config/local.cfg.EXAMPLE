@@ -49,6 +49,9 @@ dspace.ui = xmlui
 # Name of the site
 dspace.name = DSpace at My University
 
+# assetstore.dir, look at DSPACE/config/spring/api/bitstore.xml for more options
+assetstore.dir = ${dspace.dir}/assetstore
+
 # Default language for metadata values
 #default.language = en_US
 
