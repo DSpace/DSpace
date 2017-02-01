@@ -995,6 +995,17 @@ public class PluginManager
     }
 
     /**
+     * Refresh plugin, TODO need to introduce management of the lifecycle
+     */
+    public static void refreshPlugin(){
+        cacheMeCache.clear(); 
+        sequenceConfig.clear();
+        anonymousInstanceCache.clear();
+        namedPluginClasses.clear();
+        namedInstanceCache.clear();
+    }    
+    
+    /**
      * Invoking this class from the command line just runs
      * <code>checkConfiguration</code> and shows the results.
      * There are no command-line options.
