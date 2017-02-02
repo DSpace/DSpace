@@ -18,6 +18,9 @@ public class CommunityNameComparator
 {
     @Override
     public int compare(Community community1, Community community2) {
+        if(community1 == community2) { return 0; }
+        if(community1 == null) { return -1; }
+        if(community1 == null) { return -1; }
         return community1.getName().compareTo(community2.getName());
     }
 }

@@ -18,6 +18,9 @@ public class CollectionNameComparator
 {
     @Override
     public int compare(Collection collection1, Collection collection2) {
+        if(collection1 == collection2) { return 0; }
+        if(collection1 == null) { return -1; }
+        if(collection2 == null) { return -1; }
         return collection1.getName().compareTo(collection2.getName());
     }
 }
