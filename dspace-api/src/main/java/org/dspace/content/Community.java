@@ -140,6 +140,8 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Collection> getCollections()
     {
+        List<Collection> sortedCollections = new ArrayList<Collection>(collections);
+        Collections.sort(sortedCollections, new CollectionNameComparator());
         return collections;
     }
 
