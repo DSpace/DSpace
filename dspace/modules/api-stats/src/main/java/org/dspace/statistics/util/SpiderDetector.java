@@ -152,7 +152,7 @@ public class SpiderDetector {
 
             for (Pattern candidate : agents)
             {
-                if (candidate.matcher(agent).find())
+                if (candidate != null && candidate.matcher(agent).find())
                 {
                     return true;
                 }
