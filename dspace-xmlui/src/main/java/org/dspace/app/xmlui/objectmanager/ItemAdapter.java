@@ -1025,7 +1025,8 @@ public class ItemAdapter extends AbstractAdapter
 
         // Filename of original will be filename of the derived bitstream
         // minus the extension (ie everything from and including the last "." character)
-        String originalFilename = derived.getName().substring(0, derived.getName().lastIndexOf("."));
+       int endIndex = derived.getName().lastIndexOf(".");
+       String originalFilename = derived.getName().substring(0, endIndex>0?endIndex:(derived.getName().length()-1));
 
         // First find "original" bundle
         for (Bundle bundle : bundles)
