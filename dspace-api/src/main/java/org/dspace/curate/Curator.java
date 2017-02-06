@@ -180,8 +180,12 @@ public class Curator
      * Performs all configured tasks upon object identified by id. If
      * the object can be resolved as a handle, the DSO will be the
      * target object.
-     * 
-     * @param c a Dpace context
+     *
+     * <p>
+     * Note:  this method has the side-effect of setting this instance's Context
+     * reference.  The setting is retained on return.
+     *
+     * @param c a DSpace context
      * @param id an object identifier
      * @throws IOException if IO error
      */
@@ -233,9 +237,10 @@ public class Curator
      * <P>
      * Note: Site-wide tasks will default to running as
      * an Anonymous User unless you call the Site-wide task
-     * via the 'curate(Context,String)' method with an 
+     * via the {@link curate(Context,String)} or
+     * {@link #curate(Context, DSpaceObject)} method with an
      * authenticated Context object.
-     * 
+     *
      * @param dso the DSpace object
      * @throws IOException if IO error
      */
@@ -272,6 +277,10 @@ public class Curator
     /**
      * Performs all configured tasks upon DSpace object
      * (Community, Collection or Item).
+     *
+     * <p>
+     * Note:  this method has the side-effect of setting this instance's Context
+     * reference.  The setting is retained on return.
      *
      * @param c session context in which curation takes place.
      * @param dso the single object to be curated.
