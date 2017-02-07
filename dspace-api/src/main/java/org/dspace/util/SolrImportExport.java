@@ -399,9 +399,9 @@ public class SolrImportExport
      * @throws IOException if there is a problem creating the files or communicating with Solr.
      * @throws SolrImportExportException if there is a problem in communicating with Solr.
      */
-	public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, boolean overwrite)
+    public static void exportIndex(String indexName, File toDir, String solrUrl, String timeField, boolean overwrite)
             throws SolrServerException, SolrImportExportException, IOException {
-            exportIndex(indexName, toDir, solrUrl, timeField, null, overwrite);
+        exportIndex(indexName, toDir, solrUrl, timeField, null, overwrite);
     }
 
     /**
@@ -568,14 +568,14 @@ public class SolrImportExport
         query.setGetFieldStatistics(timeField);
         Map<String, FieldStatsInfo> fieldInfo = solr.query(query).getFieldStatsInfo();
         if (fieldInfo == null || !fieldInfo.containsKey(timeField)) {
-		    log.warn(String.format("Queried [%s].  No fieldInfo found while exporting index [%s] time field [%s] from [%s]. Export cancelled.",
-	                solrUrl, indexName, timeField, fromWhen));
+            log.warn(String.format("Queried [%s].  No fieldInfo found while exporting index [%s] time field [%s] from [%s]. Export cancelled.",
+                solrUrl, indexName, timeField, fromWhen));
             return;
         }
         FieldStatsInfo timeFieldInfo = fieldInfo.get(timeField);
         if (timeFieldInfo == null || timeFieldInfo.getMin() == null) {
-		    log.warn(String.format("Queried [%s].  No earliest date found while exporting index [%s] time field [%s] from [%s]. Export cancelled.",
-	                solrUrl, indexName, timeField, fromWhen));
+            log.warn(String.format("Queried [%s].  No earliest date found while exporting index [%s] time field [%s] from [%s]. Export cancelled.",
+                solrUrl, indexName, timeField, fromWhen));
             return;
         }
         Date earliestTimestamp = (Date) timeFieldInfo.getMin();
