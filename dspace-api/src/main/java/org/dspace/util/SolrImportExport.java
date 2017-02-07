@@ -84,15 +84,15 @@ public class SolrImportExport
 				printHelpAndExit(options, 0);
 			}
 
-            String[] indexNames = {"statistics"};
-            if (line.hasOption(INDEX_NAME_OPTION))
-            {
-                indexNames = line.getOptionValues(INDEX_NAME_OPTION);
-            }
-            else
-            {
-                System.err.println("No index name provided, defaulting to \"statistics\".");
-            }
+			String[] indexNames = {"statistics"};
+			if (line.hasOption(INDEX_NAME_OPTION))
+			{
+				indexNames = line.getOptionValues(INDEX_NAME_OPTION);
+			}
+			else
+			{
+				System.err.println("No index name provided, defaulting to \"statistics\".");
+			}
 
 			String directoryName = makeDirectoryName(line.getOptionValue(DIRECTORY_OPTION));
 
@@ -114,7 +114,7 @@ public class SolrImportExport
 						String solrUrl = makeSolrUrl(indexName);
 						boolean clear = line.hasOption(CLEAR_OPTION);
 						//Set overwrite to true if clear is true
-                        boolean overwrite = line.hasOption(OVERWRITE_OPTION) || clear;
+						boolean overwrite = line.hasOption(OVERWRITE_OPTION) || clear;
 						importIndex(indexName, importDir, solrUrl, clear, overwrite);
 					}
 					catch (IOException | SolrServerException | SolrImportExportException e)
@@ -168,7 +168,7 @@ public class SolrImportExport
 				{
 					try {
 						boolean keepExport = line.hasOption(KEEP_OPTION);
-                        boolean overwrite = line.hasOption(OVERWRITE_OPTION);
+						boolean overwrite = line.hasOption(OVERWRITE_OPTION);
 						reindex(indexName, directoryName, keepExport, overwrite);
 					} catch (IOException | SolrServerException | SolrImportExportException e) {
 						e.printStackTrace();
@@ -192,7 +192,7 @@ public class SolrImportExport
 		Options options = new Options();
 		options.addOption(ACTION_OPTION, "action", true, "The action to perform: import, export or reindex. Default: export.");
 		options.addOption(CLEAR_OPTION, "clear", false, "When importing, also clear the index first. Ignored when action is export or reindex.");
-        options.addOption(OVERWRITE_OPTION, "clear", false, "When importing, ignore the _version field.  When exporting or re-indexing, allow overwrite existing export files");
+		options.addOption(OVERWRITE_OPTION, "clear", false, "When importing, ignore the _version field.  When exporting or re-indexing, allow overwrite existing export files");
 		options.addOption(DIRECTORY_OPTION, "directory", true,
 				                 "The absolute path for the directory to use for import or export. If omitted, [dspace]/solr-export is used.");
 		options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
@@ -371,7 +371,7 @@ public class SolrImportExport
 	 * @param toDir The target directory for the export. Will be created if it doesn't exist yet. The directory must be writeable.
 	 * @param solrUrl The solr URL for the index to export. Must not be null.
 	 * @param timeField The time field to use for sorting the export. Must not be null.
-     * @param overwrite If set, allow export files to be overwritten
+	 * @param overwrite If set, allow export files to be overwritten
 	 * @throws SolrServerException if there is a problem with exporting the index.
 	 * @throws IOException if there is a problem creating the files or communicating with Solr.
 	 * @throws SolrImportExportException if there is a problem in communicating with Solr.
@@ -594,26 +594,26 @@ public class SolrImportExport
 				monthQuery.setStart(i);
 				URL url = new URL(solrUrl + "/select?" + monthQuery.toString());
 
-                File file = new File(toDir.getCanonicalPath(), makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
-                if (file.createNewFile() || overwrite)
-                {
-                    FileUtils.copyURLToFile(url, file);
-                    String message = String.format("Solr export to file [%s] complete.  Export for Index [%s] Month [%s] Batch [%d] Num Docs [%d]", 
-                        file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
-                        log.info(message);
-                }
-                else if (file.exists())
-                {
-                    String message = String.format("Solr export file [%s] already exists.  Export failed for Index [%s] Month [%s] Batch [%d] Num Docs [%d]", 
-                        file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
-                    throw new SolrImportExportException(message);
-                }
-                else
-                {
-                    String message = String.format("Cannot create solr export file [%s].  Export failed for Index [%s] Month [%s] Batch [%d] Num Docs [%d]", 
-                        file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
-                    throw new SolrImportExportException(message);
-                }
+				File file = new File(toDir.getCanonicalPath(), makeExportFilename(indexName, monthStartDate, docsThisMonth, i));
+				if (file.createNewFile() || overwrite)
+				{
+					FileUtils.copyURLToFile(url, file);
+					String message = String.format("Solr export to file [%s] complete.  Export for Index [%s] Month [%s] Batch [%d] Num Docs [%d]", 
+						file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
+					log.info(message);
+				}
+				else if (file.exists())
+				{
+					String message = String.format("Solr export file [%s] already exists.  Export failed for Index [%s] Month [%s] Batch [%d] Num Docs [%d]", 
+						file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
+					throw new SolrImportExportException(message);
+				}
+				else
+				{
+					String message = String.format("Cannot create solr export file [%s].  Export failed for Index [%s] Month [%s] Batch [%d] Num Docs [%d]", 
+						file.getCanonicalPath(), indexName, monthStart, i, docsThisMonth);
+					throw new SolrImportExportException(message);
+				}
 			}
 		}
 	}
@@ -732,10 +732,10 @@ public class SolrImportExport
 	{
 		HelpFormatter myhelp = new HelpFormatter();
 		myhelp.printHelp(SolrImportExport.class.getSimpleName() + "\n", options);
-        System.out.println("\n\nCommand Defaults");
-        System.out.println("\tsolr-export-statistics  [-a export]  [-i statistics]");
-        System.out.println("\tsolr-import-statistics  [-a import]  [-i statistics]");
-        System.out.println("\tsolr-reindex-statistics [-a reindex] [-i statistics]");
+		System.out.println("\n\nCommand Defaults");
+		System.out.println("\tsolr-export-statistics  [-a export]  [-i statistics]");
+		System.out.println("\tsolr-import-statistics  [-a import]  [-i statistics]");
+		System.out.println("\tsolr-reindex-statistics [-a reindex] [-i statistics]");
 		System.exit(exitCode);
 	}
 }
