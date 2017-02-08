@@ -29,7 +29,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
@@ -47,7 +46,6 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.submit.AbstractProcessingStep
  * 
  * @author Tim Donohue
- * @version $Revision$
  */
 public class UploadStep extends AbstractProcessingStep
 {
@@ -95,7 +93,7 @@ public class UploadStep extends AbstractProcessingStep
     public static final int STATUS_EDIT_COMPLETE = 25;
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(UploadStep.class);
+    private static final Logger log = Logger.getLogger(UploadStep.class);
 
     /** is the upload required? */
     protected boolean fileRequired = configurationService.getBooleanProperty("webui.submit.upload.required", true);
@@ -589,7 +587,7 @@ public class UploadStep extends AbstractProcessingStep
                 if (configurationService.getBooleanProperty("submission-curation.virus-scan"))
                 {
                     Curator curator = new Curator();
-                    curator.addTask("vscan").curate(item);
+                    curator.addTask("vscan").curate(context, item);
                     int status = curator.getStatus("vscan");
                     if (status == Curator.CURATE_ERROR)
                     {
@@ -627,24 +625,30 @@ public class UploadStep extends AbstractProcessingStep
     }
 
     /*
-      If we created a new Bitstream but now realised there is a problem then remove it.
+     * If we created a new Bitstream but now realise there is a problem then remove it.
      */
-    protected void backoutBitstream(Context context, SubmissionInfo subInfo, Bitstream b, Item item) throws SQLException, AuthorizeException, IOException
+    protected void backoutBitstream(Context context, SubmissionInfo subInfo, Bitstream b, Item item)
+            throws SQLException, AuthorizeException, IOException
     {
         // remove bitstream from bundle..
-        // delete bundle if it's now empty
         List<Bundle> bundles = b.getBundles();
+        if (bundles.isEmpty())
+            throw new SQLException("Bitstream is not in any Bundles.");
 
-        bundleService.removeBitstream(context, bundles.get(0), b);
+        Bundle firstBundle = bundles.get(0);
 
-        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
+        bundleService.removeBitstream(context, firstBundle, b);
+
+        List<Bitstream> bitstreams = firstBundle.getBitstreams();
 
         // remove bundle if it's now empty
-        if (bitstreams.size() < 1)
+        if (bitstreams.isEmpty())
         {
-            itemService.removeBundle(context, item, bundles.get(0));
+            itemService.removeBundle(context, item, firstBundle);
             itemService.update(context, item);
         }
+        else
+            bundleService.update(context, firstBundle);
 
         subInfo.setBitstream(null);
     }
