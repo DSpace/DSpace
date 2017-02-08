@@ -663,7 +663,6 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
         /**
          * Override to manage pages of documents
-         *
          * @param docs
          *     a list of Solr documents
          * @throws IOException
@@ -1231,7 +1230,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
             yearQueryParams.put(CommonParams.WT, "csv");
 
             //Start by creating a new core
-            String coreName = "statistics-" + dcStart.getYear();
+            String coreName = "statistics-" + dcStart.getYearUTC();
             HttpSolrServer statisticsYearServer = createCore(solr, coreName);
 
             System.out.println("Moving: " + totalRecords + " into core " + coreName);
@@ -1246,7 +1245,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 HttpResponse response = new DefaultHttpClient().execute(get);
                 InputStream csvInputstream = response.getEntity().getContent();
                 //Write the csv ouput to a file !
-                File csvFile = new File(tempDirectory.getPath() + File.separatorChar + "temp." + dcStart.getYear() + "." + i + ".csv");
+                File csvFile = new File(tempDirectory.getPath() + File.separatorChar + "temp." + dcStart.getYearUTC() + "." + i + ".csv");
                 FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
                 filesToUpload.add(csvFile);
 
