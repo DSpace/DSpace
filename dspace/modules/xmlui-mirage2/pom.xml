@@ -90,6 +90,7 @@
                                         <exclude>**/*.woff</exclude>
                                         <exclude>**/*.eot</exclude>
                                         <exclude>**/*.xsl</exclude>
+                                        <exclude>**/*.css</exclude>
                                     </excludes>
                                     <filtering>true</filtering>
                                 </resource>
