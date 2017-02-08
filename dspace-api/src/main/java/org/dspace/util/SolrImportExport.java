@@ -56,6 +56,7 @@ public class SolrImportExport
 
 	private static final String ACTION_OPTION = "a";
 	private static final String CLEAR_OPTION = "c";
+
 	private static final String OVERWRITE_OPTION = "f";
 	private static final String DIRECTORY_OPTION = "d";
 	private static final String HELP_OPTION = "h";
