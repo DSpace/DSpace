@@ -64,7 +64,7 @@ import java.util.*;
  * 
  * @author ben at atmire.com
  * @author kevinvandevelde at atmire.com
- * @author mdiggory at atmire.com
+ * @author mdiggory at atmire.com 
  */
 public class SolrLogger
 {
