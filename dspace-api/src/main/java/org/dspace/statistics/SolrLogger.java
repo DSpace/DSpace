@@ -1314,9 +1314,8 @@ public class SolrLogger
             yearQueryParams.put(CommonParams.WT, "csv");
 
             //Start by creating a new core
-            String coreName = "statistics-" + dcStart.getYear();
-            
-            HttpSolrServer statisticsYearServer = createCore(solr, coreName);                
+            String coreName = "statistics-" + dcStart.getYearUTC();
+            HttpSolrServer statisticsYearServer = createCore(solr, coreName);
 
             System.out.println("Moving: " + totalRecords + " into core " + coreName);
             log.info("Moving: " + totalRecords + " records into core " + coreName);
@@ -1330,7 +1329,7 @@ public class SolrLogger
                 HttpResponse response = new DefaultHttpClient().execute(get);
                 InputStream csvInputstream = response.getEntity().getContent();
                 //Write the csv ouput to a file !
-                File csvFile = new File(tempDirectory.getPath() + File.separatorChar + "temp." + dcStart.getYear() + "." + i + ".csv");
+                File csvFile = new File(tempDirectory.getPath() + File.separatorChar + "temp." + dcStart.getYearUTC() + "." + i + ".csv");
                 FileUtils.copyInputStreamToFile(csvInputstream, csvFile);
                 filesToUpload.add(csvFile);
 
