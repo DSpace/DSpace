@@ -715,6 +715,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         {
             value = "";
         }
+        else
+        {
+        	value = value.trim();
+        }
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");
         String qualifier = getAttributeValue(n, "qualifier"); //NodeValue();
@@ -736,8 +740,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         {
             qualifier = null;
         }
-
-        if (!isTest)
+        // only add metadata if it is no test and there is an actual value
+        if (!isTest && !value.equals(""))
         {
             itemService.addMetadata(c, i, schema, element, qualifier, language, value);
         }
