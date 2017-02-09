@@ -26,7 +26,9 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
+import org.apache.solr.client.solrj.request.LukeRequest;
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.RangeFacet;
 import org.apache.solr.client.solrj.response.SolrPingResponse;
@@ -34,6 +36,7 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.luke.FieldFlag;
 import org.apache.solr.common.params.*;
 import org.apache.solr.common.util.JavaBinCodec;
 import org.dspace.content.*;
@@ -70,6 +73,8 @@ public class SolrLogger
 {
     private static final Logger log = Logger.getLogger(SolrLogger.class);
 	
+    private static final String MULTIPLE_VALUES_SPLITTER = "|";
+    
     private static final HttpSolrServer solr;
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -1313,6 +1318,10 @@ public class SolrLogger
             yearQueryParams.put(CommonParams.FQ, filterQuery.toString());
             yearQueryParams.put(CommonParams.WT, "csv");
 
+            //Tell SOLR how to escape and separate the values of multi-valued fields
+            yearQueryParams.put("csv.escape", "\\");
+            yearQueryParams.put("csv.mv.separator", MULTIPLE_VALUES_SPLITTER);
+            
             //Start by creating a new core
             String coreName = "statistics-" + dcStart.getYearUTC();
             HttpSolrServer statisticsYearServer = createCore(solr, coreName);
@@ -1337,14 +1346,22 @@ public class SolrLogger
                 yearQueryParams.put(CommonParams.START, String.valueOf((i + 10000)));
             }
 
+            Set<String> multivaluedFields = getMultivaluedFieldNames();
+            
             for (File tempCsv : filesToUpload) {
                 //Upload the data in the csv files to our new solr core
                 ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
                 contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
-	            contentStreamUpdateRequest.setParam("skip", "_version_");
+                contentStreamUpdateRequest.setParam("escape", "\\");
+                contentStreamUpdateRequest.setParam("skip", "_version_");
                 contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
                 contentStreamUpdateRequest.addFile(tempCsv, "text/plain;charset=utf-8");
 
+                //Add parsing directives for the multivalued fields so that they are stored as separate values instead of one value
+                for (String multivaluedField : multivaluedFields) {
+                    contentStreamUpdateRequest.setParam("f." + multivaluedField + ".split", Boolean.TRUE.toString());
+                    contentStreamUpdateRequest.setParam("f." + multivaluedField + ".separator", MULTIPLE_VALUES_SPLITTER);
+                }
                 statisticsYearServer.request(contentStreamUpdateRequest);
             }
             statisticsYearServer.commit(true, true);
@@ -1381,6 +1398,32 @@ public class SolrLogger
         return returnServer;
     }
 
+    /**
+     * Retrieves a list of all the multi valued fields in the solr core
+     * @return all fields tagged as multivalued
+     * @throws SolrServerException When getting the schema information from the SOLR core fails
+     * @throws IOException When connection to the SOLR server fails
+     */
+    public static Set<String> getMultivaluedFieldNames() throws SolrServerException, IOException {
+        Set<String> multivaluedFields = new HashSet<String>();
+        LukeRequest lukeRequest = new LukeRequest();
+        lukeRequest.setShowSchema(true);
+        LukeResponse process = lukeRequest.process(solr);
+        Map<String, LukeResponse.FieldInfo> fields = process.getFieldInfo();
+        for(String fieldName : fields.keySet())
+        {
+            LukeResponse.FieldInfo fieldInfo = fields.get(fieldName);
+            EnumSet<FieldFlag> flags = fieldInfo.getFlags();
+            for(FieldFlag fieldFlag : flags)
+            {
+                if(fieldFlag.getAbbreviation() == FieldFlag.MULTI_VALUED.getAbbreviation())
+                {
+                    multivaluedFields.add(fieldName);
+                }
+            }
+        }
+        return multivaluedFields;
+    }
     public static void reindexBitstreamHits(boolean removeDeletedBitstreams) throws Exception {
         Context context = new Context();
 
