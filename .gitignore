@@ -3,6 +3,7 @@ target/
 
 ## Ignore project files created by Eclipse
 .settings/
+/bin/
 .project
 .classpath
 
