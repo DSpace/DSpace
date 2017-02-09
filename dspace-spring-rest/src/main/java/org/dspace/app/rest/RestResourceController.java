@@ -2,10 +2,13 @@ package org.dspace.app.rest;
 
 import java.util.UUID;
 
+import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
@@ -57,16 +60,21 @@ public class RestResourceController {
 //		Link link = entityLinks.linkFor(getResourceClass(model), model, page).withSelfRel();
 		Link link = linkTo(this.getClass(), model).withSelfRel();
 		
-		Page resources = repository.findAll(page).map(DSpaceResource::new);
+		Page<DSpaceResource> resources = repository.findAll(page).map(DSpaceResource::new);
+		resources.forEach(r -> r.add(linkTo(this.getClass(), model).slash(r.getData()).withSelfRel()));
 		PagedResources<DSpaceResource> result = assembler.toResource(resources, link);
 		return result;
 	}
 
 	private Class<?> getResourceClass(String model) {
-		return BitstreamRest.class;
+		return getResourceRepository(model).getDomainClass();
 	}
 
 	private DSpaceRestRepository getResourceRepository(String model) {
-		return applicationContext.getBean(model, DSpaceRestRepository.class);
+		try {
+			return applicationContext.getBean(model, DSpaceRestRepository.class);
+		} catch (NoSuchBeanDefinitionException e) {
+			throw new RepositoryNotFoundException(model);
+		}
 	}
 }

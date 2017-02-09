@@ -50,4 +50,9 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 		Page<BitstreamRest> page = new PageImpl<Bitstream>(bit, pageable, total).map(converter);
 		return page;
 	}
+	
+	@Override
+	public Class<BitstreamRest> getDomainClass() {
+		return BitstreamRest.class;
+	}
 }

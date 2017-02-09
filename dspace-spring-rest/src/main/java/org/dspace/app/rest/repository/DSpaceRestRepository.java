@@ -110,4 +110,6 @@ public abstract class DSpaceRestRepository<T, ID extends Serializable> implement
 		currentRequest.setAttribute(ContextUtil.DSPACE_CONTEXT, context);
 		return context;
 	}
+
+	public abstract Class<T> getDomainClass();
 }

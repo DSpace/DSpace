@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component(ItemRestResource.NAME)
 public class ItemRestRepository extends DSpaceRestRepository<ItemRestResource, UUID> {
 	ItemService is = ContentServiceFactory.getInstance().getItemService();
 	@Autowired
@@ -57,6 +57,11 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRestResource, U
 		}
 		Page<ItemRestResource> page = new PageImpl<Item>(items, pageable, total).map(converter);
 		return page;
+	}
+	
+	@Override
+	public Class<ItemRestResource> getDomainClass() {
+		return ItemRestResource.class;
 	}
 
 }
