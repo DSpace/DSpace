@@ -10,3 +10,4 @@ discobot-(.*)\.discoveryengine\.com\.
 localhost\.
 spider(.*)\.yandex\.ru\.
 spider-(.*)\.yandex\.com\.
+msnbot(.*)
