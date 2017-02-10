@@ -1048,6 +1048,16 @@
   </servlet-mapping>
 
 	<!-- CRIS -->
+  <servlet>
+    <servlet-name>stats-cleaner</servlet-name>
+    <servlet-class>org.dspace.app.webui.cris.servlet.StatsCleaner</servlet-class>
+  </servlet>  	
+  
+  <servlet-mapping>
+    <servlet-name>stats-cleaner</servlet-name>
+    <url-pattern>/dspace-admin/stats-cleaner</url-pattern>
+  </servlet-mapping>   	
+
 	<servlet>
 		<servlet-name>researcherImageServlet</servlet-name>
 		<servlet-class>org.dspace.app.webui.cris.servlet.ResearcherPictureServlet</servlet-class>
