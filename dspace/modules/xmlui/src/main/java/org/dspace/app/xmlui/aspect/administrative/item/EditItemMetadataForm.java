@@ -9,8 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -18,7 +17,6 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Composite;
@@ -30,9 +28,7 @@ import org.dspace.app.xmlui.wing.element.Params;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
-import org.dspace.app.xmlui.wing.element.Value;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -202,7 +198,9 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         header.addCell().addContent(T_column1);
         header.addCell().addContent(T_column2);
         header.addCell().addContent(T_column3);
+        header.addCell().addContent(T_column4);
 
+        Map<Integer, String> confOptions = Choices.getConfidenceOptions();
         ChoiceAuthorityManager cmgr = ChoiceAuthorityManager.getManager();
         for (DCValue value : values) {
             String name = value.schema + "_" + value.element;
@@ -242,12 +240,22 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 mdValue.setValue(value.value);
                 boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                 if (isAuth) {
-                    mdValue.setAuthorityControlled();
-                    mdValue.setAuthorityRequired(MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey));
-                    Value authValue = mdValue.setAuthorityValue((value.authority == null) ? "" : value.authority, Choices.getConfidenceText(value.confidence));
-                    // add the "unlock" button to auth field
-                    Button unlock = authValue.addButton("authority_unlock_" + index, "ds-authority-lock");
-                    unlock.setHelp(T_unlock);
+                    Cell authCell = row.addCell();
+
+                    TextArea authArea = authCell.addTextArea("value_"+index+"_authority");
+                    authArea.setSize(2, 20);
+                    authArea.setValue(value.authority);
+
+                    Select confSelect = authCell.addSelect("value_"+index+"_confidence");
+
+                    // add in descending order:
+                    SortedSet<Integer> confKeys = new TreeSet<Integer>(confOptions.keySet());
+                    while (confKeys.size() > 0) {
+                        Integer currKey = confKeys.last();
+                        confKeys.remove(currKey);
+                        confSelect.addOption(confOptions.get(currKey),confOptions.get(currKey));
+                    }
+                    confSelect.setOptionSelected(confOptions.get(value.confidence));
                 }
                 if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey)) {
                     mdValue.setChoices(fieldKey);

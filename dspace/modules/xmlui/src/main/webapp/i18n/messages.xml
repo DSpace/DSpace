@@ -1932,7 +1932,7 @@
 	<message key="xmlui.administrative.item.EditItemMetadataForm.column1">Remove</message>
 	<message key="xmlui.administrative.item.EditItemMetadataForm.column2">Name</message>
 	<message key="xmlui.administrative.item.EditItemMetadataForm.column3">Value</message>
-	<message key="xmlui.administrative.item.EditItemMetadataForm.column4">Language</message>
+	<message key="xmlui.administrative.item.EditItemMetadataForm.column4">Authority</message>
 
 
 
