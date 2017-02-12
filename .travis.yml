@@ -9,7 +9,6 @@ jdk:
   # DS-3384 Oracle JDK 8 has DocLint enabled by default.
   # Let's use this to catch any newly introduced DocLint issues.
   - oraclejdk8
-  - oraclejdk7
 
 ## Should we run into any problems with oraclejdk8 on Travis, we may try the following workaround.
 ## https://docs.travis-ci.com/user/languages/java#Testing-Against-Multiple-JDKs
