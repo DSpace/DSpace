@@ -59,6 +59,6 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 	
 	@Override	
 	public BitstreamResource wrapResource(BitstreamRest bs) {
-		return new BitstreamResource(bs);
+		return new BitstreamResource(bs, utils);
 	}
 }

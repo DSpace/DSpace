@@ -14,6 +14,8 @@ public class BitstreamRest extends DSpaceObjectRest {
 	public static final String NAME = "bitstream";
 	private String bundleName;
 	
+	// avoid to serialize this object inline as we want a full resource embedded
+	//TODO extends this annotation to provide information about lazy loading and projection behavior
 	@JsonProperty(access=Access.WRITE_ONLY)
 	private BitstreamFormatRest format;
 	private Long sizeBytes;

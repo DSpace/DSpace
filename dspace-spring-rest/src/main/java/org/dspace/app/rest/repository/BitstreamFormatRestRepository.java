@@ -49,7 +49,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<BitstreamFormatRest> page = Utils.getPage(bit, pageable).map(converter);
+		Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter);
 		return page;
 	}
 	
@@ -60,6 +60,6 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 	
 	@Override	
 	public BitstreamFormatResource wrapResource(BitstreamFormatRest bs) {
-		return new BitstreamFormatResource(bs);
+		return new BitstreamFormatResource(bs, utils);
 	}
 }

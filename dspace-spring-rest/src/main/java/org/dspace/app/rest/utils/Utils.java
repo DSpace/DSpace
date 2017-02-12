@@ -5,17 +5,25 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import java.util.List;
 
 import org.dspace.app.rest.exception.PaginationException;
+import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
+import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Utils {
+	@Autowired
+	ApplicationContext applicationContext;
 
-	public static <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
+	public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
 		int total = fullContents.size();
 		List<T> pageContent = null;
 		if (pageable.getOffset() > total) {
@@ -32,16 +40,24 @@ public class Utils {
 		}
 	}
 
-	public static Link linkToSingleResource(DSpaceResource r, String rel) {
+	public Link linkToSingleResource(DSpaceResource r, String rel) {
 		RestModel data = r.getData();
 		return linkToSingleResource(data, rel);
 	}
 	
-	public static Link linkToSingleResource(RestModel data, String rel) {
+	public Link linkToSingleResource(RestModel data, String rel) {
 		return linkTo(data.getController(), data.getType()).slash(data).withRel(rel);
 	}
 
-	public static Link linkToSubResource(RestModel data, String rel) {
+	public Link linkToSubResource(RestModel data, String rel) {
 		return linkTo(data.getController(), data.getType()).slash(data).slash(rel).withRel(rel);
+	}
+
+	public DSpaceRestRepository getResourceRepository(String model) {
+		try {
+			return applicationContext.getBean(model, DSpaceRestRepository.class);
+		} catch (NoSuchBeanDefinitionException e) {
+			throw new RepositoryNotFoundException(model);
+		}
 	}
 }

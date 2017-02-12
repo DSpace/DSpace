@@ -13,15 +13,20 @@ import org.dspace.app.rest.utils.Utils;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 public abstract class DSpaceResource<T extends RestModel> extends ResourceSupport {
 	@JsonUnwrapped
 	private final T data;
-	
-	private Map<String, Object> _embedded = new HashMap<String, Object>();
 
-	public DSpaceResource(T data) {
+	@JsonProperty(value="_embedded")
+	@JsonInclude(Include.NON_EMPTY)
+	private Map<String, Object> embedded = new HashMap<String, Object>();
+
+	public DSpaceResource(T data, Utils utils) {
 		this.data = data;
 
 		try {
@@ -29,23 +34,31 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 				Method readMethod = pd.getReadMethod();
 				if (readMethod != null && !"class".equals(pd.getName())) {
 					if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
-						this.add(Utils.linkToSubResource(data, pd.getName()));
-						_embedded.put(pd.getName(), readMethod.invoke(data));
-//						Method writeMethod = pd.getWriteMethod();
-//						writeMethod.invoke(data, new Object[]{null});
+						this.add(utils.linkToSubResource(data, pd.getName()));
+						RestModel linkedObject = (RestModel) readMethod.invoke(data);
+						if (linkedObject != null) {
+							embedded.put(pd.getName(),
+									utils.getResourceRepository(linkedObject.getType()).wrapResource(linkedObject));
+						} else {
+							embedded.put(pd.getName(), null);
+						}
+
+						Method writeMethod = pd.getWriteMethod();
+						writeMethod.invoke(data, new Object[] { null });
 					}
 				}
 			}
-		} catch (IntrospectionException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+		} catch (IntrospectionException | IllegalArgumentException | IllegalAccessException
+				| InvocationTargetException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		this.add(Utils.linkToSingleResource(data, Link.REL_SELF));
+		this.add(utils.linkToSingleResource(data, Link.REL_SELF));
 	}
 
-	public Map<String, Object> get_embedded() {
-		return _embedded;
+	public Map<String, Object> getEmbedded() {
+		return embedded;
 	}
-	
+
 	public T getData() {
 		return data;
 	}

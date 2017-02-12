@@ -5,10 +5,13 @@ import java.io.Serializable;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,10 +22,13 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceRestRepository<T extends RestModel, ID extends Serializable> implements PagingAndSortingRepository<T, ID> {
+public abstract class DSpaceRestRepository<T extends RestModel, ID extends Serializable>
+		implements PagingAndSortingRepository<T, ID> {
+	@Autowired
+	protected Utils utils;
 
 	protected RequestService requestService = new DSpace().getRequestService();
-	
+
 	@Override
 	public <S extends T> S save(S entity) {
 		// TODO Auto-generated method stub
@@ -68,25 +74,25 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 	@Override
 	public void delete(ID id) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void delete(T entity) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void delete(Iterable<? extends T> entities) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deleteAll() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -99,9 +105,9 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 		Context context = obtainContext();
 		return findAll(context, pageable);
 	}
-	
+
 	public abstract Page<T> findAll(Context context, Pageable pageable);
-	
+
 	private Context obtainContext() {
 		Request currentRequest = requestService.getCurrentRequest();
 		Context context = (Context) currentRequest.getAttribute(ContextUtil.DSPACE_CONTEXT);
@@ -114,6 +120,6 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 	}
 
 	public abstract Class<T> getDomainClass();
-	
+
 	public abstract DSpaceResource<T> wrapResource(T model);
 }

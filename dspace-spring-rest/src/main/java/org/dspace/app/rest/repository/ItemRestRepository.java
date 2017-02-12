@@ -67,7 +67,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	
 	@Override
 	public ItemResource wrapResource(ItemRest item) {
-		return new ItemResource(item);
+		return new ItemResource(item, utils);
 	}
 
 }
