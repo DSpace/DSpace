@@ -273,22 +273,24 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             // mode
 
             System.out.println("Adding items from directory: " + sourceDir);
+            log.debug("Adding items from directory: " + sourceDir);
             System.out.println("Generating mapfile: " + mapFile);
+            log.debug("Generating mapfile: " + mapFile);
 
-        boolean directoryFileCollections = false;
-        if (mycollections == null)
-        {
-            directoryFileCollections = true;
-        }
-
-        if (!isTest)
-        {
-            // get the directory names of items to skip (will be in keys of
-            // hash)
-            if (isResume)
+            boolean directoryFileCollections = false;
+            if (mycollections == null)
             {
-                skipItems = readMapFile(mapFile);
+                directoryFileCollections = true;
             }
+
+            if (!isTest)
+            {
+                // get the directory names of items to skip (will be in keys of
+                // hash)
+                if (isResume)
+                {
+                    skipItems = readMapFile(mapFile);
+                }
 
                 // sneaky isResume == true means open file in append mode
                 outFile = new File(mapFile);
@@ -312,39 +314,39 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             Arrays.sort(dircontents, ComparatorUtils.naturalComparator());
 
-        for (int i = 0; i < dircontents.length; i++)
-        {
-            if (skipItems.containsKey(dircontents[i]))
+            for (int i = 0; i < dircontents.length; i++)
             {
-                System.out.println("Skipping import of " + dircontents[i]);
-            }
-            else
-            {
-                List<Collection> clist;
-                if (directoryFileCollections) {
-                    String path = sourceDir + File.separatorChar + dircontents[i];
-                    try {
-                        List<Collection> cols = processCollectionFile(c, path, "collections");
-                        if (cols == null) {
-                            System.out.println("No collections specified for item " + dircontents[i] + ". Skipping.");
-                            continue;
-                        }
-                        clist = cols;
-                    }
-                    catch (IllegalArgumentException e)
-                    {
-                        System.out.println(e.getMessage() + " Skipping." );
-                        continue;
-                    }
+                if (skipItems.containsKey(dircontents[i]))
+                {
+                    System.out.println("Skipping import of " + dircontents[i]);
                 }
                 else
                 {
-                    clist = mycollections;
+                    List<Collection> clist;
+                    if (directoryFileCollections) {
+                        String path = sourceDir + File.separatorChar + dircontents[i];
+                        try {
+                            List<Collection> cols = processCollectionFile(c, path, "collections");
+                            if (cols == null) {
+                                System.out.println("No collections specified for item " + dircontents[i] + ". Skipping.");
+                                continue;
+                            }
+                            clist = cols;
+                        }
+                        catch (IllegalArgumentException e)
+                        {
+                            System.out.println(e.getMessage() + " Skipping." );
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        clist = mycollections;
+                    }
+                    addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
+                    System.out.println(i + " " + dircontents[i]);
                 }
-                addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
-                System.out.println(i + " " + dircontents[i]);
             }
-        }
 
         } finally {
             if(mapOut!=null) {
@@ -466,6 +468,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         String mapOutputString = null;
 
         System.out.println("Adding item from directory " + itemname);
+        log.debug("adding item from directory " + itemname);
 
         // create workspace item
         Item myitem = null;
@@ -712,6 +715,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         {
             value = "";
         }
+        else
+        {
+        	value = value.trim();
+        }
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");
         String qualifier = getAttributeValue(n, "qualifier"); //NodeValue();
@@ -733,8 +740,8 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         {
             qualifier = null;
         }
-
-        if (!isTest)
+        // only add metadata if it is no test and there is an actual value
+        if (!isTest && !value.equals(""))
         {
             itemService.addMetadata(c, i, schema, element, qualifier, language, value);
         }
@@ -1652,7 +1659,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             entry = entries.nextElement();
             if (entry.isDirectory())
             {
-                if (!new File(zipDir + entry.getName()).mkdir())
+                if (!new File(zipDir + entry.getName()).mkdirs())
                 {
                     log.error("Unable to create contents directory: " + zipDir + entry.getName());
                 }
@@ -2040,17 +2047,28 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
     }
 
     @Override
-    public File getTempWorkDirFile() {
+    public File getTempWorkDirFile()
+            throws IOException
+    {
         File tempDirFile = new File(getTempWorkDir());
         if(!tempDirFile.exists()) {
-            tempDirFile.mkdirs();
+            boolean success = tempDirFile.mkdirs();
+            if (!success)
+            {
+                throw new IOException("Work directory "
+                         + tempDirFile.getAbsolutePath()
+                         + " could not be created.");
+            }
+            else log.debug("Created directory " + tempDirFile.getAbsolutePath());
         }
+        else log.debug("Work directory exists:  " + tempDirFile.getAbsolutePath());
         return tempDirFile;
     }
 
     @Override
     public void cleanupZipTemp() {
         System.out.println("Deleting temporary zip directory: " + tempWorkDir);
+        log.debug("Deleting temporary zip directory: " + tempWorkDir);
         deleteDirectory(new File(tempWorkDir));
     }
 
