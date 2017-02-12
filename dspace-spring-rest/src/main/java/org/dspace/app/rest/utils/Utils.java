@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.utils;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -18,6 +25,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
+/**
+ * Collection of utility methods
+ * 
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * 
+ */
 @Component
 public class Utils {
 	@Autowired
@@ -28,12 +41,10 @@ public class Utils {
 		List<T> pageContent = null;
 		if (pageable.getOffset() > total) {
 			throw new PaginationException(total);
-		}
-		else {
-			if (pageable.getOffset()+pageable.getPageSize() > total) {
+		} else {
+			if (pageable.getOffset() + pageable.getPageSize() > total) {
 				pageContent = fullContents.subList(pageable.getOffset(), total);
-			}
-			else {
+			} else {
 				pageContent = fullContents.subList(pageable.getOffset(), pageable.getOffset() + pageable.getPageSize());
 			}
 			return new PageImpl<T>(pageContent, pageable, total);
@@ -44,7 +55,7 @@ public class Utils {
 		RestModel data = r.getData();
 		return linkToSingleResource(data, rel);
 	}
-	
+
 	public Link linkToSingleResource(RestModel data, String rel) {
 		return linkTo(data.getController(), data.getType()).slash(data).withRel(rel);
 	}

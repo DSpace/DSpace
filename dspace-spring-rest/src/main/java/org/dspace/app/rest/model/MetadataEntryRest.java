@@ -7,6 +7,13 @@
  */
 package org.dspace.app.rest.model;
 
+/**
+ * An embeddable representation of the Metadata to use in with DSpace REST
+ * Resource
+ * 
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class MetadataEntryRest {
 	String key;
 

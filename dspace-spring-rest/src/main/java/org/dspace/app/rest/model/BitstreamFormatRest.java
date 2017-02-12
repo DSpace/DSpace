@@ -13,6 +13,12 @@ import org.dspace.app.rest.RestResourceController;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * The BitstreamFormat REST Resource
+ * 
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public class BitstreamFormatRest extends BaseObjectRest<Integer> {
 	public static final String NAME = "bitstreamformat";
 

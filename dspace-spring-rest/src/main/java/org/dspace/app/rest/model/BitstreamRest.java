@@ -10,13 +10,19 @@ package org.dspace.app.rest.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+/**
+ * The Bitstream REST Resource
+ * 
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ */
 public class BitstreamRest extends DSpaceObjectRest {
 	public static final String NAME = "bitstream";
 	private String bundleName;
-	
+
 	// avoid to serialize this object inline as we want a full resource embedded
-	//TODO extends this annotation to provide information about lazy loading and projection behavior
-	@JsonProperty(access=Access.WRITE_ONLY)
+	// TODO extends this annotation to provide information about lazy loading
+	// and projection behavior
+	@JsonProperty(access = Access.WRITE_ONLY)
 	private BitstreamFormatRest format;
 	private Long sizeBytes;
 	private CheckSumRest checkSum;

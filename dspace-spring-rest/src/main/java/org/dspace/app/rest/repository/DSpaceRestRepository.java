@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.repository;
 
 import java.io.Serializable;
@@ -11,13 +18,15 @@ import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
+ * This is the base class for any Rest Repository. It add a DSpaceContext to the
+ * normal Spring Data Repository methods signature and assure that the
+ * repository is able to wrap a DSpace Rest Object in a HAL Resource
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *

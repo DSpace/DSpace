@@ -13,8 +13,15 @@ import org.dspace.app.rest.RestResourceController;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * Base REST representation for all the DSpaceObjects
+ * 
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ *
+ */
 public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
-	@JsonIgnore private String uuid;
+	@JsonIgnore
+	private String uuid;
 
 	private String name;
 	private String handle;
