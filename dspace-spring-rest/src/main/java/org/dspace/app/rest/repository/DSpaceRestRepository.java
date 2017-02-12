@@ -2,6 +2,8 @@ package org.dspace.app.rest.repository;
 
 import java.io.Serializable;
 
+import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.services.RequestService;
@@ -17,7 +19,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceRestRepository<T, ID extends Serializable> implements PagingAndSortingRepository<T, ID> {
+public abstract class DSpaceRestRepository<T extends RestModel, ID extends Serializable> implements PagingAndSortingRepository<T, ID> {
 
 	protected RequestService requestService = new DSpace().getRequestService();
 	
@@ -112,4 +114,6 @@ public abstract class DSpaceRestRepository<T, ID extends Serializable> implement
 	}
 
 	public abstract Class<T> getDomainClass();
+	
+	public abstract DSpaceResource<T> wrapResource(T model);
 }

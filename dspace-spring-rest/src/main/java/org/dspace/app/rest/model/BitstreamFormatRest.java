@@ -9,9 +9,12 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
-public class BitstreamFormatRest {
+import org.dspace.app.rest.RestResourceController;
 
-	private Integer id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class BitstreamFormatRest extends BaseObjectRest<Integer> {
+	public static final String NAME = "bitstreamformat";
 
 	private String shortDescription;
 
@@ -22,16 +25,8 @@ public class BitstreamFormatRest {
 	private int supportLevel;
 
 	private boolean internal;
-	
+
 	private List<String> extensions;
-
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public String getShortDescription() {
 		return shortDescription;
@@ -76,8 +71,19 @@ public class BitstreamFormatRest {
 	public List<String> getExtensions() {
 		return extensions;
 	}
-	
+
 	public void setExtensions(List<String> extensions) {
 		this.extensions = extensions;
+	}
+
+	@Override
+	public String getType() {
+		return NAME;
+	}
+
+	@Override
+	@JsonIgnore
+	public Class getController() {
+		return RestResourceController.class;
 	}
 }

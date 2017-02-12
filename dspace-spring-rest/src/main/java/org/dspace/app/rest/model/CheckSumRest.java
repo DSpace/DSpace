@@ -8,7 +8,7 @@
 
 package org.dspace.app.rest.model;
 
-public class CheckSum {
+public class CheckSumRest {
 	String checkSumAlgorithm;
 	String value;
 

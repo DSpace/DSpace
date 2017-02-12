@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.dspace.app.rest.converter.ItemConverter;
-import org.dspace.app.rest.model.ItemRestResource;
+import org.dspace.app.rest.model.ItemRest;
+import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -18,8 +19,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-@Component(ItemRestResource.NAME)
-public class ItemRestRepository extends DSpaceRestRepository<ItemRestResource, UUID> {
+@Component(ItemRest.NAME)
+public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	ItemService is = ContentServiceFactory.getInstance().getItemService();
 	@Autowired
 	ItemConverter converter;
@@ -30,7 +31,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRestResource, U
 	}
 
 	@Override
-	public ItemRestResource findOne(Context context, UUID id) {
+	public ItemRest findOne(Context context, UUID id) {
 		Item item = null;
 		try {
 			item = is.find(context, id);
@@ -41,7 +42,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRestResource, U
 	}
 
 	@Override
-	public Page<ItemRestResource> findAll(Context context, Pageable pageable) {
+	public Page<ItemRest> findAll(Context context, Pageable pageable) {
 		Iterator<Item> it = null;
 		List<Item> items = new ArrayList<Item>();
 		int total = 0;
@@ -55,13 +56,18 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRestResource, U
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<ItemRestResource> page = new PageImpl<Item>(items, pageable, total).map(converter);
+		Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter);
 		return page;
 	}
 	
 	@Override
-	public Class<ItemRestResource> getDomainClass() {
-		return ItemRestResource.class;
+	public Class<ItemRest> getDomainClass() {
+		return ItemRest.class;
+	}
+	
+	@Override
+	public ItemResource wrapResource(ItemRest item) {
+		return new ItemResource(item);
 	}
 
 }

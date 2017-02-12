@@ -16,7 +16,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
-import org.dspace.app.rest.model.ItemRestResource;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.util.DSpaceContextListener;
@@ -32,7 +31,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.RelProvider;
 

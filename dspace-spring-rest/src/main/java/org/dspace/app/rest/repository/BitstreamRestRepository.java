@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -54,5 +55,10 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 	@Override
 	public Class<BitstreamRest> getDomainClass() {
 		return BitstreamRest.class;
+	}
+	
+	@Override	
+	public BitstreamResource wrapResource(BitstreamRest bs) {
+		return new BitstreamResource(bs);
 	}
 }

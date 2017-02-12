@@ -7,12 +7,17 @@
  */
 package org.dspace.app.rest.model;
 
-public class BitstreamRest extends DSpaceRestObject {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
+public class BitstreamRest extends DSpaceObjectRest {
 	public static final String NAME = "bitstream";
 	private String bundleName;
+	
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private BitstreamFormatRest format;
 	private Long sizeBytes;
-	private CheckSum checkSum;
+	private CheckSumRest checkSum;
 	private Integer sequenceId;
 
 	public String getBundleName() {
@@ -39,11 +44,11 @@ public class BitstreamRest extends DSpaceRestObject {
 		this.sizeBytes = sizeBytes;
 	}
 
-	public CheckSum getCheckSum() {
+	public CheckSumRest getCheckSum() {
 		return checkSum;
 	}
 
-	public void setCheckSum(CheckSum checkSum) {
+	public void setCheckSum(CheckSumRest checkSum) {
 		this.checkSum = checkSum;
 	}
 
@@ -55,4 +60,8 @@ public class BitstreamRest extends DSpaceRestObject {
 		this.sequenceId = sequenceId;
 	}
 
+	@Override
+	public String getType() {
+		return NAME;
+	}
 }

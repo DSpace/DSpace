@@ -7,14 +7,13 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serializable;
 import java.util.List;
 
-import org.springframework.hateoas.Identifiable;
+import org.dspace.app.rest.RestResourceController;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class DSpaceRestObject implements Serializable, Identifiable<String> {
+public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
 	@JsonIgnore private String uuid;
 
 	private String name;
@@ -53,14 +52,6 @@ public class DSpaceRestObject implements Serializable, Identifiable<String> {
 		this.handle = handle;
 	}
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	public List<MetadataEntryRest> getMetadata() {
 		return metadata;
 	}
@@ -69,4 +60,9 @@ public class DSpaceRestObject implements Serializable, Identifiable<String> {
 		this.metadata = metadata;
 	}
 
+	@Override
+	@JsonIgnore
+	public Class getController() {
+		return RestResourceController.class;
+	}
 }

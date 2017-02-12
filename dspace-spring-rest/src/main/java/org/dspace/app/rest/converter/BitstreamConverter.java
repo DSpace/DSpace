@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.model.CheckSum;
+import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -36,7 +36,7 @@ public class BitstreamConverter
 		if (bundles != null && bundles.size() > 0) {
 			b.setBundleName(bundles.get(0).getName());
 		}
-		CheckSum checksum = new CheckSum();
+		CheckSumRest checksum = new CheckSumRest();
 		checksum.setCheckSumAlgorithm(obj.getChecksumAlgorithm());
 		checksum.setValue(obj.getChecksum());
 		b.setCheckSum(checksum);

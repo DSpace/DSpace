@@ -8,12 +8,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
 import org.springframework.core.convert.converter.Converter;
 
-public abstract class DSpaceObjectConverter <M extends DSpaceObject, R extends org.dspace.app.rest.model.DSpaceRestObject> extends DSpaceConverter<M, R> implements Converter<M, R> {	
-	@Override
-	public R convert(M source) {
-		return fromModel(source);
-	}
-	
+public abstract class DSpaceObjectConverter <M extends DSpaceObject, R extends org.dspace.app.rest.model.DSpaceObjectRest> extends DSpaceConverter<M, R> {	
 	@Override
 	public R fromModel(M obj) {
 		R resource = newInstance();

@@ -1,23 +1,51 @@
 package org.dspace.app.rest.model.hateoas;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.utils.Utils;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
-public class DSpaceResource<T> extends ResourceSupport {
+public abstract class DSpaceResource<T extends RestModel> extends ResourceSupport {
 	@JsonUnwrapped
 	private final T data;
+	
+	private Map<String, Object> _embedded = new HashMap<String, Object>();
 
 	public DSpaceResource(T data) {
-		// String username = bookmark.getAccount().getUsername();
 		this.data = data;
-		// this.add(new Link(bookmark.getUri(), "bookmark-uri"));
-		// this.add(linkTo(BookmarkRestController.class,
-		// username).withRel("bookmarks"));
-		// this.add(linkTo(methodOn(BookmarkRestController.class, username)
-		// .readBookmark(username, bookmark.getId())).withSelfRel());
+
+		try {
+			for (PropertyDescriptor pd : Introspector.getBeanInfo(data.getClass()).getPropertyDescriptors()) {
+				Method readMethod = pd.getReadMethod();
+				if (readMethod != null && !"class".equals(pd.getName())) {
+					if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
+						this.add(Utils.linkToSubResource(data, pd.getName()));
+						_embedded.put(pd.getName(), readMethod.invoke(data));
+//						Method writeMethod = pd.getWriteMethod();
+//						writeMethod.invoke(data, new Object[]{null});
+					}
+				}
+			}
+		} catch (IntrospectionException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		this.add(Utils.linkToSingleResource(data, Link.REL_SELF));
 	}
 
+	public Map<String, Object> get_embedded() {
+		return _embedded;
+	}
+	
 	public T getData() {
 		return data;
 	}

@@ -1,0 +1,65 @@
+package org.dspace.app.rest.repository;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.dspace.app.rest.converter.BitstreamConverter;
+import org.dspace.app.rest.converter.BitstreamFormatConverter;
+import org.dspace.app.rest.model.BitstreamFormatRest;
+import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
+import org.dspace.app.rest.utils.Utils;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.core.Context;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+
+@Component(BitstreamFormatRest.NAME)
+public class BitstreamFormatRestRepository extends DSpaceRestRepository<BitstreamFormatRest, Integer> {
+	BitstreamFormatService bfs = ContentServiceFactory.getInstance().getBitstreamFormatService();
+	@Autowired
+	BitstreamFormatConverter converter;
+	
+	public BitstreamFormatRestRepository() {
+		System.out.println("Repository initialized by Spring");
+	}
+
+	@Override
+	public BitstreamFormatRest findOne(Context context, Integer id) {
+		BitstreamFormat bit = null;
+		try {
+			bit = bfs.find(context, id);
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return converter.fromModel(bit);
+	}
+
+	@Override
+	public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
+		List<BitstreamFormat> bit = null;
+		try {
+			bit = bfs.findAll(context);
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		Page<BitstreamFormatRest> page = Utils.getPage(bit, pageable).map(converter);
+		return page;
+	}
+	
+	@Override
+	public Class<BitstreamFormatRest> getDomainClass() {
+		return BitstreamFormatRest.class;
+	}
+	
+	@Override	
+	public BitstreamFormatResource wrapResource(BitstreamFormatRest bs) {
+		return new BitstreamFormatResource(bs);
+	}
+}
