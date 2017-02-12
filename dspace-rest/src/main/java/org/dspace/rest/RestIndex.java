@@ -67,7 +67,7 @@ public class RestIndex {
                         "<ul>" +
                             "<li>GET / - Return this page.</li>" +
                             "<li>GET /test - Return the string \"REST api is running\" for testing purposes.</li>" +
-                            "<li>POST /login - Method for logging into the DSpace RESTful API. You must post User class. Example: {\"email\":\"test@dspace\",\"password\":\"pass\"}. Returns a token which must be included in future requests in the \"rest-dspace-token\" header.</li>" +
+                            "<li>POST /login - Method for logging into the DSpace RESTful API. You must post the parameters \"email\" and \"password\". Example: \"email=test@dspace&password=pass\". Returns a JSESSIONID cookie which can be used for future authenticated requests.</li>" +
                             "<li>POST /logout - Method for logging out of the DSpace RESTful API. The request must include the \"rest-dspace-token\" token</li> header." +
                         "</ul>" +
                     "<h2>Communities</h2>" +

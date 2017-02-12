@@ -96,7 +96,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
             File depositFile = deposit.getFile();
 
             // load the plugin manager for the required configuration
-            String cfg = ConfigurationManager.getProperty("sword-server",
+            String cfg = ConfigurationManager.getProperty("swordv2-server",
                     "mets-ingester.package-ingester");
             if (cfg == null || "".equals(cfg))
             {
@@ -117,7 +117,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
             // Should restore mode be enabled, i.e. keep existing handle?
             if (ConfigurationManager.getBooleanProperty(
-                "sword-server", "restore-mode.enable", false))
+                "swordv2-server", "restore-mode.enable", false))
             {
                 params.setRestoreModeEnabled(true);
             }
@@ -226,7 +226,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
             // load the plugin manager for the required configuration
             String cfg = ConfigurationManager.getProperty(
-                "sword-server", "mets-ingester.package-ingester");
+                "swordv2-server", "mets-ingester.package-ingester");
             if (cfg == null || "".equals(cfg))
             {
                 cfg = "METS";  // default to METS
@@ -246,7 +246,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 
             // Should restore mode be enabled, i.e. keep existing handle?
             if (ConfigurationManager.getBooleanProperty(
-                "sword-server", "restore-mode.enable", false))
+                "swordv2-server", "restore-mode.enable", false))
             {
                 params.setRestoreModeEnabled(true);
             }

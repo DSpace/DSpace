@@ -21,6 +21,7 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 
 import java.sql.SQLException;
 
@@ -38,6 +39,7 @@ import static org.junit.Assert.fail;
  * @see AbstractDSpaceTest
  * @author pvillega
  */
+@Ignore
 public class AbstractUnitTest extends AbstractDSpaceTest
 {
     /** log4j category */

@@ -53,6 +53,8 @@ We welcome everyone to participate in these lists:
 * [dspace-tech@googlegroups.com](https://groups.google.com/d/forum/dspace-tech) : Technical support mailing list. See also our guide for [How to troubleshoot an error](https://wiki.duraspace.org/display/DSPACE/Troubleshoot+an+error).
 * [dspace-devel@googlegroups.com](https://groups.google.com/d/forum/dspace-devel) : Developers / Development mailing list
 
+Great Q&A is also available under the [DSpace tag on Stackoverflow](http://stackoverflow.com/questions/tagged/dspace)
+
 Additional support options are listed at https://wiki.duraspace.org/display/DSPACE/Support
 
 DSpace also has an active service provider network. If you'd rather hire a service provider to 
