@@ -28,6 +28,7 @@ import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.Researcher;
 import org.dspace.app.webui.json.JSONRequest;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.SearchService;
@@ -109,9 +110,10 @@ public class ClaimRPJSONServlet extends JSONRequest{
 
 		String mail = req.getParameter("mailUser");
 		String rpKey = req.getParameter("rpKey");
+		boolean claimEnabled = ConfigurationManager.getBooleanProperty("cris", "rp.claim.enabled");
 		
 		int status =0;
-		if(StringUtils.isNotBlank(mail) && StringUtils.isNotBlank(rpKey)){
+		if(claimEnabled && StringUtils.isNotBlank(mail) && StringUtils.isNotBlank(rpKey)){
 			status = validateCreateEperson(context, mail, rpKey);
 		}
         JsonObject jo = new JsonObject();
