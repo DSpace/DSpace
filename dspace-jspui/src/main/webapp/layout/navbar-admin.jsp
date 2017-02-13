@@ -53,6 +53,8 @@
         navbarEmail = user.getEmail();
     }
 
+	boolean statsCleanerEnabled = ConfigurationManager.getBooleanProperty("usage-statistics","webui.statistics.showCleaner");
+    
 %>
 
        <div class="navbar-header">
@@ -84,7 +86,10 @@
                <li><a href="<%= request.getContextPath() %>/dspace-admin/authority"><fmt:message key="jsp.layout.navbar-admin.authority"/></a></li>
                <% if(mintDoiToolEnabled) { %>
                		<li><a href="<%= request.getContextPath() %>/dspace-admin/doi"><fmt:message key="jsp.layout.navbar-admin.doi"/></a></li>			
-               <% } %>              
+               <% }
+				if(statsCleanerEnabled){ %>
+					<li><a href="<%= request.getContextPath() %>/dspace-admin/stats-cleaner"><fmt:message key="jsp.layout.navbar-admin.stats-cleaner"/></a></li>					
+				<%} %>
             </ul>
           </li>
        <%
