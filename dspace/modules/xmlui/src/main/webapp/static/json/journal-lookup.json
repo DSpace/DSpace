@@ -1,6 +1,15 @@
 {
   "data" : [
      {
+        "issn" : "2305-2562",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "Y",
+        "integrated" : "Y",
+        "title" : "African Invertebrates",
+        "sponsor" : "$120"
+     },
+     {
         "issn" : "0002-9122",
         "embargo" : "Y",
         "submission" : "A",
@@ -44,6 +53,15 @@
         "issn" : "1045-2249",
         "embargo" : "N",
         "hidden" : "N"
+     },
+     {
+        "title" : "BioDiscovery",
+        "sponsor" : "$120",
+        "integrated" : "Y",
+        "submission" : "A",
+        "issn" : "2050-2966",
+        "embargo" : "Y",
+        "hidden" : "Y"
      },
      {
         "integrated" : "Y",
@@ -721,6 +739,15 @@
         "hidden" : "N"
      },
      {
+        "title" : "One Ecosystem",
+        "sponsor" : "$120",
+        "integrated" : "Y",
+        "embargo" : "Y",
+        "issn" : "2367-8194",
+        "submission" : "A",
+        "hidden" : "Y"
+     },
+     {
         "title" : "Open Biology",
         "sponsor" : "The Royal Society",
         "integrated" : "N",
@@ -893,6 +920,15 @@
      },
      {
         "integrated" : "Y",
+        "submission" : "A",
+        "issn" : "2367-7163",
+        "embargo" : "Y",
+        "hidden" : "Y",
+        "title" : "Research Ideas and Outcomes",
+        "sponsor" : "$120"
+     },
+     {
+        "integrated" : "Y",
         "hidden" : "N",
         "submission" : "R",
         "issn" : "0962-8452",
@@ -987,6 +1023,15 @@
         "integrated" : "Y",
         "embargo" : "Y",
         "issn" : "1313-2970",
+        "submission" : "A",
+        "hidden" : "Y"
+     },
+     {
+        "title" : "Zoologia",
+        "sponsor" : "$120",
+        "integrated" : "Y",
+        "embargo" : "Y",
+        "issn" : "0101-8175",
         "submission" : "A",
         "hidden" : "Y"
      },
