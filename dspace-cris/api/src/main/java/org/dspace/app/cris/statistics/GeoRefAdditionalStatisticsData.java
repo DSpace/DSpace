@@ -106,14 +106,19 @@ public class GeoRefAdditionalStatisticsData implements
         }
 
         String dnsValue = (String) doc1.getFieldValue("dns");
-        if (dnsValue != null && dnsValue != doc1.getFieldValue("ip"))
-        {
-
-            int lastIndexOf = dnsValue.lastIndexOf(".");
-            if (lastIndexOf != -1)
-            {
-                doc1.addField("topdomain", dnsValue.substring(lastIndexOf));
-            }
+        if (StringUtils.isNotBlank(dnsValue )){
+        	int firstIndexof =  dnsValue.indexOf(".");
+        	if(firstIndexof != -1){
+        		doc1.addField("domaindns", dnsValue.substring(firstIndexof));
+        	}
+        	
+        	if( dnsValue != doc1.getFieldValue("ip")){
+        		int lastIndexOf = dnsValue.lastIndexOf(".");
+        		if (lastIndexOf != -1)
+        		{
+        			doc1.addField("topdomain", dnsValue.substring(lastIndexOf));
+        		}
+       		}
         }
 
         Location location = getLocationService().getLocation(ip);
