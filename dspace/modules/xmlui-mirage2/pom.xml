@@ -20,7 +20,7 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/../../..</root.basedir>
         <grunt.environment>prod</grunt.environment>
-        <grunt.color.scheme>classic_mirage_color_scheme</grunt.color.scheme>
+        <grunt.color.scheme>bootstrap_color_scheme</grunt.color.scheme>
         <mirage2.deps.included>true</mirage2.deps.included>
         <!-- Versions of build dependencies to be auto-installed when "mirage2.deps.included=true" -->
         <sass.version>3.3.14</sass.version>

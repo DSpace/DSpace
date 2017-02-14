@@ -1,0 +1,473 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+.first-page-header {
+    margin-top: 0;
+}
+
+#ds-feed-option img {
+    margin-right: 5px;
+}
+
+dl {
+    margin: 0;
+}
+
+#ds-options h1,
+#ds-options h2,
+#ds-options h3,
+#ds-options h4,
+#ds-options h5,
+#ds-options h6 {
+    font-size: 12px;
+    margin: 0;
+
+    &.page-header {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+}
+
+.ds-option-set {
+    margin-bottom: 15px;
+}
+
+#ds-options{
+    .ds-option-set-head {
+        color: $gray-light;
+        text-transform: uppercase;
+        @include text-shadow(0px 1px 0px rgba(255,255,255,.5));
+        margin-bottom: 5px;
+    }
+
+//    .list-group-item.active {
+//        background-color: $gray-lighter;
+//        border-color: $nav-tabs-border-color;
+//        color: $gray-dark;
+//    }
+}
+
+#aspect_discovery_SimpleSearch_div_search-results .ds-artifact-item {
+    margin-bottom: 50px;
+
+    &:last-child{
+        margin-bottom: 0;
+    }
+
+    .author,
+    .publisher-date
+    {
+        color: #999;
+    }
+}
+
+#aspect_artifactbrowser_CommunityBrowser_div_comunity-browser {
+    .artifact-title {
+        margin-bottom: 3px;
+        margin-top: 7px;
+    }
+
+    .artifact-info {
+        margin-top: -6px;
+    }
+}
+
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-controls select {
+    width: 20%;
+    min-width: 110px;
+    margin-right: 15px;
+
+}
+
+//.file-wrapper.row,
+//#aspect_artifactbrowser_ConfigurableBrowse_div_browse-navigation .row,
+.ds-artifact-list .artifact-title {
+    margin-bottom: 5px;
+}
+
+.ds-artifact-list .artifact-info {
+    color: #999;
+}
+
+#aspect_artifactbrowser_ItemViewer_div_item-view {
+    .item-summary-view-metadata {
+        h2 {
+            margin-bottom: 5px;
+        }
+
+        //dt {
+        //    width: 100px;
+        //}
+
+        dd {
+            //margin-left: 120px;
+            margin-bottom: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+.detailtable .label-cell {
+    font-weight: bold;
+}
+
+.ds-table-responsive {
+    @media (max-width: $screen-xs-max) {
+        overflow-x: auto;
+        .word-break {
+            min-width: 300px;
+        }
+    }
+}
+
+.table legend {
+    display: none;
+}
+
+
+footer {
+   hr {
+       display: none;
+   }
+
+   & .row > div{
+       padding-top: $line-height-computed;
+       border: 0;
+       border-top: 1px solid $hr-border;
+
+       @media (min-width: $screen-md-min) {
+        padding-left:0 ;
+        padding-right:0 ;
+       }
+   }
+
+    &> .container{
+    padding-top: $center-section-padding-bottom;
+    padding-bottom: $center-section-padding-bottom;
+    border-top: 1px solid $legend-border-color;
+    padding-left:0;
+    padding-right:0;
+
+    @media (max-width: $screen-sm-max) {
+        margin-top: $center-section-padding-bottom;
+        width: 100%;
+    }
+
+    @media (max-width: $screen-xs-max) {
+        padding-left: $grid-gutter-width / 2;
+        padding-right: $grid-gutter-width / 2;
+    }
+
+    .pull-right {
+        text-align: center;
+    }
+    }
+}
+
+#ds-options {
+    padding-top: $navbar-margin-bottom;
+    @media(min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+        padding-right: (($grid-gutter-width/2) - 1);
+    }
+}
+
+
+#main-container {
+
+    .row-offcanvas{
+        background-color: $almost-white;
+    }
+
+    overflow: hidden;
+
+    #sidebar{
+        background-color: $almost-white;
+    }
+        @media(max-width: $screen-sm-max) {
+            .active #sidebar {
+                padding-bottom: 99999px;
+                margin-bottom: -99999px + $center-section-padding-bottom;
+            }
+
+
+    }
+
+    .horizontal-slider  {
+        //does nothing except force hardware accelerated css animations
+        @include transform(translate3d(0, 0, 0));
+
+        #sidebar {
+
+
+            @media(min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+                @include box-shadow(inset 2px 2px 1px rgba(0,0,0,.05));
+                border-right: 1px solid $legend-border-color;
+            }
+        }
+    }
+}
+
+.main-content {
+    background-color: white;
+    padding-top: $center-section-padding-top;
+    padding-bottom: $center-section-padding-bottom;
+    // Huge padding, and equal negative margin (minus the padding we need) fix the column height
+    @media(min-width: $screen-md-min){
+        padding-bottom: 99999px;
+        margin-bottom: -99999px + $center-section-padding-bottom;
+    }
+}
+
+.sidebar-col {
+    padding-top: $center-section-padding-top;
+    padding-bottom: $center-section-padding-bottom;
+}
+
+header {
+
+    .navbar {
+        color: $navbar-inverse-color;
+        margin-bottom: 0px;
+        border: none;
+    }
+
+    .navbar-default{
+
+        background-color: $navbar-inverse-bg;
+
+        .navbar-brand {
+        color: $navbar-inverse-brand-color;
+        &:hover,
+        &:focus {
+            color: $navbar-inverse-brand-hover-color;
+            background-color: $navbar-inverse-brand-hover-bg;
+        }
+    }
+
+    .navbar-text {
+        color: $navbar-inverse-color;
+    }
+
+     .navbar-toggle, .navbar-nav  {
+
+         .icon-bar {
+             background-color: $navbar-inverse-link-color;
+         }
+
+         border-color: transparent;
+         color: $navbar-inverse-link-color;
+         &:hover,
+         &:focus {
+             color: $navbar-inverse-link-hover-color;
+             background-color: $navbar-inverse-link-active-bg;
+         }
+
+        > li > a {
+            color: $navbar-inverse-link-color;
+            &:hover,
+            &:focus {
+                color: $navbar-inverse-link-hover-color;
+                background-color: $navbar-inverse-link-active-bg;
+            }
+        }
+        > .active > a {
+            &,
+            &:hover,
+            &:focus {
+                color: $navbar-inverse-link-active-color;
+                background-color: $navbar-inverse-link-active-bg;
+            }
+        }
+        > .disabled > a {
+            &,
+            &:hover,
+            &:focus {
+                color: $navbar-inverse-link-disabled-color;
+                background-color: $navbar-inverse-link-disabled-bg;
+            }
+        }
+             > .open > a {
+                 &,
+                 &:hover,
+                 &:focus {
+                     background-color: $navbar-inverse-link-active-bg;
+                     color: $navbar-inverse-link-active-color;
+                 }
+             }
+
+    }
+
+
+
+//    .navbar-toggle {
+//        border-color: $navbar-inverse-toggle-border-color;
+//        &:hover,
+//        &:focus {
+//            background-color: $navbar-inverse-toggle-hover-bg;
+//        }
+//        .icon-bar {
+//            background-color: $navbar-inverse-toggle-icon-bar-bg;
+//        }
+//    }
+    }
+}
+
+.trail-wrapper {
+    background-color: lighten($brand-primary, 25%);
+    border-bottom: 1px solid lighten($brand-primary, 15%);
+
+    .breadcrumb{
+        background-color: transparent;
+        margin-bottom: 0;
+
+        > li {
+            + li:before {
+                color: $gray-dark;
+            }
+        }
+        > .active {
+            color: $gray-dark;
+        }
+    }
+
+    .sidebar-toggle {
+        position: relative;
+        margin-right: $navbar-padding-horizontal;
+        padding: 10px;
+        @include navbar-vertical-align(34px);
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-radius: $border-radius-base;
+        margin: 0;
+        //border-color: $navbar-default-toggle-border-color;
+        .icon-bar {
+            background-color: $component-active-bg;
+        }
+
+        &:hover,
+        &:focus {
+            background-color: $component-active-bg;
+
+            .icon-bar {
+                background-color: $component-active-color;
+            }
+        }
+    }
+
+    .sidebar-toggle .icon-bar {
+        display: block;
+        width: 22px;
+        height: 2px;
+        border-radius: 1px;
+    }
+
+    .sidebar-toggle .icon-bar + .icon-bar {
+        margin-top: 4px;
+    }
+}
+
+.pagination {
+    width: 100%;
+    font-size: larger;
+}
+
+.pagination-info {
+    line-height: $line-height-base;
+    color: $gray-light;
+    margin: 0;
+    padding: $padding-base-vertical 0;
+}
+
+.centered-pagination,
+.centered-pagination ul {
+    float: left;
+    position: relative;
+}
+
+.centered-pagination ul {
+    left: -50%;
+}
+
+.centered-pagination {
+    left: 50%;
+}
+
+#aspect_artifactbrowser_CommunityViewer_div_community-view h4 {
+    margin-bottom: 0;
+}
+
+//.sort-options-menu {
+//    .dropdown-menu .glyphicon {
+//        @include checkmark-style();
+//    }
+//}
+
+.thumbnail {
+    border: none;
+    padding-left: 0;
+    & > img {
+        margin-left: 0;
+        border: 1px solid $thumbnail-border;
+    }
+}
+
+.nav-tabs {
+    margin-bottom: 15px;
+    @media (max-width: $screen-xs-max) {
+        & > li {
+            float: none;
+            display: block;
+            margin-bottom: 0;
+            a:hover {
+                border-radius: $border-radius-base;
+                border-bottom-color: $nav-tabs-link-hover-border-color;
+            }
+
+            &.active > a {
+                &,
+                &:hover,
+                &:focus {
+                    color: $nav-pills-active-link-hover-color;
+                    background-color: $nav-pills-active-link-hover-bg;
+                    border-radius: $border-radius-base;
+                    border: 1px solid $nav-pills-active-link-hover-bg;
+
+                    .caret {
+                        border-top-color: $nav-pills-active-link-hover-color;
+                        border-bottom-color: $nav-pills-active-link-hover-color;
+                    }
+                }
+            }
+        }
+    }
+    @media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+        & > li a {
+            padding: 10px;
+        }
+    }
+}
+
+.label-white{
+  background-color: $almost-white;
+  color: $text-color;
+  border: 1px solid $text-color;
+}
+
+.didYouMean {
+    margin-bottom: $line-height-computed / 2;
+
+    a {
+        font-weight: bold;
+    }
+}
+
+@media print {
+	a[href]:after {
+		content: none !important;
+	}
+}
