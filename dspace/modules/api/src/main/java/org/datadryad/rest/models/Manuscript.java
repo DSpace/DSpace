@@ -661,7 +661,7 @@ public class Manuscript {
     }
 
     public boolean isSkipReviewStep() {
-        if (getStatus() != null && getStatus().equals(Manuscript.STATUS_SUBMITTED)) {
+        if (isSubmitted() || isNeedsRevision()) {
             return false;
         }
         return true;
