@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32"
+   height="32"
+   id="svg4700"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   viewBox="0 0 32 32"
+   sodipodi:docname="vsim-favicon.svg"
+   inkscape:export-filename="/home/hpottinger/Desktop/vsim/vsim-favicon.ico"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4702" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="4"
+     inkscape:cx="-27.255284"
+     inkscape:cy="9.928004"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:grid-bbox="true"
+     inkscape:document-units="px"
+     inkscape:window-width="1920"
+     inkscape:window-height="993"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata4705">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <g
+       transform="matrix(1.0272858,0,0,1.1930328,-400.05076,-455.34447)"
+       id="g3400"
+       style="fill:#000000"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <g
+         id="g3402"
+         style="fill:#000000">
+        <polygon
+           points="405,408 419,401 415.953,397.082 405,402.559 394.047,397.082 391,401 "
+           id="polygon3404"
+           style="fill:#000000" />
+        <polygon
+           points="401.393,387.639 405,389.441 408.607,387.639 405,383 "
+           id="polygon3406"
+           style="fill:#000000" />
+        <polygon
+           points="398.033,391.957 405,395.441 411.967,391.957 409.233,388.443 405,390.559 400.767,388.443 "
+           id="polygon3408"
+           style="fill:#000000" />
+        <polygon
+           points="394.673,396.277 405,401.441 415.327,396.277 412.593,392.764 405,396.559 397.407,392.764 "
+           id="polygon3410"
+           style="fill:#000000" />
+      </g>
+    </g>
+  </g>
+</svg>
