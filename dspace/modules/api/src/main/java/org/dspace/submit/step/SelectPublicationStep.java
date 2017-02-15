@@ -306,9 +306,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             } else {
                 manuscript = JournalUtils.getManuscriptFromManuscriptStorage(manuscriptNumber, journalConcept);
                 if (manuscript.getMessage().equals("Invalid manuscript number")) {
-                    // We do not have metadata for this manuscript number
-                    // Store the manuscriptNumber and continue as in-review
-                    manuscript.setManuscriptId(manuscriptNumber);
+                    // We do not have metadata for this manuscript number. Return error.
+                    request.getSession().setAttribute("submit_error", "Invalid manuscript number. Please recheck or leave blank to continue.");
+                    return false;
                 }
             }
             // No matter which radio button was chosen, if the manuscript is rejected, say so.
