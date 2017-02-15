@@ -313,10 +313,12 @@
 						<a class="btn btn-default" href="${root}/cris/uuid/${researcher.uuid}/relMgmt/publications"><i class="fa fa-book"></i> <fmt:message key="jsp.layout.navbar-hku.staff-mode.manage-publication"/></a>
 					</div> --%>
 				</c:if>
-				<c:if test="${claim && !admin}" >
+
+				
+				<c:if test="${claim && !admin && researcher.epersonID != userID}" >
 				<div class="btn-group">				
 				<c:choose>				
-					<c:when test="${!empty researcher.email.value && empty researcher.epersonID }">
+					<c:when test="${!empty researcher.email.value && empty researcher.epersonID && !userHasRP}">
 						<span id="claim-rp" class="btn btn-primary"><i class="fa fa-user"></i>&nbsp;<fmt:message key="jsp.cris.detail.info.claimrp"/></span>
 					</c:when>
 					<c:otherwise>
