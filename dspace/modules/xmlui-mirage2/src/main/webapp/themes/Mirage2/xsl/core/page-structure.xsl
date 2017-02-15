@@ -39,6 +39,7 @@
         Specifically, adding a static page will need to override the DRI, to directly add content.
     -->
     <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
+    <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
 
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
@@ -101,6 +102,18 @@
 
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
+                                        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                                            <div class="word-break hidden-print visible-xs hidden-sm hidden-md hidden-lg">
+                                            <div class="list-group">
+                                                <a class="list-group-item ds-option" href="{$app_path}/discover">advanced search</a>
+                                                <a class="list-group-item ds-option" href="{$app_path}/pages/add">submit works</a>
+                                                <a class="list-group-item ds-option" href="{$app_path}/pages/about">about</a>
+                                                <a class="list-group-item ds-option" href="{$app_path}/pages/help">help</a>
+                                                <a class="list-group-item ds-option" href="{$app_path}/pages/contact">contact us</a>
+                                            </div>
+                                            </div>
+                                            <xsl:apply-templates select="dri:options"/>
+                                        </div>
                                         <div class="col-xs-12 col-sm-12 col-md-9 main-content">
                                             <xsl:apply-templates select="*[not(self::dri:options)]"/>
 
@@ -108,13 +121,8 @@
                                                 <xsl:call-template name="buildFooter"/>
                                             </div>
                                         </div>
-                                        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-                                            <xsl:apply-templates select="dri:options"/>
-                                        </div>
-
                                     </div>
                                 </div>
-
                                 <!--
                             The footer div, dropping whatever extra information is needed on the page. It will
                             most likely be something similar in structure to the currently given example. -->
@@ -703,7 +711,7 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                         <div>
-                            <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2016&#160; <a href="http://www.duraspace.org/" target="_blank">DuraSpace</a>
+                            Insert VSim branding here.
                         </div>
                         <div class="hidden-print">
                             <a>
@@ -727,11 +735,7 @@
                     </div>
                     <div class="col-xs-5 col-sm-4 hidden-print">
                         <div class="pull-right">
-                            <span class="theme-by">Theme by&#160;</span>
-                            <br/>
-                            <a title="Atmire NV" target="_blank" href="http://atmire.com">
-                                <img alt="Atmire NV" src="{concat($theme-path, 'images/atmire-logo-small.svg')}"/>
-                            </a>
+                            add some footer text here
                         </div>
 
                     </div>
