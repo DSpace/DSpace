@@ -273,7 +273,7 @@
 										<a target="_blank" href="<%=request.getContextPath()%>/cris/rp/${authority}">
 											<img title="A preview ${authority} picture"
 												src="researcherimage/${authority}"
-												alt="${authority} picture" name="picture" id="picture" /> </a>
+												alt="${authority} picture" name="picture" id="picture" onError="this.onerror=null;this.src='<%=request.getContextPath() %>/image/cris/photo_not_available.png'" /> </a>
 														
 
 					</div>
@@ -938,7 +938,7 @@
 	-->    
 	</script>
 	<script type="text/x-tmpl" id="tmpl-networkimage">
-		<div class='tip-title'><img style='width: 40px' id='picture' name='picture' src='researcherimage/{%= o.id %}'/><span>{%= o.name %}</span></div>
+		<div class='tip-title'><img style='width: 40px' id='picture' name='picture' src='researcherimage/{%= o.id %}' onError="this.onerror=null;this.src='<%=request.getContextPath() %>/image/cris/photo_not_available.png'"/><span>{%= o.name %}</span></div>
 	</script>
 
 
