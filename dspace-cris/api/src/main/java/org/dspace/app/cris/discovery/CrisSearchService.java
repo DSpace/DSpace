@@ -236,11 +236,15 @@ public class CrisSearchService extends SolrServiceImpl
         Boolean status = dso.getStatus();
         String sourceref = dso.getSourceRef();
         String sourceid = dso.getSourceID();
+        String crisID = ResearcherPageUtils.getPersistentIdentifier(dso);
         if(StringUtils.isNotBlank(sourceref)) {
         	doc.addField("cris-sourceref", sourceref);
         }
         if(StringUtils.isNotBlank(sourceid)) {
         	doc.addField("cris-sourceid", sourceid);
+        }
+        if(StringUtils.isNotBlank(crisID)) {
+            doc.addField("cris-id", crisID);
         }
         commonIndexerHeader(status, uuid, doc);
 
@@ -260,8 +264,8 @@ public class CrisSearchService extends SolrServiceImpl
                 toProjectionFields, sortFields, hitHighlightingFields);
 
         // add the special crisXX.this metadata
-            indexProperty(doc, dso.getUuid(), schema + ".this", dso.getName(),
-                    ResearcherPageUtils.getPersistentIdentifier(dso),
+        indexProperty(doc, dso.getUuid(), schema + ".this", dso.getName(),
+                    crisID,
                     toIgnoreFields, searchFilters, toProjectionFields,
                     sortFields, sortFieldsAdded, hitHighlightingFields,
                     moreLikeThisFields);
