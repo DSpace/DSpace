@@ -58,6 +58,11 @@ public class FullTextContentStreamsTest {
     @Mock
     private Bitstream textBitstream3;
 
+    @Mock
+    private Bitstream textBitstreamRestricted;
+
+    @Mock
+    private AuthorizeService authorizeService;
 
     @Before
     public void setUp() throws Exception {
@@ -68,15 +73,20 @@ public class FullTextContentStreamsTest {
         when(textBitstream1.getName()).thenReturn("Full Text 1");
         when(textBitstream2.getName()).thenReturn("Full Text 2");
         when(textBitstream3.getName()).thenReturn("Full Text 3");
+        when(textBitstreamRestricted.getName()).thenReturn("Full Text Restricted");
 
         when(textBitstream1.getSize()).thenReturn(1L);
         when(textBitstream2.getSize()).thenReturn(2L);
         when(textBitstream3.getSize()).thenReturn(3L);
+        when(textBitstreamRestricted.getSize()).thenReturn(0L);
 
         when(bitstreamService.retrieve(null, textBitstream1)).thenReturn(new ByteArrayInputStream("This is text 1".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstream2)).thenReturn(new ByteArrayInputStream("This is text 2".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
+        when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
+        when(authorizeService.getAuthorizedGroups(null, fulltextBitstream, Constants.READ).contains(null)).thenReturn(true);
+        
         streams.bitstreamService = bitstreamService;
     }
 
@@ -144,6 +154,24 @@ public class FullTextContentStreamsTest {
         InputStream inputStream = streams.getStream();
         assertNotNull(inputStream);
         assertEquals("The data in the input stream should match the text of the bitstream", "\nThis is text 1",
+                IOUtils.toString(inputStream, Charsets.UTF_8));
+    }
+
+    @Test
+    public void testItemWithOneRestrictedTextBitstream() throws Exception {
+        when(item.getBundles()).thenReturn(Arrays.asList(originalBundle, textBundle));
+        when(textBundle.getBitstreams()).thenReturn(Arrays.asList(textBitstreamRestricted));
+
+        streams.init(item);
+
+        assertEquals("Source info should give you the handle", HANDLE, streams.getSourceInfo());
+        assertEquals("Content type should be plain text", CONTENT_TYPE, streams.getContentType());
+        assertEquals("The name should match the name of the bitstream", "Full Text Restricted", streams.getName());
+        assertEquals("The size of the streams should be empty", (Long) 0L, streams.getSize());
+        assertTrue("Content stream should not be empty", streams.isEmpty());
+        InputStream inputStream = streams.getStream();
+        assertNotNull(inputStream);
+        assertEquals("The data in the input stream should match the text of the bitstream", "",
                 IOUtils.toString(inputStream, Charsets.UTF_8));
     }
 
