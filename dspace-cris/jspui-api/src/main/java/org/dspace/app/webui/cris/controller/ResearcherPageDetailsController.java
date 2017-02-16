@@ -129,7 +129,16 @@ public class ResearcherPageDetailsController
         Context context = UIUtil.obtainContext(request);
         EPerson currUser = context.getCurrentUser();
         if(currUser != null) {
-            model.put("isLoggedIn", new Boolean(true));    
+            model.put("isLoggedIn", new Boolean(true));
+            ResearcherPage rp = ((ApplicationService) applicationService).getResearcherPageByEPersonId(currUser.getID());
+        	model.put("userID", currUser.getID());
+            if(rp!=null){
+            	model.put("userHasRP", new Boolean(true));
+
+            }else
+            {
+            	model.put("userHasRP", new Boolean(false));
+            }
         }
         else {
             model.put("isLoggedIn", new Boolean(false));
@@ -137,6 +146,7 @@ public class ResearcherPageDetailsController
         
         boolean isAdmin = AuthorizeManager.isAdmin(context);
       
+        
         if (isAdmin
                 || (currUser != null && (researcher.getEpersonID() != null && currUser
                         .getID() == researcher.getEpersonID())))
