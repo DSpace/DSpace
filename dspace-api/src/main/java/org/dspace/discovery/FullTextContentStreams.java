@@ -81,7 +81,7 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
-    private boolean isAccessibleToAnonymousUser(Bitstream bit) {
+    protected boolean isAccessibleToAnonymousUser(Bitstream bit) {
         try {
             Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
             return getAuthorizeService().getAuthorizedGroups(context, bit, Constants.READ).contains(anonymous);
