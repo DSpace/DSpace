@@ -12,7 +12,9 @@ import org.apache.commons.io.IOUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.eperson.Group;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.authorize.service.AuthorizeService;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,6 +66,9 @@ public class FullTextContentStreamsTest {
 
     @Mock
     private AuthorizeService authorizeService;
+    
+    private List<Group> anon = new ArrayList<Group>();
+    private List<Group> empty = new ArrayList<Group>();
 
     @Before
     public void setUp() throws Exception {
@@ -86,8 +91,9 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
-        when(authorizeService.isAccessibleToAnonymousUser(textBitstreamRestricted)).thenReturn(false);
-        when(authorizeService.isAccessibleToAnonymousUser(null)).thenReturn(true);
+        anon.add(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS));
+        when(authorizeService.getAuthorizedGroups(null, textBitstreamRestricted, Constants.READ)).thenReturn(empty);
+        when(authorizeService.getAuthorizedGroups(null, null, Constants.READ)).thenReturn(anon);
         
         streams.bitstreamService = bitstreamService;
     }
