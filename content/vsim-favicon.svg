@@ -28,18 +28,25 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4"
-     inkscape:cx="-27.255284"
-     inkscape:cy="9.928004"
+     inkscape:zoom="27.68"
+     inkscape:cx="16"
+     inkscape:cy="16.822403"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
      inkscape:window-width="1920"
-     inkscape:window-height="993"
+     inkscape:window-height="1113"
      inkscape:window-x="0"
      inkscape:window-y="24"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       position="16.004335,18.822254"
+       orientation="1,0"
+       id="guide3356" />
+  </sodipodi:namedview>
   <metadata
      id="metadata4705">
     <rdf:RDF>
@@ -48,7 +55,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -57,31 +64,28 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <g
-       transform="matrix(1.0272858,0,0,1.1930328,-400.05076,-455.34447)"
-       id="g3400"
-       style="fill:#000000"
-       inkscape:export-xdpi="90"
-       inkscape:export-ydpi="90">
-      <g
-         id="g3402"
-         style="fill:#000000">
-        <polygon
-           points="405,408 419,401 415.953,397.082 405,402.559 394.047,397.082 391,401 "
-           id="polygon3404"
-           style="fill:#000000" />
-        <polygon
-           points="401.393,387.639 405,389.441 408.607,387.639 405,383 "
-           id="polygon3406"
-           style="fill:#000000" />
-        <polygon
-           points="398.033,391.957 405,395.441 411.967,391.957 409.233,388.443 405,390.559 400.767,388.443 "
-           id="polygon3408"
-           style="fill:#000000" />
-        <polygon
-           points="394.673,396.277 405,401.441 415.327,396.277 412.593,392.764 405,396.559 397.407,392.764 "
-           id="polygon3410"
-           style="fill:#000000" />
-      </g>
+       id="g3358"
+       style="fill:#577492;fill-opacity:1">
+      <polygon
+         transform="matrix(1.0272858,0,0,1.1930328,-400.05076,-455.34447)"
+         style="fill:#577492;fill-opacity:1"
+         id="polygon3404"
+         points="394.047,397.082 391,401 405,408 419,401 415.953,397.082 405,402.559 " />
+      <polygon
+         transform="matrix(1.0272858,0,0,1.1930328,-400.05076,-456.78956)"
+         style="fill:#577492;fill-opacity:1"
+         id="polygon3406"
+         points="405,383 401.393,387.639 405,389.441 408.607,387.639 " />
+      <polygon
+         transform="matrix(1.0272858,0,0,1.1930328,-400.01463,-456.53667)"
+         style="fill:#577492;fill-opacity:1"
+         id="polygon3408"
+         points="405,395.441 411.967,391.957 409.233,388.443 405,390.559 400.767,388.443 398.033,391.957 " />
+      <polygon
+         transform="matrix(1.0272858,0,0,1.1930328,-400.01463,-456.03089)"
+         style="fill:#577492;fill-opacity:1"
+         id="polygon3410"
+         points="405,401.441 415.327,396.277 412.593,392.764 405,396.559 397.407,392.764 394.673,396.277 " />
     </g>
   </g>
 </svg>
