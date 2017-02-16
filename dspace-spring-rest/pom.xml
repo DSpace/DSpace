@@ -3,7 +3,7 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-spring-rest</artifactId>
     <packaging>war</packaging>
-    <name>DSpace Spring Rest (Spring Boot Data Rest)</name>
+    <name>DSpace Spring Rest (Boot MVC + HATEOAS)</name>
     <description>
       DSpace new Rest API
     </description>
