@@ -28,7 +28,6 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.rest.common.ResourcePolicy.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
