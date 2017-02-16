@@ -12,13 +12,8 @@ import org.apache.commons.io.IOUtils;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
-import org.dspace.authorize.service.AuthorizeService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,8 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -69,12 +62,6 @@ public class FullTextContentStreamsTest {
     @Mock
     private Bitstream textBitstreamRestricted;
 
-    @Mock
-    private AuthorizeService authorizeService;
-    
-    private List<Group> anon = new ArrayList<Group>();
-    private List<Group> empty = new ArrayList<Group>();
-
     @Before
     public void setUp() throws Exception {
         when(item.getHandle()).thenReturn(HANDLE);
@@ -96,9 +83,8 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
-        anon.add(EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS));
-        when(authorizeService.getAuthorizedGroups(null, textBitstreamRestricted, Constants.READ)).thenReturn(empty);
-        when(authorizeService.getAuthorizedGroups(null, null, Constants.READ)).thenReturn(anon);
+        when(streams.isAccessibleToAnonymousUser(textBitstreamRestricted).thenReturn(false));
+        when(streams.isAccessibleToAnonymousUser(null).thenReturn(true));
         
         streams.bitstreamService = bitstreamService;
     }
