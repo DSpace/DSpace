@@ -133,6 +133,10 @@ public class UploadStep extends AbstractProcessingStep
 
         // get reference to item
         Item item = subInfo.getSubmissionItem().getItem();
+        
+        if(StringUtils.isNotBlank(ConfigurationManager.getProperty("webui.submit.upload.required."+subInfo.getCollectionHandle()))){
+        	fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required."+subInfo.getCollectionHandle());
+        }
 
         // -----------------------------------
         // Step #0: Upload new files (if any)
