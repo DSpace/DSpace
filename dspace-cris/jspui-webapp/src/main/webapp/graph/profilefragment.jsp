@@ -61,7 +61,7 @@
 										<a target="_blank" href="<%=request.getContextPath()%>/cris/rp/${authoritytarget}">
 											<img title="A preview ${authoritytarget} picture"
 												src="researcherimage/${authoritytarget}"
-												alt="${authoritytarget} picture" name="picture" id="picture" /> </a>
+												alt="${authoritytarget} picture" name="picture" id="picture" onError="this.onerror=null;this.src='<%=request.getContextPath() %>/image/cris/photo_not_available.png'" /> </a>
 						
 					</div>
 					<div class="rp-content">
