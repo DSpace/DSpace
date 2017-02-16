@@ -196,17 +196,19 @@ j(".deptvisualizationprofiletwice").click(function(){
 								"relation" : parameterId,
 								"with" : "${authoritytarget}"
 							},
-							success : function(data) {								
+							success : function(data) {
+								j("#log").dialog("close");
 								j('#relationfragmenttwice').modal("show");	
 								j("#relationfragmenttwicecontenttitle").html("${fullname} / ${researchertarget.fullName}");
 								j('#relationfragmenttwicecontent').html(data);
-								j("#log").dialog("close");
+								
 							},
 							error : function(data) {
+								j("#log").dialog("close");
 								j('#relationfragmenttwice').modal("hide");
 								j("#log").dialog("open");
 								Log.write(data.statusText);
-								j("#log").dialog("close");
+								
 							}
 						});
 

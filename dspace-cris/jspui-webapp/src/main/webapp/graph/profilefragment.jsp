@@ -173,17 +173,19 @@
 								"relation" : parameterId,
 								"with" : "${authoritytarget}"
 							},
-							success : function(data) {								
+							success : function(data) {
+								j("#log").dialog("close");
 								j('#relationfragment').modal("show");
 								j("#relationfragmentcontenttitle").html("${fullname} / ${researchertarget.fullName}");
 								j('#relationfragmentcontent').html(data);
-								j("#log").dialog("close");
+
 							},
 							error : function(data) {
+								j("#log").dialog("close");
 								j('#relationfragment').modal("hide");
 								j("#log").dialog("open");
 								Log.write(data.statusText);
-								j("#log").dialog("close");
+								
 							}
 						});
 
