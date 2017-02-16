@@ -15,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -22,6 +24,11 @@ import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.rest.common.ResourcePolicy.Action;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -46,10 +53,19 @@ public class FullTextContentStreams extends ContentStreamBase
     protected final Context context;
     protected List<FullTextBitstream> fullTextStreams;
     protected BitstreamService bitstreamService;
+    protected AuthorizeService authorizeService;
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
         init(parentItem);
+    }
+
+    private AuthorizeService getAuthorizeService() {
+        if(authorizeService == null)
+        {
+            authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        }
+        return authorizeService;
     }
 
     protected void init(Item parentItem) {
@@ -76,8 +92,15 @@ public class FullTextContentStreams extends ContentStreamBase
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
-                    fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
-
+                    try {
+                        Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+                        if (getAuthorizeService().getAuthorizedGroups(context, fulltextBitstream, Action.READ.ordinal()).contains(anonymous)){
+                            fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
+                        }
+                    } catch (Exception e) {
+                        log.error("Error checking bitstream permissions" , e);
+                    }
+                   
                     log.debug("Added BitStream: "
                             + fulltextBitstream.getStoreNumber() + " "
                             + fulltextBitstream.getSequenceID() + " "
