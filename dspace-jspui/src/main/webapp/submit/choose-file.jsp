@@ -31,6 +31,7 @@
 <%@ page import="org.dspace.app.util.DCInputsReader" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 
 <%
@@ -47,6 +48,10 @@
 
     // Determine whether a file is REQUIRED to be uploaded (default to true)
     boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+   
+    if(StringUtils.isNotBlank(ConfigurationManager.getProperty("webui.submit.upload.required."+subInfo.getCollectionHandle())) ){
+    	fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required."+subInfo.getCollectionHandle());
+    }
     boolean ajaxProgress = ConfigurationManager.getBooleanProperty("webui.submit.upload.ajax", true);
     boolean html5Upload = ConfigurationManager.getBooleanProperty("webui.submit.upload.html5", true);
 

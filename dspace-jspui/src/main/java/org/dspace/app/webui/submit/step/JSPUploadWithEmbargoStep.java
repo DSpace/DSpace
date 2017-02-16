@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
@@ -119,6 +120,9 @@ public class JSPUploadWithEmbargoStep extends JSPUploadStep
 
         // Do we need to skip the upload entirely?
         boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+        if(StringUtils.isNotBlank(ConfigurationManager.getProperty("webui.submit.upload.required."+subInfo.getCollectionHandle())) ){
+        	fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required."+subInfo.getCollectionHandle());
+        }        
         
         if (UIUtil.getBoolParameter(request, "ajaxUpload"))
         {
