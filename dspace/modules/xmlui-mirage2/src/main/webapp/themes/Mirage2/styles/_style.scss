@@ -17,3 +17,23 @@
     ::selection { @content; }
 }
 
+// add back underlined links, because we like them
+a {
+    text-decoration: underline;
+}
+
+// except list-group-item
+a.list-group-item {
+    text-decoration: none;
+}
+
+// adjust the margins for artifact titles
+.artifact-title {
+    margin-top: 15px;
+    margin-bottom: 0;
+}
+
+// center the option headings
+.ds-option-set-head {
+    text-align: center;
+}
