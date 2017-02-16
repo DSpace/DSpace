@@ -85,7 +85,8 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
-        when(authorizeService.getAuthorizedGroups(null, fulltextBitstream, Constants.READ).contains(null)).thenReturn(true);
+        when(authorizeService.isAccessibleToAnonymousUser(textBitstreamRestricted).thenReturn(false);
+        when(authorizeService.isAccessibleToAnonymousUser(null).thenReturn(true);
         
         streams.bitstreamService = bitstreamService;
     }

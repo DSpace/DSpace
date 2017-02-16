@@ -81,6 +81,16 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
+    private boolean isAccessibleToAnonymousUser(Bitstream bit) {
+        try {
+            Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+            return getAuthorizeService().getAuthorizedGroups(context, bit, Constants.READ).contains(anonymous);
+        } catch (Exception e) {
+            log.error("Error checking bitstream permissions" , e);
+            return false;
+        }
+    }
+    
     private void buildFullTextList(Item parentItem) {
         // now get full text of any bitstreams in the TEXT bundle
         // trundle through the bundles
@@ -92,13 +102,8 @@ public class FullTextContentStreams extends ContentStreamBase
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
-                    try {
-                        Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
-                        if (getAuthorizeService().getAuthorizedGroups(context, fulltextBitstream, Constants.READ).contains(anonymous)){
-                            fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
-                        }
-                    } catch (Exception e) {
-                        log.error("Error checking bitstream permissions" , e);
+                    if (isAccessibleToAnonymousUser(fulltextBitstream)){
+                        fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
                     }
                    
                     log.debug("Added BitStream: "
