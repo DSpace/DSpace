@@ -540,6 +540,7 @@
    <field name="read" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true" docValues="true" />
 
    <!-- CRIS special fields -->
+   <field name="cris-id" type="string" indexed="true" stored="true" omitNorms="true" />
    <field name="cris-uuid" type="string" indexed="true" stored="true" omitNorms="true" />
    <field name="cris-sourceid" type="string" indexed="true" stored="true" omitNorms="true" />
    <field name="cris-sourceref" type="string" indexed="true" stored="true" omitNorms="true" />
