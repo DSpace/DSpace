@@ -130,5 +130,5 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 
 	public abstract Class<T> getDomainClass();
 
-	public abstract DSpaceResource<T> wrapResource(T model);
+	public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 }

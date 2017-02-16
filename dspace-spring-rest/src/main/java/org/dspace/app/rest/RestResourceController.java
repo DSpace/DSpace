@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.dspace.app.rest.exception.PaginationException;
+import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
@@ -23,9 +24,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.EvoInflectorRelProvider;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,16 +52,55 @@ public class RestResourceController {
 	@Autowired
 	Utils utils;
 	
-	@RequestMapping(method = RequestMethod.GET, value = "/{uuid}")
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}")
 	@SuppressWarnings("unchecked")
-	DSpaceResource<BitstreamRest> findOne(@PathVariable String model, @PathVariable UUID uuid, @RequestParam(required=false) String projection) {
-		DSpaceRestRepository repository = utils.getResourceRepository(model);
-		RestModel modelObject = repository.findOne(uuid);
+	DSpaceResource<RestModel> findOne(@PathVariable String model, @PathVariable Integer id, @RequestParam(required=false) String projection) {
+		return findOneInternal(model, id, projection);
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}")
+	@SuppressWarnings("unchecked")
+	DSpaceResource<RestModel> findOne(@PathVariable String model, @PathVariable UUID uuid, @RequestParam(required=false) String projection) {
+		return findOneInternal(model, uuid, projection);
+	}
+	
+	private <ID extends Serializable> DSpaceResource<RestModel> findOneInternal(String model, ID id, String projection) {
+		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(model);
+		RestModel modelObject = null;
+		try {
+			modelObject = repository.findOne(id);
+		} catch (ClassCastException e) {
+		}
+		if (modelObject == null) {
+			throw new ResourceNotFoundException(model + " with id: " + id + " not found");
+		}
 		DSpaceResource result = repository.wrapResource(modelObject);
-		//Link link = entityLinks.linkFor(getResourceClass(model), model, uuid).withSelfRel();
-//		Link link = linkTo(this.getClass(), model).slash(modelObject).withSelfRel();
-//		result.add(link);
 		return result;
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}/{rel}")
+	ResourceSupport findRel(@PathVariable String model, @PathVariable Integer id, @PathVariable String rel, @RequestParam(required=false) String projection) {
+		return findRelInternal(model, id, rel, projection);
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/{rel}")
+	ResourceSupport findRel(@PathVariable String model, @PathVariable UUID uuid, @PathVariable String rel, @RequestParam(required=false) String projection) {
+		return findRelInternal(model, uuid, rel, projection);
+	}
+	
+	private <ID extends Serializable> ResourceSupport findRelInternal(String model, ID uuid, String rel, String projection) {
+		// FIXME this is a very bad implementation as it leads most of times to
+		// more round-trip on the database and retrieval of unneeded infromation
+		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(model);
+		RestModel modelObject = repository.findOne(uuid);
+		DSpaceResource result = repository.wrapResource(modelObject, rel);
+		if (result.getLink(rel) == null) {
+			//TODO create a custom exception
+			throw new ResourceNotFoundException(rel + "undefined for "+ model);
+		}
+		
+		ResourceSupport resu = (ResourceSupport) result.getEmbedded().get(rel);
+		return resu;
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

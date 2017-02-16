@@ -42,33 +42,35 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 	@JsonInclude(Include.NON_EMPTY)
 	private Map<String, Object> embedded = new HashMap<String, Object>();
 
-	public DSpaceResource(T data, Utils utils) {
+	public DSpaceResource(T data, Utils utils, String... rels) {
 		this.data = data;
 
-		try {
-			for (PropertyDescriptor pd : Introspector.getBeanInfo(data.getClass()).getPropertyDescriptors()) {
-				Method readMethod = pd.getReadMethod();
-				if (readMethod != null && !"class".equals(pd.getName())) {
-					if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
-						this.add(utils.linkToSubResource(data, pd.getName()));
-						RestModel linkedObject = (RestModel) readMethod.invoke(data);
-						if (linkedObject != null) {
-							embedded.put(pd.getName(),
-									utils.getResourceRepository(linkedObject.getType()).wrapResource(linkedObject));
-						} else {
-							embedded.put(pd.getName(), null);
+		if (data != null) {
+			try {
+				for (PropertyDescriptor pd : Introspector.getBeanInfo(data.getClass()).getPropertyDescriptors()) {
+					Method readMethod = pd.getReadMethod();
+					if (readMethod != null && !"class".equals(pd.getName())) {
+						if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
+							this.add(utils.linkToSubResource(data, pd.getName()));
+							RestModel linkedObject = (RestModel) readMethod.invoke(data);
+							if (linkedObject != null) {
+								embedded.put(pd.getName(),
+										utils.getResourceRepository(linkedObject.getType()).wrapResource(linkedObject));
+							} else {
+								embedded.put(pd.getName(), null);
+							}
+	
+							Method writeMethod = pd.getWriteMethod();
+							writeMethod.invoke(data, new Object[] { null });
 						}
-
-						Method writeMethod = pd.getWriteMethod();
-						writeMethod.invoke(data, new Object[] { null });
 					}
 				}
+			} catch (IntrospectionException | IllegalArgumentException | IllegalAccessException
+					| InvocationTargetException e) {
+				throw new RuntimeException(e.getMessage(), e);
 			}
-		} catch (IntrospectionException | IllegalArgumentException | IllegalAccessException
-				| InvocationTargetException e) {
-			throw new RuntimeException(e.getMessage(), e);
+			this.add(utils.linkToSingleResource(data, Link.REL_SELF));
 		}
-		this.add(utils.linkToSingleResource(data, Link.REL_SELF));
 	}
 
 	public Map<String, Object> getEmbedded() {

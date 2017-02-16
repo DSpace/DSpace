@@ -52,6 +52,9 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
+		if (item == null) {
+			return null;
+		}
 		return converter.fromModel(item);
 	}
 
@@ -80,8 +83,8 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	}
 	
 	@Override
-	public ItemResource wrapResource(ItemRest item) {
-		return new ItemResource(item, utils);
+	public ItemResource wrapResource(ItemRest item, String... rels) {
+		return new ItemResource(item, utils, rels);
 	}
 
 }

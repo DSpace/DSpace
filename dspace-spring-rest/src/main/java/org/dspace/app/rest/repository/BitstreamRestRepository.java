@@ -49,6 +49,9 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
+		if (bit == null) {
+			return null;
+		}
 		return converter.fromModel(bit);
 	}
 
@@ -72,7 +75,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 	}
 	
 	@Override	
-	public BitstreamResource wrapResource(BitstreamRest bs) {
-		return new BitstreamResource(bs, utils);
+	public BitstreamResource wrapResource(BitstreamRest bs, String... rels) {
+		return new BitstreamResource(bs, utils, rels);
 	}
 }
