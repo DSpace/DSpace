@@ -23,6 +23,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -94,7 +95,7 @@ public class FullTextContentStreams extends ContentStreamBase
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
                     try {
                         Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
-                        if (getAuthorizeService().getAuthorizedGroups(context, fulltextBitstream, Action.READ.ordinal()).contains(anonymous)){
+                        if (getAuthorizeService().getAuthorizedGroups(context, fulltextBitstream, Constants.READ).contains(anonymous)){
                             fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
                         }
                     } catch (Exception e) {
