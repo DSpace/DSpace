@@ -52,6 +52,7 @@ public class FullTextContentStreams extends ContentStreamBase
 
     protected final Context context;
     protected List<FullTextBitstream> fullTextStreams;
+    protected List<FullTextBitstream> accessibleFullTextStreams;
     protected BitstreamService bitstreamService;
     protected AuthorizeService authorizeService;
     protected VerifyAnonymousAccess verifyAnonymous;
@@ -72,6 +73,7 @@ public class FullTextContentStreams extends ContentStreamBase
 
     protected void init(Item parentItem) {
         fullTextStreams = new LinkedList<>();
+        accessibleFullTextStreams = new LinkedList<>();
 
         if(parentItem != null) {
             sourceInfo = parentItem.getHandle();
@@ -107,6 +109,9 @@ public class FullTextContentStreams extends ContentStreamBase
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
                     fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
+                    if (this.verifyAnonymous.isAccessibleToAnonymousUser(fulltextBitstream)) {
+                        accessibleFullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
+                    }
                    
                     log.debug("Added BitStream: "
                             + fulltextBitstream.getStoreNumber() + " "
@@ -132,19 +137,15 @@ public class FullTextContentStreams extends ContentStreamBase
     public Long getSize() {
         long result = 0;
 
-        if(CollectionUtils.isNotEmpty(fullTextStreams)) {
-            Iterable<Long> individualSizes = Iterables.transform(fullTextStreams, new Function<FullTextBitstream, Long>() {
+        if(CollectionUtils.isNotEmpty(accessibleFullTextStreams)) {
+            Iterable<Long> individualSizes = Iterables.transform(accessibleFullTextStreams, new Function<FullTextBitstream, Long>() {
                 @Nullable
                 @Override
                 public Long apply(@Nullable FullTextBitstream input) {
                     if (input == null) {
                         return 0L;
                     }
-                    if (verifyAnonymous.isAccessibleToAnonymousUser(input.bitstream)) {
-                        return input.getSize();
-                    }
-                    
-                    return 0L;
+                    return input.getSize();
                 }
             });
 
@@ -164,7 +165,7 @@ public class FullTextContentStreams extends ContentStreamBase
     @Override
     public InputStream getStream() throws IOException {
         try {
-            return new SequenceInputStream(new FullTextEnumeration(fullTextStreams.iterator()));
+            return new SequenceInputStream(new FullTextEnumeration(accessibleFullTextStreams.iterator()));
         } catch (Exception e) {
             log.error("Unable to add full text bitstreams to SOLR for item " + sourceInfo + ": " + e.getMessage(), e);
             return new ByteArrayInputStream((e.getClass() + ": " + e.getMessage()).getBytes(StandardCharsets.UTF_8));
@@ -172,7 +173,7 @@ public class FullTextContentStreams extends ContentStreamBase
     }
 
     public boolean isEmpty() {
-        return CollectionUtils.isEmpty(fullTextStreams);
+        return CollectionUtils.isEmpty(accessibleFullTextStreams);
     }
 
     private BitstreamService getBitstreamService() {
@@ -218,15 +219,7 @@ public class FullTextContentStreams extends ContentStreamBase
         private final Iterator<FullTextBitstream> fulltextIterator;
 
         public FullTextEnumeration(final Iterator<FullTextBitstream> fulltextStreams) {
-            List<FullTextBitstream> accessibleFullTextStreams = new LinkedList<>();
-            while(fulltextStreams.hasNext()) {
-                FullTextBitstream ftbit = fulltextStreams.next();
-                if (verifyAnonymous.isAccessibleToAnonymousUser(ftbit.bitstream)) {
-                    accessibleFullTextStreams.add(fulltextStreams.next());
-                }
-                
-            }
-            this.fulltextIterator = accessibleFullTextStreams.iterator();
+            this.fulltextIterator = fulltextStreams;
         }
 
         public boolean hasMoreElements() {
