@@ -92,6 +92,7 @@ public class FullTextContentStreamsTest {
         when(fullTextValidator.isAccessibleToAnonymousUser(null, textBitstreamRestricted)).thenReturn(false);
         
         streams.bitstreamService = bitstreamService;
+        streams.fullTextValidator = fullTextValidator;
     }
 
     @Test
