@@ -83,7 +83,7 @@
                 <module>swordv2</module>
             </modules>
         </profile>
-        <profile>
+<!--         <profile>
             <id>dspace-solr</id>
             <activation>
                 <file>
@@ -94,7 +94,7 @@
                 <module>solr</module>
             </modules>
         </profile>
-        <profile>
+ -->        <profile>
             <id>dspace-oai</id>
             <activation>
                 <file>
@@ -103,6 +103,17 @@
             </activation>
             <modules>
                 <module>oai</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-spring-rest</id>
+            <activation>
+                <file>
+                    <exists>spring-rest/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>spring-rest</module>
             </modules>
         </profile>
     </profiles>

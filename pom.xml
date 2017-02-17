@@ -65,7 +65,7 @@
                             </configuration>
                         </execution>
                         <!-- Make sure that we do not have conflicting dependencies-->
-                        <execution>
+                        <!-- <execution>
                             <id>enforce-versions</id>
                             <goals>
                                 <goal>enforce</goal>
@@ -75,7 +75,7 @@
                                     <DependencyConvergence />
                                 </rules>
                             </configuration>
-                        </execution>
+                        </execution> -->
                     </executions>
                 </plugin>
                 <!-- Used to compile all Java classes -->
@@ -646,7 +646,7 @@
         <!--
            Builds SOLR WAR for DSpace
         -->
-        <profile>
+        <!-- <profile>
             <id>dspace-solr</id>
             <activation>
                 <file>
@@ -656,7 +656,7 @@
             <modules>
                 <module>dspace-solr</module>
             </modules>
-        </profile>
+        </profile>-->
 
         <!--
            Builds SWORDv2 WAR for DSpace
@@ -703,7 +703,7 @@
                 <module>dspace-rdf</module>
                 <module>dspace-rest</module>
                 <module>dspace-services</module>
-                <module>dspace-solr</module>
+                <!-- <module>dspace-solr</module> -->
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
                 <module>dspace-spring-rest</module>
@@ -858,6 +858,12 @@
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
+                <artifactId>dspace-spring-rest</artifactId>
+                <version>7.0-SNAPSHOT</version>
+                <type>war</type>
+            </dependency>
+<!--             <dependency>
+                <groupId>org.dspace</groupId>
                 <artifactId>dspace-solr</artifactId>
                 <version>7.0-SNAPSHOT</version>
                 <type>jar</type>
@@ -870,7 +876,7 @@
                 <type>war</type>
                 <classifier>skinny</classifier>
             </dependency>
-
+ -->
             <!-- DSpace Localization Packages -->
             <dependency>
                 <groupId>org.dspace</groupId>
