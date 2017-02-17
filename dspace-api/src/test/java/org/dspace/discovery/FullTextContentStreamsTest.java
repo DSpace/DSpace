@@ -86,8 +86,10 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
+        when(mockstreams.isAccessibleToAnonymousUser(textBitstream1)).thenReturn(Boolean.TRUE);
+        when(mockstreams.isAccessibleToAnonymousUser(textBitstream2)).thenReturn(Boolean.TRUE);
+        when(mockstreams.isAccessibleToAnonymousUser(textBitstream3)).thenReturn(Boolean.TRUE);
         when(mockstreams.isAccessibleToAnonymousUser(textBitstreamRestricted)).thenReturn(Boolean.FALSE);
-        when(mockstreams.isAccessibleToAnonymousUser(null)).thenReturn(Boolean.TRUE);
         
         streams.bitstreamService = bitstreamService;
     }
@@ -181,6 +183,44 @@ public class FullTextContentStreamsTest {
     public void testItemWithMultipleTextBitstreams() throws Exception {
         when(item.getBundles()).thenReturn(Arrays.asList(originalBundle, textBundle));
         when(textBundle.getBitstreams()).thenReturn(Arrays.asList(textBitstream1, textBitstream2, textBitstream3));
+
+        streams.init(item);
+
+        assertEquals("Source info should give you the handle", HANDLE, streams.getSourceInfo());
+        assertEquals("Content type should be plain text", CONTENT_TYPE, streams.getContentType());
+        assertEquals("The name should match the concatenation of the names of the bitstreams",
+                "Full Text 1;Full Text 2;Full Text 3", streams.getName());
+        assertEquals("The size of the streams should be the sum of the bitstream sizes", (Long) 6L, streams.getSize());
+        assertFalse("Content stream should not be empty", streams.isEmpty());
+        InputStream inputStream = streams.getStream();
+        assertNotNull(inputStream);
+        assertEquals("The data in the input stream should match 'This is text 1'", "\nThis is text 1" +
+                "\nThis is text 2\nThis is text 3", IOUtils.toString(inputStream, Charsets.UTF_8));
+    }
+
+    @Test
+    public void testItemWithMultipleTextBitstreamsAndRestrictedLast() throws Exception {
+        when(item.getBundles()).thenReturn(Arrays.asList(originalBundle, textBundle));
+        when(textBundle.getBitstreams()).thenReturn(Arrays.asList(textBitstream1, textBitstream2, textBitstream3, textBitstreamRestricted));
+
+        streams.init(item);
+
+        assertEquals("Source info should give you the handle", HANDLE, streams.getSourceInfo());
+        assertEquals("Content type should be plain text", CONTENT_TYPE, streams.getContentType());
+        assertEquals("The name should match the concatenation of the names of the bitstreams",
+                "Full Text 1;Full Text 2;Full Text 3", streams.getName());
+        assertEquals("The size of the streams should be the sum of the bitstream sizes", (Long) 6L, streams.getSize());
+        assertFalse("Content stream should not be empty", streams.isEmpty());
+        InputStream inputStream = streams.getStream();
+        assertNotNull(inputStream);
+        assertEquals("The data in the input stream should match 'This is text 1'", "\nThis is text 1" +
+                "\nThis is text 2\nThis is text 3", IOUtils.toString(inputStream, Charsets.UTF_8));
+    }
+
+    @Test
+    public void testItemWithMultipleTextBitstreamsAndRestrictedFirst() throws Exception {
+        when(item.getBundles()).thenReturn(Arrays.asList(originalBundle, textBundle));
+        when(textBundle.getBitstreams()).thenReturn(Arrays.asList(textBitstreamRestricted, textBitstream1, textBitstream2, textBitstream3));
 
         streams.init(item);
 
