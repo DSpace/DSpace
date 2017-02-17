@@ -89,8 +89,6 @@ public class FullTextContentStreams extends ContentStreamBase
         // trundle through the bundles
         List<Bundle> myBundles = parentItem.getBundles();
 
-        System.err.println("Hello TBTBTB");
-        log.error("Hello TBTBTB");
         for (Bundle myBundle : emptyIfNull(myBundles)) {
             if (StringUtils.equals(FULLTEXT_BUNDLE, myBundle.getName())) {
                 // a-ha! grab the text out of the bitstreams
