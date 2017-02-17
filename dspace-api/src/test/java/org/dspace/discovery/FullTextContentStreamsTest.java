@@ -39,9 +39,6 @@ public class FullTextContentStreamsTest {
     private FullTextContentStreams streams;
 
     @Mock
-    private FullTextContentStreams.VerifyAnonymousAccess verifyAnonymous;
-
-    @Mock
     private BitstreamService bitstreamService;
 
     @Mock
@@ -86,10 +83,10 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
-        when(verifyAnonymous.isAccessibleToAnonymousUser(textBitstream1)).thenReturn(true);
-        when(verifyAnonymous.isAccessibleToAnonymousUser(textBitstream2)).thenReturn(true);
-        when(verifyAnonymous.isAccessibleToAnonymousUser(textBitstream3)).thenReturn(true);
-        when(verifyAnonymous.isAccessibleToAnonymousUser(textBitstreamRestricted)).thenReturn(false);
+        when(mock.isAccessibleToAnonymousUser(textBitstream1)).thenReturn(true);
+        when(mock.isAccessibleToAnonymousUser(textBitstream2)).thenReturn(true);
+        when(mock.isAccessibleToAnonymousUser(textBitstream3)).thenReturn(true);
+        when(mock.isAccessibleToAnonymousUser(textBitstreamRestricted)).thenReturn(false);
         
         streams.bitstreamService = bitstreamService;
     }

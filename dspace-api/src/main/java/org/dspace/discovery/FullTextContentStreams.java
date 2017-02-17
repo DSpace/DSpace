@@ -55,11 +55,9 @@ public class FullTextContentStreams extends ContentStreamBase
     protected List<FullTextBitstream> accessibleFullTextStreams;
     protected BitstreamService bitstreamService;
     protected AuthorizeService authorizeService;
-    protected VerifyAnonymousAccess verifyAnonymous;
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
-        this.verifyAnonymous = new VerifyAnonymousAccess();
         init(parentItem);
     }
 
@@ -85,15 +83,13 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
-    protected class VerifyAnonymousAccess {
-        protected boolean isAccessibleToAnonymousUser(Bitstream bit) {
-            try {
-                Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
-                return getAuthorizeService().getAuthorizedGroups(context, bit, Constants.READ).contains(anonymous);
-            } catch (Exception e) {
-                log.error("Error checking bitstream permissions" , e);
-                return false;
-            }
+    protected boolean isAccessibleToAnonymousUser(Bitstream bit) {
+        try {
+            Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+            return getAuthorizeService().getAuthorizedGroups(context, bit, Constants.READ).contains(anonymous);
+        } catch (Exception e) {
+            log.error("Error checking bitstream permissions" , e);
+            return false;
         }
     }
     
@@ -113,7 +109,7 @@ public class FullTextContentStreams extends ContentStreamBase
                     System.err.println(fulltextBitstream.getName() + " TBTBTB");
                     FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
                     fullTextStreams.add(ftBitstream);
-                    if (this.verifyAnonymous.isAccessibleToAnonymousUser(fulltextBitstream)) {
+                    if (isAccessibleToAnonymousUser(fulltextBitstream)) {
                         accessibleFullTextStreams.add(ftBitstream);
                         System.err.println(ftBitstream.getFileName() + " TRUE");
                     } else {
