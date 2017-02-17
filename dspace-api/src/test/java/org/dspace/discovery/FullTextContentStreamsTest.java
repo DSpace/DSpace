@@ -15,6 +15,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +39,9 @@ public class FullTextContentStreamsTest {
 
     @InjectMocks
     private FullTextContentStreams streams;
+    
+    @Mock
+    private Context anonymousContext;
     
     @Mock
     private AuthorizeService authorizeService;
@@ -94,6 +98,7 @@ public class FullTextContentStreamsTest {
         
         streams.bitstreamService = bitstreamService;
         streams.authorizeService = authorizeService;
+        streams.anonymousContext = anonymousContext;
     }
 
     @Test

@@ -51,6 +51,7 @@ public class FullTextContentStreams extends ContentStreamBase
     public static final String FULLTEXT_BUNDLE = "TEXT";
 
     protected final Context context;
+    protected Context anonymousContext;
     protected List<FullTextBitstream> fullTextStreams;
     protected List<FullTextBitstream> accessibleFullTextStreams;
     protected BitstreamService bitstreamService;
@@ -83,6 +84,15 @@ public class FullTextContentStreams extends ContentStreamBase
         return authorizeService;
     }
 
+    //Allow test driver to mock this call
+    private Context getAnonymousContext() {
+        if(anonymousContext == null)
+        {
+            anonymousContext = new Context();
+        }
+        return anonymousContext;
+    }
+    
     private void buildFullTextList(Item parentItem) {
         // now get full text of any bitstreams in the TEXT bundle
         // trundle through the bundles
@@ -97,7 +107,7 @@ public class FullTextContentStreams extends ContentStreamBase
                     FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
                     fullTextStreams.add(ftBitstream);
                     try {
-                        if (getAuthorizeService().authorizeActionBoolean(new Context(), fulltextBitstream, Constants.READ)) {
+                        if (getAuthorizeService().authorizeActionBoolean(getAnonymousContext(), fulltextBitstream, Constants.READ)) {
                             accessibleFullTextStreams.add(ftBitstream);
                         }    
                     } catch(SQLException e) {
