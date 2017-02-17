@@ -54,6 +54,7 @@ public class FullTextContentStreams extends ContentStreamBase
     protected List<FullTextBitstream> fullTextStreams;
     protected BitstreamService bitstreamService;
     protected AuthorizeService authorizeService;
+    protected VerifyAnonymousAccess verifyAnonymous = new VerifyAnonymousAccess();
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
@@ -81,13 +82,15 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
-    protected Boolean isAccessibleToAnonymousUser(Bitstream bit) {
-        try {
-            Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
-            return getAuthorizeService().getAuthorizedGroups(context, bit, Constants.READ).contains(anonymous);
-        } catch (Exception e) {
-            log.error("Error checking bitstream permissions" , e);
-            return false;
+    protected class VerifyAnonymousAccess {
+        protected boolean isAccessibleToAnonymousUser(Bitstream bit) {
+            try {
+                Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
+                return getAuthorizeService().getAuthorizedGroups(context, bit, Constants.READ).contains(anonymous);
+            } catch (Exception e) {
+                log.error("Error checking bitstream permissions" , e);
+                return false;
+            }
         }
     }
     
@@ -102,9 +105,7 @@ public class FullTextContentStreams extends ContentStreamBase
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
-                    if (isAccessibleToAnonymousUser(fulltextBitstream)){
-                        fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
-                    }
+                    fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
                    
                     log.debug("Added BitStream: "
                             + fulltextBitstream.getStoreNumber() + " "
@@ -135,7 +136,14 @@ public class FullTextContentStreams extends ContentStreamBase
                 @Nullable
                 @Override
                 public Long apply(@Nullable FullTextBitstream input) {
-                    return input == null ? 0L : input.getSize();
+                    if (input == null) {
+                        return 0L;
+                    }
+                    if (verifyAnonymous.isAccessibleToAnonymousUser(input.bitstream)) {
+                        return input.getSize();
+                    }
+                    
+                    return 0L;
                 }
             });
 
@@ -209,7 +217,15 @@ public class FullTextContentStreams extends ContentStreamBase
         private final Iterator<FullTextBitstream> fulltextIterator;
 
         public FullTextEnumeration(final Iterator<FullTextBitstream> fulltextStreams) {
-            this.fulltextIterator = fulltextStreams;
+            List<FullTextBitstream> accessibleFullTextStreams = new LinkedList<>();
+            while(fulltextStreams.hasNext()) {
+                FullTextBitstream ftbit = fulltextStreams.next();
+                if (verifyAnonymous.isAccessibleToAnonymousUser(ftbit.bitstream)) {
+                    accessibleFullTextStreams.add(fulltextStreams.next());
+                }
+                
+            }
+            this.fulltextIterator = accessibleFullTextStreams.iterator();
         }
 
         public boolean hasMoreElements() {

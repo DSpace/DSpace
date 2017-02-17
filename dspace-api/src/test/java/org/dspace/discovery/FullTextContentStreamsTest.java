@@ -39,7 +39,7 @@ public class FullTextContentStreamsTest {
     private FullTextContentStreams streams;
 
     @Mock
-    private FullTextContentStreams mockstreams;
+    private VerifyAnonymousAccess verifyAnonymous;
 
     @Mock
     private BitstreamService bitstreamService;
@@ -86,10 +86,10 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
-        when(mockstreams.isAccessibleToAnonymousUser(textBitstream1)).thenReturn(Boolean.TRUE);
-        when(mockstreams.isAccessibleToAnonymousUser(textBitstream2)).thenReturn(Boolean.TRUE);
-        when(mockstreams.isAccessibleToAnonymousUser(textBitstream3)).thenReturn(Boolean.TRUE);
-        when(mockstreams.isAccessibleToAnonymousUser(textBitstreamRestricted)).thenReturn(Boolean.FALSE);
+        when(verifyAnonymous.isAccessibleToAnonymousUser(textBitstream1)).thenReturn(true);
+        when(verifyAnonymous.isAccessibleToAnonymousUser(textBitstream2)).thenReturn(true);
+        when(verifyAnonymous.isAccessibleToAnonymousUser(textBitstream3)).thenReturn(true);
+        when(verifyAnonymous.isAccessibleToAnonymousUser(textBitstreamRestricted)).thenReturn(false);
         
         streams.bitstreamService = bitstreamService;
     }
@@ -208,7 +208,7 @@ public class FullTextContentStreamsTest {
         assertEquals("Source info should give you the handle", HANDLE, streams.getSourceInfo());
         assertEquals("Content type should be plain text", CONTENT_TYPE, streams.getContentType());
         assertEquals("The name should match the concatenation of the names of the bitstreams",
-                "Full Text 1;Full Text 2;Full Text 3", streams.getName());
+                "Full Text 1;Full Text 2;Full Text 3;Full Text Restricted", streams.getName());
         assertEquals("The size of the streams should be the sum of the bitstream sizes", (Long) 6L, streams.getSize());
         assertFalse("Content stream should not be empty", streams.isEmpty());
         InputStream inputStream = streams.getStream();
@@ -227,7 +227,7 @@ public class FullTextContentStreamsTest {
         assertEquals("Source info should give you the handle", HANDLE, streams.getSourceInfo());
         assertEquals("Content type should be plain text", CONTENT_TYPE, streams.getContentType());
         assertEquals("The name should match the concatenation of the names of the bitstreams",
-                "Full Text 1;Full Text 2;Full Text 3", streams.getName());
+                "Full Text Restricted;Full Text 1;Full Text 2;Full Text 3", streams.getName());
         assertEquals("The size of the streams should be the sum of the bitstream sizes", (Long) 6L, streams.getSize());
         assertFalse("Content stream should not be empty", streams.isEmpty());
         InputStream inputStream = streams.getStream();
