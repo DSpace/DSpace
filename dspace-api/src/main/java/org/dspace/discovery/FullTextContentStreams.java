@@ -54,11 +54,11 @@ public class FullTextContentStreams extends ContentStreamBase
     protected List<FullTextBitstream> fullTextStreams;
     protected BitstreamService bitstreamService;
     protected AuthorizeService authorizeService;
-    protected FullTextContentStreams.VerifyAnonymousAccess verifyAnonymous;
+    protected VerifyAnonymousAccess verifyAnonymous;
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
-        this.verifyAnonymous = this.new VerifyAnonymousAccess();
+        this.verifyAnonymous = new VerifyAnonymousAccess();
         init(parentItem);
     }
 
