@@ -39,7 +39,7 @@ public class FullTextContentStreamsTest {
     private FullTextContentStreams streams;
 
     @Mock
-    private VerifyAnonymousAccess verifyAnonymous;
+    private FullTextContentStreams.VerifyAnonymousAccess verifyAnonymous;
 
     @Mock
     private BitstreamService bitstreamService;
