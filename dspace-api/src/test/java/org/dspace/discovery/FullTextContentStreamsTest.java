@@ -91,10 +91,10 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
-        when(authorizeService.authorizeActionBoolean(null, textBitstream1, Constants.READ)).thenReturn(true);
-        when(authorizeService.authorizeActionBoolean(null, textBitstream2, Constants.READ)).thenReturn(true);
-        when(authorizeService.authorizeActionBoolean(null, textBitstream3, Constants.READ)).thenReturn(true);
-        when(authorizeService.authorizeActionBoolean(null, textBitstreamRestricted, Constants.READ)).thenReturn(false);
+        when(authorizeService.authorizeActionBoolean(anonymousContext, textBitstream1, Constants.READ)).thenReturn(true);
+        when(authorizeService.authorizeActionBoolean(anonymousContext, textBitstream2, Constants.READ)).thenReturn(true);
+        when(authorizeService.authorizeActionBoolean(anonymousContext, textBitstream3, Constants.READ)).thenReturn(true);
+        when(authorizeService.authorizeActionBoolean(anonymousContext, textBitstreamRestricted, Constants.READ)).thenReturn(false);
         
         streams.bitstreamService = bitstreamService;
         streams.authorizeService = authorizeService;
