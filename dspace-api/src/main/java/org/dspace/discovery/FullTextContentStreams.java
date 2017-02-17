@@ -146,10 +146,7 @@ public class FullTextContentStreams extends ContentStreamBase
                 @Nullable
                 @Override
                 public Long apply(@Nullable FullTextBitstream input) {
-                    if (input == null) {
-                        return 0L;
-                    }
-                    return input.getSize();
+                    return return input == null ? 0L : input.getSize();
                 }
             });
 
