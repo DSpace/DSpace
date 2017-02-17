@@ -64,8 +64,7 @@ public class FullTextContentStreams extends ContentStreamBase
     protected void init(Item parentItem) {
         fullTextStreams = new LinkedList<>();
         accessibleFullTextStreams = new LinkedList<>();
-        getAuthorizeService();
-
+ 
         if(parentItem != null) {
             sourceInfo = parentItem.getHandle();
 
@@ -95,11 +94,10 @@ public class FullTextContentStreams extends ContentStreamBase
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
-                    System.err.println(fulltextBitstream.getName() + " TBTBTB");
                     FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
                     fullTextStreams.add(ftBitstream);
                     try {
-                        if (authorizeService.authorizeActionBoolean(new Context(), fulltextBitstream, Constants.READ)) {
+                        if (getAuthorizeService().authorizeActionBoolean(new Context(), fulltextBitstream, Constants.READ)) {
                             accessibleFullTextStreams.add(ftBitstream);
                         }    
                     } catch(SQLException e) {
