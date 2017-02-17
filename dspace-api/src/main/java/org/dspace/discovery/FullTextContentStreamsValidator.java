@@ -21,7 +21,7 @@ public class FullTextContentStreamsValidator
     private static final Logger log = Logger.getLogger(FullTextContentStreamsValidator.class);
     public boolean isAccessibleToAnonymousUser(Context context, Bitstream bit) {
         try {
-            return AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(context, bit, Constants.READ);
+            return AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(new Context(), bit, Constants.READ);
         } catch (Exception e) {
             log.error("Error checking bitstream permissions" , e);
             return false;
