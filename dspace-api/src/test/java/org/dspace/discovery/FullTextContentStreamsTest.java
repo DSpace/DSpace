@@ -39,7 +39,7 @@ public class FullTextContentStreamsTest {
     private FullTextContentStreams streams;
     
     @Mock
-    private AuthorizeService authorizeService
+    private AuthorizeService authorizeService;
     
     @Mock
     private BitstreamService bitstreamService;
