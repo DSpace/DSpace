@@ -108,9 +108,10 @@ public class FullTextContentStreams extends ContentStreamBase
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
-                    fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
+                    FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
+                    fullTextStreams.add(ftBitstream);
                     if (this.verifyAnonymous.isAccessibleToAnonymousUser(fulltextBitstream)) {
-                        accessibleFullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
+                        accessibleFullTextStreams.add(ftBitstream);
                     }
                    
                     log.debug("Added BitStream: "
