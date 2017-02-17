@@ -55,18 +55,11 @@ public class FullTextContentStreams extends ContentStreamBase
     protected List<FullTextBitstream> accessibleFullTextStreams;
     protected BitstreamService bitstreamService;
     protected AuthorizeService authorizeService;
+    protected FullTextContentStreamsValidator fullTextValidator = new FullTextContentStreamsValidator();
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
         init(parentItem);
-    }
-
-    private AuthorizeService getAuthorizeService() {
-        if(authorizeService == null)
-        {
-            authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-        }
-        return authorizeService;
     }
 
     protected void init(Item parentItem) {
@@ -83,16 +76,6 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
-    protected boolean isAccessibleToAnonymousUser(Bitstream bit) {
-        try {
-            Group anonymous = EPersonServiceFactory.getInstance().getGroupService().findByName(context, Group.ANONYMOUS);
-            return getAuthorizeService().getAuthorizedGroups(context, bit, Constants.READ).contains(anonymous);
-        } catch (Exception e) {
-            log.error("Error checking bitstream permissions" , e);
-            return false;
-        }
-    }
-    
     private void buildFullTextList(Item parentItem) {
         // now get full text of any bitstreams in the TEXT bundle
         // trundle through the bundles
@@ -109,7 +92,7 @@ public class FullTextContentStreams extends ContentStreamBase
                     System.err.println(fulltextBitstream.getName() + " TBTBTB");
                     FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
                     fullTextStreams.add(ftBitstream);
-                    if (isAccessibleToAnonymousUser(fulltextBitstream)) {
+                    if (fullTextValidator.isAccessibleToAnonymousUser(context, fulltextBitstream)) {
                         accessibleFullTextStreams.add(ftBitstream);
                         System.err.println(ftBitstream.getFileName() + " TRUE");
                     } else {
