@@ -39,7 +39,7 @@ public class FullTextContentStreamsTest {
     private FullTextContentStreams streams;
     
     @Mock
-    private FullTextContentStreamsValidator fullTextValidator;
+    private AuthorizeService authorizeService
     
     @Mock
     private BitstreamService bitstreamService;
@@ -86,13 +86,13 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
-        when(fullTextValidator.isAccessibleToAnonymousUser(null, textBitstream1)).thenReturn(true);
-        when(fullTextValidator.isAccessibleToAnonymousUser(null, textBitstream2)).thenReturn(true);
-        when(fullTextValidator.isAccessibleToAnonymousUser(null, textBitstream3)).thenReturn(true);
-        when(fullTextValidator.isAccessibleToAnonymousUser(null, textBitstreamRestricted)).thenReturn(false);
+        when(authorizeService.isAccessibleToAnonymousUser(null, textBitstream1, Constants.READ)).thenReturn(true);
+        when(authorizeService.isAccessibleToAnonymousUser(null, textBitstream2, Constants.READ)).thenReturn(true);
+        when(authorizeService.isAccessibleToAnonymousUser(null, textBitstream3, Constants.READ)).thenReturn(true);
+        when(authorizeService.isAccessibleToAnonymousUser(null, textBitstreamRestricted, Constants.READ)).thenReturn(false);
         
         streams.bitstreamService = bitstreamService;
-        streams.fullTextValidator = fullTextValidator;
+        streams.authorizeService = authorizeService;
     }
 
     @Test

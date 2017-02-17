@@ -55,7 +55,6 @@ public class FullTextContentStreams extends ContentStreamBase
     protected List<FullTextBitstream> accessibleFullTextStreams;
     protected BitstreamService bitstreamService;
     protected AuthorizeService authorizeService;
-    protected FullTextContentStreamsValidator fullTextValidator = new FullTextContentStreamsValidator();
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
@@ -65,6 +64,7 @@ public class FullTextContentStreams extends ContentStreamBase
     protected void init(Item parentItem) {
         fullTextStreams = new LinkedList<>();
         accessibleFullTextStreams = new LinkedList<>();
+        getAuthorizeService();
 
         if(parentItem != null) {
             sourceInfo = parentItem.getHandle();
@@ -74,6 +74,14 @@ public class FullTextContentStreams extends ContentStreamBase
 
             buildFullTextList(parentItem);
         }
+    }
+
+    private AuthorizeService getAuthorizeService() {
+        if(authorizeService == null)
+        {
+            authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+        }
+        return authorizeService;
     }
 
     private void buildFullTextList(Item parentItem) {
@@ -92,11 +100,12 @@ public class FullTextContentStreams extends ContentStreamBase
                     System.err.println(fulltextBitstream.getName() + " TBTBTB");
                     FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
                     fullTextStreams.add(ftBitstream);
-                    if (fullTextValidator.isAccessibleToAnonymousUser(context, fulltextBitstream)) {
-                        accessibleFullTextStreams.add(ftBitstream);
-                        System.err.println(ftBitstream.getFileName() + " TRUE");
-                    } else {
-                        System.err.println(ftBitstream.getFileName() + " FALSE");
+                    try {
+                        if (authorizeService.authorizeActionBoolean(new Context(), fulltextBitstream, Constants.READ)) {
+                            accessibleFullTextStreams.add(ftBitstream);
+                        }    
+                    } catch(SQLException e) {
+                        log.error("Error validating bistream accessibility", e);
                     }
                    
                     log.debug("Added BitStream: "
