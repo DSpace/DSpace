@@ -112,6 +112,9 @@ public class FullTextContentStreams extends ContentStreamBase
                     fullTextStreams.add(ftBitstream);
                     if (this.verifyAnonymous.isAccessibleToAnonymousUser(fulltextBitstream)) {
                         accessibleFullTextStreams.add(ftBitstream);
+                        log.info(ftBitstream.getFileName() + " TRUE");
+                    } else {
+                        log.info(ftBitstream.getFileName() + " FALSE");
                     }
                    
                     log.debug("Added BitStream: "
