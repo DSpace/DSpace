@@ -104,6 +104,8 @@ public class FullTextContentStreams extends ContentStreamBase
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
+                    log.info("TBTB "+fulltextBitstream.getName() + "("+fullTextStreams.size()+","+accessibleFullTextStreams.size()+")");	
+                
                     FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
                     fullTextStreams.add(ftBitstream);
                     try {
