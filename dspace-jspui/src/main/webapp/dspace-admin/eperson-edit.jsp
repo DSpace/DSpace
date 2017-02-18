@@ -172,14 +172,14 @@
    		<%-- <td>Can Log In:</td> --%>
             <label class="col-md-2" for="tcan_log_in"><fmt:message key="jsp.dspace-admin.eperson-edit.can"/></label>
             <div class="col-md-6">
-			<input class="form-control"  type="checkbox" name="can_log_in" id="tcan_log_in" value="true"<%= eperson.canLogIn() ? " checked=\"checked\"" : "" %> />
+			<input type="checkbox" name="can_log_in" id="tcan_log_in" value="true"<%= eperson.canLogIn() ? " checked=\"checked\"" : "" %> />
 			</div>
         </div>
         <div class="row">
         <%-- <td>Require Certificate:</td> --%>
             <label class="col-md-2" for="trequire_certificate"><fmt:message key="jsp.dspace-admin.eperson-edit.require"/></label>
             <div class="col-md-6">
-			<input class="form-control"  type="checkbox" name="require_certificate" id="trequire_certificate" value="true"<%= eperson.getRequireCertificate() ? " checked=\"checked\"" : "" %> />
+			<input type="checkbox" name="require_certificate" id="trequire_certificate" value="true"<%= eperson.getRequireCertificate() ? " checked=\"checked\"" : "" %> />
 			</div>
 		</div>
 		<br/>
