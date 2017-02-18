@@ -106,17 +106,11 @@ public class FullTextContentStreams extends ContentStreamBase
                         accessibleFullTextStreams.add(ftBitstream);
                     }    
 
-                    log.info(String.format("TBTB [%s] %b (%d,%d)", 
-                       fulltextBitstream.getName(),
-                       isAccessible,
-                       fullTextStreams.size(),
-                       accessibleFullTextStreams.size()
-                    ));	
-
-                    log.debug("Added BitStream: "
+                    log.info("Added BitStream: "
                             + fulltextBitstream.getStoreNumber() + " "
                             + fulltextBitstream.getSequenceID() + " "
-                            + fulltextBitstream.getName());
+                            + fulltextBitstream.getName() + " "
+                            + "Accessible:" + isAccessible);
                 }
             }
         }
