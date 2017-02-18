@@ -697,8 +697,8 @@
         </xsl:variable>
 
         <script type="text/javascript">
-            <xsl:text disable-output-escaping="yes">!window.jQuery &amp;&amp; document.write('&lt;script type="text/javascript" src="</xsl:text><xsl:value-of
-                select="$localJQuerySrc"/><xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
+            !window.jQuery &amp;&amp; document.write('&lt;script type="text/javascript" src="<xsl:value-of
+                select="$localJQuerySrc"/>"&gt;&#160;&lt;\/script&gt;')
         </script>
 
         <script type="text/javascript"><xsl:text>
