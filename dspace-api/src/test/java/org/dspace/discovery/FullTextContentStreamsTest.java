@@ -7,6 +7,7 @@
  */
 package org.dspace.discovery;
 
+import org.dspace.discovery.FullTextContentStreams.AnonymousAccessChecker;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.dspace.content.Bitstream;
@@ -41,10 +42,7 @@ public class FullTextContentStreamsTest {
     private FullTextContentStreams streams;
     
     @Mock
-    private Context anonymousContext;
-    
-    @Mock
-    private AuthorizeService authorizeService;
+    private AnonymousAccessChecker anonymousAccessChecker;
     
     @Mock
     private BitstreamService bitstreamService;
@@ -91,14 +89,14 @@ public class FullTextContentStreamsTest {
         when(bitstreamService.retrieve(null, textBitstream3)).thenReturn(new ByteArrayInputStream("This is text 3".getBytes(Charsets.UTF_8)));
         when(bitstreamService.retrieve(null, textBitstreamRestricted)).thenReturn(new ByteArrayInputStream("This is text Restricted".getBytes(Charsets.UTF_8)));
 
-        when(authorizeService.authorizeActionBoolean(anonymousContext, textBitstream1, Constants.READ)).thenReturn(true);
-        when(authorizeService.authorizeActionBoolean(anonymousContext, textBitstream2, Constants.READ)).thenReturn(true);
-        when(authorizeService.authorizeActionBoolean(anonymousContext, textBitstream3, Constants.READ)).thenReturn(true);
-        when(authorizeService.authorizeActionBoolean(anonymousContext, textBitstreamRestricted, Constants.READ)).thenReturn(false);
+        when(anonymousAccessChecker.check(textBitstream1)).thenReturn(true);
+        when(anonymousAccessChecker.check(textBitstream2)).thenReturn(true);
+        when(anonymousAccessChecker.check(textBitstream3)).thenReturn(true);
+        when(anonymousAccessChecker.check(textBitstreamRestricted)).thenReturn(false);
         
         streams.bitstreamService = bitstreamService;
-        streams.authorizeService = authorizeService;
-        streams.anonymousContext = anonymousContext;
+        streams.anonymousAccessChecker = anonymousAccessChecker;
+
     }
 
     @Test

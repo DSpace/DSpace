@@ -51,11 +51,10 @@ public class FullTextContentStreams extends ContentStreamBase
     public static final String FULLTEXT_BUNDLE = "TEXT";
 
     protected final Context context;
-    protected Context anonymousContext;
     protected List<FullTextBitstream> fullTextStreams;
     protected List<FullTextBitstream> accessibleFullTextStreams;
     protected BitstreamService bitstreamService;
-    protected AuthorizeService authorizeService;
+    protected AnonymousAccessChecker anonymousAccessChecker = new AnonymousAccessChecker();
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
@@ -76,21 +75,15 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
-    private AuthorizeService getAuthorizeService() {
-        if(authorizeService == null)
-        {
-            authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    class AnonymousAccessChecker {
+        public boolean check(Bitstream bit) {
+            try {
+                return AuthorizeServiceFactory.getInstance().getAuthorizeService().authorizeActionBoolean(new Context(), bit, Constants.READ);
+            } catch (Exception e) {
+                log.error("Error checking bitstream access", e);
+                return false;
+            }
         }
-        return authorizeService;
-    }
-
-    //Allow test driver to mock this call
-    private Context getAnonymousContext() {
-        if(anonymousContext == null)
-        {
-            anonymousContext = new Context();
-        }
-        return anonymousContext;
     }
     
     private void buildFullTextList(Item parentItem) {
@@ -104,21 +97,22 @@ public class FullTextContentStreams extends ContentStreamBase
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
-                    log.info("TBTB "+fulltextBitstream.getName() + "("+fullTextStreams.size()+","+accessibleFullTextStreams.size()+")");	
                 
                     FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
                     fullTextStreams.add(ftBitstream);
-                    try {
-                        boolean isAccessible = getAuthorizeService().authorizeActionBoolean(getAnonymousContext(), fulltextBitstream, Constants.READ);
-                        log.info("TBTB "+fulltextBitstream.getName() + isAccessible);	
+                    boolean isAccessible = anonymousAccessChecker.check(fulltextBitstream);
                         
-                        if (getAuthorizeService().authorizeActionBoolean(getAnonymousContext(), fulltextBitstream, Constants.READ)) {
-                            accessibleFullTextStreams.add(ftBitstream);
-                        }    
-                    } catch(SQLException e) {
-                        log.error("Error validating bistream accessibility", e);
-                    }
-                   
+                    if (isAccessible) {
+                        accessibleFullTextStreams.add(ftBitstream);
+                    }    
+
+                    log.info(String.format("TBTB [%s] %b (%d,%d)", 
+                       fulltextBitstream.getName(),
+                       isAccessible,
+                       fullTextStreams.size(),
+                       accessibleFullTextStreams.size()
+                    ));	
+
                     log.debug("Added BitStream: "
                             + fulltextBitstream.getStoreNumber() + " "
                             + fulltextBitstream.getSequenceID() + " "
