@@ -56,6 +56,8 @@ import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletResponse;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -476,11 +478,15 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             letterQuery.put(BrowseParams.STARTS_WITH, "0");
             jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), "0-9");
             
-            for (char c = 'A'; c <= 'Z'; c++)
+            // Obtain jump navigation letters from configuration file
+            String[] english = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",};
+            ConfigurationService service = new DSpace().getSingletonService(ConfigurationService.class);
+            String[] letters = service.getArrayProperty("xmlui.browse.jump.navigation.letters", english);
+
+            for (String letter : letters)
             {
-                letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
-                jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
-                        .toString(c));
+                letterQuery.put(BrowseParams.STARTS_WITH, letter);
+                jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), letter);
             }
 
             // Create a free text field for the initial characters
