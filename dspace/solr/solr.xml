@@ -29,10 +29,10 @@
     If 'null' (or absent), cores will not be manageable via REST
   -->
   <cores adminPath="/admin/cores">
-    <core name="search" instanceDir="search" />
-    <core name="statistics" instanceDir="statistics" />
-    <core name="oai" instanceDir="oai" />
-    <core name="authority" instanceDir="authority" />
+    <core name="vsim_search" instanceDir="vsim_search" />
+    <core name="vsim_statistics" instanceDir="vsim_statistics" />
+    <core name="vsim_oai" instanceDir="vsim_oai" />
+    <core name="vsim_authority" instanceDir="vsim_authority" />
   </cores>
   
 </solr>
