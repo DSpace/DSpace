@@ -226,7 +226,7 @@ function doSubmission()
        var workspace = getWorkspaceItemService().find(getDSContext(), workspaceID);
        
        // First check that the id is valid.
-       var submitterID = workspace.getSubmitter().getID()
+       var submitterID = workspace.getSubmitter().getID();
        var currentID = getDSContext().getCurrentUser().getID();
        if (submitterID == currentID)
        {
@@ -278,6 +278,16 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 {
     //load initial submission information
 	var submissionInfo = getSubmissionInfo(workspaceID);
+	
+    if(!collectionHandle.equals(submissionInfo.getCollectionHandle())){
+        // Handle selected does not match the handle of the submission (this can
+        // happen if user has used the back button to change collection). Create
+        // a new workspace item. 
+        var dso = HandleManager.resolveToObject(getDSContext(), collectionHandle);
+        var workspace = WorkspaceItem.create(getDSContext(), dso, true);
+        workspaceID = "S"+workspace.getID();
+        submissionInfo = getSubmissionInfo(workspaceID);
+	}
 
 	//Initialize a Cocoon Local Page to save current state information
 	//(This lets us handle when users click the browser "back button"
@@ -288,8 +298,7 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
     //this is array of all the steps/pages in current submission process
     //it's used to step back and forth between pages!
     var stepsInSubmission = getSubmissionSteps(submissionInfo);
-
-
+    
     //if we didn't have a page passed in, go to first page in process
     if(initStepAndPage==null)
     	state.stepAndPage = stepsInSubmission[0];
@@ -452,7 +461,6 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
 function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, response_flag)
 {
   	//split out step and page (e.g. 1.2 is page 2 of step 1)
-    var step = stepAndPage.getStep();
 	var page = stepAndPage.getPage();
   
   	//-------------------------------------
@@ -497,7 +505,6 @@ function processPage(workspaceID, stepConfig, page)
 	// often this processing takes place as part of a new request 
 	// and the DSpace Context is changed on each request) 
 	var submissionInfo = getSubmissionInfo(workspaceID);
-    var handle = submissionInfo.getCollectionHandle();
 	var response_flag = null;
 
 	//---------------------------------------------
