@@ -1,0 +1,41 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<body>
+<div id="file.add.div.add" n="news" rend="primary">
+
+<head>Submitting Content to VSim</head>
+
+<hi rend="bold">Who may submit content?</hi>
+
+<p>Gosh, what a great question. When we have an answer for this, we will put it here.</p>
+
+<hi rend="bold">Submitting files</hi>
+<p>We should explain the nuts and bolts of how to submit a new model here, kind of like a focused mini-tour, just to outline the process</p>
+
+<hi rend="bold">File types</hi>
+
+<p>Most electronic formats can be placed in VSim. If we have specific guidance it can go here.</p>
+
+<hi rend="bold">Previously published content</hi>
+
+<p>Publishers may restrict your ability to include previously published content in an open access repository. 
+    Contact us for help in determining the guidelines for specific journals and publishers.</p>
+
+<hi rend="bold">Contact us</hi>
+
+<p><xref target="/xmlui/pages/contact">Contact us</xref> if you 
+    have questions about submitting content, preferred file formats, and publisher restrictions on 
+    previously published material.</p>
+
+</div>
+
+</body>
+
+<meta>
+<pageMeta>
+<metadata element="title">Submit Works to VSim</metadata>
+<trail target="../">VSim Home</trail>
+</pageMeta>
+</meta>
+
+</document>
