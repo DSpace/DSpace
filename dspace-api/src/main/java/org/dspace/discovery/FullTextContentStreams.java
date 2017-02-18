@@ -109,6 +109,9 @@ public class FullTextContentStreams extends ContentStreamBase
                     FullTextBitstream ftBitstream = new FullTextBitstream(sourceInfo, fulltextBitstream);
                     fullTextStreams.add(ftBitstream);
                     try {
+                        boolean isAccessible = getAuthorizeService().authorizeActionBoolean(getAnonymousContext(), fulltextBitstream, Constants.READ);
+                        log.info("TBTB "+fulltextBitstream.getName() + isAccessible);	
+                        
                         if (getAuthorizeService().authorizeActionBoolean(getAnonymousContext(), fulltextBitstream, Constants.READ)) {
                             accessibleFullTextStreams.add(ftBitstream);
                         }    
