@@ -355,7 +355,6 @@
                             <img src="{$theme-path}images/vsim.png" />
                         </a>
 
-
                         <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
                         <ul class="nav nav-pills pull-left ">
 
@@ -424,6 +423,12 @@
                                     </li>
                                 </xsl:otherwise>
                             </xsl:choose>
+
+                            <li><a class="btn btn-default" role="button" href="/pages/add">add</a></li>
+                            <li><a class="btn btn-default" role="button" href="/pages/about">about</a></li>
+                            <li><a class="btn btn-default" role="button" href="/pages/contact">contact</a></li>
+                            <li><a class="btn btn-default" role="button" href="/pages/help">help</a></li>
+
                         </ul>
                               </div>
                     </div>
