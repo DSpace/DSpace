@@ -135,7 +135,10 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
             namespaces.pushContext();
             needNewNamespaceContext = false;
         }
-        namespaces.declarePrefix(prefix, uri);
+        if (!uri.equals("http://di.tamu.edu/DRI/1.0/"))
+        {
+            namespaces.declarePrefix(prefix, uri);
+        }
 
         super.startPrefixMapping(prefix, uri);
     }
