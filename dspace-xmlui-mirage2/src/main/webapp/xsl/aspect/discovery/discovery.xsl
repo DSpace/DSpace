@@ -245,12 +245,19 @@
                     <xsl:if test="dri:list[@n=(concat($handle, ':dc.date.issued'))]">
                         <span class="publisher-date h4">   <small>
                             <xsl:text>(</xsl:text>
-                            <xsl:if test="dri:list[@n=(concat($handle, ':dc.publisher'))]">
-                                <span class="publisher">
-                                    <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.publisher'))]/dri:item"/>
-                                </span>
-                                <xsl:text>, </xsl:text>
-                            </xsl:if>
+                            <span class="publisher">
+                            	<xsl:if test="dri:list[@n=(concat($handle, ':dc.publisher'))]">
+									<xsl:for-each select="dri:list[@n=(concat($handle, ':dc.publisher'))]/dri:item">
+	                                    <xsl:apply-templates select="."/>
+	                                    <xsl:if test="count(following-sibling::dri:item) != 0">
+	                                        <xsl:text>; </xsl:text>
+	                                    </xsl:if>
+										<xsl:if test="count(following-sibling::dri:item) = 0">
+	                                        <xsl:text>, </xsl:text>
+	                                    </xsl:if>
+                                	</xsl:for-each>
+                                </xsl:if>
+							</span>
                             <span class="date">
                                 <xsl:value-of
                                         select="substring(dri:list[@n=(concat($handle, ':dc.date.issued'))]/dri:item,1,10)"/>
