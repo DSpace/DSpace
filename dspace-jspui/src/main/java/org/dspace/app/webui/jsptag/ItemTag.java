@@ -529,9 +529,9 @@ public class ItemTag extends TagSupport
                 String label = null;
                 try
                 {
-                    label = I18nUtil.getMessage("metadata."
-                            + ("default".equals(this.style) ? "" : this.style + ".") + field,
-                            context);
+                    label = I18nUtil.getMessageOrExcept("metadata."
+                                    + ("default".equals(this.style) ? "" : this.style + ".") + field,
+                            context.getCurrentLocale());
                 }
                 catch (MissingResourceException e)
                 {

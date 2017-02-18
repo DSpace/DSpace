@@ -270,25 +270,44 @@ public class I18nUtil
      */
     public static String getMessage(String key, Locale locale)
     {
-        if (locale == null)
-        {
-            locale = DEFAULTLOCALE;
-        }
-        ResourceBundle.Control control = 
-            ResourceBundle.Control.getNoFallbackControl(
-            ResourceBundle.Control.FORMAT_DEFAULT);
-
-        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale, control);
         try {
-            String message = messages.getString(key.trim());
-            return message;
+            return getMessageOrExcept(key, locale);
         } catch (MissingResourceException e) {
+            if (locale == null)
+            {
+                locale = DEFAULTLOCALE;
+            }
             log.error("'" + key + "' translation undefined in locale '"
                     + locale.toString() + "'");
             return key;
         }
     }
-    
+
+    /**
+     * Get the i18n message string for a given key and locale
+     *
+     * @param key
+     *        String - name of the key to get the message for
+     * @param locale
+     *        Locale, to get the message for
+     *
+     * @return message
+     *         String of the message
+     */
+    public static String getMessageOrExcept(String key, Locale locale) throws MissingResourceException
+    {
+        if (locale == null)
+        {
+            locale = DEFAULTLOCALE;
+        }
+        ResourceBundle.Control control =
+                ResourceBundle.Control.getNoFallbackControl(
+                        ResourceBundle.Control.FORMAT_DEFAULT);
+
+        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale, control);
+        return messages.getString(key.trim());
+    }
+
     /**
      * Get the i18n message string for a given key and context
      *
