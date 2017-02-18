@@ -76,16 +76,16 @@ public class HierarchyResource extends Resource {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public HierarchySite getHierarchy(
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-            @Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException, WebApplicationException {
-        
-        org.dspace.core.Context context = null;
-        HierarchySite repo = new HierarchySite();
-        
+    		@QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+    		@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException, WebApplicationException {
+		
+		org.dspace.core.Context context = null;
+		HierarchySite repo = new HierarchySite();
+		
         try {
             context = createContext();
             if (!configurationService.getBooleanProperty("rest.hierarchy-authenticate", true)) {
-                context.turnOffAuthorisationSystem();                
+                context.turnOffAuthorisationSystem();
             }
 
             Site site = siteService.findSite(context);
@@ -108,7 +108,7 @@ public class HierarchyResource extends Resource {
         return repo;
     }
     
-    
+
     private void processCommunity(org.dspace.core.Context context, HierarchyCommunity parent, List<Community> communities) throws SQLException {
         if (communities == null) {
             return;
@@ -137,7 +137,7 @@ public class HierarchyResource extends Resource {
                 }
             }
             processCommunity(context, mycomm, comm.getSubcommunities());
-        }        
-        
+        }
+
     }
 }

@@ -114,9 +114,9 @@ public class FilteredItemsResource extends Resource {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public org.dspace.rest.common.ItemFilter getItemQuery(@QueryParam("expand") String expand, 
-            @QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-            @QueryParam("filters") @DefaultValue("is_item,all_filters") String filters,
+    		@QueryParam("limit") @DefaultValue("100") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+    		@QueryParam("filters") @DefaultValue("is_item,all_filters") String filters,
             @QueryParam("query_field[]") @DefaultValue("dc.title") List<String> query_field,
             @QueryParam("query_op[]") @DefaultValue("exists") List<String> query_op,
             @QueryParam("query_val[]") @DefaultValue("") List<String> query_val,
@@ -128,7 +128,7 @@ public class FilteredItemsResource extends Resource {
         try {
             context = createContext();
             if (!configurationService.getBooleanProperty("rest.reporting-authenticate", true)) {
-                context.turnOffAuthorisationSystem();                
+                context.turnOffAuthorisationSystem();
             }
             
             int index = Math.min(query_field.size(), Math.min(query_op.size(), query_val.size()));
@@ -143,15 +143,15 @@ public class FilteredItemsResource extends Resource {
             }
 
             List<UUID> uuids = getUuidsFromStrings(collSel);
-            List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);            
+            List<List<MetadataField>> listFieldList = getMetadataFieldsList(context, query_field);
 
             Iterator<org.dspace.content.Item> childItems = itemService.findByMetadataQuery(context, listFieldList, query_op, query_val, uuids, regexClause, offset, limit);
              
             int count = itemFilterSet.processSaveItems(context, servletContext, childItems, true, expand);
-            writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
-            result.annotateQuery(query_field, query_op, query_val);
-            result.setUnfilteredItemCount(count);
-            context.complete();
+    	    writeStats(siteService.findSite(context), UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
+    	    result.annotateQuery(query_field, query_op, query_val);
+    	    result.setUnfilteredItemCount(count);
+    	    context.complete();
         } catch (IOException e) {
             processException(e.getMessage(), context);
         } catch (SQLException e) {
@@ -165,7 +165,7 @@ public class FilteredItemsResource extends Resource {
         }
         return result;
     }
-    
+
     private List<List<MetadataField>> getMetadataFieldsList(org.dspace.core.Context context, List<String> query_field) throws SQLException {
         List<List<MetadataField>> listFieldList = new ArrayList<List<MetadataField>>();
         for(String s: query_field) {
@@ -190,18 +190,18 @@ public class FilteredItemsResource extends Resource {
         
             if (Item.ANY.equals(qualifier)) {
                 for(MetadataField mf: metadataFieldService.findFieldsByElementNameUnqualified(context, schema, element)){
-                    fields.add(mf);                                    
+                    fields.add(mf);
                 }
             } else {
                 MetadataField mf = metadataFieldService.findByElement(context, schema, element, qualifier);
                 if (mf != null) {
-                    fields.add(mf);                    
+                    fields.add(mf);
                 }
             }
         }
         return listFieldList;
     }
-    
+
     private List<UUID> getUuidsFromStrings(List<String> collSel) {
         List<UUID> uuids = new ArrayList<UUID>();
         for(String s: collSel) {

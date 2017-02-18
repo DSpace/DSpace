@@ -208,15 +208,10 @@ public class FilteredCollectionsResource extends Resource {
             }
 
             org.dspace.content.Collection collection = collectionService.findByIdOrLegacyId(context, collection_id);
-            if (authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ))
-            {
-                writeStats(collection, UsageEvent.Action.VIEW, user_ip,
-                    user_agent, xforwardedfor, headers, request, context);
-                retColl = new org.dspace.rest.common.FilteredCollection(
-                    collection, servletContext, filters, expand, context, limit, offset);
-            }
-            else
-            {
+            if(authorizeService.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
+				writeStats(collection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
+                retColl = new org.dspace.rest.common.FilteredCollection(collection, servletContext, filters, expand, context, limit, offset);
+            } else {
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
             context.complete();

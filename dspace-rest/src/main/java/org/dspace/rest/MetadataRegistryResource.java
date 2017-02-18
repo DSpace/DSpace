@@ -101,7 +101,7 @@ public class MetadataRegistryResource extends Resource
     @Path("/schema")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataSchema[] getSchemas(@QueryParam("expand") @DefaultValue("fields") String expand, 
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
@@ -173,7 +173,7 @@ public class MetadataRegistryResource extends Resource
     @Path("/schema/{schema_prefix}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataSchema getSchema(@PathParam("schema_prefix") String schemaPrefix, @QueryParam("expand") @DefaultValue("fields") String expand,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
@@ -246,13 +246,13 @@ public class MetadataRegistryResource extends Resource
     @Path("/schema/{schema_prefix}/metadata-fields/{element}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataField getMetadataFieldUnqualified(@PathParam("schema_prefix") String schemaPrefix,
-            @PathParam("element") String element,
-            @QueryParam("expand") String expand,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+    		@PathParam("element") String element,
+    		@QueryParam("expand") String expand,
+    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
-        return getMetadataFieldQualified(schemaPrefix, element, "", expand, user_ip, user_agent, xforwardedfor, headers, request);
+    	return getMetadataFieldQualified(schemaPrefix, element, "", expand, user_ip, user_agent, xforwardedfor, headers, request);
     }
     
     /**
@@ -374,8 +374,8 @@ public class MetadataRegistryResource extends Resource
     @Path("/metadata-fields/{field_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataField getMetadataField(@PathParam("field_id") Integer fieldId,  
-            @QueryParam("expand") @DefaultValue("parentSchema") String expand,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+    		@QueryParam("expand") @DefaultValue("parentSchema") String expand,
+    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
@@ -697,7 +697,7 @@ public class MetadataRegistryResource extends Resource
         } 
         catch (NonUniqueMetadataException e) {
             processException("Could not update metadata field(id=" + fieldId + "), NonUniqueMetadataException. Message:" + e, context);
-        } 
+        }
         catch (IOException e) {
             processException("Could not update metadata field(id=" + fieldId + "), IOException. Message:" + e, context);
         }
