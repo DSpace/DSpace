@@ -694,16 +694,8 @@ Common usage:
 
     <target name="build_webapps_wars" description="Compress Web Applications into .war files" if="wars">
 
-        <war destfile="${dspace.dir}/webapps/xmlui.war">
-            <fileset dir="${dspace.dir}/webapps/xmlui/" />
-        </war>
-
         <war destfile="${dspace.dir}/webapps/oai.war">
             <fileset dir="${dspace.dir}/webapps/oai/" />
-        </war>
-
-        <war destfile="${dspace.dir}/webapps/jspui.war">
-            <fileset dir="${dspace.dir}/webapps/jspui/" />
         </war>
 
         <war destfile="${dspace.dir}/webapps/rdf.war">
