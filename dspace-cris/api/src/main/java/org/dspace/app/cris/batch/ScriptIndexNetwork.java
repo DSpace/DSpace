@@ -105,7 +105,7 @@ public class ScriptIndexNetwork
             {
                 for (String connection : connectionsString.split(","))
                 {
-                    connections.add(connection);
+                    connections.add(connection.trim());
                 }
             }
         }

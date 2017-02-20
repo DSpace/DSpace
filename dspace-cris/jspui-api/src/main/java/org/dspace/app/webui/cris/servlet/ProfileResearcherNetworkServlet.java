@@ -169,7 +169,7 @@ public class ProfileResearcherNetworkServlet extends DSpaceServlet {
         
 		solrQuery.setQuery(
 				
-				field1 + ":\"" + from + "\" AND "+ field2 + ":\""+ to +"\""				
+				"("+field1 + ":\"" + from + "\" AND "+ field2 + ":\""+ to +"\"" + ") OR ("+field2 + ":\"" + from + "\" AND "+ field1 + ":\""+ to +"\"" + ")"				
 								
 		);
 		solrQuery.addFilterQuery("entity:" + ConstantNetwork.ENTITY_RP);

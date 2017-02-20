@@ -155,8 +155,7 @@ public class RelationsResearcherNetworkServlet extends DSpaceServlet
             field2 = "b_val";
         }
 
-        solrQuery.setQuery(field1 + ":\"" + from
-                + "\" AND " + field2 + ":\"" + to + "\"");
+        solrQuery.setQuery("("+field1 + ":\"" + from + "\" AND "+ field2 + ":\""+ to +"\"" + ") OR ("+field2 + ":\"" + from + "\" AND "+ field1 + ":\""+ to +"\"" + ")");
 
         solrQuery.addFilterQuery("type:" + type);
         solrQuery.addFilterQuery("entity:" + ConstantNetwork.ENTITY_RP);
