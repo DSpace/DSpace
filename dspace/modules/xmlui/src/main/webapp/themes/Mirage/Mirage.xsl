@@ -344,26 +344,122 @@
                     <a href="#most-viewed-data"><span>Popular</span></a>
                     <a id="by_author" href="#by-author"><span>By author</span></a>
                     <a id="by_journal" href="#by-journal"><span>By journal</span></a>
-
                 </div>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
                     <div id="recently-published-data" class="browse-data-panel">
-                        <xsl:for-each select="dri:div[@n='site-home']">
+   <!--                     <xsl:for-each select="dri:div[@n='site-home']">
                             <xsl:apply-templates/>
                         </xsl:for-each>
+-->
+<!-- Start of temp Recently Added -->
+
+<h1 class="ds-div-head">Recently published
+data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" href="/feed/atom_1.0/10255/3" class="single-image-link" title="Web feed of data packages recently added to Dryad">
+<img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed - Recently published data" />
+</a>
+</h1>
+
+<div id="aspect_discovery_SiteRecentSubmissions_div_site-recent-submission" class="ds-static-div secondary recent-submission">
+<ul class="ds-artifact-list">
+
+<li class="ds-artifact-item odd">
+<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
+<a href="/resource/doi:10.5061/dryad.bn1gf">
+<span class="author">Correia PA, Lottem E, Banerjee D, Machado AS, Carey MR, Mainen ZF</span>
+<span class="artifact-title">Data from: Transient inhibition and long-term facilitation of locomotion by phasic optogenetic activation of serotonin neurons. </span>
+<span class="italics">eLife</span> <span class="doi">http://dx.doi.org/10.5061/dryad.bn1gf</span>
+</a>
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.bn1gf&amp;rft_id=2050-084X&amp;rft_id=eLife-20975&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Correia%2C+Patr%C3%ADcia+A.&amp;rft.contributor=Lottem%2C+Eran&amp;rft.contributor=Banerjee%2C+Dhruba&amp;rft.contributor=Machado%2C+Ana+S.&amp;rft.contributor=Carey%2C+Megan+R.&amp;rft.contributor=Mainen%2C+Zachary+F.&amp;rft.coverage=Portugal&amp;rft.identifier=doi%3A10.5061%2Fdryad.bn1gf&amp;rft.identifier=2050-084X&amp;rft.description=Serotonin+%285-HT%29+is+associated+with+mood+and+motivation+but+the+function+of+endogenous+5-HT+remains+controversial.+Here%2C+we+studied+the+impact+of+phasic+optogenetic+activation+of+5-HT+neurons+in+mice+over+time+scales+from+seconds+to+weeks.+We+found+that+activating+dorsal+raphe+nucleus+%28DRN%29+5-HT+neurons+induced+a+strong+suppression+of+spontaneous+locomotor+behavior+in+the+open+field+with+rapid+kinetics+%28onset+%7Bless+than+or+equal+to%7D+1+s%29.+Inhibition+of+locomotion+was+independent+of+measures+of+anxiety+or+motor+impairment+and+could+be+overcome+by+strong+motivational+drive.+Repetitive+place-contingent+pairing+of+activation+caused+neither+place+preference+nor+aversion.+However%2C+repeated+15+min+daily+stimulation+caused+a+persistent+increase+in+spontaneous+locomotion+to+emerge+over+three+weeks.+These+results+show+that+5-HT+transients+have+strong+and+opposing+short+and+long-term+effects+on+motor+behavior+that+appear+to+arise+from+effects+on+the+underlying+factors+that+motivate+actions.&amp;rft.relation=doi%3A10.5061%2Fdryad.bn1gf%2F1&amp;rft.subject=serotonin&amp;rft.subject=dorsal+raphe+nucleus&amp;rft.subject=locomotion&amp;rft.subject=optogenetics&amp;rft.subject=mouse&amp;rft.title=Data+from%3A+Transient+inhibition+and+long-term+facilitation+of+locomotion+by+phasic+optogenetic+activation+of+serotonin+neurons&amp;rft.type=Article&amp;rft.contributor=Correia%2C+Patr%C3%ADcia+A.&amp;rft.identifier=eLife-20975&amp;rft.publicationName=eLife&amp;rft.archive=editorial%40elifesciences.org&amp;rft.archive=automated-messages%40datadryad.org&amp;rft.submit=false&amp;rft.review=editorial%40elifesciences.org&amp;rft.review=automated-messages%40datadryad.org">
+                 
+</span>
+</div>
+</li>
+
+<li class="ds-artifact-item even">
+<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
+<a href="/resource/doi:10.5061/dryad.869f2">
+<span class="author">Garrido E, Díaz MF, Bernal H, Ñústez CE, Thaler J, Jander G, Poveda K</span>
+<span class="pub-date"> (2017) </span>
+<span class="artifact-title">Data from: Costs and tradeoffs of resistance and tolerance to belowground herbivory in potato. </span>
+<span class="italics">PLOS ONE</span> <span class="doi">http://dx.doi.org/10.5061/dryad.869f2</span>
+</a>
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.869f2&amp;rft_id=Garrido+E%2C+D%C3%ADaz+MF%2C+Bernal+H%2C+%C3%91ustez+CE%2C+Thaler+J%2C+Jander+G%2C+Poveda+K+%282017%29+Costs+and+Tradeoffs+of+Resistance+and+Tolerance+to+Belowground+Herbivory+in+Potato.+PLOS+ONE+12%281%29%3A+e0169083.&amp;rft_id=1932-6203&amp;rft_id=PONE-D-16-19771&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Garrido%2C+Etzel&amp;rft.contributor=D%C3%ADaz%2C+Mar%C3%ADa+F.&amp;rft.contributor=Bernal%2C+Hugo&amp;rft.contributor=%C3%91%C3%BAstez%2C+Carlos+E.&amp;rft.contributor=Thaler%2C+Jennifer&amp;rft.contributor=Jander%2C+Georg&amp;rft.contributor=Poveda%2C+Katja&amp;rft.coverage=Colombia&amp;rft.date=2017-01-17&amp;rft.identifier=doi%3A10.5061%2Fdryad.869f2&amp;rft.identifier=Garrido+E%2C+D%C3%ADaz+MF%2C+Bernal+H%2C+%C3%91ustez+CE%2C+Thaler+J%2C+Jander+G%2C+Poveda+K+%282017%29+Costs+and+Tradeoffs+of+Resistance+and+Tolerance+to+Belowground+Herbivory+in+Potato.+PLOS+ONE+12%281%29%3A+e0169083.&amp;rft.identifier=1932-6203&amp;rft.description=1.+The+success+of+sustainable+crop+production+depends+on+our+ability+to+select+or+create+varieties+that+can+allocate+resources+to+both+growth+and+defence.+However%2C+breeding+efforts+have+emphasized+increases+in+yields+but+have+partially+neglected+defence+traits+against+pests.+Estimating+the+costs+of+multiple+defences+against+tuber+herbivores+and+the+tradeoffs+among+them%2C+as+well+as+understanding+the+relationship+between+yield+and+multiple+defences+is+still+unknown+but+relevant+to+both+basic+and+applied+ecology.+2.+Using+twenty+commercial+potato+varieties+available+in+Colombia+and+the+tuber+herbivore+Tecia+solanivora%2C+we+tested+whether+high+yielding+varieties+show+a+reduction+in+three+types+of+defence%3A+constitutive+and+induced+resistance%2C+as+well+as+tolerance.+Specifically%2C+we+determined+%281%29+the+costs+in+terms+of+yield+of+all+three+defences%2C+%282%29+the+possible+tradeoffs+among+them%2C+and+%283%29+if+oviposition+preference+was+related+to+the+expression+of+these+defences.+3.+We+detected+no+costs+in+terms+of+yield+of+constitutive+and+induced+resistance+to+tuber+damage.+We+did%2C+however%2C+find+evidence+of+costs+of+being+able+to+tolerate+tuber+herbivory.+While+we+found+no+tradeoffs+among+any+of+the+estimated+defences%2C+there+was+a+positive+correlation+between+aboveground+compensatory+growth+and+tolerance+in+terms+of+tuber+production%2C+suggesting+that+after+damage+there+are+no+shifts+in+the+allocation+of+resources+from+aboveground+to+belowground+biomass.+Finally%2C+we+found+that+females+laid+more+eggs+on+those+varieties+with+the+lowest+level+of+constitutive+resistance.+4.+Synthesis+and+applications.+Our+findings+suggest+that+in+potatoes%2C+breeding+for+higher+yields+has+not+caused+any+reduction+in+constitutive+or+induced+resistance+to+tuber+damage.+This+is+not+the+case+for+tolerance+where+those+varieties+with+higher+yields+are+also+less+likely+to+tolerate+tuber+damage.+Given+the+high+incidence+of+tuber+pests+in+Colombia%2C+selecting+for+higher+tolerance+could+allow+for+high+productivity+in+the+presence+of+herbivores.+Finding+mechanisms+to+decouple+the+tolerance+response+from+yield+should+be+a+new+priority+in+potato+breeding+in+Colombia+to+guarantee+a+higher+yield+in+both+the+presence+and+absence+of+herbivores.&amp;rft.relation=doi%3A10.5061%2Fdryad.869f2%2F1&amp;rft.relation=doi%3A10.1371%2Fjournal.pone.0169083&amp;rft.subject=belowground+herbivory&amp;rft.subject=costs&amp;rft.subject=defence&amp;rft.subject=induced+defences&amp;rft.subject=resistance&amp;rft.subject=tolerance&amp;rft.subject=tradeoffs&amp;rft.subject=tuber-herbivores&amp;rft.title=Data+from%3A+Costs+and+tradeoffs+of+resistance+and+tolerance+to+belowground+herbivory+in+potato&amp;rft.type=Article&amp;rft.ScientificName=Solanum+tuberosum&amp;rft.ScientificName=Tecia+solanivora&amp;rft.contributor=Katja+Poveda&amp;rft.identifier=PONE-D-16-19771&amp;rft.publicationName=PLOS+ONE&amp;rft.archive=plosone%40plos.org&amp;rft.archive=automated-messages%40datadryad.org&amp;rft.submit=false&amp;rft.review=plosone%40plos.org&amp;rft.review=automated-messages%40datadryad.org&amp;rft.citationInProgress=true">
+                 
+</span>
+</div>
+</li>
+
+<li class="ds-artifact-item odd">
+<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
+<a href="/resource/doi:10.5061/dryad.34m6j">
+<span class="author">Li Y, Geary D</span>
+<span class="artifact-title">Data from: Children's visuospatial memory predicts mathematics achievement through early adolescence. </span>
+<span class="italics">PLOS ONE</span> <span class="doi">http://dx.doi.org/10.5061/dryad.34m6j</span>
+</a>
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.34m6j&amp;rft_id=1932-6203&amp;rft_id=PONE-D-16-36630&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Li%2C+Yaoran&amp;rft.contributor=Geary%2C+David&amp;rft.identifier=doi%3A10.5061%2Fdryad.34m6j&amp;rft.identifier=1932-6203&amp;rft.description=A+previous+study+showed+that+gains+in+visuospatial+memory+from+first+to+fifth+grade+predicted+end-of-fifth+grade+mathematics+but+not+reading+achievement%2C+controlling+other+factors.+In+this+follow+up+study%2C+these+relations+were+assessed+from+sixth+to+ninth+grade%2C+inclusive+%28n+%3D+145%29.+The+results+showed+that+growth+in+visuospatial+memory+across+the+elementary+school+years+was+related+to+growth+in+mathematics+achievement+after+fifth+grade%2C+controlling+intelligence%2C+the+central+executive+and+phonological+memory+components+of+working+memory%2C+in-class+attentive+behavior%2C+parental+education%2C+and+fifth+grade+mathematics+achievement.+As+found+for+fifth+grade%2C+this+relation+was+not+found+for+reading+achievement+after+fifth+grade.+In+total%2C+the+results+suggest+that+visuospatial+memory+has+a+unique+influence+on+ease+of+learning+some+types+of+mathematics+and+that+this+influence+becomes+more+important+across+successive+grades.&amp;rft.relation=doi%3A10.5061%2Fdryad.34m6j%2F1&amp;rft.relation=doi%3A10.1371%2Fjournal.pone.0172046&amp;rft.subject=visuospatial+ability&amp;rft.subject=working+memory&amp;rft.subject=mathematics+achievement&amp;rft.title=Data+from%3A+Children%27s+visuospatial+memory+predicts+mathematics+achievement+through+early+adolescence&amp;rft.type=Article&amp;rft.contributor=Geary%2C+David&amp;rft.identifier=PONE-D-16-36630&amp;rft.publicationName=PLOS+ONE&amp;rft.archive=plosone%40plos.org&amp;rft.archive=automated-messages%40datadryad.org&amp;rft.submit=false&amp;rft.review=plosone%40plos.org&amp;rft.review=automated-messages%40datadryad.org&amp;rft.fundingEntity=R01+HD38283%2C+R37+HD045914+US+National+Institute+of+Child+Health+and+Human+Development%3B+DRL-1250359%2C+US+National+Science+Foundation%40National+Science+Foundation+%28United+States%29&amp;rft.citationMismatchedDOI=doi%3A10.1371%2Fjournal.pone.0070160">
+                 
+</span>
+</div>
+</li>
+
+<li class="ds-artifact-item even">
+<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
+<a href="/resource/doi:10.5061/dryad.p170v">
+<span class="author">Corry J, Abdullah H, Omar S, Clarke R, Power U, Brady C, McGarvey L, Winter H, Cosby S, Lundy F, Touzelet O</span>
+<span class="artifact-title">Data from: Respiratory virus infection up-regulates TRPV1, TRPA1 and ASICS3 receptors on airway cells. </span>
+<span class="italics">PLOS ONE</span> <span class="doi">http://dx.doi.org/10.5061/dryad.p170v</span>
+</a>
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.p170v&amp;rft_id=1932-6203&amp;rft_id=PONE-D-16-42709&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Corry%2C+John&amp;rft.contributor=Abdullah%2C+Haniah&amp;rft.contributor=Omar%2C+Shadia&amp;rft.contributor=Clarke%2C+Rebecca&amp;rft.contributor=Power%2C+Ultan&amp;rft.contributor=Brady%2C+Clare&amp;rft.contributor=McGarvey%2C+Lorcan&amp;rft.contributor=Winter%2C+Hanagh&amp;rft.contributor=Cosby%2C+Sara&amp;rft.contributor=Lundy%2C+Fionnuala&amp;rft.contributor=Touzelet%2C+Olivier&amp;rft.identifier=doi%3A10.5061%2Fdryad.p170v&amp;rft.identifier=1932-6203&amp;rft.description=Receptors+implicated+in+cough+hypersensitivity+are+transient+receptor+potential+vanilloid+1+%28TRPV1%29%2C+transient+receptor+potential+cation+channel%2C+Subfamily+A%2C+Member+1+%28TRPA1%29+and+acid+sensing+ion+channel+receptor+3+%28ASIC3%29.+Respiratory+viruses%2C+such+as+respiratory+syncytial+virus+%28RSV%29+and+measles+virus+%28MV%29+may+interact+directly+and%2For+indirectly+with+these+receptors+on+sensory+nerves+and+epithelial+cells+in+the+airways.+We+used+in+vitro+models+of+sensory+neurones+%28SHSY5Y+or+differentiated+IMR-32+cells%29+and+human+bronchial+epithelium+%28BEAS-2B+cells%29+as+well+as+primary+human+bronchial+epithelial+cells+%28PBEC%29+to+study+the+effect+of+MV+and+RSV+infection+on+receptor+expression.+Receptor+mRNA+and+protein+levels+were+examined+by+qPCR+and+flow+cytometry%2C+respectively%2C+following+infection+or+treatment+with+UV+inactivated+virus%2C+virus-induced+soluble+factors+or+pelleted+virus.+Concentrations+of+a+range+of+cytokines+in+resultant+BEAS-2B+and+PBEC+supernatants+were+determined+by+ELISA.%0D%0AUp-regulation+of+TRPV1%2C+TRPA1+and+ASICS3+expression+occurred+by+12+hours+post-infection+in+each+cell+type.+This+was+independent+of+replicating+virus%2C+within+the+same+cell%2C+as+virus-induced+soluble+factors+alone+were+sufficient+to+increase+channel+expression.+IL-8+and+IL-6+increased+in+infected+cell+supernatants.+Antibodies+against+these+factors+inhibited+TRP+receptor+up-regulation.+Capsazepine+treatment+inhibited+virus+induced+up-regulation+of+TRPV1+indicating+that+these+receptors+are+targets+for+treating+virus-induced+cough.&amp;rft.relation=doi%3A10.5061%2Fdryad.p170v%2F1&amp;rft.relation=doi%3A10.1371%2Fjournal.pone.0171681&amp;rft.subject=Respiratory+viruses&amp;rft.subject=TRPV1&amp;rft.subject=TRPA1&amp;rft.subject=ASICS+3&amp;rft.subject=Cough&amp;rft.subject=asthma&amp;rft.subject=COPD&amp;rft.subject=Measles+virus&amp;rft.subject=Respiratory+syncytial+virus&amp;rft.title=Data+from%3A+Respiratory+virus+infection+up-regulates+TRPV1%2C+TRPA1+and+ASICS3+receptors+on+airway+cells&amp;rft.type=Article&amp;rft.contributor=Cosby%2C+Sara&amp;rft.identifier=PONE-D-16-42709&amp;rft.publicationName=PLOS+ONE&amp;rft.archive=plosone%40plos.org&amp;rft.archive=automated-messages%40datadryad.org&amp;rft.submit=false&amp;rft.review=plosone%40plos.org&amp;rft.review=automated-messages%40datadryad.org">
+                 
+</span>
+</div>
+</li>
+
+<li class="ds-artifact-item odd">
+<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
+<a href="/resource/doi:10.5061/dryad.t7sq1">
+<span class="author">Su W, Wang L, Lei J, Chai S, Liu Y, Yang Y, Yang X, Jiao C</span>
+<span class="artifact-title">Data from: Genome-wide assessment of population structure and genetic diversity and development of a core germplasm set for sweet potato based on specific length amplified fragment (SLAF) sequencing. </span>
+<span class="italics">PLOS ONE</span> <span class="doi">http://dx.doi.org/10.5061/dryad.t7sq1</span>
+</a>
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.t7sq1&amp;rft_id=1932-6203&amp;rft_id=PONE-D-16-41461&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Su%2C+Wenjin&amp;rft.contributor=Wang%2C+Lianjun&amp;rft.contributor=Lei%2C+Jian&amp;rft.contributor=Chai%2C+Shasha&amp;rft.contributor=Liu%2C+Yi&amp;rft.contributor=Yang%2C+Yuanyuan&amp;rft.contributor=Yang%2C+Xinsun&amp;rft.contributor=Jiao%2C+Chunhai&amp;rft.coverage=China&amp;rft.coverage=Africa&amp;rft.coverage=Japan&amp;rft.coverage=South+Korea&amp;rft.coverage=Thailand&amp;rft.coverage=United+States+of+America&amp;rft.identifier=doi%3A10.5061%2Fdryad.t7sq1&amp;rft.identifier=1932-6203&amp;rft.description=Sweet+potato%2C+Ipomoea+batatas+%28L.%29+Lam.%2C+is+an+important+food+crop+that+is+cultivated+worldwide.+However%2C+no+genome-wide+assessment+of+the+genetic+diversity+of+sweet+potato+has+been+reported+to+date.+In+the+present+study%2C+the+population+structure+and+genetic+diversity+of+197+sweet+potato+accessions+most+of+which+were+from+China+were+assessed+using+62%2C363+SNPs.+A+model-based+structure+analysis+divided+the+accessions+into+three+groups%3A+group+1%2C+group+2+and+group+3.+The+genetic+relationships+among+the+accessions+were+evaluated+using+a+phylogenetic+tree%2C+which+clustered+all+the+accessions+into+three+major+groups.+A+principal+component+analysis+%28PCA%29+showed+that+the+accessions+were+distributed+according+to+their+population+structure.+The+mean+genetic+distance+among+accessions+ranged+from+0.290+for+group+1+to+0.311+for+group+3%2C+and+the+mean+polymorphic+information+content+%28PIC%29+ranged+from+0.232+for+group+1+to+0.251+for+group+3.+The+mean+minor+allele+frequency+%28MAF%29+ranged+from+0.207+for+group+1+to+0.222+for+group+3.+Analysis+of+molecular+variance+%28AMOVA%29+showed+that+the+maximum+diversity+was+within+accessions+%2889.569%25%29.+Using+CoreHunter+software%2C+a+core+set+of+39+accessions+was+obtained%2C+which+accounted+for+approximately+19.8%25+of+the+total+collection.+The+core+germplasm+set+of+sweet+potato+developed+will+be+a+valuable+resource+for+future+sweet+potato+improvement+strategies.&amp;rft.relation=doi%3A10.5061%2Fdryad.t7sq1%2F1&amp;rft.relation=doi%3A10.1371%2Fjournal.pone.0172066&amp;rft.subject=sweet+potato&amp;rft.subject=genetic+diversity&amp;rft.subject=a+core+germplasm+set&amp;rft.title=Data+from%3A+Genome-wide+assessment+of+population+structure+and+genetic+diversity+and+development+of+a+core+germplasm+set+for+sweet+potato+based+on+specific+length+amplified+fragment+%28SLAF%29+sequencing&amp;rft.type=Article&amp;rft.contributor=Su%2C+Wenjin&amp;rft.identifier=PONE-D-16-41461&amp;rft.publicationName=PLOS+ONE&amp;rft.archive=plosone%40plos.org&amp;rft.archive=automated-messages%40datadryad.org&amp;rft.submit=false&amp;rft.review=plosone%40plos.org&amp;rft.review=automated-messages%40datadryad.org">
+                 
+</span>
+</div>
+</li>
+
+<li class="ds-artifact-item even">
+<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
+<a href="/resource/doi:10.5061/dryad.nq67q">
+<span class="author">Riesch R, Muschick M, Lindtke D, Villoutreix R, Comeault AA, Farkas TE, Lucek K, Hellen E, Soria-Carrasco V, Dennis SR, de Carvalho CF, Safran RJ, Sandoval CP, Feder J, Gries R, Crespi BJ, Gries G, Gompert Z, Nosil P</span>
+<span class="artifact-title">Data from: Transitions between phases of genomic differentiation during stick-insect speciation. </span>
+<span class="italics">Nature Ecology &amp; Evolution</span> <span class="doi">http://dx.doi.org/10.5061/dryad.nq67q</span>
+</a>
+<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.nq67q&amp;rft_id=2397-334X&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Riesch%2C+R%C3%BCdiger&amp;rft.contributor=Muschick%2C+Moritz&amp;rft.contributor=Lindtke%2C+Dorothea&amp;rft.contributor=Villoutreix%2C+Romain&amp;rft.contributor=Comeault%2C+Aaron+A.&amp;rft.contributor=Farkas%2C+Timothy+E.&amp;rft.contributor=Lucek%2C+Kay&amp;rft.contributor=Hellen%2C+Elizabeth&amp;rft.contributor=Soria-Carrasco%2C+V%C3%ADctor&amp;rft.contributor=Dennis%2C+Stuart+R.&amp;rft.contributor=de+Carvalho%2C+Clarissa+F.&amp;rft.contributor=Safran%2C+Rebecca+J.&amp;rft.contributor=Sandoval%2C+Cristina+P.&amp;rft.contributor=Feder%2C+Jeff&amp;rft.contributor=Gries%2C+Regine&amp;rft.contributor=Crespi%2C+Bernard+J.&amp;rft.contributor=Gries%2C+Gerhard&amp;rft.contributor=Gompert%2C+Zach&amp;rft.contributor=Nosil%2C+Patrik&amp;rft.coverage=California&amp;rft.coverage=Oligocene&amp;rft.coverage=Miocene&amp;rft.coverage=Pliocene&amp;rft.coverage=Pleistocene&amp;rft.coverage=Holocene&amp;rft.identifier=doi%3A10.5061%2Fdryad.nq67q&amp;rft.identifier=2397-334X&amp;rft.description=Speciation+can+involve+a+transition+from+a+few+genetic+loci+that+are+resistant+to+gene+flow+to+genome-wide+differentiation.+However%2C+only+limited+data+exist+concerning+this+transition+and+the+factors+promoting+it.+We+study+phases+of+speciation+using+data+from+%3E100+populations+of+11+species+of+Timema+stick+insects.+Consistent+with+early+phases+of+genic+speciation%2C+adaptive+colour-pattern+loci+reside+in+localised+genetic+regions+of+accentuated+differentiation+between+populations+experiencing+gene+flow.+Transitions+to+genome-wide+differentiation+are+also+observed+with+gene+flow%2C+in+association+with+differentiation+in+polygenic+chemical+traits+affecting+mate+choice.+Our+results+support+that+intermediate+phases+of+speciation+are+associated+with+genome-wide+differentiation+and+mate+choice%2C+but+not+growth+of+a+few+genomic+islands.+We+also+find+a+gap+in+genomic+differentiation+between+sympatric+taxa+that+still+exchange+genes+and+those+that+do+not%2C+highlighting+the+association+between+differentiation+and+complete+reproductive+isolation.+Our+results+suggest+that+substantial+progress+towards+speciation+may+involve+the+alignment+of+multi-faceted+aspects+of+differentiation.&amp;rft.relation=1%3B0082%3B2017&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F1&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F2&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F3&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F4&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F5&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F6&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F7&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F8&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F9&amp;rft.relation=doi%3A10.5061%2Fdryad.nq67q%2F10&amp;rft.relation=doi%3A10.1038%2Fs41559-016-0082&amp;rft.subject=evolution&amp;rft.subject=genomics&amp;rft.subject=adaptation&amp;rft.subject=speciation&amp;rft.subject=mate+choice&amp;rft.title=Data+from%3A+Transitions+between+phases+of+genomic+differentiation+during+stick-insect+speciation&amp;rft.type=Article&amp;rft.ScientificName=Timema+bartmani&amp;rft.ScientificName=Timema+boharti&amp;rft.ScientificName=Timema+californicum&amp;rft.ScientificName=Timema+cristinae&amp;rft.ScientificName=Timema+chumash&amp;rft.ScientificName=Timema+knulli&amp;rft.ScientificName=Timema+landelsensis&amp;rft.ScientificName=Timema+petita&amp;rft.ScientificName=Timema+podura&amp;rft.ScientificName=Timema+poppensis&amp;rft.ScientificName=Timema+sp+nov.+%22cuesta+ridge%22&amp;rft.contributor=Patrik+Nosil&amp;rft.publicationName=Nature+Ecology+%26+Evolution">
+                 
+</span>
+</div>
+</li>
+
+</ul>
+</div>
+<!-- End of temp Recently Added -->
+
                     </div>
                     <div id="most-viewed-data" class="browse-data-panel">
-
+		      This display is currently unavailable.
                         <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostDownloadedBitstream.div.home']"/>
 
                     </div>
 
                     <div id="by-author" class="browse-data-panel">
+		      This display is currently unavailable.
                         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter']"/>
                         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter-results']"/>
 
                     </div>
                     <div id="by-journal" class="browse-data-panel">
+		      This display is currently unavailable.
                         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter']"/>
                         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter-results']"/>
 
@@ -420,7 +516,43 @@
                     <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                          id="aspect_statistics_StatisticsTransformer_div_stats" class="ds-static-div secondary stats">
                         <!--remove old static information and add real data-->
-                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@n='front-page-stats']"/>
+                        <!-- <xsl:apply-templates select="/dri:document/dri:body/dri:div[@n='front-page-stats']"/> -->
+			<!-- Begin temporary stats -->
+			<div xmlns="http://www.w3.org/1999/xhtml" id="org_datadryad_dspace_statistics_SiteOverview_div_front-page-stats" class="ds-static-div">
+<table id="org_datadryad_dspace_statistics_SiteOverview_table_list-table" class="ds-table">
+<tr class="ds-table-header-row">
+<th class="ds-table-header-cell odd">Type</th>
+<th xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-header-cell even">Total</th>
+<th xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-header-cell odd">30 days</th>
+</tr>
+<tr xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-row even">
+<td class="ds-table-cell odd">Data packages</td>
+<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">15905</td>
+<td class="ds-table-cell odd">305</td>
+</tr>
+<tr class="ds-table-row odd">
+<td class="ds-table-cell odd">Data files</td>
+<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">50441</td>
+<td class="ds-table-cell odd">749</td>
+</tr>
+<tr class="ds-table-row even">
+<td class="ds-table-cell odd">Journals</td>
+<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">563</td>
+<td class="ds-table-cell odd">134</td>
+</tr>
+<tr class="ds-table-row odd">
+<td class="ds-table-cell odd">Authors</td>
+<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">56647</td>
+<td class="ds-table-cell odd">5466</td>
+</tr>
+<tr class="ds-table-row even">
+<td class="ds-table-cell odd">Downloads</td>
+<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">9951</td>
+<td class="ds-table-cell odd">893</td>
+</tr>
+</table>
+			</div>
+<!-- End temporary stats -->
                     </div>
                 </div>
             </div>
