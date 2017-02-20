@@ -10,12 +10,12 @@ package org.dspace.app.cris.network;
 import java.util.LinkedList;
 import java.util.List;
 
-public class VisualizationGraphEvents extends AVisualizationGraphModeTwo
+public class VisualizationGraphPlace extends AVisualizationGraphModeTwo
 {
 
-    public final static String CONNECTION_NAME = "events";
+    public final static String CONNECTION_NAME = "place";
 
-    private static final String FIELD_QUERY = "network.events_keyword";
+    private static final String FIELD_QUERY = "network.place_keyword";
 
     @Override
     public String getType()

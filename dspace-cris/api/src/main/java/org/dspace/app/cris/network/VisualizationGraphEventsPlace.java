@@ -10,13 +10,13 @@ package org.dspace.app.cris.network;
 import java.util.LinkedList;
 import java.util.List;
 
-public class VisualizationGraphEvents extends AVisualizationGraphModeTwo
+public class VisualizationGraphEventsPlace extends AVisualizationGraphModeFour
 {
 
-    public final static String CONNECTION_NAME = "events";
+    public final static String CONNECTION_NAME = "eventsplace";
 
-    private static final String FIELD_QUERY = "network.events_keyword";
-
+    private static final String FIELD_QUERY = "crisrp.partecipatedin.networkevents";
+    
     @Override
     public String getType()
     {
@@ -26,19 +26,13 @@ public class VisualizationGraphEvents extends AVisualizationGraphModeTwo
     @Override
     public String getLineWidthToOverride()
     {
-        return "2.5";
+        return "1.5";
     }
 
     @Override
     public String getConnectionName()
     {
         return CONNECTION_NAME;
-    }
-
-    @Override
-    protected String getFacetFieldQuery()
-    {
-        return FIELD_QUERY;
     }
 
     @Override
@@ -49,18 +43,23 @@ public class VisualizationGraphEvents extends AVisualizationGraphModeTwo
     }
 
     @Override
-    public String getFacet(String value)
+    protected String getFacetFieldQuery()
     {
-        return FA_VALUE;
+        return FIELD_QUERY;
     }
-    
-    protected List<String> transform(String values)
+
+    @Override
+    protected List<String> getValues(String facetValue)
     {
         // e.g.
-        String[] temp = values.split("###");
-        String tt = temp[1];        
+        String[] temp = facetValue.split("\\|#\\|#\\|#");
+        String tt = temp[1];
+        String[] temp2 = tt.split("###");
         List<String> result = new LinkedList<String>();
-        result.add(temp[0]);
+        for(String ss : temp2) {
+            result.add(ss);
+        }
         return result;
     }
+    
 }
