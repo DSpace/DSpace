@@ -38,6 +38,8 @@ import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.AuthorityValueFinder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
@@ -915,14 +917,18 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             String value = "";
             if (info.hasValue())
             {
+	            value = "\"" + info.getValue() + "\"";
+
                 if (bix.isAuthorityIndex())
                 {
                     String fk = bix.getMetadata(0).replace(".", "_");
                     value = "\""+choicheAuthorityService.getLabel(fk, info.getValue(), null)+"\"";
                 }
-                else
-                {
-                    value = "\"" + info.getValue() + "\"";
+                else if(StringUtils.isNotBlank(info.getAuthority())) {
+	                AuthorityValue authorityValue = new AuthorityValueFinder().findByUID(context, info.getAuthority());
+	                if(authorityValue != null) {
+		                value = "\"" + authorityValue.getValue() + "\"";
+	                }
                 }
             }
 
