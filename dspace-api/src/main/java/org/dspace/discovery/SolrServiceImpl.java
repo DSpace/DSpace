@@ -10,6 +10,7 @@ package org.dspace.discovery;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -53,12 +54,18 @@ import org.dspace.util.MultiFormatDateParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -779,11 +786,25 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 {
                     ContentStreamUpdateRequest req = new ContentStreamUpdateRequest("/update/extract");
 
-                    for(BitstreamContentStream bce : streams)
-                    {
-                        req.addContentStream(bce);
-                    }
+                    Charset utf8 = StandardCharsets.UTF_8;
+                    try {
+                        Files.deleteIfExists(Paths.get("fullText.txt"));
+                        for(BitstreamContentStream bce : streams)
+                        {
+                            // Prepare to copy the bitstream (TEXT-only) contents into a string
+                            StringWriter writer = new StringWriter();
+                            IOUtils.copy(bce.getStream(), writer, utf8);
+                            String bitstreamContents = writer.toString();
+                            // Append (or create) the current bitstream into the fullText.txt file
+                            Files.write(Paths.get("fullText.txt"), bitstreamContents.getBytes(utf8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                        }
+                        // Add the file with every bitstream to the SOLR index
+                        req.addFile(new File("fullText.txt"), "UTF-8");
 
+                    } catch (IOException e) {
+                        String currentHandle = (String) doc.getFieldValue(HANDLE_FIELD);
+                        log.error("Unable to properly process handle "+currentHandle+" for full text indexing", e);
+                    }
                     ModifiableSolrParams params = new ModifiableSolrParams();
 
                     //req.setParam(ExtractingParams.EXTRACT_ONLY, "true");
