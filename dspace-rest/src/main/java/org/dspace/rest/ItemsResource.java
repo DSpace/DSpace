@@ -450,7 +450,7 @@ public class ItemsResource extends Resource
         try
         {
             context = createContext(getUser(headers));
-            org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
+            org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.ADD);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
