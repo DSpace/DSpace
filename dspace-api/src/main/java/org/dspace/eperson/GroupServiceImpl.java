@@ -186,6 +186,15 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 return result;
             }
         } else {
+            // Check also for anonymous users if IP authentication used
+            List<Group> specialGroups = context.getSpecialGroups();
+            if(CollectionUtils.isNotEmpty(specialGroups)) {
+                for(Group specialGroup : specialGroups){
+                    if (StringUtils.equals(specialGroup.getName(), groupName)) {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
     }
