@@ -9,7 +9,6 @@ package org.dspace.app.requestitem;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -55,9 +54,10 @@ public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
      * Return a RequestItemAuthor object for the specified helpdesk email address.
      * It makes an attempt to find if there is a matching eperson for the helpdesk address, to use the name,
      * Otherwise it falls back to a helpdeskname key in the Messages.props.
-     * @param context
-     * @param helpDeskEmail
-     * @return
+     * @param context context
+     * @param helpDeskEmail email
+     * @return RequestItemAuthor
+     * @throws SQLException if database error
      */
     public RequestItemAuthor getHelpDeskPerson(Context context, String helpDeskEmail) throws SQLException{
         EPerson helpdeskEPerson = null;

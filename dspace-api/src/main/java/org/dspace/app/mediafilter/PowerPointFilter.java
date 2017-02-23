@@ -64,10 +64,12 @@ public class PowerPointFilter extends MediaFilter
     }
 
     /**
-     * @param source
-     *            source input stream
+     * @param currentItem item
+     * @param source source input stream
+     * @param verbose verbose mode
      * 
      * @return InputStream the resulting input stream
+     * @throws Exception if error
      */
     @Override
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)

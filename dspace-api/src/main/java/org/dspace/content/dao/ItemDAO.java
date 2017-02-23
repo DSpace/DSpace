@@ -22,7 +22,7 @@ import java.util.UUID;
 /**
  * Database Access Object interface class for the Item object.
  * The implementation of this class is responsible for all database calls for the Item object and is autowired by spring
- * This class should only be accessed from a single service & should never be exposed outside of the API
+ * This class should only be accessed from a single service and should never be exposed outside of the API
  *
  * @author kevinvandevelde at atmire.com
  */
@@ -35,9 +35,10 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
     /**
      * Find all Items modified since a Date.
      *
-     * @param context
+     * @param context Context
      * @param since Earliest interesting last-modified date.
-     * @return 
+     * @return iterator over items
+     * @throws SQLException if database error 
      */
     public Iterator<Item> findByLastModifiedSince(Context context, Date since)
             throws SQLException;
@@ -56,24 +57,62 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
 
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
+    /**
+     * Count number of items in a given collection
+     * @param context context
+     * @param collection the collection
+     * @param includeArchived whether to include archived items in count
+     * @param includeWithdrawn whether to include withdrawn items in count
+     * @return item count
+     * @throws SQLException if database error
+     */
     public int countItems(Context context, Collection collection, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
+    
+    /**
+     * Count number of unique items across several collections at once.
+     * This method can be used with 
+     * {@link org.dspace.content.service.CommunityService#getAllCollections(Context,Community)}
+     * to determine the unique number of items in a Community.
+     * 
+     * @param context context
+     * @param collections the list of collections
+     * @param includeArchived whether to include archived items in count
+     * @param includeWithdrawn whether to include withdrawn items in count
+     * @return item count
+     * @throws SQLException if database error
+     */
+    public int countItems(Context context, List<Collection> collections, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
 
     /**
      * Get all Items installed or withdrawn, discoverable, and modified since a Date.
-     * @param context
-     * @param archived
-     * @param withdrawn
-     * @param discoverable
+     * @param context context
+     * @param archived whether to find archived
+     * @param withdrawn whether to find withdrawn
+     * @param discoverable whether to find discoverable
      * @param lastModified earliest interesting last-modified date.
-     * @return
+     * @return iterator over items
+     * @throws SQLException if database error
      */
     public Iterator<Item> findAll(Context context, boolean archived,
             boolean withdrawn, boolean discoverable, Date lastModified)
             throws SQLException;
 
+    /**
+     * Count total number of items (rows in item table)
+     * @param context context
+     * @return total count
+     * @throws SQLException if database error
+     */
     int countRows(Context context) throws SQLException;
 
-    int countNotArchived(Context context) throws SQLException;
-
-    int countWithdrawn(Context context) throws SQLException;
+    /**
+     * Count number of items based on specific status flags
+     * @param context context
+     * @param includeArchived whether to include archived items in count
+     * @param includeWithdrawn whether to include withdrawn items in count
+     * @return count of items
+     * @throws SQLException if database error
+     */
+    int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
+    
 }

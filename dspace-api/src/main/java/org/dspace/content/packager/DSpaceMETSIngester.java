@@ -28,7 +28,7 @@ import org.jdom.Element;
 
 /**
  * Packager plugin to ingest a
- * METS (Metadata Encoding & Transmission Standard) package
+ * METS (Metadata Encoding and Transmission Standard) package
  * that conforms to the DSpace METS SIP (Submission Information Package) Profile.
  * See <a href="http://www.loc.gov/standards/mets/">http://www.loc.gov/standards/mets/</a>
  * for more information on METS, and
@@ -76,6 +76,11 @@ public class DSpaceMETSIngester
      * 3. If (1) or (2) succeeds, crosswalk it and ignore all other DMDs with
      *    same GROUPID<br>
      * 4. Crosswalk remaining DMDs not eliminated already.
+     * @throws CrosswalkException if crosswalk error
+     * @throws PackageValidationException if validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
@@ -167,6 +172,10 @@ public class DSpaceMETSIngester
      * supplied by explicit argument first, else use collection's
      * default deposit license.
      * For Creative Commons, look for a rightsMd containing a CC license.
+     * @throws PackageValidationException if validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void addLicense(Context context, Item item, String license,
@@ -220,6 +229,10 @@ public class DSpaceMETSIngester
     /**
      * Take a second pass over files to correct names of derived files
      * (e.g. thumbnails, extracted text) to what DSpace expects:
+     * @throws MetadataValidationException if validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void finishBitstream(Context context,

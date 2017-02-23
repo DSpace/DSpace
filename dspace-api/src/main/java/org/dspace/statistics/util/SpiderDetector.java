@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.Collections;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +51,7 @@ public class SpiderDetector {
             = Collections.synchronizedList(new ArrayList<Pattern>());
 
     /**
-     * Utility method which reads lines from a file & returns them in a Set.
+     * Utility method which reads lines from a file and returns them in a Set.
      *
      * @param patternFile the location of our spider file
      * @return a vector full of patterns
@@ -90,7 +90,7 @@ public class SpiderDetector {
     /**
      * Get an immutable Set representing all the Spider Addresses here
      *
-     * @return
+     * @return a set of IP addresses as strings
      */
     public static Set<String> getSpiderIpAddresses() {
 
@@ -107,7 +107,7 @@ public class SpiderDetector {
         if (table == null) {
             table = new IPTable();
 
-            String filePath = ConfigurationManager.getProperty("dspace.dir");
+            String filePath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir");
 
             try {
                 File spidersDir = new File(filePath, "config/spiders");
@@ -156,7 +156,7 @@ public class SpiderDetector {
      */
     private static void loadPatterns(String directory, List<Pattern> patternList)
     {
-        String dspaceHome = ConfigurationManager.getProperty("dspace.dir");
+        String dspaceHome = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir");
         File spidersDir = new File(dspaceHome, "config/spiders");
         File patternsDir = new File(spidersDir, directory);
         if (patternsDir.exists() && patternsDir.isDirectory())
@@ -175,7 +175,7 @@ public class SpiderDetector {
                 }
                 for (String pattern : patterns)
                 {
-                    patternList.add(Pattern.compile(pattern));
+                    patternList.add(Pattern.compile(pattern,Pattern.CASE_INSENSITIVE));
                 }
                 log.info("Loaded pattern file:  {}", file.getPath());
             }
@@ -259,6 +259,7 @@ public class SpiderDetector {
      * Static Service Method for testing spiders against existing spider files.
      *
      * @param request
+     *     Servlet's HTTP request object.
      * @return true|false if the request was detected to be from a spider.
      */
     public static boolean isSpider(HttpServletRequest request)
@@ -273,6 +274,7 @@ public class SpiderDetector {
      * Check individual IP is a spider.
      *
      * @param ip
+     *     IP address to check
      * @return if is spider IP
      */
     public static boolean isSpider(String ip) {
@@ -296,7 +298,7 @@ public class SpiderDetector {
 
     private static boolean isUseProxies() {
         if(useProxies == null) {
-            useProxies = "true".equals(ConfigurationManager.getProperty("useProxies"));
+            useProxies = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("useProxies");
         }
 
         return useProxies;

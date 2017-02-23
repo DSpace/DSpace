@@ -39,7 +39,8 @@ public class EZIDRequestFactory
      * @param authority our DOI authority number.
      * @param username EZID user name.
      * @param password {@code username}'s password.
-     * @throws URISyntaxException
+     * @return a new EZID request with the given parameters
+     * @throws URISyntaxException if host or authority is bad.
      */
     public EZIDRequest getInstance(String authority, String username, String password)
             throws URISyntaxException

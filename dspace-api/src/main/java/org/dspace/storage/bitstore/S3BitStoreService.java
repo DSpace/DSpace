@@ -49,13 +49,13 @@ public class S3BitStoreService implements BitStoreService
     private String awsRegionName;
 
     /** container for all the assets */
-	private String bucketName = null;
+    private String bucketName = null;
 
     /** (Optional) subfolder within bucket where objects are stored */
     private String subfolder = null;
-	
-	/** S3 service */
-	private AmazonS3 s3Service = null;
+    
+    /** S3 service */
+    private AmazonS3 s3Service = null;
 
     public S3BitStoreService()
     {
@@ -69,7 +69,7 @@ public class S3BitStoreService implements BitStoreService
      *  - bucket name
      */
     public void init() throws IOException {
-        if(StringUtils.isBlank(getAwsAccessKey()) || StringUtils.isBlank(getAwsSecretKey())) {
+        if (StringUtils.isBlank(getAwsAccessKey()) || StringUtils.isBlank(getAwsSecretKey())) {
             log.warn("Empty S3 access or secret");
         }
 
@@ -78,13 +78,13 @@ public class S3BitStoreService implements BitStoreService
         s3Service = new AmazonS3Client(awsCredentials);
 
         // bucket name
-        if(StringUtils.isEmpty(bucketName)) {
+        if (StringUtils.isEmpty(bucketName)) {
             bucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
             log.warn("S3 BucketName is not configured, setting default: " + bucketName);
         }
 
         try {
-            if(! s3Service.doesBucketExist(bucketName)) {
+            if (! s3Service.doesBucketExist(bucketName)) {
                 s3Service.createBucket(bucketName);
                 log.info("Creating new S3 Bucket: " + bucketName);
             }
@@ -96,7 +96,7 @@ public class S3BitStoreService implements BitStoreService
         }
 
         // region
-        if(StringUtils.isNotBlank(awsRegionName)) {
+        if (StringUtils.isNotBlank(awsRegionName)) {
             try {
                 Regions regions = Regions.fromName(awsRegionName);
                 Region region = Region.getRegion(regions);
@@ -109,44 +109,44 @@ public class S3BitStoreService implements BitStoreService
 
         log.info("AWS S3 Assetstore ready to go! bucket:"+bucketName);
     }
-	
+    
 
-	
-	/**
+    
+    /**
      * Return an identifier unique to this asset store instance
      * 
      * @return a unique ID
      */
-	public String generateId()
-	{
+    public String generateId()
+    {
         return Utils.generateKey();
-	}
+    }
 
-	/**
+    /**
      * Retrieve the bits for the asset with ID. If the asset does not
      * exist, returns null.
      * 
      * @param bitstream
      *            The ID of the asset to retrieve
-     * @exception java.io.IOException
+     * @throws java.io.IOException
      *                If a problem occurs while retrieving the bits
      *
      * @return The stream of bits, or null
      */
-	public InputStream get(Bitstream bitstream) throws IOException
-	{
+    public InputStream get(Bitstream bitstream) throws IOException
+    {
         String key = getFullKey(bitstream.getInternalId());
-		try
-		{
+        try
+        {
             S3Object object = s3Service.getObject(new GetObjectRequest(bucketName, key));
-			return (object != null) ? object.getObjectContent() : null;
-		}
+            return (object != null) ? object.getObjectContent() : null;
+        }
         catch (Exception e)
-		{
+        {
             log.error("get("+key+")", e);
-        	throw new IOException(e);
-		}
-	}
+            throw new IOException(e);
+        }
+    }
 
     /**
      * Store a stream of bits.
@@ -158,13 +158,11 @@ public class S3BitStoreService implements BitStoreService
      *
      * @param in
      *            The stream of bits to store
-     * @exception java.io.IOException
+     * @throws java.io.IOException
      *             If a problem occurs while storing the bits
-     *
-     * @return Map containing technical metadata (size, checksum, etc)
      */
-	public void put(Bitstream bitstream, InputStream in) throws IOException
-	{
+    public void put(Bitstream bitstream, InputStream in) throws IOException
+    {
         String key = getFullKey(bitstream.getInternalId());
         //Copy istream to temp file, and send the file, with some metadata
         File scratchFile = File.createTempFile(bitstream.getInternalId(), "s3bs");
@@ -185,11 +183,11 @@ public class S3BitStoreService implements BitStoreService
             log.error("put(" + bitstream.getInternalId() +", is)", e);
             throw new IOException(e);
         } finally {
-            if(scratchFile.exists()) {
+            if (scratchFile.exists()) {
                 scratchFile.delete();
             }
         }
-	}
+    }
 
     /**
      * Obtain technical metadata about an asset in the asset store.
@@ -202,14 +200,14 @@ public class S3BitStoreService implements BitStoreService
      * @param attrs
      *            A Map whose keys consist of desired metadata fields
      *
-     * @exception java.io.IOException
+     * @throws java.io.IOException
      *            If a problem occurs while obtaining metadata
      * @return attrs
      *            A Map with key/value pairs of desired metadata
      *            If file not found, then return null
      */
-	public Map about(Bitstream bitstream, Map attrs) throws IOException
-	{
+    public Map about(Bitstream bitstream, Map attrs) throws IOException
+    {
         String key = getFullKey(bitstream.getInternalId());
         try {
             ObjectMetadata objectMetadata = s3Service.getObjectMetadata(bucketName, key);
@@ -228,7 +226,7 @@ public class S3BitStoreService implements BitStoreService
                 return attrs;
             }
         } catch (AmazonS3Exception e) {
-            if(e.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
+            if (e.getStatusCode() == HttpStatus.SC_NOT_FOUND) {
                 return null;
             }
         } catch (Exception e) {
@@ -236,18 +234,18 @@ public class S3BitStoreService implements BitStoreService
             throw new IOException(e);
         }
         return null;
-	}
+    }
 
     /**
      * Remove an asset from the asset store. An irreversible operation.
      *
      * @param bitstream
      *            The asset to delete
-     * @exception java.io.IOException
+     * @throws java.io.IOException
      *             If a problem occurs while removing the asset
      */
-	public void remove(Bitstream bitstream) throws IOException
-	{
+    public void remove(Bitstream bitstream) throws IOException
+    {
         String key = getFullKey(bitstream.getInternalId());
         try {
             s3Service.deleteObject(bucketName, key);
@@ -255,15 +253,16 @@ public class S3BitStoreService implements BitStoreService
             log.error("remove("+key+")", e);
             throw new IOException(e);
         }
-	}
+    }
 
     /**
      * Utility Method: Prefix the key with a subfolder, if this instance assets are stored within subfolder
      * @param id
-     * @return
+     *     DSpace bitstream internal ID
+     * @return full key prefixed with a subfolder, if applicable
      */
     public String getFullKey(String id) {
-        if(StringUtils.isNotEmpty(subfolder)) {
+        if (StringUtils.isNotEmpty(subfolder)) {
             return subfolder + "/" + id;
         } else {
             return id;
@@ -313,44 +312,45 @@ public class S3BitStoreService implements BitStoreService
         this.subfolder = subfolder;
     }
 
-	/**
-	 * Contains a command-line testing tool. Expects arguments:
-	 *  -a accessKey -s secretKey -f assetFileName
-	 *
-	 * @param args
-	 *        Command line arguments
-	 */
-	public static void main(String[] args) throws Exception
-	{
+    /**
+     * Contains a command-line testing tool. Expects arguments:
+     *  -a accessKey -s secretKey -f assetFileName
+     *
+     * @param args the command line arguments given
+     * @throws Exception
+     *     generic exception
+     */
+    public static void main(String[] args) throws Exception
+    {
         //TODO use proper CLI, or refactor to be a unit test. Can't mock this without keys though.
 
-		// parse command line
-		String assetFile = null;
-		String accessKey = null;
-		String secretKey = null;
+        // parse command line
+        String assetFile = null;
+        String accessKey = null;
+        String secretKey = null;
 
-		for (int i = 0; i < args.length; i+= 2)
-		{
-			if (args[i].startsWith("-a"))
-			{
-				accessKey = args[i+1];
-			}
-			else if (args[i].startsWith("-s"))
-			{
-				secretKey = args[i+1];
-			}
-			else if (args[i].startsWith("-f"))
-			{
-				assetFile = args[i+1];
-			}
-		}
+        for (int i = 0; i < args.length; i+= 2)
+        {
+            if (args[i].startsWith("-a"))
+            {
+                accessKey = args[i+1];
+            }
+            else if (args[i].startsWith("-s"))
+            {
+                secretKey = args[i+1];
+            }
+            else if (args[i].startsWith("-f"))
+            {
+                assetFile = args[i+1];
+            }
+        }
 
-		if (accessKey == null || secretKey == null ||assetFile == null)
-		{
-			System.out.println("Missing arguments - exiting");
-			return;
-		}
-		S3BitStoreService store = new S3BitStoreService();
+        if (accessKey == null || secretKey == null ||assetFile == null)
+        {
+            System.out.println("Missing arguments - exiting");
+            return;
+        }
+        S3BitStoreService store = new S3BitStoreService();
 
         AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
 
@@ -380,8 +380,8 @@ public class S3BitStoreService implements BitStoreService
         System.out.println("Metadata after put():");
         while (iter.hasNext())
         {
-        	String key = (String)iter.next();
-        	System.out.println( key + ": " + (String)attrs.get(key) );
+            String key = (String)iter.next();
+            System.out.println( key + ": " + (String)attrs.get(key) );
         }
         // Case 2: get metadata and compare
         System.out.print("about() file with ID " + id + ": ");
@@ -393,8 +393,8 @@ public class S3BitStoreService implements BitStoreService
         System.out.println("Metadata after about():");
         while (iter.hasNext())
         {
-        	String key = (String)iter.next();
-        	System.out.println( key + ": " + (String)attrs.get(key) );
+            String key = (String)iter.next();
+            System.out.println( key + ": " + (String)attrs.get(key) );
         }
         // Case 3: retrieve asset and compare bits
         System.out.print("get() file with ID " + id + ": ");
@@ -415,5 +415,5 @@ public class S3BitStoreService implements BitStoreService
         // should get nothing back now - will throw exception
         store.get(id);
 */
-	}
+    }
 }

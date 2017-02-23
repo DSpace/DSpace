@@ -36,6 +36,8 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
     public List<ResourcePolicy> find(Context c, DSpaceObject dso, Group group, int action, int notPolicyID) throws SQLException;
 
     public List<ResourcePolicy> find(Context context, Group group) throws SQLException;
+    
+    public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id) throws SQLException;
 
     public String getActionText(ResourcePolicy resourcePolicy);
 
@@ -44,8 +46,6 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
     public ResourcePolicy clone(Context context, ResourcePolicy resourcePolicy) throws SQLException, AuthorizeException;
 
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException;
-
-    public void removeAllPolicies(Context c, DSpaceObject o, boolean updateLastModified) throws SQLException, AuthorizeException;
 
     public void removePolicies(Context c, DSpaceObject o, int actionId) throws SQLException, AuthorizeException;
 

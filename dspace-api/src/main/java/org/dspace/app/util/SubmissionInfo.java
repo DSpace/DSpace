@@ -213,7 +213,7 @@ public class SubmissionInfo extends HashMap
     /**
      * Returns a particular global step definition based on its ID.
      * <P>
-     * Global step definitions are those defined in the <step-definitions>
+     * Global step definitions are those defined in the {@code <step-definitions>}
      * section of the configuration file.
      * 
      * @param stepID

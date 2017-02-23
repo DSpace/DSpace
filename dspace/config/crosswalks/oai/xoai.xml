@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-
-    The contents of this file are subject to the license and copyright
-    detailed in the LICENSE and NOTICE files at the root of the source
-    tree and available online at
-
-    http://www.dspace.org/license/
-
-	Developed by DSpace @ Lyncode <dspace@lyncode.com>
- -->
 <Configuration indented="false" maxListIdentifiersSize="100" maxListRecordsSize="100"
                maxListSetsSize="100" stylesheet="static/style.xsl"
                xmlns="http://www.lyncode.com/XOAIConfiguration">
@@ -16,7 +6,7 @@
     <Contexts>
         <Context baseurl="request" name="Default Context">
             <!-- Restrict access to hidden items by default -->
-            <Filter ref="defaultFilter" />
+            <Filter ref="defaultFilter"/>
 
             <Format ref="oaidc"/>
             <Format ref="mets"/>
@@ -60,9 +50,9 @@
         </Context>
 
         <!--
-            OpenAIRE Guidelines 1.1:
+            OpenAIRE Guidelines 3.0:
 
-            - https://guidelines.openaire.eu/en/latest/
+            - https://guidelines.openaire.eu/
 
             There is a limitation over the embargoedEndDate parameter:
 
@@ -79,7 +69,7 @@
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Description>
-                This context complies with OpenAIRE rules.
+                This contexts complies with OpenAIRE Guidelines for Literature Repositories v3.0.
             </Description>
         </Context>
     </Contexts>
@@ -243,19 +233,23 @@
                     <LeftCondition>
                         <And>
                             <LeftCondition>
-                                <Custom ref="titleExistsCondition"/>
+                                <And>
+                                    <LeftCondition>
+                                        <Custom ref="titleExistsCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="authorExistsCondition"/>
+                                    </RightCondition>
+                                </And>
                             </LeftCondition>
                             <RightCondition>
-                                <Custom ref="authorExistsCondition"/>
+                                <Custom ref="driverDocumentTypeCondition"/>
                             </RightCondition>
                         </And>
                     </LeftCondition>
                     <RightCondition>
-                        <And>
+                        <Or>
                             <LeftCondition>
-                                <Custom ref="driverDocumentTypeCondition"/>
-                            </LeftCondition>
-                            <RightCondition>
                                 <And>
                                     <LeftCondition>
                                         <Or>
@@ -268,11 +262,14 @@
                                         </Or>
                                     </LeftCondition>
                                     <RightCondition>
-                                        <Custom ref="openaireRelationCondition"/>
+                                        <Custom ref="driverAccessCondition"/>
                                     </RightCondition>
                                 </And>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="openaireRelationCondition"/>
                             </RightCondition>
-                        </And>
+                        </Or>
                     </RightCondition>
                 </And>
             </Definition>
@@ -360,6 +357,7 @@
                     <string>annotation</string>
                     <string>contributionToPeriodical</string>
                     <string>patent</string>
+                    <string>dataset</string>
                     <string>other</string>
                 </list>
             </Configuration>
@@ -374,7 +372,6 @@
                 <string name="field">dc.rights</string>
                 <string name="operator">contains</string>
                 <list name="values">
-                    <string>open access</string>
                     <string>openAccess</string>
                 </list>
             </Configuration>
@@ -400,7 +397,7 @@
             <Configuration>
                 <string name="field">dc.relation</string>
                 <string name="operator">starts_with</string>
-                <string name="value">info:eu-repo/grantAgreement/EC</string>
+                <string name="value">info:eu-repo/grantAgreement/</string>
             </Configuration>
         </CustomCondition>
     </Filters>
@@ -412,8 +409,8 @@
             <!-- Just an alias -->
         </Set>
         <Set id="openaireSet">
-            <Spec>ec_fundedresources</Spec>
-            <Name>EC_fundedresources set</Name>
+            <Spec>openaire</Spec>
+            <Name>OpenAIRE</Name>
             <!-- Just an alias -->
         </Set>
     </Sets>

@@ -7,22 +7,7 @@
  */
 package org.dspace.content.packager;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -33,11 +18,18 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.PasswordHash;
-
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.jdom.Namespace;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.*;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Plugin to export all Group and EPerson objects in XML, perhaps for reloading.
@@ -129,7 +121,7 @@ public class RoleDisseminator implements PackageDisseminator
      * 
      * @param emitPasswords true if password hashes should be included.
      * @return the stream of XML representing users and groups.
-     * @throws IOException
+     * @throws IOException if IO error
      *             if a PipedOutputStream or PipedInputStream cannot be created.
      */
     InputStream asStream(Context context, DSpaceObject object, boolean emitPasswords)
@@ -199,11 +191,11 @@ public class RoleDisseminator implements PackageDisseminator
     /**
      * Serialize users and groups to a stream.
      * 
-     * @param context
+     * @param context current Context
+     * @param object DSpaceObject
      * @param stream receives the output.  Is not closed by this method.
      * @param emitPasswords true if password hashes should be included.
-     * @throws XMLStreamException
-     * @throws SQLException
+     * @throws PackageException if error
      */
     protected void writeToStream(Context context, DSpaceObject object, OutputStream stream,
             boolean emitPasswords)
@@ -298,12 +290,14 @@ public class RoleDisseminator implements PackageDisseminator
      *
      * @param context
      *            the DSpace Context
-     * @parm relatedObject
+     * @param relatedObject
      *            the DSpaceObject related to this group (if any)
      * @param group
      *            the Group to describe
      * @param writer
      *            the description to this stream
+     * @throws XMLStreamException if XML error
+     * @throws PackageException if packaging error
      */
     protected void writeGroup(Context context, DSpaceObject relatedObject, Group group, XMLStreamWriter writer)
             throws XMLStreamException, PackageException
@@ -444,6 +438,7 @@ public class RoleDisseminator implements PackageDisseminator
      *            the description to this stream
      * @param emitPassword
      *            do not export the password hash unless true
+     * @throws XMLStreamException if XML error
      */
     protected void writeEPerson(EPerson eperson, XMLStreamWriter writer,
             boolean emitPassword) throws XMLStreamException
@@ -541,15 +536,16 @@ public class RoleDisseminator implements PackageDisseminator
      * @param context The DSpace context
      * @param object the DSpace object
      * @return array of all associated groups
+     * @throws SQLException if database error
      */
     protected List<Group> findAssociatedGroups(Context context, DSpaceObject object)
             throws SQLException
     {
         if(object.getType()==Constants.SITE)
         {
-            // @TODO FIXME -- if there was a way to ONLY export Groups which are NOT
+            // TODO FIXME -- if there was a way to ONLY export Groups which are NOT
             // associated with a Community or Collection, we should be doing that instead!
-            return groupService.findAll(context, GroupService.NAME);
+            return groupService.findAll(context, null);
         }
         else if(object.getType()==Constants.COMMUNITY)
         {
@@ -643,6 +639,7 @@ public class RoleDisseminator implements PackageDisseminator
      * @param context The DSpace context
      * @param object the DSpace object
      * @return array of all associated EPerson objects
+     * @throws SQLException if database error
      */
     protected List<EPerson> findAssociatedPeople(Context context, DSpaceObject object)
             throws SQLException

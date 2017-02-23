@@ -141,9 +141,9 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 	 * @param bitstreamPath The relative path of the bitstream to be registered.
 	 * 		The path is relative to the path of ths assetstore.
 	 * @return The ID of the registered bitstream
-	 * @exception SQLException
+	 * @throws SQLException
 	 *                If a problem occurs accessing the RDBMS
-	 * @throws IOException
+	 * @throws IOException if IO error
 	 */
 	@Override
     public UUID register(Context context, Bitstream bitstream, int assetstore,
@@ -337,9 +337,16 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     /**
      *
      * @param context
-     * @param bitstream the bitstream to be cloned
+     *     The relevant DSpace Context.
+     * @param bitstream
+     *     the bitstream to be cloned
      * @return id of the clone bitstream.
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
 	@Override
     public Bitstream clone(Context context, Bitstream bitstream) throws SQLException, IOException, AuthorizeException {
@@ -355,7 +362,16 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
     /**
      * Migrates all assets off of one assetstore to another
      * @param assetstoreSource
+     *     source assetstore
      * @param assetstoreDestination
+     *     destination assetstore
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) throws IOException, SQLException, AuthorizeException {
         //Find all the bitstreams on the old source, copy it to new destination, update store_number, save, remove old

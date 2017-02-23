@@ -50,44 +50,54 @@ public class HierarchyResource extends Resource {
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
     
     /**
-    * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
+     * @param headers
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return instance of collection. It can also return status code
-     *         NOT_FOUND(404) if id of collection is incorrect or status code
+     *     NOT_FOUND(404) if id of collection is incorrect or status code
      * @throws UnsupportedEncodingException 
+     *     The Character Encoding is not supported.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading
-     *             (SQLException) or problem with creating
-     *             context(ContextException). It is thrown by NOT_FOUND and
-     *             UNATHORIZED status codes, too.
+     *     It is thrown when was problem with database reading
+     *     (SQLException) or problem with creating
+     *     context(ContextException). It is thrown by NOT_FOUND and
+     *     UNATHORIZED status codes, too.
      */
-	@GET
+    @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public HierarchySite getHierarchy(
-    		@QueryParam("userAgent") String user_agent, @QueryParam("xforwarderfor") String xforwarderfor,
-    		@Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException, WebApplicationException {
-		
-		org.dspace.core.Context context = null;
-		HierarchySite repo = new HierarchySite();
-		
+            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context HttpHeaders headers, @Context HttpServletRequest request) throws UnsupportedEncodingException, WebApplicationException {
+        
+        org.dspace.core.Context context = null;
+        HierarchySite repo = new HierarchySite();
+        
         try {
-            context = createContext(getUser(headers));
+            context = createContext();
             if (!configurationService.getBooleanProperty("rest.hierarchy-authenticate", true)) {
-                context.turnOffAuthorisationSystem();            	
+                context.turnOffAuthorisationSystem();                
             }
 
             Site site = siteService.findSite(context);
             repo.setId(site.getID().toString());
             repo.setName(site.getName());
             repo.setHandle(site.getHandle());
-    		List<Community> dspaceCommunities = communityService.findAllTop(context);
-    		processCommunity(context, repo, dspaceCommunities);
-         } catch (Exception e) {
-        	processException(e.getMessage(), context);
-		} finally {
-            if(context != null) {
+            List<Community> dspaceCommunities = communityService.findAllTop(context);
+            processCommunity(context, repo, dspaceCommunities);
+        } catch (Exception e) {
+            processException(e.getMessage(), context);
+        } finally {
+            if (context != null) {
                 try {
                     context.complete();
                 } catch (SQLException e) {
@@ -95,39 +105,39 @@ public class HierarchyResource extends Resource {
                 }
             }
         }
-   		return repo;
-   }
+        return repo;
+    }
     
-	
-	private void processCommunity(org.dspace.core.Context context, HierarchyCommunity parent, List<Community> communities) throws SQLException {
-		if (communities == null){
-			return;
-		}
-		if (communities.size() == 0) {
-			return;
-		}
-		List<HierarchyCommunity> parentComms = new ArrayList<HierarchyCommunity>();
-		parent.setCommunities(parentComms);
-		for(Community comm: communities) {
-			if (!authorizeService.authorizeActionBoolean(context, comm, org.dspace.core.Constants.READ)) {
-				continue;
-			}
-			HierarchyCommunity mycomm = new HierarchyCommunity(comm.getID().toString(), comm.getName(), comm.getHandle());
-			parentComms.add(mycomm);
-			List<Collection> colls = comm.getCollections();
-			if (colls.size() > 0) {
-				List<HierarchyCollection> myColls = new ArrayList<HierarchyCollection>();
-				mycomm.setCollections(myColls);
-				for(Collection coll: colls) {
-					if (!authorizeService.authorizeActionBoolean(context, coll, org.dspace.core.Constants.READ)) {
-						continue;
-					}
-					HierarchyCollection mycoll = new HierarchyCollection(coll.getID().toString(), coll.getName(), coll.getHandle());
-					myColls.add(mycoll);
-				}
-			}
-			processCommunity(context, mycomm, comm.getSubcommunities());
-		}		
-		
-	}
+    
+    private void processCommunity(org.dspace.core.Context context, HierarchyCommunity parent, List<Community> communities) throws SQLException {
+        if (communities == null) {
+            return;
+        }
+        if (communities.size() == 0) {
+            return;
+        }
+        List<HierarchyCommunity> parentComms = new ArrayList<HierarchyCommunity>();
+        parent.setCommunities(parentComms);
+        for(Community comm: communities) {
+            if (!authorizeService.authorizeActionBoolean(context, comm, org.dspace.core.Constants.READ)) {
+                continue;
+            }
+            HierarchyCommunity mycomm = new HierarchyCommunity(comm.getID().toString(), comm.getName(), comm.getHandle());
+            parentComms.add(mycomm);
+            List<Collection> colls = comm.getCollections();
+            if (colls.size() > 0) {
+                List<HierarchyCollection> myColls = new ArrayList<HierarchyCollection>();
+                mycomm.setCollections(myColls);
+                for(Collection coll: colls) {
+                    if (!authorizeService.authorizeActionBoolean(context, coll, org.dspace.core.Constants.READ)) {
+                        continue;
+                    }
+                    HierarchyCollection mycoll = new HierarchyCollection(coll.getID().toString(), coll.getName(), coll.getHandle());
+                    myColls.add(mycoll);
+                }
+            }
+            processCommunity(context, mycomm, comm.getSubcommunities());
+        }        
+        
+    }
 }

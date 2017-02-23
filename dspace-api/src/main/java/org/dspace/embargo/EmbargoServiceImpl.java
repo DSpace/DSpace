@@ -27,17 +27,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Public interface to the embargo subsystem.
  * <p>
  * Configuration properties: (with examples)
- *   <br/># DC metadata field to hold the user-supplied embargo terms
- *   <br/>embargo.field.terms = dc.embargo.terms
- *   <br/># DC metadata field to hold computed "lift date" of embargo
- *   <br/>embargo.field.lift = dc.date.available
- *   <br/># String to indicate indefinite (forever) embargo in terms
- *   <br/>embargo.terms.open = Indefinite
- *   <br/># implementation of embargo setter plugin
- *   <br/>plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
- *   <br/># implementation of embargo lifter plugin
- *   <br/>plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
- *
+ * {@code
+ *   # DC metadata field to hold the user-supplied embargo terms
+ *   embargo.field.terms = dc.embargo.terms
+ *   # DC metadata field to hold computed "lift date" of embargo
+ *   embargo.field.lift = dc.date.available
+ *   # String to indicate indefinite (forever) embargo in terms
+ *   embargo.terms.open = Indefinite
+ *   # implementation of embargo setter plugin
+ *   plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
+ *   # implementation of embargo lifter plugin
+ *   plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
+ * }
  * @author Larry Stone
  * @author Richard Rodgers
  */
@@ -92,10 +93,9 @@ public class EmbargoServiceImpl implements EmbargoService
              }
         }
         String slift = myLift.toString();
-        boolean ignoreAuth = context.ignoreAuthorization();
         try
         {
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             itemService.clearMetadata(context, item, lift_schema, lift_element, lift_qualifier, Item.ANY);
             itemService.addMetadata(context, item, lift_schema, lift_element, lift_qualifier, null, slift);
             log.info("Set embargo on Item "+item.getHandle()+", expires on: "+slift);
@@ -106,7 +106,7 @@ public class EmbargoServiceImpl implements EmbargoService
         }
         finally
         {
-            context.setIgnoreAuthorization(ignoreAuth);
+            context.restoreAuthSystemState();
         }
     }
 
@@ -171,6 +171,8 @@ public class EmbargoServiceImpl implements EmbargoService
      * Ensures the configurationService is injected, so that we can
      * get plugins and MD field settings from config.
      * Called by "init-method" in Spring config.
+     *
+     * @throws Exception on generic exception
      */
     public void init() throws Exception
     {

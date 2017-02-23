@@ -11,14 +11,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataField;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.EPersonDAO;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
@@ -100,17 +99,20 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
 
     @Override
     public List<EPerson> findByGroups(Context context, Set<Group> groups) throws SQLException {
-        Criteria criteria = createCriteria(context, EPerson.class);
-        criteria.createAlias("groups", "g");
-        Disjunction orRestriction = Restrictions.or();
-        for(Group group : groups)
-        {
-            orRestriction.add(Restrictions.eq("g.id", group.getID()));
-        }
-        criteria.add(orRestriction);
-        return list(criteria);
-    }
+        Query query = createQuery(context,
+                "SELECT DISTINCT e FROM EPerson e " +
+                        "JOIN e.groups g " +
+                        "WHERE g.id IN (:idList) ");
 
+        List<UUID> idList = new ArrayList<>(groups.size());
+        for (Group group : groups) {
+            idList.add(group.getID());
+        }
+
+        query.setParameterList("idList", idList);
+
+        return list(query);
+    }
 
     @Override
     public List<EPerson> findWithPasswordWithoutDigestAlgorithm(Context context) throws SQLException {
@@ -152,7 +154,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
             query.setParameter("queryParam", "%"+queryParam.toLowerCase()+"%");
         }
         for (MetadataField metadataField : metadataFieldsToJoin) {
-            query.setParameter(metadataField.toString(), metadataField.getFieldID());
+            query.setParameter(metadataField.toString(), metadataField.getID());
         }
 
         return query;

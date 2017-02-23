@@ -7,18 +7,6 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -33,6 +21,13 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Configurable QDC Crosswalk
@@ -121,6 +116,8 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private static SAXBuilder builder = new SAXBuilder();
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+    private CrosswalkMetadataValidator metadataValidator = new CrosswalkMetadataValidator();
 
     /**
      * Fill in the plugin-name table from DSpace configuration entries
@@ -336,6 +333,11 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
     /**
      * Returns object's metadata in MODS format, as XML structure node.
+     * @param context context
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public List<Element> disseminateList(Context context, DSpaceObject dso)
@@ -463,7 +465,15 @@ public class QDCCrosswalk extends SelfNamedPlugin
             else if (element2qdc.containsKey(key))
             {
                 String qdc[] = (element2qdc.get(key)).split("\\.");
-                CrosswalkUtils.checkMetadata(context, qdc[0], qdc[1], qdc[2], createMissingMetadataFields);
+
+                MetadataField metadataField;
+                if (qdc.length == 3) {
+                    metadataField = metadataValidator.checkMetadata(context, qdc[0], qdc[1], qdc[2], createMissingMetadataFields);
+                } else if (qdc.length == 2) {
+                    metadataField = metadataValidator.checkMetadata(context, qdc[0], qdc[1], null, createMissingMetadataFields);
+                } else {
+                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\"" + key + "\", qdc=\"" + element2qdc.get(key) + "\"");
+                }
 
                 // get language - prefer xml:lang, accept lang.
                 String lang = me.getAttributeValue("lang", Namespace.XML_NAMESPACE);
@@ -472,18 +482,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
                     lang = me.getAttributeValue("lang");
                 }
 
-                if (qdc.length == 3)
-                {
-                    itemService.addMetadata(context, item, qdc[0], qdc[1], qdc[2], lang, me.getText());
-                }
-                else if (qdc.length == 2)
-                {
-                    itemService.addMetadata(context, item, qdc[0], qdc[1], null, lang, me.getText());
-                }
-                else
-                {
-                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\"" + key + "\", qdc=\"" + element2qdc.get(key) + "\"");
-                }
+                itemService.addMetadata(context, item, metadataField, lang, me.getText());
             }
             else
             {

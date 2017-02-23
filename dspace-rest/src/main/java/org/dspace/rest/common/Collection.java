@@ -10,6 +10,7 @@ package org.dspace.rest.common;
 import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @XmlRootElement(name = "collection")
 public class Collection extends DSpaceObject {
+    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
@@ -52,14 +54,19 @@ public class Collection extends DSpaceObject {
 
     public Collection(){}
 
-    public Collection(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
+    public Collection(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset)
+        throws SQLException, WebApplicationException
+    {
         super(collection, servletContext);
         setup(collection, servletContext, expand, context, limit, offset);
     }
 
-    private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset) throws SQLException{
+    private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset)
+        throws SQLException
+    {
         List<String> expandFields = new ArrayList<String>();
-        if(expand != null) {
+        if (expand != null)
+        {
             expandFields = Arrays.asList(expand.split(","));
         }
 
@@ -67,55 +74,78 @@ public class Collection extends DSpaceObject {
         this.setIntroductoryText(collectionService.getMetadata(collection, org.dspace.content.Collection.INTRODUCTORY_TEXT));
         this.setShortDescription(collectionService.getMetadata(collection, org.dspace.content.Collection.SHORT_DESCRIPTION));
         this.setSidebarText(collectionService.getMetadata(collection, org.dspace.content.Collection.SIDEBAR_TEXT));
-        
-        if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
-            List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
-            for(org.dspace.content.Community parentCommunity : parentCommunities) {
+
+        if (expandFields.contains("parentCommunityList") || expandFields.contains("all"))
+        {
+            List<org.dspace.content.Community> parentCommunities = communityService.getAllParents(context, collection);
+            for (org.dspace.content.Community parentCommunity : parentCommunities)
+            {
                 this.addParentCommunityList(new Community(parentCommunity, servletContext, null, context));
             }
-        } else {
+        }
+        else
+        {
             this.addExpand("parentCommunityList");
         }
 
-        if(expandFields.contains("parentCommunity") | expandFields.contains("all")) {
-            org.dspace.content.Community parentCommunity = (org.dspace.content.Community) collectionService.getParentObject(context, collection);
-            this.setParentCommunity(new Community(parentCommunity, servletContext, null, context));
-        } else {
+        if (expandFields.contains("parentCommunity") | expandFields.contains("all"))
+        {
+            org.dspace.content.Community parentCommunity =
+                (org.dspace.content.Community) collectionService
+                    .getParentObject(context, collection);
+            this.setParentCommunity(new Community(
+                parentCommunity, servletContext, null, context));
+        }
+        else
+        {
             this.addExpand("parentCommunity");
         }
 
         //TODO: Item paging. limit, offset/page
-        if(expandFields.contains("items") || expandFields.contains("all")) {
-            Iterator<org.dspace.content.Item> childItems = itemService.findByCollection(context, collection, limit, offset);
+        if (expandFields.contains("items") || expandFields.contains("all"))
+        {
+            Iterator<org.dspace.content.Item> childItems =
+                itemService.findByCollection(context, collection, limit, offset);
 
             items = new ArrayList<Item>();
-            while(childItems.hasNext()) {
+            while (childItems.hasNext())
+            {
                 org.dspace.content.Item item = childItems.next();
 
-                if(itemService.isItemListedForUser(context, item)) {
+                if (itemService.isItemListedForUser(context, item))
+                {
                     items.add(new Item(item, servletContext, null, context));
                 }
             }
-        } else {
+        }
+        else
+        {
             this.addExpand("items");
         }
 
-        if(expandFields.contains("license") || expandFields.contains("all")) {
+        if (expandFields.contains("license") || expandFields.contains("all"))
+        {
             setLicense(collectionService.getLicense(collection));
-        } else {
+        }
+        else
+        {
             this.addExpand("license");
         }
 
-        if(expandFields.contains("logo") || expandFields.contains("all")) {
-            if(collection.getLogo() != null) {
+        if (expandFields.contains("logo") || expandFields.contains("all"))
+        {
+            if (collection.getLogo() != null)
+            {
                 this.logo = new Bitstream(collection.getLogo(), servletContext, null, context);
             }
         }
-        else {
-        	this.addExpand("logo");
+        else
+        {
+            this.addExpand("logo");
         }
 
-        if(!expandFields.contains("all")) {
+        if (!expandFields.contains("all"))
+        {
             this.addExpand("all");
         }
 
@@ -143,18 +173,18 @@ public class Collection extends DSpaceObject {
     }
 
     public List<Item> getItems() {
-		return items;
-	}
+        return items;
+    }
 
-	public void setItems(List<Item> items) {
-		this.items = items;
-	}
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
 
-	public void setParentCommunityList(List<Community> parentCommunityList) {
-		this.parentCommunityList = parentCommunityList;
-	}
+    public void setParentCommunityList(List<Community> parentCommunityList) {
+        this.parentCommunityList = parentCommunityList;
+    }
 
-	public List<Community> getParentCommunityList() {
+    public List<Community> getParentCommunityList() {
         return parentCommunityList;
     }
 
@@ -170,35 +200,35 @@ public class Collection extends DSpaceObject {
         this.license = license;
     }
 
-	public String getCopyrightText() {
-		return copyrightText;
-	}
+    public String getCopyrightText() {
+        return copyrightText;
+    }
 
-	public void setCopyrightText(String copyrightText) {
-		this.copyrightText = copyrightText;
-	}
+    public void setCopyrightText(String copyrightText) {
+        this.copyrightText = copyrightText;
+    }
 
-	public String getIntroductoryText() {
-		return introductoryText;
-	}
+    public String getIntroductoryText() {
+        return introductoryText;
+    }
 
-	public void setIntroductoryText(String introductoryText) {
-		this.introductoryText = introductoryText;
-	}
+    public void setIntroductoryText(String introductoryText) {
+        this.introductoryText = introductoryText;
+    }
 
-	public String getShortDescription() {
-		return shortDescription;
-	}
+    public String getShortDescription() {
+        return shortDescription;
+    }
 
-	public void setShortDescription(String shortDescription) {
-		this.shortDescription = shortDescription;
-	}
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
 
-	public String getSidebarText() {
-		return sidebarText;
-	}
+    public String getSidebarText() {
+        return sidebarText;
+    }
 
-	public void setSidebarText(String sidebarText) {
-		this.sidebarText = sidebarText;
-	}
+    public void setSidebarText(String sidebarText) {
+        this.sidebarText = sidebarText;
+    }
 }

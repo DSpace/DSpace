@@ -44,7 +44,12 @@ public class StatisticsImporter
     private static final Logger log = Logger.getLogger(StatisticsImporter.class);
 
     /** Date format (for solr) */
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
+    };
     protected final SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
 
     /** Solr server connection */
@@ -209,7 +214,7 @@ public class StatisticsImporter
 //                uuid = parts[0];
                 action = parts[1];
                 id = parts[2];
-                date = dateFormat.parse(parts[3]);
+                date = dateFormat.get().parse(parts[3]);
                 user = parts[4];
                 ip = parts[5];
 
@@ -405,7 +410,7 @@ public class StatisticsImporter
             }
         }
         System.out.println(" done!");
-	}
+    }
 
     /**
      * Print the help message
@@ -424,23 +429,29 @@ public class StatisticsImporter
     /**
      * Main method to run the statistics importer.
      *
-     * @param args The command line arguments
+     * @param args the command line arguments given
      * @throws Exception If something goes wrong
      */
-	public static void main(String[] args) throws Exception
+    public static void main(String[] args) throws Exception
     {
-		CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new PosixParser();
 
-		Options options = new Options();
+        Options options = new Options();
 
-        options.addOption("i", "in", true, "the input file ('-' or omit for standard input)");
-        options.addOption("l", "local", false, "developers tool - map external log file to local handles");
-        options.addOption("m", "multiple", false, "treat the input file as having a wildcard ending");
-        options.addOption("s", "skipdns", false, "skip performing reverse DNS lookups on IP addresses");
-        options.addOption("v", "verbose", false, "display verbose output (useful for debugging)");
-        options.addOption("h", "help", false, "help");
+        options.addOption("i", "in", true,
+            "the input file ('-' or omit for standard input)");
+        options.addOption("l", "local", false,
+            "developers tool - map external log file to local handles");
+        options.addOption("m", "multiple", false,
+            "treat the input file as having a wildcard ending");
+        options.addOption("s", "skipdns", false,
+            "skip performing reverse DNS lookups on IP addresses");
+        options.addOption("v", "verbose", false,
+            "display verbose output (useful for debugging)");
+        options.addOption("h", "help", false,
+            "help");
 
-		CommandLine line = parser.parse(options, args);
+        CommandLine line = parser.parse(options, args);
 
         // Did the user ask to see the help?
         if (line.hasOption('h'))
@@ -457,8 +468,8 @@ public class StatisticsImporter
         // (useful if using someone else's log file for testing)
         boolean local = line.hasOption('l');
 
-		// We got all our parameters now get the rest
-		Context context = new Context();
+        // We got all our parameters now get the rest
+        Context context = new Context();
 
         // Verbose option
         boolean verbose = line.hasOption('v');
@@ -469,7 +480,7 @@ public class StatisticsImporter
         {
             System.out.println("Writing to solr server at: " + sserver);
         }
-		solr = new HttpSolrServer(sserver);
+        solr = new HttpSolrServer(sserver);
 
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try
@@ -517,8 +528,8 @@ public class StatisticsImporter
 
     /**
      * Inner class to hold a cache of reverse lookups of IP addresses
-     * @param <K>
-     * @param <V>
+     * @param <K> key type.
+     * @param <V> value type.
      */
     static class DNSCache<K,V> extends LinkedHashMap<K,V>
     {

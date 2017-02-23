@@ -7,19 +7,12 @@
  */
 package org.dspace.authorize;
 
-import java.sql.SQLException;
-import java.util.*;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -30,6 +23,9 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.workflow.WorkflowItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace. For better
@@ -96,7 +92,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
     @Override
     public void authorizeAction(Context c, DSpaceObject o, int action, boolean useInheritance) throws AuthorizeException, SQLException
     {
-    	authorizeAction(c, c.getCurrentUser(), o, action, useInheritance);
+        authorizeAction(c, c.getCurrentUser(), o, action, useInheritance);
     }
     
     @Override
@@ -232,7 +228,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
      *         object can be used
      * @return <code>true</code> if user is authorized to perform the given
      *         action, <code>false</code> otherwise
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     protected boolean authorize(Context c, DSpaceObject o, int action, EPerson e, boolean useInheritance) throws SQLException
     {
@@ -419,8 +415,46 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return false; // anonymous users can't be admins....
         } else
         {
-            return groupService.isMember(c, groupService.findByName(c, Group.ADMIN));
+            return groupService.isMember(c, Group.ADMIN);
         }
+    }
+    
+    public boolean isCommunityAdmin(Context c) throws SQLException 
+    {
+        EPerson e = c.getCurrentUser();
+        
+        if (e != null) 
+        {
+            List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
+                    groupService.allMemberGroups(c, e),
+                    Constants.ADMIN, Constants.COMMUNITY);
+
+            if (CollectionUtils.isNotEmpty(policies)) 
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public boolean isCollectionAdmin(Context c) throws SQLException 
+    {
+        EPerson e = c.getCurrentUser();
+        
+        if (e != null) 
+        {
+            List<ResourcePolicy> policies = resourcePolicyService.find(c, e,
+                    groupService.allMemberGroups(c, e),
+                    Constants.ADMIN, Constants.COLLECTION);
+
+            if (CollectionUtils.isNotEmpty(policies)) 
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     ///////////////////////////////////////////////
@@ -501,12 +535,23 @@ public class AuthorizeServiceImpl implements AuthorizeService
         }
         addPolicies(c, nonAdminPolicies, dest);
     }
+    
+    @Override
+    public void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction) throws SQLException, AuthorizeException {
+        List<ResourcePolicy> rps = getPoliciesActionFilter(context, dso, fromAction);
+        for (ResourcePolicy rp : rps) {
+            rp.setAction(toAction);
+        }
+        resourcePolicyService.update(context, rps);
+    }
 
     @Override
     public void addPolicies(Context c, List<ResourcePolicy> policies, DSpaceObject dest)
             throws SQLException, AuthorizeException
     {
         // now add them to the destination object
+        List<ResourcePolicy> newPolicies = new LinkedList<>();
+
         for (ResourcePolicy srp : policies)
         {
             ResourcePolicy rp = resourcePolicyService.create(c);
@@ -521,21 +566,17 @@ public class AuthorizeServiceImpl implements AuthorizeService
             rp.setRpName(srp.getRpName());
             rp.setRpDescription(srp.getRpDescription());
             rp.setRpType(srp.getRpType());
-            // and write out new policy
-            resourcePolicyService.update(c, rp);
+
+            // and add policy to list of new policies
+            newPolicies.add(rp);
         }
 
-        serviceFactory.getDSpaceObjectService(dest).updateLastModified(c, dest);
+        resourcePolicyService.update(c, newPolicies);
     }
 
     @Override
     public void removeAllPolicies(Context c, DSpaceObject o) throws SQLException, AuthorizeException {
-        resourcePolicyService.removeAllPolicies(c, o, true);
-    }
-
-    @Override
-    public void removeAllPolicies(Context c, DSpaceObject o, boolean updateLastModified) throws SQLException, AuthorizeException {
-        resourcePolicyService.removeAllPolicies(c, o, updateLastModified);
+        resourcePolicyService.removeAllPolicies(c, o);
     }
 
     @Override
@@ -583,7 +624,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
         List<Group> groups = new ArrayList<Group>();
         for (ResourcePolicy resourcePolicy : policies) {
-            if(resourcePolicy.getGroup() != null)
+            if (resourcePolicy.getGroup() != null)
             {
                 groups.add(resourcePolicy.getGroup());
             }
@@ -612,7 +653,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
         if (CollectionUtils.isNotEmpty(policies))
         {
             return policies.iterator().next();
-        }else{
+        } else {
             return null;
         }
     }
@@ -623,16 +664,22 @@ public class AuthorizeServiceImpl implements AuthorizeService
      * have right on the collection. E.g., if the anonymous can access the collection policies are assigned to anonymous.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param embargoDate
+     *     embargo end date
      * @param reason
+     *     embargo reason
      * @param dso
+     *     DSpace object
      * @param owningCollection
-     * @throws SQLException
-     * @throws AuthorizeException
+     *     collection to get group policies from
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void generateAutomaticPolicies(Context context, Date embargoDate,
-                                                 String reason, DSpaceObject dso, Collection owningCollection) throws SQLException, AuthorizeException
+        String reason, DSpaceObject dso, Collection owningCollection)
+        throws SQLException, AuthorizeException
     {
 
         if (embargoDate != null || (embargoDate == null && dso instanceof Bitstream))
@@ -673,7 +720,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
     @Override
     public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson, int type, String rpType) throws SQLException, AuthorizeException {
-        if(group == null && eperson == null)
+        if (group == null && eperson == null)
         {
             throw new IllegalArgumentException("We need at least an eperson or a group in order to create a resource policy.");
         }
@@ -685,7 +732,6 @@ public class AuthorizeServiceImpl implements AuthorizeService
         myPolicy.setEPerson(eperson);
         myPolicy.setRpType(rpType);
         resourcePolicyService.update(context, myPolicy);
-        serviceFactory.getDSpaceObjectService(dso).updateLastModified(context, dso);
 
         return myPolicy;
     }

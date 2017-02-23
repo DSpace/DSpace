@@ -17,6 +17,11 @@ public interface Transform
 {
     /**
      * Convert the input form to the desired output form.
+     * @param from
+     *     input form to transform from
+     * @return transformed output form
+     * @throws Exception
+     *     A general exception
      */
     public String transform(String from)
             throws Exception;

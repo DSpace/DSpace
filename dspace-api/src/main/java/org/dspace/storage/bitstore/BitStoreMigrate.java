@@ -29,8 +29,7 @@ public class BitStoreMigrate {
     /**
      * Migrates asset store.
      *
-     * @param argv -
-     *            Command-line arguments
+     * @param argv the command line arguments given
      */
     public static void main(String[] argv)
     {
@@ -90,7 +89,7 @@ public class BitStoreMigrate {
                 Integer sourceAssetstore = Integer.valueOf(line.getOptionValue('a'));
                 Integer destinationAssetstore = Integer.valueOf(line.getOptionValue('b'));
 
-                //Safe default, commit every time. @TODO Performance Profile
+                //Safe default, commit every time. TODO Performance Profile
                 Integer batchCommitSize = 1;
                 if(line.hasOption('s')) {
                     batchCommitSize = Integer.parseInt(line.getOptionValue('s'));

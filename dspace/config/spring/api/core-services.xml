@@ -56,7 +56,14 @@
     <!-- Ensure PluginService is initialized properly via init() method -->
     <bean class="org.dspace.core.LegacyPluginServiceImpl" init-method="init"/>
     <bean class="org.dspace.core.LicenseServiceImpl"/>
-    <bean class="org.dspace.core.NewsServiceImpl"/>
+    <bean class="org.dspace.core.NewsServiceImpl">
+   		<property name="acceptableFilenames">
+			<list>
+				<value>news-top.html</value>
+				<value>news-side.html</value>
+			</list>
+		</property>
+	</bean>
 
     <!-- Ensure WorkflowCuratorService is initialized properly via init() method -->
     <bean class="org.dspace.curate.WorkflowCuratorServiceImpl" init-method="init"/>
@@ -96,22 +103,15 @@
     <bean class="org.dspace.workflowbasic.BasicWorkflowItemServiceImpl"/>
     <bean class="org.dspace.workflowbasic.BasicWorkflowServiceImpl"/>
 
-
-
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.InProgressUserServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.PoolTaskServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRoleServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>-->
-
-
     <!--Configurable workflow services, uncomment the xml workflow beans below to enable the configurable workflow-->
-    <!--<bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>-->
-    <!--<bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>-->
-
-
-
+    <!--<bean class="org.dspace.xmlworkflow.storedcomponents.ClaimedTaskServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.CollectionRoleServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.InProgressUserServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.PoolTaskServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.WorkflowItemRoleServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItemServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.XmlWorkflowServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.WorkflowRequirementsServiceImpl"/>
+    <bean class="org.dspace.xmlworkflow.XmlWorkflowFactoryImpl"/>-->
 
 </beans>

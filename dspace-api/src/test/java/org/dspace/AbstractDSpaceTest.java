@@ -19,6 +19,10 @@ import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.AfterClass;
 import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+
+import mockit.integration.junit4.JMockit;
 
 /**
  * DSpace Unit Tests need to initialize the DSpace Kernel / Service Mgr
@@ -33,6 +37,8 @@ import org.junit.BeforeClass;
  * @see AbstractIntegrationTest
  * @author Tim
  */
+@Ignore
+@RunWith(JMockit.class)
 public class AbstractDSpaceTest
 {
     /** log4j category */

@@ -49,7 +49,7 @@ public class HandleResource extends Resource {
         org.dspace.core.Context context = null;
 
         try {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.DSpaceObject dso = handleService.resolveToObject(context, prefix + "/" + suffix);
 

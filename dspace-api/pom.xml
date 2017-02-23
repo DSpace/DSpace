@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>6.0-SNAPSHOT</version>
+        <version>7.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -218,7 +218,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
+
                     <!-- Run Unit Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
@@ -232,6 +232,46 @@
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
+
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>xml-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                          <execution>
+                            <id>validate-ALL-xml-and-xsl</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                              <goal>validate</goal>
+                            </goals>
+                          </execution>
+                        </executions>
+                        <configuration>
+                          <validationSets>
+                            <!-- validate ALL XML and XSL config files in the testing folder -->
+                             <validationSet>
+                                 <dir>${agnostic.build.dir}/testing</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                     <include>**/*.xsl</include>
+                                     <include>**/*.xconf</include>
+                                 </includes>
+                             </validationSet>
+                             <!-- validate ALL XML and XSL files throughout the project -->
+                             <validationSet>
+                                <dir>${root.basedir}</dir>
+                                 <includes>
+                                     <include>**/*.xml</include>
+                                     <include>**/*.xsl</include>
+                                     <include>**/*.xmap</include>
+                                 </includes>
+                              </validationSet>
+                          </validationSets>
+                        </configuration>
+                    </plugin>
+
+
 
                     <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
@@ -256,6 +296,12 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.logging</groupId>
+                    <artifactId>jboss-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
         	<groupId>org.hibernate</groupId>
@@ -285,6 +331,16 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>apache-jena-libs</artifactId>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -343,7 +399,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>jdom</groupId>
+            <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
         </dependency>
         <dependency>
@@ -361,10 +417,6 @@
         <dependency>
            <groupId>org.apache.pdfbox</groupId>
            <artifactId>fontbox</artifactId>
-        </dependency>
-        <dependency>
-           <groupId>org.apache.pdfbox</groupId>
-           <artifactId>jempbox</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -401,10 +453,16 @@
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>xml-apis</groupId>
-            <artifactId>xmlParserAPIs</artifactId>
+            <artifactId>xml-apis</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
@@ -448,6 +506,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.rometools</groupId>
             <artifactId>rome-modules</artifactId>
             <version>1.0</version>
@@ -456,11 +519,30 @@
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-core</artifactId>
             <version>0.9.3.5</version>
+            <exclusions>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>gr.ekt.bte</groupId>
             <artifactId>bte-io</artifactId>
             <version>0.9.3.5</version>
+            <exclusions>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <!-- A more recent version is retrieved from another dependency -->
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -535,7 +617,7 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-		
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -553,12 +635,12 @@
             <artifactId>im4java</artifactId>
             <version>1.4.0</version>
         </dependency>
-        
+
         <!-- Flyway DB API (flywaydb.org) is used to manage DB upgrades automatically. -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>3.2.1</version>
+            <version>4.0.3</version>
         </dependency>
 
         <!-- Google Analytics -->
@@ -606,13 +688,15 @@
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
-            <version>1.2.17</version>
+            <!-- NOTE: SWORDv2 needs 1.2.14, required by Abdera: https://abdera.apache.org/ -->
+            <version>1.2.14</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
-            <version>1.2.17</version>
+            <!-- NOTE: SWORDv2 needs 1.2.14, required by Abdera: https://abdera.apache.org/ -->
+            <version>1.2.14</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -624,6 +708,16 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.10.50</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- S3 also wanted jackson... -->
         <dependency>

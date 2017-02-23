@@ -7,10 +7,6 @@
  */
 package org.dspace;
 
-import static org.junit.Assert.fail;
-
-import java.sql.SQLException;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
@@ -25,6 +21,11 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+
+import java.sql.SQLException;
+
+import static org.junit.Assert.fail;
 
 
 
@@ -38,6 +39,7 @@ import org.junit.BeforeClass;
  * @see AbstractDSpaceTest
  * @author pvillega
  */
+@Ignore
 public class AbstractUnitTest extends AbstractDSpaceTest
 {
     /** log4j category */
@@ -85,7 +87,8 @@ public class AbstractUnitTest extends AbstractDSpaceTest
         catch(SQLException se)
         {
             log.error("Error initializing database", se);
-            fail("Error initializing database: " + se.getMessage());
+            fail("Error initializing database: " + se.getMessage()
+                    + (se.getCause() == null ? "" : ": " + se.getCause().getMessage()));
         }
 
         // Initialize mock indexer (which does nothing, since Solr isn't running)

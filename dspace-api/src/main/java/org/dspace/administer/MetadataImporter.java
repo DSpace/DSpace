@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
  * 
  * The format of the XML file is as follows:
  * 
+ * {@code
  * <dspace-dc-types>
  *   <dc-type>
  *     <schema>icadmin</schema>
@@ -58,6 +59,7 @@ import org.xml.sax.SAXException;
  *   [....]
  *   
  * </dspace-dc-types>
+ * }
  */
 public class MetadataImporter
 {
@@ -67,13 +69,24 @@ public class MetadataImporter
     /** logging category */
     private static final Logger log = LoggerFactory.getLogger(MetadataImporter.class);
 
-	/**
-	 * main method for reading user input from the command line
-	 */
+    /**
+     * main method for reading user input from the command line
+     *
+     * @param args the command line arguments given
+     * @throws ParseException if parse error
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws TransformerException if transformer error
+     * @throws ParserConfigurationException if config error
+     * @throws AuthorizeException if authorization error
+     * @throws SAXException if parser error
+     * @throws NonUniqueMetadataException if duplicate metadata
+     * @throws RegistryImportException if import fails
+     **/
     public static void main(String[] args)
-    	throws ParseException, SQLException, IOException, TransformerException,
-    			ParserConfigurationException, AuthorizeException, SAXException,
-    			NonUniqueMetadataException, RegistryImportException
+        throws ParseException, SQLException, IOException, TransformerException,
+               ParserConfigurationException, AuthorizeException, SAXException,
+               NonUniqueMetadataException, RegistryImportException
     {
         boolean forceUpdate = false;
         
@@ -102,11 +115,20 @@ public class MetadataImporter
     /**
      * Load the data from the specified file path into the database
      * 
-     * @param 	file	the file path containing the source data
+     * @param     file    the file path containing the source data
+     * @param   forceUpdate whether to force update
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws TransformerException if transformer error
+     * @throws ParserConfigurationException if config error
+     * @throws AuthorizeException if authorization error
+     * @throws SAXException if parser error
+     * @throws NonUniqueMetadataException if duplicate metadata
+     * @throws RegistryImportException if import fails
      */
     public static void loadRegistry(String file, boolean forceUpdate)
-    	throws SQLException, IOException, TransformerException, ParserConfigurationException, 
-    		AuthorizeException, SAXException, NonUniqueMetadataException, RegistryImportException
+        throws SQLException, IOException, TransformerException, ParserConfigurationException, 
+            AuthorizeException, SAXException, NonUniqueMetadataException, RegistryImportException
     {
         Context context = null;
 
@@ -158,7 +180,12 @@ public class MetadataImporter
      *            DSpace context object
      * @param node
      *            the node in the DOM tree
-     * @throws NonUniqueMetadataException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws TransformerException if transformer error
+     * @throws AuthorizeException if authorization error
+     * @throws NonUniqueMetadataException if duplicate metadata
+     * @throws RegistryImportException if import fails
      */
     private static void loadSchema(Context context, Node node, boolean updateExisting)
         throws SQLException, IOException, TransformerException,
@@ -221,7 +248,12 @@ public class MetadataImporter
      *            DSpace context object
      * @param node
      *            the node in the DOM tree
-     * @throws NonUniqueMetadataException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws TransformerException if transformer error
+     * @throws AuthorizeException if authorization error
+     * @throws NonUniqueMetadataException if duplicate metadata
+     * @throws RegistryImportException if import fails
      */
     private static void loadType(Context context, Node node)
             throws SQLException, IOException, TransformerException,
@@ -270,8 +302,8 @@ public class MetadataImporter
     public static void usage()
     {
         String usage = "Use this class with the following option:\n" +
-        				" -f <xml source file> : specify which xml source file " +
-        				"contains the DC fields to import.\n";
+                        " -f <xml source file> : specify which xml source file " +
+                        "contains the DC fields to import.\n";
         System.out.println(usage);
     }
 }

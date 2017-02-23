@@ -18,21 +18,21 @@ import java.util.List;
 public interface RDFStorage {
     /**
      * Don't use this method directly, use 
-     * {@link org.dspace.rdf.RDFizer#convert(org.dspace.core.Context, 
-     * org.dspace.content.DSpaceObject) RDFizer.convert(...)} to convert and store DSpaceObjets.
+     * {@link org.dspace.rdf.RDFUtil#convert(org.dspace.core.Context, org.dspace.content.DSpaceObject) RDFizer.convert(...)}
+     * to convert and store DSpaceObjets.
      * @param uri Identifier for this DSO 
-     * ({@link org.dspace.rdf.RDFizer#generateIdentifier(org.dspace.core.Context, 
-     * org.dspace.content.DSpaceObject) RDFizer.generateIdentifier(...)}). You can load this model by using this URI.
+     * ({@link org.dspace.rdf.RDFUtil#generateIdentifier(org.dspace.core.Context, org.dspace.content.DSpaceObject) RDFizer.generateIdentifier(...)}).
+     * You can load this model by using this URI.
      * @param model The model to store.
-     * @see org.dspace.rdf.RDFizer;
+     * @see org.dspace.rdf.RDFizer#RDFizer
      */
     public void store(String uri, Model model);
     
     /**
      * Don't use this method directly, use
-     * {@link org.dspace.rdf.RDFizer#loadModel(String) RDFizer.loadModel(...)} instead.
-     * @param uri
-     * @return 
+     * {@link org.dspace.rdf.RDFUtil#loadModel(String) RDFizer.loadModel(...)} instead.
+     * @param uri Identifier for this DSO 
+     * @return the model
      */
     public Model load(String uri);
     

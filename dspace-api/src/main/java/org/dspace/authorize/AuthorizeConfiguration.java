@@ -174,6 +174,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to create new, not strictly community
      * related, group?
+     * @return true/false
      */
     public static boolean canCommunityAdminPerformGroupCreation()
     {
@@ -182,6 +183,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are community admins allowed to create collections or subcommunities?
+     * @return true/false
      */
     public static boolean canCommunityAdminPerformSubelementCreation()
     {
@@ -190,6 +192,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are community admins allowed to remove collections or subcommunities?
+     * @return true/false
      */
     public static boolean canCommunityAdminPerformSubelementDeletion()
     {
@@ -199,6 +202,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to manage the community's and
      * subcommunities' policies?
+     * @return true/false
      */
     public static boolean canCommunityAdminManagePolicies()
     {
@@ -208,6 +212,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to create/edit them community's and
      * subcommunities' admin groups?
+     * @return true/false
      */
     public static boolean canCommunityAdminManageAdminGroup()
     {
@@ -217,6 +222,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to create/edit the community's and
      * subcommunities' admin group?
+     * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionPolicies()
     {
@@ -226,6 +232,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to manage the item template of them
      * collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionTemplateItem()
     {
@@ -235,6 +242,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to manage (create/edit/remove) the
      * submitters group of them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionSubmitters()
     {
@@ -244,6 +252,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to manage (create/edit/remove) the workflows
      * group of them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionWorkflows()
     {
@@ -253,6 +262,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to manage (create/edit/remove) the admin
      * group of them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminManageCollectionAdminGroup()
     {
@@ -261,6 +271,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are community admins allowed to remove an item from them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminPerformItemDeletion()
     {
@@ -269,6 +280,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are community admins allowed to withdrawn an item from them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminPerformItemWithdrawn()
     {
@@ -278,6 +290,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to reinstate an item from them
      * collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminPerformItemReinstatiate()
     {
@@ -287,6 +300,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to manage the policies of an item owned by
      * one of them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminManageItemPolicies()
     {
@@ -296,6 +310,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to add a bitstream to an item owned by one
      * of them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminPerformBitstreamCreation()
     {
@@ -305,6 +320,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to remove a bitstream from an item owned by
      * one of them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminPerformBitstreamDeletion()
     {
@@ -314,6 +330,7 @@ public class AuthorizeConfiguration
     /**
      * Are community admins allowed to perform CC License replace or addition to
      * an item owned by one of them collections?
+     * @return true/false
      */
     public static boolean canCommunityAdminManageCCLicense()
     {
@@ -322,6 +339,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are collection admins allowed to manage the collection's policies?
+     * @return true/false
      */
     public static boolean canCollectionAdminManagePolicies()
     {
@@ -331,6 +349,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to manage (create/edit/delete) the
      * collection's item template?
+     * @return true/false
      */
     public static boolean canCollectionAdminManageTemplateItem()
     {
@@ -340,6 +359,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to manage (create/edit/delete) the
      * collection's submitters group?
+     * @return true/false
      */
     public static boolean canCollectionAdminManageSubmitters()
     {
@@ -349,6 +369,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to manage (create/edit/delete) the
      * collection's workflows group?
+     * @return true/false
      */
     public static boolean canCollectionAdminManageWorkflows()
     {
@@ -358,6 +379,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to manage (create/edit) the collection's
      * admins group?
+     * @return true/false
      */
     public static boolean canCollectionAdminManageAdminGroup()
     {
@@ -366,6 +388,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are collection admins allowed to remove an item from the collection?
+     * @return true/false
      */
     public static boolean canCollectionAdminPerformItemDeletion()
     {
@@ -374,6 +397,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are collection admins allowed to withdrawn an item from the collection?
+     * @return true/false
      */
     public static boolean canCollectionAdminPerformItemWithdrawn()
     {
@@ -383,6 +407,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to reinstate an item from the
      * collection?
+     * @return true/false
      */
     public static boolean canCollectionAdminPerformItemReinstatiate()
     {
@@ -392,6 +417,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to manage the policies of item owned by the
      * collection?
+     * @return true/false
      */
     public static boolean canCollectionAdminManageItemPolicies()
     {
@@ -401,6 +427,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to add a bitstream to an item owned by the
      * collections?
+     * @return true/false
      */
     public static boolean canCollectionAdminPerformBitstreamCreation()
     {
@@ -410,6 +437,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to remove a bitstream from an item owned by
      * the collections?
+     * @return true/false
      */
     public static boolean canCollectionAdminPerformBitstreamDeletion()
     {
@@ -419,6 +447,7 @@ public class AuthorizeConfiguration
     /**
      * Are collection admins allowed to replace or adding a CC License to an
      * item owned by the collections?
+     * @return true/false
      */
     public static boolean canCollectionAdminManageCCLicense()
     {
@@ -427,6 +456,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are item admins allowed to manage the item's policies?
+     * @return true/false
      */
     public static boolean canItemAdminManagePolicies()
     {
@@ -435,6 +465,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are item admins allowed to add bitstreams to the item?
+     * @return true/false
      */
     public static boolean canItemAdminPerformBitstreamCreation()
     {
@@ -443,6 +474,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are item admins allowed to remove bitstreams from the item?
+     * @return true/false
      */
     public static boolean canItemAdminPerformBitstreamDeletion()
     {
@@ -451,6 +483,7 @@ public class AuthorizeConfiguration
 
     /**
      * Are item admins allowed to replace or adding CC License to the item?
+     * @return true/false
      */
     public static boolean canItemAdminManageCCLicense()
     {

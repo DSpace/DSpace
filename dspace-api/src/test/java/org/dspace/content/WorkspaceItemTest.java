@@ -295,11 +295,42 @@ public class WorkspaceItemTest extends AbstractUnitTest
      * Test of update method, of class WorkspaceItem.
      */
     @Test
-    public void testUpdate() throws Exception
+    public void testUpdateAuth() throws Exception
     {
-        //TODO: how can we verify it works?
+		// no need to mockup the authorization as we are the same user that have
+		// created the wi
+        boolean pBefore = wi.isPublishedBefore();
+        wi.setPublishedBefore(!pBefore);
         workspaceItemService.update(context, wi);
-        System.out.println("update");
+        context.commit();
+        // force to read the data from the database
+        context.uncacheEntity(wi);
+        // read all our test attributes objects from the fresh session 
+        // to avoid duplicate object in session issue
+        wi = workspaceItemService.find(context, wi.getID());
+        collection = wi.getCollection();
+        owningCommunity = collection.getCommunities().get(0);
+        assertTrue("testUpdate", pBefore != wi.isPublishedBefore());
+    }
+    
+    /**
+     * Test of update method, of class WorkspaceItem with no WRITE auth.
+     */
+    @Test(expected=AuthorizeException.class)
+    public void testUpdateNoAuth() throws Exception
+    {
+    	new NonStrictExpectations(authorizeService.getClass())
+        {{
+             // Remove Item WRITE perms
+        	authorizeService.authorizeActionBoolean((Context) any, (Item) any,
+                    Constants.WRITE); result = false; 
+                    authorizeService.authorizeAction((Context) any, (Item) any,
+                     Constants.WRITE); result = new AuthorizeException();
+        }};
+        boolean pBefore = wi.isPublishedBefore();
+        wi.setPublishedBefore(!pBefore);
+        workspaceItemService.update(context, wi);
+    	fail("Exception expected");
     }
 
     /**

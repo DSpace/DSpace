@@ -42,25 +42,28 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
- * <P>
+ * <p>
  * Typical use:
- * <P>
+ * </p>
+ * <p>
  * <code>Email email = new Email();</code><br>
  * <code>email.addRecipient("foo@bar.com");</code><br>
  * <code>email.addArgument("John");</code><br>
  * <code>email.addArgument("On the Testing of DSpace");</code><br>
  * <code>email.send();</code><br>
- * <P>
+ * </p>
+ * <p>
  * <code>name</code> is the name of an email template in
  * <code>dspace-dir/config/emails/</code> (which also includes the subject.)
  * <code>arg0</code> and <code>arg1</code> are arguments to fill out the
  * message with.
- * <P>
+ * </p>
+ * <p>
  * Emails are formatted using <code>java.text.MessageFormat.</code>
  * Additionally, comment lines (starting with '#') are stripped, and if a line
  * starts with "Subject:" the text on the right of the colon is used for the
  * subject line. For example:
- * <P>
+ * </p>
  *
  * <pre>
  *
@@ -77,10 +80,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  *
  * </pre>
  *
- * <P>
+ * <p>
  * If the example code above was used to send this mail, the resulting mail
  * would have the subject <code>Example e-mail</code> and the body would be:
- * <P>
+ * </p>
  *
  * <pre>
  *
@@ -91,9 +94,10 @@ import org.dspace.services.factory.DSpaceServicesFactory;
  *
  * </pre>
  *
- * <P>
+ * <p>
  * Note that parameters like <code>{0}</code> cannot be placed in the subject
  * of the e-mail; they won't get filled out.
+ * </p>
  *
  *
  * @author Robert Tansley
@@ -232,7 +236,7 @@ public class Email
      *
      * @throws MessagingException
      *             if there was a problem sending the mail.
-     * @throws IOException 
+     * @throws IOException if IO error
      */
     public void send() throws MessagingException, IOException
     {
@@ -295,37 +299,44 @@ public class Email
                 message.setText(fullMessage);
             }
         }
-        else{
-        	 Multipart multipart = new MimeMultipart();
-	            // create the first part of the email
-	            BodyPart messageBodyPart = new MimeBodyPart();
-	            messageBodyPart.setText(fullMessage);
-	            multipart.addBodyPart(messageBodyPart);
-        	 if(!attachments.isEmpty()){
-	            for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext();)
-	            {
-	                FileAttachment f = iter.next();
-	                // add the file
-	                messageBodyPart = new MimeBodyPart();
-	                messageBodyPart.setDataHandler(new DataHandler(
-	                        new FileDataSource(f.file)));
-	                messageBodyPart.setFileName(f.name);
-	                multipart.addBodyPart(messageBodyPart);
-	            }
-	            message.setContent(multipart);
-        	 }
-        	 if(!moreAttachments.isEmpty()){
- 	            for (Iterator<InputStreamAttachment> iter = moreAttachments.iterator(); iter.hasNext();)
- 	            {
- 	            	InputStreamAttachment isa = iter.next();
- 	                // add the stream
- 	                messageBodyPart = new MimeBodyPart();
- 	                messageBodyPart.setDataHandler(new DataHandler(new InputStreamDataSource(isa.name,isa.mimetype,isa.is)));
- 	                messageBodyPart.setFileName(isa.name);
- 	                multipart.addBodyPart(messageBodyPart);
- 	            }
- 	            message.setContent(multipart);
-        	 }
+        else
+        {
+             Multipart multipart = new MimeMultipart();
+                // create the first part of the email
+                BodyPart messageBodyPart = new MimeBodyPart();
+                messageBodyPart.setText(fullMessage);
+                multipart.addBodyPart(messageBodyPart);
+             if (!attachments.isEmpty()) {
+                for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext();)
+                {
+                    FileAttachment f = iter.next();
+                    // add the file
+                    messageBodyPart = new MimeBodyPart();
+                    messageBodyPart.setDataHandler(new DataHandler(
+                            new FileDataSource(f.file)));
+                    messageBodyPart.setFileName(f.name);
+                    multipart.addBodyPart(messageBodyPart);
+                }
+                message.setContent(multipart);
+             }
+             if (!moreAttachments.isEmpty()) {
+                 for (Iterator<InputStreamAttachment> iter = moreAttachments.iterator(); iter.hasNext();)
+                 {
+                     InputStreamAttachment isa = iter.next();
+                     // add the stream
+                     messageBodyPart = new MimeBodyPart();
+                     messageBodyPart.setDataHandler(
+                         new DataHandler(new InputStreamDataSource(
+                             isa.name,
+                             isa.mimetype, 
+                             isa.is)
+                         )
+                     );
+                     messageBodyPart.setFileName(isa.name);
+                     multipart.addBodyPart(messageBodyPart);
+                 }
+                 message.setContent(multipart);
+             }
         }
 
         if (replyTo != null)
@@ -338,7 +349,7 @@ public class Email
         if (disabled)
         {
             StringBuffer text = new StringBuffer(
-                    "Message not sent due to mail.server.disabled:\n");
+                "Message not sent due to mail.server.disabled:\n");
 
             Enumeration<String> headers = message.getAllHeaderLines();
             while (headers.hasMoreElements())
@@ -370,12 +381,12 @@ public class Email
      * @return the email object, with the content and subject filled out from
      *         the template
      *
-     * @throws IOException
+     * @throws IOException if IO error
      *             if the template couldn't be found, or there was some other
      *             error reading the template
      */
     public static Email getEmail(String emailFile)
-            throws IOException
+        throws IOException
     {
         String charset = null;
         String subject = "";
@@ -459,7 +470,7 @@ public class Email
     /**
      * Test method to send an email to check email server settings
      *
-     * @param args Command line options
+     * @param args the command line arguments given
      */
     public static void main(String[] args)
     {
@@ -479,7 +490,7 @@ public class Email
         boolean disabled = config.getBooleanProperty("mail.server.disabled", false);
         try
         {
-            if( disabled)
+            if (disabled)
             {
                 System.err.println("\nError sending email:");
                 System.err.println(" - Error: cannot test email because mail.server.disabled is set to true");
@@ -497,8 +508,10 @@ public class Email
             System.err.println("\nPlease see the DSpace documentation for assistance.\n");
             System.err.println("\n");
             System.exit(1);
-        }catch (IOException e1) {
-        	System.err.println("\nError sending email:");
+        }
+        catch (IOException e1)
+        {
+            System.err.println("\nError sending email:");
             System.err.println(" - Error: " + e1);
             System.err.println("\nPlease see the DSpace documentation for assistance.\n");
             System.err.println("\n");

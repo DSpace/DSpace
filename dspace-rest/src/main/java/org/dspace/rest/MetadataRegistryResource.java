@@ -75,19 +75,34 @@ public class MetadataRegistryResource extends Resource
      * Return all metadata registry items in DSpace.
      * 
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of metadata schema. Options are: "all", "fields".  Default value "fields".
+     *     String in which is what you want to add to returned instance
+     *     of metadata schema. Options are: "all", "fields".  Default value "fields".
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
+     * @param headers
+     *     If you want to access the metadata schema as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of metadata schemas.
      * @throws WebApplicationException
-     *             It can be caused by creating context or while was problem
-     *             with reading schema from database(SQLException).
+     *     It can be caused by creating context or while was problem
+     *     with reading schema from database(SQLException).
      */
     @GET
     @Path("/schema")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataSchema[] getSchemas(@QueryParam("expand") @DefaultValue("fields") String expand, 
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -97,7 +112,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             List<org.dspace.content.MetadataSchema> schemas = metadataSchemaService.findAll(context);
             metadataSchemas = new ArrayList<MetadataSchema>();
@@ -129,26 +144,37 @@ public class MetadataRegistryResource extends Resource
      * parameter or method for metadata fields.
      * 
      * @param schemaPrefix
-     *            Prefix for schema in DSpace.
+     *     Prefix for schema in DSpace.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of metadata schema. Options are: "all", "fields".  Default value "fields".
+     *     String in which is what you want to add to returned instance
+     *     of metadata schema. Options are: "all", "fields".  Default value "fields".
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to metadata schema under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the metadata schema as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return instance of org.dspace.rest.common.MetadataSchema.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading. Also if id/prefix of schema is incorrect
-     *             or logged user into context has no permission to read.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading. Also if id/prefix of schema is incorrect
+     *     or logged user into context has no permission to read.
      */
     @GET
     @Path("/schema/{schema_prefix}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataSchema getSchema(@PathParam("schema_prefix") String schemaPrefix, @QueryParam("expand") @DefaultValue("fields") String expand,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -158,12 +184,12 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataSchema schema = metadataSchemaService.find(context, schemaPrefix);
             metadataSchema = new MetadataSchema(schema, expand, context);
             if (schema == null) {
-            	processException(String.format("Schema not found for index %s", schemaPrefix), context);
+                processException(String.format("Schema not found for index %s", schemaPrefix), context);
             }
 
             context.complete();
@@ -189,66 +215,88 @@ public class MetadataRegistryResource extends Resource
      * Returns metadata field with basic properties. 
      * 
      * @param schemaPrefix
-     *            Prefix for schema in DSpace.
+     *     Prefix for schema in DSpace.
      * @param element
-     *            Unqualified element name for field in the metadata registry.
+     *     Unqualified element name for field in the metadata registry.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of the metadata field. Options are: "all", "parentSchema".  Default value "".
+     *     String in which is what you want to add to returned instance
+     *     of the metadata field. Options are: "all", "parentSchema".  Default value "".
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return instance of org.dspace.rest.common.MetadataField.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading. Also if id of field is incorrect
-     *             or logged user into context has no permission to read.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading. Also if id of field is incorrect
+     *     or logged user into context has no permission to read.
      */
     @GET
     @Path("/schema/{schema_prefix}/metadata-fields/{element}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataField getMetadataFieldUnqualified(@PathParam("schema_prefix") String schemaPrefix,
-    		@PathParam("element") String element,
-    		@QueryParam("expand") String expand,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @PathParam("element") String element,
+            @QueryParam("expand") String expand,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
-    	return getMetadataFieldQualified(schemaPrefix, element, "", expand, user_ip, user_agent, xforwarderfor, headers, request);
+        return getMetadataFieldQualified(schemaPrefix, element, "", expand, user_ip, user_agent, xforwardedfor, headers, request);
     }
     
     /**
      * Returns metadata field with basic properties. 
      * 
      * @param schemaPrefix
-     *            Prefix for schema in DSpace.
+     *     Prefix for schema in DSpace.
      * @param element
-     *            Element name for field in the metadata registry.
+     *     Element name for field in the metadata registry.
      * @param qualifier
-     *            Element name qualifier for field in the metadata registry.
+     *     Element name qualifier for field in the metadata registry.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of the metadata field. Options are: "all", "parentSchema".  Default value "".
+     *     String in which is what you want to add to returned instance
+     *     of the metadata field. Options are: "all", "parentSchema".  Default value "".
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return instance of org.dspace.rest.common.MetadataField.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading. Also if id of field is incorrect
-     *             or logged user into context has no permission to read.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading. Also if id of field is incorrect
+     *     or logged user into context has no permission to read.
      */
     @GET
     @Path("/schema/{schema_prefix}/metadata-fields/{element}/{qualifier}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataField getMetadataFieldQualified(@PathParam("schema_prefix") String schemaPrefix,
-    		@PathParam("element") String element,
-    		@PathParam("qualifier") @DefaultValue("") String qualifier,
-    		@QueryParam("expand") String expand,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @PathParam("element") String element,
+            @PathParam("qualifier") @DefaultValue("") String qualifier,
+            @QueryParam("expand") String expand,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -258,7 +306,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataSchema schema = metadataSchemaService.find(context, schemaPrefix);
             
@@ -297,27 +345,38 @@ public class MetadataRegistryResource extends Resource
      * Returns metadata field with basic properties. 
      * 
      * @param fieldId
-     *            Id of metadata field in DSpace.
+     *     Id of metadata field in DSpace.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of the metadata field. Options are: "all", "parentSchema".  Default value "parentSchema".
+     *     String in which is what you want to add to returned instance
+     *     of the metadata field. Options are: "all", "parentSchema".  Default value "parentSchema".
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to community under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the community as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return instance of org.dspace.rest.common.MetadataField.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading. Also if id of field is incorrect
-     *             or logged user into context has no permission to read.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading. Also if id of field is incorrect
+     *     or logged user into context has no permission to read.
      */
     @GET
     @Path("/metadata-fields/{field_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataField getMetadataField(@PathParam("field_id") Integer fieldId,  
-    		@QueryParam("expand") @DefaultValue("parentSchema") String expand,
-    		@QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwarderfor") String xforwarderfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("expand") @DefaultValue("parentSchema") String expand,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -327,7 +386,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataField field = metadataFieldService.find(context, fieldId);
             if (field == null) {
@@ -364,18 +423,29 @@ public class MetadataRegistryResource extends Resource
      * Create schema in the schema registry. Creating a schema is restricted to admin users.
      * 
      * @param schema
-     *            Schema that will be added to the metadata registry.
+     *     Schema that will be added to the metadata registry.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to schema under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the schema as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response 200 if was everything all right. Otherwise 400
-     *         when id of community was incorrect or 401 if was problem with
-     *         permission to write into collection.
-     *         Returns the schema (schemaId), if was all ok.
+     *     when id of community was incorrect or 401 if was problem with
+     *     permission to write into collection.
+     *     Returns the schema (schemaId), if was all ok.
      * @throws WebApplicationException
-     *             It can be thrown by SQLException, AuthorizeException and
-     *             ContextException.
+     *     It can be thrown by SQLException, AuthorizeException and
+     *     ContextException.
      */
     @POST
     @Path("/schema")
@@ -391,7 +461,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             if (!authorizeService.isAdmin(context))
             {
@@ -407,7 +477,7 @@ public class MetadataRegistryResource extends Resource
 
             log.debug(String.format("Admin user creating schema with namespace %s and prefix %s", schema.getNamespace(), schema.getPrefix()));
 
-            org.dspace.content.MetadataSchema dspaceSchema = metadataSchemaService.create(context, schema.getNamespace(), schema.getPrefix());
+            org.dspace.content.MetadataSchema dspaceSchema = metadataSchemaService.create(context, schema.getPrefix(), schema.getNamespace());
             log.debug("Creating return object.");
             retSchema = new MetadataSchema(dspaceSchema, "", context);
             
@@ -432,7 +502,7 @@ public class MetadataRegistryResource extends Resource
         } 
         catch (NonUniqueMetadataException e) {
             processException("Could not create new metadata schema, NonUniqueMetadataException. Message: " + e.getMessage(), context);
-		}
+        }
         catch (Exception e)
         {
             processException("Could not create new metadata schema, Exception. Class: " + e.getClass(), context);
@@ -450,25 +520,38 @@ public class MetadataRegistryResource extends Resource
      * Create a new metadata field within a schema. 
      * Creating a metadata field is restricted to admin users.
      * 
+     * @param schemaPrefix
+     *     Prefix for schema in DSpace.
      * @param field
-     *            Field that will be added to the metadata registry for a schema.
+     *     Field that will be added to the metadata registry for a schema.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to schema under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the schema as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response 200 if was everything all right. Otherwise 400
-     *         when id of community was incorrect or 401 if was problem with
-     *         permission to write into collection.
-     *         Returns the field (with fieldId), if was all ok.
+     *     when id of community was incorrect or 401 if was problem with
+     *     permission to write into collection.
+     *     Returns the field (with fieldId), if was all ok.
      * @throws WebApplicationException
-     *             It can be thrown by SQLException, AuthorizeException and
-     *             ContextException.
+     *     It can be thrown by SQLException, AuthorizeException and
+     *     ContextException.
      */
     @POST
     @Path("/schema/{schema_prefix}/metadata-fields")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataField createMetadataField(@PathParam("schema_prefix") String schemaPrefix,
-    		MetadataField field, @QueryParam("userIP") String user_ip,
+            MetadataField field, @QueryParam("userIP") String user_ip,
             @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
     {
@@ -479,7 +562,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             if (!authorizeService.isAdmin(context))
             {
@@ -520,7 +603,7 @@ public class MetadataRegistryResource extends Resource
         } 
         catch (NonUniqueMetadataException e) {
            processException("Could not create new metadata field, NonUniqueMetadataException. Message: " + e.getMessage(), context);
-		}
+        }
         catch (Exception e)
         {
             processException("Could not create new metadata field, Exception. Message: " + e.getMessage(), context);
@@ -541,20 +624,31 @@ public class MetadataRegistryResource extends Resource
      * Update metadata field. Replace all information about community except the id and the containing schema.
      * 
      * @param fieldId
-     *            Id of the field in the DSpace metdata registry.
+     *     Id of the field in the DSpace metdata registry.
      * @param field
-     *            Instance of the metadata field which will replace actual metadata field in
-     *            DSpace.
+     *     Instance of the metadata field which will replace actual metadata field in
+     *     DSpace.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to metadata field under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the metadata field as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Response 200 if was all ok. Otherwise 400 if was id incorrect or
-     *         401 if logged user has no permission to update the metadata field.
+     *     401 if logged user has no permission to update the metadata field.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading or writing. Or problem with writing to
-     *             community caused by authorization.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading or writing. Or problem with writing to
+     *     community caused by authorization.
      */
     @PUT
     @Path("/metadata-fields/{field_id}")
@@ -570,7 +664,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataField dspaceField = metadataFieldService.find(context, fieldId);
             if (field == null) {
@@ -603,10 +697,10 @@ public class MetadataRegistryResource extends Resource
         } 
         catch (NonUniqueMetadataException e) {
             processException("Could not update metadata field(id=" + fieldId + "), NonUniqueMetadataException. Message:" + e, context);
-		} 
+        } 
         catch (IOException e) {
             processException("Could not update metadata field(id=" + fieldId + "), IOException. Message:" + e, context);
-		}
+        }
         finally
         {
             processFinally(context);
@@ -620,18 +714,29 @@ public class MetadataRegistryResource extends Resource
      * Delete metadata field from the DSpace metadata registry
      * 
      * @param fieldId
-     *            Id of the metadata field in DSpace.
+     *     Id of the metadata field in DSpace.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to metadata field under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the metadata field as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response code OK(200) if was everything all right.
-     *         Otherwise return NOT_FOUND(404) if was id of metadata field is incorrect.
-     *         Or (UNAUTHORIZED)401 if was problem with permission to metadata field.
+     *     Otherwise return NOT_FOUND(404) if was id of metadata field is incorrect.
+     *     Or (UNAUTHORIZED)401 if was problem with permission to metadata field.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading or deleting. Or problem with deleting
-     *             metadata field caused by IOException or authorization.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading or deleting. Or problem with deleting
+     *     metadata field caused by IOException or authorization.
      */
     @DELETE
     @Path("/metadata-fields/{field_id}")
@@ -645,7 +750,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataField dspaceField = metadataFieldService.find(context, fieldId);
             if (dspaceField == null) {
@@ -686,18 +791,29 @@ public class MetadataRegistryResource extends Resource
      * Delete metadata schema from the DSpace metadata registry
      * 
      * @param schemaId
-     *            Id of the metadata schema in DSpace.
+     *     Id of the metadata schema in DSpace.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to metadata schema under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the metadata schema as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response code OK(200) if was everything all right.
-     *         Otherwise return NOT_FOUND(404) if was id of metadata schema is incorrect.
-     *         Or (UNAUTHORIZED)401 if was problem with permission to metadata schema.
+     *     Otherwise return NOT_FOUND(404) if was id of metadata schema is incorrect.
+     *     Or (UNAUTHORIZED)401 if was problem with permission to metadata schema.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading or deleting. Or problem with deleting
-     *             metadata schema caused by IOException or authorization.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading or deleting. Or problem with deleting
+     *     metadata schema caused by IOException or authorization.
      */
     @DELETE
     @Path("/schema/{schema_id}")
@@ -711,7 +827,7 @@ public class MetadataRegistryResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.MetadataSchema dspaceSchema = metadataSchemaService.find(context, schemaId);
             if (dspaceSchema == null) {

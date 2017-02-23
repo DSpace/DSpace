@@ -51,6 +51,10 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 
+/*
+ * @deprecated  As of DSpace 6.0, ElasticSearch statistics are replaced by Solr statistics
+ * @see org.dspace.statistics.SolrLoggerServiceImpl#SolrLoggerServiceImpl
+ */
 public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerService, InitializingBean {
 
     private static Logger log = Logger.getLogger(ElasticSearchLoggerServiceImpl.class);
@@ -238,7 +242,7 @@ public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerServic
                 String dns = DnsLookup.reverseDns(ip);
                 docBuilder.field("dns", dns.toLowerCase());
             } catch (Exception e) {
-                log.error("Failed DNS Lookup for IP:" + ip);
+                log.info("Failed DNS Lookup for IP:" + ip);
                 log.debug(e.getMessage(), e);
             }
 
@@ -356,7 +360,7 @@ public class ElasticSearchLoggerServiceImpl implements ElasticSearchLoggerServic
                 String dns = DnsLookup.reverseDns(ip);
                 docBuilder.field("dns", dns.toLowerCase());
             } catch (Exception e) {
-                log.error("Failed DNS Lookup for IP:" + ip);
+                log.info("Failed DNS Lookup for IP:" + ip);
                 log.debug(e.getMessage(), e);
             }
 

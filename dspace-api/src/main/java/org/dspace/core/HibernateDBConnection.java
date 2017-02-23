@@ -7,16 +7,20 @@
  */
 package org.dspace.core;
 
+import org.dspace.content.DSpaceObject;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.proxy.HibernateProxyHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.hibernate4.SessionFactoryUtils;
 
 import javax.sql.DataSource;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -32,10 +36,13 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
 
+    private boolean batchModeEnabled = false;
+
     @Override
     public Session getSession() throws SQLException {
         if(!isTransActionAlive()){
             sessionFactory.getCurrentSession().beginTransaction();
+            configureBatchMode();
         }
         return sessionFactory.getCurrentSession();
     }
@@ -74,6 +81,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     public void commit() throws SQLException {
         if(isTransActionAlive() && !getTransaction().wasRolledBack())
         {
+            getSession().flush();
             getTransaction().commit();
         }
     }
@@ -108,8 +116,52 @@ public class HibernateDBConnection implements DBConnection<Session> {
         return databaseConfigVO;
     }
 
-	@Override
-	public void clearCache() throws SQLException {
-		this.getSession().clear();
-	}
+
+    @Override
+    public long getCacheSize() throws SQLException {
+        return getSession().getStatistics().getEntityCount();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <E extends ReloadableEntity> E reloadEntity(final E entity) throws SQLException {
+        if(entity == null) {
+            return null;
+        } else if(getSession().contains(entity)) {
+            return entity;
+        } else {
+            return (E) getSession().get(HibernateProxyHelper.getClassWithoutInitializingProxy(entity), entity.getID());
+        }
+    }
+
+    @Override
+    public void setOptimizedForBatchProcessing(final boolean batchOptimized) throws SQLException {
+        this.batchModeEnabled = batchOptimized;
+        configureBatchMode();
+    }
+
+    @Override
+    public boolean isOptimizedForBatchProcessing() {
+        return batchModeEnabled;
+    }
+
+    private void configureBatchMode() throws SQLException {
+        if(batchModeEnabled) {
+            getSession().setFlushMode(FlushMode.ALWAYS);
+        } else {
+            getSession().setFlushMode(FlushMode.AUTO);
+        }
+    }
+
+    /**
+     * Evict an entity from the hibernate cache. This is necessary when batch processing a large number of items.
+     *
+     * @param entity The entity to reload
+     * @param <E> The class of the enity. The entity must implement the {@link ReloadableEntity} interface.
+     * @throws SQLException When reloading the entity from the database fails.
+     */
+    @Override
+    public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
+        getSession().evict(entity);        
+    }
 }

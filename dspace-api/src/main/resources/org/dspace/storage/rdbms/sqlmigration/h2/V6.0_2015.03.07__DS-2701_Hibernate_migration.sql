@@ -32,6 +32,11 @@ ALTER TABLE eperson ALTER COLUMN eperson_id SET NULL;
 
 
 
+UPDATE metadatavalue SET text_value='Administrator'
+  WHERE resource_type_id=6 AND resource_id=1;
+UPDATE metadatavalue SET text_value='Anonymous'
+  WHERE resource_type_id=6 AND resource_id=0;
+
 ALTER TABLE epersongroup ADD COLUMN uuid UUID DEFAULT random_uuid();
 INSERT INTO dspaceobject  (uuid) SELECT uuid FROM epersongroup;
 ALTER TABLE epersongroup ADD FOREIGN KEY (uuid) REFERENCES dspaceobject;

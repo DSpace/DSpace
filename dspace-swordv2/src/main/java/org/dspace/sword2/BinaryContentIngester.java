@@ -31,14 +31,14 @@ import java.util.List;
 
 public class BinaryContentIngester extends AbstractSwordContentIngester
 {
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory
-            .getInstance().getWorkspaceItemService();
+    protected WorkspaceItemService workspaceItemService =
+        ContentServiceFactory.getInstance().getWorkspaceItemService();
 
-    protected BundleService bundleService = ContentServiceFactory.getInstance()
-            .getBundleService();
+    protected BundleService bundleService =
+        ContentServiceFactory.getInstance().getBundleService();
 
-    protected BitstreamService bitstreamService = ContentServiceFactory
-            .getInstance().getBitstreamService();
+    protected BitstreamService bitstreamService =
+        ContentServiceFactory.getInstance().getBitstreamService();
 
     public DepositResult ingestToCollection(Context context, Deposit deposit,
             Collection collection, VerboseDescription verboseDescription,
@@ -66,11 +66,10 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
                 item = wsi.getItem();
             }
 
-            Bitstream bs = itemService
-                    .createSingleBitstream(context, deposit.getInputStream(),
-                            item);
-            BitstreamFormat format = this
-                    .getFormat(context, deposit.getFilename());
+            Bitstream bs = itemService.createSingleBitstream(
+                 context, deposit.getInputStream(), item);
+            BitstreamFormat format = this.getFormat(
+                context, deposit.getFilename());
             bs.setName(context, deposit.getFilename());
             bs.setFormat(context, format);
             bitstreamService.update(context, bs);
@@ -78,10 +77,10 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
             // now we have an item in the workspace, and we need to consider adding some metadata to it,
             // but since the binary file didn't contain anything, what do we do?
             itemService.addMetadata(context, item, "dc", "title", null, null,
-                    "Untitled: " + deposit.getFilename());
-            itemService
-                    .addMetadata(context, item, "dc", "description", null, null,
-                            "Zip file deposted by SWORD without accompanying metadata");
+                "Untitled: " + deposit.getFilename());
+            itemService.addMetadata(
+                context, item, "dc", "description", null, null,
+                "Zip file deposted by SWORD without accompanying metadata");
 
             // update the item metadata to inclue the current time as
             // the updated date
@@ -100,9 +99,8 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
             context.restoreAuthSystemState();
 
             verboseDescription.append("Ingest successful");
-            verboseDescription
-                    .append("Item created with internal identifier: " +
-                            item.getID());
+            verboseDescription.append(
+                "Item created with internal identifier: " + item.getID());
 
             result.setItem(item);
             result.setTreatment(this.getTreatment());
@@ -192,13 +190,14 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
      * The human readable description of the treatment this ingester has
      * put the deposit through
      *
-     * @return
+     * @return human readable description
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     private String getTreatment() throws DSpaceSwordException
     {
         return "The package has been ingested and unpacked into the item.  Template metadata for " +
-                "the collection has been used, and a default title with the name of the file has " +
-                "been set";
+           "the collection has been used, and a default title with the name of the file has " +
+           "been set";
     }
 }

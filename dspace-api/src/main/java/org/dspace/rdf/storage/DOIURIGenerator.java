@@ -20,29 +20,35 @@ import org.dspace.identifier.service.DOIService;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  *
  * @author pbecker
  */
-public class DOIURIGenerator
-implements URIGenerator
+public class DOIURIGenerator implements URIGenerator
 {
     private static final Logger log = Logger.getLogger(DOIURIGenerator.class);
 
-    /*
-     * Currently (DSpace 5) DSpace supports DOIs for items only. This fallback
-     * will be used to generate an URI, whenever no DOI was found.
-     */
-    protected final static URIGenerator fallback = new LocalURIGenerator();
-    protected final DOIService doiService = IdentifierServiceFactory.getInstance().getDOIService();
+    protected static URIGenerator fallback;
+
+    @Required
+    public static void setFallback(URIGenerator fallback) {
+        DOIURIGenerator.fallback = fallback;
+    }
+    
+    @Autowired(required=true)
+    protected DOIService doiService;
     
     @Override
-    public String generateIdentifier(Context context, int type, UUID id, String handle, List<String> identifiers) throws SQLException {
+    public String generateIdentifier(Context context, int type, UUID id, String handle, List<String> identifiers)
+        throws SQLException
+    {
         if (type != Constants.SITE
-                && type != Constants.COMMUNITY
-                && type != Constants.COLLECTION
-                && type != Constants.ITEM)
+            && type != Constants.COMMUNITY
+            && type != Constants.COLLECTION
+            && type != Constants.ITEM)
         {
             return null;
         }
@@ -68,9 +74,16 @@ implements URIGenerator
 
     @Override
     public String generateIdentifier(Context context, DSpaceObject dso)
-            throws SQLException
+        throws SQLException
     {
-        return generateIdentifier(context, dso.getType(), dso.getID(), dso.getHandle(), ContentServiceFactory.getInstance().getDSpaceObjectService(dso).getIdentifiers(context, dso));
+        return generateIdentifier(
+            context,
+            dso.getType(),
+            dso.getID(),
+            dso.getHandle(),
+            ContentServiceFactory.getInstance().getDSpaceObjectService(dso)
+                .getIdentifiers(context, dso)
+        );
     }
     
 }

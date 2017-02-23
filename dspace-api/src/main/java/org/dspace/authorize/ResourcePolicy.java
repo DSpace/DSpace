@@ -10,8 +10,10 @@ package org.dspace.authorize;
 import org.apache.commons.lang.ObjectUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.hibernate.annotations.Type;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -24,7 +26,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name="resourcepolicy")
-public class ResourcePolicy{
+public class ResourcePolicy implements ReloadableEntity<Integer> {
     public static String TYPE_SUBMISSION = "TYPE_SUBMISSION";
     public static String TYPE_WORKFLOW = "TYPE_WORKFLOW";
     public static String TYPE_CUSTOM= "TYPE_CUSTOM";
@@ -40,9 +42,15 @@ public class ResourcePolicy{
     @JoinColumn(name = "dspace_object")
     private DSpaceObject dSpaceObject;
 
+    /*
+     * {@see org.dspace.core.Constants#Constants Constants}
+     */
     @Column(name = "resource_type_id")
     private int resourceTypeId;
 
+    /*
+     * {@see org.dspace.core.Constants#Constants Constants}
+     */
     @Column(name="action_id")
     private int actionId;
 
@@ -70,7 +78,9 @@ public class ResourcePolicy{
     @Column(name="rptype", length = 30)
     private String rptype;
 
-    @Column(name="rpdescription", length = 100)
+    @Lob
+    @Type(type="org.hibernate.type.MaterializedClobType")
+    @Column(name="rpdescription")
     private String rpdescription;
 
     /**
@@ -86,6 +96,7 @@ public class ResourcePolicy{
      * Return true if this object equals obj, false otherwise.
      *
      * @param obj
+     *     object to compare (eperson, group, start date, end date, ...)
      * @return true if ResourcePolicy objects are equal
      */
     @Override
@@ -134,23 +145,22 @@ public class ResourcePolicy{
     {
         int hash = 7;
         hash = 19 * hash + this.getAction();
-        if(this.getGroup() != null)
+        if (this.getGroup() != null)
         {
             hash = 19 * hash + this.getGroup().hashCode();
-        }else{
+        } else {
             hash = 19 * hash + -1;
         }
 
-        if(this.epersonGroup != null)
+        if (this.getEPerson() != null)
         {
             hash = 19 * hash + this.getEPerson().hashCode();
-        }else{
+        } else {
             hash = 19 * hash + -1;
-
         }
 
-        hash = 19 * hash + (this.getStartDate() != null? this.getStartDate().hashCode():0);
-        hash = 19 * hash + (this.getEndDate() != null? this.getEndDate().hashCode():0);
+        hash = 19 * hash + (this.getStartDate() != null ? this.getStartDate().hashCode() : 0);
+        hash = 19 * hash + (this.getEndDate() != null ? this.getEndDate().hashCode() : 0);
         return hash;
     }
 
@@ -175,7 +185,7 @@ public class ResourcePolicy{
     /**
      * set the action this policy authorizes
      *
-     * @param myid  action ID from <code>org.dspace.core.Constants</code>
+     * @param myid  action ID from {@link org.dspace.core.Constants#Constants Constants}
      */
     public void setAction(int myid)
     {
@@ -200,6 +210,7 @@ public class ResourcePolicy{
 
     /**
      * assign an EPerson to this policy
+     * @param eperson Eperson
      */
     public void setEPerson(EPerson eperson)
     {
@@ -207,9 +218,9 @@ public class ResourcePolicy{
     }
 
     /**
-     * gets ID for Group referred to by this policy
+     * gets the Group referred to by this policy
      *
-     * @return groupID, or null if no group set
+     * @return group, or null if no group set
      */
     public Group getGroup()
     {
@@ -217,7 +228,8 @@ public class ResourcePolicy{
     }
 
     /**
-     * sets ID for Group referred to by this policy
+     * sets the Group referred to by this policy
+     * @param epersonGroup Group
      */
     public void setGroup(Group epersonGroup)
     {
@@ -267,24 +279,24 @@ public class ResourcePolicy{
         this.endDate = d;
     }
 
-    public String getRpName(){
+    public String getRpName() {
         return rpname;
     }
-    public void setRpName(String name){
+    public void setRpName(String name) {
         this.rpname = name;
     }
 
-    public String getRpType(){
+    public String getRpType() {
         return rptype;
     }
-    public void setRpType(String type){
+    public void setRpType(String type) {
         this.rptype = type;
     }
 
-    public String getRpDescription(){
+    public String getRpDescription() {
         return rpdescription;
     }
-    public void setRpDescription(String description){
+    public void setRpDescription(String description) {
         this.rpdescription = description;
     }
 }

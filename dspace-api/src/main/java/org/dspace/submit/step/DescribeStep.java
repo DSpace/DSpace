@@ -34,8 +34,8 @@ import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -83,7 +83,12 @@ public class DescribeStep extends AbstractProcessingStep
     protected final MetadataAuthorityService metadataAuthorityService;
 
 
-    /** Constructor */
+    /**
+     * Constructor
+     *
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     */
     public DescribeStep() throws ServletException
     {
         //load the DCInputsReader
@@ -93,7 +98,6 @@ public class DescribeStep extends AbstractProcessingStep
     }
 
    
-
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)
@@ -106,16 +110,25 @@ public class DescribeStep extends AbstractProcessingStep
      * it should perform *all* of its processing in this method!
      *
      * @param context
-     *            current DSpace context
+     *     The relevant DSpace Context.
      * @param request
-     *            current servlet request object
+     *     Servlet's HTTP request object.
      * @param response
-     *            current servlet response object
+     *     Servlet's HTTP response object.
      * @param subInfo
-     *            submission info object
+     *     submission info object
      * @return Status or error flag which will be processed by
-     *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
+     *     doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
+     *     no errors occurred!)
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     public int doProcessing(Context context, HttpServletRequest request,
@@ -123,7 +136,7 @@ public class DescribeStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        if(!request.getParameterNames().hasMoreElements()){
+        if (!request.getParameterNames().hasMoreElements()){
             //In case of an empty request do NOT just remove all metadata, just return to the submission page
             return STATUS_MORE_INPUT_REQUESTED;
         }
@@ -151,7 +164,7 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Fetch the document type (dc.type)
         String documentType = "";
-        if( (itemService.getMetadataByMetadataString(item, "dc.type") != null) && (itemService.getMetadataByMetadataString(item, "dc.type").size() >0) )
+        if ( (itemService.getMetadataByMetadataString(item, "dc.type") != null) && (itemService.getMetadataByMetadataString(item, "dc.type").size() >0) )
         {
             documentType = itemService.getMetadataByMetadataString(item, "dc.type").get(0).getValue();
         }
@@ -161,29 +174,29 @@ public class DescribeStep extends AbstractProcessingStep
         for (int i = 0; i < inputs.length; i++)
         {
 
-        	// Allow the clearing out of the metadata defined for other document types, provided it can change anytime
-        	
+            // Allow the clearing out of the metadata defined for other document types, provided it can change anytime
+            
             if (!inputs[i]
                     .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                             : DCInput.SUBMISSION_SCOPE))
             {
                 continue;
             }
-	        if (inputs[i].getInputType().equals("qualdrop_value"))
-	        {
-		        @SuppressWarnings("unchecked") // This cast is correct
-		        List<String> pairs = inputs[i].getPairs();
-		        for (int j = 0; j < pairs.size(); j += 2)
-		        {
-			        String qualifier = pairs.get(j+1);
+            if (inputs[i].getInputType().equals("qualdrop_value"))
+            {
+                @SuppressWarnings("unchecked") // This cast is correct
+                List<String> pairs = inputs[i].getPairs();
+                for (int j = 0; j < pairs.size(); j += 2)
+                {
+                    String qualifier = pairs.get(j+1);
                     itemService.clearMetadata(context, item, inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
-		        }
-	        }
-	        else
-	        {
-		        String qualifier = inputs[i].getQualifier();
+                }
+            }
+            else
+            {
+                String qualifier = inputs[i].getQualifier();
                 itemService.clearMetadata(context, item, inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
-	        }
+            }
         }
 
         // Clear required-field errors first since missing authority
@@ -196,10 +209,10 @@ public class DescribeStep extends AbstractProcessingStep
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
-        	// Omit fields not allowed for this document type
+            // Omit fields not allowed for this document type
             if(!inputs[j].isAllowedFor(documentType))
             {
-            	continue;
+                continue;
             }
 
             if (!inputs[j]
@@ -316,11 +329,11 @@ public class DescribeStep extends AbstractProcessingStep
         {
             for (int i = 0; i < inputs.length; i++)
             {
-            	// Do not check the required attribute if it is not visible or not allowed for the document type
-            	String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+                // Do not check the required attribute if it is not visible or not allowed for the document type
+                String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
                 if ( !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
                 {
-                	continue;
+                    continue;
                 }
 
                 String qualifier = inputs[i].getQualifier();
@@ -381,11 +394,13 @@ public class DescribeStep extends AbstractProcessingStep
      * once!
      *
      * @param request
-     *            The HTTP Request
+     *     The HTTP Request
      * @param subInfo
-     *            The current submission information object
+     *     The current submission information object
      *
      * @return the number of pages in this step
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     @Override
     public int getNumberOfPages(HttpServletRequest request,
@@ -414,6 +429,8 @@ public class DescribeStep extends AbstractProcessingStep
     /**
      *
      * @return the current DCInputsReader
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     public static DCInputsReader getInputsReader() throws ServletException
     {
@@ -436,8 +453,10 @@ public class DescribeStep extends AbstractProcessingStep
     
     /**
      * @param filename
-     *        file to get the input reader for
+     *     file to get the input reader for
      * @return the current DCInputsReader
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     public static DCInputsReader getInputsReader(String filename) throws ServletException
     {
@@ -459,7 +478,7 @@ public class DescribeStep extends AbstractProcessingStep
     public static String getDefaultLanguageQualifier()
     {
        String language = "";
-       language = ConfigurationManager.getProperty("default.language");
+       language = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("default.language");
        if (StringUtils.isEmpty(language))
        {
            language = "en";
@@ -479,15 +498,15 @@ public class DescribeStep extends AbstractProcessingStep
      * field is "dc.contributor.author", the names in the request will be from
      * the fields as follows:
      *
-     * dc_contributor_author_last -> last name of first author
-     * dc_contributor_author_first -> first name(s) of first author
-     * dc_contributor_author_last_1 -> last name of second author
-     * dc_contributor_author_first_1 -> first name(s) of second author
+     * dc_contributor_author_last: last name of first author
+     * dc_contributor_author_first: first name(s) of first author
+     * dc_contributor_author_last_1: last name of second author
+     * dc_contributor_author_first_1: first name(s) of second author
      *
      * and so on. If the field is unqualified:
      *
-     * dc_contributor_last -> last name of first contributor
-     * dc_contributor_first -> first name(s) of first contributor
+     * dc_contributor_last: last name of first contributor
+     * dc_contributor_first: first name(s) of first contributor
      *
      * If the parameter "submit_dc_contributor_author_remove_n" is set, that
      * value is removed.
@@ -500,18 +519,22 @@ public class DescribeStep extends AbstractProcessingStep
      * first name(s)", ordered as they appear in the list. These will replace
      * any existing values.
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param request
-     *            the request object
+     *     the request object
      * @param item
-     *            the item to update
+     *     the item to update
      * @param schema
-     *            the metadata schema
+     *     the metadata schema
      * @param element
-     *            the metadata element
+     *     the metadata element
      * @param qualifier
-     *            the metadata qualifier, or null if unqualified
+     *     the metadata qualifier, or null if unqualified
      * @param repeated
-     *            set to true if the field is repeatable on the form
+     *     set to true if the field is repeatable on the form
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void readNames(Context context, HttpServletRequest request, Item item,
             String schema, String element, String qualifier, boolean repeated) throws SQLException {
@@ -665,22 +688,26 @@ public class DescribeStep extends AbstractProcessingStep
      * The values will be put in separate DCValues, ordered as they appear in
      * the list. These will replace any existing values.
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param request
-     *            the request object
+     *     Servlet's HTTP request object.
      * @param item
-     *            the item to update
+     *     the item to update
      * @param schema
-     *            the short schema name
+     *     the short schema name
      * @param element
-     *            the metadata element
+     *     the metadata element
      * @param qualifier
-     *            the metadata qualifier, or null if unqualified
+     *     the metadata qualifier, or null if unqualified
      * @param repeated
-     *            set to true if the field is repeatable on the form
+     *     set to true if the field is repeatable on the form
      * @param lang
-     *            language to set (ISO code)
+     *     language to set (ISO code)
      * @param hasLanguageTag
-     *            to check if the field has a language tag
+     *     to check if the field has a language tag
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void readText(Context context, HttpServletRequest request, Item item, String schema,
             String element, String qualifier, boolean repeated, String lang, boolean hasLanguageTag)
@@ -811,17 +838,19 @@ public class DescribeStep extends AbstractProcessingStep
      * The granularity is determined by the values that are actually set. If the
      * year isn't set (or is invalid)
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param request
-     *            the request object
+     *     the request object
      * @param item
-     *            the item to update
+     *     the item to update
      * @param schema
-     *            the metadata schema
+     *     the metadata schema
      * @param element
-     *            the metadata element
+     *     the metadata element
      * @param qualifier
-     *            the metadata qualifier, or null if unqualified
-     * @throws SQLException
+     *     the metadata qualifier, or null if unqualified
+     * @throws SQLException if database error
      */
     protected void readDate(Context context, HttpServletRequest request, Item item, String schema,
             String element, String qualifier) throws SQLException
@@ -867,18 +896,22 @@ public class DescribeStep extends AbstractProcessingStep
      * first name(s)", ordered as they appear in the list. These will replace
      * any existing values.
      *
+     * @param context
+     *     The relevant DSpace Context.
      * @param request
-     *            the request object
+     *     Servlet's HTTP request object.
      * @param item
-     *            the item to update
+     *     the item to update
      * @param schema
-     *            the metadata schema
+     *     the metadata schema
      * @param element
-     *            the metadata element
+     *     the metadata element
      * @param qualifier
-     *            the metadata qualifier, or null if unqualified
+     *     the metadata qualifier, or null if unqualified
      * @param repeated
-     *            set to true if the field is repeatable on the form
+     *     set to true if the field is repeatable on the form
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     protected void readSeriesNumbers(Context context, HttpServletRequest request, Item item,
             String schema, String element, String qualifier, boolean repeated) throws SQLException {
@@ -955,12 +988,12 @@ public class DescribeStep extends AbstractProcessingStep
      * require multiple params, etc. a first name and last name).
      *
      * @param request
-     *            the HTTP request containing the form information
+     *     the HTTP request containing the form information
      * @param metadataField
-     *            the metadata field which can store repeated values
+     *     the metadata field which can store repeated values
      * @param param
-     *            the repeated parameter on the page (used to fill out the
-     *            metadataField)
+     *     the repeated parameter on the page (used to fill out the
+     *     metadataField)
      *
      * @return a List of Strings
      */
@@ -1034,12 +1067,12 @@ public class DescribeStep extends AbstractProcessingStep
      * properly identify their language tag
      * 
      * @param request    
-     *               the HTTP request containing the form information
+     *     the HTTP request containing the form information
      * @param metadataField    
-     *               the metadata field which can store repeated values
+     *     the metadata field which can store repeated values
      * @param param  
-     *               the repeated parameter on the page (used to fill out the
-     *               metadataField)  
+     *     the repeated parameter on the page (used to fill out the
+     *     metadataField)  
      * @return     a TreeMap of Integer and Strings
     */ 
     protected TreeMap<Integer, String> getRepeatedParameterWithTheirIndices(HttpServletRequest request,
@@ -1108,6 +1141,8 @@ public class DescribeStep extends AbstractProcessingStep
      * Return the HTML / DRI field name for the given input.
      *
      * @param input
+     *     represents line in an imput form
+     * @return metadata field in the "schema_element_qualifier" format
      */
     public static String getFieldName(DCInput input)
     {

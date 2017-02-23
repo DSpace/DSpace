@@ -23,8 +23,8 @@ import javax.script.ScriptException;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * TaskResolver takes a logical name of a curation task and attempts to deliver 
@@ -41,24 +41,24 @@ import org.dspace.core.factory.CoreServiceFactory;
  * dspace/config/modules/curate.cfg property "script.dir". A catalog of
  * scripted tasks named 'task.catalog" is kept in this directory.
  * Each task has a 'descriptor' property with value syntax:
- * <engine>|<relFilePath>|<implClassCtor>
+ * {@code <engine>|<relFilePath>|<implClassCtor>}
  * An example property:
  * 
- * linkchecker = ruby|rubytask.rb|LinkChecker.new
+ * {@code linkchecker = ruby|rubytask.rb|LinkChecker.new}
  * 
  * This descriptor means that a 'ruby' script engine will be created,
- * a script file named 'rubytask.rb' in the directory <script.dir> will be
+ * a script file named 'rubytask.rb' in the directory {@code <script.dir>} will be
  * loaded and the resolver will expect an evaluation of 'LinkChecker.new' will 
  * provide a correct implementation object.
  * 
  * Script files may embed their descriptors to facilitate deployment.
  * To accomplish this, a script must include the descriptor string with syntax:
- * $td=<descriptor> somewhere on a comment line. for example:
+ * {@code $td=<descriptor>} somewhere on a comment line. for example:
  * 
- * # My descriptor $td=ruby|rubytask.rb|LinkChecker.new
+ * {@code My descriptor $td=ruby|rubytask.rb|LinkChecker.new}
  * 
- * For portability, the <relFilePath> component may be omitted in this context.
- * Thus, $td=ruby||LinkChecker.new will be expanded to a descriptor
+ * For portability, the {@code <relFilePath>} component may be omitted in this context.
+ * Thus, {@code $td=ruby||LinkChecker.new} will be expanded to a descriptor
  * with the name of the embedding file.
  * 
  * @author richardrodgers
@@ -71,13 +71,14 @@ public class TaskResolver
 	
 	// base directory of task scripts & catalog name
 	protected static final String CATALOG = "task.catalog";
-	protected static final String scriptDir = ConfigurationManager.getProperty("curate", "script.dir");
+	protected final String scriptDir;
 	
 	// catalog of script tasks
 	protected Properties catalog;
 	
 	public TaskResolver()
 	{
+            scriptDir = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("curate.script.dir");
 	}
 		
 	/**

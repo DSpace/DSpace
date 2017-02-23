@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import org.apache.commons.lang.ArrayUtils;
 
-import org.dspace.core.ConfigurationManager;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Class to mediate with the item list configuration
@@ -33,33 +35,34 @@ public class ItemListConfig
 	
 	/** constant for a TEXT column */
 	private static final int TEXT = 2;
+
+        private final transient ConfigurationService configurationService
+             = DSpaceServicesFactory.getInstance().getConfigurationService();
 	
 	/**
 	 * Create a new instance of the Item list configuration.  This loads
 	 * all the required information from configuration
 	 * 
-	 * @throws BrowseException
+	 * @throws BrowseException if count error
 	 */
 	public ItemListConfig()
 		throws BrowseException
 	{
 		try
 		{
-			String configLine = ConfigurationManager.getProperty("webui.itemlist.columns");
+			String[] browseFields  = configurationService.getArrayProperty("webui.itemlist.columns");
 			
-			if (configLine == null || "".equals(configLine))
+			if (ArrayUtils.isEmpty(browseFields))
 			{
 				throw new BrowseException("There is no configuration for webui.itemlist.columns");
 			}
 			
 			// parse the config
-			StringTokenizer st = new StringTokenizer(configLine, ",");
 			int i = 1;
-			while (st.hasMoreTokens())
+			for(String token : browseFields)
 			{
 				Integer key = Integer.valueOf(i);
-				String token = st.nextToken();
-				
+
 				// find out if the field is a date
 				if (token.indexOf("(date)") > 0)
 				{
@@ -97,7 +100,8 @@ public class ItemListConfig
 	/**
 	 * What metadata is to go in the given column number?
 	 * 
-	 * @param col
+	 * @param col column
+         * @return array of metadata
 	 */
 	public String[] getMetadata(int col)
 	{
@@ -113,6 +117,7 @@ public class ItemListConfig
      * @param mfield	the string representation of the metadata
      * @param init	the default value of the array elements
      * @return	a three element array with schema, element and qualifier respectively
+     * @throws IOException if IO error
      */
     public final String[] interpretField(String mfield, String init)
     	throws IOException

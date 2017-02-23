@@ -66,21 +66,23 @@ public interface BitstreamStorageService {
      * true:
      *
      * <ul>
-     * <li>Neither bits nor RDBMS metadata entries have been stored.
+     * <li>Neither bits nor RDBMS metadata entries have been stored.</li>
      * <li>RDBMS metadata entries with the deleted flag set have been stored,
-     * but no bits.
+     * but no bits.</li>
      * <li>RDBMS metadata entries with the deleted flag set have been stored,
-     * and some or all of the bits have also been stored.
+     * and some or all of the bits have also been stored.</li>
      * </ul>
      *
      * @param context
-     *            The current context
+     *     The current context
+     * @param bitstream
+     *     The bitstream to store
      * @param is
-     *            The stream of bits to store
-     * @exception java.io.IOException
-     *                If a problem occurs while storing the bits
-     * @exception java.sql.SQLException
-     *                If a problem occurs accessing the RDBMS
+     *     The stream of bits to store
+     * @throws java.io.IOException
+     *     If a problem occurs while storing the bits
+     * @throws java.sql.SQLException
+     *     If a problem occurs accessing the RDBMS
      *
      * @return The ID of the stored bitstream
      */
@@ -88,31 +90,36 @@ public interface BitstreamStorageService {
 
 
     /**
-   	 * Register a bitstream already in storage.
-   	 *
-   	 * @param context
-   	 *            The current context
-   	 * @param assetstore The assetstore number for the bitstream to be
-   	 * 			registered
-   	 * @param bitstreamPath The relative path of the bitstream to be registered.
-   	 * 		The path is relative to the path of ths assetstore.
-   	 * @return The ID of the registered bitstream
-   	 * @exception SQLException
-   	 *                If a problem occurs accessing the RDBMS
-   	 * @throws IOException
-   	 */
-   	public UUID register(Context context, Bitstream bitstream, int assetstore, String bitstreamPath)
+     * Register a bitstream already in storage.
+     *
+     * @param context
+     *     The current context
+     * @param bitstream
+     *     The bitstream to register
+     * @param assetstore The assetstore number for the bitstream to be
+     *     registered
+     * @param bitstreamPath The relative path of the bitstream to be registered.
+     *     The path is relative to the path of ths assetstore.
+     * @return The ID of the registered bitstream
+     * @throws SQLException
+     *     If a problem occurs accessing the RDBMS
+     * @throws IOException if IO error
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
+     */
+    public UUID register(Context context, Bitstream bitstream, int assetstore, String bitstreamPath)
             throws SQLException, IOException, AuthorizeException;
 
     public Map computeChecksum(Context context, Bitstream bitstream) throws IOException;
 
     /**
-   	 * Does the internal_id column in the bitstream row indicate the bitstream
-   	 * is a registered file
-   	 *
-   	 * @param internalId the value of the internal_id column
-   	 * @return true if the bitstream is a registered file
-   	 */
+     * Does the internal_id column in the bitstream row indicate the bitstream
+     * is a registered file
+     *
+     * @param internalId the value of the internal_id column
+     * @return true if the bitstream is a registered file
+     */
     public boolean isRegisteredBitstream(String internalId);
 
     /**
@@ -120,15 +127,14 @@ public interface BitstreamStorageService {
      * exist, or is marked deleted, returns null.
      *
      * @param context
-     *            The current context
+     *     The current context
      * @param bitstream
-     *            The bitstream to retrieve
-     * @exception IOException
-     *                If a problem occurs while retrieving the bits
-     * @exception SQLException
-     *                If a problem occurs accessing the RDBMS
-     *
+     *     The bitstream to retrieve
      * @return The stream of bits, or null
+     * @throws IOException
+     *     If a problem occurs while retrieving the bits
+     * @throws SQLException
+     *     If a problem occurs accessing the RDBMS
      */
     public InputStream retrieve(Context context, Bitstream bitstream)
             throws SQLException, IOException;
@@ -139,11 +145,16 @@ public interface BitstreamStorageService {
      * be undone.
      *
      * @param deleteDbRecords if true deletes the database records otherwise it
-     * 	           only deletes the files and directories in the assetstore
-     * @exception IOException
-     *                If a problem occurs while cleaning up
-     * @exception SQLException
-     *                If a problem occurs accessing the RDBMS
+     *     only deletes the files and directories in the assetstore
+     * @param verbose
+     *     verbosity flag
+     * @throws IOException
+     *     If a problem occurs while cleaning up
+     * @throws SQLException
+     *     If a problem occurs accessing the RDBMS
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void cleanup(boolean deleteDbRecords, boolean verbose) throws SQLException, IOException, AuthorizeException;
 
@@ -152,17 +163,30 @@ public interface BitstreamStorageService {
     /**
      * Print out (log/out) a listing of the assetstores configured, and how many assets they contain
      * @param context
-     * @throws SQLException
+     *     The relevant DSpace Context.
+     * @throws SQLException if database error
      */
     public void printStores(Context context) throws SQLException;
 
     /**
      * Migrate all the assets from assetstoreSource to assetstoreDestination
      * @param context
+     *     The relevant DSpace Context.
      * @param assetstoreSource
+     *     source assetstore
      * @param assetstoreDestination
+     *     destination assetstore
      * @param deleteOld
+     *     whether to delete files from the source assetstore after migration
      * @param batchCommitSize
+     *     batch size
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) throws IOException, SQLException, AuthorizeException;
 

@@ -20,6 +20,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.identifier.doi.DOIConnector;
 import org.dspace.identifier.doi.DOIIdentifierException;
@@ -33,7 +34,7 @@ import org.springframework.beans.factory.annotation.Required;
  * Provide service for DOIs using DataCite.
  * 
  * <p>This class handles reservation, registration and deletion of DOIs using
- * the direct API from {@link <a href="http://www.datacite.org">DataCite</a>}.
+ * the direct API from <a href="http://www.datacite.org">DataCite</a>.
  * Please pay attention that some members of DataCite offer special services
  * and want their customers to use special APIs. If you are unsure ask your
  * registration agency.</p>
@@ -63,6 +64,7 @@ public class DOIIdentifierProvider
     
     static final String CFG_PREFIX = "identifier.doi.prefix";
     static final String CFG_NAMESPACE_SEPARATOR = "identifier.doi.namespaceseparator";
+    static final char SLASH = '/';
         
     // Metadata field name elements
     // TODO: move these to MetadataSchema or some such?
@@ -83,11 +85,11 @@ public class DOIIdentifierProvider
     @Autowired(required = true)
     protected DOIService doiService;
     @Autowired(required = true)
-    protected ItemService itemService;
-    @Autowired(required = true)
     protected ContentServiceFactory contentServiceFactory;
+    @Autowired(required = true)
+    protected ItemService itemService;
 
-    private DOIIdentifierProvider() {
+    protected DOIIdentifierProvider() {
     }
 
     /**
@@ -142,7 +144,7 @@ public class DOIIdentifierProvider
      * This identifier provider supports identifiers of type
      * {@link org.dspace.identifier.DOI}.
      * @param identifier to check if it will be supported by this provider.
-     * @return 
+     * @return boolean
      */
     @Override
     public boolean supports(Class<? extends Identifier> identifier)
@@ -158,17 +160,14 @@ public class DOIIdentifierProvider
      *  <li>http://dx.doi.org/10.123/456</li>
      * </ul>
      * @param identifier to check if it is in a supported format.
-     * @return 
+     * @return boolean
      */
     @Override
     public boolean supports(String identifier)
     {
         try {
             doiService.formatIdentifier(identifier);
-        } catch (IdentifierException e) {
-            return false;
-        } catch (IllegalArgumentException e)
-        {
+        } catch (IdentifierException | IllegalArgumentException ex) {
             return false;
         }
         return true;
@@ -182,7 +181,7 @@ public class DOIIdentifierProvider
         String doi = mint(context, dso);
         // register tries to reserve doi if it's not already.
         // So we don't have to reserve it here.
-        this.register(context, dso, doi);
+        register(context, dso, doi);
         return doi;
     }
 
@@ -229,18 +228,18 @@ public class DOIIdentifierProvider
 
     /**
      * @param context
+     *     The relevant DSpace Context.
      * @param dso DSpaceObject the DOI should be reserved for. Some metadata of
-     *            this object will be send to the registration agency.
+     *     this object will be send to the registration agency.
      * @param identifier DOI to register in a format that
-     *                   {@link FormatIdentifier(String)} accepts.
+     *     {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)} accepts.
      * @throws IdentifierException If the format of {@code identifier} was
-     *                             unrecognized or if it was impossible to 
-     *                             reserve the DOI (registration agency denied 
-     *                             for some reason, see logs).
+     *     unrecognized or if it was impossible to 
+     *     reserve the DOI (registration agency denied 
+     *     for some reason, see logs).
      * @throws IllegalArgumentException If {@code identifier} is a DOI already
-     *                                  registered for another DSpaceObject then
-     *                                  {@code dso}.
-     * @see IdentifierProvider.reserve(Context, DSpaceObject, String)
+     *     registered for another DSpaceObject then {@code dso}.
+     * @see org.dspace.identifier.IdentifierProvider#reserve(Context, DSpaceObject, String)
      */
     @Override
     public void reserve(Context context, DSpaceObject dso, String identifier)
@@ -347,9 +346,7 @@ public class DOIIdentifierProvider
             throws IdentifierException, IllegalArgumentException, SQLException 
     {
         String doi = doiService.formatIdentifier(identifier);
-        DOI doiRow = null;
-        
-        doiRow = loadOrCreateDOI(context, dso, doi);
+        DOI doiRow = loadOrCreateDOI(context, dso, doi);
 
         if (DELETED.equals(doiRow.getStatus()) ||
                 TO_BE_DELETED.equals(doiRow.getStatus()))
@@ -697,12 +694,13 @@ public class DOIIdentifierProvider
      
     /**
      * Returns a DSpaceObject depending on its DOI.
-     * @param context the context
+     * @param context
+     *     The relevant DSpace Context.
      * @param identifier The DOI in a format that is accepted by
-     *                   {@link formatIdentifier(String)}.
+     *     {@link org.dspace.identifier.service.DOIService#formatIdentifier(String)}.
      * @return Null if the DOI couldn't be found or the associated DSpaceObject.
-     * @throws SQLException
-     * @throws IdentifierException If {@code identifier} is null or an empty string.
+     * @throws SQLException if database error
+     * @throws DOIIdentifierException If {@code identifier} is null or an empty string.
      * @throws IllegalArgumentException If the identifier couldn't be recognized as DOI.
      */
     public DSpaceObject getObjectByDOI(Context context, String identifier)
@@ -731,10 +729,12 @@ public class DOIIdentifierProvider
      * Search the database for a DOI, using the type and id of an DSpaceObject.
      *
      * @param context
-     * @param dso DSpaceObject to find doi for. DOIs with status TO_BE_DELETED will be
-     * ignored.
+     *     The relevant DSpace Context.
+     * @param dso
+     *     DSpaceObject to find doi for. DOIs with status TO_BE_DELETED will be
+     *     ignored.
      * @return The DOI as String or null if DOI was not found.
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     public String getDOIByObject(Context context, DSpaceObject dso)
             throws SQLException
@@ -767,75 +767,106 @@ public class DOIIdentifierProvider
      * DOI is in a decent format, use DOI.formatIdentifier(String) if necessary.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso The DSpaceObject the DOI should be loaded or created for.
-     * @param doi A DOI or null if a DOI should be generated. The generated DOI
+     * @param doiIdentifier A DOI or null if a DOI should be generated. The generated DOI
      * can be found in the appropriate column for the TableRow.
      * @return The database row of the object.
      * @throws SQLException In case of an error using the database.
      * @throws DOIIdentifierException If {@code doi} is not part of our prefix or
      *                             DOI is registered for another object already.
      */
-    protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doi)
+    protected DOI loadOrCreateDOI(Context context, DSpaceObject dso, String doiIdentifier)
             throws SQLException, DOIIdentifierException
     {
-        DOI doiRow = null;
-        if (null != doi)
+        DOI doi = null;
+        if (null != doiIdentifier)
         {
             // we expect DOIs to have the DOI-Scheme except inside the doi table:
-            doi = doi.substring(DOI.SCHEME.length());
+            doiIdentifier = doiIdentifier.substring(DOI.SCHEME.length());
             
             // check if DOI is already in Database
-            doiRow = doiService.findByDoi(context, doi);
-            if (null != doiRow)
+            doi = doiService.findByDoi(context, doiIdentifier);
+            if (null != doi)
             {
-                // check if DOI already belongs to dso
-                if (ObjectUtils.equals(doiRow.getDSpaceObject(), dso))
+                if (doi.getDSpaceObject() == null)
                 {
-                    return doiRow;
-                }
-                else
-                {
-                    throw new DOIIdentifierException("Trying to create a DOI " +
-                            "that is already reserved for another object.",
-                            DOIIdentifierException.DOI_ALREADY_EXISTS);
+                    // doi was deleted, check resource type
+                    if (doi.getResourceTypeId() != null
+                            && doi.getResourceTypeId() != dso.getType())
+                    {
+                        // doi was assigend to another resource type. Don't
+                        // reactivate it
+                        throw new DOIIdentifierException("Cannot reassing "
+                                + "previously deleted DOI " + doiIdentifier 
+                                + " as the resource types of the object it was "
+                                + "previously assigned to and the object it "
+                                + "shall be assigned to now divert (was: "
+                                + Constants.typeText[doi.getResourceTypeId()]
+                                + ", trying to assign to "
+                                + Constants.typeText[dso.getType()] + ").", 
+                                DOIIdentifierException.DOI_IS_DELETED);
+                    } else {
+                        // reassign doi
+                        // nothing to do here, doi will br reassigned after this
+                        // if-else-if-else-...-block
+                    }
+                } else {
+                    // doi is assigned to a DSO; is it assigned to our specific dso?
+                    // check if DOI already belongs to dso
+                    if (dso.getID().equals(doi.getDSpaceObject().getID()))
+                    {
+                        return doi;
+                    }
+                    else
+                    {
+                        throw new DOIIdentifierException("Trying to create a DOI " +
+                                "that is already reserved for another object.",
+                                DOIIdentifierException.DOI_ALREADY_EXISTS);
+                    }
                 }
             }
 
             // check prefix
-            if (!doi.startsWith(this.getPrefix() + "/"))
+            if (!doiIdentifier.startsWith(this.getPrefix() + "/"))
             {
                 throw new DOIIdentifierException("Trying to create a DOI " +
                         "that's not part of our Namespace!",
                         DOIIdentifierException.FOREIGN_DOI);
             }
-            // prepare new doiRow
-            doiRow = doiService.create(context);
+            if (doi == null)
+            {
+                // prepare new doiRow
+                doi = doiService.create(context);
+            }
         }
         else
         {
             // We need to generate a new DOI.
-            doiRow = doiService.create(context);
-
-            doi = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
-                    doiRow.getId();
+            doi = doiService.create(context);
+            doiIdentifier = this.getPrefix() + "/" + this.getNamespaceSeparator() + 
+                    doi.getID();
         }
 
-        doiRow.setDoi(doi);
-        doiRow.setDSpaceObject(dso);
-        doiRow.setStatus(null);
+        // prepare new doiRow
+        doi.setDoi(doiIdentifier);
+        doi.setDSpaceObject(dso);
+        doi.setStatus(null);
         try {
-            doiService.update(context, doiRow);
+            doiService.update(context, doi);
         } catch (SQLException e) {
             throw new RuntimeException("Cannot save DOI to databse for unkown reason.");
         }
 
-        return doiRow;
+        return doi;
     }
     
     /**
      * Loads a DOI out of the metadata of an DSpaceObject.
      * @param dso
+     *     DSpace object to get DOI metadata from
      * @return The DOI or null if no DOI was found.
+     * @throws DOIIdentifierException if identifier error
      */
     public String getDOIOutOfObject(DSpaceObject dso)
             throws DOIIdentifierException {
@@ -850,7 +881,7 @@ public class DOIIdentifierProvider
         List<MetadataValue> metadata = itemService.getMetadata(item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         for (MetadataValue id : metadata)
         {
-            if (id.getValue().startsWith(DOI.RESOLVER + "/10.")) {
+            if (id.getValue().startsWith(DOI.RESOLVER + String.valueOf(SLASH) + PREFIX + String.valueOf(SLASH) + NAMESPACE_SEPARATOR)) {
                 return doiService.DOIFromExternalFormat(id.getValue());
             }
         }
@@ -861,10 +892,12 @@ public class DOIIdentifierProvider
      * Adds a DOI to the metadata of an item.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso DSpaceObject the DOI should be added to.
      * @param doi The DOI that should be added as metadata.
-     * @throws SQLException
-     * @throws AuthorizeException 
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IdentifierException if identifier error
      */
     protected void saveDOIToObject(Context context, DSpaceObject dso, String doi)
             throws SQLException, AuthorizeException, IdentifierException
@@ -892,10 +925,12 @@ public class DOIIdentifierProvider
      * Removes a DOI out of the metadata of a DSpaceObject.
      * 
      * @param context
+     *     The relevant DSpace Context.
      * @param dso The DSpaceObject the DOI should be removed from.
      * @param doi The DOI to remove out of the metadata.
-     * @throws AuthorizeException
-     * @throws SQLException 
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
+     * @throws IdentifierException if identifier error
      */
     protected void removeDOIFromObject(Context context, DSpaceObject dso, String doi)
             throws AuthorizeException, SQLException, IdentifierException
@@ -922,12 +957,6 @@ public class DOIIdentifierProvider
         itemService.clearMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null);
         itemService.addMetadata(context, item, MD_SCHEMA, DOI_ELEMENT, DOI_QUALIFIER, null,
                 remainder);
-        try {
-            itemService.update(context, item);
-        } catch (SQLException e) {
-            throw e;
-        } catch (AuthorizeException e) {
-            throw e;
-        }
+        itemService.update(context, item);
     }
 }

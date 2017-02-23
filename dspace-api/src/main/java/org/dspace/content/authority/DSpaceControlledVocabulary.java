@@ -31,24 +31,27 @@ import org.dspace.services.ConfigurationService;
 
 /**
  * ChoiceAuthority source that reads the JSPUI-style hierarchical vocabularies
- * from ${dspace.dir}/config/controlled-vocabularies/*.xml and turns them into
+ * from {@code ${dspace.dir}/config/controlled-vocabularies/*.xml} and turns them into
  * autocompleting authorities.
  *
  * Configuration:
  *   This MUST be configured as a self-named plugin, e.g.:
+ *   {@code
  *     plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
  *        org.dspace.content.authority.DSpaceControlledVocabulary
+ *   }
  *
  * It AUTOMATICALLY configures a plugin instance for each XML file in the
  * controlled vocabularies directory. The name of the plugin is the basename
- * of the file; e.g., "${dspace.dir}/config/controlled-vocabularies/nsi.xml"
+ * of the file; e.g., {@code ${dspace.dir}/config/controlled-vocabularies/nsi.xml}
  * would generate a plugin called "nsi".
  *
  * Each configured plugin comes with three configuration options:
+ *  {@code
  *   vocabulary.plugin._plugin_.hierarchy.store = <true|false>    # Store entire hierarchy along with selected value. Default: TRUE
  *   vocabulary.plugin._plugin_.hierarchy.suggest = <true|false>  # Display entire hierarchy in the suggestion list.  Default: TRUE
  *   vocabulary.plugin._plugin_.delimiter = "<string>"              # Delimiter to use when building hierarchy strings. Default: "::"
- *
+ *  }
  *
  * @author Michael B. Klein
  *

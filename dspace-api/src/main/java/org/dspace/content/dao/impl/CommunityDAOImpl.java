@@ -43,10 +43,11 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
      * Get a list of all communities in the system. These are alphabetically
      * sorted by community name.
      *
-     * @param context
-     *            DSpace context object
+     * @param context DSpace context object
+     * @param sortField sort field
      *
      * @return the communities in the system
+     * @throws SQLException if database error
      */
     @Override
     public List<Community> findAll(Context context, MetadataField sortField) throws SQLException
@@ -69,7 +70,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         if(limit != null){
             query.setMaxResults(limit);
         }
-        query.setParameter(sortField.toString(), sortField.getFieldID());
+        query.setParameter(sortField.toString(), sortField.getID());
         return list(query);
     }
 
@@ -89,7 +90,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         addMetadataSortQuery(queryBuilder, Arrays.asList(sortField), ListUtils.EMPTY_LIST);
 
         Query query = createQuery(context, queryBuilder.toString());
-        query.setParameter(sortField.toString(), sortField.getFieldID());
+        query.setParameter(sortField.toString(), sortField.getID());
 
         return findMany(context, query);
     }

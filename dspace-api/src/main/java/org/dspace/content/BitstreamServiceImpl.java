@@ -144,8 +144,9 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
      * @param assetstore corresponds to an assetstore in dspace.cfg
      * @param bitstreamPath the path and filename relative to the assetstore
      * @return  the newly registered bitstream
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public Bitstream register(Context context,
@@ -238,7 +239,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public void delete(Context context, Bitstream bitstream) throws SQLException, AuthorizeException {
 
-        // changed to a check on remove
+        // changed to a check on delete
         // Check authorisation
         authorizeService.authorizeAction(context, bitstream, Constants.DELETE);
         log.info(LogManager.getHeader(context, "delete_bitstream",
@@ -247,17 +248,21 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         context.addEvent(new Event(Event.DELETE, Constants.BITSTREAM, bitstream.getID(),
                 String.valueOf(bitstream.getSequenceID()), getIdentifiers(context, bitstream)));
 
-        bitstream.getBundles().clear();
-
-
-        // Remove policies
-        authorizeService.removeAllPolicies(context, bitstream);
-
-        deleteMetadata(context, bitstream);
+        //Remove our bitstream from all our bundles
+        final List<Bundle> bundles = bitstream.getBundles();
+        for (Bundle bundle : bundles) {
+            bundle.getBitstreams().remove(bitstream);
+        }
 
         // Remove bitstream itself
         bitstream.setDeleted(true);
         update(context, bitstream);
+
+        // Remove policies only after the bitstream has been updated (otherwise the current user has not WRITE rights)
+        authorizeService.removeAllPolicies(context, bitstream);
+
+        //Remove all bundles from the bitstream object, clearing the connection in 2 ways
+        bundles.clear();
     }
 
     @Override

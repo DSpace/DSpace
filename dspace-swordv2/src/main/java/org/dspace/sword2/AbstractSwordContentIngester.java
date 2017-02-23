@@ -27,14 +27,14 @@ import java.util.StringTokenizer;
 public abstract class AbstractSwordContentIngester
         implements SwordContentIngester
 {
-    public static final Logger log = Logger
-            .getLogger(AbstractSwordContentIngester.class);
+    public static final Logger log = Logger.getLogger(
+        AbstractSwordContentIngester.class);
 
-    protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory
-            .getInstance().getBitstreamFormatService();
+    protected BitstreamFormatService bitstreamFormatService =
+        ContentServiceFactory.getInstance().getBitstreamFormatService();
 
-    protected ItemService itemService = ContentServiceFactory.getInstance()
-            .getItemService();
+    protected ItemService itemService =
+        ContentServiceFactory.getInstance().getItemService();
 
     public DepositResult ingest(Context context, Deposit deposit,
             DSpaceObject dso, VerboseDescription verboseDescription)
@@ -53,12 +53,12 @@ public abstract class AbstractSwordContentIngester
         if (dso instanceof Collection)
         {
             return this.ingestToCollection(context, deposit, (Collection) dso,
-                    verboseDescription, result);
+                verboseDescription, result);
         }
         else if (dso instanceof Item)
         {
             return this.ingestToItem(context, deposit, (Item) dso,
-                    verboseDescription, result);
+                verboseDescription, result);
         }
         return null;
     }
@@ -110,31 +110,35 @@ public abstract class AbstractSwordContentIngester
      * the field in which to store this metadata in the configuration
      * sword.updated.field
      *
-     *
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     target item
+     * @param verboseDescription
+     *     The description.
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     protected void setUpdatedDate(Context context, Item item,
             VerboseDescription verboseDescription)
             throws DSpaceSwordException
     {
         String field = ConfigurationManager
-                .getProperty("swordv2-server", "updated.field");
+            .getProperty("swordv2-server", "updated.field");
         if (field == null || "".equals(field))
         {
             throw new DSpaceSwordException(
-                    "No configuration, or configuration is invalid for: sword.updated.field");
+                "No configuration, or configuration is invalid for: sword.updated.field");
         }
 
         MetadataFieldInfo info = this.configToDC(field, null);
         try
         {
             itemService.clearMetadata(context, item, info.schema, info.element,
-                    info.qualifier, Item.ANY);
+                info.qualifier, Item.ANY);
             DCDate date = new DCDate(new Date());
             itemService.addMetadata(context, item, info.schema, info.element,
-                    info.qualifier, null, date.toString());
+                info.qualifier, null, date.toString());
         }
         catch (SQLException e)
         {
@@ -142,8 +146,8 @@ public abstract class AbstractSwordContentIngester
             throw new DSpaceSwordException(e);
         }
 
-        verboseDescription
-                .append("Updated date added to response from item metadata where available");
+        verboseDescription.append(
+            "Updated date added to response from item metadata where available");
     }
 
     /**
@@ -152,11 +156,16 @@ public abstract class AbstractSwordContentIngester
      * field in which to store this metadata in the configuration
      * sword.slug.field
      *
-     *
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     target item
      * @param slugVal
+     *     slug value
+     * @param verboseDescription
+     *     The description.
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     protected void setSlug(Context context, Item item, String slugVal,
             VerboseDescription verboseDescription)
@@ -169,20 +178,20 @@ public abstract class AbstractSwordContentIngester
         }
 
         String field = ConfigurationManager
-                .getProperty("swordv2-server", "slug.field");
+            .getProperty("swordv2-server", "slug.field");
         if (field == null || "".equals(field))
         {
             throw new DSpaceSwordException(
-                    "No configuration, or configuration is invalid for: sword.slug.field");
+                "No configuration, or configuration is invalid for: sword.slug.field");
         }
 
         MetadataFieldInfo info = this.configToDC(field, null);
         try
         {
             itemService.clearMetadata(context, item, info.schema, info.element,
-                    info.qualifier, Item.ANY);
+                info.qualifier, Item.ANY);
             itemService.addMetadata(context, item, info.schema, info.element,
-                    info.qualifier, null, slugVal);
+                info.qualifier, null, slugVal);
         }
         catch (SQLException e)
         {

@@ -48,17 +48,23 @@ public class SubscribeCLITool {
      * Process subscriptions. This must be invoked only once a day. Messages are
      * only sent out when a collection has actually received new items, so that
      * people's mailboxes are not clogged with many "no new items" mails.
-     * <p/>
+     * <p>
      * Yesterday's newly available items are included. If this is run at for
      * example midday, any items that have been made available during the
      * current day will not be included, but will be included in the next day's
      * run.
-     * <p/>
+     * <p>
      * For example, if today's date is 2002-10-10 (in UTC) items made available
      * during 2002-10-09 (UTC) will be included.
      *
-     * @param context DSpace context object
+     * @param context
+     *     The relevant DSpace Context.
      * @param test
+     *     If true, do a "dry run", i.e. don't actually send email, just log the attempt
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
     public static void processDaily(Context context, boolean test) throws SQLException,
             IOException {
@@ -115,6 +121,13 @@ public class SubscribeCLITool {
      * @param eperson     eperson to send to
      * @param collections List of collection IDs (Integers)
      * @param test
+     *     If true, do a "dry run", i.e. don't actually send email, just log the attempt
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws MessagingException
+     *     A general class of exceptions for sending email.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public static void sendEmail(Context context, EPerson eperson,
                                  List<Collection> collections, boolean test) throws IOException, MessagingException,
@@ -245,7 +258,7 @@ public class SubscribeCLITool {
     /**
      * Method for invoking subscriptions via the command line
      *
-     * @param argv command-line arguments, none used yet
+     * @param argv the command line arguments given
      */
     public static void main(String[] argv) {
         String usage = "org.dspace.eperson.Subscribe [-t] or nothing to send out subscriptions.";

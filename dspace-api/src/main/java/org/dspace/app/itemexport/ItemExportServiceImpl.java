@@ -57,8 +57,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * core in RDF schema / contents - text file, listing one file per line / file1
  * - files contained in the item / file2 / ...
  * <P>
- * issues -doesn't handle special characters in metadata (needs to turn &'s into
- * &amp;, etc.)
+ * issues -doesn't handle special characters in metadata (needs to turn {@code &'s} into
+ * {@code &amp;}, etc.)
  * <P>
  * Modified by David Little, UCSD Libraries 12/21/04 to allow the registration
  * of files (bitstreams) into DSpace.
@@ -180,10 +180,11 @@ public class ItemExportServiceImpl implements ItemExportService
      * Discover the different schemas in use and output a separate metadata XML
      * file for each schema.
      *
-     * @param c
-     * @param i
-     * @param destDir
-     * @throws Exception
+     * @param c DSpace context
+     * @param i DSpace Item
+     * @param destDir destination directory
+     * @param migrate Whether to use the migrate option or not
+     * @throws Exception if error
      */
     protected void writeMetadata(Context c, Item i, File destDir, boolean migrate)
             throws Exception
@@ -202,7 +203,15 @@ public class ItemExportServiceImpl implements ItemExportService
         }
     }
 
-    // output the item's dublin core into the item directory
+    /**
+     * output the item's dublin core into the item directory
+     * @param c DSpace context
+     * @param schema schema
+     * @param i DSpace Item
+     * @param destDir destination directory
+     * @param migrate Whether to use the migrate option or not
+     * @throws Exception if error
+     */
     protected void writeMetadata(Context c, String schema, Item i,
             File destDir, boolean migrate) throws Exception
     {
@@ -318,7 +327,13 @@ public class ItemExportServiceImpl implements ItemExportService
         }
     }
 
-    // create the file 'handle' which contains the handle assigned to the item
+    /**
+     * create the file 'handle' which contains the handle assigned to the item
+     * @param c DSpace Context
+     * @param i DSpace Item
+     * @param destDir destination directory
+     * @throws Exception if error
+     */
     protected void writeHandle(Context c, Item i, File destDir)
             throws Exception
     {
@@ -358,7 +373,9 @@ public class ItemExportServiceImpl implements ItemExportService
      *            the item being exported
      * @param destDir
      *            the item's export directory
-     * @throws Exception
+     * @param excludeBitstreams
+     *             whether to exclude bitstreams
+     * @throws Exception if error
      *             if there is any problem writing to the export directory
      */
     protected void writeBitstreams(Context c, Item i, File destDir,
@@ -531,7 +548,8 @@ public class ItemExportServiceImpl implements ItemExportService
      *            - the dspace context
      * @param additionalEmail
      *            - email address to cc in addition the the current user email
-     * @throws Exception
+     * @param toMigrate Whether to use the migrate option or not
+     * @throws Exception if error
      */
     protected void processDownloadableExport(List<DSpaceObject> dsObjects,
             Context context, final String additionalEmail, boolean toMigrate) throws Exception
@@ -808,7 +826,7 @@ public class ItemExportServiceImpl implements ItemExportService
                     "A dspace.cfg entry for 'org.dspace.app.itemexport.download.dir' does not exist.");
         }
         File result = new File(downloadDir + System.getProperty("file.separator") + ePerson.getID());
-        if(!result.exists())
+        if(!result.exists() && ePerson.getLegacyId()!=null)
         {
             //Check for the old identifier
             result = new File(downloadDir + System.getProperty("file.separator") + ePerson.getLegacyId());
@@ -868,6 +886,13 @@ public class ItemExportServiceImpl implements ItemExportService
         return file.length();
     }
 
+    /**
+     * Attempt to find an EPerson based on string ID
+     * @param context DSpace context
+     * @param strID string identifier
+     * @return EPerson object (if found)
+     * @throws SQLException if database error
+     */
     protected EPerson getEPersonFromString(Context context, String strID) throws SQLException {
         EPerson eperson;
         try{
@@ -1105,6 +1130,14 @@ public class ItemExportServiceImpl implements ItemExportService
         }
     }
 
+    /**
+     * 
+     * @param cpFile file
+     * @param strSource source location
+     * @param strTarget target location
+     * @param cpZipOutputStream current zip outputstream
+     * @throws Exception if error
+     */
     protected void zipFiles(File cpFile, String strSource,
             String strTarget, ZipOutputStream cpZipOutputStream)
             throws Exception
@@ -1158,6 +1191,11 @@ public class ItemExportServiceImpl implements ItemExportService
         }
     }
 
+    /**
+     * Delete a directory
+     * @param path directory path
+     * @return true if successful, false otherwise
+     */
     protected boolean deleteDirectory(File path)
     {
         if (path.exists())

@@ -29,9 +29,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -48,7 +46,6 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.submit.AbstractProcessingStep
  * 
  * @author Tim Donohue
- * @version $Revision$
  */
 public class UploadStep extends AbstractProcessingStep
 {
@@ -96,10 +93,10 @@ public class UploadStep extends AbstractProcessingStep
     public static final int STATUS_EDIT_COMPLETE = 25;
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(UploadStep.class);
+    private static final Logger log = Logger.getLogger(UploadStep.class);
 
     /** is the upload required? */
-    protected boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+    protected boolean fileRequired = configurationService.getBooleanProperty("webui.submit.upload.required", true);
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
 
@@ -115,16 +112,25 @@ public class UploadStep extends AbstractProcessingStep
      * it should perform *all* of its processing in this method!
      * 
      * @param context
-     *            current DSpace context
+     *     The relevant DSpace Context.
      * @param request
-     *            current servlet request object
+     *     Servlet's HTTP request object.
      * @param response
-     *            current servlet response object
+     *     Servlet's HTTP response object.
      * @param subInfo
-     *            submission info object
+     *     submission info object
      * @return Status or error flag which will be processed by
-     *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
+     *     doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
+     *     no errors occurred!)
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     public int doProcessing(Context context, HttpServletRequest request,
@@ -161,7 +167,7 @@ public class UploadStep extends AbstractProcessingStep
         // if user pressed jump-to button in process bar,
         // return success (so that jump will occur)
         if (buttonPressed.startsWith(PROGRESS_BAR_PREFIX) || 
-        		buttonPressed.startsWith(PREVIOUS_BUTTON))
+                buttonPressed.startsWith(PREVIOUS_BUTTON))
         {
             // check if a file is required to be uploaded
             if (fileRequired && !itemService.hasUploadedFiles(item))
@@ -351,9 +357,9 @@ public class UploadStep extends AbstractProcessingStep
             List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
             if (bundles.size() > 0)
             {
-            	bundles.get(0).setPrimaryBitstreamID(bitstreamService.find(context, Util.getUUIDParameter(request,
+                bundles.get(0).setPrimaryBitstreamID(bitstreamService.find(context, Util.getUUIDParameter(request,
                         "primary_bitstream_id")));
-            	bundleService.update(context, bundles.get(0));
+                bundleService.update(context, bundles.get(0));
             }
         }
 
@@ -389,11 +395,12 @@ public class UploadStep extends AbstractProcessingStep
      * once!
      * 
      * @param request
-     *            The HTTP Request
+     *     Servlet's HTTP request object.
      * @param subInfo
-     *            The current submission information object
-     * 
+     *     The current submission information object
      * @return the number of pages in this step
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     @Override
     public int getNumberOfPages(HttpServletRequest request,
@@ -414,14 +421,21 @@ public class UploadStep extends AbstractProcessingStep
      * Remove a file from an item
      * 
      * @param context
-     *            current DSpace context
+     *     The relevant DSpace Context.
      * @param item
-     *            Item where file should be removed from
+     *     Item where file should be removed from
      * @param bitstreamID
-     *            The id of bitstream representing the file to remove
+     *     The id of bitstream representing the file to remove
      * @return Status or error flag which will be processed by
-     *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
+     *     UI-related code! (if STATUS_COMPLETE or 0 is returned,
+     *     no errors occurred!)
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected int processRemoveFile(Context context, Item item, UUID bitstreamID)
             throws IOException, SQLException, AuthorizeException
@@ -469,17 +483,25 @@ public class UploadStep extends AbstractProcessingStep
      * Process the upload of a new file!
      * 
      * @param context
-     *            current DSpace context
+     *     The relevant DSpace Context.
      * @param request
-     *            current servlet request object
+     *     Servlet's HTTP request object.
      * @param response
-     *            current servlet response object
+     *     Servlet's HTTP response object.
      * @param subInfo
-     *            submission info object
-     * 
+     *     submission info object
      * @return Status or error flag which will be processed by
-     *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
+     *     UI-related code! (if STATUS_COMPLETE or 0 is returned,
+     *     no errors occurred!)
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public int processUploadFile(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
@@ -587,10 +609,10 @@ public class UploadStep extends AbstractProcessingStep
                 }
 
                 // Check for virus
-                if (ConfigurationManager.getBooleanProperty("submission-curation", "virus-scan"))
+                if (configurationService.getBooleanProperty("submission-curation.virus-scan"))
                 {
                     Curator curator = new Curator();
-                    curator.addTask("vscan").curate(item);
+                    curator.addTask("vscan").curate(context, item);
                     int status = curator.getStatus("vscan");
                     if (status == Curator.CURATE_ERROR)
                     {
@@ -628,24 +650,30 @@ public class UploadStep extends AbstractProcessingStep
     }
 
     /*
-      If we created a new Bitstream but now realised there is a problem then remove it.
+     * If we created a new Bitstream but now realise there is a problem then remove it.
      */
-    protected void backoutBitstream(Context context, SubmissionInfo subInfo, Bitstream b, Item item) throws SQLException, AuthorizeException, IOException
+    protected void backoutBitstream(Context context, SubmissionInfo subInfo, Bitstream b, Item item)
+            throws SQLException, AuthorizeException, IOException
     {
         // remove bitstream from bundle..
-        // delete bundle if it's now empty
         List<Bundle> bundles = b.getBundles();
+        if (bundles.isEmpty())
+            throw new SQLException("Bitstream is not in any Bundles.");
 
-        bundleService.removeBitstream(context, bundles.get(0), b);
+        Bundle firstBundle = bundles.get(0);
 
-        List<Bitstream> bitstreams = bundles.get(0).getBitstreams();
+        bundleService.removeBitstream(context, firstBundle, b);
+
+        List<Bitstream> bitstreams = firstBundle.getBitstreams();
 
         // remove bundle if it's now empty
-        if (bitstreams.size() < 1)
+        if (bitstreams.isEmpty())
         {
-            itemService.removeBundle(context, item, bundles.get(0));
+            itemService.removeBundle(context, item, firstBundle);
             itemService.update(context, item);
         }
+        else
+            bundleService.update(context, firstBundle);
 
         subInfo.setBitstream(null);
     }
@@ -665,6 +693,15 @@ public class UploadStep extends AbstractProcessingStep
      * @return Status or error flag which will be processed by
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected int processSaveFileFormat(Context context,
             HttpServletRequest request, HttpServletResponse response,
@@ -704,17 +741,25 @@ public class UploadStep extends AbstractProcessingStep
      * Process input from the "change file description" page
      * 
      * @param context
-     *            current DSpace context
+     *     The relevant DSpace Context.
      * @param request
-     *            current servlet request object
+     *     Servlet's HTTP request object.
      * @param response
-     *            current servlet response object
+     *     Servlet's HTTP response object.
      * @param subInfo
-     *            submission info object
-     * 
+     *     submission info object
      * @return Status or error flag which will be processed by
-     *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
-     *         no errors occurred!)
+     *     UI-related code! (if STATUS_COMPLETE or 0 is returned,
+     *     no errors occurred!)
+     * @throws ServletException
+     *     A general exception a servlet can throw when it encounters difficulty.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     protected int processSaveFileDescription(Context context,
             HttpServletRequest request, HttpServletResponse response,

@@ -56,12 +56,11 @@ public class LicenseCleanup
 
     static
     {
-
         try
         {
             templates = TransformerFactory.newInstance().newTemplates(
-                    new StreamSource(CreativeCommonsServiceImpl.class
-                            .getResourceAsStream("LicenseCleanup.xsl")));
+                new StreamSource(CreativeCommonsServiceImpl.class
+                    .getResourceAsStream("LicenseCleanup.xsl")));
         }
         catch (TransformerConfigurationException e)
         {
@@ -71,17 +70,17 @@ public class LicenseCleanup
     }
 
     /**
-     * @param args
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @param args the command line arguments given
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     public static void main(String[] args) throws SQLException,
             AuthorizeException, IOException
     {
 
         Context ctx = new Context();
-        ctx.setIgnoreAuthorization(true);
+        ctx.turnOffAuthorisationSystem();
         Iterator<Item> iter = itemService.findAll(ctx);
 
         Properties props = new Properties();
@@ -116,9 +115,7 @@ public class LicenseCleanup
 
                 props.put("I" + item.getID(), "done");
                 i++;
-
             }
-
         }
         finally
         {
@@ -126,15 +123,18 @@ public class LicenseCleanup
                     .store(new FileOutputStream(processed),
                             "processed license files, remove to restart processing from scratch");
         }
-
     }
 
     /**
      * Process Item, correcting CC-License if encountered.
+     *
+     * @param context
+     *     The relevant DSpace Context.
      * @param item
-     * @throws SQLException
-     * @throws AuthorizeException
-     * @throws IOException
+     *     The item to process
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     * @throws IOException if IO error
      */
     protected static void handleItem(Context context, Item item) throws SQLException,
             AuthorizeException, IOException
@@ -161,8 +161,8 @@ public class LicenseCleanup
         try
         {
             templates.newTransformer().transform(
-                    new StreamSource(new ByteArrayInputStream(license_rdf
-                            .getBytes())), new StreamResult(result));
+                new StreamSource(new ByteArrayInputStream(license_rdf.getBytes())),
+                new StreamResult(result));
         }
         catch (TransformerException e)
         {
@@ -186,7 +186,6 @@ public class LicenseCleanup
         bundleService.removeBitstream(context, bundle, bitstream);
 
         bundleService.update(context, bundle);
-
     }
 
     static final int BUFF_SIZE = 100000;
@@ -196,14 +195,16 @@ public class LicenseCleanup
     /**
      * Fast stream copy routine
      * 
+     * @param context
+     *     The relevant DSpace Context.
      * @param b the Bitstream to be copied.
      * @return copy of the content of {@code b}.
-     * @throws IOException
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
-    public static byte[] copy(Context context, Bitstream b) throws IOException, SQLException,
-            AuthorizeException
+    public static byte[] copy(Context context, Bitstream b)
+        throws IOException, SQLException, AuthorizeException
     {
         InputStream in = null;
         ByteArrayOutputStream out = null;

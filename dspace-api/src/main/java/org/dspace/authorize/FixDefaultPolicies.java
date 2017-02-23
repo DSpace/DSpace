@@ -34,13 +34,16 @@ public class FixDefaultPolicies
 {
     /**
      * Command line interface to setPolicies - run to see arguments
+     *
+     * @param argv the command line arguments given
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {
         Context c = new Context();
 
         // turn off authorization
-        c.setIgnoreAuthorization(true);
+        c.turnOffAuthorisationSystem();
 
         //////////////////////
         // carnage begins here

@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
 
     protected String emailMetadata;
-    protected String fullNameMatadata;
+    protected String fullNameMetadata;
 
     @Autowired(required = true)
     protected ItemService itemService;
@@ -46,9 +46,9 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
 			{
 				String email = vals.iterator().next().getValue();
 				String fullname = null;
-				if (fullNameMatadata != null)
+				if (fullNameMetadata != null)
 				{
-                    List<MetadataValue> nameVals = itemService.getMetadataByMetadataString(item, fullNameMatadata);
+                    List<MetadataValue> nameVals = itemService.getMetadataByMetadataString(item, fullNameMetadata);
 					if (nameVals.size() > 0)
 					{
 						fullname = nameVals.iterator().next().getValue();
@@ -74,8 +74,8 @@ public class RequestItemMetadataStrategy extends RequestItemSubmitterStrategy {
 		this.emailMetadata = emailMetadata;
 	}
 
-	public void setFullNameMatadata(String fullNameMatadata) {
-		this.fullNameMatadata = fullNameMatadata;
+	public void setFullNameMetadata(String fullNameMetadata) {
+		this.fullNameMetadata = fullNameMetadata;
 	}
 
 }

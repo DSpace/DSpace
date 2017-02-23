@@ -34,8 +34,11 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
      *
      * @param context
      *            DSpace context object
-     *
+     * @param item DSpace item
+     * @param name bundle name
      * @return the newly created bundle
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
      */
     public Bundle create(Context context, Item item, String name) throws SQLException, AuthorizeException;
 
@@ -44,8 +47,12 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
     /**
      * Add an existing bitstream to this bundle
      *
+     * @param context DSpace Context
+     * @param bundle the bitstream bundle
      * @param bitstream
      *            the bitstream to add
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
      */
     public void addBitstream(Context context, Bundle bundle, Bitstream bitstream)
             throws SQLException, AuthorizeException;
@@ -60,8 +67,13 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
      * bitstream from the foreign key constraint so that the
      * <code>cleanup</code> process can run normally.
      *
+     * @param context DSpace Context
+     * @param bundle the bitstream bundle
      * @param bitstream
      *            the bitstream to remove
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
+     * @throws SQLException if database error
      */
     public void removeBitstream(Context context, Bundle bundle, Bitstream bitstream) throws AuthorizeException,
             SQLException, IOException;
@@ -71,12 +83,14 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
      * remove all policies on the bundle and its contents, and replace them with
      * the DEFAULT_BITSTREAM_READ policies belonging to the collection.
      *
+     * @param context DSpace Context
+     * @param bundle the bitstream bundle
      * @param collection
      *            Collection
-     * @throws java.sql.SQLException
+     * @throws SQLException
      *             if an SQL error or if no default policies found. It's a bit
      *             draconian, but default policies must be enforced.
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      */
     public void inheritCollectionDefaultPolicies(Context context, Bundle bundle, Collection collection)
             throws java.sql.SQLException, AuthorizeException;
@@ -85,11 +99,13 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
      * remove all of the policies for the bundle and bitstream contents and replace
      * them with a new list of policies
      *
+     * @param context DSpace Context
+     * @param bundle the bitstream bundle
      * @param newpolicies -
      *            this will be all of the new policies for the bundle and
      *            bitstream contents
-     * @throws SQLException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void replaceAllBitstreamPolicies(Context context, Bundle bundle, List<ResourcePolicy> newpolicies)
             throws SQLException, AuthorizeException;
@@ -100,6 +116,8 @@ public interface BundleService extends DSpaceObjectService<Bundle>, DSpaceObject
 
     /**
      * Changes bitstream order according to the array
+     * @param context DSpace Context
+     * @param bundle the bitstream bundle
      * @param bitstreamIds the identifiers in the order they are to be set
      * @throws SQLException when an SQL error has occurred (querying DSpace)
      * @throws AuthorizeException If the user can't make the changes

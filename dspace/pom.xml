@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>6.0-SNAPSHOT</version>
+        <version>7.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -157,7 +157,34 @@
             <artifactId>dspace-oai</artifactId>
             <type>jar</type>
             <classifier>classes</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.lyncode</groupId>
+                    <artifactId>builder-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
     	</dependency>
+        <dependency>
+            <groupId>com.lyncode</groupId>
+            <artifactId>builder-commons</artifactId>
+            <version>1.0.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+
         <!-- The Servlet API is also needed by the 'dspace oai' launcher.xml
              command. -->
     	<dependency>

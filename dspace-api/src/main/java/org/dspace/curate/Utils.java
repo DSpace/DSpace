@@ -39,7 +39,7 @@ public class Utils
      * @return checksum
      *        string of the calculated checksum
      *        
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public static String checksum(File file, String algorithm) throws IOException
     {
@@ -71,7 +71,7 @@ public class Utils
      * @return checksum
      *        string of the calculated checksum
      *        
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public static String checksum(InputStream in, String algorithm) throws IOException
     {
@@ -120,9 +120,9 @@ public class Utils
     /**
      * Performs a buffered copy from one file into another.
      * 
-     * @param inFile
-     * @param outFile
-     * @throws IOException
+     * @param inFile input file
+     * @param outFile output file
+     * @throws IOException if IO error
      */
     public static void copy(File inFile, File outFile) throws IOException
     {
@@ -156,7 +156,7 @@ public class Utils
      *        input stream
      * @param out
      *        output stream
-     * @throws IOException
+     * @throws IOException if IO error
      */
     public static void copy(InputStream in, OutputStream out) throws IOException
     {

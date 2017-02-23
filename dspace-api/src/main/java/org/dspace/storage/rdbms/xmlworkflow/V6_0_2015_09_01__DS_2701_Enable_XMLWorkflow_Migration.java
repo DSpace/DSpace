@@ -7,9 +7,10 @@
  */
 package org.dspace.storage.rdbms.xmlworkflow;
 
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.flywaydb.core.internal.util.scanner.classpath.ClassPathResource;
@@ -17,6 +18,18 @@ import org.flywaydb.core.internal.util.scanner.classpath.ClassPathResource;
 import java.sql.Connection;
 
 /**
+ * This class automatically migrates your DSpace Database to use the
+ * XML-based Configurable Workflow system whenever it is enabled.
+ * <P>
+ * Because XML-based Configurable Workflow existed prior to our migration, this
+ * class first checks for the existence of the "cwf_workflowitem" table before
+ * running any migrations.
+ * <P>
+ * This class represents a Flyway DB Java Migration
+ * http://flywaydb.org/documentation/migration/java.html
+ * <P>
+ * It can upgrade a 6.0 version of DSpace to use the XMLWorkflow.
+ * 
  * User: kevin (kevin at atmire.com)
  * Date: 1/09/15
  * Time: 11:34
@@ -29,8 +42,8 @@ public class V6_0_2015_09_01__DS_2701_Enable_XMLWorkflow_Migration implements Jd
 
     @Override
     public void migrate(Connection connection) throws Exception {
-                // Make sure XML Workflow is enabled in workflow.cfg before proceeding
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+        // Make sure XML Workflow is enabled, shouldn't even be needed since this class is only loaded if the service is enabled.
+        if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService)
         {
             // Now, check if the XMLWorkflow table (cwf_workflowitem) already exists in this database
             // If XMLWorkflow Table does NOT exist in this database, then lets do the migration!

@@ -9,6 +9,7 @@ package org.dspace.versioning;
 
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.hibernate.proxy.HibernateProxyHelper;
 
@@ -24,13 +25,13 @@ import java.util.Date;
  */
 @Entity
 @Table(name="versionitem")
-public class Version {
+public class Version implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="versionitem_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="versionitem_seq")
     @SequenceGenerator(name="versionitem_seq", sequenceName="versionitem_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
@@ -68,7 +69,7 @@ public class Version {
 
     }
 
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 
@@ -133,7 +134,7 @@ public class Version {
         }
 
         final Version that = (Version)o;
-        if (this.getId() != that.getId())
+        if (this.getID() != that.getID())
         {
             return false;
         }
@@ -144,7 +145,7 @@ public class Version {
     @Override
     public int hashCode() {
         int hash=7;
-        hash=79*hash+ this.getId();
+        hash=79*hash+ this.getID();
         return hash;
     }
 }

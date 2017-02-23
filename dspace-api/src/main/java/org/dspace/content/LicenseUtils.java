@@ -56,12 +56,16 @@ public class LicenseUtils
      * {x} any addition argument supplied wrapped in the
      * LicenseArgumentFormatter based on his type (map key)
      * 
-     * @see license.LicenseArgumentFormatter
      * @param locale
+     *     Formatter locale
      * @param collection
+     *     collection to get license from
      * @param item
+     *     the item object of the license
      * @param eperson
+     *     EPerson to get firstname, lastname and email from
      * @param additionalInfo
+     *     additional template arguments beyond 0-6
      * @return the license text obtained substituting the provided argument in
      *         the license template
      */
@@ -105,9 +109,13 @@ public class LicenseUtils
      * supplying {@code null} for the additionalInfo argument)
      *
      * @param locale
+     *     Formatter locale
      * @param collection
+     *     collection to get license from
      * @param item
+     *     the item object of the license
      * @param eperson
+     *     EPerson to get firstname, lastname and email from
      * @return the license text, with no custom substitutions.
      */
     public static String getLicenseText(Locale locale, Collection collection,
@@ -125,9 +133,9 @@ public class LicenseUtils
      *            the item object of the license
      * @param licenseText
      *            the license the user granted
-     * @throws SQLException
-     * @throws IOException
-     * @throws AuthorizeException
+     * @throws SQLException if database error
+     * @throws IOException if IO error
+     * @throws AuthorizeException if authorization error
      */
     public static void grantLicense(Context context, Item item,
             String licenseText) throws SQLException, IOException,

@@ -95,6 +95,26 @@ public class DSpaceAIPIngester
      * 3. If (1) or (2) succeeds, crosswalk it and ignore all other DMDs with
      *    same GROUPID<br>
      * 4. Crosswalk remaining DMDs not eliminated already.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param dso
+     *     DSpace object
+     * @param manifest
+     *     the METSManifest
+     * @param callback
+     *     the MdrefManager (manages all external metadata files
+     *     referenced by METS <code>mdref</code> elements)
+     * @param dmds
+     *     array of Elements, each a METS <code>dmdSec</code> that
+     *     applies to the Item as a whole.
+     * @param params
+     *     Packager Parameters
+     * @throws PackageValidationException validation error
+     * @throws CrosswalkException if crosswalk error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
@@ -193,6 +213,19 @@ public class DSpaceAIPIngester
      * license supplied by explicit argument next, else use collection's
      * default deposit license.
      * Normally the rightsMD crosswalks should provide a license.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param item
+     *     item to add license to
+     * @param collection
+     *     collection to get the default license from
+     * @param params
+     *     Packager Parameters
+     * @throws PackageValidationException validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void addLicense(Context context, Item item, String license,
@@ -202,7 +235,7 @@ public class DSpaceAIPIngester
     {
         boolean newLicense = false;
 
-        if(!params.restoreModeEnabled())
+        if (!params.restoreModeEnabled())
         {
             //AIP is not being restored/replaced, so treat it like a SIP -- every new SIP needs a new license
             newLicense = true;
@@ -216,7 +249,7 @@ public class DSpaceAIPIngester
             newLicense = true;
         }
 
-        if(newLicense)
+        if (newLicense)
         {
             PackageUtils.addDepositLicense(context, license, item, collection);
         }
@@ -224,14 +257,30 @@ public class DSpaceAIPIngester
 
     /**
      * Last change to fix up a DSpace Object.
-     * <P>
+     * <p>
      * For AIPs, if the object is an Item, we may want to make sure all of its
      * metadata fields already exist in the database (otherwise, the database
      * will throw errors when we attempt to save/update the Item)
+     * </p>
      *
-     * @param context DSpace Context
-     * @param dso DSpace object
-     * @param params Packager Parameters
+     * @param context
+     *     The relevant DSpace Context.
+     * @param dso
+     *     DSpace object
+     * @param params
+     *     Packager Parameters
+     * @throws PackageValidationException
+     *     Failure when importing or exporting a package
+     *     caused by invalid unacceptable package format or contents
+     * @throws CrosswalkException
+     *     Superclass for more-specific crosswalk exceptions.
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     @Override
     public void finishObject(Context context, DSpaceObject dso, PackageParameters params)
@@ -239,7 +288,7 @@ public class DSpaceAIPIngester
          AuthorizeException, SQLException, IOException
     {
         //Metadata fields are now required before adding, so this logic isn't needed anymore
-        /*if(dso.getType()==Constants.ITEM)
+        /*if (dso.getType()==Constants.ITEM)
         {
             // Check if 'createMetadataFields' option is enabled (default=true)
             // This defaults to true as by default we should attempt to restore as much metadata as we can.
@@ -256,6 +305,10 @@ public class DSpaceAIPIngester
 
     /**
      * Nothing extra to do to bitstream after ingestion.
+     * @throws MetadataValidationException if validation error
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public void finishBitstream(Context context,
@@ -271,6 +324,8 @@ public class DSpaceAIPIngester
     /**
      * Return the type of DSpaceObject in this package; it is
      * in the TYPE attribute of the mets:mets element.
+     * @return type
+     * @throws PackageValidationException if package validation error
      */
     @Override
     public int getObjectType(METSManifest manifest)
@@ -296,6 +351,7 @@ public class DSpaceAIPIngester
 
     /**
      * Name used to distinguish DSpace Configuration entries for this subclass.
+     * @return config name
      */
     @Override
     public String getConfigurationName()

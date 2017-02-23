@@ -94,16 +94,21 @@ public class HarvestScheduler implements Runnable
     }
 
     public static String getStatus() {
-        switch(status) {
-        case HARVESTER_STATUS_RUNNING:
-            switch(interrupt) {
-            case HARVESTER_INTERRUPT_PAUSE: return("The scheduler is finishing active harvests before pausing. ");
-            case HARVESTER_INTERRUPT_STOP: return("The scheduler is shutting down. ");
-            }
-            return("The scheduler is actively harvesting collections. ");
-        case HARVESTER_STATUS_SLEEPING: return("The scheduler is waiting for collections to harvest. ");
-        case HARVESTER_STATUS_PAUSED: return("The scheduler is paused. ");
-        default: return("Automatic harvesting is not active. ");
+        switch (status) {
+            case HARVESTER_STATUS_RUNNING:
+                switch (interrupt) {
+                    case HARVESTER_INTERRUPT_PAUSE:
+                        return("The scheduler is finishing active harvests before pausing. ");
+                    case HARVESTER_INTERRUPT_STOP:
+                        return("The scheduler is shutting down. ");
+                }
+                return("The scheduler is actively harvesting collections. ");
+            case HARVESTER_STATUS_SLEEPING:
+                return("The scheduler is waiting for collections to harvest. ");
+            case HARVESTER_STATUS_PAUSED:
+                return("The scheduler is paused. ");
+            default:
+                return("Automatic harvesting is not active. ");
         }
     }
 
@@ -146,6 +151,8 @@ public class HarvestScheduler implements Runnable
         {
             try
             {
+                mainContext = new Context();
+
                 synchronized (HarvestScheduler.class) {
                     switch (interrupt) {
                         case HARVESTER_INTERRUPT_NONE:
@@ -179,7 +186,6 @@ public class HarvestScheduler implements Runnable
                 status = HARVESTER_STATUS_RUNNING;
 
                 // Stage #1: if something is ready for harvest, push it onto the ready stack, mark it as "queued"
-                mainContext = new Context();
                 List<HarvestedCollection> cids = harvestedCollectionService.findReady(mainContext);
                 log.info("Collections ready for immediate harvest: " + cids.toString());
 
@@ -277,6 +283,18 @@ public class HarvestScheduler implements Runnable
      * for harvesting before it is "due" for another cycle. This allows starting a harvest process
      * from the UI that still "plays nice" with these thread mechanics instead of making an
      * asynchronous call to runHarvest().
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param harvestedCollection
+     *     collection to be harvested
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void addThread(Context context, HarvestedCollection harvestedCollection) throws SQLException, IOException, AuthorizeException {
         log.debug("****** Entered the addThread method. Active threads: " + harvestThreads.toString());

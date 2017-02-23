@@ -56,14 +56,26 @@ public class FilteredCollection extends DSpaceObject {
      * Evaluate a collection against of set of Item Filters
      * @param collection
      *     DSpace Collection to evaluate
+     * @param servletContext
+     *     Context of the servlet container.
      * @param filters
      *     String representing a list of filters
      * @param expand
+     *     String in which is what you want to add to returned instance
+     *     of collection. Options are: "all", "parentCommunityList",
+     *     "parentCommunity", "items", "license" and "logo". If you want
+     *     to use multiple options, it must be separated by commas.
      * @param context
+     *     The relevant DSpace Context.
      * @param limit
+     *     Limit value for items in list in collection. Default value is 100.
      * @param offset
+     *     Offset of start index in list of items of collection. Default
+     *     value is 0.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws WebApplicationException
+     *     Runtime exception for applications.
      */
     public FilteredCollection(org.dspace.content.Collection collection, ServletContext servletContext, String filters, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
         super(collection, servletContext);
@@ -72,12 +84,12 @@ public class FilteredCollection extends DSpaceObject {
 
     private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset, String filters) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
-        if(expand != null) {
+        if (expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
 
-        if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
-            List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
+        if (expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
+            List<org.dspace.content.Community> parentCommunities = communityService.getAllParents(context, collection);
             List<Community> parentCommunityList = new ArrayList<Community>();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
                 parentCommunityList.add(new Community(parentCommunity, servletContext, null, context));
@@ -87,15 +99,15 @@ public class FilteredCollection extends DSpaceObject {
             this.addExpand("parentCommunityList");
         }
 
-        if(expandFields.contains("parentCommunity") | expandFields.contains("all")) {
+        if (expandFields.contains("parentCommunity") | expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity = collection.getCommunities().get(0);
             this.setParentCommunity(new Community(parentCommunity, servletContext, null, context));
         } else {
             this.addExpand("parentCommunity");
         }
 
-        if(expandFields.contains("topCommunity") | expandFields.contains("all")) {
-            List<org.dspace.content.Community> parentCommunities = collection.getCommunities();
+        if (expandFields.contains("topCommunity") | expandFields.contains("all")) {
+            List<org.dspace.content.Community> parentCommunities = communityService.getAllParents(context, collection);
             if (parentCommunities.size() > 0) {
                 org.dspace.content.Community topCommunity = parentCommunities.get(parentCommunities.size()-1);
                 this.setTopCommunity(new Community(topCommunity, servletContext, null, context));
@@ -111,12 +123,12 @@ public class FilteredCollection extends DSpaceObject {
         
         this.setNumberItemsProcessed(0);
         if (itemFilters.size() > 0) {
-        	Iterator<org.dspace.content.Item> childItems = itemService.findByCollection(context, collection, limit, offset);
+            Iterator<org.dspace.content.Item> childItems = itemService.findByCollection(context, collection, limit, offset);
             int numProc = itemFilterSet.processSaveItems(context, servletContext, childItems, items, reportItems, expand);
             this.setNumberItemsProcessed(numProc);
         }       
         
-        if(!expandFields.contains("all")) {
+        if (!expandFields.contains("all")) {
             this.addExpand("all");
         }
         this.setNumberItems(itemService.countItems(context, collection));
@@ -155,26 +167,26 @@ public class FilteredCollection extends DSpaceObject {
 
     
     public List<Item> getItems() {
-		return items;
-	}
+        return items;
+    }
+    
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+    
+    public void setParentCommunityList(List<Community> parentCommunityList) {
+        this.parentCommunityList = parentCommunityList;
+    }
 
-	public void setItems(List<Item> items) {
-		this.items = items;
-	}
-
-	public void setParentCommunityList(List<Community> parentCommunityList) {
-		this.parentCommunityList = parentCommunityList;
-	}
-
-	public List<Community> getParentCommunityList() {
+    public List<Community> getParentCommunityList() {
         return parentCommunityList;
     }
 
-	public List<ItemFilter> getItemFilters() {
-	    return itemFilters;
-	}
-	
-	public void setItemFilters(List<ItemFilter> itemFilters) {
-	    this.itemFilters = itemFilters;
-	}
+    public List<ItemFilter> getItemFilters() {
+        return itemFilters;
+    }
+
+    public void setItemFilters(List<ItemFilter> itemFilters) {
+        this.itemFilters = itemFilters;
+    }
 }

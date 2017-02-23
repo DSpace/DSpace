@@ -22,17 +22,18 @@ import java.util.List;
  * Public interface to the embargo subsystem.
  * <p>
  * Configuration properties: (with examples)
- *   <br/># DC metadata field to hold the user-supplied embargo terms
- *   <br/>embargo.field.terms = dc.embargo.terms
- *   <br/># DC metadata field to hold computed "lift date" of embargo
- *   <br/>embargo.field.lift = dc.date.available
- *   <br/># String to indicate indefinite (forever) embargo in terms
- *   <br/>embargo.terms.open = Indefinite
- *   <br/># implementation of embargo setter plugin
- *   <br/>plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
- *   <br/># implementation of embargo lifter plugin
- *   <br/>plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
- *
+ * {@code
+ *   # DC metadata field to hold the user-supplied embargo terms
+ *   embargo.field.terms = dc.embargo.terms
+ *   # DC metadata field to hold computed "lift date" of embargo
+ *   embargo.field.lift = dc.date.available
+ *   # String to indicate indefinite (forever) embargo in terms
+ *   embargo.terms.open = Indefinite
+ *   # implementation of embargo setter plugin
+ *   plugin.single.org.dspace.embargo.EmbargoSetter = edu.my.Setter
+ *   # implementation of embargo lifter plugin
+ *   plugin.single.org.dspace.embargo.EmbargoLifter = edu.my.Lifter
+ * }
  * @author Larry Stone
  * @author Richard Rodgers
  */
@@ -50,6 +51,11 @@ public interface EmbargoService {
      *
      * @param context the DSpace context
      * @param item the item to embargo
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void setEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException;
@@ -68,6 +74,11 @@ public interface EmbargoService {
      * @param context the DSpace context
      * @param item the item to embargo
      * @return lift date on which the embargo is to be lifted, or null if none
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public DCDate getEmbargoTermsAsDate(Context context, Item item)
         throws SQLException, AuthorizeException;
@@ -79,6 +90,13 @@ public interface EmbargoService {
      *
      * @param context the DSpace context
      * @param item the item on which to lift the embargo
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     public void liftEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException, IOException;

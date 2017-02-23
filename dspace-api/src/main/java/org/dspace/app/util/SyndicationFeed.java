@@ -50,6 +50,8 @@ import com.sun.syndication.io.SyndFeedOutput;
 import com.sun.syndication.io.FeedException;
 
 import org.apache.log4j.Logger;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * Invoke ROME library to assemble a generic model of a syndication
@@ -83,38 +85,43 @@ public class SyndicationFeed
     protected  String defaultTitleField = "dc.title";
     protected  String defaultAuthorField = "dc.contributor.author";
     protected  String defaultDateField = "dc.date.issued";
-    private static  String defaultDescriptionFields = "dc.description.abstract, dc.description, dc.title.alternative, dc.title";
+    private static final String[] defaultDescriptionFields = new String[]{"dc.description.abstract", "dc.description", "dc.title.alternative", "dc.title"};
     protected  String defaultExternalMedia = "dc.source.uri";
 
+    private final ConfigurationService configurationService = 
+            DSpaceServicesFactory.getInstance().getConfigurationService();
+
     // metadata field for Item title in entry:
-    protected  String titleField =
-        getDefaultedConfiguration("webui.feed.item.title", defaultTitleField);
+    protected String titleField = 
+            configurationService.getProperty("webui.feed.item.title", defaultTitleField);
 
     // metadata field for Item publication date in entry:
-    protected  String dateField =
-        getDefaultedConfiguration("webui.feed.item.date", defaultDateField);
+    protected String dateField =
+            configurationService.getProperty("webui.feed.item.date", defaultDateField);
 
     // metadata field for Item description in entry:
-    private static String descriptionFields[] =
-        getDefaultedConfiguration("webui.feed.item.description", defaultDescriptionFields).split("\\s*,\\s*");
-
-    protected  String authorField =
-        getDefaultedConfiguration("webui.feed.item.author", defaultAuthorField);
+    private static final String descriptionFields[] =
+            DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("webui.feed.item.description", defaultDescriptionFields);
+    
+    protected String authorField =
+            configurationService.getProperty("webui.feed.item.author", defaultAuthorField);
 
     // metadata field for Podcast external media source url
-    protected  String externalSourceField = getDefaultedConfiguration("webui.feed.podcast.sourceuri", defaultExternalMedia);
+    protected String externalSourceField = 
+            configurationService.getProperty("webui.feed.podcast.sourceuri", defaultExternalMedia);
 
     // metadata field for Item dc:creator field in entry's DCModule (no default)
-    protected  String dcCreatorField = ConfigurationManager.getProperty("webui.feed.item.dc.creator");
+    protected String dcCreatorField = configurationService.getProperty("webui.feed.item.dc.creator");
 
     // metadata field for Item dc:date field in entry's DCModule (no default)
-    protected  String dcDateField = ConfigurationManager.getProperty("webui.feed.item.dc.date");
+    protected String dcDateField = configurationService.getProperty("webui.feed.item.dc.date");
 
     // metadata field for Item dc:author field in entry's DCModule (no default)
-    protected  String dcDescriptionField = ConfigurationManager.getProperty("webui.feed.item.dc.description");
+    protected String dcDescriptionField = configurationService.getProperty("webui.feed.item.dc.description");
 
     // List of available mimetypes that we'll add to podcast feed. Multiple values separated by commas
-    protected  String podcastableMIMETypes = getDefaultedConfiguration("webui.feed.podcast.mimetypes", "audio/x-mpeg");
+    protected String[] podcastableMIMETypes =
+            configurationService.getArrayProperty("webui.feed.podcast.mimetypes", new String[]{"audio/x-mpeg"});
 
     // -------- Instance variables:
 
@@ -158,9 +165,14 @@ public class SyndicationFeed
 
     /**
      * Fills in the feed and entry-level metadata from DSpace objects.
+     * @param request request
+     * @param context context
+     * @param dso DSpaceObject
+     * @param items array of objects
+     * @param labels label map
      */
     public void populate(HttpServletRequest request, Context context, DSpaceObject dso,
-                         DSpaceObject items[], Map<String, String> labels)
+                         List<?extends DSpaceObject> items, Map<String, String> labels)
     {
         String logoURL = null;
         String objectURL = null;
@@ -374,7 +386,7 @@ public class SyndicationFeed
                             List<Bitstream> bits = bunds.get(0).getBitstreams();
                             for (Bitstream bit : bits) {
                                 String mime = bit.getFormat(context).getMIMEType();
-                                if (podcastableMIMETypes.contains(mime)) {
+                                if (ArrayUtils.contains(podcastableMIMETypes,mime)) {
                                     SyndEnclosure enc = new SyndEnclosureImpl();
                                     enc.setType(bit.getFormat(context).getMIMEType());
                                     enc.setLength(bit.getSize());
@@ -443,6 +455,7 @@ public class SyndicationFeed
      * Sets the feed type for XML delivery, e.g. "rss_1.0", "atom_1.0"
      * Must match one of ROME's configured generators, see rome.properties
      * (currently rss_1.0, rss_2.0, atom_1.0, atom_0.3)
+     * @param feedType feed type
      */
     public void setType(String feedType)
     {
@@ -456,6 +469,7 @@ public class SyndicationFeed
 
     /**
      * @return the feed we built as DOM Document
+     * @throws FeedException if feed error
      */
     public Document outputW3CDom()
         throws FeedException
@@ -474,6 +488,7 @@ public class SyndicationFeed
 
     /**
      * @return the feed we built as serialized XML string
+     * @throws FeedException if feed error
      */
     public String outputString()
         throws FeedException
@@ -484,6 +499,9 @@ public class SyndicationFeed
 
     /**
      * send the output to designated Writer
+     * @param writer Writer
+     * @throws FeedException if feed error
+     * @throws IOException if IO error
      */
     public void output(java.io.Writer writer)
         throws FeedException, IOException
@@ -494,6 +512,7 @@ public class SyndicationFeed
 
     /**
      * Add a ROME plugin module (e.g. for OpenSearch) at the feed level.
+     * @param m module
      */
     public void addModule(Module m)
     {
@@ -516,17 +535,17 @@ public class SyndicationFeed
                  logo.getID()+"/"+(name == null?"":name);
     }
 
+    protected String baseURL = null;  // cache the result for null
     /**
      * Return a url to the DSpace object, either use the official
      * handle for the item or build a url based upon the current server.
      *
      * If the dspaceobject is null then a local url to the repository is generated.
      *
+     * @param request current servlet request
      * @param dso The object to reference, null if to the repository.
-     * @return
+     * @return URL
      */
-    protected String baseURL = null;  // cache the result for null
-
     protected String resolveURL(HttpServletRequest request, DSpaceObject dso)
     {
         // If no object given then just link to the whole repository,

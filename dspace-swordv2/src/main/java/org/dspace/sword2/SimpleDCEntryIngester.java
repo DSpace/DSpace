@@ -12,24 +12,29 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.swordapp.server.*;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.StringUtils;
+
 
 public class SimpleDCEntryIngester extends AbstractSimpleDC
         implements SwordEntryIngester
 {
-    private static final Logger log = Logger
-            .getLogger(SimpleDCEntryIngester.class);
+    private static final Logger log =
+        Logger.getLogger(SimpleDCEntryIngester.class);
 
-    protected WorkspaceItemService workspaceItemService = ContentServiceFactory
-            .getInstance().getWorkspaceItemService();
+    protected WorkspaceItemService workspaceItemService =
+        ContentServiceFactory.getInstance().getWorkspaceItemService();
+    
+    protected ConfigurationService configurationService =
+        DSpaceServicesFactory.getInstance().getConfigurationService();
 
     public SimpleDCEntryIngester()
     {
@@ -41,8 +46,8 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             throws DSpaceSwordException, SwordError, SwordAuthException,
             SwordServerException
     {
-        return this
-                .ingest(context, deposit, dso, verboseDescription, null, false);
+        return this.ingest(
+            context, deposit, dso, verboseDescription, null, false);
     }
 
     public DepositResult ingest(Context context, Deposit deposit,
@@ -54,12 +59,12 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
         if (dso instanceof Collection)
         {
             return this.ingestToCollection(context, deposit, (Collection) dso,
-                    verboseDescription, result);
+                verboseDescription, result);
         }
         else if (dso instanceof Item)
         {
             return this.ingestToItem(context, deposit, (Item) dso,
-                    verboseDescription, result, replace);
+                verboseDescription, result, replace);
         }
         return null;
     }
@@ -115,18 +120,16 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
     private void removeMetadata(Context context, Item item)
             throws DSpaceSwordException
     {
-        String raw = ConfigurationManager
-                .getProperty("swordv2-server", "metadata.replaceable");
-        String[] parts = raw.split(",");
-        for (String part : parts)
+        String[] replaceableMetadata = configurationService
+            .getArrayProperty("swordv2-server.metadata.replaceable");
+        for (String part : replaceableMetadata)
         {
-            MetadataValueInfo info = this
-                    .makeMetadataValueInfo(part.trim(), null);
+            MetadataValueInfo info =
+                this.makeMetadataValueInfo(part.trim(), null);
             try
             {
-                itemService
-                        .clearMetadata(context, item, info.schema, info.element,
-                                info.qualifier, Item.ANY);
+                itemService.clearMetadata(context, item,
+                    info.schema, info.element, info.qualifier, Item.ANY);
             }
             catch (SQLException e)
             {
@@ -150,8 +153,8 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
         {
             lang = Item.ANY;
         }
-        List<MetadataValue> existing = itemService
-                .getMetadata(item, info.schema, info.element, qual, lang);
+        List<MetadataValue> existing = itemService.getMetadata(
+            item, info.schema, info.element, qual, lang);
         for (MetadataValue dcValue : existing)
         {
             // FIXME: probably we want to be slightly more careful about qualifiers and languages
@@ -182,8 +185,8 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             String titleField = this.dcMap.get("title");
             if (titleField != null)
             {
-                MetadataValueInfo info = this
-                        .makeMetadataValueInfo(titleField, title);
+                MetadataValueInfo info =
+                    this.makeMetadataValueInfo(titleField, title);
                 try
                 {
                     this.addUniqueMetadata(context, info, item);
@@ -200,8 +203,8 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             String abstractField = this.dcMap.get("abstract");
             if (abstractField != null)
             {
-                MetadataValueInfo info = this
-                        .makeMetadataValueInfo(abstractField, summary);
+                MetadataValueInfo info =
+                    this.makeMetadataValueInfo(abstractField, summary);
                 try
                 {
                     this.addUniqueMetadata(context, info, item);
@@ -288,9 +291,8 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             context.restoreAuthSystemState();
 
             verboseDescription.append("Ingest successful");
-            verboseDescription
-                    .append("Item created with internal identifier: " +
-                            item.getID());
+            verboseDescription.append(
+                "Item created with internal identifier: " + item.getID());
 
             result.setItem(item);
             result.setTreatment(this.getTreatment());
@@ -331,31 +333,35 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
      * the field in which to store this metadata in the configuration
      * sword.updated.field
      *
-     *
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     item to add date metadata to
+     * @param verboseDescription
+     *     The description.
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     protected void setUpdatedDate(Context context, Item item,
             VerboseDescription verboseDescription)
             throws DSpaceSwordException
     {
-        String field = ConfigurationManager
-                .getProperty("swordv2-server", "updated.field");
-        if (field == null || "".equals(field))
+        String field = configurationService
+                .getProperty("swordv2-server.updated.field");
+        if (StringUtils.isBlank(field))
         {
             throw new DSpaceSwordException(
-                    "No configuration, or configuration is invalid for: sword.updated.field");
+                "No configuration, or configuration is invalid for: swordv2-server.updated.field");
         }
 
         MetadataValueInfo info = this.makeMetadataValueInfo(field, null);
         try
         {
-            itemService.clearMetadata(context, item, info.schema, info.element,
-                    info.qualifier, Item.ANY);
+            itemService.clearMetadata(context, item,
+                info.schema, info.element, info.qualifier, Item.ANY);
             DCDate date = new DCDate(new Date());
-            itemService.addMetadata(context, item, info.schema, info.element,
-                    info.qualifier, null, date.toString());
+            itemService.addMetadata(context, item, info.schema,
+                info.element, info.qualifier, null, date.toString());
         }
         catch (SQLException e)
         {
@@ -363,8 +369,8 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             throw new DSpaceSwordException(e);
         }
 
-        verboseDescription
-                .append("Updated date added to response from item metadata where available");
+        verboseDescription.append(
+            "Updated date added to response from item metadata where available");
     }
 
     /**
@@ -373,11 +379,16 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
      * field in which to store this metadata in the configuration
      * sword.slug.field
      *
-     *
      * @param context
+     *     The relevant DSpace Context.
      * @param item
+     *     the item to modify
      * @param slugVal
+     *     the value to store to metadata
+     * @param verboseDescription
+     *     The description.
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     protected void setSlug(Context context, Item item, String slugVal,
             VerboseDescription verboseDescription)
@@ -389,21 +400,21 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
             return;
         }
 
-        String field = ConfigurationManager
-                .getProperty("swordv2-server", "slug.field");
-        if (field == null || "".equals(field))
+        String field = configurationService.getProperty(
+            "swordv2-server.slug.field");
+        if (StringUtils.isBlank(field))
         {
             throw new DSpaceSwordException(
-                    "No configuration, or configuration is invalid for: sword.slug.field");
+                "No configuration, or configuration is invalid for: swordv2-server.slug.field");
         }
 
         MetadataValueInfo info = this.makeMetadataValueInfo(field, null);
         try
         {
-            itemService.clearMetadata(context, item, info.schema, info.element,
-                    info.qualifier, Item.ANY);
-            itemService.addMetadata(context, item, info.schema, info.element,
-                    info.qualifier, null, slugVal);
+            itemService.clearMetadata(context, item,
+                info.schema, info.element, info.qualifier, Item.ANY);
+            itemService.addMetadata(context, item,
+                info.schema, info.element, info.qualifier, null, slugVal);
         }
         catch (SQLException e)
         {
@@ -418,8 +429,9 @@ public class SimpleDCEntryIngester extends AbstractSimpleDC
      * The human readable description of the treatment this ingester has
      * put the deposit through
      *
-     * @return
+     * @return human readable description
      * @throws DSpaceSwordException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     private String getTreatment() throws DSpaceSwordException
     {

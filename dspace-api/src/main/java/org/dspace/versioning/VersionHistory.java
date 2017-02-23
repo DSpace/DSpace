@@ -8,11 +8,13 @@
 package org.dspace.versioning;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -20,16 +22,19 @@ import java.util.List;
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Pascal-Nicolas Becker (dspace at pascal dash becker dot de)
  */
 @Entity
 @Table(name="versionhistory")
-public class VersionHistory {
+public class VersionHistory implements ReloadableEntity<Integer> {
+    
+    private static final Logger log = Logger.getLogger(VersionHistory.class);
 
     @Id
     @Column(name="versionhistory_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="versionhistory_seq")
     @SequenceGenerator(name="versionhistory_seq", sequenceName="versionhistory_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     //We use fetchtype eager for versions since we always require our versions when loading the history
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "versionHistory")
@@ -46,11 +51,20 @@ public class VersionHistory {
 
     }
 
-    public int getId() {
+    public Integer getID() {
         return id;
     }
 
-    public List<Version> getVersions() {
+    /**
+     * Please use {@link org.dspace.versioning.service.VersioningService#getVersionsByHistory(Context, VersionHistory)} instead.
+     * 
+     * To keep version number stables we keep information about deleted Versions.
+     * {@code org.dspace.versioning.service.VersioningService#getVersionsByHistory(Context, VersionHistory) VersioningService#getVersionsByHistory} filters
+     * such versions and returns only active versions.
+     * 
+     * @return list of versions
+     */
+    protected List<Version> getVersions() {
         return versions;
     }
 
@@ -81,7 +95,7 @@ public class VersionHistory {
         }
 
         final VersionHistory that = (VersionHistory)o;
-        if (this.getId() != that.getId())
+        if (this.getID() != that.getID())
         {
             return false;
         }
@@ -92,8 +106,8 @@ public class VersionHistory {
     @Override
     public int hashCode()
     {
-        int hash=7;
-        hash=79*hash+ this.getId();
+        int hash = 7;
+        hash = 79*hash + this.getID();
         return hash;
     }
 

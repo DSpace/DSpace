@@ -65,6 +65,7 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     protected boolean developing = false;
     /**
      * Standard constructor.
+     * @param configurationService current DSpace configuration service
      */
     public DSpaceServiceManager(DSpaceConfigurationService configurationService) {
         if (configurationService == null) {
@@ -78,7 +79,8 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     protected String[] springXmlConfigFiles = null;
     /**
      * TESTING - This is for testing only.
-     * @param springXmlConfigFiles
+     * @param configurationService current DSpace configuration service
+     * @param springXmlConfigFiles one or more Spring XML configs
      */
     protected DSpaceServiceManager(DSpaceConfigurationService configurationService, String... springXmlConfigFiles) {
         this.configurationService = configurationService;

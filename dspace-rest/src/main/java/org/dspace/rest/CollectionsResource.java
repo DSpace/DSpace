@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.browse.BrowseException;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.InstallItemService;
@@ -68,30 +67,41 @@ public class CollectionsResource extends Resource
      * through expand parameter.
      * 
      * @param collectionId
-     *            Id of collection in DSpace.
+     *     Id of collection in DSpace.
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of collection. Options are: "all", "parentCommunityList",
-     *            "parentCommunity", "items", "license" and "logo". If you want
-     *            to use multiple options, it must be separated by commas.
+     *     String in which is what you want to add to returned instance
+     *     of collection. Options are: "all", "parentCommunityList",
+     *     "parentCommunity", "items", "license" and "logo". If you want
+     *     to use multiple options, it must be separated by commas.
      * @param limit
-     *            Limit value for items in list in collection. Default value is
-     *            100.
+     *     Limit value for items in list in collection. Default value is
+     *     100.
      * @param offset
-     *            Offset of start index in list of items of collection. Default
-     *            value is 0.
+     *     Offset of start index in list of items of collection. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return instance of collection. It can also return status code
-     *         NOT_FOUND(404) if id of collection is incorrect or status code
-     *         UNATHORIZED(401) if user has no permission to read collection.
+     *     NOT_FOUND(404) if id of collection is incorrect or status code
+     *     UNATHORIZED(401) if user has no permission to read collection.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading
-     *             (SQLException) or problem with creating
-     *             context(ContextException). It is thrown by NOT_FOUND and
-     *             UNATHORIZED status codes, too.
+     *     It is thrown when was problem with database reading
+     *     (SQLException) or problem with creating
+     *     context(ContextException). It is thrown by NOT_FOUND and
+     *     UNATHORIZED status codes, too.
      */
     @GET
     @Path("/{collection_id}")
@@ -109,7 +119,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
@@ -142,26 +152,37 @@ public class CollectionsResource extends Resource
      * through expand parameter.
      * 
      * @param expand
-     *            String in which is what you want to add to returned instance
-     *            of collection. Options are: "all", "parentCommunityList",
-     *            "parentCommunity", "items", "license" and "logo". If you want
-     *            to use multiple options, it must be separated by commas.
+     *     String in which is what you want to add to returned instance
+     *     of collection. Options are: "all", "parentCommunityList",
+     *     "parentCommunity", "items", "license" and "logo". If you want
+     *     to use multiple options, it must be separated by commas.
      * @param limit
-     *            Limit value for items in list in collection. Default value is
-     *            100.
+     *     Limit value for items in list in collection. Default value is
+     *     100.
      * @param offset
-     *            Offset of start index in list of items of collection. Default
-     *            value is 0.
+     *     Offset of start index in list of items of collection. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to collections under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collections as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of collection, on which has logged user permission
-     *         to view.
+     *     to view.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading
-     *             (SQLException) or problem with creating
-     *             context(ContextException).
+     *     It is thrown when was problem with database reading
+     *     (SQLException) or problem with creating
+     *     context(ContextException).
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
@@ -178,7 +199,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
@@ -223,30 +244,41 @@ public class CollectionsResource extends Resource
      * with expand parameter.
      * 
      * @param collectionId
-     *            Id of collection in DSpace.
+     *     Id of collection in DSpace.
      * @param expand
-     *            String which define, what additional properties will be in
-     *            returned item. Options are separeted by commas and are: "all",
-     *            "metadata", "parentCollection", "parentCollectionList",
-     *            "parentCommunityList" and "bitstreams".
+     *     String which define, what additional properties will be in
+     *     returned item. Options are separeted by commas and are: "all",
+     *     "metadata", "parentCollection", "parentCollectionList",
+     *     "parentCommunityList" and "bitstreams".
      * @param limit
-     *            Limit value for items in array. Default value is 100.
+     *     Limit value for items in array. Default value is 100.
      * @param offset
-     *            Offset of start index in array of items of collection. Default
-     *            value is 0.
+     *     Offset of start index in array of items of collection. Default
+     *     value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of items, on which has logged user permission to
-     *         read. It can also return status code NOT_FOUND(404) if id of
-     *         collection is incorrect or status code UNATHORIZED(401) if user
-     *         has no permission to read collection.
+     *     read. It can also return status code NOT_FOUND(404) if id of
+     *     collection is incorrect or status code UNATHORIZED(401) if user
+     *     has no permission to read collection.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading
-     *             (SQLException) or problem with creating
-     *             context(ContextException). It is thrown by NOT_FOUND and
-     *             UNATHORIZED status codes, too.
+     *     It is thrown when was problem with database reading
+     *     (SQLException) or problem with creating
+     *     context(ContextException). It is thrown by NOT_FOUND and
+     *     UNATHORIZED status codes, too.
      */
     @GET
     @Path("/{collection_id}/items")
@@ -264,7 +296,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
@@ -310,24 +342,35 @@ public class CollectionsResource extends Resource
      * Create item in collection. Item can be without filled metadata.
      * 
      * @param collectionId
-     *            Id of collection in which will be item created.
+     *     Id of collection in which will be item created.
      * @param item
-     *            Item filled only with metadata, other variables are ignored.
+     *     Item filled only with metadata, other variables are ignored.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return status code with item. Return status (OK)200 if item was
-     *         created. NOT_FOUND(404) if id of collection does not exists.
-     *         UNAUTHORIZED(401) if user have not permission to write items in
-     *         collection.
+     *     created. NOT_FOUND(404) if id of collection does not exists.
+     *     UNAUTHORIZED(401) if user have not permission to write items in
+     *     collection.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading or
-     *             writing (SQLException) or problem with creating
-     *             context(ContextException) or problem with authorization to
-     *             collection or IOException or problem with index item into
-     *             browse index. It is thrown by NOT_FOUND and UNATHORIZED
-     *             status codes, too.
+     *     It is thrown when was problem with database reading or
+     *     writing (SQLException) or problem with creating
+     *     context(ContextException) or problem with authorization to
+     *     collection or IOException or problem with index item into
+     *     browse index. It is thrown by NOT_FOUND and UNATHORIZED
+     *     status codes, too.
      * 
      */
     @POST
@@ -345,7 +388,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
@@ -366,10 +409,6 @@ public class CollectionsResource extends Resource
                 }
             }
 
-            // Index item to browse.
-            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse();
-            browse.indexItem(dspaceItem);
-
             log.trace("Installing item to collection(id=" + collectionId + ").");
             dspaceItem = installItemService.installItem(context, workspaceItem);
             workspaceItemService.update(context, workspaceItem);
@@ -387,10 +426,6 @@ public class CollectionsResource extends Resource
         {
             processException("Could not add item into collection(id=" + collectionId + "), AuthorizeException. Message: " + e,
                     context);
-        }
-        catch (BrowseException e)
-        {
-            processException("Could not add item into browse index, BrowseException. Message: " + e, context);
         }
         catch (ContextException e)
         {
@@ -411,20 +446,31 @@ public class CollectionsResource extends Resource
      * Update collection. It replace all properties.
      * 
      * @param collectionId
-     *            Id of collection in DSpace.
+     *     Id of collection in DSpace.
      * @param collection
-     *            Collection which will replace properties of actual collection.
+     *     Collection which will replace properties of actual collection.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response 200 if was everything all right. Otherwise 400
-     *         when id of community was incorrect or 401 if was problem with
-     *         permission to write into collection.
+     *     when id of community was incorrect or 401 if was problem with
+     *     permission to write into collection.
      * @throws WebApplicationException
-     *             It is thrown when was problem with database reading or
-     *             writing. Or problem with authorization to collection. Or
-     *             problem with creating context.
+     *     It is thrown when was problem with database reading or
+     *     writing. Or problem with authorization to collection. Or
+     *     problem with creating context.
      */
     @PUT
     @Path("/{collection_id}")
@@ -440,7 +486,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
@@ -483,19 +529,30 @@ public class CollectionsResource extends Resource
      * Delete collection.
      * 
      * @param collectionId
-     *            Id of collection which will be deleted.
+     *     Id of collection which will be deleted.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response code OK(200) if was everything all right.
-     *         Otherwise return NOT_FOUND(404) if was id of community or
-     *         collection incorrect. Or (UNAUTHORIZED)401 if was problem with
-     *         permission to community or collection.
+     *     Otherwise return NOT_FOUND(404) if was id of community or
+     *     collection incorrect. Or (UNAUTHORIZED)401 if was problem with
+     *     permission to community or collection.
      * @throws WebApplicationException
-     *             It is throw when was problem with creating context or problem
-     *             with database reading or writing. Or problem with deleting
-     *             collection caused by IOException or authorization.
+     *     Thrown if there was a problem with creating context or problem
+     *     with database reading or writing. Or problem with deleting
+     *     collection caused by IOException or authorization.
      */
     @DELETE
     @Path("/{collection_id}")
@@ -510,7 +567,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.DELETE);
 
@@ -551,20 +608,34 @@ public class CollectionsResource extends Resource
      * Delete item in collection.
      * 
      * @param collectionId
-     *            Id of collection which will be deleted.
-     * 
+     *     Id of collection which will be deleted.
      * @param itemId
-     *            Id of item in colletion.
+     *     Id of item in colletion.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
+     * @param headers
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return It returns status code: OK(200). NOT_FOUND(404) if item or
-     *         collection was not found, UNAUTHORIZED(401) if user is not
-     *         allowed to delete item or permission to write into collection.
+     *     collection was not found, UNAUTHORIZED(401) if user is not
+     *     allowed to delete item or permission to write into collection.
      * @throws WebApplicationException
-     *             It can be thrown by: SQLException, when was problem with
-     *             database reading or writting. AuthorizeException, when was
-     *             problem with authorization to item or collection.
-     *             IOException, when was problem with removing item.
-     *             ContextException, when was problem with creating context of
-     *             DSpace.
+     *     It can be thrown by: SQLException, when was problem with
+     *     database reading or writting. AuthorizeException, when was
+     *     problem with authorization to item or collection.
+     *     IOException, when was problem with removing item.
+     *     ContextException, when was problem with creating context of
+     *     DSpace.
      */
     @DELETE
     @Path("/{collection_id}/items/{item_id}")
@@ -580,7 +651,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             org.dspace.content.Collection dspaceCollection = collectionService.findByIdOrLegacyId(context, collectionId);
             org.dspace.content.Item item = itemService.findByIdOrLegacyId(context, itemId);
@@ -655,14 +726,15 @@ public class CollectionsResource extends Resource
      * Search for first collection with passed name.
      * 
      * @param name
-     *            Name of collection.
+     *     Name of collection.
      * @param headers
-     *            If you want to access to collection under logged user into
-     *            context. In headers must be set header "rest-dspace-token"
-     *            with passed token from login method.
+     *     If you want to access the collection as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
      * @return It returns null if collection was not found. Otherwise returns
-     *         first founded collection.
+     *     first founded collection.
      * @throws WebApplicationException
+     *     A general exception a servlet can throw when it encounters difficulty.
      */
     @POST
     @Path("/find-collection")
@@ -676,7 +748,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             List<org.dspace.content.Collection> dspaceCollections = collectionService.findAll(context);
             //TODO, this would be more efficient with a findByName query
@@ -728,15 +800,15 @@ public class CollectionsResource extends Resource
      * user logged into context has permission to do passed action.
      * 
      * @param context
-     *            Context of actual logged user.
+     *     Context of actual logged user.
      * @param id
-     *            Id of collection in DSpace.
+     *     Id of collection in DSpace.
      * @param action
-     *            Constant from org.dspace.core.Constants.
+     *     Constant from org.dspace.core.Constants.
      * @return It returns DSpace collection.
      * @throws WebApplicationException
-     *             Is thrown when item with passed id is not exists and if user
-     *             has no permission to do passed action.
+     *     Is thrown when item with passed id is not exists and if user
+     *     has no permission to do passed action.
      */
     private org.dspace.content.Collection findCollection(org.dspace.core.Context context, String id, int action)
             throws WebApplicationException

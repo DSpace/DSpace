@@ -1,8 +1,12 @@
 ## Ignore the MVN compiled output directories from version tracking
 target/
 
+## Ignore tags index files created by Exuberant Ctags
+tags
+
 ## Ignore project files created by Eclipse
 .settings/
+/bin/
 .project
 .classpath
 

@@ -203,14 +203,11 @@ public class MetadataImport
                             }
 
                             // Remove the item
-                            List<Collection> owners = item.getCollections();
-                            for (Collection owner : owners)
-                            {
-                                if (change)
-                                {
-                                    collectionService.removeItem(c, owner, item);
-                                }
-                            }
+
+							if (change) {
+								itemService.delete(c, item);
+							}
+                            
                             whatHasChanged.setDeleted();
                         }
                         else if ("withdraw".equals(action))
@@ -420,8 +417,7 @@ public class MetadataImport
      * @param change Whether or not to make the update
      * @param md The element to compare
      * @param changes The changes object to populate
-     *
-     * @param line
+     * @param line line in CSV file
      * @throws SQLException if there is a problem accessing a Collection from the database, from its handle
      * @throws AuthorizeException if there is an authorization problem with permissions
      */

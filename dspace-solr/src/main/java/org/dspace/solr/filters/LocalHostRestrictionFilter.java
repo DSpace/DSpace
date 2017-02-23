@@ -20,46 +20,51 @@ import javax.servlet.http.HttpServletResponse;
 
 public class LocalHostRestrictionFilter implements Filter {
 
-	private boolean enabled = true;
+    private boolean enabled = true;
 
-	public LocalHostRestrictionFilter() {
-		// TODO Auto-generated constructor stub
-	}
+    public LocalHostRestrictionFilter() {
+        // TODO Auto-generated constructor stub
+    }
 
-	public void destroy() {
-		// TODO Auto-generated method stub
+    public void destroy() {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response,
+            FilterChain chain)
+        throws IOException, ServletException
+    {
 
-		if(enabled){
-			InetAddress ia = InetAddress.getLocalHost();
-			String localAddr = ia.getHostAddress();
-			String remoteAddr = request.getRemoteAddr();
+        if (enabled){
+            InetAddress ia = InetAddress.getLocalHost();
+            String localAddr = ia.getHostAddress();
+            String remoteAddr = request.getRemoteAddr();
 
-			if(!(localAddr.equals(remoteAddr) || remoteAddr.equals("127.0.0.1") || remoteAddr.startsWith("0:0:0:0:0:0:0:1")))
-			{
-				((HttpServletResponse)response).sendError(403);
-		                return;
-			}
+            if (!(localAddr.equals(remoteAddr) ||
+                remoteAddr.equals("127.0.0.1") ||
+                remoteAddr.startsWith("0:0:0:0:0:0:0:1")))
+            {
+                ((HttpServletResponse)response).sendError(403);
+                    return;
+            }
 
-		}
+        }
 
-		chain.doFilter(request, response);
-	}
+        chain.doFilter(request, response);
+    }
 
-	/**
-	 *
-	 */
-	public void init(FilterConfig arg0) throws ServletException {
-		String restrict = arg0.getServletContext().getInitParameter("LocalHostRestrictionFilter.localhost");
-		if("false".equalsIgnoreCase(restrict))
-		{
-			enabled = false;
-		}
-
-	}
-
+    /**
+     *
+     */
+    public void init(FilterConfig arg0)
+        throws ServletException
+    {
+        String restrict = arg0.getServletContext().getInitParameter(
+            "LocalHostRestrictionFilter.localhost");
+        if ("false".equalsIgnoreCase(restrict))
+        {
+            enabled = false;
+        }
+    }
 }

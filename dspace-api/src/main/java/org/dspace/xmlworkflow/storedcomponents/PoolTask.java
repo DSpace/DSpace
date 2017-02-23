@@ -8,6 +8,7 @@
 package org.dspace.xmlworkflow.storedcomponents;
 
 import org.dspace.core.Context;
+import org.dspace.core.ReloadableEntity;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -24,13 +25,13 @@ import java.sql.SQLException;
  */
 @Entity
 @Table(name="cwf_pooltask")
-public class PoolTask {
+public class PoolTask implements ReloadableEntity<Integer> {
 
     @Id
     @Column(name="pooltask_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator="cwf_pooltask_seq")
     @SequenceGenerator(name="cwf_pooltask_seq", sequenceName="cwf_pooltask_seq", allocationSize = 1)
-    private int id;
+    private Integer id;
 
     @OneToOne
     @JoinColumn(name = "workflowitem_id")
@@ -68,6 +69,10 @@ public class PoolTask {
     protected PoolTask()
     {
 
+    }
+
+    public Integer getID() {
+        return id;
     }
 
     public void setEperson(EPerson eperson){
@@ -117,5 +122,4 @@ public class PoolTask {
     public String getActionID(){
         return this.actionId;
     }
-
 }

@@ -19,16 +19,25 @@ import java.sql.SQLException;
  * are required to have.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public interface InProgressSubmissionService<T extends InProgressSubmission> {
 
     /**
      * Deletes submission wrapper, doesn't delete item contents
+     * @param context context
+     * @param inProgressSubmission submission
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void deleteWrapper(Context context, T inProgressSubmission) throws SQLException, AuthorizeException;
 
     /**
      * Update the submission, including the unarchived item.
+     * @param context context
+     * @param inProgressSubmission submission
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public void update(Context context, T inProgressSubmission) throws SQLException, AuthorizeException;
 }

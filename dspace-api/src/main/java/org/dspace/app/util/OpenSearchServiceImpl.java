@@ -85,50 +85,50 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
     public void afterPropertiesSet() throws Exception
     {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
-    	enabled = config.getBooleanProperty("websvc.opensearch.enable");
+        enabled = config.getBooleanProperty("websvc.opensearch.enable");
         svcUrl = config.getProperty("dspace.url") + "/" +
                  config.getProperty("websvc.opensearch.svccontext");
         uiUrl = config.getProperty("dspace.url") + "/" +
                 config.getProperty("websvc.opensearch.uicontext");
 
-    	// read rest of config info if enabled
-    	formats = new ArrayList<String>();
-    	if (enabled)
-    	{
-    		String[] fmts = config.getArrayProperty("websvc.opensearch.formats");
+        // read rest of config info if enabled
+        formats = new ArrayList<String>();
+        if (enabled)
+        {
+        String[] fmts = config.getArrayProperty("websvc.opensearch.formats");
             formats = Arrays.asList(fmts);
-    	}
+        }
     }
 
     @Override
     public List<String> getFormats()
     {
-    	return formats;
+        return formats;
     }
     
     @Override
     public String getContentType(String format)
     {
-    	return "html".equals(format) ? "text/html" : 
-    									"application/" + format + "+xml; charset=UTF-8";
+        return "html".equals(format) ? "text/html" : 
+                                       "application/" + format + "+xml; charset=UTF-8";
     }
     
     @Override
     public Document getDescriptionDoc(String scope) throws IOException
     {
-    	return jDomToW3(getServiceDocument(scope));
+        return jDomToW3(getServiceDocument(scope));
     }
     
     @Override
     public String getDescription(String scope)
     {
-    	return new XMLOutputter().outputString(getServiceDocument(scope));
+        return new XMLOutputter().outputString(getServiceDocument(scope));
     }
 
     @Override
     public String getResultsString(Context context, String format, String query, int totalResults, int start, int pageSize,
-    		                          	  DSpaceObject scope, DSpaceObject[] results,
-    		                          	  Map<String, String> labels) throws IOException
+                                            DSpaceObject scope, List<DSpaceObject> results,
+                                            Map<String, String> labels) throws IOException
     {
         try
         {
@@ -137,13 +137,13 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
         catch (FeedException e)
         {
             log.error(e.toString(), e);
-            	throw new IOException("Unable to generate feed", e);
+                throw new IOException("Unable to generate feed", e);
         }
     }
 
     @Override
     public Document getResultsDoc(Context context, String format, String query, int totalResults, int start, int pageSize,
-    		                          DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
+                                      DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
                                       throws IOException
     {
         try
@@ -158,7 +158,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
     }
 
     protected SyndicationFeed getResults(Context context, String format, String query, int totalResults, int start, int pageSize,
-                                          DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
+                                          DSpaceObject scope, List<DSpaceObject> results, Map<String, String> labels)
     {
         // Encode results in requested format
         if ("rss".equals(format))
@@ -169,13 +169,13 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
         {
             format = "atom_1.0";
         }
-    	
+        
         SyndicationFeed feed = new SyndicationFeed(labels.get(SyndicationFeed.MSG_UITYPE));
         feed.populate(null, context, scope, results, labels);
         feed.setType(format);
         feed.addModule(openSearchMarkup(query, totalResults, start, pageSize));
-    	return feed;
-	}
+        return feed;
+    }
     
     /*
      * Generates the OpenSearch elements which are added to the RSS or Atom feeds as foreign markup
@@ -187,17 +187,17 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
      */
     protected OpenSearchModule openSearchMarkup(String query, int totalResults, int start, int pageSize)
     {
-    	OpenSearchModule osMod = new OpenSearchModuleImpl();
-    	osMod.setTotalResults(totalResults);
-    	osMod.setStartIndex(start);
-    	osMod.setItemsPerPage(pageSize);
-    	OSQuery osq = new OSQuery();
-    	osq.setRole("request");
+        OpenSearchModule osMod = new OpenSearchModuleImpl();
+        osMod.setTotalResults(totalResults);
+        osMod.setStartIndex(start);
+        osMod.setItemsPerPage(pageSize);
+        OSQuery osq = new OSQuery();
+        osq.setRole("request");
         try
         {
             osq.setSearchTerms(URLEncoder.encode(query, "UTF-8"));
         }
-        catch(UnsupportedEncodingException e)
+        catch (UnsupportedEncodingException e)
         {
             log.error(e);
         }
@@ -216,7 +216,7 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
     {
         ConfigurationService config = DSpaceServicesFactory.getInstance().getConfigurationService();
 
-    	Namespace ns = Namespace.getNamespace(osNs);
+        Namespace ns = Namespace.getNamespace(osNs);
         Element root = new Element("OpenSearchDescription", ns);
         root.addContent(new Element("ShortName", ns).setText(config.getProperty("websvc.opensearch.shortname")));
         root.addContent(new Element("LongName", ns).setText(config.getProperty("websvc.opensearch.longname")));
@@ -227,74 +227,76 @@ public class OpenSearchServiceImpl implements OpenSearchService, InitializingBea
         String sample = config.getProperty("websvc.opensearch.samplequery");
         if (sample != null && sample.length() > 0)
         {
-        	Element sq = new Element("Query", ns).setAttribute("role", "example");
-        	root.addContent(sq.setAttribute("searchTerms", sample));
+            Element sq = new Element("Query", ns).setAttribute("role", "example");
+            root.addContent(sq.setAttribute("searchTerms", sample));
         }
         String tags = config.getProperty("websvc.opensearch.tags");
         if (tags != null && tags.length() > 0)
         {
-        	root.addContent(new Element("Tags", ns).setText(tags));
+            root.addContent(new Element("Tags", ns).setText(tags));
         }
         String contact = config.getProperty("mail.admin");
         if (contact != null && contact.length() > 0)
         {
-        	root.addContent(new Element("Contact", ns).setText(contact));
+            root.addContent(new Element("Contact", ns).setText(contact));
         }
         String faviconUrl = config.getProperty("websvc.opensearch.faviconurl");
         if (faviconUrl != null && faviconUrl.length() > 0)
         {
-        	String dim = String.valueOf(16);
-        	String type = faviconUrl.endsWith("ico") ? "image/vnd.microsoft.icon" : "image/png";
-        	Element fav = new Element("Image", ns).setAttribute("height", dim).setAttribute("width", dim).
-        	                setAttribute("type", type).setText(faviconUrl);
-        	root.addContent(fav);
+            String dim = String.valueOf(16);
+            String type = faviconUrl.endsWith("ico") ? "image/vnd.microsoft.icon" : "image/png";
+            Element fav = new Element("Image", ns).setAttribute("height", dim).setAttribute("width", dim).
+                            setAttribute("type", type).setText(faviconUrl);
+            root.addContent(fav);
         }
         // service URLs
         for (String format : formats)
         {
-        	Element url = new Element("Url", ns).setAttribute("type", getContentType(format));
-        	StringBuilder template = new StringBuilder();
-        	if ("html".equals(format))
-        	{
-        		template.append(uiUrl);
-        	}
-        	else
-        	{
-        		template.append(svcUrl);
-        	}
+            Element url = new Element("Url", ns).setAttribute("type", getContentType(format));
+            StringBuilder template = new StringBuilder();
+            if ("html".equals(format))
+            {
+                template.append(uiUrl);
+            }
+            else
+            {
+                template.append(svcUrl);
+            }
             template.append("?query={searchTerms}");
-        	if(! "html".equals(format))
-        	{
-               	template.append("&start={startIndex?}&rpp={count?}&format=");
-               	template.append(format);
-        	}
-        	if (scope != null)
-        	{
-        		template.append("&scope=");
-        		template.append(scope);
-        	}
-        	url.setAttribute("template", template.toString());
-        	root.addContent(url);
+            if(! "html".equals(format))
+            {
+                   template.append("&start={startIndex?}&rpp={count?}&format=");
+                   template.append(format);
+            }
+            if (scope != null)
+            {
+                template.append("&scope=");
+                template.append(scope);
+            }
+            url.setAttribute("template", template.toString());
+            root.addContent(url);
         }
         return new org.jdom.Document(root);
     }
     
     /**
      * Converts a JDOM document to a W3C one
+     *
      * @param jdomDoc
+     *     jDOM document to convert
      * @return W3C Document object
-     * @throws IOException
+     * @throws IOException if IO error
      */
     protected Document jDomToW3(org.jdom.Document jdomDoc) throws IOException
     {
         DOMOutputter domOut = new DOMOutputter();
         try
         {
-        	return domOut.output(jdomDoc);
+            return domOut.output(jdomDoc);
         }
-        catch(JDOMException jde)
+        catch (JDOMException jde)
         {
-        	throw new IOException("JDOM output exception", jde);
+            throw new IOException("JDOM output exception", jde);
         }
     }
 

@@ -16,6 +16,7 @@ import java.sql.SQLException;
  * Interface representing a Database connection, this class should only be access by the context object.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public interface DBConnection<T> {
 
@@ -39,5 +40,28 @@ public interface DBConnection<T> {
 
     public DatabaseConfigVO getDatabaseConfig() throws SQLException;
     
-    public void clearCache() throws SQLException;
+    public void setOptimizedForBatchProcessing(boolean batchOptimized) throws SQLException;
+
+    public boolean isOptimizedForBatchProcessing();
+
+    public long getCacheSize() throws SQLException;
+
+    /**
+     * Reload a DSpace object from the database. This will make sure the object is valid and stored in the cache.
+     * @param <E> the type of entity.
+     * @param entity The DSpace object to reload
+     * @return the reloaded entity.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
+    public <E extends ReloadableEntity> E reloadEntity(E entity) throws SQLException;
+
+    /**
+     * Remove a DSpace object from the cache when batch processing a large number of objects.
+     * @param <E> the type of entity.
+     * @param entity The DSpace object to reload
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
+    public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException ;
 }

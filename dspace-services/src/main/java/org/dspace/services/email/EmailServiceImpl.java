@@ -39,7 +39,10 @@ public class EmailServiceImpl
 
     private ConfigurationService cfg = null;
 
-    /** Inject the ConfigurationService */
+    /**
+     * Inject/set the ConfigurationService
+     * @param cfg the configurationService object
+     */
     @Autowired
     @Required
     public void setCfg(ConfigurationService cfg)
@@ -96,7 +99,18 @@ public class EmailServiceImpl
             {
                 props.put("mail.smtp.port", port);
             }
-
+            // Set extra configuration properties
+            String[] extras = cfg.getArrayProperty("mail.extraproperties");
+            if (extras != null)
+            {
+                String key, value;
+                for (String argument : extras)
+                {
+                    key = argument.substring(0, argument.indexOf('=')).trim();
+                    value = argument.substring(argument.indexOf('=') + 1).trim();
+                    props.put(key, value);
+                }
+            }
             if (null == cfg.getProperty("mail.server.username"))
             {
                 session = Session.getInstance(props);
@@ -107,19 +121,7 @@ public class EmailServiceImpl
                 session = Session.getInstance(props, this);
             }
 
-            // Set extra configuration properties
-            String extras = cfg.getProperty("mail.extraproperties");
-            if ((extras != null) && (!"".equals(extras.trim())))
-            {
-                String arguments[] = extras.split(",");
-                String key, value;
-                for (String argument : arguments)
-                {
-                    key = argument.substring(0, argument.indexOf('=')).trim();
-                    value = argument.substring(argument.indexOf('=') + 1).trim();
-                    props.put(key, value);
-                }
-            }
+
         }
     }
 

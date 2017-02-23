@@ -79,7 +79,7 @@
         <name>dsprop</name>
         <description>View a DSpace property from dspace.cfg</description>
         <step>
-            <class>org.dspace.core.ConfigurationManager</class>
+            <class>org.dspace.app.util.Configuration</class>
         </step>
     </command>
     <command>
@@ -136,13 +136,6 @@
         <description>Indexes all metadata fields that use solr authority</description>
         <step>
             <class>org.dspace.authority.indexer.AuthorityIndexClient</class>
-        </step>
-    </command>
-    <command>
-        <name>index-db-browse</name>
-        <description>General browse index command (requires extra parameters)</description>
-        <step>
-            <class>org.dspace.browse.IndexBrowse</class>
         </step>
     </command>
     <command>
@@ -229,8 +222,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>export</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>
@@ -240,8 +231,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>import</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>
@@ -251,8 +240,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>reindex</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>

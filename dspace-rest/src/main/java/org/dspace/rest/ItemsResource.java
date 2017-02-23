@@ -40,9 +40,9 @@ import java.util.List;
 
 /**
  * Class which provide all CRUD methods over items.
- * 
+ *
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
- * 
+ *
  */
 // Every DSpace class used without namespace is from package org.dspace.rest.common.*. Otherwise namespace is defined.
 @SuppressWarnings("deprecation")
@@ -63,34 +63,45 @@ public class ItemsResource extends Resource
     /**
      * Return item properties without metadata and bitstreams. You can add
      * additional properties by parameter expand.
-     * 
+     *
      * @param itemId
-     *            Id of item in DSpace.
+     *     Id of item in DSpace.
      * @param expand
-     *            String which define, what additional properties will be in
-     *            returned item. Options are separeted by commas and are: "all",
-     *            "metadata", "parentCollection", "parentCollectionList",
-     *            "parentCommunityList" and "bitstreams".
+     *     String which define, what additional properties will be in
+     *     returned item. Options are separeted by commas and are: "all",
+     *     "metadata", "parentCollection", "parentCollectionList",
+     *     "parentCommunityList" and "bitstreams".
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return If user is allowed to read item, it returns item. Otherwise is
-     *         thrown WebApplicationException with response status
-     *         UNAUTHORIZED(401) or NOT_FOUND(404) if was id incorrect.
+     *     thrown WebApplicationException with response status
+     *     UNAUTHORIZED(401) or NOT_FOUND(404) if was id incorrect.
      * @throws WebApplicationException
-     *             This exception can be throw by NOT_FOUND(bad id of item),
-     *             UNAUTHORIZED, SQLException if wasproblem with reading from
-     *             database and ContextException, if there was problem with
-     *             creating context of DSpace.
+     *     This exception can be throw by NOT_FOUND(bad id of item),
+     *     UNAUTHORIZED, SQLException if wasproblem with reading from
+     *     database and ContextException, if there was problem with
+     *     creating context of DSpace.
      */
     @GET
     @Path("/{item_id}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item getItem(@PathParam("item_id") String itemId, @QueryParam("expand") String expand,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
+        @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+        @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Reading item(id=" + itemId + ").");
@@ -99,7 +110,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -129,28 +140,45 @@ public class ItemsResource extends Resource
      * It returns an array of items in DSpace. You can define how many items in
      * list will be and from which index will start. Items in list are sorted by
      * handle, not by id.
-     * 
+     *
+     * @param expand
+     *     String which define, what additional properties will be in
+     *     returned item. Options are separeted by commas and are: "all",
+     *     "metadata", "parentCollection", "parentCollectionList",
+     *     "parentCommunityList" and "bitstreams".
      * @param limit
-     *            How many items in array will be. Default value is 100.
+     *     How many items in array will be. Default value is 100.
      * @param offset
-     *            On which index will array start. Default value is 0.
+     *     On which index will array start. Default value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of items, on which has logged user into context
-     *         permission.
+     *     permission.
      * @throws WebApplicationException
-     *             It can be thrown by SQLException, when was problem with
-     *             reading items from database or ContextException, when was
-     *             problem with creating context of DSpace.
+     *     It can be thrown by SQLException, when was problem with
+     *     reading items from database or ContextException, when was
+     *     problem with creating context of DSpace.
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item[] getItems(@QueryParam("expand") String expand, @QueryParam("limit") @DefaultValue("100") Integer limit,
-            @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-            @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
+        @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("userIP") String user_ip,
+        @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+        @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Reading items.(offset=" + offset + ",limit=" + limit + ").");
@@ -159,7 +187,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             Iterator<org.dspace.content.Item> dspaceItems = itemService.findAllUnfiltered(context);
             items = new ArrayList<Item>();
@@ -205,28 +233,40 @@ public class ItemsResource extends Resource
 
     /**
      * Returns item metadata in list.
-     * 
+     *
      * @param itemId
-     *            Id of item in DSpace.
+     *     Id of item in DSpace.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return list of metadata fields if was everything ok. Otherwise it
-     *         throw WebApplication exception with response code NOT_FOUND(404)
-     *         or UNAUTHORIZED(401).
+     *     throw WebApplication exception with response code NOT_FOUND(404)
+     *     or UNAUTHORIZED(401).
      * @throws WebApplicationException
-     *             It can be thrown by two exceptions: SQLException if was
-     *             problem wtih reading item from database and ContextException,
-     *             if was problem with creating context of DSpace. And can be
-     *             thrown by NOT_FOUND and UNAUTHORIZED too.
+     *     It can be thrown by two exceptions: SQLException if was
+     *     problem wtih reading item from database and ContextException,
+     *     if was problem with creating context of DSpace. And can be
+     *     thrown by NOT_FOUND and UNAUTHORIZED too.
      */
     @GET
     @Path("/{item_id}/metadata")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public MetadataEntry[] getItemMetadata(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-            @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
+        @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+        @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Reading item(id=" + itemId + ") metadata.");
@@ -235,7 +275,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -262,31 +302,42 @@ public class ItemsResource extends Resource
 
     /**
      * Return array of bitstreams in item. It can be paged.
-     * 
+     *
      * @param itemId
-     *            Id of item in DSpace.
+     *     Id of item in DSpace.
      * @param limit
-     *            How many items will be in array.
+     *     How many items will be in array.
      * @param offset
-     *            On which index will start array.
+     *     On which index will start array.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return paged array of bitstreams in item.
      * @throws WebApplicationException
-     *             It can be throw by NOT_FOUND, UNAUTHORIZED, SQLException if
-     *             was problem with reading from database and ContextException
-     *             if was problem with creating context of DSpace.
+     *     It can be throw by NOT_FOUND, UNAUTHORIZED, SQLException if
+     *     was problem with reading from database and ContextException
+     *     if was problem with creating context of DSpace.
      */
     @GET
     @Path("/{item_id}/bitstreams")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Bitstream[] getItemBitstreams(@PathParam("item_id") String itemId,
-            @QueryParam("limit") @DefaultValue("20") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
+        @QueryParam("limit") @DefaultValue("20") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+        @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Reading item(id=" + itemId + ") bitstreams.(offset=" + offset + ",limit=" + limit + ")");
@@ -294,7 +345,7 @@ public class ItemsResource extends Resource
         List<Bitstream> bitstreams = null;
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -332,32 +383,43 @@ public class ItemsResource extends Resource
     /**
      * Adding metadata fields to item. If metadata key is in item, it will be
      * added, NOT REPLACED!
-     * 
+     *
      * @param itemId
-     *            Id of item in DSpace.
+     *     Id of item in DSpace.
      * @param metadata
-     *            List of metadata fields, which will be added into item.
+     *     List of metadata fields, which will be added into item.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return It returns status code OK(200) if all was ok. UNAUTHORIZED(401)
-     *         if user is not allowed to write to item. NOT_FOUND(404) if id of
-     *         item is incorrect.
+     *     if user is not allowed to write to item. NOT_FOUND(404) if id of
+     *     item is incorrect.
      * @throws WebApplicationException
-     *             It is throw by these exceptions: SQLException, if was problem
-     *             with reading from database or writing to database.
-     *             AuthorizeException, if was problem with authorization to item
-     *             fields. ContextException, if was problem with creating
-     *             context of DSpace.
+     *     It is throw by these exceptions: SQLException, if was problem
+     *     with reading from database or writing to database.
+     *     AuthorizeException, if was problem with authorization to item
+     *     fields. ContextException, if was problem with creating
+     *     context of DSpace.
      */
     @POST
     @Path("/{item_id}/metadata")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response addItemMetadata(@PathParam("item_id") String itemId, List<org.dspace.rest.common.MetadataEntry> metadata,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
+        @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+        @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Adding metadata to item(id=" + itemId + ").");
@@ -365,7 +427,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -402,36 +464,59 @@ public class ItemsResource extends Resource
 
     /**
      * Create bitstream in item.
-     * 
+     *
+     * @param name
+     *     Btstream name to set.
+     * @param description
+     *     Btstream description to set.
+     * @param groupId
+     *     ResourcePolicy group (allowed to READ).
+     * @param year
+     *     ResourcePolicy start date year.
+     * @param month
+     *     ResourcePolicy start date month.
+     * @param day
+     *     ResourcePolicy start date day.
      * @param itemId
-     *            Id of item in DSpace.
+     *     Id of item in DSpace.
      * @param inputStream
-     *            Data of bitstream in inputStream.
+     *     Data of bitstream in inputStream.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Returns bitstream with status code OK(200). If id of item is
-     *         invalid , it returns status code NOT_FOUND(404). If user is not
-     *         allowed to write to item, UNAUTHORIZED(401).
+     *     invalid , it returns status code NOT_FOUND(404). If user is not
+     *     allowed to write to item, UNAUTHORIZED(401).
      * @throws WebApplicationException
-     *             It is thrown by these exceptions: SQLException, when was
-     *             problem with reading/writing from/to database.
-     *             AuthorizeException, when was problem with authorization to
-     *             item and add bitstream to item. IOException, when was problem
-     *             with creating file or reading from inpustream.
-     *             ContextException. When was problem with creating context of
-     *             DSpace.
+     *     It is thrown by these exceptions: SQLException, when was
+     *     problem with reading/writing from/to database.
+     *     AuthorizeException, when was problem with authorization to
+     *     item and add bitstream to item. IOException, when was problem
+     *     with creating file or reading from inpustream.
+     *     ContextException. When was problem with creating context of
+     *     DSpace.
      */
     // TODO Add option to add bitstream by URI.(for very big files)
     @POST
     @Path("/{item_id}/bitstreams")
     public Bitstream addItemBitstream(@PathParam("item_id") String itemId, InputStream inputStream,
-            @QueryParam("name") String name, @QueryParam("description") String description,
-            @QueryParam("groupId") String groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
-            @QueryParam("day") Integer day, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
+        @QueryParam("name") String name, @QueryParam("description") String description,
+        @QueryParam("groupId") String groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
+        @QueryParam("day") Integer day, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+        @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Adding bitstream to item(id=" + itemId + ").");
@@ -440,7 +525,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -451,10 +536,10 @@ public class ItemsResource extends Resource
             org.dspace.content.Bitstream dspaceBitstream = null;
             List<Bundle> bundles = itemService.getBundles(dspaceItem, org.dspace.core.Constants.CONTENT_BUNDLE_NAME);
 
-			if(bundles != null && bundles.size() != 0)
-			{
-				bundle = bundles.get(0); // There should be only one bundle ORIGINAL.
-			}
+            if(bundles != null && bundles.size() != 0)
+            {
+                bundle = bundles.get(0); // There should be only one bundle ORIGINAL.
+            }
             if (bundle == null)
             {
                 log.trace("Creating bundle in item.");
@@ -573,32 +658,43 @@ public class ItemsResource extends Resource
 
     /**
      * Replace all metadata in item with new passed metadata.
-     * 
+     *
      * @param itemId
-     *            Id of item in DSpace.
+     *     Id of item in DSpace.
      * @param metadata
-     *            List of metadata fields, which will replace old metadata in
-     *            item.
+     *     List of metadata fields, which will replace old metadata in
+     *     item.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return It returns status code: OK(200). NOT_FOUND(404) if item was not
-     *         found, UNAUTHORIZED(401) if user is not allowed to write to item.
+     *     found, UNAUTHORIZED(401) if user is not allowed to write to item.
      * @throws WebApplicationException
-     *             It is thrown by: SQLException, when was problem with database
-     *             reading or writting, AuthorizeException when was problem with
-     *             authorization to item and metadata fields. And
-     *             ContextException, when was problem with creating context of
-     *             DSpace.
+     *     It is thrown by: SQLException, when was problem with database
+     *     reading or writting, AuthorizeException when was problem with
+     *     authorization to item and metadata fields. And
+     *     ContextException, when was problem with creating context of
+     *     DSpace.
      */
     @PUT
     @Path("/{item_id}/metadata")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response updateItemMetadata(@PathParam("item_id") String itemId, MetadataEntry[] metadata,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
+        @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+        @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Updating metadata in item(id=" + itemId + ").");
@@ -606,7 +702,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -658,28 +754,40 @@ public class ItemsResource extends Resource
 
     /**
      * Delete item from DSpace. It delete bitstreams only from item bundle.
-     * 
+     *
      * @param itemId
-     *            Id of item which will be deleted.
+     *     Id of item which will be deleted.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return It returns status code: OK(200). NOT_FOUND(404) if item was not
-     *         found, UNAUTHORIZED(401) if user is not allowed to delete item
-     *         metadata.
+     *     found, UNAUTHORIZED(401) if user is not allowed to delete item
+     *     metadata.
      * @throws WebApplicationException
-     *             It can be thrown by: SQLException, when was problem with
-     *             database reading. AuthorizeException, when was problem with
-     *             authorization to item.(read and delete) IOException, when was
-     *             problem with deleting bitstream file. ContextException, when
-     *             was problem with creating context of DSpace.
+     *     It can be thrown by: SQLException, when was problem with
+     *     database reading. AuthorizeException, when was problem with
+     *     authorization to item.(read and delete) IOException, when was
+     *     problem with deleting bitstream file. ContextException, when
+     *     was problem with creating context of DSpace.
      */
     @DELETE
     @Path("/{item_id}")
     public Response deleteItem(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-            @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
+        @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+        @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Deleting item(id=" + itemId + ").");
@@ -687,14 +795,13 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.DELETE);
 
             writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting item.");
-            org.dspace.content.Collection collection = collectionService.find(context, dspaceItem.getCollections().get(0).getID());
-            collectionService.removeItem(context, collection, dspaceItem);
+            itemService.delete(context, dspaceItem);
             context.complete();
 
         }
@@ -726,28 +833,40 @@ public class ItemsResource extends Resource
 
     /**
      * Delete all item metadata.
-     * 
+     *
      * @param itemId
-     *            Id of item in DSpace.
+     *     Id of item in DSpace.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return It returns status code: OK(200). NOT_FOUND(404) if item was not
-     *         found, UNAUTHORIZED(401) if user is not allowed to delete item
-     *         metadata.
+     *     found, UNAUTHORIZED(401) if user is not allowed to delete item
+     *     metadata.
      * @throws WebApplicationException
-     *             Thrown by three exceptions. SQLException, when there was
-     *             a problem reading item from database or editing metadata
-     *             fields. AuthorizeException, when there was a problem with
-     *             authorization to item. And ContextException, when there was a problem
-     *             with creating a DSpace context.
+     *     Thrown by three exceptions. SQLException, when there was
+     *     a problem reading item from database or editing metadata
+     *     fields. AuthorizeException, when there was a problem with
+     *     authorization to item. And ContextException, when there was a problem
+     *     with creating a DSpace context.
      */
     @DELETE
     @Path("/{item_id}/metadata")
     public Response deleteItemMetadata(@PathParam("item_id") String itemId, @QueryParam("userIP") String user_ip,
-            @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
-            @Context HttpHeaders headers, @Context HttpServletRequest request) throws WebApplicationException
+        @QueryParam("userAgent") String user_agent, @QueryParam("xforwardedfor") String xforwardedfor,
+        @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Deleting metadata in item(id=" + itemId + ").");
@@ -755,14 +874,14 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
             log.trace("Deleting metadata.");
             // TODO Rewrite without deprecated object. Leave there only generated metadata.
-            
+
             String valueAccessioned = itemService.getMetadataFirstValue(dspaceItem, "dc", "date", "accessioned", org.dspace.content.Item.ANY);
             String valueAvailable = itemService.getMetadataFirstValue(dspaceItem, "dc", "date", "available", org.dspace.content.Item.ANY);
             String valueURI = itemService.getMetadataFirstValue(dspaceItem, "dc", "identifier", "uri", org.dspace.content.Item.ANY);
@@ -798,31 +917,42 @@ public class ItemsResource extends Resource
 
     /**
      * Delete bitstream from item bundle.
-     * 
+     *
      * @param itemId
-     *            Id of item in DSpace.
-     * @param headers
-     *            If you want to access to item under logged user into context.
-     *            In headers must be set header "rest-dspace-token" with passed
-     *            token from login method.
+     *     Id of item in DSpace.
      * @param bitstreamId
-     *            Id of bitstream, which will be deleted from bundle.
+     *     Id of bitstream, which will be deleted from bundle.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
+     * @param headers
+     *     If you want to access the item as the user logged into the context.
+     *     The value of the "rest-dspace-token" header must be set with passed
+     *     token from login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return status code OK(200) if is all ok. NOT_FOUND(404) if item
-     *         or bitstream was not found. UNAUTHORIZED(401) if user is not
-     *         allowed to delete bitstream.
+     *     or bitstream was not found. UNAUTHORIZED(401) if user is not
+     *     allowed to delete bitstream.
      * @throws WebApplicationException
-     *             It is thrown, when: Was problem with edditting database,
-     *             SQLException. Or problem with authorization to item, bundle
-     *             or bitstream, AuthorizeException. When was problem with
-     *             deleting file IOException. Or problem with creating context
-     *             of DSpace, ContextException.
+     *     It is thrown, when: Was problem with edditting database,
+     *     SQLException. Or problem with authorization to item, bundle
+     *     or bitstream, AuthorizeException. When was problem with
+     *     deleting file IOException. Or problem with creating context
+     *     of DSpace, ContextException.
      */
     @DELETE
     @Path("/{item_id}/bitstreams/{bitstream_id}")
     public Response deleteItemBitstream(@PathParam("item_id") String itemId, @PathParam("bitstream_id") String bitstreamId,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
+        @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+        @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Deleting bitstream in item(id=" + itemId + ").");
@@ -830,7 +960,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Item item = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             org.dspace.content.Bitstream bitstream = bitstreamService.findByIdOrLegacyId(context, bitstreamId);
@@ -843,7 +973,7 @@ public class ItemsResource extends Resource
             else if (!authorizeService.authorizeActionBoolean(context, bitstream, org.dspace.core.Constants.DELETE))
             {
                 context.abort();
-                log.error("User(" + getUser(headers).getEmail() + ") is not allowed to delete bitstream(id=" + bitstreamId + ").");
+                log.error("User(" + context.getCurrentUser().getEmail() + ") is not allowed to delete bitstream(id=" + bitstreamId + ").");
                 return Response.status(Status.UNAUTHORIZED).build();
             }
 
@@ -885,28 +1015,44 @@ public class ItemsResource extends Resource
 
     /**
      * Find items by one metadata field.
-     * 
+     *
      * @param metadataEntry
-     *            Metadata field to search by.
+     *     Metadata field to search by.
+     * @param expand
+     *     String which define, what additional properties will be in
+     *     returned item. Options are separeted by commas and are: "all",
+     *     "metadata", "parentCollection", "parentCollectionList",
+     *     "parentCommunityList" and "bitstreams".
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into context,
-     *            header "rest-dspace-token" must be set to token value retrieved
-     *            from the login method.
+     *     If you want to access the item as the user logged into context,
+     *     header "rest-dspace-token" must be set to token value retrieved
+     *     from the login method.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return array of found items.
      * @throws WebApplicationException
-     *             Can be thrown: SQLException - problem with
-     *             database reading. AuthorizeException - problem with
-     *             authorization to item. IOException - problem with
-     *             reading from metadata field. ContextException -
-     *             problem with creating DSpace context.
+     *     Can be thrown: SQLException - problem with
+     *     database reading. AuthorizeException - problem with
+     *     authorization to item. IOException - problem with
+     *     reading from metadata field. ContextException -
+     *     problem with creating DSpace context.
      */
     @POST
     @Path("/find-by-metadata-field")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Item[] findItemsByMetadataField(MetadataEntry metadataEntry, @QueryParam("expand") String expand,
-            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
-            throws WebApplicationException
+        @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+        @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+        throws WebApplicationException
     {
 
         log.info("Looking for item with metadata(key=" + metadataEntry.getKey() + ",value=" + metadataEntry.getValue()
@@ -925,14 +1071,14 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
 
             Iterator<org.dspace.content.Item> itemIterator = itemService.findByMetadataField(context, metadataEntry.getSchema(), metadataEntry.getElement(), metadataEntry.getQualifier(), metadataEntry.getValue());
 
             while (itemIterator.hasNext())
             {
                 org.dspace.content.Item dspaceItem = itemIterator.next();
-                Item item = new Item(dspaceItem, servletContext, "", context);
+                Item item = new Item(dspaceItem, servletContext, expand, context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);
@@ -972,19 +1118,20 @@ public class ItemsResource extends Resource
      * Find item from DSpace database. It is encapsulation of method
      * org.dspace.content.Item.find with checking if item exist and if user
      * logged into context has permission to do passed action.
-     * 
+     *
      * @param context
-     *            Context of actual logged user.
+     *     Context of actual logged user.
      * @param id
-     *            Id of item in DSpace.
+     *     Id of item in DSpace.
      * @param action
-     *            Constant from org.dspace.core.Constants.
+     *     Constant from org.dspace.core.Constants.
      * @return It returns DSpace item.
      * @throws WebApplicationException
-     *             Is thrown when item with passed id is not exists and if user
-     *             has no permission to do passed action.
+     *     Is thrown when item with passed id is not exists and if user
+     *     has no permission to do passed action.
      */
-    private org.dspace.content.Item findItem(org.dspace.core.Context context, String id, int action) throws WebApplicationException
+    private org.dspace.content.Item findItem(org.dspace.core.Context context, String id, int action)
+        throws WebApplicationException
     {
         org.dspace.content.Item item = null;
         try

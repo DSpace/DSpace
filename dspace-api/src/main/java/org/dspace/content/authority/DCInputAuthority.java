@@ -26,13 +26,15 @@ import org.dspace.core.SelfNamedPlugin;
  *
  * Configuration:
  *   This MUST be configured aas a self-named plugin, e.g.:
+ *   {@code
  *     plugin.selfnamed.org.dspace.content.authority.ChoiceAuthority = \
  *        org.dspace.content.authority.DCInputAuthority
+ *   }
  *
- * It AUTOMATICALLY configures a plugin instance for each <value-pairs>
- * element (within <form-value-pairs>) of the input-forms.xml.  The name
+ * It AUTOMATICALLY configures a plugin instance for each {@code <value-pairs>}
+ * element (within {@code <form-value-pairs>}) of the input-forms.xml.  The name
  * of the instance is the "value-pairs-name" attribute, e.g.
- * the element: <value-pairs value-pairs-name="common_types" dc-term="type">
+ * the element: {@code <value-pairs value-pairs-name="common_types" dc-term="type">}
  * defines a plugin instance "common_types".
  *
  * IMPORTANT NOTE: Since these value-pairs do NOT include authority keys,
@@ -155,7 +157,17 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     @Override
     public String getLabel(String field, String key, String locale)
     {
-        init();
-        return labels[Integer.parseInt(key)];
+    	init();
+        int pos=-1;
+        for (int i = 0; i < values.length; i++) {
+            if (values[i].equals(key)){
+                 pos = i;
+                 break;
+            }
+        }
+        if (pos != -1)
+            return labels[pos];
+        else
+            return "UNKNOWN KEY "+key;
     }
 }

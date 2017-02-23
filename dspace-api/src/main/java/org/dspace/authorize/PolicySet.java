@@ -43,6 +43,9 @@ public class PolicySet
 
     /**
      * Command line interface to setPolicies - run to see arguments
+     *
+     * @param argv the command line arguments given
+     * @throws Exception if error
      */
     public static void main(String[] argv) throws Exception
     {
@@ -77,7 +80,7 @@ public class PolicySet
         Context c = new Context();
 
         // turn off authorization
-        c.setIgnoreAuthorization(true);
+        c.turnOffAuthorisationSystem();
 
         //////////////////////
         // carnage begins here
@@ -111,9 +114,9 @@ public class PolicySet
      * @param clearOnly
      *            if <code>true</code>, just delete policies for matching
      *            objects
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if current user is not authorized to change these policies
      */
     public static void setPolicies(Context c, int containerType,
@@ -128,19 +131,32 @@ public class PolicySet
     /**
      *
      * @param c
+     *            current context
      * @param containerType
+     *            type, Constants.ITEM or Constants.COLLECTION
      * @param containerID
+     *            ID of container (DB primary key)
      * @param contentType
+     *            ID of container (DB primary key)
      * @param actionID
+     *            action ID (e.g. Constants.READ)
      * @param groupID
+     *            group ID (database key)
      * @param isReplace
+     *            if <code>true</code>, existing policies are removed first,
+     *            otherwise add to existing policies
      * @param clearOnly
+     *            if non-null, only process bitstreams whose names contain filter
      * @param name
+     *            policy name
      * @param description
+     *            policy descrption
      * @param startDate
+     *            policy start date
      * @param endDate
-     * @throws SQLException
-     * @throws AuthorizeException
+     *            policy end date
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     public static void setPolicies(Context c, int containerType,
                                    UUID containerID, int contentType, int actionID, UUID groupID,
@@ -164,7 +180,7 @@ public class PolicySet
      * @param contentType
      *            type (BUNDLE, ITEM, or BITSTREAM)
      * @param actionID
-     *            action ID
+     *            action ID (e.g. Constants.READ)
      * @param groupID
      *            group ID (database key)
      * @param isReplace
@@ -175,9 +191,9 @@ public class PolicySet
      *            objects
      * @param filter
      *            if non-null, only process bitstreams whose names contain filter
-     * @throws SQLException
+     * @throws SQLException if database error
      *             if database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if current user is not authorized to change these policies
      */
     public static void setPoliciesFilter(Context c, int containerType,
@@ -212,12 +228,16 @@ public class PolicySet
      * @param filter
      *            if non-null, only process bitstreams whose names contain filter
      * @param name
+     *            policy name
      * @param description
+     *            policy description
      * @param startDate
+     *            policy start date
      * @param endDate
-     * @throws SQLException
+     *            policy end date
+     * @throws SQLException if database error
      *             if database problem
-     * @throws AuthorizeException
+     * @throws AuthorizeException if authorization error
      *             if current user is not authorized to change these policies
      */
     public static void setPoliciesFilter(Context c, int containerType,
@@ -248,7 +268,7 @@ public class PolicySet
                     {
 
                         // before create a new policy check if an identical policy is already in place
-                        if(!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, myitem, group, actionID, -1)){
+                        if (!authorizeService.isAnIdenticalPolicyAlreadyInPlace(c, myitem, group, actionID, -1)) {
                             // now add the policy
                             ResourcePolicy rp = resourcePolicyService.create(c);
 

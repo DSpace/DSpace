@@ -25,15 +25,17 @@ import java.util.List;
 public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 {
     /** logger */
-    private static Logger log = Logger
-            .getLogger(CollectionCollectionGenerator.class);
+    private static Logger log =
+        Logger.getLogger(CollectionCollectionGenerator.class);
 
-    protected CollectionService collectionService = ContentServiceFactory
-            .getInstance().getCollectionService();
+    protected CollectionService collectionService =
+        ContentServiceFactory.getInstance().getCollectionService();
 
     /**
-     * Construct an object taking the sword service instance an argument
+     * Construct an object taking the SWORD service instance an argument
+     *
      * @param service
+     *     SWORD service implementation
      */
     public CollectionCollectionGenerator(SWORDService service)
     {
@@ -44,8 +46,11 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
     /**
      * Build the collection for the given DSpaceObject.  In this implementation,
      * if the object is not a DSpace Collection, it will throw an exception.
+     *
      * @param dso
+     *     target DSpace object
      * @throws DSpaceSWORDException
+     *     can be thrown by the internals of the DSpace SWORD implementation
      */
     public Collection buildCollection(DSpaceObject dso)
             throws DSpaceSWORDException
@@ -53,9 +58,9 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
         if (!(dso instanceof org.dspace.content.Collection))
         {
             log.error(
-                    "buildCollection passed argument which is not of type Collection");
+                "buildCollection passed argument which is not of type Collection");
             throw new DSpaceSWORDException(
-                    "Incorrect ATOMCollectionGenerator instantiated");
+                "Incorrect ATOMCollectionGenerator instantiated");
         }
 
         // get the things we need out of the service

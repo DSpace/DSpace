@@ -11,6 +11,7 @@ package org.dspace.eperson;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -28,11 +29,20 @@ import org.dspace.eperson.service.EPersonService;
  */
 public class Groomer
 {
-    private static final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+    private static final ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return DateFormat.getDateInstance(DateFormat.SHORT);
+        }
+    };
 
     private static final EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     /**
      * Command line tool for "grooming" the EPerson collection.
+     *
+     * @param argv the command line arguments given
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     static public void main(String[] argv)
             throws SQLException
@@ -50,7 +60,7 @@ public class Groomer
 
         options.addOption("b", "last-used-before", true,
                 "date of last login was before this (for example:  "
-                        + dateFormat.format(Calendar.getInstance().getTime())
+                        + dateFormat.get().format(Calendar.getInstance().getTime())
                         + ')');
         options.addOption("d", "delete", false, "delete matching epersons");
 
@@ -102,7 +112,7 @@ public class Groomer
 
             Date before = null;
             try {
-                before = dateFormat.parse(command.getOptionValue('b'));
+                before = dateFormat.get().parse(command.getOptionValue('b'));
             } catch (java.text.ParseException ex) {
                 System.err.println(ex.getMessage());
                 System.exit(1);
@@ -156,7 +166,7 @@ public class Groomer
     /**
      * List accounts having no password salt.
      *
-     * @throws SQLException
+     * @throws SQLException if database error
      */
     private static void findUnsalted()
             throws SQLException

@@ -8,7 +8,9 @@
 package org.dspace.core;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 
 import java.sql.SQLException;
@@ -22,6 +24,7 @@ import java.util.UUID;
  * Each DAO should extend this class to prevent code duplication.
  *
  * @author kevinvandevelde at atmire.com
+ * @param <T> class type
  */
 public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
 
@@ -91,9 +94,11 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * Execute a JPA Criteria query and return a collection of results.
      *
      * @param context
+     *     The relevant DSpace Context.
      * @param query
-     * @return
-     * @throws SQLException
+     *     JPQL query string
+     * @return list of DAOs specified by the query string
+     * @throws SQLException if database error
      */
     public List<T> findMany(Context context, Query query) throws SQLException {
         @SuppressWarnings("unchecked")
@@ -131,8 +136,8 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
      * Retrieve a unique result from the query.  If multiple results CAN be
      * retrieved an exception will be thrown,
      * so only use when the criteria state uniqueness in the database.
-     * @param criteria
-     * @return
+     * @param criteria JPA criteria
+     * @return a DAO specified by the criteria
      */
     public T uniqueResult(Criteria criteria)
     {
@@ -144,11 +149,12 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
     /**
      * Retrieve a single result from the query.  Best used if you expect a
      * single result, but this isn't enforced on the database.
-     * @param criteria
-     * @return
+     * @param criteria JPA criteria
+     * @return a DAO specified by the criteria
      */
     public T singleResult(Criteria criteria)
     {
+        criteria.setMaxResults(1);
         List<T> list = list(criteria);
         if(CollectionUtils.isNotEmpty(list))
         {
@@ -157,6 +163,17 @@ public abstract class AbstractHibernateDAO<T> implements GenericDAO<T> {
             return null;
         }
 
+    }
+
+    public T singleResult(final Query query) {
+        query.setMaxResults(1);
+        List<T> list = list(query);
+        if(CollectionUtils.isNotEmpty(list))
+        {
+            return list.get(0);
+        }else{
+            return null;
+        }
     }
 
     public T uniqueResult(Query query)

@@ -203,7 +203,7 @@ public class TagCloudConfiguration {
 	}
 
 	/**
-	 * @param ordering the locale to set
+	 * @param locale the locale to set
 	 */
 	public void setLocale(String locale) {
 		this.locale = locale;

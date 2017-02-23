@@ -87,11 +87,24 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         List<ResourcePolicy> results;
         if (notPolicyID != -1)
         {
-            criteria.add(Restrictions.and(Restrictions.not(Restrictions.eq("id", action))));
+            criteria.add(Restrictions.and(Restrictions.not(Restrictions.eq("id", notPolicyID))));
         }
 
         return list(criteria);
     }
+     public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups, int action, int type_id) throws SQLException
+     {
+         Criteria criteria = createCriteria(context, ResourcePolicy.class);
+         criteria.add(Restrictions.and(
+                  Restrictions.eq("resourceTypeId", type_id),
+                  Restrictions.eq("actionId", action),
+                  (Restrictions.or(
+                    Restrictions.eq("eperson", e),
+                    Restrictions.in("epersonGroup", groups)
+                    ))
+                 ));
+         return list(criteria);
+     }
 
     @Override
     public void deleteByDso(Context context, DSpaceObject dso) throws SQLException
@@ -113,9 +126,9 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
 
     @Override
     public void deleteByDsoAndType(Context context, DSpaceObject dso, String type) throws SQLException {
-        String queryString = "delete from ResourcePolicy where dSpaceObject= :dso AND rptype = :rptype";
+        String queryString = "delete from ResourcePolicy where dSpaceObject.id = :dsoId AND rptype = :rptype";
         Query query = createQuery(context, queryString);
-        query.setParameter("dso", dso);
+        query.setParameter("dsoId", dso.getID());
         query.setString("rptype", type);
         query.executeUpdate();
     }

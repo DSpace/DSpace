@@ -17,33 +17,43 @@ import org.apache.solr.common.SolrDocument;
 
 import com.lyncode.xoai.dataprovider.core.ItemMetadata;
 import com.lyncode.xoai.dataprovider.core.ReferenceSet;
+import java.util.Collection;
 
 /**
  * 
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * @author Lyncode Development Team (dspace at lyncode dot com)
  */
 public class DSpaceSolrItem extends DSpaceItem
 {
-    private static Logger log = LogManager
+    private static final Logger log = LogManager
             .getLogger(DSpaceSolrItem.class);
     
-    private String unparsedMD;
+    private final String unparsedMD;
     private ItemMetadata metadata;
-    private String handle;
-    private Date lastMod;
-    private List<ReferenceSet> sets;
-    private boolean deleted;
-    
+    private final String handle;
+    private final Date lastMod;
+    private final List<ReferenceSet> sets;
+    private final boolean deleted;
+
     public DSpaceSolrItem (SolrDocument doc) {
     	log.debug("Creating OAI Item from Solr source");
         unparsedMD = (String) doc.getFieldValue("item.compile");
         handle = (String) doc.getFieldValue("item.handle");
         lastMod = (Date) doc.getFieldValue("item.lastmodified");
-        sets = new ArrayList<ReferenceSet>();
-        for (Object obj : doc.getFieldValues("item.communities"))
-            sets.add(new ReferenceSet((String) obj));
-        for (Object obj : doc.getFieldValues("item.collections"))
-            sets.add(new ReferenceSet((String) obj));
+        sets = new ArrayList<>();
+
+        Collection<Object> fieldValues;
+
+        fieldValues = doc.getFieldValues("item.communities");
+        if (null != fieldValues)
+            for (Object obj : fieldValues)
+                sets.add(new ReferenceSet((String) obj));
+
+        fieldValues = doc.getFieldValues("item.collections");
+        if (null != fieldValues)
+            for (Object obj : fieldValues)
+                sets.add(new ReferenceSet((String) obj));
+
         deleted = (Boolean) doc.getFieldValue("item.deleted");
     }
 

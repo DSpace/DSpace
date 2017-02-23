@@ -33,19 +33,25 @@ public interface WorkflowItemService<T extends WorkflowItem> extends InProgressS
      * Get a workflow item from the database.
      *
      * @param context
-     *            DSpace context object
+     *     The relevant DSpace Context.
      * @param id
-     *            ID of the workflow item
+     *     ID of the workflow item
      *
      * @return the workflow item, or null if the ID is invalid.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public T find(Context context, int id) throws SQLException;
 
     /**
      * return all workflowitems
      *
-     * @param context  active context
+     * @param context
+     *     The relevant DSpace Context.
+     *
      * @return List of all workflowItems in system
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<T> findAll(Context context) throws SQLException;
 
@@ -53,11 +59,13 @@ public interface WorkflowItemService<T extends WorkflowItem> extends InProgressS
      * Get all workflow items for a particular collection.
      *
      * @param context
-     *            the context object
+     *     The relevant DSpace Context.
      * @param collection
-     *            the collection
+     *     the collection
      *
      * @return array of the corresponding workflow items
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<T> findByCollection(Context context, Collection collection) throws SQLException;
 
@@ -66,11 +74,13 @@ public interface WorkflowItemService<T extends WorkflowItem> extends InProgressS
      * If so, its WorkflowItem is returned.  If not, null is returned
      *
      * @param context
-     *            the context object
+     *     The relevant DSpace Context.
      * @param item
-     *            the item
+     *     the item
      *
      * @return workflow item corresponding to the item, or null
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public T findByItem(Context context, Item item) throws SQLException;
 
@@ -79,17 +89,50 @@ public interface WorkflowItemService<T extends WorkflowItem> extends InProgressS
      * e-person.
      *
      * @param context
-     *            the context object
+     *     The relevant DSpace Context.
      * @param ep
-     *            the eperson
+     *     the eperson
      *
      * @return the corresponding workflow items
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     public List<T> findBySubmitter(Context context, EPerson ep) throws SQLException;
 
+    /**
+     * Delete all workflow items present in the specified collection.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param collection
+     *     the containing collection
+     *
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
+     */
     public void deleteByCollection(Context context, Collection collection) throws SQLException, IOException, AuthorizeException;
 
-
+    /**
+     * Delete the specified workflow item.
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param workflowItem
+     *     which workflow item to delete
+     *
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
+     */
     public void delete(Context context, T workflowItem) throws SQLException, AuthorizeException, IOException;
 
 }

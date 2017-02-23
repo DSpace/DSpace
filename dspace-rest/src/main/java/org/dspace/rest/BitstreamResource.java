@@ -77,23 +77,34 @@ public class BitstreamResource extends Resource
      * request is when the bitstream id does not exist. UNAUTHORIZED if the user
      * logged into the DSpace context does not have the permission to access the
      * bitstream. Server error when something went wrong.
-     * 
+     *
      * @param bitstreamId
-     *            Id of bitstream in DSpace.
+     *     Id of bitstream in DSpace.
      * @param expand
-     *            This string defines which additional optional fields will be added
-     *            to bitstream response. Individual options are separated by commas without
-     *            spaces. The options are: "all", "parent".
+     *     This string defines which additional optional fields will be added
+     *     to bitstream response. Individual options are separated by commas without
+     *     spaces. The options are: "all", "parent".
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the
+     *     context. The value of the "rest-dspace-token" header must be set
+     *     to the token received from the login method response.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return If user is allowed to read bitstream, it returns instance of
-     *         bitstream. Otherwise, it throws WebApplicationException with
-     *         response code UNAUTHORIZED.
+     *     bitstream. Otherwise, it throws WebApplicationException with
+     *     response code UNAUTHORIZED.
      * @throws WebApplicationException
-     *             It can happen on: Bad request, unauthorized, SQL exception
-     *             and context exception(could not create context).
+     *     It can happen on: Bad request, unauthorized, SQL exception
+     *     and context exception(could not create context).
      */
     @GET
     @Path("/{bitstream_id}")
@@ -110,7 +121,7 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
@@ -118,7 +129,7 @@ public class BitstreamResource extends Resource
 
             bitstream = new Bitstream(dspaceBitstream, servletContext, expand, context);
             context.complete();
-            log.trace("Bitsream(id=" + bitstreamId + ") was successfully read.");
+            log.trace("Bitstream(id=" + bitstreamId + ") was successfully read.");
 
         }
         catch (SQLException e)
@@ -142,13 +153,13 @@ public class BitstreamResource extends Resource
     /**
      * Return all bitstream resource policies from all bundles, in which
      * the bitstream is present.
-     * 
+     *
      * @param bitstreamId
-     *            Id of bitstream in DSpace.
+     *     Id of bitstream in DSpace.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the context.
+     *     The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
      * @return Returns an array of ResourcePolicy objects.
      */
     @GET
@@ -163,7 +174,7 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
             policies = new Bitstream(dspaceBitstream, servletContext, "policies", context).getPolicies();
 
@@ -193,20 +204,35 @@ public class BitstreamResource extends Resource
      * Read list of bitstreams. It throws WebApplicationException with response
      * code INTERNAL_SERVER_ERROR(500), if there was problem while reading
      * bitstreams from database.
-     * 
+     *
+     * @param expand
+     *     This string defines which additional optional fields will be added
+     *     to bitstream response. Individual options are separated by commas without
+     *     spaces. The options are: "all", "parent".
      * @param limit
-     *            How many bitstreams will be in the list. Default value is 100.
+     *     How many bitstreams will be in the list. Default value is 100.
      * @param offset
-     *            On which offset (item) the list starts. Default value is 0.
+     *     On which offset (item) the list starts. Default value is 0.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the context.
+     *     The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Returns an array of bistreams. Array doesn't contain bitstreams for
-     *         which the user doesn't have read permission.
+     *     which the user doesn't have read permission.
      * @throws WebApplicationException
-     *             Thrown in case of a problem with reading the database or with
-     *             creating a context.
+     *     Thrown in case of a problem with reading the database or with
+     *     creating a context.
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
@@ -223,7 +249,7 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             List<org.dspace.content.Bitstream> dspaceBitstreams = bitstreamService.findAll(context);
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
@@ -265,7 +291,7 @@ public class BitstreamResource extends Resource
         {
             processFinally(context);
         }
-        
+
         return bitstreams.toArray(new Bitstream[0]);
     }
 
@@ -275,20 +301,31 @@ public class BitstreamResource extends Resource
      * there was a problem with reading bitstream file. SQLException if there was
      * a problem while reading from database. And AuthorizeException if there was
      * a problem with authorization of user logged to DSpace context.
-     * 
+     *
      * @param bitstreamId
-     *            Id of the bitstream, whose data will be read.
+     *     Id of the bitstream, whose data will be read.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the context.
+     *     The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Returns response with data with file content type. It can
-     *         return the NOT_FOUND(404) response code in case of wrong bitstream
-     *         id. Or response code UNAUTHORIZED(401) if user is not
-     *         allowed to read bitstream.
+     *     return the NOT_FOUND(404) response code in case of wrong bitstream
+     *     id. Or response code UNAUTHORIZED(401) if user is not
+     *     allowed to read bitstream.
      * @throws WebApplicationException
-     *             Thrown if there was a problem: reading the file data; or reading
-     *             the database; or creating the context; or with authorization.
+     *     Thrown if there was a problem: reading the file data; or reading
+     *     the database; or creating the context; or with authorization.
      */
     @GET
     @Path("/{bitstream_id}/retrieve")
@@ -302,18 +339,20 @@ public class BitstreamResource extends Resource
         org.dspace.core.Context context = null;
         InputStream inputStream = null;
         String type = null;
+        String name = null;
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
-            log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
+            log.trace("Bitstream(id=" + bitstreamId + ") data was successfully read.");
             inputStream = bitstreamService.retrieve(context, dspaceBitstream);
             type = dspaceBitstream.getFormat(context).getMIMEType();
+            name = dspaceBitstream.getName();
 
             context.complete();
         }
@@ -342,21 +381,34 @@ public class BitstreamResource extends Resource
             processFinally(context);
         }
 
-        return Response.ok(inputStream).type(type).build();
+        return Response.ok(inputStream).type(type)
+                .header("Content-Disposition", "attachment; filename=\"" + name + "\"")
+                .build();
     }
 
     /**
      * Add bitstream policy to all bundles containing the bitstream.
-     * 
+     *
      * @param bitstreamId
-     *            Id of bitstream in DSpace.
+     *     Id of bitstream in DSpace.
      * @param policy
-     *            Policy to be added. The following attributes are not
-     *            applied: epersonId,
+     *     Policy to be added. The following attributes are not
+     *     applied: epersonId,
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the context.
+     *     The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Returns ok, if all was ok. Otherwise status code 500.
      */
     @POST
@@ -374,7 +426,7 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers,
@@ -413,22 +465,33 @@ public class BitstreamResource extends Resource
      * May throw WebApplicationException caused by two exceptions:
      * SQLException, if there was a problem with the database. AuthorizeException if
      * there was a problem with the authorization to edit bitstream metadata.
-     * 
+     *
      * @param bitstreamId
-     *            Id of bistream to be updated.
+     *     Id of bistream to be updated.
      * @param bitstream
-     *            Bitstream with will be placed. It must have filled user
-     *            credentials.
+     *     Bitstream with will be placed. It must have filled user
+     *     credentials.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the context.
+     *     The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response codes: OK(200), NOT_FOUND(404) if bitstream does
-     *         not exist and UNAUTHORIZED(401) if user is not allowed to write
-     *         to bitstream.
+     *     not exist and UNAUTHORIZED(401) if user is not allowed to write
+     *     to bitstream.
      * @throws WebApplicationException
-     *             Thrown when: Error reading from database; or error
-     *             creating context; or error regarding bitstream authorization.
+     *     Thrown when: Error reading from database; or error
+     *     creating context; or error regarding bitstream authorization.
      */
     @PUT
     @Path("/{bitstream_id}")
@@ -444,7 +507,7 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
@@ -518,22 +581,33 @@ public class BitstreamResource extends Resource
      * a problem editing or reading the database, IOException if there was
      * a problem with reading from InputStream, Exception if there was another
      * problem.
-     * 
+     *
      * @param bitstreamId
-     *            Id of bistream to be updated.
+     *     Id of bistream to be updated.
      * @param is
-     *            InputStream filled with new data.
+     *     InputStream filled with new data.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the context.
+     *     The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response if bitstream was updated. Response codes:
-     *         OK(200), NOT_FOUND(404) if id of bitstream was bad. And
-     *         UNAUTHORIZED(401) if user is not allowed to update bitstream.
+     *     OK(200), NOT_FOUND(404) if id of bitstream was bad. And
+     *     UNAUTHORIZED(401) if user is not allowed to update bitstream.
      * @throws WebApplicationException
-     *             This exception can be thrown in this cases: Problem with
-     *             reading or writing to database. Or problem with reading from
-     *             InputStream.
+     *     This exception can be thrown in this cases: Problem with
+     *     reading or writing to database. Or problem with reading from
+     *     InputStream.
      */
     // TODO Change to better logic, without editing database.
     @PUT
@@ -549,7 +623,7 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
@@ -590,21 +664,32 @@ public class BitstreamResource extends Resource
      * SQLException if there was a problem reading from database or removing
      * from database. AuthorizeException, if user doesn't have permission to delete
      * the bitstream or file. IOException, if there was a problem deleting the file.
-     * 
+     *
      * @param bitstreamId
-     *            Id of bitstream to be deleted.
+     *     Id of bitstream to be deleted.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the context.
+     *     The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return Return response codes: OK(200), NOT_FOUND(404) if bitstream of
-     *         that id does not exist and UNAUTHORIZED(401) if user is not
-     *         allowed to delete bitstream.
+     *     that id does not exist and UNAUTHORIZED(401) if user is not
+     *     allowed to delete bitstream.
      * @throws WebApplicationException
-     *             Can be thrown if there was a problem reading or editing
-     *             the database. Or problem deleting the file. Or problem with
-     *             authorization to bitstream and bundles. Or problem with
-     *             creating context.
+     *     Can be thrown if there was a problem reading or editing
+     *     the database. Or problem deleting the file. Or problem with
+     *     authorization to bitstream and bundles. Or problem with
+     *     creating context.
      */
     @DELETE
     @Path("/{bitstream_id}")
@@ -618,7 +703,7 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.DELETE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.DELETE, user_ip, user_agent, xforwardedfor,
@@ -650,22 +735,33 @@ public class BitstreamResource extends Resource
         {
             processFinally(context);
         }
-        
+
         log.info("Bitstream(id=" + bitstreamId + ") was successfully deleted.");
         return Response.ok().build();
     }
 
     /**
      * Delete policy.
-     * 
+     *
      * @param bitstreamId
-     *            Id of the DSpace bitstream whose policy will be deleted.
+     *     Id of the DSpace bitstream whose policy will be deleted.
      * @param policyId
-     *            Id of the policy to delete.
+     *     Id of the policy to delete.
+     * @param user_ip
+     *     User's IP address.
+     * @param user_agent
+     *     User agent string (specifies browser used and its version).
+     * @param xforwardedfor
+     *     When accessed via a reverse proxy, the application sees the proxy's IP as the
+     *     source of the request. The proxy may be configured to add the
+     *     "X-Forwarded-For" HTTP header containing the original IP of the client
+     *     so that the reverse-proxied application can get the client's IP.
      * @param headers
-     *            If you want to access the item as the user logged into the context.
-     *            The header "rest-dspace-token" with the token passed
-     *            from the login method must be set.
+     *     If you want to access the item as the user logged into the context.
+     *     The header "rest-dspace-token" with the token passed
+     *     from the login method must be set.
+     * @param request
+     *     Servlet's HTTP request object.
      * @return It returns Ok, if all was ok. Otherwise status code 500.
      */
     @DELETE
@@ -680,7 +776,7 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext();
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers,
@@ -713,13 +809,13 @@ public class BitstreamResource extends Resource
         {
             processFinally(context);
         }
-        
+
         return Response.status(Status.OK).build();
     }
 
     /**
      * Return the MIME type of the file, by file extension.
-     * 
+     *
      * @param name
      *            Name of file.
      * @return String filled with type of file in MIME style.
@@ -733,9 +829,12 @@ public class BitstreamResource extends Resource
      * Add policy(org.dspace.rest.common.ResourcePolicy) to bitstream.
      * @param context Context to create DSpace ResourcePolicy.
      * @param policy Policy which will be added to bitstream.
-     * @param dspaceBitstream
+     * @param dspaceBitstream DSpace Bitstream object.
      * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      * @throws AuthorizeException
+     *     Exception indicating the current user of the context does not have permission
+     *     to perform a particular action.
      */
     private void addPolicyToBitstream(org.dspace.core.Context context, ResourcePolicy policy, org.dspace.content.Bitstream dspaceBitstream) throws SQLException, AuthorizeException {
         org.dspace.authorize.ResourcePolicy dspacePolicy = resourcePolicyService.create(context);
@@ -751,20 +850,20 @@ public class BitstreamResource extends Resource
     }
 
     /**
-     * Find bitstream from DSpace database. This encapsulates the 
-     * org.dspace.content.Bitstream.find method with a check whether the item exists and 
+     * Find bitstream from DSpace database. This encapsulates the
+     * org.dspace.content.Bitstream.find method with a check whether the item exists and
      * whether the user logged into the context has permission to preform the requested action.
-     * 
+     *
      * @param context
-     *            Context of actual logged user.
+     *     Context of actual logged user.
      * @param id
-     *            Id of bitstream in DSpace.
+     *     Id of bitstream in DSpace.
      * @param action
-     *            Constant from org.dspace.core.Constants.
+     *     Constant from org.dspace.core.Constants.
      * @return Returns DSpace bitstream.
      * @throws WebApplicationException
-     *             Is thrown when item with passed id is not exists and if user
-     *             has no permission to do passed action.
+     *     Is thrown when item with passed id is not exists and if user
+     *     has no permission to do passed action.
      */
     private org.dspace.content.Bitstream findBitstream(org.dspace.core.Context context, String id, int action)
             throws WebApplicationException

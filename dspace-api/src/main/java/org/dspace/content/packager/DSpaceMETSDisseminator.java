@@ -32,7 +32,7 @@ import edu.harvard.hul.ois.mets.helper.PCData;
 
 /**
  * Packager plugin to produce a
- * METS (Metadata Encoding & Transmission Standard) package
+ * METS (Metadata Encoding and Transmission Standard) package
  * that is accepted as a DSpace METS SIP (Submission Information Package).
  * See <a href="http://www.loc.gov/standards/mets/">http://www.loc.gov/standards/mets/</a>
  * for more information on METS.
@@ -104,6 +104,7 @@ public class DSpaceMETSDisseminator
 
     /**
      * Create metsHdr element - separate so subclasses can override.
+     * @return mets header
      */
     @Override
     public MetsHdr makeMetsHdr(Context context, DSpaceObject dso,
@@ -134,6 +135,10 @@ public class DSpaceMETSDisseminator
      * params may contain one or more values for "dmd"; each of those is
      * the name of a crosswalk plugin, optionally followed by colon and
      * its METS MDTYPE name.
+     * @return array of DMD types
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public String [] getDmdTypes(Context context, DSpaceObject dso, PackageParameters params)
@@ -159,6 +164,10 @@ public class DSpaceMETSDisseminator
      * Get name of technical metadata crosswalk for Bitstreams.
      * Default is PREMIS.  This is both the name of the crosswalk plugin
      * and the METS MDTYPE.
+     * @return array of TechMD types
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error 
      */
     @Override
     public String[] getTechMdTypes(Context context, DSpaceObject dso, PackageParameters params)
@@ -193,6 +202,10 @@ public class DSpaceMETSDisseminator
     /**
      * Add rights MD (licenses) for DSpace item.  These
      * may include a deposit license, and Creative Commons.
+     * @return array of RightsMD types
+     * @throws IOException if IO error
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
      */
     @Override
     public String[] getRightsMdTypes(Context context, DSpaceObject dso, PackageParameters params)

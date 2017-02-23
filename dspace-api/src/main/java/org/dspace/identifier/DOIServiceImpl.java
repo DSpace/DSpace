@@ -115,4 +115,11 @@ public class DOIServiceImpl implements DOIService {
     public List<DOI> getDOIsByStatus(Context context, List<Integer> statuses) throws SQLException{
         return doiDAO.findByStatus(context, statuses);
     }
+    
+    @Override
+    public List<DOI> getSimilarDOIsNotInState(Context context, String doiPattern, List<Integer> statuses, boolean dsoIsNotNull)
+            throws SQLException
+    {
+        return doiDAO.findSimilarNotInState(context, doiPattern, statuses, dsoIsNotNull);
+    }
 }

@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.core.Constants;
 
 /**
  * The main service class used to reserve, register and resolve identifiers
@@ -47,16 +48,16 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Autowired
-   @Required
-   public void setProviders(List<IdentifierProvider> providers)
-   {
-       this.providers = providers;
-
-       for(IdentifierProvider p : providers)
-       {
-           p.setParentService(this);
-       }
-   }
+    @Required
+    public void setProviders(List<IdentifierProvider> providers)
+    {
+        this.providers = providers;
+ 
+        for (IdentifierProvider p : providers)
+        {
+            p.setParentService(this);
+        }
+    }
 
     /**
      * Reserves identifiers for the item
@@ -64,21 +65,13 @@ public class IdentifierServiceImpl implements IdentifierService {
      * @param dso dspace object
      */
     @Override
-    public void reserve(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException {
+    public void reserve(Context context, DSpaceObject dso)
+        throws AuthorizeException, SQLException, IdentifierException
+    {
         for (IdentifierProvider service : providers)
         {
-            service.mint(context, dso);
-        }
-        //Update our item
-        contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
-    }
-
-    @Override
-    public void reserve(Context context, DSpaceObject dso, String identifier) throws AuthorizeException, SQLException, IdentifierException {
-        // Next resolve all other services
-        for (IdentifierProvider service : providers)
-        {
-            if(service.supports(identifier))
+            String identifier = service.mint(context, dso);
+            if (!StringUtils.isEmpty(identifier))
             {
                 service.reserve(context, dso, identifier);
             }
@@ -88,7 +81,25 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public void register(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException {
+    public void reserve(Context context, DSpaceObject dso, String identifier)
+        throws AuthorizeException, SQLException, IdentifierException
+    {
+        // Next resolve all other services
+        for (IdentifierProvider service : providers)
+        {
+            if (service.supports(identifier))
+            {
+                service.reserve(context, dso, identifier);
+            }
+        }
+        //Update our item
+        contentServiceFactory.getDSpaceObjectService(dso).update(context, dso);
+    }
+
+    @Override
+    public void register(Context context, DSpaceObject dso)
+        throws AuthorizeException, SQLException, IdentifierException
+    {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
         for (IdentifierProvider service : providers)
@@ -100,8 +111,9 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public void register(Context context, DSpaceObject object, String identifier) throws AuthorizeException, SQLException, IdentifierException {
-
+    public void register(Context context, DSpaceObject object, String identifier)
+        throws AuthorizeException, SQLException, IdentifierException
+    {
         //We need to commit our context because one of the providers might require the handle created above
         // Next resolve all other services
         boolean registered = false;
@@ -123,10 +135,11 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public String lookup(Context context, DSpaceObject dso, Class<? extends Identifier> identifier) {
+    public String lookup(Context context, DSpaceObject dso, Class<? extends Identifier> identifier)
+    {
         for (IdentifierProvider service : providers)
         {
-            if(service.supports(identifier))
+            if (service.supports(identifier))
             {
                try{
                    String result = service.lookup(context, dso);
@@ -218,10 +231,12 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public DSpaceObject resolve(Context context, String identifier) throws IdentifierNotFoundException, IdentifierNotResolvableException{
+    public DSpaceObject resolve(Context context, String identifier)
+        throws IdentifierNotFoundException, IdentifierNotResolvableException
+    {
         for (IdentifierProvider service : providers)
         {
-            if(service.supports(identifier))
+            if (service.supports(identifier))
             {   try
                 {
                     DSpaceObject result = service.resolve(context, identifier);
@@ -248,7 +263,9 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public void delete(Context context, DSpaceObject dso) throws AuthorizeException, SQLException, IdentifierException {
+    public void delete(Context context, DSpaceObject dso)
+       throws AuthorizeException, SQLException, IdentifierException
+    {
        for (IdentifierProvider service : providers)
        {
             try
@@ -261,12 +278,14 @@ public class IdentifierServiceImpl implements IdentifierService {
     }
 
     @Override
-    public void delete(Context context, DSpaceObject dso, String identifier) throws AuthorizeException, SQLException, IdentifierException {
+    public void delete(Context context, DSpaceObject dso, String identifier)
+        throws AuthorizeException, SQLException, IdentifierException
+    {
         for (IdentifierProvider service : providers)
         {
             try
             {
-                if(service.supports(identifier))
+                if (service.supports(identifier))
                 {
                     service.delete(context, dso, identifier);
                 }

@@ -23,6 +23,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,6 +65,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected SubscribeService subscribeService;
     @Autowired(required = true)
     protected WorkspaceItemService workspaceItemService;
+    @Autowired(required=true)
+    protected HarvestedCollectionService harvestedCollectionService;
 
 
     protected CollectionServiceImpl()
@@ -119,14 +123,23 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public List<Collection> findAll(Context context) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, "dc", "title", null);
-        return collectionDAO.findAll(context, nameField);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(nameField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
 
+        return collectionDAO.findAll(context, nameField);
     }
 
     @Override
     public List<Collection> findAll(Context context, Integer limit, Integer offset) throws SQLException {
-        MetadataField nameField = metadataFieldService.findByElement(context, "dc", "title", null);
+        MetadataField nameField = metadataFieldService.findByElement(context, MetadataSchema.DC_SCHEMA, "title", null);
+        if(nameField==null)
+        {
+            throw new IllegalArgumentException("Required metadata field '" + MetadataSchema.DC_SCHEMA + ".title' doesn't exist!");
+        }
+
         return collectionDAO.findAll(context, nameField, limit, offset);
     }
 
@@ -318,7 +331,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             Group g = groupService.create(context);
             context.restoreAuthSystemState();
 
-            g.setName(context, "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + step);
+            groupService.setName(g,
+                    "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + step);
             groupService.update(context, g);
             setWorkflowGroup(collection, step, g);
 
@@ -365,12 +379,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
      * Get the value of a metadata field
      *
      * @param collection
+     *     which collection to operate on
      * @param field
-     *            the name of the metadata field to get
+     *     the name of the metadata field to get
      *
      * @return the value of the metadata field
      *
-     * @exception IllegalArgumentException
+     * @throws IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
     @Override
@@ -395,7 +410,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             submitters = groupService.create(context);
             context.restoreAuthSystemState();
 
-            submitters.setName(context, "COLLECTION_" + collection.getID() + "_SUBMIT");
+            groupService.setName(submitters,
+                    "COLLECTION_" + collection.getID() + "_SUBMIT");
             groupService.update(context, submitters);
         }
 
@@ -435,7 +451,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             admins = groupService.create(context);
             context.restoreAuthSystemState();
 
-            admins.setName(context, "COLLECTION_" + collection.getID() + "_ADMIN");
+            groupService.setName(admins, "COLLECTION_" + collection.getID() + "_ADMIN");
             groupService.update(context, admins);
         }
 
@@ -545,17 +561,18 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void removeItem(Context context, Collection collection, Item item) throws SQLException, AuthorizeException, IOException {
-                // Check authorisation
+        // Check authorisation
         authorizeService.authorizeAction(context, collection, Constants.REMOVE);
 
-        //Remove the item from the collection
-        item.removeCollection(collection);
-
         //Check if we orphaned our poor item
-        if (item.getCollections().isEmpty())
+        if (item.getCollections().size() == 1)
         {
             // Orphan; delete it
             itemService.delete(context, item);
+        } else {
+            //Remove the item from the collection if we have multiple collections
+            item.removeCollection(collection);
+
         }
 
         context.addEvent(new Event(Event.REMOVE, Constants.COLLECTION,
@@ -612,7 +629,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Override
     public void canEdit(Context context, Collection collection, boolean useInheritance) throws SQLException, AuthorizeException {
-        List<Community> parents = collection.getCommunities();
+        List<Community> parents = communityService.getAllParents(context, collection);
         for (Community parent : parents) {
             if (authorizeService.authorizeActionBoolean(context, parent,
                     Constants.WRITE, useInheritance)) {
@@ -631,6 +648,13 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public void delete(Context context, Collection collection) throws SQLException, AuthorizeException, IOException {
         log.info(LogManager.getHeader(context, "delete_collection",
                 "collection_id=" + collection.getID()));
+
+        // remove harvested collections.
+        HarvestedCollection hc = harvestedCollectionService.find(context,collection);
+        if(hc!=null)
+        {
+            harvestedCollectionService.delete(context, hc);
+        }
 
         context.addEvent(new Event(Event.DELETE, Constants.COLLECTION,
                 collection.getID(), collection.getHandle(), getIdentifiers(context, collection)));
@@ -665,9 +689,6 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         // Delete bitstream logo
         setLogo(context, collection, null);
 
-        // Remove all authorization policies
-        authorizeService.removeAllPolicies(context, collection);
-
         Iterator<WorkspaceItem> workspaceItems = workspaceItemService.findByCollection(context, collection).iterator();
         while (workspaceItems.hasNext()) {
             WorkspaceItem workspaceItem = workspaceItems.next();
@@ -687,6 +708,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         Group g = collection.getWorkflowStep1();
         if (g != null)
         {
+            collection.setWorkflowStep1(null);
             groupService.delete(context, g);
         }
 
@@ -694,6 +716,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
+            collection.setWorkflowStep2(null);
             groupService.delete(context, g);
         }
 
@@ -701,6 +724,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
+            collection.setWorkflowStep3(null);
             groupService.delete(context, g);
         }
 
@@ -709,6 +733,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
+            collection.setAdmins(null);
             groupService.delete(context, g);
         }
 
@@ -717,11 +742,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
+            collection.setSubmitters(null);
             groupService.delete(context, g);
         }
 
-
-        deleteMetadata(context, collection);
         Iterator<Community> owningCommunities = collection.getCommunities().iterator();
         while (owningCommunities.hasNext())
         {
@@ -780,7 +804,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         List<Community> communities = collection.getCommunities();
         if (CollectionUtils.isNotEmpty(communities))
         {
-            community = communities.iterator().next();
+            community = communities.get(0);
         }
 
         switch (action)
@@ -813,7 +837,7 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     public DSpaceObject getParentObject(Context context, Collection collection) throws SQLException {
         List<Community> communities = collection.getCommunities();
         if(CollectionUtils.isNotEmpty(communities)){
-            return communities.iterator().next();
+            return communities.get(0);
         }else{
             return null;
         }

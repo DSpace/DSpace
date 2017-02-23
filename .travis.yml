@@ -5,11 +5,28 @@ env:
   # Give Maven 1GB of memory to work with
   - MAVEN_OPTS=-Xmx1024M
 
+jdk:
+  # DS-3384 Oracle JDK 8 has DocLint enabled by default.
+  # Let's use this to catch any newly introduced DocLint issues.
+  - oraclejdk8
+  - oraclejdk7
+
+## Should we run into any problems with oraclejdk8 on Travis, we may try the following workaround.
+## https://docs.travis-ci.com/user/languages/java#Testing-Against-Multiple-JDKs
+## https://github.com/travis-ci/travis-ci/issues/3259#issuecomment-130860338
+#addons:
+#  apt:
+#    packages:
+#      - oracle-java8-installer
+
 # Install prerequisites for building Mirage2 more rapidly
 before_install:
-  # Install latest Node.js 0.10.x & print version info
-  - nvm install 0.10
+  # Install Node.js 6.5.0 & print version info
+  - nvm install 6.5.0
   - node --version
+  # Install npm 3.10.8 & print version info
+  - npm install -g npm@3.10.8
+  - npm --version
   # Install Bower
   - npm install -g bower
   # Install Grunt & print version info
@@ -38,9 +55,10 @@ script:
   #        -P !assembly            => Skip normal assembly (as it can be memory intensive)
   #        -B => Maven batch/non-interactive mode (recommended for CI)
   #        -V => Display Maven version info before build
-  - "mvn clean install license:check -Dmaven.test.skip=false -DskipITs=false -P !assembly -B -V"
+  #        -Dsurefire.rerunFailingTestsCount=2 => try again for flakey tests, and keep track of/report on number of retries
+  - "mvn clean install license:check -Dmaven.test.skip=false -DskipITs=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2"
   # 2. [Assemble DSpace] Ensure assembly process works (from [src]/dspace/), including Mirage 2
   #        -Dmirage2.on=true => Build Mirage2
   #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
   #        -P !assembly => SKIP the actual building of [src]/dspace/dspace-installer (as it can be memory intensive)
-  - "cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V"
+  - "cd dspace && mvn package -Dmirage2.on=true -Dmirage2.deps.included=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2"

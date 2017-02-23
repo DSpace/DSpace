@@ -10,14 +10,13 @@ package org.dspace.storage.rdbms.migration;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.dspace.storage.rdbms.MigrationUtils;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 
 /**
  * This class is in support of the "V1.4__Upgrade_to_DSpace_1.4_schema.sql"
  * It simply drops the database constraint associated with the "name" column
- * of the "community" table. This is necessary for the upgrade from 1.3 -> 1.4
+ * of the "community" table. This is necessary for the upgrade from 1.3 to 1.4
  * <P>
  * This class was created because the names of database constraints differs based
  * on the type of database (Postgres vs. Oracle vs. H2). As such, it becomes difficult
@@ -46,6 +45,11 @@ public class V1_3_9__Drop_constraint_for_DSpace_1_4_schema
     /**
      * Actually migrate the existing database
      * @param connection
+     *     SQL Connection object
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
      */
     @Override
     public void migrate(Connection connection)

@@ -31,8 +31,8 @@ public class ApacheLogRobotsProcessor {
      * Creates a file containing spiders based on an Apache logfile
      * by analyzing users of the robots.txt file
      *
-     * @param args
-     * @throws Exception
+     * @param args the command line arguments given
+     * @throws Exception if error
      */
 
     public static void main(String[] args) throws Exception {

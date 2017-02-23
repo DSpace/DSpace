@@ -39,7 +39,7 @@ public class SubmissionStepConfig implements Serializable
 
     /**
      * the id for this step ('id' only exists if this step is defined in the
-     * <step-definitions> section)
+     * &lt;step-definitions&gt; section)
      */
     private String id = null;
 
@@ -100,8 +100,8 @@ public class SubmissionStepConfig implements Serializable
 
     /**
      * Get the ID for this step. An ID is only defined if the step exists in the
-     * <step-definitions> section. This ID field is used to reference special
-     * steps (like the required step with id="collection")
+     * {@code <step-definitions>} section. This ID field is used to reference special
+     * steps (like the required step with {@code id="collection"})
      * 
      * @return the step ID
      */
