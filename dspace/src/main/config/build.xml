@@ -668,6 +668,7 @@ Common usage:
             <fileset dir="webapps">
                 <exclude name="**/web.xml" />
                 <exclude name="**/robots.txt" />
+            	<exclude name="**/application.properties" />
             </fileset>
         </copy>
 
@@ -676,6 +677,7 @@ Common usage:
             <fileset dir="webapps">
                 <include name="**/web.xml" />
                 <include name="**/robots.txt" />
+            	<include name="**/application.properties" />
             </fileset>
             <filterchain>
                 <expandproperties />
