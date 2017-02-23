@@ -7,10 +7,14 @@
  */
 package org.dspace.servicemanager;
 
+import static org.dspace.servicemanager.config.DSpaceConfigurationService.DSPACE_HOME;
 import static org.junit.Assert.*;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Paths;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,13 +26,18 @@ import org.junit.Test;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceKernelImplTest {
+public class DSpaceKernelTest {
 
     private DSpaceKernel kernelImpl;
 
     @Before
     public void init() {
         kernelImpl = DSpaceKernelInit.getKernel(); // checks for the existing kernel but does not init
+        String actualDspaceHome = System.getProperty(DSPACE_HOME);
+        if(actualDspaceHome == null) {
+            String testResourcesUri = getClass().getResource("/").getFile();
+            System.setProperty(DSPACE_HOME, testResourcesUri);
+        }
     }
 
     @After
@@ -44,7 +53,7 @@ public class DSpaceKernelImplTest {
      */
     @Test
     public void testKernel() {
-        kernelImpl.start(null);
+        kernelImpl.start();
         assertNotNull(kernelImpl);
         assertNotNull(kernelImpl);
         assertNotNull(this.kernelImpl.getConfigurationService());

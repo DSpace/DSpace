@@ -10,7 +10,6 @@ package org.dspace.servicemanager;
 import java.util.Date;
 import java.util.List;
 
-import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
@@ -39,7 +38,7 @@ public final class DSpaceKernel {
         static final DSpaceKernel INSTANCE = new DSpaceKernel();
     }
 
-    private DSpaceKernel(){
+    private DSpaceKernel() {
         log.info("Created new kernel: " + this);
     }
 
@@ -85,7 +84,6 @@ public final class DSpaceKernel {
 
     public void start() {
         if (isRunning()) {
-            //log.warn("Kernel ("+this+") is already started");
             return;
         }
 
@@ -152,7 +150,7 @@ public final class DSpaceKernel {
 
     @Override
     public String toString() {
-        return "DSpaceKernel:lastLoad=" + lastLoadDate + ":loadTime=" + loadTime + ":running=" + running + ":kernel=" + getClass().getName() +"@"+getClass().getClassLoader() + ":" + super.toString();
+        return "DSpaceKernel:lastLoad=" + lastLoadDate + ":loadTime=" + loadTime + ":running=" + running + ":kernel=" + getClass().getName() + "@" + getClass().getClassLoader() + ":" + super.toString();
     }
 
     private void registerShutdownHook() {
@@ -173,14 +171,13 @@ public final class DSpaceKernel {
      * Called from within the shutdown thread.
      */
     private void doDestroy() {
-        if (! this.destroyed) {
+        if (!this.destroyed) {
             destroy();
         }
     }
 
     private void stop() {
         if (!running) {
-            //log.warn("Kernel ("+this+") is already stopped");
             return;
         }
 

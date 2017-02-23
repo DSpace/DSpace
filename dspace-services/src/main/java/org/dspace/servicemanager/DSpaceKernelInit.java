@@ -18,7 +18,6 @@ public class DSpaceKernelInit {
      * Executes {@link org.dspace.servicemanager.DSpaceKernel#getInstance DSpaceKernel.getInstance()}
      * Left due to API compatibility
      *
-     * @param name kernel name (or null for default kernel)
      * @return a DSpace Kernel
      */
     public static DSpaceKernel getKernel() {
