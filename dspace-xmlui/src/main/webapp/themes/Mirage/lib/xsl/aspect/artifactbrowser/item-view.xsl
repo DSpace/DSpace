@@ -405,12 +405,19 @@
                     <xsl:choose>
                         <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
                         mets:file[@GROUPID=current()/@GROUPID]">
-                            <img alt="Thumbnail">
-                                <xsl:attribute name="src">
-                                    <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                                    mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-                                </xsl:attribute>
-                            </img>
+                            <xsl:variable name="src" 
+                              select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                            <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
+                            <xsl:choose>
+                              <xsl:when test="contains($src,'isAllowed=n')"/>
+                              <xsl:otherwise>
+                                <img class="img-thumbnail" alt="Thumbnail">
+                                    <xsl:attribute name="src">
+                                        <xsl:value-of select="$src"/>
+                                    </xsl:attribute>
+                                </img>
+                              </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:when>
                         <xsl:otherwise>
                             <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="height: {$thumbnail.maxheight}px;"/>
