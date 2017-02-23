@@ -267,7 +267,7 @@
                                      <include>**/*.xmap</include>
                                  </includes>
                                  <excludes>
-                                     <exclude>**/node/node_modules/**</exclude>
+                                     <exclude>**/node_modules/**</exclude>
                                  </excludes>
                               </validationSet>
                           </validationSets>
