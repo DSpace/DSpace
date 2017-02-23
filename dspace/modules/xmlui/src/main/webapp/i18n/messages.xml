@@ -317,7 +317,7 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.trail">Request a copy of the document</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.head">Request a copy of the document</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestForm.login_para">Users of this system, can login to view this document.</message>
-    <message key="xmlui.ArtifactBrowser.ItemRequestForm.login">Login</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestForm.login">Login/Create New Account</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestForm.para1">Enter the following information to request a copy of the document from the responsible person.</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail">Your e-mail address</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail_help">This email address is used for sending the document.</message>
@@ -489,7 +489,7 @@
 	<message key="xmlui.EPerson.Navigation.my_account">My Account</message>
 	<message key="xmlui.EPerson.Navigation.profile">Profile</message>
 	<message key="xmlui.EPerson.Navigation.logout">Logout</message>
-	<message key="xmlui.EPerson.Navigation.login">Login</message>
+    <message key="xmlui.EPerson.Navigation.login">Login/Create New Account</message>
 	<message key="xmlui.EPerson.Navigation.register">Register</message>
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
@@ -2171,7 +2171,7 @@
 
 	<message key="xmlui.dri2xhtml.structural.profile">Profile: </message>
 	<message key="xmlui.dri2xhtml.structural.logout">Logout</message>
-	<message key="xmlui.dri2xhtml.structural.login">Login</message>
+    <message key="xmlui.dri2xhtml.structural.login">Login/Create New Account</message>
 
 	<message key="xmlui.dri2xhtml.structural.search">Search VSim</message>
 	<message key="xmlui.dri2xhtml.structural.search-advanced">Advanced Search</message>
