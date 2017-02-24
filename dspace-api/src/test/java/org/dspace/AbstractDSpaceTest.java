@@ -54,6 +54,11 @@ public class AbstractDSpaceTest
      * any other services.
      */
     protected static DSpaceKernel kernel;
+    /**
+     * use kernel
+     */
+    @Deprecated
+    protected static DSpaceKernel kernelImpl;
 
     /**
      * This method will be run before the first test as per @BeforeClass. It will
@@ -78,6 +83,7 @@ public class AbstractDSpaceTest
 
             // Initialise the service manager kernel
             kernel = DSpaceKernelInit.getKernel();
+            kernelImpl = kernel;
             if (!kernel.isRunning())
             {
                 // NOTE: the "dspace.dir" system property MUST be specified via Maven

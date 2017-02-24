@@ -55,7 +55,7 @@ public class HandleIdentifierProviderTest
     @BeforeClass
     public static void setUpClass()
     {
-        ServiceManager serviceManager = kernelImpl.getServiceManager();
+        ServiceManager serviceManager = kernel.getServiceManager();
 
         // Get the normal ApplicationContext
         ApplicationContext parentApplicationContext
