@@ -23,7 +23,7 @@ public class DSpaceTest {
     @Test
     public void testDSpaceObject() {
         DSpaceKernel kernel = DSpaceKernel.getInstance();
-        kernel.start(null);
+        kernel.start();
 
         DSpace dspace = new DSpace();
         Object o = dspace.getServiceManager();

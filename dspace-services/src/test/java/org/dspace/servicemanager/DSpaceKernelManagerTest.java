@@ -28,7 +28,7 @@ public class DSpaceKernelManagerTest {
     @Before
     public void init() {
         kernel = DSpaceKernelInit.getKernel();
-        kernel.start(null); // init the kernel
+        kernel.start(); // init the kernel
         kernelManager = new DSpaceKernelManager();
     }
 
@@ -44,11 +44,11 @@ public class DSpaceKernelManagerTest {
      * Test method for {@link org.dspace.kernel.DSpaceKernelManager#getKernel()}.
      */
     @Test
-    public void testGetKernel() {
+    public void shouldAlwaysReturnSameKernelInstance() {
         DSpaceKernel kernel = kernelManager.getKernel();
         assertNotNull(kernel);
-        DSpaceKernel k2 = kernelManager.getKernel();
-        assertNotNull(k2);
-        assertEquals(kernel, k2);
+        DSpaceKernel secondKernel = kernelManager.getKernel();
+        assertNotNull(secondKernel);
+        assertEquals(kernel, secondKernel);
     }
 }

@@ -78,6 +78,7 @@ public final class DSpaceKernel {
         }
     }
 
+    @Deprecated
     public void start(String legacyHome) {
         start();
     }

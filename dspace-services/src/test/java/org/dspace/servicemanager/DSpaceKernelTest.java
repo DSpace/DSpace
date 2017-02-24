@@ -33,11 +33,6 @@ public class DSpaceKernelTest {
     @Before
     public void init() {
         kernelImpl = DSpaceKernelInit.getKernel(); // checks for the existing kernel but does not init
-        String actualDspaceHome = System.getProperty(DSPACE_HOME);
-        if(actualDspaceHome == null) {
-            String testResourcesUri = getClass().getResource("/").getFile();
-            System.setProperty(DSPACE_HOME, testResourcesUri);
-        }
     }
 
     @After

@@ -43,7 +43,7 @@ public abstract class DSpaceAbstractTest {
      */
     public static void _initializeKernel() {
         kernel = DSpaceKernelInit.getKernel();
-        kernel.start(null); // init the kernel
+        kernel.start(); // init the kernel
     }
 
     /**
