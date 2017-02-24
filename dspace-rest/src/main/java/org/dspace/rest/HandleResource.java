@@ -45,7 +45,7 @@ public class HandleResource extends Resource {
         DSpaceObject result = null;
 
         try {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
 
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
             if(dso == null) {

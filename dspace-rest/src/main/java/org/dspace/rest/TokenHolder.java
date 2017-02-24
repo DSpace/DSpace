@@ -34,9 +34,9 @@ public class TokenHolder
 
     public static String TOKEN_HEADER = "rest-dspace-token";
 
-    private static Map<String, String> tokens = new HashMap<String, String>(); // Map with pair Email,token
+    private static Map<String, String> email2token = new HashMap<String, String>(); // Map with pair Email,token
 
-    private static Map<String, EPerson> persons = new HashMap<String, EPerson>(); // Map with pair token,Eperson
+    private static Map<String, String> token2email = new HashMap<String, String>();
 
     /**
      * Login user into rest api. It check user credentials if they are okay.
@@ -66,15 +66,15 @@ public class TokenHolder
                 {
                     token = null;
                 }
-                else if (tokens.containsKey(user.getEmail()))
+                else if (email2token.containsKey(user.getEmail()))
                 {
-                    token = tokens.get(user.getEmail());
+                    token = email2token.get(user.getEmail());
                 }
                 else
                 {
                     token = generateToken();
-                    persons.put(token, dspaceUser);
-                    tokens.put(user.getEmail(), token);
+                    email2token.put(user.getEmail(), token);
+                    token2email.put(token, user.getEmail());
                 }
             }
 
@@ -115,9 +115,27 @@ public class TokenHolder
      * @return Return instance of EPerson if is token right, otherwise it
      *         returns NULL.
      */
-    public static synchronized EPerson getEPerson(String token)
+    public static synchronized EPerson getEPerson(org.dspace.core.Context context, String token)
     {
-        return persons.get(token);
+        try {
+            return EPerson.findByEmail(context, token2email.get(token));
+        } catch (SQLException e) {
+            log.error("Could not read user from database. Message:" + e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (AuthorizeException e) {
+            log.error("Could not find user, AuthorizeException. Message:" + e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Return email associated with the token
+     *
+     * @param token
+     * @return
+     */
+    public static synchronized String getEMail(String token){
+        return token2email.get(token);
     }
 
     /**
@@ -129,17 +147,16 @@ public class TokenHolder
      */
     public static synchronized boolean logout(String token)
     {
-        if ((token == null) || (persons.get(token) == null))
+        if ((token == null) || (token2email.get(token) == null))
         {
             return false;
         }
-        String email = persons.get(token).getEmail();
-        EPerson person = persons.remove(token);
-        if (person == null)
+        String email = token2email.remove(token);
+        if (email == null)
         {
             return false;
         }
-        tokens.remove(email);
+        email2token.remove(email);
         return true;
     }
 
