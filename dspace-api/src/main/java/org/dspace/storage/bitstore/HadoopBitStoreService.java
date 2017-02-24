@@ -26,7 +26,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 /**
- * Created by abr on 23-02-17.
+ * DSpace (or "Directory Scatter" if you prefer) asset store implemented for the Hadoop Filesystem API..
+ * Implements a directory 'scatter' algorithm to avoid limits on
+ * files per directory.
+ *
+ * A lot of code have been lifted directly from DSBitStoreService
+ * @see DSBitStoreService
+ * @author Asger Askov Blekinge
  */
 public class HadoopBitStoreService implements BitStoreService
 {
@@ -34,8 +40,6 @@ public class HadoopBitStoreService implements BitStoreService
 
     /** log4j log */
     private static Logger log = Logger.getLogger(DSBitStoreService.class);
-    private FileSystem fs;
-    private Configuration configuration;
 
     // These settings control the way an identifier is hashed into
     // directory and file names
@@ -56,19 +60,55 @@ public class HadoopBitStoreService implements BitStoreService
 
     /** the asset directory */
     private Path baseDir;
+
+    /** The file system path for the hadoop filesystem. Connect to a hdfs cluster with a path like "hdfs://namenode:8020" and to a local file with a path like "file:///"
+     */
     private String defaultFS;
+
+    /**
+     * The hadoop filesystem connection
+     */
+    private FileSystem fileSystem;
 
 
     @Override
     public void init() throws IOException
     {
-        configuration = new Configuration();
-        //defaultFS = "hdfs://namenode:8020";
-        configuration.set(org.apache.hadoop.fs.CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, defaultFS);
-        fs = FileSystem.get(configuration);
     }
 
 
+    public Path getBaseDir() {
+        return baseDir;
+    }
+
+    public void setBaseDir(Path baseDir) {
+        this.baseDir = baseDir;
+    }
+
+    public String getDefaultFS() {
+        return defaultFS;
+    }
+
+    public void setDefaultFS(String defaultFS) {
+        this.defaultFS = defaultFS;
+    }
+
+    /**
+     * Utility method to initialise and/or get the filesystem. The first invocation initiatializes the file system connection, and the rest just return this. Synchronized so no initialise race conditions
+     * @return the file system object
+     * @throws IOException if the file system could not be initialised
+     */
+    protected synchronized FileSystem getFileSystem() throws IOException {
+        if (fileSystem == null)
+        {
+            Configuration configuration = new Configuration();
+            //defaultFS = "hdfs://namenode:8020";
+            configuration.set(org.apache.hadoop.fs.CommonConfigurationKeysPublic.FS_DEFAULT_NAME_KEY, defaultFS);
+            fileSystem = FileSystem.get(configuration);
+        }
+        return fileSystem;
+
+    }
 
     /**
      * Retrieve the bits for the asset with ID. If the asset does not
@@ -86,11 +126,20 @@ public class HadoopBitStoreService implements BitStoreService
     {
         try
         {
-            return fs.open(getFile(bitstream));
-        } catch (Exception e)
+            FileSystem fs = getFileSystem();
+            Path file = getFile(bitstream, baseDir);
+            if (file != null && fs.exists(file))
+            {
+                return fs.open(file);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (Exception e)
         {
-            log.error("get(" + bitstream.getInternalId() + ")", e);
-            throw new IOException(e);
+            throw new IOException("get(" + bitstream.getInternalId() + ")", e);
         }
     }
 
@@ -110,9 +159,10 @@ public class HadoopBitStoreService implements BitStoreService
     @Override
     public void put(Bitstream bitstream, InputStream in) throws IOException
     {
-        try
-        {
-            Path file = getFile(bitstream);
+        try {
+            FileSystem fs = getFileSystem();
+
+            Path file = getFile(bitstream, baseDir);
 
             // Make the parent dirs if necessary
             Path parent = file.getParent();
@@ -120,29 +170,23 @@ public class HadoopBitStoreService implements BitStoreService
                 fs.mkdirs(parent);
             }
 
-            byte[] digest;
-            try (//Create the corresponding file and open it
-                 OutputStream fos = fs.create(file);
-                 // Read through a digest input stream that will work out the MD5
-                 DigestInputStream dis = new DigestInputStream(in, MessageDigest.getInstance(CSA));)
-            {
-
-                Utils.bufferedCopy(dis, fos);
-
-                digest = dis.getMessageDigest().digest();
-            } catch (NoSuchAlgorithmException nsae)
-            { // Should never happen
-                throw new RuntimeException("Caught NoSuchAlgorithmException", nsae);
-            }
-
-
-            bitstream.setSizeBytes(fs.getFileStatus(file).getLen());
-            bitstream.setChecksum(Utils.toHex(digest));
             bitstream.setChecksumAlgorithm(CSA);
+            MessageDigest messageDigest = getMessageDigest(CSA);
+            try ( //Try-with-resources to autoclose the streams
+                    //Create the corresponding file and open it
+                    OutputStream fos = fs.create(file);
+                    // digest input stream that will work out the MD5 when read
+                    DigestInputStream dis = new DigestInputStream(in, messageDigest);)
+            {
+                Utils.bufferedCopy(dis, fos);
+            }
+            byte[] digest = messageDigest.digest();
+            bitstream.setChecksum(Utils.toHex(digest));
+            bitstream.setSizeBytes(fs.getFileStatus(file).getLen());
+
         } catch (Exception e)
         {
-            log.error("put(" + bitstream.getInternalId() + ", inputstream)", e);
-            throw new IOException(e);
+            throw new IOException("put(" + bitstream.getInternalId() + ", inputstream)", e);
         }
     }
 
@@ -164,8 +208,9 @@ public class HadoopBitStoreService implements BitStoreService
     {
         try
         {
+            FileSystem fs = getFileSystem();
             // potentially expensive, since it may calculate the checksum
-            Path file = getFile(bitstream);
+            Path file = getFile(bitstream, baseDir);
             if (file != null && fs.exists(file))
             {
                 FileStatus fileStatus = fs.getFileStatus(file);
@@ -175,24 +220,16 @@ public class HadoopBitStoreService implements BitStoreService
                 }
                 if (attrs.containsKey("checksum"))
                 {
-
+                    MessageDigest messageDigest = getMessageDigest(CSA);
                     // generate checksum by reading the bytes
-
-                    MessageDigest digest;
-                    try {
-                        digest = MessageDigest.getInstance(CSA);
-                    } catch (NoSuchAlgorithmException e)
-                    {
-                        log.warn("Caught NoSuchAlgorithmException", e);
-                        throw new IOException("Invalid checksum algorithm");
-                    }
-                    try (DigestInputStream dis = new DigestInputStream(fs.open(file), digest);
-                         OutputStream devNull = new IOUtils.NullOutputStream();)
+                    try (OutputStream devNull = new IOUtils.NullOutputStream();
+                         DigestInputStream dis = new DigestInputStream(fs.open(file), messageDigest) )
                     {
                         Utils.bufferedCopy(dis, devNull);
-                        attrs.put("checksum", Utils.toHex(dis.getMessageDigest().digest()));
-                        attrs.put("checksum_algorithm", CSA);
+
                     }
+                    attrs.put("checksum", Utils.toHex(messageDigest.digest()));
+                    attrs.put("checksum_algorithm", CSA);
                 }
                 if (attrs.containsKey("modified"))
                 {
@@ -203,8 +240,7 @@ public class HadoopBitStoreService implements BitStoreService
             return null;
         } catch (Exception e)
         {
-            log.error("about(" + bitstream.getInternalId() + ")", e);
-            throw new IOException(e);
+            throw new IOException("about(" + bitstream.getInternalId() + ")", e);
         }
     }
 
@@ -222,22 +258,22 @@ public class HadoopBitStoreService implements BitStoreService
     {
         try
         {
-            Path file = getFile(bitstream);
-            if (file != null && fs.exists(file))
+            FileSystem fs = getFileSystem();
+            Path file = getFile(bitstream, baseDir);
+            if (file != null && fs.exists(file)) // only if file exists
             {
-                if (fs.delete(file,false))
+                if (fs.delete(file,false)) //true if delete succeeds
                 {
-                    deleteParents(file);
+                    deleteParents(file, fs);
                 }
             }
-            else
-                {
+            else // File does not exist
+            {
                 log.warn("Attempt to remove non-existent asset. ID: " + bitstream.getInternalId());
             }
         } catch (Exception e)
         {
-            log.error("remove(" + bitstream.getInternalId() + ")", e);
-            throw new IOException(e);
+            throw new IOException("remove(" + bitstream.getInternalId() + ")", e);
         }
     }
 
@@ -264,8 +300,9 @@ public class HadoopBitStoreService implements BitStoreService
      *
      * @param file
      *            The file with parent directories to delete
+     * @param fs the filesystem to use
      */
-    private synchronized void deleteParents(Path file) throws IOException
+    private synchronized void deleteParents(Path file, FileSystem fs) throws IOException
     {
         if (file == null)
         {
@@ -278,7 +315,8 @@ public class HadoopBitStoreService implements BitStoreService
             Path directory = tmp.getParent();
             try
             {
-                fs.delete(directory,false);
+                //recursive=false, this throws IOException when attempting to delete non-empty dir.
+                fs.delete(directory, false);
             } catch (IOException e)
             {
                 //Directory not empty...
@@ -301,7 +339,7 @@ public class HadoopBitStoreService implements BitStoreService
      * @throws IOException
      *                If a problem occurs while determining the file
      */
-    protected Path getFile(Bitstream bitstream) throws IOException
+    protected Path getFile(Bitstream bitstream, Path baseDir) throws IOException
     {
         // Check that bitstream is not null
         if (bitstream == null)
@@ -378,29 +416,22 @@ public class HadoopBitStoreService implements BitStoreService
         return buf.toString();
     }
 
-    protected final String REGISTERED_FLAG = "-R";
-    public boolean isRegisteredBitstream(String internalId)
+
+    protected MessageDigest getMessageDigest(String CSA) {
+        MessageDigest CSA_instance;
+        try {
+            CSA_instance = MessageDigest.getInstance(CSA);
+        } catch (NoSuchAlgorithmException nsae) { // Should never happen
+            throw new RuntimeException("Caught NoSuchAlgorithmException", nsae);
+        }
+        return CSA_instance;
+    }
+
+
+    protected static final String REGISTERED_FLAG = "-R";
+    public static boolean isRegisteredBitstream(String internalId)
     {
         return internalId.startsWith(REGISTERED_FLAG);
     }
 
-    public Path getBaseDir()
-    {
-        return baseDir;
-    }
-
-    public void setBaseDir(Path baseDir)
-    {
-        this.baseDir = baseDir;
-    }
-
-    public String getDefaultFS()
-    {
-        return defaultFS;
-    }
-
-    public void setDefaultFS(String defaultFS)
-    {
-        this.defaultFS = defaultFS;
-    }
 }
