@@ -112,6 +112,7 @@ import org.springframework.stereotype.Service;
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
+ * @author Adán Román Ruiz (aroman at arvo.es)
  */
 @Service
 public class SolrServiceImpl implements SearchService, IndexingService {
@@ -940,7 +941,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             //New metadata field, create a new list for it
                             resultingList = new ArrayList<DiscoverySearchFilter>();
                         }
-                        resultingList.add(discoverySearchFilter);
+                        if(!resultingList.contains(discoverySearchFilter)){
+                            resultingList.add(discoverySearchFilter);
+                        }
 
                         searchFilters.put(metadataField, resultingList);
                     }
