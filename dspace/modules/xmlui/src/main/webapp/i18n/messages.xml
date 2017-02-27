@@ -2876,10 +2876,7 @@
     <message key="xmlui.submit.select.country.error">Please select a country</message>
 	<message key="xmlui.submit.select.funding.head"><span class="ds-form-label">Funding Agency Sponsorship</span><br /><br /></message>
 	<message key="xmlui.submit.select.funding.help">
-		Is the research associated with your data/publication funded by the United States National Science Foundation?
-		Data Publishing Charges associated with US NSF-funded research may be covered if there is no sponsor already in place (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>).
-		If applicable, this sponsorship will be applied at checkout.
-	</message>
+		Is the research associated with your data/publication funded by the United States National Science Foundation?</message>
 	<message key="xmlui.submit.select.funding.error">We could not verify your grant number against the US NSF grants database.
 		Providing this information is optional. You may try again or remove the number to proceed with your submission.</message>
 	<message key="xmlui.submit.select.funding.desc1"><span class="ds-form-label-grant-info">US NSF grant number, if applicable:</span><span class="ds-form-label-grant-info-help">(e.g. 1234567 or DBI-1234567)</span></message>
@@ -3049,17 +3046,8 @@
 	<message key="xmlui.Submission.submit.OverviewStep.button.edit-datapackage">Edit data package description</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.finalize">Finalize submission</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.button.proceed">Proceed to checkout</message>
-	<message key="xmlui.Submission.submit.CheckoutStep.funding.question">
-		Is the research associated with your data/publication funded by the United States National Science Foundation? If so, this information may be used to charge your DPC directly to the US NSF.
-		Dryad and the US NSF are testing the feasibility of a fund for the direct sponsorship of data deposits (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>).
-		If not, or if you would prefer to pay the DPC yourself, leave the field blank and click "Proceed to checkout."
-	</message>
-	<message key="xmlui.Submission.submit.CheckoutStep.funding.error">We could not verify your grant number against the US NSF grants database. Providing this information is optional.
-		You may try again or remove the number and proceed to provide payment information.</message>
 	<message key="xmlui.Submission.submit.CheckoutStep.funding.valid">
-		The United States National Science Foundation has awarded a fund to test the feasibility of direct sponsorship (<a href="http://blog.datadryad.org/2016/07/20/piloting-new-ways-for-funders-to-support-data-stewardship">find out more</a>).
-		<br/><br/>
-		<span class="bold">Thank you for providing your grant information. Your Data Publishing Charge is covered by the United States National Science Foundation.</span>
+		Thank you for providing your grant information. Your Data Publishing Charge is covered by the United States National Science Foundation.
 		<br/><br/>
 		Click the Finalize Submission button below to complete checkout.
 	</message>
