@@ -133,19 +133,22 @@
 	            </subjects>
 	        </xsl:if>
 			<!-- ************ Funding information ************** -->
-			<xsl:if test="dspace:field[@element='fundingEntity']">
+			<xsl:if test="dspace:field[@element='fundingEntity' and @confidence='ACCEPTED']">
 				<contributors>
 					<xsl:for-each select="dspace:field[@element='fundingEntity']">
 						<xsl:variable name="funderName" select="substring-after(.,'@')"/>
 						<xsl:variable name="funderID" select="substring-after(./@authority, 'http://dx.doi.org/')"/>
-						<contributor contributorType="Funder">
-							<contributorName>
-								<xsl:value-of select="$funderName"/>
-							</contributorName>
-							<nameIdentifier nameIdentifierScheme="FundRef">
-								<xsl:value-of select="$funderID"/>
-							</nameIdentifier>
-						</contributor>
+						<xsl:variable name="confidence" select="./@confidence"/>
+						<xsl:if test="$confidence='ACCEPTED'">
+							<contributor contributorType="Funder">
+								<contributorName>
+									<xsl:value-of select="$funderName"/>
+								</contributorName>
+								<nameIdentifier nameIdentifierScheme="FundRef">
+									<xsl:value-of select="$funderID"/>
+								</nameIdentifier>
+							</contributor>
+						</xsl:if>
 					</xsl:for-each>
 				</contributors>
 			</xsl:if>
