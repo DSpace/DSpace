@@ -185,13 +185,19 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    }
 	    
 	    settings.addLabel(T_label_setid);
-            //Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
-            Radio oaiSetSettingRadio = settings.addItem().addRadio("oai-set-setting");
-            oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
-            oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
+        Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
+        Radio oaiSetSettingRadio = oaiSetComp.addRadio("oai-set-setting");
+        oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
+        oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
 
-            Text oaiSetId = settings.addItem().addText("oai_setid");
-            if (errorMap.containsKey(OAIHarvester.OAI_SET_ERROR)) {
+        Text oaiSetId = oaiSetComp.addText("oai_setid");
+        //Composite oaiSetComp = settings.addItem().addComposite("oai-set-comp");
+        Radio oaiSetSettingRadio = settings.addItem().addRadio("oai-set-setting");
+        oaiSetSettingRadio.addOption("all".equals(oaiSetIdValue) || oaiSetIdValue == null, "all", "All sets");
+        oaiSetSettingRadio.addOption(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null, "specific", "Specific sets");
+
+        Text oaiSetId = settings.addItem().addText("oai_setid");
+        if (errorMap.containsKey(OAIHarvester.OAI_SET_ERROR)) {
 	    	oaiSetId.addError(errorMap.get(OAIHarvester.OAI_SET_ERROR));
 	    }
 	    if (errorMap.containsKey("oai_setid")) {
