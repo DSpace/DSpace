@@ -422,8 +422,6 @@ public class PaymentServiceImpl implements PaymentService {
     public void generateUserForm(Context context, Division mainDiv, String actionURL, String knotId, String transactionType, Request request, Item item, DSpaceObject dso) throws WingException, SQLException {
         PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
         PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-        PaymentService paymentService = new DSpace().getSingletonService(PaymentService.class);
-        String errorMessage = request.getParameter("encountError");
         ShoppingCart shoppingCart = null;
         Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
         if (dataPackage != null) {
@@ -443,59 +441,19 @@ public class PaymentServiceImpl implements PaymentService {
                     voucher = Voucher.findByCode(context, voucherCode);
                     // put the voucher ID in the shopping cart so we can access it next time, if it's good.
                     shoppingCart.setVoucher(voucher.getID());
-                } else {
-                    // set the error message; this will be passed in as a request parameter for the next round.
-                    errorMessage = PAYMENT_ERROR_VOUCHER;
                 }
                 paymentSystemService.updateTotal(context, shoppingCart);
             }
 
-            // similarly, check for existence of either dryad.fundingEntity metadata or a grant-info request parameter
-            String grantInfo = null;
-            boolean hasGrant = true;
+            // Generate the corresponding UI if there is a funding sponsor and update the cart accordingly.
             DCValue[] fundingEntities = item.getMetadata("dryad.fundingEntity");
+            String authority = null;
             if (fundingEntities != null && fundingEntities.length > 0) {
-                grantInfo = fundingEntities[0].value;
-            } else {
-                grantInfo = request.getParameter("grant-info");
-                log.debug("grant is now -" + grantInfo + "-");
-                if (grantInfo == null) {
-                    hasGrant = true;
-                    log.debug("should ask about grant");
-                } else {
-                    if ("".equals(StringUtils.stripToEmpty(grantInfo))) {
-                        hasGrant = false;
-                        log.debug("no grant, go to payment screen");
-                    } else {
-                        // This clause is temporary for the NSF pilot project: in future, we should already have grant information in the item.
-                        int confidence = 0;
-                        if (JournalUtils.isValidNSFGrantNumber(grantInfo)) {
-                            log.debug("valid grant");
-                            confidence = Choices.CF_ACCEPTED;
-                        } else {
-                            log.error("invalid grant");
-                            confidence = Choices.CF_REJECTED;
-                        }
-                        DryadFunderConcept nsfConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, DryadFunderConcept.NSF_ID);
-                        item.clearMetadata("dryad.fundingEntity");
-                        item.addMetadata("dryad", "fundingEntity", null, null, grantInfo, DryadFunderConcept.NSF_ID, confidence);
-                        item.update();
-                        hasGrant = true;
-                        log.debug("added grant info " + grantInfo);
-                    }
-                }
+                authority = fundingEntities[0].authority;
             }
-
-            // Now that we've checked vouchers and grants, we can generate the corresponding UI and update the cart accordingly.
-            if (hasGrant && transactionType.equals(PAYPAL_AUTHORIZE)) {
-                fundingEntities = item.getMetadata("dryad.fundingEntity");
-                String authority = null;
-                if (fundingEntities != null && fundingEntities.length > 0) {
-                    authority = fundingEntities[0].authority;
-                }
-                if (authority != null) {
-                    log.debug("nsf pays");
-                    DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, authority);
+            if (authority != null && fundingEntities[0].confidence == Choices.CF_ACCEPTED) {
+                DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, authority);
+                if (funderConcept.getSubscriptionPaid()) {
                     shoppingCart.setSponsoringOrganization(funderConcept);
                     shoppingCart.update();
                     paymentSystemService.updateTotal(context, shoppingCart);
@@ -504,30 +462,19 @@ public class PaymentServiceImpl implements PaymentService {
                     List buttons = mainDiv.addList("paypal-form-buttons");
                     Button skipButton = buttons.addItem().addButton("skip_payment");
                     skipButton.setValue("Submit");
-                } else {
-                    log.debug("ask");
-                    mainDiv.addPara(T_funding_head);
-                    mainDiv.addPara(T_funding_question);
-                    List list = mainDiv.addList("grant-list");
-                    list.addItem(T_funding_desc1);
-                    list.addItem().addText("grant-info");
-                    list.addItem().addButton("submit-grant").setValue(T_button_proceed);
-                    Button cancelButton = list.addItem().addButton(AbstractProcessingStep.CANCEL_BUTTON);
-                    cancelButton.setValue("Cancel");
                 }
-            } else {
-                if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
-                    generateNoCostForm(mainDiv, shoppingCart, item, manager, paymentSystemService);
-                } else {
-                    mainDiv.setHead(T_HEAD);
-                    mainDiv.addPara(T_HELP);
-                    Division creditcard = mainDiv.addDivision("creditcard");
-                    generatePaypalForm(creditcard, shoppingCart, actionURL, transactionType, context);
-                    mainDiv.addPara().addContent(T_payment_note);
-                }
-                mainDiv.addHidden("submission-continue").setValue(knotId);
-                addButtons(mainDiv);
             }
+            if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+                generateNoCostForm(mainDiv, shoppingCart, item, manager, paymentSystemService);
+            } else {
+                mainDiv.setHead(T_HEAD);
+                mainDiv.addPara(T_HELP);
+                Division creditcard = mainDiv.addDivision("creditcard");
+                generatePaypalForm(creditcard, shoppingCart, actionURL, transactionType, context);
+                mainDiv.addPara().addContent(T_payment_note);
+            }
+            mainDiv.addHidden("submission-continue").setValue(knotId);
+            addButtons(mainDiv);
         } catch (Exception e) {
             //TODO: handle the exceptions
             showSkipPaymentButton(mainDiv, "errors in generating the payment form:" + e.getMessage());
