@@ -487,6 +487,15 @@
         "title" : "International Journal of Plant Sciences"
      },
      {
+        "sponsor" : "$120",
+        "title" : "Journal of the American Medical Informatics Association",
+        "hidden" : "Y",
+        "issn" : "1527-974X",
+        "embargo" : "Y",
+        "submission" : "A",
+        "integrated" : "Y"
+     },
+     {
         "title" : "Journal of Animal Ecology",
         "sponsor" : "British Ecological Society",
         "issn" : "0021-8790",
@@ -639,6 +648,7 @@
         "hidden" : "N",
         "integrated" : "Y"
      },
+
      {
         "hidden" : "Y",
         "submission" : "A",
