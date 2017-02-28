@@ -26,7 +26,12 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
 	@Override
 	public ItemRest fromModel(org.dspace.content.Item obj) {
 		ItemRest item = super.fromModel(obj);
-		// item.setOwningCollection(collectionConverter.fromModel(obj.getOwningCollection()));
+		item.setInArchive(obj.isArchived());
+		item.setDiscoverable(obj.isDiscoverable());
+		item.setWithdrawn(obj.isWithdrawn());
+		item.setLastModified(obj.getLastModified());
+		//item.setTemplateItemOf(collectionConverter.fromModel(obj.getTemplateItemOf()));
+		//item.setOwningCollection(collectionConverter.fromModel(obj.getOwningCollection()));
 		return item;
 	}
 
@@ -40,4 +45,5 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
 	protected ItemRest newInstance() {
 		return new ItemRest();
 	}
+
 }
