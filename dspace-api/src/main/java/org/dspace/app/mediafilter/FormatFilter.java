@@ -44,18 +44,20 @@ public interface FormatFilter
     public String getFormatString();
 
     /**
-     * @return string to describe the newly-generated Bitstream's - how it was
+     * @return string to describe the newly-generated Bitstream - how it was
      *         produced is a good idea
      */
     public String getDescription();
 
     /**
+     * Read the source stream and produce the filtered content.
+     *
      * @param item Item
      * @param source
      *            input stream
      * @param verbose verbosity flag
      * 
-     * @return result of filter's transformation, written out to a bitstream
+     * @return result of filter's transformation as a byte stream.
      * @throws Exception if error
      */
     public InputStream getDestinationStream(Item item, InputStream source, boolean verbose)
