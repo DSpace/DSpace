@@ -937,4 +937,50 @@
         </xsl:if>
     </xsl:template>
 
+    <!-- TAMU CUSTOMIZATION: Display the login chooser page which asks the user to login via shibboleth or via an email/password pair -->
+     <xsl:template match="dri:div[@id='aspect.eperson.LoginChooser.div.login-chooser']">
+        <xsl:apply-templates select="./dri:head"/>
+        <div id="aspect_eperson_LoginChooser_div_login-chooser" class="ds-static-div">
+
+            <xsl:for-each select="dri:list/dri:item">
+                <xsl:choose>
+                
+                    <!-- Shibboleth login -->
+                    <xsl:when test="contains(dri:xref/@target,'shibboleth-login')">
+                        <div id="shibboleth-authentication-method" class="authentication-method">
+                            <h3>For A&amp;M Students, Faculty, and Staff:</h3>
+                            <p class="authentication-item"><a class="btn btn-default">
+                                <xsl:attribute name="href"><xsl:value-of select="dri:xref/@target"/></xsl:attribute>
+                                Login with university NetID
+                            </a></p>
+                        </div>
+                    </xsl:when>
+
+                    <!-- Password login -->
+                    <xsl:when test="contains(dri:xref/@target,'password-login')">
+                        <div id="password-authentication-method" class="authentication-method">
+                            <h3>For those not affiliated with A&amp;M:</h3>
+                            <p class="authentication-item"><a class="btn btn-default">
+                                <xsl:attribute name="href"><xsl:value-of select="dri:xref/@target"/></xsl:attribute>
+                                Login with email address
+                            </a></p>
+                            <p class="authentication-item"><a href="#" class="btn btn-default">
+                                <xsl:attribute name="href"><xsl:value-of select="//dri:xref/@target[contains(.,'register')]"/></xsl:attribute>
+                                Register new account
+                            </a></p>
+                        </div>
+                    </xsl:when>
+
+                    <!-- Some other login that is not special cased -->
+                    <xsl:otherwise>
+                        <p class="authentication-item"><xsl:apply-templates/></p>
+                    </xsl:otherwise>
+
+                </xsl:choose>
+            </xsl:for-each>
+
+        </div>
+     </xsl:template>
+
+
 </xsl:stylesheet>
