@@ -460,6 +460,15 @@
         "integrated" : "Y"
      },
      {
+        "sponsor" : "$120",
+        "title" : "Insect Systematics and Diversity",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "2399-3421",
+        "embargo" : "N",
+        "submission" : "R"
+     },
+     {
         "title" : "Interface Focus",
         "sponsor" : "The Royal Society",
         "integrated" : "N",
