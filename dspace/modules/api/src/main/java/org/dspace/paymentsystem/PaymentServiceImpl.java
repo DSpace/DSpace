@@ -445,25 +445,6 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentSystemService.updateTotal(context, shoppingCart);
             }
 
-            // Generate the corresponding UI if there is a funding sponsor and update the cart accordingly.
-            DCValue[] fundingEntities = item.getMetadata("dryad.fundingEntity");
-            String authority = null;
-            if (fundingEntities != null && fundingEntities.length > 0) {
-                authority = fundingEntities[0].authority;
-            }
-            if (authority != null && fundingEntities[0].confidence == Choices.CF_ACCEPTED) {
-                DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, authority);
-                if (funderConcept.getSubscriptionPaid()) {
-                    shoppingCart.setSponsoringOrganization(funderConcept);
-                    shoppingCart.update();
-                    paymentSystemService.updateTotal(context, shoppingCart);
-                    mainDiv.addPara(T_funding_valid);
-                    mainDiv.addHidden("show_button").setValue(T_button_finalize);
-                    List buttons = mainDiv.addList("paypal-form-buttons");
-                    Button skipButton = buttons.addItem().addButton("skip_payment");
-                    skipButton.setValue("Submit");
-                }
-            }
             if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
                 generateNoCostForm(mainDiv, shoppingCart, item, manager, paymentSystemService);
             } else {
