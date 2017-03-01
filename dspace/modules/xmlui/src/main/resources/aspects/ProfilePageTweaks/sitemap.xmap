@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+  sitemap.xmap
+-->
+
+<!-- 
+
+This Aspect adds a repository wide recent submission section to the front page.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:components>
+				
+		<map:transformers>  
+		    <map:transformer name="ProfilePageTweaks" src="edu.tamu.dspace.profilepagetweaks.ProfilePageTweaks"/>
+		</map:transformers>
+			
+	</map:components>
+	
+	<map:pipelines>
+		<map:pipeline>
+			<map:generate/>
+						
+			<!-- Viewing the profile -->
+			<map:match pattern="profile">
+                <map:transform type="ProfilePageTweaks"/>
+                <map:serialize type="xml"/>
+            </map:match>
+            
+            <!-- Viewing an eperson -->
+			<map:match pattern="admin/epeople**">
+                <map:transform type="ProfilePageTweaks"/>
+                <map:serialize type="xml"/>
+            </map:match>
+			
+			<!-- Not a URL we care about, so just pass it on. -->
+			<map:serialize type="xml"/>
+			
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>

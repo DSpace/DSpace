@@ -86,6 +86,7 @@
              ============ -->
 
         <aspect name="Community Tree Browser" path="resource://aspects/CommunityTreeBrowser/" />
+        <aspect name="ProfilePageTweaks" path="resource://aspects/ProfilePageTweaks/" />
 
         <!-- ========================
              Usage Statistics Engines
