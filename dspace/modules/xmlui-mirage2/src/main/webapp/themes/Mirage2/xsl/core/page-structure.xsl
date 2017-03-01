@@ -230,6 +230,9 @@
 
             <link rel="stylesheet" href="{concat($theme-path, 'styles/main.css')}"/>
 
+            <!-- TAMU Customization - allow any descendant themes to inject content into the head of the document-->
+            <xsl:call-template name="appendHead"/>
+
             <!-- Add syndication feeds -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">
                 <link rel="alternate" type="application">
@@ -899,7 +902,18 @@
             <xsl:call-template name="choiceLookupPopUpSetup"/>
         </xsl:if>
 
+
+        <xsl:call-template name="appendJavaScript" />
+
         <xsl:call-template name="addJavascript-google-analytics" />
+    </xsl:template>
+
+    <!-- TAMU Customization - empty by default, but allows any descendant themes to inject content into the head of the document by overriding -->
+    <xsl:template name="appendHead">
+    </xsl:template>
+
+    <!-- TAMU Customization - empty by default, but allows any descendant themes to inject content into the addJavascript template -->
+    <xsl:template name="appendJavaScript">
     </xsl:template>
 
     <xsl:template name="addJavascript-google-analytics">
