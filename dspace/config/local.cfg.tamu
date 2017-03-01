@@ -276,10 +276,10 @@ lastname-header = TDL-sn
 role-header = eduPersonEntitlement
 
 webui.browse.index.1 = dateissued:item:dateissued
-webui.browse.index.2 = author:metadata:dc.contributor.*,dc.creator:text
+webui.browse.index.2 = author:metadata:dc.contributor.*:text,dc.creator:text
 webui.browse.index.3 = title:item:title
 webui.browse.index.4 = subject:metadata:dc.subject.*:text
-webui.browse.index.5 = department:metadata:local.department.*,thesis.degree.department:text
+webui.browse.index.5 = department:metadata:local.department.*:text,thesis.degree.department:text
 
 search.index.1 = author:dc.contributor.*
 search.index.2 = author:dc.creator.*
