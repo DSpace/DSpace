@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BitstreamConverter
 		extends DSpaceObjectConverter<org.dspace.content.Bitstream, org.dspace.app.rest.model.BitstreamRest> {
-	@Autowired
+	@Autowired(required = true)
 	BitstreamFormatConverter bfConverter;
 
 	@Override

@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * The Item REST Resource
@@ -25,6 +26,8 @@ public class ItemRest extends DSpaceObjectRest {
 	private CollectionRest templateItemOf;
 	//private EPerson submitter;
 
+	List<BitstreamRest> bitstreams;
+	
 	@Override
 	public String getType() {
 		return NAME;
@@ -65,6 +68,13 @@ public class ItemRest extends DSpaceObjectRest {
 	}
 	public void setTemplateItemOf(CollectionRest templateItemOf){
 		this.templateItemOf = templateItemOf;
+	}
+	public List<BitstreamRest> getBitstreams() {
+		return bitstreams;
+	}
+
+	public void setBitstreams(List<BitstreamRest> bitstreams) {
+		this.bitstreams = bitstreams;
 	}
 
 }
