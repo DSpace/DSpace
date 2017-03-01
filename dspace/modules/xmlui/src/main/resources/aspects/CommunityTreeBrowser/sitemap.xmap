@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+  sitemap.xmap
+-->
+
+<!-- 
+
+This Aspect is an example of a local modification to DSpace to provide an expanding/collapsing
+community/collection browser on the community pages.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:components>
+	
+		<map:transformers>
+			<map:transformer name="CommunityTreeBrowser" src="org.tdl.dspace.communityview.CommunityTreeBrowser"/>
+		</map:transformers>
+	
+		<map:matchers default="wildcard">
+			<map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+		</map:matchers>
+		
+	</map:components>
+	
+	<map:pipelines>
+		<map:pipeline>
+			<map:generate/>
+			
+			<map:match type="HandleTypeMatcher" pattern="community">
+				<!-- Community view -->
+				<map:match pattern="handle/*/*">
+					<map:transform type="CommunityTreeBrowser"/>
+				</map:match>
+			</map:match>
+			
+			<!-- Not a URL we care about, so just pass it on. -->
+			<map:serialize type="xml"/>
+			
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>
