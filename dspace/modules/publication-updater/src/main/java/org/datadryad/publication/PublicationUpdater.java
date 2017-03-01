@@ -31,6 +31,9 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.http.client.utils.URLEncodedUtils;
 
 /**
@@ -226,21 +229,24 @@ public class PublicationUpdater extends HttpServlet {
                     // look for this item in crossref:
                     Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
                     if (matchedManuscript != null) {
-                        // update the item's metadata
-                        message = "Associated publication (match score " + matchedManuscript.optionalProperties.get("crossref-score") + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                        if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
-                            updatedItems.add(buildItemSummary(item) + "\n\t" + message);
-                        }
-                        // was there a manuscript record saved for this? If so, update it.
-                        if (databaseManuscript != null) {
-                            databaseManuscript.setPublicationDOI(matchedManuscript.getPublicationDOI());
-                            databaseManuscript.setPublicationDate(matchedManuscript.getPublicationDate());
-                            databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
-                            try {
-                                LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
-                                JournalUtils.writeManuscriptToDB(databaseManuscript);
-                            } catch (Exception e) {
-                                LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
+                        // does this manuscript have the same authors?
+                        if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript)) {
+                            // update the item's metadata
+                            message = "Associated publication (match score " + matchedManuscript.optionalProperties.get("crossref-score") + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
+                            if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
+                                updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                            }
+                            // was there a manuscript record saved for this? If so, update it.
+                            if (databaseManuscript != null) {
+                                databaseManuscript.setPublicationDOI(matchedManuscript.getPublicationDOI());
+                                databaseManuscript.setPublicationDate(matchedManuscript.getPublicationDate());
+                                databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
+                                try {
+                                    LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
+                                    JournalUtils.writeManuscriptToDB(databaseManuscript);
+                                } catch (Exception e) {
+                                    LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
+                                }
                             }
                         }
                     }
@@ -263,11 +269,14 @@ public class PublicationUpdater extends HttpServlet {
             // look for this item in crossref:
             Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
             if (matchedManuscript != null) {
-                // update the item's metadata
-                String score = matchedManuscript.optionalProperties.get("crossref-score");
-                if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
+                // does the matched manuscript have the same authors?
+                if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript)) {
+                    // update the item's metadata
+                    String score = matchedManuscript.optionalProperties.get("crossref-score");
                     message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                    updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                    if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
+                        updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                    }
                 }
             }
         }
@@ -450,6 +459,13 @@ public class PublicationUpdater extends HttpServlet {
 
     private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, String provenance) {
         boolean changed = false;
+
+        // first, check to see if this is one of the known mismatches:
+        if (isManuscriptMismatchForItem(item, manuscript)) {
+            LOGGER.error("pub " + manuscript.getPublicationDOI() + " is known to be a mismatch for " + item.getID());
+            return false;
+        }
+
         if (!"".equals(manuscript.getPublicationDOI()) && !item.hasMetadataEqualTo(PUBLICATION_DOI, manuscript.getPublicationDOI())) {
             changed = true;
             item.clearMetadata(PUBLICATION_DOI);
@@ -475,11 +491,10 @@ public class PublicationUpdater extends HttpServlet {
                 item.addMetadata(PUBLICATION_DATE, null, dateString, null, -1);
             }
         }
-
         if (changed) {
             item.clearMetadata(CITATION_IN_PROGRESS);
             item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
-
+            LOGGER.info("writing provenance for item " + item.getID() + ": " + provenance);
             if (!"".equals(provenance)) {
                 item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + provenance + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
             }
@@ -494,6 +509,31 @@ public class PublicationUpdater extends HttpServlet {
         return changed;
     }
 
+    private boolean isManuscriptMismatchForItem(Item item, Manuscript manuscript) {
+        // normalize the pubDOI from the manuscript: remove leading "doi:" or "dx.doi.org/"
+        String msDOI = null;
+        Pattern doi = Pattern.compile(".*(10.\\d+/.+)");
+        Matcher m = doi.matcher(manuscript.getPublicationDOI().toLowerCase());
+        if (m.matches()) {
+            msDOI = m.group(1);
+        }
+        LOGGER.error("looking for mismatches for " + msDOI);
+        DCValue[] itemMismatches = item.getMetadata("dryad", "citationMismatchedDOI", Item.ANY, Item.ANY);
+        if (itemMismatches.length > 0) {
+            for (DCValue dcv : itemMismatches) {
+                m = doi.matcher(dcv.value.toLowerCase());
+                if (m.matches()) {
+                    if (msDOI.equals(m.group(1))) {
+                        LOGGER.error("found a mismatch: " + m.group(1));
+                        return true;
+                    }
+                }
+            }
+        }
+        LOGGER.error("no mismatches");
+        return false;
+    }
+
     @Override
     public void init(ServletConfig aConfig) throws ServletException {
         super.init(aConfig);
@@ -503,7 +543,7 @@ public class PublicationUpdater extends HttpServlet {
             ConfigurationManager.loadConfig(config);
         }
 
-        LOGGER.debug("scheduling publication checker");
+//        LOGGER.debug("scheduling publication checker");
 //        myPublicationUpdaterTimer = new Timer();
         // schedule harvesting to the number of days set in the configuration:
         // timers are set in units of milliseconds.
