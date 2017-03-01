@@ -275,3 +275,36 @@ lastname-header = TDL-sn
 
 role-header = eduPersonEntitlement
 
+webui.browse.index.1 = dateissued:item:dateissued
+webui.browse.index.2 = author:metadata:dc.contributor.*,dc.creator:text
+webui.browse.index.3 = title:item:title
+webui.browse.index.4 = subject:metadata:dc.subject.*:text
+webui.browse.index.5 = department:metadata:local.department.*,thesis.degree.department:text
+
+search.index.1 = author:dc.contributor.*
+search.index.2 = author:dc.creator.*
+search.index.3 = title:dc.title.*
+search.index.4 = keyword:dc.subject.*
+search.index.5 = abstract:dc.description.abstract
+search.index.6 = author:dc.description.statementofresponsibility
+search.index.7 = series:dc.relation.ispartofseries
+search.index.8 = abstract:dc.description.tableofcontents
+search.index.9 = mime:dc.format.mimetype
+search.index.10 = sponsor:dc.description.sponsorship
+search.index.11 = identifier:dc.identifier.*
+search.index.12 = language:dc.language.iso
+search.index.13 = etdlevel:thesis.degree.level
+search.index.14 = etddiscipline:thesis.degree.discipline
+search.index.15 = etdgrantor:thesis.degree.grantor
+search.index.16 = etdauthor:dc.creator.*
+search.index.17 = etdsubmitted:dc.date.created
+search.index.18 = etdchair:dc.contributor.advisor
+search.index.19 = etdcommitteemember:dc.contributor.committeeMember
+search.index.20 = description:dc.description.*
+search.index.21 = coverage:dc.coverage.*
+search.index.22 = rights:dc.rights.*
+search.index.23 = department:local.department.*
+search.index.24 = ispartof:dc.relation.ispartof
+search.index.25 = type:dc.type.*
+search.index.26 = department:thesis.degree.department
+
