@@ -341,12 +341,12 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 }
 
                 // funder of last resort:
-                log.error("checking to see if " + funder + " is a sponsor");
+                log.info("checking to see if " + funder + " is a sponsor");
                 if (!shoppingcart.hasSubscription()) {
                     if (!"".equals(funder)) {
                         DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, funder);
                         if (funderConcept != null && funderConcept.getSubscriptionPaid()) {
-                            log.error("funder is a sponsor");
+                            log.info("funder is a sponsor");
                             shoppingcart.setSponsoringOrganization(funderConcept);
                         }
                     }
