@@ -21,6 +21,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -34,9 +35,7 @@ public class RestrictedItemsTransformer extends AbstractWingTransformer
     private List<String> restrictedCampus;
     
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
-    
-    @Autowired(required = true)
-    protected ItemService itemService;
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     // Set up the restricted bitstreams listing
     public void setup(SourceResolver resolver, Map objectModel, String src,
