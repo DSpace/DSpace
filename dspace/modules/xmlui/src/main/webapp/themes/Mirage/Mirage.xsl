@@ -399,14 +399,15 @@
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
 
+
+                        <!-- Journal of the American Medical Informatics Association -->
+                        <a class="single-image-link" href="/discoverfield=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+the%5C+american%5C+medical%5C+informatics%5C+association%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+the%5C+American%5C+Medical%5C+Informatics%5C+Association"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAMIA.png" alt="Journal of the American Medical Informatics Association" /></a>
+
+                        <!-- Insect Systematics and Diversity -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ainsect%5C+systematics%5C+and%5C+diversity%5C%7C%5C%7C%5C%7CInsect%5C+Systematics%5C+and%5C+Diversity"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ISDIVE.png" alt="Insect Systematics and Diversity" /></a>
+
                         <!-- African Invertebrates -->
 		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aafrican%5C+invertebrates%5C%7C%5C%7C%5C%7CAfrican%5C+Invertebrates"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-AI.png" alt="African Invertebrates" /></a>
-
-                        <!-- BioDiscovery -->
-		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Abiodiscovery%5C%7C%5C%7C%5C%7CBioDiscovery"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-BD.png" alt="BioDiscovery" /></a>
-
-                        <!-- One Ecosystem -->
-		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aone%5C+ecosystem%5C%7C%5C%7C%5C%7COne%5C+Ecosystem"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-OE.png" alt="One Ecosystem" /></a>
 
                         <!-- Research Ideas and Outcomes -->
 		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aresearch%5C+ideas%5C+and%5C+outcomes%5C%7C%5C%7C%5C%7CResearch%5C+Ideas%5C+and%5C+Outcomes"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-RIO.png" alt="Research Ideas and Outcomes" /></a>
