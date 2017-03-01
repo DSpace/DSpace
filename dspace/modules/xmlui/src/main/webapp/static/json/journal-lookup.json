@@ -460,6 +460,15 @@
         "integrated" : "Y"
      },
      {
+        "sponsor" : "$120",
+        "title" : "Insect Systematics and Diversity",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "issn" : "2399-3421",
+        "embargo" : "N",
+        "submission" : "R"
+     },
+     {
         "title" : "Interface Focus",
         "sponsor" : "The Royal Society",
         "integrated" : "N",
@@ -476,6 +485,15 @@
         "integrated" : "Y",
         "sponsor" : "University of Chicago Press",
         "title" : "International Journal of Plant Sciences"
+     },
+     {
+        "sponsor" : "American Medical Informatics Association",
+        "title" : "Journal of the American Medical Informatics Association",
+        "hidden" : "Y",
+        "issn" : "1527-974X",
+        "embargo" : "Y",
+        "submission" : "R",
+        "integrated" : "Y"
      },
      {
         "title" : "Journal of Animal Ecology",
@@ -630,6 +648,7 @@
         "hidden" : "N",
         "integrated" : "Y"
      },
+
      {
         "hidden" : "Y",
         "submission" : "A",
