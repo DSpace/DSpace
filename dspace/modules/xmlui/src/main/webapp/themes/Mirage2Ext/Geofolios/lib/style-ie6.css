@@ -1,0 +1,57 @@
+/*@import url( base.style );*/
+
+
+body
+{
+    margin: 0px auto;
+    position: relative;
+}
+	
+
+
+#content
+{
+	width: 728px;
+}
+
+
+div#top_navigation ul#breadcrumbs
+{
+	top: 87px;
+	margin: 0;
+	padding: 0 0 0 4px;
+}
+
+/*
+div#header
+{
+	overflow-x: hidden;
+	padding: 0;
+	margin: 0;
+}
+*/
+
+
+div#top_navigation
+{
+	overflow-x: hidden;
+	padding: 0px 0px 0px 0px;
+	margin: -17px 0px 0px 0px;
+}
+
+
+/*
+#mapContainer { border: 1px solid green; width: 96%; max-width: 800px; }
+
+#sidebar { border: 1px solid blue; }
+
+#pdflink { margin: 0; padding: 8px 20px 20px 55px; }
+
+
+.thumbnail { overflow: hidden; height: 180px; width: 125px; margin: 0px 22px 22px 0; padding: 10px; float: left; position: relative;   background-color: #e8e8e8; }
+.thumbnail img { margin: 4px 0 4px 12px; border: none; }
+.thumbnail p { white-space: nowrap; font-size: 75%; margin: 0;}
+.thumbnail p a { color: #999; font-size: 90%; text-decoration: none; }
+
+#pdflink { margin: 40px 25px 20px; padding: 20px 20px 20px 55px; border: 1px solid #ccc; background-color: #e8e8e8; background-image: url(pdficon-sm.gif); background-repeat: no-repeat; background-position: 8px 8px; clear: both; }
+*/

@@ -1,0 +1,1853 @@
+<?xml version="1.0" encoding="utf-8"?>
+<folios>
+   <!--
+    <folio number="Folio Number"><title>Folio Name</title>
+      <coverage><political>States Covered</political>
+         <box>northlimit=Latitude; westlimit=Longitude; southlimit=Latitude; eastlimit=Longitude</box>
+         <point>LatitudeNLongitudeW</point>
+      </coverage>
+      <date/>
+      <url/>
+   </folio>
+      -->
+   <folio number="1"><title>Livingston</title>
+      <coverage><political>Montana</political>
+         <box>northlimit=46; westlimit=111; southlimit=45; eastlimit=110</box>
+         <point>46:00:00N111:00:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/2808</url>
+   </folio>
+   <folio number="2"><title>Ringgold</title>
+      <coverage><political>Georgia - Tennessee</political>
+         <box>northlimit=35; westlimit=85.5; southlimit=34.5; eastlimit=85</box>
+         <point>35:00:00N85:30:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/2809</url>
+   </folio>
+   <folio number="3"><title>Placerville</title>
+      <coverage><political>California</political>
+         <box>northlimit=39; westlimit=121; southlimit=38.5; eastlimit=120.5</box>
+         <point>39:00:00N121:00:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/2810</url>
+   </folio>
+   <folio number="4"><title>Kingston</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36; westlimit=85; southlimit=35.5; eastlimit=84.5</box>
+         <point>36:00:00N85:00:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/2811</url>
+   </folio>
+   <folio number="5"><title>Sacramento</title>
+      <coverage><political>California</political>
+         <box>northlimit=39; westlimit=121.5; southlimit=38.5; eastlimit=121</box>
+         <point>39:00:00N121:30:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3006</url>
+   </folio>
+   <folio number="6"><title>Chattanooga</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=35.5; westlimit=85.5; southlimit=35; eastlimit=85</box>
+         <point>35:30:00N85:30:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3007</url>
+   </folio>
+   <folio number="7"><title>Pikes Peak</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=39; westlimit=105.5; southlimit=38.5; eastlimit=105</box>
+         <point>39:00:00N105:30:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3008</url>
+   </folio>
+   <folio number="8"><title>Sewanee</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=35.5; westlimit=86; southlimit=35; eastlimit=85.5</box>
+         <point>35:30:00N86:00:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3009</url>
+   </folio>
+   <folio number="9"><title>Anthracite - Crested Butte</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=39; westlimit=107.25; southlimit=38.75; eastlimit=107</box>
+         <point>39:00:00N107:15:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3010</url>
+   </folio>
+   <folio number="10"><title>Harpers Ferry</title>
+      <coverage><political>Maryland - Virginia - West Virginia</political>
+         <box>northlimit=39.5; westlimit=78; southlimit=39; eastlimit=77.5</box>
+         <point>39:30:00N78:00:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3011</url>
+   </folio>
+   <folio number="11"><title>Jackson </title>
+      <coverage><political>California</political>
+         <box>northlimit=38.5; westlimit=121; southlimit=38; eastlimit=120.5</box>
+         <point>38:30:00N121:00:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3012</url>
+   </folio>
+   <folio number="12"><title>Estillville </title>
+      <coverage><political>Kentucky - Virginia - Tennessee</political>
+         <box>northlimit=37; westlimit=83; southlimit=36.5; eastlimit=82.5</box>
+         <point>37:00:00N83:00:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3692</url>
+   </folio>
+   <folio number="13"><title>Fredericksburg</title>
+      <coverage><political>Maryland - Virginia</political>
+         <box>northlimit=38.5; westlimit=77.5; southlimit=38; eastlimit=77</box>
+         <point>38:30:00N77:30:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3013</url>
+   </folio>
+   <folio number="14"><title>Staunton </title>
+      <coverage><political>Virginia - West Virginia</political>
+         <box>northlimit=38.5; westlimit=79.5; southlimit=38; eastlimit=79</box>
+         <point>38:30:00N79:30:00W</point>
+      </coverage>
+      <date>1894</date>
+      <url>handle/1969.1/3014</url>
+   </folio>
+   <folio number="15"><title>Lassen Peak</title>
+      <coverage><political>California</political>
+         <box>northlimit=41; westlimit=122; southlimit=40; eastlimit=121</box>
+         <point>41:00:00N122:00:00W</point>
+      </coverage>
+      <date>1895</date>
+      <url>handle/1969.1/3015</url>
+   </folio>
+   <folio number="16"><title>Knoxville</title>
+      <coverage><political>North Carolina - Tennessee</political>
+         <box>northlimit=36; westlimit=84; southlimit=35.5; eastlimit=83.5</box>
+         <point>36:00:00N84:00:00W</point>
+      </coverage>
+      <date>1895</date>
+      <url>handle/1969.1/3016</url>
+   </folio>
+   <folio number="17"><title>Marysville </title>
+      <coverage><political>California</political>
+         <box>northlimit=39.5; westlimit=122; southlimit=39; eastlimit=121.5</box>
+         <point>39:30:00N122:00:00W</point>
+      </coverage>
+      <date>1895</date>
+      <url>handle/1969.1/3017</url>
+   </folio>
+   <folio number="18"><title>Smartsville</title>
+      <coverage><political>California</political>
+         <box>northlimit=39.5; westlimit=121.5; southlimit=39; eastlimit=121</box>
+         <point>39:30:00N121:30:00W</point>
+      </coverage>
+      <date>1895</date>
+      <url>handle/1969.1/3018</url>
+   </folio>
+   <folio number="19"><title>Stevenson</title>
+      <coverage><political>Alabama - Georgia - Tennessee</political>
+         <box>northlimit=35; westlimit=86; southlimit=34.5; eastlimit=85.5</box>
+         <point>35:00:00N86:00:00W</point>
+      </coverage>
+      <date>1895</date>
+      <url>handle/1969.1/3019</url>
+   </folio>
+   <folio number="20"><title>Cleveland</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=35.5; westlimit=85; southlimit=35; eastlimit=84.5</box>
+         <point>35:30:00N85:00:00W</point>
+      </coverage>
+      <date>1895</date>
+      <url>handle/1969.1/3022</url>
+   </folio>
+   <folio number="21"><title>Pikeville</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36; westlimit=85.5; southlimit=35.5; eastlimit=85</box>
+         <point>36:00:00N85:30:00W</point>
+      </coverage>
+      <date>1895</date>
+      <url>handle/1969.1/3023</url>
+   </folio>
+   <folio number="22"><title>McMinnville</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36; westlimit=86; southlimit=35.5; eastlimit=85.5</box>
+         <point>36:00:00N86:00:00W</point>
+      </coverage>
+      <date>1895</date>
+      <url>handle/1969.1/3024</url>
+   </folio>
+   <folio number="23"><title>Nomini </title>
+      <coverage><political>Maryland - Virginia</political>
+         <box>northlimit=38.5; westlimit=77; southlimit=38; eastlimit=76.5</box>
+         <point>38:30:00N77:00:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3025</url>
+   </folio>
+   <folio number="24"><title>Three Forks</title>
+      <coverage><political>Montana</political>
+         <box>northlimit=46; westlimit=112; southlimit=45; eastlimit=111</box>
+         <point>46:00:00N112:00:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/2491</url>
+   </folio>
+   <folio number="25"><title>Loudon</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36; westlimit=84.5; southlimit=35.5; eastlimit=84</box>
+         <point>36:00:00N84:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3026</url>
+   </folio>
+   <folio number="26"><title>Pocahontas</title>
+      <coverage><political>Virginia - West Virginia</political>
+         <box>northlimit=37.5; westlimit=81.5; southlimit=37; eastlimit=81</box>
+         <point>37:30:00N81:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3027</url>
+   </folio>
+   <folio number="27"><title>Morristown</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36.5; westlimit=83.5; southlimit=36; eastlimit=83</box>
+         <point>36:30:00N83:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3028</url>
+   </folio>
+   <folio number="28"><title>Piedmont</title>
+      <coverage><political>Maryland - West Virginia </political>
+         <box>northlimit=39.5; westlimit=79.5; southlimit=39; eastlimit=79</box>
+         <point>39:30:00N79:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3029</url>
+   </folio>
+   <folio number="29"><title>Nevada City Special</title>
+      <coverage><political>California</political>
+         <box>northlimit=39.28833333; westlimit=121.0625; southlimit=39.23055556; eastlimit=121.0069444</box>
+         <point>39:17:18N121:03:45W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3030</url>
+   </folio>
+   <folio number="30"><title>Yellowstone National Park</title>
+      <coverage><political>Wyoming</political>
+         <box>northlimit=45; westlimit=111; southlimit=44; eastlimit=110</box>
+         <point>45:00:00N111:00:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3031</url>
+   </folio>
+   <folio number="31"><title>Pyramid Peak</title>
+      <coverage><political>California</political>
+         <box>northlimit=39; westlimit=120.5; southlimit=38.5; eastlimit=120</box>
+         <point>39:00:00N120:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3032</url>
+   </folio>
+   <folio number="32"><title>Franklin</title>
+      <coverage><political>Virginia - West Virginia</political>
+         <box>northlimit=39; westlimit=79.5; southlimit=38.5; eastlimit=79</box>
+         <point>39:00:00N79:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3033</url>
+   </folio>
+   <folio number="33"><title>Briceville</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36.5; westlimit=84.5; southlimit=36; eastlimit=84</box>
+         <point>36:30:00N84:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3034</url>
+   </folio>
+   <folio number="34"><title>Buckhannon</title>
+      <coverage><political>West Virginia</political>
+         <box>northlimit=39; westlimit=80.5; southlimit=38.5; eastlimit=80</box>
+         <point>39:00:00N80:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3035</url>
+   </folio>
+   <folio number="35"><title>Gadsden</title>
+      <coverage><political>Alabama</political>
+         <box>northlimit=34.5; westlimit=86.5; southlimit=34; eastlimit=86</box>
+         <point>34:30:00N86:30:00W</point>
+      </coverage>
+      <date>1896</date>
+      <url>handle/1969.1/3036</url>
+   </folio>
+   <folio number="36"><title>Pueblo</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=38.5; westlimit=105; southlimit=38; eastlimit=104.5</box>
+         <point>38:30:00N105:00:00W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/3037</url>
+   </folio>
+   <folio number="37"><title>Downieville</title>
+      <coverage><political>California</political>
+         <box>northlimit=40; westlimit=121; southlimit=39.5; eastlimit=120.5</box>
+         <point>40:00:00N121:00:00W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/2947</url>
+   </folio>
+   <folio number="38"><title>Butte Special</title>
+      <coverage><political>Montana</political>
+         <box>northlimit=46.04833333; westlimit=112.6116667; southlimit=45.99111111; eastlimit=112.4916667</box>
+         <point>46:02:54N112:36:42W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/2812</url>
+   </folio>
+   <folio number="39"><title>Truckee</title>
+      <coverage><political>California</political>
+         <box>northlimit=39.5; westlimit=120.5; southlimit=39; eastlimit=120</box>
+         <point>39:30:00N120:30:00W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/3038</url>
+   </folio>
+   <folio number="40"><title>Wartburg</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36.5; westlimit=85; southlimit=36; eastlimit=84.5</box>
+         <point>36:30:00N85:00:00W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/3039</url>
+   </folio>
+   <folio number="41"><title>Sonora</title>
+      <coverage><political>California</political>
+         <box>northlimit=38; westlimit=120.5; southlimit=37.5; eastlimit=120</box>
+         <point>38:00:00N120:30:00W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/2813</url>
+   </folio>
+   <folio number="42"><title>Nueces</title>
+      <coverage><political>Texas</political>
+         <box>northlimit=30; westlimit=100.5; southlimit=29.5; eastlimit=100</box>
+         <point>30:00:00N100:30:00W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/3040</url>
+   </folio>
+   <folio number="43"><title>Bidwell Bar</title>
+      <coverage><political>California</political>
+         <box>northlimit=40; westlimit=121.5; southlimit=39.5; eastlimit=121</box>
+         <point>40:00:00N121:30:00W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/3041</url>
+   </folio>
+   <folio number="44"><title>Tazewell</title>
+      <coverage><political>Virginia - West Virginia</political>
+         <box>northlimit=37.5; westlimit=82; southlimit=37; eastlimit=81.5</box>
+         <point>37:30:00N82:00:00W</point>
+      </coverage>
+      <date>1897</date>
+      <url>handle/1969.1/3358</url>
+   </folio>
+   <folio number="45"><title>Boise</title>
+      <coverage><political>Idaho</political>
+         <box>northlimit=44; westlimit=116.5; southlimit=43.5; eastlimit=116</box>
+         <point>44:00:00N116:30:00W</point>
+      </coverage>
+      <date>1898</date>
+      <url>handle/1969.1/3360</url>
+   </folio>
+   <folio number="46"><title>Richmond</title>
+      <coverage><political>Kentucky</political>
+         <box>northlimit=38; westlimit=84.5; southlimit=37.5; eastlimit=84</box>
+         <point>38:00:00N84:30:00W</point>
+      </coverage>
+      <date>1898</date>
+      <url>handle/1969.1/2821</url>
+   </folio>
+   <folio number="47"><title>London</title>
+      <coverage><political>Kentucky</political>
+         <box>northlimit=37.5; westlimit=84.5; southlimit=37; eastlimit=84</box>
+         <point>37:30:00N84:30:00W</point>
+      </coverage>
+      <date>1898</date>
+      <url>handle/1969.1/2822</url>
+   </folio>
+   <folio number="48"><title>Tenmile District Special</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=39.50694444; westlimit=106.2688889; southlimit=39.3825; eastlimit=106.1333333</box>
+         <point>39:30:25N106:16:08W</point>
+      </coverage>
+      <date>1898</date>
+      <url>handle/1969.1/3361</url>
+   </folio>
+   <folio number="49"><title>Roseburg </title>
+      <coverage><political>Oregon</political>
+         <box>northlimit=43.5; westlimit=123.5; southlimit=43; eastlimit=123</box>
+         <point>43:30:00N123:30:00W</point>
+      </coverage>
+      <date>1898</date>
+      <url>handle/1969.1/3362</url>
+   </folio>
+   <folio number="50"><title>Holyoke </title>
+      <coverage><political>Connecticut</political>
+         <box>northlimit=42.5; westlimit=73; southlimit=42; eastlimit=72.5</box>
+         <point>42:30:00N73:00:00W</point>
+      </coverage>
+      <date>1898</date>
+      <url>handle/1969.1/3363</url>
+   </folio>
+   <folio number="51"><title>Big Trees</title>
+      <coverage><political>California</political>
+         <box>northlimit=38.5; westlimit=120.05; southlimit=38; eastlimit=120</box>
+         <point>38:30:00N120:03:00W</point>
+      </coverage>
+      <date>1898</date>
+      <url>handle/1969.1/3378</url>
+   </folio>
+   <folio number="52"><title>Absaroka </title>
+      <coverage><political>Wyoming</political>
+         <box>northlimit=45; westlimit=110; southlimit=44.5; eastlimit=109.5</box>
+         <point>45:00:00N110:00:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/3379</url>
+   </folio>
+   <folio number="53"><title>Standingstone</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36.5; westlimit=85.5; southlimit=36; eastlimit=85</box>
+         <point>36:30:00N85:30:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/3380</url>
+   </folio>
+   <folio number="54"><title>Tacoma </title>
+      <coverage><political>Washington</political>
+         <box>northlimit=47.5; westlimit=122.5; southlimit=47; eastlimit=122</box>
+         <point>47:30:00N122:30:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/2823</url>
+   </folio>
+   <folio number="55"><title>Fort Benton</title>
+      <coverage><political>Montana</political>
+         <box>northlimit=48; westlimit=111; southlimit=47; eastlimit=110</box>
+         <point>48:00:00N111:00:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/3382</url>
+   </folio>
+   <folio number="56"><title>Little Belt Mountains </title>
+      <coverage><political>Montana</political>
+         <box>northlimit=47; westlimit=111; southlimit=46; eastlimit=110</box>
+         <point>47:00:00N111:00:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/2824</url>
+   </folio>
+   <folio number="57"><title>Telluride</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=38; westlimit=108; southlimit=37.75; eastlimit=107.75</box>
+         <point>38:00:00N108:00:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/3383</url>
+   </folio>
+   <folio number="58"><title>Elmoro </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=37.5; westlimit=104.5; southlimit=37; eastlimit=104</box>
+         <point>37:30:00N104:30:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/3384</url>
+   </folio>
+   <folio number="59"><title>Bristol</title>
+      <coverage><political>Tennessee - Virginia</political>
+         <box>northlimit=37; westlimit=82.5; southlimit=36.5; eastlimit=82</box>
+         <point>37:00:00N82:30:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/3385</url>
+   </folio>
+   <folio number="60"><title>La Plata </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=37.5; westlimit=108.25; southlimit=37.25; eastlimit=108</box>
+         <point>37:30:00N108:15:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/3386</url>
+   </folio>
+   <folio number="61"><title>Monterey</title>
+      <coverage><political>Virginia - West Virginia</political>
+         <box>northlimit=38.5; westlimit=80; southlimit=38; eastlimit=79.5</box>
+         <point>38:30:00N80:00:00W</point>
+      </coverage>
+      <date>1899</date>
+      <url>handle/1969.1/3387</url>
+   </folio>
+   <folio number="62"><title>Menominee Special</title>
+      <coverage><political>Michigan</political>
+         <box>northlimit=45.91666667; westlimit=88.15; southlimit=45.73333333; eastlimit=87.73333333</box>
+         <point>45:55:00N88:09:00W</point>
+      </coverage>
+      <date>1900</date>
+      <url>handle/1969.1/3388</url>
+   </folio>
+   <folio number="63"><title>Mother Lode District</title>
+      <coverage><political>California</political>
+         <box>northlimit=38; westlimit=121; southlimit=37.5; eastlimit=120</box>
+         <point>38:00:00N121:00:00W</point>
+      </coverage>
+      <date>1900</date>
+      <url>handle/1969.1/3389</url>
+   </folio>
+   <folio number="64"><title>Uvalde </title>
+      <coverage><political>Texas</political>
+         <box>northlimit=29.5; westlimit=100; southlimit=29; eastlimit=99.5</box>
+         <point>29:30:00N100:00:00W</point>
+      </coverage>
+      <date>1900</date>
+      <url>handle/1969.1/2825</url>
+   </folio>
+   <folio number="65"><title>Tintic Special</title>
+      <coverage><political>Utah</political>
+         <box>northlimit=40; westlimit=112.1666667; southlimit=39.75; eastlimit=111.9166667</box>
+         <point>40:00:00N112:10:00W</point>
+      </coverage>
+      <date>1900</date>
+      <url>handle/1969.1/3390</url>
+   </folio>
+   <folio number="66"><title>Colfax </title>
+      <coverage><political>California</political>
+         <box>northlimit=39.5; westlimit=121; southlimit=39; eastlimit=120.5</box>
+         <point>39:30:00N121:00:00W</point>
+      </coverage>
+      <date>1900</date>
+      <url>handle/1969.1/3391</url>
+   </folio>
+   <folio number="67"><title>Danville</title>
+      <coverage><political>Illinois - Indiana</political>
+         <box>northlimit=40.25; westlimit=87.75; southlimit=40; eastlimit=87.5</box>
+         <point>40:15:00N87:45:00W</point>
+      </coverage>
+      <date>1900</date>
+      <url>handle/1969.1/3392</url>
+   </folio>
+   <folio number="68"><title>Walsenburg </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=38; westlimit=105; southlimit=37.5; eastlimit=104.5</box>
+         <point>38:00:00N105:00:00W</point>
+      </coverage>
+      <date>1900</date>
+      <url>handle/1969.1/2826</url>
+   </folio>
+   <folio number="69"><title>Huntington</title>
+      <coverage><political>Ohio - West Virginia</political>
+         <box>northlimit=38.5; westlimit=82.5; southlimit=38; eastlimit=82</box>
+         <point>38:30:00N82:30:00W</point>
+      </coverage>
+      <date>1900</date>
+      <url>handle/1969.1/3393</url>
+   </folio>
+   <folio number="70"><title>Washington</title>
+      <coverage><political>District of Columbia</political>
+         <box>northlimit=39; westlimit=77.25; southlimit=38.75; eastlimit=76.75</box>
+         <point>39:00:00N77:15:00W</point>
+      </coverage>
+      <date>1901</date>
+      <url>handle/1969.1/2923</url>
+   </folio>
+   <folio number="71"><title>Spanish Peaks </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=37.5; westlimit=105; southlimit=37; eastlimit=104.5</box>
+         <point>37:30:00N105:00:00W</point>
+      </coverage>
+      <date>1901</date>
+      <url>handle/1969.1/3394</url>
+   </folio>
+   <folio number="72"><title>Charleston</title>
+      <coverage><political>West Virginia</political>
+         <box>northlimit=38.5; westlimit=82; southlimit=38; eastlimit=81.5</box>
+         <point>38:30:00N82:00:00W</point>
+      </coverage>
+      <date>1901</date>
+      <url>handle/1969.1/3395</url>
+   </folio>
+   <folio number="73"><title>Coos Bay</title>
+      <coverage><political>Oregon</political>
+         <box>northlimit=43.5; westlimit=124.5; southlimit=43; eastlimit=124</box>
+         <point>43:30:00N124:30:00W</point>
+      </coverage>
+      <date>1901</date>
+      <url>handle/1969.1/2924</url>
+   </folio>
+   <folio number="74"><title>Coalgate</title>
+      <coverage><political>Oklahoma</political>
+         <box>northlimit=35; westlimit=96.5; southlimit=34.5; eastlimit=96</box>
+         <point>35:00:00N96:30:00W</point>
+      </coverage>
+      <date>1901</date>
+      <url>handle/1969.1/3396</url>
+   </folio>
+   <folio number="75"><title>Maynardville </title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36.5; westlimit=84; southlimit=36; eastlimit=83.5</box>
+         <point>36:30:00N84:00:00W</point>
+      </coverage>
+      <date>1901</date>
+      <url>handle/1969.1/3397</url>
+   </folio>
+   <folio number="76"><title>Austin </title>
+      <coverage><political>Texas</political>
+         <box>northlimit=30.5; westlimit=98; southlimit=30; eastlimit=97.5</box>
+         <point>30:30:00N98:00:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/2893</url>
+   </folio>
+   <folio number="77"><title>Raleigh </title>
+      <coverage><political>West Virginia</political>
+         <box>northlimit=38; westlimit=81.5; southlimit=37.5; eastlimit=81</box>
+         <point>38:00:00N81:30:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/3398</url>
+   </folio>
+   <folio number="78"><title>Rome </title>
+      <coverage><political>Alabama - Georgia</political>
+         <box>northlimit=34.5; westlimit=85.5; southlimit=34; eastlimit=85</box>
+         <point>34:30:00N85:30:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/2925</url>
+   </folio>
+   <folio number="79"><title>Atoka </title>
+      <coverage><political>Oklahoma</political>
+         <box>northlimit=34.5; westlimit=96.5; southlimit=34; eastlimit=96</box>
+         <point>34:30:00N96:30:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/3402</url>
+   </folio>
+   <folio number="80"><title>Norfolk </title>
+      <coverage><political>North Carolina - Virginia</political>
+         <box>northlimit=37; westlimit=76.5; southlimit=36.5; eastlimit=75.5</box>
+         <point>37:00:00N76:30:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/3403</url>
+   </folio>
+   <folio number="81"><title>Chicago</title>
+      <coverage><political>Illinois - Indiana</political>
+         <box>northlimit=42; westlimit=88; southlimit=41.5; eastlimit=87.5</box>
+         <point>42:00:00N88:00:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/3691</url>
+   </folio>
+   <folio number="82"><title>Masontown-Uniontown</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40; westlimit=79.75; southlimit=39.75; eastlimit=79.5</box>
+         <point>40:00:00N79:45:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/3401</url>
+   </folio>
+   <folio number="83"><title>New York City</title>
+      <coverage><political>New Jersey - New York</political>
+         <box>northlimit=41; westlimit=74.25; southlimit=40.5; eastlimit=73.75</box>
+         <point>41:00:00N74:15:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/3400</url>
+   </folio>
+   <folio number="84"><title>Ditney </title>
+      <coverage><political>Indiana</political>
+         <box>northlimit=38.5; westlimit=87.5; southlimit=38; eastlimit=87</box>
+         <point>38:30:00N87:30:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/3399</url>
+   </folio>
+   <folio number="85"><title>Oelrichs</title>
+      <coverage><political>Nebraska - South Dakota</political>
+         <box>northlimit=43.5; westlimit=103.5; southlimit=43; eastlimit=103</box>
+         <point>43:30:00N103:30:00W</point>
+      </coverage>
+      <date>1902</date>
+      <url>handle/1969.1/3405</url>
+   </folio>
+   <folio number="86"><title>Ellensburg</title>
+      <coverage><political>Washington</political>
+         <box>northlimit=47; westlimit=121; southlimit=46.5; eastlimit=120.5</box>
+         <point>47:00:00N121:00:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2926</url>
+   </folio>
+   <folio number="87"><title>Camp Clarke</title>
+      <coverage><political>Nebraska</political>
+         <box>northlimit=42; westlimit=103.5; southlimit=41.5; eastlimit=103</box>
+         <point>42:00:00N103:30:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2927</url>
+   </folio>
+   <folio number="88"><title>Scotts Bluff</title>
+      <coverage><political>Nebraska</political>
+         <box>northlimit=42; westlimit=104; southlimit=41.5; eastlimit=103.5</box>
+         <point>42:00:00N104:00:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2928</url>
+   </folio>
+   <folio number="89"><title>Port Orford</title>
+      <coverage><political>Oregon</political>
+         <box>northlimit=43; westlimit=124.5; southlimit=42.5; eastlimit=124</box>
+         <point>43:00:00N124:30:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2929</url>
+   </folio>
+   <folio number="90"><title>Cranberry </title>
+      <coverage><political>North Carolina - Tennessee</political>
+         <box>northlimit=36.5; westlimit=82; southlimit=36; eastlimit=81.5</box>
+         <point>36:30:00N82:00:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2930</url>
+   </folio>
+   <folio number="91"><title>Hartville </title>
+      <coverage><political>Wyoming</political>
+         <box>northlimit=42.5; westlimit=105; southlimit=42; eastlimit=104.5</box>
+         <point>42:30:00N105:00:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/3406</url>
+   </folio>
+   <folio number="92"><title>Gaines </title>
+      <coverage><political>New York - Pennsylvania</political>
+         <box>northlimit=42; westlimit=77.75; southlimit=41.75; eastlimit=77.5</box>
+         <point>42:00:00N77:45:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2931</url>
+   </folio>
+   <folio number="93"><title>Elkland-Tioga</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=42; westlimit=77.5; southlimit=41.75; eastlimit=77</box>
+         <point>42:00:00N77:30:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2932</url>
+   </folio>
+   <folio number="94"><title>Brownsville-Connellsville </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.25; westlimit=80; southlimit=40; eastlimit=79.5</box>
+         <point>40:15:00N80:00:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2933</url>
+   </folio>
+   <folio number="95"><title>Columbia</title>
+      <coverage><political>Tennessee</political>
+         <box>northlimit=36; westlimit=87.5; southlimit=35.5; eastlimit=87</box>
+         <point>36:00:00N87:30:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2934</url>
+   </folio>
+   <folio number="96"><title>Olivet </title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=43.5; westlimit=98; southlimit=43; eastlimit=97.5</box>
+         <point>43:30:00N98:00:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2935</url>
+   </folio>
+   <folio number="97"><title>Parker</title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=43.5; westlimit=97.5; southlimit=43; eastlimit=97</box>
+         <point>43:30:00N97:30:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/3407</url>
+   </folio>
+   <folio number="98"><title>Tishomingo</title>
+      <coverage><political>Oklahoma</political>
+         <box>northlimit=34.5; westlimit=97; southlimit=34; eastlimit=96.5</box>
+         <point>34:30:00N97:00:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/2936</url>
+   </folio>
+   <folio number="99"><title>Mitchell</title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=44; westlimit=98.5; southlimit=43.5; eastlimit=98</box>
+         <point>44:00:00N98:30:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/3404</url>
+   </folio>
+   <folio number="100"><title>Alexandria </title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=44; westlimit=98; southlimit=43.5; eastlimit=97.5</box>
+         <point>44:00:00N98:00:00W</point>
+      </coverage>
+      <date>1903</date>
+      <url>handle/1969.1/3408</url>
+   </folio>
+   <folio number="101"><title>San Luis</title>
+      <coverage><political>California</political>
+         <box>northlimit=35.5; westlimit=121; southlimit=35; eastlimit=120.5</box>
+         <point>35:30:00N121:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2937</url>
+   </folio>
+   <folio number="102"><title>Indiana</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.75; westlimit=79.25; southlimit=40.5; eastlimit=79</box>
+         <point>40:45:00N79:15:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2938</url>
+   </folio>
+   <folio number="103"><title>Nampa</title>
+      <coverage><political>Idaho - Oregon</political>
+         <box>northlimit=44; westlimit=117; southlimit=43.5; eastlimit=116.5</box>
+         <point>44:00:00N117:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2960</url>
+   </folio>
+   <folio number="104"><title>Silver City </title>
+      <coverage><political>Idaho</political>
+         <box>northlimit=43.5; westlimit=117; southlimit=43; eastlimit=116.5</box>
+         <point>43:30:00N117:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2961</url>
+   </folio>
+   <folio number="105"><title>Patoka</title>
+      <coverage><political>Illinois - Indiana</political>
+         <box>northlimit=38.5; westlimit=88; southlimit=38; eastlimit=87.5</box>
+         <point>38:30:00N88:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2962</url>
+   </folio>
+   <folio number="106"><title>Mount Stuart</title>
+      <coverage><political>Washington</political>
+         <box>northlimit=47.5; westlimit=121; southlimit=47; eastlimit=120.5</box>
+         <point>47:30:00N121:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2963</url>
+   </folio>
+   <folio number="107"><title>Newcastle</title>
+      <coverage><political>South Dakota - Wyoming</political>
+         <box>northlimit=44; westlimit=104.5; southlimit=43.5; eastlimit=104</box>
+         <point>44:00:00N104:30:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/3409</url>
+   </folio>
+   <folio number="108"><title>Edgemont </title>
+      <coverage><political>Nebraska - South Dakota</political>
+         <box>northlimit=43.5; westlimit=104; southlimit=43; eastlimit=103.5</box>
+         <point>43:30:00N104:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/3410</url>
+   </folio>
+   <folio number="109"><title>Cottonwood Falls </title>
+      <coverage><political>Kansas</political>
+         <box>northlimit=38.5; westlimit=97; southlimit=38; eastlimit=96.5</box>
+         <point>38:30:00N97:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2964</url>
+   </folio>
+   <folio number="110"><title>Latrobe </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.5; westlimit=79.5; southlimit=40.25; eastlimit=79.25</box>
+         <point>40:30:00N79:30:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2965</url>
+   </folio>
+   <folio number="111"><title>Globe</title>
+      <coverage><political>Arizona</political>
+         <box>northlimit=33.5; westlimit=111; southlimit=33.25; eastlimit=110.75</box>
+         <point>33:30:00N111:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2966</url>
+   </folio>
+   <folio number="112"><title>Bisbee </title>
+      <coverage><political>Arizona</political>
+         <box>northlimit=31.5; westlimit=110; southlimit=31.33333333; eastlimit=109.75</box>
+         <point>31:30:00N110:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2975</url>
+   </folio>
+   <folio number="113"><title>Huron</title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=44.5; westlimit=98.5; southlimit=44; eastlimit=98</box>
+         <point>44:30:00N98:30:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/3411</url>
+   </folio>
+   <folio number="114"><title>De Smet </title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=44.5; westlimit=98; southlimit=44; eastlimit=97.5</box>
+         <point>44:30:00N98:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/3412</url>
+   </folio>
+   <folio number="115"><title>Kittanning </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=41; westlimit=79.75; southlimit=40.75; eastlimit=79.5</box>
+         <point>41:00:00N79:45:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2948</url>
+   </folio>
+   <folio number="116"><title>Asheville </title>
+      <coverage><political>North Carolina - Tennessee</political>
+         <box>northlimit=36; westlimit=83; southlimit=35.5; eastlimit=82.5</box>
+         <point>36:00:00N83:00:00W</point>
+      </coverage>
+      <date>1904</date>
+      <url>handle/1969.1/2949</url>
+   </folio>
+   <folio number="117"><title>Casselton-Fargo </title>
+      <coverage><political>Minnesota</political>
+         <box>northlimit=47; westlimit=97.5; southlimit=46.5; eastlimit=96.5</box>
+         <point>47:00:00N97:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2950</url>
+   </folio>
+   <folio number="118"><title>Greeneville</title>
+      <coverage><political>North Carolina - Tennessee</political>
+         <box>northlimit=36.5; westlimit=83; southlimit=36; eastlimit=82.5</box>
+         <point>36:30:00N83:00:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2951</url>
+   </folio>
+   <folio number="119"><title>Fayetteville </title>
+      <coverage><political>Arkansas - Missouri</political>
+         <box>northlimit=36.5; westlimit=94.5; southlimit=36; eastlimit=94</box>
+         <point>36:30:00N94:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2952</url>
+   </folio>
+   <folio number="120"><title>Silverton </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=38; westlimit=107.75; southlimit=37.75; eastlimit=107.5</box>
+         <point>38:00:00N107:45:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2953</url>
+   </folio>
+   <folio number="121"><title>Waynesburg </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40; westlimit=80.25; southlimit=39.75; eastlimit=80</box>
+         <point>40:00:00N80:15:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2954</url>
+   </folio>
+   <folio number="122"><title>Tahlequah </title>
+      <coverage><political>Oklahoma</political>
+         <box>northlimit=36; westlimit=95; southlimit=35.5; eastlimit=94.5</box>
+         <point>36:00:00N95:00:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2968</url>
+   </folio>
+   <folio number="123"><title>Elders Ridge </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.75; westlimit=79.5; southlimit=40.5; eastlimit=79.25</box>
+         <point>40:45:00N79:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2976</url>
+   </folio>
+   <folio number="124"><title>Mount Mitchell</title>
+      <coverage><political>North Carolina - Tennessee</political>
+         <box>northlimit=36; westlimit=82.5; southlimit=35.5; eastlimit=82</box>
+         <point>36:00:00N82:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2955</url>
+   </folio>
+   <folio number="125"><title>Rural Valley </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=41; westlimit=79.5; southlimit=40.75; eastlimit=79.25</box>
+         <point>41:00:00N79:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/3413</url>
+   </folio>
+   <folio number="126"><title>Bradshaw Mountains </title>
+      <coverage><political>Arizona</political>
+         <box>northlimit=34.5; westlimit=112.5; southlimit=34; eastlimit=112</box>
+         <point>34:30:00N112:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2956</url>
+   </folio>
+   <folio number="127"><title>Sundance </title>
+      <coverage><political>South Dakota - Wyoming</political>
+         <box>northlimit=44.5; westlimit=104.5; southlimit=44; eastlimit=104</box>
+         <point>44:30:00N104:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/3446</url>
+   </folio>
+   <folio number="128"><title>Aladdin</title>
+      <coverage><political>Montana - South Dakota - Wyoming</political>
+         <box>northlimit=45; westlimit=104.5; southlimit=44.5; eastlimit=104</box>
+         <point>45:00:00N104:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/3447</url>
+   </folio>
+   <folio number="129"><title>Clifton </title>
+      <coverage><political>Arizona</political>
+         <box>northlimit=33.25; westlimit=109.5; southlimit=33; eastlimit=109.25</box>
+         <point>33:15:00N109:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2957</url>
+   </folio>
+   <folio number="130"><title>Rico </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=37.75; westlimit=108.25; southlimit=37.5; eastlimit=108</box>
+         <point>37:45:00N108:15:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2958</url>
+   </folio>
+   <folio number="131"><title>Needle Mountains </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=37.75; westlimit=107.75; southlimit=37.5; eastlimit=107.5</box>
+         <point>37:45:00N107:45:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2959</url>
+   </folio>
+   <folio number="132"><title>Muscoqee </title>
+      <coverage><political>Oklahoma</political>
+         <box>northlimit=36; westlimit=95.5; southlimit=35.5; eastlimit=95</box>
+         <point>36:00:00N95:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2977</url>
+   </folio>
+   <folio number="133"><title>Edensburg </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.5; westlimit=78.75; southlimit=40.25; eastlimit=78.5</box>
+         <point>40:30:00N78:45:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2978</url>
+   </folio>
+   <folio number="134"><title>Beaver </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.75; westlimit=80.5; southlimit=40.5; eastlimit=80.25</box>
+         <point>40:45:00N80:30:00W</point>
+      </coverage>
+      <date>1905</date>
+      <url>handle/1969.1/2979</url>
+   </folio>
+   <folio number="135"><title>Nepesta </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=38.5; westlimit=104.5; southlimit=38; eastlimit=104</box>
+         <point>38:30:00N104:30:00W</point>
+      </coverage>
+      <date>1906</date>
+      <url>handle/1969.1/3517</url>
+   </folio>
+   <folio number="136"><title>St. Marys</title>
+      <coverage><political>Maryland - Virginia</political>
+         <box>northlimit=38.5; westlimit=76.5; southlimit=38; eastlimit=76</box>
+         <point>38:30:00N76:30:00W</point>
+      </coverage>
+      <date>1906</date>
+      <url>handle/1969.1/2980</url>
+   </folio>
+   <folio number="137"><title>Dover </title>
+      <coverage><political>Delaware - Maryland - New Jersey</political>
+         <box>northlimit=39.5; westlimit=76; southlimit=39; eastlimit=75.5</box>
+         <point>39:30:00N76:00:00W</point>
+      </coverage>
+      <date>1906</date>
+      <url>handle/1969.1/2981</url>
+   </folio>
+   <folio number="138"><title>Redding</title>
+      <coverage><political>California</political>
+         <box>northlimit=41; westlimit=122.5; southlimit=40.5; eastlimit=122</box>
+         <point>41:00:00N122:30:00W</point>
+      </coverage>
+      <date>1906</date>
+      <url>handle/1969.1/2982</url>
+   </folio>
+   <folio number="139"><title>Snoqualmie</title>
+      <coverage><political>Washington</political>
+         <box>northlimit=47.5; westlimit=121.5; southlimit=47; eastlimit=121</box>
+         <point>47:30:00N121:30:00W</point>
+      </coverage>
+      <date>1906</date>
+      <url>handle/1969.1/2983</url>
+   </folio>
+   <folio number="140"><title>Milwaukee Special </title>
+      <coverage><political>Wisconsin</political>
+         <box>northlimit=43.15; westlimit=88.08333333; southlimit=42.9; eastlimit=87.83333333</box>
+         <point>43:09:00N88:05:00W</point>
+      </coverage>
+      <date>1906</date>
+      <url>handle/1969.1/2984</url>
+   </folio>
+   <folio number="141"><title> Bald Mountain-Dayton </title>
+      <coverage><political>Wyoming</political>
+         <box>northlimit=45; westlimit=108; southlimit=44.5; eastlimit=107</box>
+         <point>45:00:00N108:00:00W</point>
+      </coverage>
+      <date>1906</date>
+      <url>handle/1969.1/3522</url>
+   </folio>
+   <folio number="142"><title>Cloud Peak-Fort McKinney</title>
+      <coverage><political>Wyoming</political>
+         <box>northlimit=44.5; westlimit=107.5; southlimit=44; eastlimit=106.5</box>
+         <point>44:30:00N107:30:00W</point>
+      </coverage>
+      <date>1906</date>
+      <url>handle/1969.1/2985</url>
+   </folio>
+   <folio number="143"><title>Nantahala</title>
+      <coverage><political>North Carolina - Tennessee</political>
+         <box>northlimit=35.5; westlimit=84; southlimit=35; eastlimit=83.5</box>
+         <point>35:30:00N84:00:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/2986</url>
+   </folio>
+   <folio number="144"><title>Amity </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.25; westlimit=80.25; southlimit=40; eastlimit=80</box>
+         <point>40:15:00N80:15:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/2987</url>
+   </folio>
+   <folio number="145"><title>Lancaster-Mineral Point </title>
+      <coverage><political>Illinois - Iowa - Wisconsin</political>
+         <box>northlimit=43; westlimit=91; southlimit=42.5; eastlimit=90.5</box>
+         <point>43:00:00N91:00:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/2988</url>
+   </folio>
+   <folio number="146"><title>Rogersville </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40; westlimit=80.5; southlimit=39.75; eastlimit=80.25</box>
+         <point>40:00:00N80:30:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/2989</url>
+   </folio>
+   <folio number="147"><title>Pisqah</title>
+      <coverage><political>North Carolina - South Carolina</political>
+         <box>northlimit=35.5; westlimit=83; southlimit=35; eastlimit=82.5</box>
+         <point>35:30:00N83:00:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/2990</url>
+   </folio>
+   <folio number="148"><title>Joplin District</title>
+      <coverage><political>Kansas - Missouri</political>
+         <box>northlimit=37.25; westlimit=94.75; southlimit=37; eastlimit=94.25</box>
+         <point>37:15:00N94:45:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/2992</url>
+   </folio>
+   <folio number="149"><title>Penobscot Bay</title>
+      <coverage><political>Maine</political>
+         <box>northlimit=44.5; westlimit=69; southlimit=44; eastlimit=68.5</box>
+         <point>44:30:00N69:00:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/2993</url>
+   </folio>
+   <folio number="150"><title>Devils Tower </title>
+      <coverage><political>Wyoming</political>
+         <box>northlimit=45; westlimit=105; southlimit=44.5; eastlimit=104.5</box>
+         <point>45:00:00N105:00:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/3523</url>
+   </folio>
+   <folio number="151"><title>Roan Mountain</title>
+      <coverage><political>North Carolina - Tennessee</political>
+         <box>northlimit=36.5; westlimit=82.5; southlimit=36; eastlimit=82</box>
+         <point>36:30:00N82:30:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/3439</url>
+   </folio>
+   <folio number="152"><title>Patuxent </title>
+      <coverage><political>District of Columbia</political>
+         <box>northlimit=39; westlimit=77; southlimit=38.5; eastlimit=76.5</box>
+         <point>39:00:00N77:00:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/3445</url>
+   </folio>
+   <folio number="153"><title>Ouray </title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=38.25; westlimit=107.75; southlimit=38; eastlimit=107.5</box>
+         <point>38:15:00N107:45:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/3460</url>
+   </folio>
+   <folio number="154"><title>Winslow </title>
+      <coverage><political>Arkansas - Oklahoma</political>
+         <box>northlimit=36; westlimit=94.5; southlimit=35.5; eastlimit=94</box>
+         <point>36:00:00N94:30:00W</point>
+      </coverage>
+      <date>1907</date>
+      <url>handle/1969.1/3461</url>
+   </folio>
+   <folio number="155"><title>Ann Arbor</title>
+      <coverage><political>Michigan</political>
+         <box>northlimit=42.5; westlimit=84; southlimit=42; eastlimit=83.5</box>
+         <point>42:30:00N84:00:00W</point>
+      </coverage>
+      <date>1908</date>
+      <url>handle/1969.1/3478</url>
+   </folio>
+   <folio number="156"><title>Elk Point</title>
+      <coverage><political>Iowa - Nebraska - South Dakota</political>
+         <box>northlimit=43; westlimit=97; southlimit=42.5; eastlimit=96.5</box>
+         <point>43:00:00N97:00:00W</point>
+      </coverage>
+      <date>1908</date>
+      <url>handle/1969.1/3554</url>
+   </folio>
+   <folio number="157"><title>Passaic </title>
+      <coverage><political>New Jersey - New York</political>
+         <box>northlimit=41; westlimit=74.5; southlimit=40.5; eastlimit=74</box>
+         <point>41:00:00N74:30:00W</point>
+      </coverage>
+      <date>1908</date>
+      <url>handle/1969.1/3558</url>
+   </folio>
+   <folio number="158"><title>Rockland</title>
+      <coverage><political>Maine</political>
+         <box>northlimit=44.25; westlimit=69.25; southlimit=44; eastlimit=69</box>
+         <point>44:15:00N69:15:00W</point>
+      </coverage>
+      <date>1908</date>
+      <url>handle/1969.1/3569</url>
+   </folio>
+   <folio number="159"><title>Independence</title>
+      <coverage><political>Kansas</political>
+         <box>northlimit=37.5; westlimit=96; southlimit=37; eastlimit=95.5</box>
+         <point>37:30:00N96:00:00W</point>
+      </coverage>
+      <date>1908</date>
+      <url>handle/1969.1/3572</url>
+   </folio>
+   <folio number="160"><title>Accident-Grantsville</title>
+      <coverage><political>Maryland - Pennsylvania - West Virginia</political>
+         <box>northlimit=39.75; westlimit=79.5; southlimit=39.5; eastlimit=79</box>
+         <point>39:45:00N79:30:00W</point>
+      </coverage>
+      <date>1908</date>
+      <url>handle/1969.1/3575</url>
+   </folio>
+   <folio number="161"><title>Franklin Furnace</title>
+      <coverage><political>New Jersey</political>
+         <box>northlimit=41.25; westlimit=74.75; southlimit=41; eastlimit=74.5</box>
+         <point>41:15:00N74:45:00W</point>
+      </coverage>
+      <date>1908</date>
+      <url>handle/1969.1/3591</url>
+   </folio>
+   <folio number="162"><title>Philadelphia </title>
+      <coverage><political>Delaware - New Jersey - Pennsylvania</political>
+         <box>northlimit=40.25; westlimit=75.5; southlimit=39.75; eastlimit=75</box>
+         <point>40:15:00N75:30:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/3592</url>
+   </folio>
+   <folio number="163"><title>Santa Cruz</title>
+      <coverage><political>California</political>
+         <box>northlimit=37.5; westlimit=122.5; southlimit=37; eastlimit=122</box>
+         <point>37:30:00N122:30:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/3593</url>
+   </folio>
+   <folio number="164"><title>Belle Fourche</title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=45; westlimit=104; southlimit=44.5; eastlimit=103.5</box>
+         <point>45:00:00N104:00:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/3594</url>
+   </folio>
+   <folio number="165"><title>Aberdeen-Redfield</title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=45.5; westlimit=99; southlimit=44.5; eastlimit=98</box>
+         <point>45:30:00N99:00:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/3596</url>
+   </folio>
+   <folio number="166"><title>El Paso</title>
+      <coverage><political>Texas</political>
+         <box>northlimit=32; westlimit=106.5; southlimit=31.5; eastlimit=106</box>
+         <point>32:00:00N106:30:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/2994</url>
+   </folio>
+   <folio number="167"><title>Trenton</title>
+      <coverage><political>New Jersey - Pennsylvania </political>
+         <box>northlimit=40.5; westlimit=75; southlimit=40; eastlimit=74.5</box>
+         <point>40:30:00N75:00:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/3597</url>
+   </folio>
+   <folio number="168"><title>Jamestown-Tower</title>
+      <coverage><political>North Dakota</political>
+         <box>northlimit=47; westlimit=99; southlimit=46.5; eastlimit=97.5</box>
+         <point>47:00:00N99:00:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/3602</url>
+   </folio>
+   <folio number="169"><title>Watkins Glen-Catatonk</title>
+      <coverage><political>New York</political>
+         <box>northlimit=42.5; westlimit=76.5; southlimit=42; eastlimit=76</box>
+         <point>42:30:00N76:30:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/3598</url>
+   </folio>
+   <folio number="170"><title>Mercersburg-Chambersburg</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40; westlimit=78; southlimit=39.75; eastlimit=77.5</box>
+         <point>40:00:00N78:00:00W</point>
+      </coverage>
+      <date>1909</date>
+      <url>handle/1969.1/3599</url>
+   </folio>
+   <folio number="171"><title>Engineer Mountain</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=37.75; westlimit=108; southlimit=37.5; eastlimit=107.75</box>
+         <point>37:45:00N108:00:00W</point>
+      </coverage>
+      <date>1910</date>
+      <url>handle/1969.1/3600</url>
+   </folio>
+   <folio number="172"><title>Warren</title>
+      <coverage><political>New York - Pennsylvania</political>
+         <box>northlimit=42; westlimit=79.25; southlimit=41.75; eastlimit=79</box>
+         <point>42:00:00N79:15:00W</point>
+      </coverage>
+      <date>1910</date>
+      <url>handle/1969.1/2995</url>
+   </folio>
+   <folio number="173"><title>Laramie-Sherman</title>
+      <coverage><political>Wyoming</political>
+         <box>northlimit=41.5; westlimit=106; southlimit=41; eastlimit=105</box>
+         <point>41:30:00N106:00:00W</point>
+      </coverage>
+      <date>1910</date>
+      <url>handle/1969.1/3603</url>
+   </folio>
+   <folio number="174"><title>Johnstown </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.5; westlimit=79; southlimit=40.25; eastlimit=78.75</box>
+         <point>40:30:00N79:00:00W</point>
+      </coverage>
+      <date>1910</date>
+      <url>handle/1969.1/3604</url>
+   </folio>
+   <folio number="175"><title>Birmingham</title>
+      <coverage><political>Alabama</political>
+         <box>northlimit=34; westlimit=87; southlimit=33.5; eastlimit=86.5</box>
+         <point>34:00:00N87:00:00W</point>
+      </coverage>
+      <date>1910</date>
+      <url>handle/1969.1/3605</url>
+   </folio>
+   <folio number="176"><title>Sewickley </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.75; westlimit=80.25; southlimit=40.5; eastlimit=80</box>
+         <point>40:45:00N80:15:00W</point>
+      </coverage>
+      <date>1911</date>
+      <url>handle/1969.1/2996</url>
+   </folio>
+   <folio number="177"><title>Burgettstown-Carnegie</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.5; westlimit=80.5; southlimit=40.25; eastlimit=80</box>
+         <point>40:30:00N80:30:00W</point>
+      </coverage>
+      <date>1911</date>
+      <url>handle/1969.1/3606</url>
+   </folio>
+   <folio number="178"><title>Foxburg-Clarion</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=41.25; westlimit=79.75; southlimit=41; eastlimit=79.25</box>
+         <point>41:15:00N79:45:00W</point>
+      </coverage>
+      <date>1911</date>
+      <url>handle/1969.1/3608</url>
+   </folio>
+   <folio number="179"><title>Pawpaw-Hancock </title>
+      <coverage><political>Maryland - Pennsylvania - West Virginia</political>
+         <box>northlimit=39.75; westlimit=78.5; southlimit=39.5; eastlimit=78</box>
+         <point>39:45:00N78:30:00W</point>
+      </coverage>
+      <date>1912</date>
+      <url>handle/1969.1/3610</url>
+   </folio>
+   <folio number="180"><title>Claysville </title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.25; westlimit=80.5; southlimit=40; eastlimit=80.25</box>
+         <point>40:15:00N80:30:00W</point>
+      </coverage>
+      <date>1912</date>
+      <url>handle/1969.1/3611</url>
+   </folio>
+   <folio number="181"><title>Bismarck</title>
+      <coverage><political>North Dakota</political>
+         <box>northlimit=47; westlimit=101; southlimit=46.5; eastlimit=100.5</box>
+         <point>47:00:00N101:00:00W</point>
+      </coverage>
+      <date>1912</date>
+      <url>handle/1969.1/3622</url>
+   </folio>
+   <folio number="182"><title>Choptank</title>
+      <coverage><political>Maryland</political>
+         <box>northlimit=39; westlimit=76.5; southlimit=38.5; eastlimit=76</box>
+         <point>39:00:00N76:30:00W</point>
+      </coverage>
+      <date>1912</date>
+      <url>handle/1969.1/3623</url>
+   </folio>
+   <folio number="183"><title>Llano-Burnet</title>
+      <coverage><political>Texas</political>
+         <box>northlimit=31; westlimit=99; southlimit=30.5; eastlimit=98</box>
+         <point>31:00:00N99:00:00W</point>
+      </coverage>
+      <date>1912</date>
+      <url>handle/1969.1/2997</url>
+   </folio>
+   <folio number="184"><title>Kenova </title>
+      <coverage><political>Kentucky -Ohio - West Virginia</political>
+         <box>northlimit=38.5; westlimit=83; southlimit=38; eastlimit=82.5</box>
+         <point>38:30:00N83:00:00W</point>
+      </coverage>
+      <date>1912</date>
+      <url>handle/1969.1/2998</url>
+   </folio>
+   <folio number="185"><title>Murphysboro-Herrin </title>
+      <coverage><political>Illinois</political>
+         <box>northlimit=38; westlimit=89.5; southlimit=37.75; eastlimit=89</box>
+         <point>38:00:00N89:30:00W</point>
+      </coverage>
+      <date>1912</date>
+      <url>handle/1969.1/3624</url>
+   </folio>
+   <folio number="186"><title>Apishapa</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=38; westlimit=104.5; southlimit=37.5; eastlimit=104</box>
+         <point>38:00:00N104:30:00W</point>
+      </coverage>
+      <date>1912</date>
+      <url>handle/1969.1/3626</url>
+   </folio>
+   <folio number="187"><title>Ellijay</title>
+      <coverage><political>Georgia - North Carolina - Tennessee</political>
+         <box>northlimit=35; westlimit=84.5; southlimit=34.5; eastlimit=84</box>
+         <point>35:00:00N84:30:00W</point>
+      </coverage>
+      <date>1913</date>
+      <url>handle/1969.1/2999</url>
+   </folio>
+   <folio number="188"><title>Tallula-Springfield</title>
+      <coverage><political>Illinois</political>
+         <box>northlimit=40; westlimit=90; southlimit=39.75; eastlimit=89.5</box>
+         <point>40:00:00N90:00:00W</point>
+      </coverage>
+      <date>1913</date>
+      <url>handle/1969.1/3627</url>
+   </folio>
+   <folio number="189"><title>Barnesboro-Patton</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.75; westlimit=79; southlimit=40.5; eastlimit=78.5</box>
+         <point>40:45:00N79:00:00W</point>
+      </coverage>
+      <date>1913</date>
+      <url>handle/1969.1/3635</url>
+   </folio>
+   <folio number="190"><title>Niagara </title>
+      <coverage><political>New York</political>
+         <box>northlimit=43.5; westlimit=79; southlimit=43; eastlimit=78.5</box>
+         <point>43:30:00N79:00:00W</point>
+      </coverage>
+      <date>1913</date>
+      <url>handle/1969.1/3640</url>
+   </folio>
+   <folio number="191"><title>Raritan</title>
+      <coverage><political>New Jersey</political>
+         <box>northlimit=41; westlimit=75; southlimit=40.5; eastlimit=74.5</box>
+         <point>41:00:00N75:00:00W</point>
+      </coverage>
+      <date>1914</date>
+      <url>handle/1969.1/3641</url>
+   </folio>
+   <folio number="192"><title>Eastport</title>
+      <coverage><political>Maine</political>
+         <box>northlimit=45; westlimit=67.25; southlimit=44.75; eastlimit=66.9375</box>
+         <point>45:00:00N67:15:00W</point>
+      </coverage>
+      <date>1914</date>
+      <url>handle/1969.1/3642</url>
+   </folio>
+   <folio number="193"><title>San Francisco</title>
+      <coverage><political>California</political>
+         <box>northlimit=38; westlimit=122.75; southlimit=37.5; eastlimit=122</box>
+         <point>38:00:00N122:45:00W</point>
+      </coverage>
+      <date>1914</date>
+      <url>handle/1969.1/3643</url>
+   </folio>
+   <folio number="194"><title>Van Horn</title>
+      <coverage><political>Texas</political>
+         <box>northlimit=31.5; westlimit=105; southlimit=31; eastlimit=104.5</box>
+         <point>31:30:00N105:00:00W</point>
+      </coverage>
+      <date>1914</date>
+      <url>handle/1969.1/3000</url>
+   </folio>
+   <folio number="195"><title>Belleville-Breese</title>
+      <coverage><political>Illinois</political>
+         <box>northlimit=38.75; westlimit=90; southlimit=38.5; eastlimit=89.5</box>
+         <point>38:45:00N90:00:00W</point>
+      </coverage>
+      <date>1915</date>
+      <url>handle/1969.1/3644</url>
+   </folio>
+   <folio number="196"><title>Philipsburg</title>
+      <coverage><political>Montana</political>
+         <box>northlimit=46.5; westlimit=113.5; southlimit=46; eastlimit=113</box>
+         <point>46:30:00N113:30:00W</point>
+      </coverage>
+      <date>1915</date>
+      <url>handle/1969.1/3001</url>
+   </folio>
+   <folio number="197"><title>Columbus</title>
+      <coverage><political>Ohio</political>
+         <box>northlimit=40.25; westlimit=83.25; southlimit=39.75; eastlimit=82.75</box>
+         <point>40:15:00N83:15:00W</point>
+      </coverage>
+      <date>1915</date>
+      <url>handle/1969.1/3002</url>
+   </folio>
+   <folio number="198"><title>Castle Rock</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=39.5; westlimit=105; southlimit=39; eastlimit=104.5</box>
+         <point>39:30:00N105:00:00W</point>
+      </coverage>
+      <date>1915</date>
+      <url>handle/1969.1/3645</url>
+   </folio>
+   <folio number="199"><title>Silver City</title>
+      <coverage><political>New Mexico</political>
+         <box>northlimit=33; westlimit=108.5; southlimit=32.5; eastlimit=108</box>
+         <point>33:00:00N108:30:00W</point>
+      </coverage>
+      <date>1916</date>
+      <url>handle/1969.1/3667</url>
+   </folio>
+   <folio number="200"><title>Galena-Elizabeth</title>
+      <coverage><political>Illinois - Iowa</political>
+         <box>northlimit=42.50472222; westlimit=90.5; southlimit=42.25; eastlimit=90</box>
+         <point>42:30:17N90:30:00W</point>
+      </coverage>
+      <date>1916</date>
+      <url>handle/1969.1/3668</url>
+   </folio>
+   <folio number="201"><title>Minneapolis-St. Paul </title>
+      <coverage><political>Minnesota</political>
+         <box>northlimit=45.25; westlimit=93.5; southlimit=44.75; eastlimit=93</box>
+         <point>45:15:00N93:30:00W</point>
+      </coverage>
+      <date>1916</date>
+      <url>handle/1969.1/3003</url>
+   </folio>
+   <folio number="202"><title>Eureka Springs-Harrison</title>
+      <coverage><political>Arkansas - Missouri</political>
+         <box>northlimit=36.5; westlimit=94; southlimit=36; eastlimit=93</box>
+         <point>36:30:00N94:00:00W</point>
+      </coverage>
+      <date>1916</date>
+      <url>handle/1969.1/3669</url>
+   </folio>
+   <folio number="203"><title>Colorado Springs</title>
+      <coverage><political>Colorado</political>
+         <box>northlimit=38.91666667; westlimit=105.0833333; southlimit=38.75; eastlimit=104.75</box>
+         <point>38:55:00N105:05:00W</point>
+      </coverage>
+      <date>1916</date>
+      <url>handle/1969.1/3670</url>
+   </folio>
+   <folio number="204"><title>Tolchester</title>
+      <coverage><political>Maryland</political>
+         <box>northlimit=39.5; westlimit=76.5; southlimit=39; eastlimit=76</box>
+         <point>39:30:00N76:30:00W</point>
+      </coverage>
+      <date>1917</date>
+      <url>handle/1969.1/3671</url>
+   </folio>
+   <folio number="205"><title>Detroit</title>
+      <coverage><political>Michigan</political>
+         <box>northlimit=42.5; westlimit=83.5; southlimit=42; eastlimit=82.75</box>
+         <point>42:30:00N83:30:00W</point>
+      </coverage>
+      <date>1917</date>
+      <url>handle/1969.1/3672</url>
+   </folio>
+   <folio number="206"><title>Leavenworth-Smithville</title>
+      <coverage><political>Kansas - Missouri</political>
+         <box>northlimit=39.5; westlimit=95; southlimit=39.25; eastlimit=94.5</box>
+         <point>39:30:00N95:00:00W</point>
+      </coverage>
+      <date>1917</date>
+      <url>handle/1969.1/3673</url>
+   </folio>
+   <folio number="207"><title>Deming </title>
+      <coverage><political>New Mexico</political>
+         <box>northlimit=32.5; westlimit=108; southlimit=32; eastlimit=107.5</box>
+         <point>32:30:00N108:00:00W</point>
+      </coverage>
+      <date>1917</date>
+      <url>handle/1969.1/3674</url>
+   </folio>
+   <folio number="208"><title>Colchester-Macomb </title>
+      <coverage><political>Illinois</political>
+         <box>northlimit=40.5; westlimit=91; southlimit=40.25; eastlimit=90.5</box>
+         <point>40:30:00N91:00:00W</point>
+      </coverage>
+      <date>1919</date>
+      <url>handle/1969.1/3675</url>
+   </folio>
+   <folio number="209"><title>Newell </title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=45; westlimit=103.5; southlimit=44.5; eastlimit=103</box>
+         <point>45:00:00N103:30:00W</point>
+      </coverage>
+      <date>1919</date>
+      <url>handle/1969.1/3676</url>
+   </folio>
+   <folio number="210"><title>Herman-Morris </title>
+      <coverage><political>Minnesota</political>
+         <box>northlimit=46; westlimit=96.25; southlimit=45.5; eastlimit=95.75</box>
+         <point>46:00:00N96:15:00W</point>
+      </coverage>
+      <date>1919</date>
+      <url>handle/1969.1/3004</url>
+   </folio>
+   <folio number="211"><title>Elkton-Wilmington</title>
+      <coverage><political>Delaware - Maryland - New Jersey - Pennsylvania</political>
+         <box>northlimit=39.75; westlimit=76; southlimit=39.5; eastlimit=75.5</box>
+         <point>39:45:00N76:00:00W</point>
+      </coverage>
+      <date>1920</date>
+      <url>handle/1969.1/3677</url>
+   </folio>
+   <folio number="212"><title>Syracuse-Lakin </title>
+      <coverage><political>Kansas</political>
+         <box>northlimit=38; westlimit=102; southlimit=37.5; eastlimit=101</box>
+         <point>38:00:00N102:00:00W</point>
+      </coverage>
+      <date>1920</date>
+      <url>handle/1969.1/3678</url>
+   </folio>
+   <folio number="213"><title>New Athens-Okawville</title>
+      <coverage><political>Illinois</political>
+         <box>northlimit=38.5; westlimit=90; southlimit=38.25; eastlimit=89.5</box>
+         <point>38:30:00N90:00:00W</point>
+      </coverage>
+      <date>1921</date>
+      <url>handle/1969.1/3679</url>
+   </folio>
+   <folio number="214"><title>Raton-Brilliant-Koehler</title>
+      <coverage><political>Colorado - New Mexico</political>
+         <box>northlimit=37; westlimit=104.75; southlimit=36.5; eastlimit=104.25</box>
+         <point>37:00:00N104:45:00W</point>
+      </coverage>
+      <date>1922</date>
+      <url>handle/1969.1/3681</url>
+   </folio>
+   <folio number="215"><title>Hot Springs</title>
+      <coverage><political>Arkansas</political>
+         <box>northlimit=34.6325; westlimit=93.17972222; southlimit=34.3825; eastlimit=92.92972222</box>
+         <point>34:37:57N93:10:47W</point>
+      </coverage>
+      <date>1923</date>
+      <url>handle/1969.1/3685</url>
+   </folio>
+   <folio number="216"><title>Carlyle-Centralia</title>
+      <coverage><political>Illinois</political>
+         <box>northlimit=38.75; westlimit=89.5; southlimit=38.5; eastlimit=89</box>
+         <point>38:45:00N89:30:00W</point>
+      </coverage>
+      <date>1923</date>
+      <url>handle/1969.1/3686</url>
+   </folio>
+   <folio number="217"><title>Ray </title>
+      <coverage><political>Arizona</political>
+         <box>northlimit=33.25; westlimit=111; southlimit=33; eastlimit=110.75</box>
+         <point>33:15:00N111:00:00W</point>
+      </coverage>
+      <date>1923</date>
+      <url>handle/1969.1/3687</url>
+   </folio>
+   <folio number="218"><title>Riddle</title>
+      <coverage><political>Oregon</political>
+         <box>northlimit=43; westlimit=123.5; southlimit=42.5; eastlimit=123</box>
+         <point>43:00:00N123:30:00W</point>
+      </coverage>
+      <date>1924</date>
+      <url>handle/1969.1/3688</url>
+   </folio>
+   <folio number="219"><title>Central Black Hills</title>
+      <coverage><political>South Dakota</political>
+         <box>northlimit=44.5; westlimit=104; southlimit=44; eastlimit=103.5</box>
+         <point>44:30:00N104:00:00W</point>
+      </coverage>
+      <date>1925</date>
+      <url>handle/1969.1/3680</url>
+   </folio>
+   <folio number="220"><title>Gillespie-Mount Olive </title>
+      <coverage><political>Illinois</political>
+         <box>northlimit=39.25; westlimit=90; southlimit=39; eastlimit=89.5</box>
+         <point>39:15:00N90:00:00W</point>
+      </coverage>
+      <date>1926</date>
+      <url>handle/1969.1/3689</url>
+   </folio>
+   <folio number="221"><title>Bessemer-Vandiver </title>
+      <coverage><political>Alabama</political>
+         <box>northlimit=33.5; westlimit=87; southlimit=33.25; eastlimit=86.5</box>
+         <point>33:30:00N87:00:00W</point>
+      </coverage>
+      <date>1927</date>
+      <url>handle/1969.1/3690</url>
+   </folio>
+   <folio number="222"><title>Gaffney-Kings Mountain</title>
+      <coverage><political>North Carolina - South Carolina</political>
+         <box>northlimit=35.25; westlimit=81.75; southlimit=35; eastlimit=81.25</box>
+         <point>35:15:00N81:45:00W</point>
+      </coverage>
+      <date>1931</date>
+      <url>handle/1969.1/3414</url>
+   </folio>
+   <folio number="223"><title>Coatesville-West Chester</title>
+      <coverage><political>Delaware - Pennsylvania</political>
+         <box>northlimit=40; westlimit=76; southlimit=39.75; eastlimit=75.5</box>
+         <point>40:00:00N76:00:00W</point>
+      </coverage>
+      <date>1932</date>
+      <url>handle/1969.1/3005</url>
+   </folio>
+   <folio number="224"><title>Somerset-Windber</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.25; westlimit=79.25; southlimit=40; eastlimit=78.75</box>
+         <point>40:15:00N79:15:00W</point>
+      </coverage>
+      <date>1934</date>
+      <url>handle/1969.1/3415</url>
+   </folio>
+   <folio number="225"><title>Fairfield-Gettysburg</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40; westlimit=77.5; southlimit=39.75; eastlimit=77</box>
+         <point>40:00:00N77:30:00W</point>
+      </coverage>
+      <date>1929</date>
+      <url>handle/1969.1/3438</url>
+   </folio>
+   <folio number="226"><title>Montevallo-Columbiana</title>
+      <coverage><political>Alabama</political>
+         <box>northlimit=33.25; westlimit=87; southlimit=33; eastlimit=86.5</box>
+         <point>33:15:00N87:00:00W</point>
+      </coverage>
+      <date>1940</date>
+      <url>handle/1969.1/3416</url>
+   </folio>
+   <folio number="227"><title>Hollidaysburg-Huntingdon</title>
+      <coverage><political>Pennsylvania</political>
+         <box>northlimit=40.5; westlimit=78.5; southlimit=40.25; eastlimit=78</box>
+         <point>40:30:00N78:30:00W</point>
+      </coverage>
+      <date>1945</date>
+      <url>handle/1969.1/3437</url>
+   </folio>
+</folios>
+
+
+
+
+
+
+<!-- So that I can build something like this...			
+			
+    // Folio 2 - Ringgold folio, Georgia, Tennessee
+    var ll_2 = new LatLon(60.0, -60.0);
+    var mk_2 = new CustomPOIMarker('2', 'Ringgold folio, Georgia, Tennessee', 'Folio 2, published 1894<br/>Lat: 35:00:00; Lon: 85:30:00<br/><br/><a href="/geofolios/handle/1969.1/2809">View complete folio</a>', '0x990033', '0xffffff');
+    map.addMarkerByLatLon(mk_2, ll_2);
+    
+    // Folio 3 - Placerville folio, California
+    var ll_3 = new LatLon(38.75, -120.75);
+    var mk_3 = new CustomPOIMarker('3', 'Placerville folio, California', 'Folio 3, published 1894<br/>Lat: 39:00:00; Lon: 121:00:00<br/><br/><a href="/geofolios/handle/1969.1/2811">View complete folio</a>', '0x990033', '0xffffff');
+    map.addMarkerByLatLon(mk_3, ll_3);
+    			
+    // Folio 4 - Kingston folio, Tennessee
+    var ll_4 = new LatLon(35.75, -84.75);
+    var mk_4 = new CustomPOIMarker('4', 'Kingston folio, Tennessee', 'Folio 4, published 1894<br/>Lat: 36:00:00; Lon: 85:00:00<br/><br/><a href="/geofolios/handle/1969.1/">View complete folio</a>', '0x990033', '0xffffff');
+    map.addMarkerByLatLon(mk_4, ll_4);
+    
+-->

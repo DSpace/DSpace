@@ -1,0 +1,185 @@
+* { margin: 0; padding: 0; }
+
+body { font-family: Arial, helvetica, sans-serif; }
+
+h1, h2, h3 { margin: 15px 0 20px; }
+p { margin: 0 0 20px 0; }
+ul { margin: 0 0 20px 20px; } 
+
+#header { border: 0px solid green; }
+
+#banner { width: 100%; text-align: center; background-color: #8A2034; height: 83px; border-bottom: 3px solid #666; border-top: 2px solid #333; background-image: url(dr_logo3.jpg); background-repeat: no-repeat; background-position: 45% 0px; }
+
+#breadcrumb { color: #666; background-color: #e4e4e4; padding: 6px 10px 5px 5px; font-size: 75%; border-bottom: 1px solid #ccc; }
+#breadcrumb a { padding: 0 5px; text-decoration: none; color: #666; }
+#breadcrumb a:hover { text-decoration: underline; }
+
+#userbox { position: absolute; right: 0px; top: 55px; text-align: right; color: #999; padding: 6px 10px 5px 5px; font-size: 75%; }
+#userbox a { padding: 0 5px; text-decoration: none; color: #CCC; }
+#userbox a:hover { text-decoration: underline; }
+
+#sidebar { width: 210px; float: left; padding: 30px 10px 30px 15px; color: #666; } 
+#sidebar h3 { font-size: 90%; background-color: #bbb; padding: 4px; margin: 0; }
+#sidebar ul { background-color: #eee; margin: 0 0 20px 0; padding-top: 5px; list-style: none; }
+#sidebar li { font-size: 75%; padding: 5px 4px; border-bottom: 1px solid #ccc; }
+#sidebar li:hover { background-color: #ddd; }
+#sidebar a { color: #666; text-decoration: none; } 
+#sidebar a:hover { text-decoration: underline; }
+#sidebar .panel { background-color: #eee; margin-bottom: 20px; padding: 10px 5px 10px; font-size: 75%; }
+#sidebar input.ds-text-field { height: 15px; margin-bottom: 5px;}
+#sidebar input.ds-button-field { margin-bottom: 5px;}
+#sidebar input.radio { margin-left: 3px; height: 10px; }
+#advancedSearch { display: block; margin-top: 7px; margin-left: 5px; font-weight: bolder; }
+
+
+
+#content { border: 0px solid black; margin: 10px 10px 30px 240px; padding: 15px; }
+#content #toggle { position: absolute; top: 151px; right: -25px; font-size: 80%; padding: 3px; margin: 20px 50px 0 0; background-color: #e8e8e8; border: 1px solid #ccc; }
+#content #toggle a { color: #666; text-decoration: none; }
+#content h2 { font-size: 200%; font-weight: bolder;  }
+#content h1 { font-size: 200%; font-weight: bolder; margin: 0;  }
+
+#mapContainer { height: 400px; width: 100%; max-width: 800px; border: 1px solid black; margin: 5px 0 0 0; }
+
+
+#metadata { margin: 0; }
+#metadata .byline { color: #666; font-weight: normal; font-size: 140%; }
+#metadata strong { color: #aaa; }
+#metadata .showlink { font-family: Courier New, Serif; font-size: 100%; font-weight: bolder; }
+#metadata #smallset { color: #666; font-size: 80%; margin: 0 0 20px 0; }
+#metadata #fullset { color: #666; font-size: 80%; margin: 10px 0; }
+
+
+
+#bitstreams { margin-top: 25px; }
+
+.thumbnail { overflow: hidden; height: 180px; width: 125px; margin: 0px 22px 22px 0; padding: 10px; float: left; position: relative;   background-color: #e8e8e8; }
+.thumbnail img { margin: 4px 0 4px 12px; border: none; }
+.thumbnail p { white-space: nowrap; font-size: 75%; margin: 0;}
+.thumbnail p a { color: #999; font-size: 90%; text-decoration: none; }
+
+#pdflink { margin: 40px 25px 20px; padding: 20px 20px 20px 55px; border: 1px solid #ccc; background-color: #e8e8e8; background-image: url(pdficon-sm.gif); background-repeat: no-repeat; background-position: 8px 8px; clear: both; }
+
+#footer { clear: both; background-color: #e4e4e4; border-top: 2px solid #ccc; padding: 30px; margin-top: 30px; font-size: 70%; color: #666; text-align: center; }
+#footer p { margin-bottom: 6px; } 
+#footer a { color: #666; }
+#footer a:hover { color: blue; }
+
+table { padding: 0px; border-spacing: 0px; border: 1px solid rgb(206,220,234); }
+tr.ds-table-header-row { background-color: #ddd; }
+tr.ds-table-row.odd { background-color: white; }
+tr.ds-table-row.even { background-color: #e4e4e4; }
+td { padding: 3px 20px 5px 10px; border: none; }
+th { padding: 10px; }
+
+
+#artifactbrowser_CommunityViewer_div_community-browse,
+.ds-logo-wrapper
+{ display: none }
+
+p#artifactbrowser_SimpleSearch_p_result-query { color: rgb(25,20,250); font-weight: bold; margin: 5px 0; }
+
+p.pagination-info { display: none; }
+
+.pagination-masked a { color: #666; text-decoration: none; border: 1px solid #ccc; background-color: #eeeeee; padding: 2px 4px; margin: 0 4px;}
+
+.pagination-masked a:hover { color: #666; text-decoration: underline; }
+
+.pagination-masked { padding: 15px 0; width: 40%; font-size: 90% }
+
+.pagination-masked ul {margin: 0; display: inline; list-style-type: none;}
+
+.pagination-masked li {display: inline;}
+
+
+#content #ds-search-form { margin: 10px 0 30px 0; padding: 3px 0; border: 1px solid #ccc; background-color: #eeeeee; width: 270px; font-weight: bold; font-size: 80%;}
+
+
+
+ul.alphabet {
+    padding-left: 10px;
+    padding-top: 0px;
+    margin: 0px;
+    margin-top: 5px;
+    text-align: center;
+}    
+
+.alphabet li {
+    list-style: none;
+    display: inline;
+    margin-right: 5px;
+    font-weight: 200;
+}    
+
+.alphabet a{
+    font-weight: bold;
+    font-size: 80%;
+    color: rgb(25,20,250);
+}
+
+.alphabet a:hover{
+    font-weight: 600;
+    color: rgb(150,150,50);
+}
+
+.navigation {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background-color: #eeeeee; 
+    border: 1px solid #ccc;
+    padding: 0px 5px 0px 5px;   
+}
+
+.navigation input, .navigation select {
+    margin-left: 5px;
+}
+
+.navigation p {
+    margin: 5px;
+    text-align: center;
+}
+
+.pagination a.previous-page-link {
+    font-weight: bold;
+    font-size: 70%;
+    position: absolute;
+    left: 270px;
+    top: 620px;
+}
+
+.pagination a.next-page-link {
+    font-weight: bold;
+    font-size: 70%;
+    position: absolute;
+    right: 30px;
+    top: 620px;
+}
+
+
+li.ds-artifact-item {
+    margin-bottom: 3px;
+}
+
+ul.ds-artifact-list {
+//    clear: both;
+    border: 1px solid rgb(225,225,225);
+    margin-left: 0px;
+    padding-left: 0px;
+}    
+
+li.ds-artifact-item {
+    list-style-position: inside;
+    list-style: none;
+    padding: 8px;
+    margin-left: 0px;
+}
+
+
+li.ds-artifact-item.odd {
+    background-color: rgb(240,240,240);
+}
+
+li.ds-artifact-item.even {
+    background-color: rgb(250,250,250);
+}
+

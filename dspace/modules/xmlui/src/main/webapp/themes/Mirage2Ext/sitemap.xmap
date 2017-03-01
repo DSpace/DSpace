@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+  sitemap.xmap
+
+  Version: $Revision: 1.0 $
+ 
+  Date: $Date: 2007/10/26 22:54:52 $
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+	<map:components>
+		<map:transformers>
+			<map:transformer name="restrictedItemsInfo" src="org.tamu.dspace.extensions.RestrictedItemsTransformer"/>	    
+		</map:transformers>
+		<map:actions>
+			<map:action name="recordContext" src="org.tamu.dspace.extensions.RecordContextAction"/>
+		</map:actions>
+	</map:components>
+	<map:pipelines>
+		
+		<map:pipeline>
+
+			<!-- This allows js documents to be served fromt he root of theme 
+				 The main reason for this is to allow loadJQuery.js to bt served 
+				 from that location	-->
+			<map:match pattern="themes/*/**">
+				<map:read src="{2}"/>
+			</map:match>
+			
+			<map:match pattern="themes/*/lib/**">
+				<map:read src="lib/{2}"/>
+			</map:match>
+			
+			<!-- Deliver static theme content for the Geofolios sub-theme -->
+			<map:match pattern="themes/*/Geofolios/**">
+				<map:mount uri-prefix="" src="Geofolios/"/>
+			</map:match>
+			
+			<!-- Deliver static theme content for the ESL sub-theme -->
+			<map:match pattern="themes/*/ESL/**">
+				<map:mount uri-prefix="" src="ESL/"/>
+			</map:match>
+			
+			<!-- Deliver static theme content for the Periodicals sub-theme -->
+			<map:match pattern="themes/*/Periodicals/**">
+				<map:mount uri-prefix="" src="Periodicals/"/>
+			</map:match>
+			
+			<!-- Deliver static theme content for the ImageGallery sub-theme -->
+			<map:match pattern="themes/*/ImageGallery/**">
+				<map:mount uri-prefix="" src="ImageGallery/"/>
+			</map:match>
+			
+			<!-- Deliver static theme content for the PrimerosLibros sub-theme -->
+			<map:match pattern="themes/*/PrimerosLibros/**">
+				<map:mount uri-prefix="" src="PrimerosLibros/"/>
+			</map:match>
+			
+			<!-- Deliver static theme content for the Fanzine sub-theme -->
+			<map:match pattern="themes/*/Fanzine/**">
+				<map:mount uri-prefix="" src="Fanzine/"/>
+			</map:match>
+	
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>

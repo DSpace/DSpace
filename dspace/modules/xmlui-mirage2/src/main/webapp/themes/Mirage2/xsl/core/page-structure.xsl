@@ -18,6 +18,9 @@
     Author: ben at atmire.com
     Author: Alexey Maslov
 
+    TAMU Customizations by 
+    Author: James Creel
+    Author: Jason Savell
 -->
 
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
@@ -102,6 +105,22 @@
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
                                         <div class="col-xs-12 col-sm-12 col-md-9 main-content">
+                                            <!-- TAMU Customization - Uses Restricted Items Transformer information to provide a message about bitstream restrictions -->
+                                            <xsl:choose>
+                                                <xsl:when test="//dri:meta/dri:pageMeta/dri:metadata[@element='restricted'] and //dri:meta/dri:pageMeta/dri:metadata[@element='focus' and @qualifier='container']='hdl:1969.1/2'">
+                                                <div id="bitstreamRestrictionNotice" class="alert alert-warning" role="alert">The full text of this item is not available at this time because the student has placed this item under an embargo for a period of time. The Libraries are not authorized to provide a copy of this work during the embargo period, even for Texas A&amp;M users with NetID.</div>
+                                                </xsl:when>
+                                                <xsl:when test="//dri:meta/dri:userMeta[@authenticated='no'] and //dri:meta/dri:pageMeta/dri:metadata[@element='restricted' and @qualifier='campus']">
+                                                <div id="bitstreamRestrictionNotice" class="alert alert-warning" role="alert">NOTE: This item is not available outside the Texas A&amp;M University network. Texas A&amp;M affiliated users who are off campus can access the item through NetID and password authentication or by using <a href="http://it.tamu.edu/Connecting/Internet_Wireless/Virtual_Private_Network__VPN_.php" target="_blank">TAMU VPN</a>. Non-affiliated individuals should request a copy through their local library's interlibrary loan service.</div>
+                                                </xsl:when>
+                                                <xsl:when test="//dri:meta/dri:userMeta[@authenticated='no'] and //dri:meta/dri:pageMeta/dri:metadata[@element='restricted']">
+                                                <div id="bitstreamRestrictionNotice" class="alert alert-warning" role="alert">NOTE: Restrictions are in place to limit access to one or more of the files associated with this item. Authorized users must log in to gain access. Non-authorized users do not have access to these files.</div>
+                                                </xsl:when>
+                                                <xsl:when test="//dri:meta/dri:userMeta[@authenticated='yes'] and //dri:meta/dri:pageMeta/dri:metadata[@element='restricted']">
+                                                <div id="bitstreamRestrictionNotice" class="alert alert-warning" role="alert">NOTE: You are not authorized to access some or all of the files below.</div>
+                                                </xsl:when>
+                                            </xsl:choose>
+
                                             <xsl:apply-templates select="*[not(self::dri:options)]"/>
 
                                             <div class="visible-xs visible-sm">

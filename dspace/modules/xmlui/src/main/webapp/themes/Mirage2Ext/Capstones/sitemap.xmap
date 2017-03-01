@@ -1,69 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- TAMU Specific customization of Mirage2 sitemap.xmap
-     we had to put this in the core Mirage2 source directory instead of the module as it wasn't getting packaged from the module 
--->
+<?xml version="1.0"?>
 <!--
+  sitemap.xmap
 
-    The contents of this file are subject to the license and copyright
-    detailed in the LICENSE and NOTICE files at the root of the source
-    tree and available online at
-
-    http://www.dspace.org/license/
-
--->
-<!-- HOW A DSPACE THEME IS PROCESSED IN 5 STEPS:
-
-          1: Generate the DRI (XML) page
-
-                The first step is to generate a DRI page for the request;
-                this is handled by the Aspect chain. Once it is generated
-                it is the beginning of a theme's pipeline, the DRI page is
-                ultimately transformed in the resulting XHTML that is
-                given to the user's browser.
-
-          2: Add page metadata (to DRI) - see "transform-to-xhtml" resource
-
-                The next step is to add theme specific metadata to the
-                DRI page. This is metadata about where the theme is
-                located and its name. Typically this metadata is different
-                depending on the users browser, this allows us to give
-                different stylesheets to Internet Explorer than for other browsers.
-
-          3: Transform DRI to XHTML (via XSLT) - see "transform-to-xhtml" resource
-
-                The third step is the main component of a theme. The XSL
-                transformations will turn the DRI page from the aspects
-                into an XHTML page useable by browsers.
-
-          4: Localize the page (by replacing i18n tags) - see "transform-to-xhtml" resource
-
-                The second to last step is to localize the content for the
-                particular user, if they user is requesting a page in a
-                particular language then those language strings are inserted
-                into the resulting XHTML.
-
-          5: Serialize to the browser
-
-                The last step sends the XHTML page to the user's browser.
+  Version: $Revision: 1.1 $
+ 
+  Date: $Date: 2006/05/25 16:03:31 $
+ 
 -->
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
-
     <map:components>
-        <map:readers>
-            <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
-        </map:readers>
-
         <map:transformers>
             <transformer name="strip-namespaces" src="org.apache.cocoon.transformation.StripNameSpacesTransformer"/>
-            <!-- TAMU Customization - restricted items transformer -->
-            <transformer name="restrictedItemsInfo" src="org.tamu.dspace.extensions.RestrictedItemsTransformer"/>
+            <map:transformer name="restrictedItemsInfo" src="org.tamu.dspace.extensions.RestrictedItemsTransformer"/>       
         </map:transformers>
-
         <map:actions>
-            <map:action name="ContextAbortAction" src="org.dspace.app.xmlui.cocoon.ContextAbortAction" />
+            <map:action name="recordContext" src="org.tamu.dspace.extensions.RecordContextAction"/>
         </map:actions>
-
-
         <map:serializers>
             <map:serializer name="html-no-doctype" logger="sitemap.serializer.xhtml"
                             src="org.apache.cocoon.serialization.HTMLSerializer"
@@ -74,8 +26,7 @@
             </map:serializer>
         </map:serializers>
     </map:components>
-
-    <!-- Define global resources that are used in multiple areas of the pipeline. -->
+   <!-- Define global resources that are used in multiple areas of the pipeline. -->
     <map:resources>
 
         <!--
@@ -89,12 +40,13 @@
             <!-- Fix some overly convoluted DRI constructs in
                 DSpace code without having to change java code and
                 interfere with other themes -->
-            <map:transform src="xsl/preprocess.xsl"/>
+            <map:transform src="../../Mirage2/xsl/preprocess.xsl"/>
 
             <!-- Add page metadata to DRI -->
             <map:transform type="IncludePageMeta">
                 <map:parameter name="theme.path" value="{global:theme-path}/"/>
                 <map:parameter name="theme.name" value="{global:theme-name}/"/>
+                <map:parameter name="childtheme.path" value="{global:childtheme-path}/"/>
             </map:transform>
 
             <!-- Debugging output (this is only called when ?XML is passed on querystring) -->
@@ -104,7 +56,7 @@
             </map:match>
 
             <!-- Transform DRI to XHTML using the Theme's XSLT(s) -->
-            <map:transform src="xsl/theme.xsl"/>
+            <map:transform src="capstones.xsl"/>
 
             <!-- Localize the XHTML page (by replacing i18n tags) -->
             <map:act type="locale">
@@ -117,37 +69,14 @@
             <map:transform type="strip-namespaces" />
         </map:resource>
     </map:resources>
-
     <map:pipelines>
-
-        <!--
-            Define global theme variables that are used later in this
-            sitemap. Two variables are typically defined here, the theme's
-            path and name. The path is the directory name where this theme
-            is located, such as "Reference" for the reference theme. The
-            theme's name is used only for descriptive purposes to describe
-            the theme.
-        -->
         <map:component-configurations>
             <global-variables>
-                <theme-path>${item}</theme-path>
-                <theme-name>${item}</theme-name>
+                <theme-path>Mirage2</theme-path>
+                <childtheme-path>Mirage2Ext</childtheme-path>
+                <theme-name>The official TAMU theme Image Gallery</theme-name>
             </global-variables>
         </map:component-configurations>
-
-        <map:pipeline internal-only="true">
-            <map:parameter name="expires" value="access plus 1 hours"/>
-
-            <!--
-                 Bypass the file extension check for the Mirage2 theme's scripts-dist.xml file.
-                 That way, we don't have to whitelist all .xml files just to make JS loading work.
-            -->
-            <map:match pattern="themes/{global:theme-name}/scripts-dist.xml">
-                <map:read type="ThemeResourceReader" src="scripts-dist.xml">
-                    <map:parameter name="bypass-whitelist" value="true"/>
-                </map:read>
-            </map:match>
-        </map:pipeline>
 
         <!--
              Caching Pipeline: This caching pipeline handles access to static content (css, js, etc)
@@ -177,31 +106,32 @@
 
             <!-- Static content -->
             <map:match pattern="themes/*/**">
-                <map:read type="ThemeResourceReader" src="{2}"/>
+                <map:read src="{2}"/>
+            </map:match>
+            <!-- Deliver static theme content -->
+            <map:match pattern="themes/*/ImageGallery/**">
+                <map:read src="{2}"/>
             </map:match>
         </map:pipeline>
-
-        <!--
-             Primary (non-caching) Pipeline:
-             This pipeline is the one that generates *dynamic* content. It first creates
-             the DRI (XML) by calling the Aspect chain. Then it transforms that DRI
-             into the XHTML page which is passed to the user.
-        -->
+        
         <map:pipeline>
             <!-- Never allow the browser to cache dynamic content -->
             <map:parameter name="expires" value="now"/>
-
+            
+            <!-- Generate DSpace content pages -->
             <map:match pattern="**">
+                <!-- Step 0.1:  generate interrupt request to preserve context when users navigate to login page -->
+                <map:act type="recordContext"/>
 
                 <!-- Step 1: Generate the DRI page -->
                 <!-- This line actually initiates the Aspect chain. The Aspect chain will build
                      the DRI (XML) content based on which page the user is accessing. -->
                 <map:generate type="file" src="cocoon://DRI/{1}"/>
-
+                
                 <!-- Step 1.5: TAMU Customization - Gather info on restricted bitstreams -->
                 <map:match pattern="handle/*/*">
                     <map:transform type="restrictedItemsInfo"/>
-                </map:match> 
+                </map:match>          
 
                 <!-- Step 2: Transform the DRI page into XHTML -->
                 <!-- This line calls the resource named 'transform-to-xhtml' (included above).
@@ -210,7 +140,6 @@
 
                 <!-- Step 3: Serialize to the browser (sends final HTML to user's browser) -->
                 <map:serialize type="html-no-doctype"/>
-
             </map:match>
         </map:pipeline>
 
@@ -244,7 +173,6 @@
                 </map:when>
                 <!-- All other errors (HTTP 500 Internal Server Error) -->
                 <map:otherwise>
-                    <map:act type="ContextAbortAction"/>
                     <map:serialize type="html-no-doctype" status-code="500"/>
                 </map:otherwise>
             </map:select>

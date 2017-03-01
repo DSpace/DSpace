@@ -1,0 +1,1602 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:ymaps="http://api.maps.yahoo.com/Maps/V1/AnnotatedMaps.xsd" version="2.0"><channel><title>Geofolios</title>
+      <link>http://txspace.tamu.edu/handle/1969.1/2490</link>
+      <description>A GeoRSS encoded mapping file for the Geologic Folios collection at Texas A&amp;M</description>
+   <ymaps:Groups defaultViewNumbered="true">
+         <group>
+            <Title>Folios</Title>
+            <Id>folios</Id>
+            <BaseIcon width="9" height="8">http://students.cs.tamu.edu/alexey/red_x.png</BaseIcon>
+         </group>
+      </ymaps:Groups>
+      <item><title>Folio 1</title>
+         <link>handle/1969.1/2808</link>
+         <description>Livingston folio -- Montana</description>
+         <geo:lat>46</geo:lat>
+         <geo:long>-111</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 2</title>
+         <link>handle/1969.1/2809</link>
+         <description>Ringgold folio -- Georgia - Tennessee</description>
+         <geo:lat>35</geo:lat>
+         <geo:long>-85.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 3</title>
+         <link>handle/1969.1/2810</link>
+         <description>Placerville folio -- California</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-121</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 4</title>
+         <link>handle/1969.1/2811</link>
+         <description>Kingston folio -- Tennessee</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-85</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 5</title>
+         <link>handle/1969.1/3006</link>
+         <description>Sacramento folio -- California</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-121.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 6</title>
+         <link>handle/1969.1/3007</link>
+         <description>Chattanooga folio -- Tennessee</description>
+         <geo:lat>35.5</geo:lat>
+         <geo:long>-85.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 7</title>
+         <link>handle/1969.1/3008</link>
+         <description>Pikes Peak folio -- Colorado</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-105.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 8</title>
+         <link>handle/1969.1/3009</link>
+         <description>Sewanee folio -- Tennessee</description>
+         <geo:lat>35.5</geo:lat>
+         <geo:long>-86</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 9</title>
+         <link>handle/1969.1/3010</link>
+         <description>Anthracite - Crested Butte folio -- Colorado</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-107.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 10</title>
+         <link>handle/1969.1/3011</link>
+         <description>Harpers Ferry folio -- Maryland - Virginia - West Virginia</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-78</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 11</title>
+         <link>handle/1969.1/3012</link>
+         <description>Jackson  folio -- California</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-121</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 12</title>
+         <link>handle/1969.1/3692</link>
+         <description>Estillville  folio -- Kentucky - Virginia - Tennessee</description>
+         <geo:lat>37</geo:lat>
+         <geo:long>-83</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 13</title>
+         <link>handle/1969.1/3013</link>
+         <description>Fredericksburg folio -- Maryland - Virginia</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-77.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 14</title>
+         <link>handle/1969.1/3014</link>
+         <description>Staunton  folio -- Virginia - West Virginia</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-79.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 15</title>
+         <link>handle/1969.1/3015</link>
+         <description>Lassen Peak folio -- California</description>
+         <geo:lat>41</geo:lat>
+         <geo:long>-122</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 16</title>
+         <link>handle/1969.1/3016</link>
+         <description>Knoxville folio -- North Carolina - Tennessee</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-84</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 17</title>
+         <link>handle/1969.1/3017</link>
+         <description>Marysville  folio -- California</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-122</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 18</title>
+         <link>handle/1969.1/3018</link>
+         <description>Smartsville folio -- California</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-121.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 19</title>
+         <link>handle/1969.1/3019</link>
+         <description>Stevenson folio -- Alabama - Georgia - Tennessee</description>
+         <geo:lat>35</geo:lat>
+         <geo:long>-86</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 20</title>
+         <link>handle/1969.1/3022</link>
+         <description>Cleveland folio -- Tennessee</description>
+         <geo:lat>35.5</geo:lat>
+         <geo:long>-85</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 21</title>
+         <link>handle/1969.1/3023</link>
+         <description>Pikeville folio -- Tennessee</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-85.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 22</title>
+         <link>handle/1969.1/3024</link>
+         <description>McMinnville folio -- Tennessee</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-86</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 23</title>
+         <link>handle/1969.1/3025</link>
+         <description>Nomini  folio -- Maryland - Virginia</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-77</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 24</title>
+         <link>handle/1969.1/2491</link>
+         <description>Three Forks folio -- Montana</description>
+         <geo:lat>46</geo:lat>
+         <geo:long>-112</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 25</title>
+         <link>handle/1969.1/3026</link>
+         <description>Loudon folio -- Tennessee</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-84.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 26</title>
+         <link>handle/1969.1/3027</link>
+         <description>Pocahontas folio -- Virginia - West Virginia</description>
+         <geo:lat>37.5</geo:lat>
+         <geo:long>-81.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 27</title>
+         <link>handle/1969.1/3028</link>
+         <description>Morristown folio -- Tennessee</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-83.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 28</title>
+         <link>handle/1969.1/3029</link>
+         <description>Piedmont folio -- Maryland - West Virginia </description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-79.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 29</title>
+         <link>handle/1969.1/3030</link>
+         <description>Nevada City Special folio -- California</description>
+         <geo:lat>39.28833333</geo:lat>
+         <geo:long>-121.0625</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 30</title>
+         <link>handle/1969.1/3031</link>
+         <description>Yellowstone National Park folio -- Wyoming</description>
+         <geo:lat>45</geo:lat>
+         <geo:long>-111</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 31</title>
+         <link>handle/1969.1/3032</link>
+         <description>Pyramid Peak folio -- California</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-120.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 32</title>
+         <link>handle/1969.1/3033</link>
+         <description>Franklin folio -- Virginia - West Virginia</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-79.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 33</title>
+         <link>handle/1969.1/3034</link>
+         <description>Briceville folio -- Tennessee</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-84.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 34</title>
+         <link>handle/1969.1/3035</link>
+         <description>Buckhannon folio -- West Virginia</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-80.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 35</title>
+         <link>handle/1969.1/3036</link>
+         <description>Gadsden folio -- Alabama</description>
+         <geo:lat>34.5</geo:lat>
+         <geo:long>-86.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 36</title>
+         <link>handle/1969.1/3037</link>
+         <description>Pueblo folio -- Colorado</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-105</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 37</title>
+         <link>handle/1969.1/2947</link>
+         <description>Downieville folio -- California</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-121</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 38</title>
+         <link>handle/1969.1/2813</link>
+         <description>Butte Special folio -- Montana</description>
+         <geo:lat>46.04833333</geo:lat>
+         <geo:long>-112.6116667</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 39</title>
+         <link>handle/1969.1/3038</link>
+         <description>Truckee folio -- California</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-120.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 40</title>
+         <link>handle/1969.1/3039</link>
+         <description>Wartburg folio -- Tennessee</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-85</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 41</title>
+         <link>handle/1969.1/</link>
+         <description>Sonora folio -- California</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-120.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 42</title>
+         <link>handle/1969.1/3040</link>
+         <description>Nueces folio -- Texas</description>
+         <geo:lat>30</geo:lat>
+         <geo:long>-100.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 43</title>
+         <link>handle/1969.1/3041</link>
+         <description>Bidwell Bar folio -- California</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-121.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 44</title>
+         <link>handle/1969.1/3358</link>
+         <description>Tazewell folio -- Virginia - West Virginia</description>
+         <geo:lat>82</geo:lat>
+         <geo:long>-37.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 45</title>
+         <link>handle/1969.1/3360</link>
+         <description>Boise folio -- Idaho</description>
+         <geo:lat>44</geo:lat>
+         <geo:long>-116.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 46</title>
+         <link>handle/1969.1/2821</link>
+         <description>Richmond folio -- Kentucky</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-84.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 47</title>
+         <link>handle/1969.1/2822</link>
+         <description>London folio -- Kentucky</description>
+         <geo:lat>37.5</geo:lat>
+         <geo:long>-84.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 48</title>
+         <link>handle/1969.1/3361</link>
+         <description>Tenmile District Special folio -- Colorado</description>
+         <geo:lat>39.50694444</geo:lat>
+         <geo:long>-106.2688889</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 49</title>
+         <link>handle/1969.1/3362</link>
+         <description>Roseburg  folio -- Oregon</description>
+         <geo:lat>43.5</geo:lat>
+         <geo:long>-123.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 50</title>
+         <link>handle/1969.1/3363</link>
+         <description>Holyoke  folio -- Connecticut</description>
+         <geo:lat>42.5</geo:lat>
+         <geo:long>-73</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 51</title>
+         <link>handle/1969.1/3378</link>
+         <description>Big Trees folio -- California</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-120.05</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 52</title>
+         <link>handle/1969.1/3379</link>
+         <description>Absaroka  folio -- Wyoming</description>
+         <geo:lat>45</geo:lat>
+         <geo:long>-110</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 53</title>
+         <link>handle/1969.1/3380</link>
+         <description>Standingstone folio -- Tennessee</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-85.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 54</title>
+         <link>handle/1969.1/2823</link>
+         <description>Tacoma  folio -- Washington</description>
+         <geo:lat>47.5</geo:lat>
+         <geo:long>-122.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 55</title>
+         <link>handle/1969.1/3382</link>
+         <description>Fort Benton folio -- Montana</description>
+         <geo:lat>48</geo:lat>
+         <geo:long>-111</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 56</title>
+         <link>handle/1969.1/2824</link>
+         <description>Little Belt Mountains  folio -- Montana</description>
+         <geo:lat>47</geo:lat>
+         <geo:long>-111</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 57</title>
+         <link>handle/1969.1/3383</link>
+         <description>Telluride folio -- Colorado</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-108</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 58</title>
+         <link>handle/1969.1/3384</link>
+         <description>Elmoro  folio -- Colorado</description>
+         <geo:lat>37.5</geo:lat>
+         <geo:long>-104.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 59</title>
+         <link>handle/1969.1/3385</link>
+         <description>Bristol folio -- Tennessee - Virginia</description>
+         <geo:lat>37</geo:lat>
+         <geo:long>-82.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 60</title>
+         <link>handle/1969.1/3386</link>
+         <description>La Plata  folio -- Colorado</description>
+         <geo:lat>37.5</geo:lat>
+         <geo:long>-108.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 61</title>
+         <link>handle/1969.1/3387</link>
+         <description>Monterey folio -- Virginia - West Virginia</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-80</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 62</title>
+         <link>handle/1969.1/3388</link>
+         <description>Menominee Special folio -- Michigan</description>
+         <geo:lat>45.91666667</geo:lat>
+         <geo:long>-88.15</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 63</title>
+         <link>handle/1969.1/3389</link>
+         <description>Mother Lode District folio -- California</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-121</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 64</title>
+         <link>handle/1969.1/2825</link>
+         <description>Uvalde  folio -- Texas</description>
+         <geo:lat>29.5</geo:lat>
+         <geo:long>-100</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 65</title>
+         <link>handle/1969.1/3390</link>
+         <description>Tintic Special folio -- Utah</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-112.1666667</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 66</title>
+         <link>handle/1969.1/3391</link>
+         <description>Colfax  folio -- California</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-121</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 67</title>
+         <link>handle/1969.1/3392</link>
+         <description>Danville folio -- Illinois - Indiana</description>
+         <geo:lat>40.25</geo:lat>
+         <geo:long>-87.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 68</title>
+         <link>handle/1969.1/2826</link>
+         <description>Walsenburg  folio -- Colorado</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-105</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 69</title>
+         <link>handle/1969.1/3393</link>
+         <description>Huntington folio -- Ohio - West Virginia</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-82.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 70</title>
+         <link>handle/1969.1/2923</link>
+         <description>Washington folio -- District of Columbia</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-77.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 71</title>
+         <link>handle/1969.1/3394</link>
+         <description>Spanish Peaks  folio -- Colorado</description>
+         <geo:lat>37.5</geo:lat>
+         <geo:long>-105</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 72</title>
+         <link>handle/1969.1/3395</link>
+         <description>Charleston folio -- West Virginia</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-82</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 73</title>
+         <link>handle/1969.1/2924</link>
+         <description>Coos Bay folio -- Oregon</description>
+         <geo:lat>43.5</geo:lat>
+         <geo:long>-124.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 74</title>
+         <link>handle/1969.1/3396</link>
+         <description>Coalgate folio -- Oklahoma</description>
+         <geo:lat>35</geo:lat>
+         <geo:long>-96.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 75</title>
+         <link>handle/1969.1/3397</link>
+         <description>Maynardville  folio -- Tennessee</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-84</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 76</title>
+         <link>handle/1969.1/2893</link>
+         <description>Austin  folio -- Texas</description>
+         <geo:lat>30.5</geo:lat>
+         <geo:long>-98</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 77</title>
+         <link>handle/1969.1/3398</link>
+         <description>Raleigh  folio -- West Virginia</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-81.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 78</title>
+         <link>handle/1969.1/2925</link>
+         <description>Rome  folio -- Alabama - Georgia</description>
+         <geo:lat>34.5</geo:lat>
+         <geo:long>-85.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 79</title>
+         <link>handle/1969.1/3402</link>
+         <description>Atoka  folio -- Oklahoma</description>
+         <geo:lat>34.5</geo:lat>
+         <geo:long>-96.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 80</title>
+         <link>handle/1969.1/3403</link>
+         <description>Norfolk  folio -- North Carolina - Virginia</description>
+         <geo:lat>37</geo:lat>
+         <geo:long>-76.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 81</title>
+         <link>handle/1969.1/3691</link>
+         <description>Chicago folio -- Illinois - Indiana</description>
+         <geo:lat>42</geo:lat>
+         <geo:long>-88</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 82</title>
+         <link>handle/1969.1/3401</link>
+         <description>Masontown-Uniontown folio -- Pennsylvania</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-79.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 83</title>
+         <link>handle/1969.1/3400</link>
+         <description>New York City folio -- New Jersey - New York</description>
+         <geo:lat>41</geo:lat>
+         <geo:long>-74.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 84</title>
+         <link>handle/1969.1/3399</link>
+         <description>Ditney  folio -- Indiana</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-87.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 85</title>
+         <link>handle/1969.1/3405</link>
+         <description>Oelrichs folio -- Nebraska - South Dakota</description>
+         <geo:lat>43.5</geo:lat>
+         <geo:long>-103.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 86</title>
+         <link>handle/1969.1/2926</link>
+         <description>Ellensburg folio -- Washington</description>
+         <geo:lat>47</geo:lat>
+         <geo:long>-121</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 87</title>
+         <link>handle/1969.1/2927</link>
+         <description>Camp Clarke folio -- Nebraska</description>
+         <geo:lat>42</geo:lat>
+         <geo:long>-103.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 88</title>
+         <link>handle/1969.1/2928</link>
+         <description>Scotts Bluff folio -- Nebraska</description>
+         <geo:lat>42</geo:lat>
+         <geo:long>-104</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 89</title>
+         <link>handle/1969.1/2929</link>
+         <description>Port Orford folio -- Oregon</description>
+         <geo:lat>43</geo:lat>
+         <geo:long>-124.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 90</title>
+         <link>handle/1969.1/2930</link>
+         <description>Cranberry  folio -- North Carolina - Tennessee</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-82</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 91</title>
+         <link>handle/1969.1/3406</link>
+         <description>Hartville  folio -- Wyoming</description>
+         <geo:lat>42.5</geo:lat>
+         <geo:long>-105</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 92</title>
+         <link>handle/1969.1/2931</link>
+         <description>Gaines  folio -- New York - Pennsylvania</description>
+         <geo:lat>42</geo:lat>
+         <geo:long>-77.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 93</title>
+         <link>handle/1969.1/2932</link>
+         <description>Elkland-Tioga folio -- Pennsylvania</description>
+         <geo:lat>42</geo:lat>
+         <geo:long>-77.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 94</title>
+         <link>handle/1969.1/2933</link>
+         <description>Brownsville-Connellsville  folio -- Pennsylvania</description>
+         <geo:lat>40.25</geo:lat>
+         <geo:long>-80</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 95</title>
+         <link>handle/1969.1/2934</link>
+         <description>Columbia folio -- Tennessee</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-87.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 96</title>
+         <link>handle/1969.1/2935</link>
+         <description>Olivet  folio -- South Dakota</description>
+         <geo:lat>43.5</geo:lat>
+         <geo:long>-98</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 97</title>
+         <link>handle/1969.1/3407</link>
+         <description>Parker folio -- South Dakota</description>
+         <geo:lat>43.5</geo:lat>
+         <geo:long>-97.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 98</title>
+         <link>handle/1969.1/2936</link>
+         <description>Tishomingo folio -- Oklahoma</description>
+         <geo:lat>34.5</geo:lat>
+         <geo:long>-97</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 99</title>
+         <link>handle/1969.1/3404</link>
+         <description>Mitchell folio -- South Dakota</description>
+         <geo:lat>44</geo:lat>
+         <geo:long>-98.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 100</title>
+         <link>handle/1969.1/3408</link>
+         <description>Alexandria  folio -- South Dakota</description>
+         <geo:lat>44</geo:lat>
+         <geo:long>-98</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 101</title>
+         <link>handle/1969.1/2937</link>
+         <description>San Luis folio -- California</description>
+         <geo:lat>35.5</geo:lat>
+         <geo:long>-121</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 102</title>
+         <link>handle/1969.1/2938</link>
+         <description>Indiana folio -- Pennsylvania</description>
+         <geo:lat>40.75</geo:lat>
+         <geo:long>-79.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 103</title>
+         <link>handle/1969.1/2960</link>
+         <description>Nampa folio -- Idaho - Oregon</description>
+         <geo:lat>44</geo:lat>
+         <geo:long>-117</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 104</title>
+         <link>handle/1969.1/2961</link>
+         <description>Silver City  folio -- Idaho</description>
+         <geo:lat>43.5</geo:lat>
+         <geo:long>-117</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 105</title>
+         <link>handle/1969.1/2962</link>
+         <description>Patoka folio -- Illinois - Indiana</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-88</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 106</title>
+         <link>handle/1969.1/2963</link>
+         <description>Mount Stuart folio -- Washington</description>
+         <geo:lat>47.5</geo:lat>
+         <geo:long>-121</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 107</title>
+         <link>handle/1969.1/3409</link>
+         <description>Newcastle folio -- South Dakota - Wyoming</description>
+         <geo:lat>44</geo:lat>
+         <geo:long>-104.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 108</title>
+         <link>handle/1969.1/3410</link>
+         <description>Edgemont  folio -- Nebraska - South Dakota</description>
+         <geo:lat>43.5</geo:lat>
+         <geo:long>-104</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 109</title>
+         <link>handle/1969.1/2964</link>
+         <description>Cottonwood Falls  folio -- Kansas</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-97</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 110</title>
+         <link>handle/1969.1/2965</link>
+         <description>Latrobe  folio -- Pennsylvania</description>
+         <geo:lat>40.5</geo:lat>
+         <geo:long>-79.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 111</title>
+         <link>handle/1969.1/2967</link>
+         <description>Globe folio -- Arizona</description>
+         <geo:lat>33.5</geo:lat>
+         <geo:long>-111</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 112</title>
+         <link>handle/1969.1/2975</link>
+         <description>Bisbee  folio -- Arizona</description>
+         <geo:lat>31.5</geo:lat>
+         <geo:long>-110</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 113</title>
+         <link>handle/1969.1/3411</link>
+         <description>Huron folio -- South Dakota</description>
+         <geo:lat>44.5</geo:lat>
+         <geo:long>-98.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 114</title>
+         <link>handle/1969.1/3412</link>
+         <description>De Smet  folio -- South Dakota</description>
+         <geo:lat>44.5</geo:lat>
+         <geo:long>-98</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 115</title>
+         <link>handle/1969.1/2948</link>
+         <description>Kittanning  folio -- Pennsylvania</description>
+         <geo:lat>41</geo:lat>
+         <geo:long>-79.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 116</title>
+         <link>handle/1969.1/2949</link>
+         <description>Asheville  folio -- North Carolina - Tennessee</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-83</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 117</title>
+         <link>handle/1969.1/2950</link>
+         <description>Casselton-Fargo  folio -- Minnesota</description>
+         <geo:lat>47</geo:lat>
+         <geo:long>-97.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 118</title>
+         <link>handle/1969.1/2951</link>
+         <description>Greeneville folio -- North Carolina - Tennessee</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-83</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 119</title>
+         <link>handle/1969.1/2952</link>
+         <description>Fayetteville  folio -- Arkansas - Missouri</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-94.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 120</title>
+         <link>handle/1969.1/2953</link>
+         <description>Silverton  folio -- Colorado</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-107.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 121</title>
+         <link>handle/1969.1/2954</link>
+         <description>Waynesburg  folio -- Pennsylvania</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-80.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 122</title>
+         <link>handle/1969.1/2968</link>
+         <description>Tahlequah  folio -- Oklahoma</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-95</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 123</title>
+         <link>handle/1969.1/2976</link>
+         <description>Elders Ridge  folio -- Pennsylvania</description>
+         <geo:lat>40.75</geo:lat>
+         <geo:long>-79.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 124</title>
+         <link>handle/1969.1/2955</link>
+         <description>Mount Mitchell folio -- North Carolina - Tennessee</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-82.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 125</title>
+         <link>handle/1969.1/3413</link>
+         <description>Rural Valley  folio -- Pennsylvania</description>
+         <geo:lat>41</geo:lat>
+         <geo:long>-79.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 126</title>
+         <link>handle/1969.1/2956</link>
+         <description>Bradshaw Mountains  folio -- Arizona</description>
+         <geo:lat>34.5</geo:lat>
+         <geo:long>-112.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 127</title>
+         <link>handle/1969.1/3446</link>
+         <description>Sundance  folio -- South Dakota - Wyoming</description>
+         <geo:lat>44.5</geo:lat>
+         <geo:long>-104.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 128</title>
+         <link>handle/1969.1/3447</link>
+         <description>Aladdin folio -- Montana - South Dakota - Wyoming</description>
+         <geo:lat>45</geo:lat>
+         <geo:long>-104.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 129</title>
+         <link>handle/1969.1/2957</link>
+         <description>Clifton  folio -- Arizona</description>
+         <geo:lat>33.25</geo:lat>
+         <geo:long>-109.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 130</title>
+         <link>handle/1969.1/2958</link>
+         <description>Rico  folio -- Colorado</description>
+         <geo:lat>37.75</geo:lat>
+         <geo:long>-108.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 131</title>
+         <link>handle/1969.1/2959</link>
+         <description>Needle Mountains  folio -- Colorado</description>
+         <geo:lat>37.75</geo:lat>
+         <geo:long>-107.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 132</title>
+         <link>handle/1969.1/2977</link>
+         <description>Muscoqee  folio -- Oklahoma</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-95.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 133</title>
+         <link>handle/1969.1/2978</link>
+         <description>Edensburg  folio -- Pennsylvania</description>
+         <geo:lat>40.5</geo:lat>
+         <geo:long>-78.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 134</title>
+         <link>handle/1969.1/2979</link>
+         <description>Beaver  folio -- Pennsylvania</description>
+         <geo:lat>40.75</geo:lat>
+         <geo:long>-80.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 135</title>
+         <link>handle/1969.1/3517</link>
+         <description>Nepesta  folio -- Colorado</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-104.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 136</title>
+         <link>handle/1969.1/2980</link>
+         <description>St. Marys folio -- Maryland - Virginia</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-76.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 137</title>
+         <link>handle/1969.1/2981</link>
+         <description>Dover  folio -- Delaware - Maryland - New Jersey</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-76</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 138</title>
+         <link>handle/1969.1/2982</link>
+         <description>Redding folio -- California</description>
+         <geo:lat>41</geo:lat>
+         <geo:long>-122.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 139</title>
+         <link>handle/1969.1/2983</link>
+         <description>Snoqualmie folio -- Washington</description>
+         <geo:lat>47.5</geo:lat>
+         <geo:long>-121.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 140</title>
+         <link>handle/1969.1/2984</link>
+         <description>Milwaukee Special  folio -- Wisconsin</description>
+         <geo:lat>43.15</geo:lat>
+         <geo:long>-88.08333333</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 141</title>
+         <link>handle/1969.1/3522</link>
+         <description> Bald Mountain-Dayton  folio -- Wyoming</description>
+         <geo:lat>45</geo:lat>
+         <geo:long>-108</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 142</title>
+         <link>handle/1969.1/2985</link>
+         <description>Cloud Peak-Fort McKinney folio -- Wyoming</description>
+         <geo:lat>44.5</geo:lat>
+         <geo:long>-107.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 143</title>
+         <link>handle/1969.1/2986</link>
+         <description>Nantahala folio -- North Carolina - Tennessee</description>
+         <geo:lat>35.5</geo:lat>
+         <geo:long>-84</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 144</title>
+         <link>handle/1969.1/2987</link>
+         <description>Amity  folio -- Pennsylvania</description>
+         <geo:lat>40.25</geo:lat>
+         <geo:long>-80.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 145</title>
+         <link>handle/1969.1/2988</link>
+         <description>Lancaster-Mineral Point  folio -- Illinois - Iowa - Wisconsin</description>
+         <geo:lat>43</geo:lat>
+         <geo:long>-91</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 146</title>
+         <link>handle/1969.1/2989</link>
+         <description>Rogersville  folio -- Pennsylvania</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-80.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 147</title>
+         <link>handle/1969.1/2990</link>
+         <description>Pisqah folio -- North Carolina - South Carolina</description>
+         <geo:lat>35.5</geo:lat>
+         <geo:long>-83</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 148</title>
+         <link>handle/1969.1/2992</link>
+         <description>Joplin District folio -- Kansas - Missouri</description>
+         <geo:lat>37.25</geo:lat>
+         <geo:long>-94.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 149</title>
+         <link>handle/1969.1/2993</link>
+         <description>Penobscot Bay folio -- Maine</description>
+         <geo:lat>44.5</geo:lat>
+         <geo:long>-69</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 150</title>
+         <link>handle/1969.1/3523</link>
+         <description>Devils Tower  folio -- Wyoming</description>
+         <geo:lat>45</geo:lat>
+         <geo:long>-105</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 151</title>
+         <link>handle/1969.1/3439</link>
+         <description>Roan Mountain folio -- North Carolina - Tennessee</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-82.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 152</title>
+         <link>handle/1969.1/3445</link>
+         <description>Patuxent  folio -- District of Columbia</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-77</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 153</title>
+         <link>handle/1969.1/3460</link>
+         <description>Ouray  folio -- Colorado</description>
+         <geo:lat>38.25</geo:lat>
+         <geo:long>-107.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 154</title>
+         <link>handle/1969.1/3461</link>
+         <description>Winslow  folio -- Arkansas - Oklahoma</description>
+         <geo:lat>36</geo:lat>
+         <geo:long>-94.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 155</title>
+         <link>handle/1969.1/3478</link>
+         <description>Ann Arbor folio -- Michigan</description>
+         <geo:lat>42.5</geo:lat>
+         <geo:long>-84</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 156</title>
+         <link>handle/1969.1/3554</link>
+         <description>Elk Point folio -- Iowa - Nebraska - South Dakota</description>
+         <geo:lat>43</geo:lat>
+         <geo:long>-97</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 157</title>
+         <link>handle/1969.1/3558</link>
+         <description>Passaic  folio -- New Jersey - New York</description>
+         <geo:lat>41</geo:lat>
+         <geo:long>-74.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 158</title>
+         <link>handle/1969.1/3569</link>
+         <description>Rockland folio -- Maine</description>
+         <geo:lat>44.25</geo:lat>
+         <geo:long>-69.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 159</title>
+         <link>handle/1969.1/3572</link>
+         <description>Independence folio -- Kansas</description>
+         <geo:lat>37.5</geo:lat>
+         <geo:long>-96</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 160</title>
+         <link>handle/1969.1/3575</link>
+         <description>Accident-Grantsville folio -- Maryland - Pennsylvania - West Virginia</description>
+         <geo:lat>39.75</geo:lat>
+         <geo:long>-79.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 161</title>
+         <link>handle/1969.1/3591</link>
+         <description>Franklin Furnace folio -- New Jersey</description>
+         <geo:lat>41.25</geo:lat>
+         <geo:long>-74.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 162</title>
+         <link>handle/1969.1/3592</link>
+         <description>Philadelphia  folio -- Delaware - New Jersey - Pennsylvania</description>
+         <geo:lat>40.25</geo:lat>
+         <geo:long>-75.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 163</title>
+         <link>handle/1969.1/3593</link>
+         <description>Santa Cruz folio -- California</description>
+         <geo:lat>37.5</geo:lat>
+         <geo:long>-122.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 164</title>
+         <link>handle/1969.1/3594</link>
+         <description>Belle Fourche folio -- South Dakota</description>
+         <geo:lat>45</geo:lat>
+         <geo:long>-104</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 165</title>
+         <link>handle/1969.1/3596</link>
+         <description>Aberdeen-Redfield folio -- South Dakota</description>
+         <geo:lat>45.5</geo:lat>
+         <geo:long>-99</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 166</title>
+         <link>handle/1969.1/2994</link>
+         <description>El Paso folio -- Texas</description>
+         <geo:lat>32</geo:lat>
+         <geo:long>-106.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 167</title>
+         <link>handle/1969.1/3597</link>
+         <description>Trenton folio -- New Jersey - Pennsylvania </description>
+         <geo:lat>40.5</geo:lat>
+         <geo:long>-75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 168</title>
+         <link>handle/1969.1/3602</link>
+         <description>Jamestown-Tower folio -- North Dakota</description>
+         <geo:lat>47</geo:lat>
+         <geo:long>-99</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 169</title>
+         <link>handle/1969.1/3598</link>
+         <description>Watkins Glen-Catatonk folio -- New York</description>
+         <geo:lat>42.5</geo:lat>
+         <geo:long>-76.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 170</title>
+         <link>handle/1969.1/3599</link>
+         <description>Mercersburg-Chambersburg folio -- Pennsylvania</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-78</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 171</title>
+         <link>handle/1969.1/3600</link>
+         <description>Engineer Mountain folio -- Colorado</description>
+         <geo:lat>37.75</geo:lat>
+         <geo:long>-108</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 172</title>
+         <link>handle/1969.1/2995</link>
+         <description>Warren folio -- New York - Pennsylvania</description>
+         <geo:lat>42</geo:lat>
+         <geo:long>-79.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 173</title>
+         <link>handle/1969.1/3603</link>
+         <description>Laramie-Sherman folio -- Wyoming</description>
+         <geo:lat>41.5</geo:lat>
+         <geo:long>-106</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 174</title>
+         <link>handle/1969.1/3604</link>
+         <description>Johnstown  folio -- Pennsylvania</description>
+         <geo:lat>40.5</geo:lat>
+         <geo:long>-79</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 175</title>
+         <link>handle/1969.1/3605</link>
+         <description>Birmingham folio -- Alabama</description>
+         <geo:lat>34</geo:lat>
+         <geo:long>-87</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 176</title>
+         <link>handle/1969.1/2996</link>
+         <description>Sewickley  folio -- Pennsylvania</description>
+         <geo:lat>40.75</geo:lat>
+         <geo:long>-80.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 177</title>
+         <link>handle/1969.1/3606</link>
+         <description>Burgettstown-Carnegie folio -- Pennsylvania</description>
+         <geo:lat>40.5</geo:lat>
+         <geo:long>-80.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 178</title>
+         <link>handle/1969.1/3608</link>
+         <description>Foxburg-Clarion folio -- Pennsylvania</description>
+         <geo:lat>41.25</geo:lat>
+         <geo:long>-79.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 179</title>
+         <link>handle/1969.1/3610</link>
+         <description>Pawpaw-Hancock  folio -- Maryland - Pennsylvania - West Virginia</description>
+         <geo:lat>39.75</geo:lat>
+         <geo:long>-78.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 180</title>
+         <link>handle/1969.1/3611</link>
+         <description>Claysville  folio -- Pennsylvania</description>
+         <geo:lat>40.25</geo:lat>
+         <geo:long>-80.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 181</title>
+         <link>handle/1969.1/3622</link>
+         <description>Bismarck folio -- North Dakota</description>
+         <geo:lat>47</geo:lat>
+         <geo:long>-101</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 182</title>
+         <link>handle/1969.1/3623</link>
+         <description>Choptank folio -- Maryland</description>
+         <geo:lat>39</geo:lat>
+         <geo:long>-76.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 183</title>
+         <link>handle/1969.1/2997</link>
+         <description>Llano-Burnet folio -- Texas</description>
+         <geo:lat>31</geo:lat>
+         <geo:long>-99</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 184</title>
+         <link>handle/1969.1/2998</link>
+         <description>Kenova  folio -- Kentucky -Ohio - West Virginia</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-83</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 185</title>
+         <link>handle/1969.1/3624</link>
+         <description>Murphysboro-Herrin  folio -- Illinois</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-89.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 186</title>
+         <link>handle/1969.1/3626</link>
+         <description>Apishapa folio -- Colorado</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-104.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 187</title>
+         <link>handle/1969.1/2999</link>
+         <description>Ellijay folio -- Georgia - North Carolina - Tennessee</description>
+         <geo:lat>35</geo:lat>
+         <geo:long>-84.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 188</title>
+         <link>handle/1969.1/3627</link>
+         <description>Tallula-Springfield folio -- Illinois</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-90</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 189</title>
+         <link>handle/1969.1/3635</link>
+         <description>Barnesboro-Patton folio -- Pennsylvania</description>
+         <geo:lat>40.75</geo:lat>
+         <geo:long>-79</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 190</title>
+         <link>handle/1969.1/3640</link>
+         <description>Niagara  folio -- New York</description>
+         <geo:lat>43.5</geo:lat>
+         <geo:long>-79</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 191</title>
+         <link>handle/1969.1/3641</link>
+         <description>Raritan folio -- New Jersey</description>
+         <geo:lat>41</geo:lat>
+         <geo:long>-75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 192</title>
+         <link>handle/1969.1/3642</link>
+         <description>Eastport folio -- Maine</description>
+         <geo:lat>45</geo:lat>
+         <geo:long>-67.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 193</title>
+         <link>handle/1969.1/3643</link>
+         <description>San Francisco folio -- California</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-122.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 194</title>
+         <link>handle/1969.1/3000</link>
+         <description>Van Horn folio -- Texas</description>
+         <geo:lat>31.5</geo:lat>
+         <geo:long>-105</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 195</title>
+         <link>handle/1969.1/3644</link>
+         <description>Belleville-Breese folio -- Illinois</description>
+         <geo:lat>38.75</geo:lat>
+         <geo:long>-90</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 196</title>
+         <link>handle/1969.1/3001</link>
+         <description>Philipsburg folio -- Montana</description>
+         <geo:lat>46.5</geo:lat>
+         <geo:long>-113.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 197</title>
+         <link>handle/1969.1/3002</link>
+         <description>Columbus folio -- Ohio</description>
+         <geo:lat>40.25</geo:lat>
+         <geo:long>-83.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 198</title>
+         <link>handle/1969.1/3645</link>
+         <description>Castle Rock folio -- Colorado</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-105</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 199</title>
+         <link>handle/1969.1/3667</link>
+         <description>Silver City folio -- New Mexico</description>
+         <geo:lat>33</geo:lat>
+         <geo:long>-108.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 200</title>
+         <link>handle/1969.1/3668</link>
+         <description>Galena-Elizabeth folio -- Illinois - Iowa</description>
+         <geo:lat>42.50472222</geo:lat>
+         <geo:long>-90.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 201</title>
+         <link>handle/1969.1/3003</link>
+         <description>Minneapolis-St. Paul  folio -- Minnesota</description>
+         <geo:lat>45.25</geo:lat>
+         <geo:long>-93.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 202</title>
+         <link>handle/1969.1/3669</link>
+         <description>Eureka Springs-Harrison folio -- Arkansas - Missouri</description>
+         <geo:lat>36.5</geo:lat>
+         <geo:long>-94</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 203</title>
+         <link>handle/1969.1/3670</link>
+         <description>Colorado Springs folio -- Colorado</description>
+         <geo:lat>38.91666667</geo:lat>
+         <geo:long>-105.0833333</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 204</title>
+         <link>handle/1969.1/3671</link>
+         <description>Tolchester folio -- Maryland</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-76.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 205</title>
+         <link>handle/1969.1/3672</link>
+         <description>Detroit folio -- Michigan</description>
+         <geo:lat>42.5</geo:lat>
+         <geo:long>-83.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 206</title>
+         <link>handle/1969.1/3673</link>
+         <description>Leavenworth-Smithville folio -- Kansas - Missouri</description>
+         <geo:lat>39.5</geo:lat>
+         <geo:long>-95</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 207</title>
+         <link>handle/1969.1/3674</link>
+         <description>Deming  folio -- New Mexico</description>
+         <geo:lat>32.5</geo:lat>
+         <geo:long>-108</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 208</title>
+         <link>handle/1969.1/3675</link>
+         <description>Colchester-Macomb  folio -- Illinois</description>
+         <geo:lat>40.5</geo:lat>
+         <geo:long>-91</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 209</title>
+         <link>handle/1969.1/3676</link>
+         <description>Newell  folio -- South Dakota</description>
+         <geo:lat>45</geo:lat>
+         <geo:long>-103.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 210</title>
+         <link>handle/1969.1/3004</link>
+         <description>Herman-Morris  folio -- Minnesota</description>
+         <geo:lat>46</geo:lat>
+         <geo:long>-96.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 211</title>
+         <link>handle/1969.1/3677</link>
+         <description>Elkton-Wilmington folio -- Delaware - Maryland - New Jersey - Pennsylvania</description>
+         <geo:lat>39.75</geo:lat>
+         <geo:long>-76</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 212</title>
+         <link>handle/1969.1/3678</link>
+         <description>Syracuse-Lakin  folio -- Kansas</description>
+         <geo:lat>38</geo:lat>
+         <geo:long>-102</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 213</title>
+         <link>handle/1969.1/3679</link>
+         <description>New Athens-Okawville folio -- Illinois</description>
+         <geo:lat>38.5</geo:lat>
+         <geo:long>-90</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 214</title>
+         <link>handle/1969.1/3681</link>
+         <description>Raton-Brilliant-Koehler folio -- Colorado - New Mexico</description>
+         <geo:lat>37</geo:lat>
+         <geo:long>-104.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 215</title>
+         <link>handle/1969.1/3685</link>
+         <description>Hot Springs folio -- Arkansas</description>
+         <geo:lat>34.6325</geo:lat>
+         <geo:long>-93.17972222</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 216</title>
+         <link>handle/1969.1/3686</link>
+         <description>Carlyle-Centralia folio -- Illinois</description>
+         <geo:lat>38.75</geo:lat>
+         <geo:long>-89.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 217</title>
+         <link>handle/1969.1/3687</link>
+         <description>Ray  folio -- Arizona</description>
+         <geo:lat>33.25</geo:lat>
+         <geo:long>-111</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 218</title>
+         <link>handle/1969.1/3688</link>
+         <description>Riddle folio -- Oregon</description>
+         <geo:lat>43</geo:lat>
+         <geo:long>-123.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 219</title>
+         <link>handle/1969.1/3680</link>
+         <description>Central Black Hills folio -- South Dakota</description>
+         <geo:lat>44.5</geo:lat>
+         <geo:long>-104</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 220</title>
+         <link>handle/1969.1/3689</link>
+         <description>Gillespie-Mount Olive  folio -- Illinois</description>
+         <geo:lat>39.25</geo:lat>
+         <geo:long>-90</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 221</title>
+         <link>handle/1969.1/3690</link>
+         <description>Bessemer-Vandiver  folio -- Alabama</description>
+         <geo:lat>33.5</geo:lat>
+         <geo:long>-87</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 222</title>
+         <link>handle/1969.1/3414</link>
+         <description>Gaffney-Kings Mountain folio -- North Carolina - South Carolina</description>
+         <geo:lat>35.25</geo:lat>
+         <geo:long>-81.75</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 223</title>
+         <link>handle/1969.1/3005</link>
+         <description>Coatesville-West Chester folio -- Delaware - Pennsylvania</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-76</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 224</title>
+         <link>handle/1969.1/3415</link>
+         <description>Somerset-Windber folio -- Pennsylvania</description>
+         <geo:lat>40.25</geo:lat>
+         <geo:long>-79.25</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 225</title>
+         <link>handle/1969.1/3438</link>
+         <description>Fairfield-Gettysburg folio -- Pennsylvania</description>
+         <geo:lat>40</geo:lat>
+         <geo:long>-77.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 226</title>
+         <link>handle/1969.1/3416</link>
+         <description>Montevallo-Columbiana folio -- Alabama</description>
+         <geo:lat>33.25</geo:lat>
+         <geo:long>-87</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+      <item><title>Folio 227</title>
+         <link>handle/1969.1/3437</link>
+         <description>Hollidaysburg-Huntingdon folio -- Pennsylvania</description>
+         <geo:lat>40.5</geo:lat>
+         <geo:long>-78.5</geo:long>
+         <ymaps:GroupId>folios</ymaps:GroupId>
+      </item>
+   </channel>
+</rss>

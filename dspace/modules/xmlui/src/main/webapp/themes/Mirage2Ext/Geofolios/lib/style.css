@@ -1,0 +1,100 @@
+/*@import url( base.style );*/
+
+#mapContainer { height: 400px; width: 100%; max-width:800px; border: 1px solid black; margin: 16px 0 0 0; }
+
+div.intro-text {
+    margin: 20px 0px;
+}
+
+.thumbnail { border: 1px solid #d1d1d1; overflow: hidden; height: 180px; width: 128px; margin: 0px 26px 22px 0; padding: 10px; float: left; position: relative;   background-color: #e8e8e8; }
+.thumbnail img { margin: 4px 0 4px 12px; border: none; }
+.thumbnail p { white-space: nowrap; font-size: 8pt; margin: 0; padding: 10px 0 0 3px; }
+.thumbnail p a { color: #999; font-size: 90%; text-decoration: none; }
+
+p.linkbox { margin: 10px 25px 5px; padding: 20px 20px 20px 55px; border: 1px solid #ccc; background-color: #e8e8e8; clear: both; }
+p.linkbox.front { margin: 10px auto 5px; width: 96%; }
+p.linkbox a {text-decoration: none !important; display: inline-block;vertical-align:middle;margin-bottom: 20px; margin-top: 10px; }
+p.linkbox a:hover {text-decoration: underline !important; }
+span.linkboxlink { margin: 5px 10px; padding: 20px 20px 20px 55px; background-repeat: no-repeat; background-position: 8px 8px; clear: both; font-size: .8em; } 
+span.linkboxlink a:hover { text-decoration: underline; }
+
+#pdflink { background-image: url(../images/pdficon-sm.png); }
+#gislink { background-image: url(../images/map_icongis.png); }
+#kmllink { background-image: url(../images/Google_Earth_icon_sm_d.png); }
+#georsslink { background-image: url(../images/georss_sm.png); }
+
+table tr td {
+    padding: 1px;
+}
+
+span.folio-marker { 
+    font-size: 10px;
+    font-weight: bold;    
+    position: relative;
+    left: 3px;
+    top: 4px;
+    color: white;
+}
+
+div.folio-popup {
+    position: relative;
+    font-weight: bold;    
+    top: 2px;
+    left: 2px;
+    color: rgb(40,40,20);
+    font-size: 11px;
+    width: 200px;
+    
+    padding-right: 4px;
+}
+
+div.folio-desc {
+    color: rgb(50,45,40);
+    font-size: 11px;
+    width: 200px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    padding: 5px 5px 8px 2px;
+}
+
+div.folio-desc .title {
+    font-weight: bold; 
+    color: rgb(40,30,20);
+}
+
+#content div.folio-desc a {
+    position: relative;
+    top: 5px;
+    color: rgb(80,120,200);
+}
+
+#content div.folio-desc a:hover {
+    color: rgb(80,120,200);
+    text-decoration: underline;
+}
+
+p.ds-paragraph {
+    display: none;
+}
+
+p.ds-paragraph.item-view-toggle.item-view-toggle-top
+{
+    background-color:#E8E8E8;
+    border:1px solid #CCCCCC;
+    font-size:95%;
+    margin:20px 50px 0pt 0pt;
+    padding:3px;
+    position:absolute;
+    right:18px;
+    top:21px;
+}
+
+p.byline
+{
+    font-size: 14pt;
+    color: #666666;
+}
+
+#content h1 {
+    margin-bottom: 0;
+}

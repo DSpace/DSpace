@@ -1,0 +1,2278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss"
+    xmlns:gml="http://www.opengis.net/gml">
+    <title>Geologic Atlas of the United States</title>
+    <link href="http://oaktrust.library.tamu.edu/handle/1969.1/2490"/>
+    <subtitle>A GeoRSS encoded mapping file for the Geologic Folios collection at Texas A&amp;M
+        University</subtitle>
+    <entry>
+        <title>Folio 1</title>
+        <link href="http://hdl.handle.net/1969.1/2808"/>
+        <summary>Livingston folio -- Montana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>46 -111</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 2</title>
+        <link href="http://hdl.handle.net/1969.1/2809"/>
+        <summary>Ringgold folio -- Georgia - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35 -85.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 3</title>
+        <link href="http://hdl.handle.net/1969.1/2810"/>
+        <summary>Placerville folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -121</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 4</title>
+        <link href="http://hdl.handle.net/1969.1/2811"/>
+        <summary>Kingston folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -85</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 5</title>
+        <link href="http://hdl.handle.net/1969.1/3006"/>
+        <summary>Sacramento folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -121.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 6</title>
+        <link href="http://hdl.handle.net/1969.1/3007"/>
+        <summary>Chattanooga folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35.5 -85.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 7</title>
+        <link href="http://hdl.handle.net/1969.1/3008"/>
+        <summary>Pikes Peak folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -105.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 8</title>
+        <link href="http://hdl.handle.net/1969.1/3009"/>
+        <summary>Sewanee folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35.5 -86</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 9</title>
+        <link href="http://hdl.handle.net/1969.1/3010"/>
+        <summary>Anthracite - Crested Butte folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -107.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 10</title>
+        <link href="http://hdl.handle.net/1969.1/3011"/>
+        <summary>Harpers Ferry folio -- Maryland - Virginia - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -78</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 11</title>
+        <link href="http://hdl.handle.net/1969.1/3012"/>
+        <summary>Jackson folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -121</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 12</title>
+        <link href="http://hdl.handle.net/1969.1/3692"/>
+        <summary>Estillville folio -- Kentucky - Virginia - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37 -83</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 13</title>
+        <link href="http://hdl.handle.net/1969.1/3013"/>
+        <summary>Fredericksburg folio -- Maryland - Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -77.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 14</title>
+        <link href="http://hdl.handle.net/1969.1/3014"/>
+        <summary>Staunton folio -- Virginia - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -79.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 15</title>
+        <link href="http://hdl.handle.net/1969.1/3015"/>
+        <summary>Lassen Peak folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41 -122</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 16</title>
+        <link href="http://hdl.handle.net/1969.1/3016"/>
+        <summary>Knoxville folio -- North Carolina - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -84</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 17</title>
+        <link href="http://hdl.handle.net/1969.1/3017"/>
+        <summary>Marysville folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -122</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 18</title>
+        <link href="http://hdl.handle.net/1969.1/3018"/>
+        <summary>Smartsville folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -121.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 19</title>
+        <link href="http://hdl.handle.net/1969.1/3019"/>
+        <summary>Stevenson folio -- Alabama - Georgia - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35 -86</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 20</title>
+        <link href="http://hdl.handle.net/1969.1/3022"/>
+        <summary>Cleveland folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35.5 -85</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 21</title>
+        <link href="http://hdl.handle.net/1969.1/3023"/>
+        <summary>Pikeville folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -85.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 22</title>
+        <link href="http://hdl.handle.net/1969.1/3024"/>
+        <summary>McMinnville folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -86</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 23</title>
+        <link href="http://hdl.handle.net/1969.1/3025"/>
+        <summary>Nomini folio -- Maryland - Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -77</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 24</title>
+        <link href="http://hdl.handle.net/1969.1/2491"/>
+        <summary>Three Forks folio -- Montana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>46 -112</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 25</title>
+        <link href="http://hdl.handle.net/1969.1/3026"/>
+        <summary>Loudon folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -84.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 26</title>
+        <link href="http://hdl.handle.net/1969.1/3027"/>
+        <summary>Pocahontas folio -- Virginia - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.5 -81.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 27</title>
+        <link href="http://hdl.handle.net/1969.1/3028"/>
+        <summary>Morristown folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -83.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 28</title>
+        <link href="http://hdl.handle.net/1969.1/3029"/>
+        <summary>Piedmont folio -- Maryland - West Virginia </summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -79.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 29</title>
+        <link href="http://hdl.handle.net/1969.1/3030"/>
+        <summary>Nevada City Special folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.28833333 -121.0625</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 30</title>
+        <link href="http://hdl.handle.net/1969.1/3031"/>
+        <summary>Yellowstone National Park folio -- Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45 -111</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 31</title>
+        <link href="http://hdl.handle.net/1969.1/3032"/>
+        <summary>Pyramid Peak folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -120.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 32</title>
+        <link href="http://hdl.handle.net/1969.1/3033"/>
+        <summary>Franklin folio -- Virginia - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -79.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 33</title>
+        <link href="http://hdl.handle.net/1969.1/3034"/>
+        <summary>Briceville folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -84.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 34</title>
+        <link href="http://hdl.handle.net/1969.1/3035"/>
+        <summary>Buckhannon folio -- West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -80.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 35</title>
+        <link href="http://hdl.handle.net/1969.1/3036"/>
+        <summary>Gadsden folio -- Alabama</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>34.5 -86.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 36</title>
+        <link href="http://hdl.handle.net/1969.1/3037"/>
+        <summary>Pueblo folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -105</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 37</title>
+        <link href="http://hdl.handle.net/1969.1/2947"/>
+        <summary>Downieville folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -121</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 38</title>
+        <link href="http://hdl.handle.net/1969.1/2813"/>
+        <summary>Butte Special folio -- Montana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>46.04833333 -112.6116667</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 39</title>
+        <link href="http://hdl.handle.net/1969.1/3038"/>
+        <summary>Truckee folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -120.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 40</title>
+        <link href="http://hdl.handle.net/1969.1/3039"/>
+        <summary>Wartburg folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -85</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 41</title>
+        <link href="http://hdl.handle.net/1969.1/"/>
+        <summary>Sonora folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -120.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 42</title>
+        <link href="http://hdl.handle.net/1969.1/3040"/>
+        <summary>Nueces folio -- Texas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>30 -100.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 43</title>
+        <link href="http://hdl.handle.net/1969.1/3041"/>
+        <summary>Bidwell Bar folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -121.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 44</title>
+        <link href="http://hdl.handle.net/1969.1/3358"/>
+        <summary>Tazewell folio -- Virginia - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.5 -82</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 45</title>
+        <link href="http://hdl.handle.net/1969.1/3360"/>
+        <summary>Boise folio -- Idaho</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44 -116.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 46</title>
+        <link href="http://hdl.handle.net/1969.1/2821"/>
+        <summary>Richmond folio -- Kentucky</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -84.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 47</title>
+        <link href="http://hdl.handle.net/1969.1/2822"/>
+        <summary>London folio -- Kentucky</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.5 -84.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 48</title>
+        <link href="http://hdl.handle.net/1969.1/3361"/>
+        <summary>Tenmile District Special folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.50694444 -106.2688889</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 49</title>
+        <link href="http://hdl.handle.net/1969.1/3362"/>
+        <summary>Roseburg folio -- Oregon</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.5 -123.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 50</title>
+        <link href="http://hdl.handle.net/1969.1/3363"/>
+        <summary>Holyoke folio -- Connecticut</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42.5 -73</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 51</title>
+        <link href="http://hdl.handle.net/1969.1/3378"/>
+        <summary>Big Trees folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -120.05</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 52</title>
+        <link href="http://hdl.handle.net/1969.1/3379"/>
+        <summary>Absaroka folio -- Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45 -110</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 53</title>
+        <link href="http://hdl.handle.net/1969.1/3380"/>
+        <summary>Standingstone folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -85.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 54</title>
+        <link href="http://hdl.handle.net/1969.1/2823"/>
+        <summary>Tacoma folio -- Washington</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>47.5 -122.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 55</title>
+        <link href="http://hdl.handle.net/1969.1/3382"/>
+        <summary>Fort Benton folio -- Montana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>48 -111</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 56</title>
+        <link href="http://hdl.handle.net/1969.1/2824"/>
+        <summary>Little Belt Mountains folio -- Montana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>47 -111</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 57</title>
+        <link href="http://hdl.handle.net/1969.1/3383"/>
+        <summary>Telluride folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -108</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 58</title>
+        <link href="http://hdl.handle.net/1969.1/3384"/>
+        <summary>Elmoro folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.5 -104.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 59</title>
+        <link href="http://hdl.handle.net/1969.1/3385"/>
+        <summary>Bristol folio -- Tennessee - Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37 -82.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 60</title>
+        <link href="http://hdl.handle.net/1969.1/3386"/>
+        <summary>La Plata folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.5 -108.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 61</title>
+        <link href="http://hdl.handle.net/1969.1/3387"/>
+        <summary>Monterey folio -- Virginia - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -80</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 62</title>
+        <link href="http://hdl.handle.net/1969.1/3388"/>
+        <summary>Menominee Special folio -- Michigan</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45.91666667 -88.15</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 63</title>
+        <link href="http://hdl.handle.net/1969.1/3389"/>
+        <summary>Mother Lode District folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -121</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 64</title>
+        <link href="http://hdl.handle.net/1969.1/2825"/>
+        <summary>Uvalde folio -- Texas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>29.5 -100</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 65</title>
+        <link href="http://hdl.handle.net/1969.1/3390"/>
+        <summary>Tintic Special folio -- Utah</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -112.1666667</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 66</title>
+        <link href="http://hdl.handle.net/1969.1/3391"/>
+        <summary>Colfax folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -121</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 67</title>
+        <link href="http://hdl.handle.net/1969.1/3392"/>
+        <summary>Danville folio -- Illinois - Indiana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.25 -87.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 68</title>
+        <link href="http://hdl.handle.net/1969.1/2826"/>
+        <summary>Walsenburg folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -105</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 69</title>
+        <link href="http://hdl.handle.net/1969.1/3393"/>
+        <summary>Huntington folio -- Ohio - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -82.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 70</title>
+        <link href="http://hdl.handle.net/1969.1/2923"/>
+        <summary>Washington folio -- District of Columbia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -77.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 71</title>
+        <link href="http://hdl.handle.net/1969.1/3394"/>
+        <summary>Spanish Peaks folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.5 -105</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 72</title>
+        <link href="http://hdl.handle.net/1969.1/3395"/>
+        <summary>Charleston folio -- West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -82</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 73</title>
+        <link href="http://hdl.handle.net/1969.1/2924"/>
+        <summary>Coos Bay folio -- Oregon</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.5 -124.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 74</title>
+        <link href="http://hdl.handle.net/1969.1/3396"/>
+        <summary>Coalgate folio -- Oklahoma</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35 -96.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 75</title>
+        <link href="http://hdl.handle.net/1969.1/3397"/>
+        <summary>Maynardville folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -84</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 76</title>
+        <link href="http://hdl.handle.net/1969.1/2893"/>
+        <summary>Austin folio -- Texas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>30.5 -98</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 77</title>
+        <link href="http://hdl.handle.net/1969.1/3398"/>
+        <summary>Raleigh folio -- West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -81.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 78</title>
+        <link href="http://hdl.handle.net/1969.1/2925"/>
+        <summary>Rome folio -- Alabama - Georgia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>34.5 -85.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 79</title>
+        <link href="http://hdl.handle.net/1969.1/3402"/>
+        <summary>Atoka folio -- Oklahoma</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>34.5 -96.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 80</title>
+        <link href="http://hdl.handle.net/1969.1/3403"/>
+        <summary>Norfolk folio -- North Carolina - Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37 -76.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 81</title>
+        <link href="http://hdl.handle.net/1969.1/3691"/>
+        <summary>Chicago folio -- Illinois - Indiana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42 -88</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 82</title>
+        <link href="http://hdl.handle.net/1969.1/3401"/>
+        <summary>Masontown-Uniontown folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -79.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 83</title>
+        <link href="http://hdl.handle.net/1969.1/3400"/>
+        <summary>New York City folio -- New Jersey - New York</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41 -74.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 84</title>
+        <link href="http://hdl.handle.net/1969.1/3399"/>
+        <summary>Ditney folio -- Indiana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -87.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 85</title>
+        <link href="http://hdl.handle.net/1969.1/3405"/>
+        <summary>Oelrichs folio -- Nebraska - South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.5 -103.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 86</title>
+        <link href="http://hdl.handle.net/1969.1/2926"/>
+        <summary>Ellensburg folio -- Washington</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>47 -121</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 87</title>
+        <link href="http://hdl.handle.net/1969.1/2927"/>
+        <summary>Camp Clarke folio -- Nebraska</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42 -103.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 88</title>
+        <link href="http://hdl.handle.net/1969.1/2928"/>
+        <summary>Scotts Bluff folio -- Nebraska</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42 -104</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 89</title>
+        <link href="http://hdl.handle.net/1969.1/2929"/>
+        <summary>Port Orford folio -- Oregon</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43 -124.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 90</title>
+        <link href="http://hdl.handle.net/1969.1/2930"/>
+        <summary>Cranberry folio -- North Carolina - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -82</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 91</title>
+        <link href="http://hdl.handle.net/1969.1/3406"/>
+        <summary>Hartville folio -- Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42.5 -105</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 92</title>
+        <link href="http://hdl.handle.net/1969.1/2931"/>
+        <summary>Gaines folio -- New York - Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42 -77.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 93</title>
+        <link href="http://hdl.handle.net/1969.1/2932"/>
+        <summary>Elkland-Tioga folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42 -77.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 94</title>
+        <link href="http://hdl.handle.net/1969.1/2933"/>
+        <summary>Brownsville-Connellsville folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.25 -80</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 95</title>
+        <link href="http://hdl.handle.net/1969.1/2934"/>
+        <summary>Columbia folio -- Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -87.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 96</title>
+        <link href="http://hdl.handle.net/1969.1/2935"/>
+        <summary>Olivet folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.5 -98</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 97</title>
+        <link href="http://hdl.handle.net/1969.1/3407"/>
+        <summary>Parker folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.5 -97.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 98</title>
+        <link href="http://hdl.handle.net/1969.1/2936"/>
+        <summary>Tishomingo folio -- Oklahoma</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>34.5 -97</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 99</title>
+        <link href="http://hdl.handle.net/1969.1/3404"/>
+        <summary>Mitchell folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44 -98.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 100</title>
+        <link href="http://hdl.handle.net/1969.1/3408"/>
+        <summary>Alexandria folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44 -98</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 101</title>
+        <link href="http://hdl.handle.net/1969.1/2937"/>
+        <summary>San Luis folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35.5 -121</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 102</title>
+        <link href="http://hdl.handle.net/1969.1/2938"/>
+        <summary>Indiana folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.75 -79.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 103</title>
+        <link href="http://hdl.handle.net/1969.1/2960"/>
+        <summary>Nampa folio -- Idaho - Oregon</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44 -117</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 104</title>
+        <link href="http://hdl.handle.net/1969.1/2961"/>
+        <summary>Silver City folio -- Idaho</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.5 -117</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 105</title>
+        <link href="http://hdl.handle.net/1969.1/2962"/>
+        <summary>Patoka folio -- Illinois - Indiana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -88</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 106</title>
+        <link href="http://hdl.handle.net/1969.1/2963"/>
+        <summary>Mount Stuart folio -- Washington</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>47.5 -121</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 107</title>
+        <link href="http://hdl.handle.net/1969.1/3409"/>
+        <summary>Newcastle folio -- South Dakota - Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44 -104.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 108</title>
+        <link href="http://hdl.handle.net/1969.1/3410"/>
+        <summary>Edgemont folio -- Nebraska - South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.5 -104</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 109</title>
+        <link href="http://hdl.handle.net/1969.1/2964"/>
+        <summary>Cottonwood Falls folio -- Kansas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -97</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 110</title>
+        <link href="http://hdl.handle.net/1969.1/2965"/>
+        <summary>Latrobe folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.5 -79.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 111</title>
+        <link href="http://hdl.handle.net/1969.1/2967"/>
+        <summary>Globe folio -- Arizona</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>33.5 -111</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 112</title>
+        <link href="http://hdl.handle.net/1969.1/2975"/>
+        <summary>Bisbee folio -- Arizona</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>31.5 -110</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 113</title>
+        <link href="http://hdl.handle.net/1969.1/3411"/>
+        <summary>Huron folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44.5 -98.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 114</title>
+        <link href="http://hdl.handle.net/1969.1/3412"/>
+        <summary>De Smet folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44.5 -98</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 115</title>
+        <link href="http://hdl.handle.net/1969.1/2948"/>
+        <summary>Kittanning folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41 -79.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 116</title>
+        <link href="http://hdl.handle.net/1969.1/2949"/>
+        <summary>Asheville folio -- North Carolina - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -83</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 117</title>
+        <link href="http://hdl.handle.net/1969.1/2950"/>
+        <summary>Casselton-Fargo folio -- Minnesota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>47 -97.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 118</title>
+        <link href="http://hdl.handle.net/1969.1/2951"/>
+        <summary>Greeneville folio -- North Carolina - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -83</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 119</title>
+        <link href="http://hdl.handle.net/1969.1/2952"/>
+        <summary>Fayetteville folio -- Arkansas - Missouri</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -94.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 120</title>
+        <link href="http://hdl.handle.net/1969.1/2953"/>
+        <summary>Silverton folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -107.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 121</title>
+        <link href="http://hdl.handle.net/1969.1/2954"/>
+        <summary>Waynesburg folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -80.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 122</title>
+        <link href="http://hdl.handle.net/1969.1/2968"/>
+        <summary>Tahlequah folio -- Oklahoma</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -95</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 123</title>
+        <link href="http://hdl.handle.net/1969.1/2976"/>
+        <summary>Elders Ridge folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.75 -79.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 124</title>
+        <link href="http://hdl.handle.net/1969.1/2955"/>
+        <summary>Mount Mitchell folio -- North Carolina - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -82.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 125</title>
+        <link href="http://hdl.handle.net/1969.1/3413"/>
+        <summary>Rural Valley folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41 -79.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 126</title>
+        <link href="http://hdl.handle.net/1969.1/2956"/>
+        <summary>Bradshaw Mountains folio -- Arizona</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>34.5 -112.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 127</title>
+        <link href="http://hdl.handle.net/1969.1/3446"/>
+        <summary>Sundance folio -- South Dakota - Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44.5 -104.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 128</title>
+        <link href="http://hdl.handle.net/1969.1/3447"/>
+        <summary>Aladdin folio -- Montana - South Dakota - Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45 -104.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 129</title>
+        <link href="http://hdl.handle.net/1969.1/2957"/>
+        <summary>Clifton folio -- Arizona</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>33.25 -109.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 130</title>
+        <link href="http://hdl.handle.net/1969.1/2958"/>
+        <summary>Rico folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.75 -108.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 131</title>
+        <link href="http://hdl.handle.net/1969.1/2959"/>
+        <summary>Needle Mountains folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.75 -107.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 132</title>
+        <link href="http://hdl.handle.net/1969.1/2977"/>
+        <summary>Muscoqee folio -- Oklahoma</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -95.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 133</title>
+        <link href="http://hdl.handle.net/1969.1/2978"/>
+        <summary>Edensburg folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.5 -78.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 134</title>
+        <link href="http://hdl.handle.net/1969.1/2979"/>
+        <summary>Beaver folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.75 -80.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 135</title>
+        <link href="http://hdl.handle.net/1969.1/3517"/>
+        <summary>Nepesta folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -104.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 136</title>
+        <link href="http://hdl.handle.net/1969.1/2980"/>
+        <summary>St. Marys folio -- Maryland - Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -76.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 137</title>
+        <link href="http://hdl.handle.net/1969.1/2981"/>
+        <summary>Dover folio -- Delaware - Maryland - New Jersey</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -76</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 138</title>
+        <link href="http://hdl.handle.net/1969.1/2982"/>
+        <summary>Redding folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41 -122.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 139</title>
+        <link href="http://hdl.handle.net/1969.1/2983"/>
+        <summary>Snoqualmie folio -- Washington</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>47.5 -121.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 140</title>
+        <link href="http://hdl.handle.net/1969.1/2984"/>
+        <summary>Milwaukee Special folio -- Wisconsin</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.15 -88.08333333</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 141</title>
+        <link href="http://hdl.handle.net/1969.1/3522"/>
+        <summary> Bald Mountain-Dayton folio -- Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45 -108</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 142</title>
+        <link href="http://hdl.handle.net/1969.1/2985"/>
+        <summary>Cloud Peak-Fort McKinney folio -- Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44.5 -107.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 143</title>
+        <link href="http://hdl.handle.net/1969.1/2986"/>
+        <summary>Nantahala folio -- North Carolina - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35.5 -84</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 144</title>
+        <link href="http://hdl.handle.net/1969.1/2987"/>
+        <summary>Amity folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.25 -80.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 145</title>
+        <link href="http://hdl.handle.net/1969.1/2988"/>
+        <summary>Lancaster-Mineral Point folio -- Illinois - Iowa - Wisconsin</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43 -91</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 146</title>
+        <link href="http://hdl.handle.net/1969.1/2989"/>
+        <summary>Rogersville folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -80.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 147</title>
+        <link href="http://hdl.handle.net/1969.1/2990"/>
+        <summary>Pisqah folio -- North Carolina - South Carolina</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35.5 -83</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 148</title>
+        <link href="http://hdl.handle.net/1969.1/2992"/>
+        <summary>Joplin District folio -- Kansas - Missouri</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.25 -94.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 149</title>
+        <link href="http://hdl.handle.net/1969.1/2993"/>
+        <summary>Penobscot Bay folio -- Maine</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44.5 -69</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 150</title>
+        <link href="http://hdl.handle.net/1969.1/3523"/>
+        <summary>Devils Tower folio -- Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45 -105</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 151</title>
+        <link href="http://hdl.handle.net/1969.1/3439"/>
+        <summary>Roan Mountain folio -- North Carolina - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -82.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 152</title>
+        <link href="http://hdl.handle.net/1969.1/3445"/>
+        <summary>Patuxent folio -- District of Columbia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -77</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 153</title>
+        <link href="http://hdl.handle.net/1969.1/3460"/>
+        <summary>Ouray folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.25 -107.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 154</title>
+        <link href="http://hdl.handle.net/1969.1/3461"/>
+        <summary>Winslow folio -- Arkansas - Oklahoma</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36 -94.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 155</title>
+        <link href="http://hdl.handle.net/1969.1/3478"/>
+        <summary>Ann Arbor folio -- Michigan</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42.5 -84</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 156</title>
+        <link href="http://hdl.handle.net/1969.1/3554"/>
+        <summary>Elk Point folio -- Iowa - Nebraska - South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43 -97</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 157</title>
+        <link href="http://hdl.handle.net/1969.1/3558"/>
+        <summary>Passaic folio -- New Jersey - New York</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41 -74.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 158</title>
+        <link href="http://hdl.handle.net/1969.1/3569"/>
+        <summary>Rockland folio -- Maine</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44.25 -69.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 159</title>
+        <link href="http://hdl.handle.net/1969.1/3572"/>
+        <summary>Independence folio -- Kansas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.5 -96</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 160</title>
+        <link href="http://hdl.handle.net/1969.1/3575"/>
+        <summary>Accident-Grantsville folio -- Maryland - Pennsylvania - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.75 -79.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 161</title>
+        <link href="http://hdl.handle.net/1969.1/3591"/>
+        <summary>Franklin Furnace folio -- New Jersey</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41.25 -74.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 162</title>
+        <link href="http://hdl.handle.net/1969.1/3592"/>
+        <summary>Philadelphia folio -- Delaware - New Jersey - Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.25 -75.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 163</title>
+        <link href="http://hdl.handle.net/1969.1/3593"/>
+        <summary>Santa Cruz folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.5 -122.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 164</title>
+        <link href="http://hdl.handle.net/1969.1/3594"/>
+        <summary>Belle Fourche folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45 -104</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 165</title>
+        <link href="http://hdl.handle.net/1969.1/3596"/>
+        <summary>Aberdeen-Redfield folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45.5 -99</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 166</title>
+        <link href="http://hdl.handle.net/1969.1/2994"/>
+        <summary>El Paso folio -- Texas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>32 -106.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 167</title>
+        <link href="http://hdl.handle.net/1969.1/3597"/>
+        <summary>Trenton folio -- New Jersey - Pennsylvania </summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.5 -75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 168</title>
+        <link href="http://hdl.handle.net/1969.1/3602"/>
+        <summary>Jamestown-Tower folio -- North Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>47 -99</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 169</title>
+        <link href="http://hdl.handle.net/1969.1/3598"/>
+        <summary>Watkins Glen-Catatonk folio -- New York</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42.5 -76.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 170</title>
+        <link href="http://hdl.handle.net/1969.1/3599"/>
+        <summary>Mercersburg-Chambersburg folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -78</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 171</title>
+        <link href="http://hdl.handle.net/1969.1/3600"/>
+        <summary>Engineer Mountain folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37.75 -108</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 172</title>
+        <link href="http://hdl.handle.net/1969.1/2995"/>
+        <summary>Warren folio -- New York - Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42 -79.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 173</title>
+        <link href="http://hdl.handle.net/1969.1/3603"/>
+        <summary>Laramie-Sherman folio -- Wyoming</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41.5 -106</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 174</title>
+        <link href="http://hdl.handle.net/1969.1/3604"/>
+        <summary>Johnstown folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.5 -79</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 175</title>
+        <link href="http://hdl.handle.net/1969.1/3605"/>
+        <summary>Birmingham folio -- Alabama</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>34 -87</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 176</title>
+        <link href="http://hdl.handle.net/1969.1/2996"/>
+        <summary>Sewickley folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.75 -80.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 177</title>
+        <link href="http://hdl.handle.net/1969.1/3606"/>
+        <summary>Burgettstown-Carnegie folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.5 -80.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 178</title>
+        <link href="http://hdl.handle.net/1969.1/3608"/>
+        <summary>Foxburg-Clarion folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41.25 -79.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 179</title>
+        <link href="http://hdl.handle.net/1969.1/3610"/>
+        <summary>Pawpaw-Hancock folio -- Maryland - Pennsylvania - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.75 -78.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 180</title>
+        <link href="http://hdl.handle.net/1969.1/3611"/>
+        <summary>Claysville folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.25 -80.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 181</title>
+        <link href="http://hdl.handle.net/1969.1/3622"/>
+        <summary>Bismarck folio -- North Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>47 -101</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 182</title>
+        <link href="http://hdl.handle.net/1969.1/3623"/>
+        <summary>Choptank folio -- Maryland</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39 -76.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 183</title>
+        <link href="http://hdl.handle.net/1969.1/2997"/>
+        <summary>Llano-Burnet folio -- Texas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>31 -99</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 184</title>
+        <link href="http://hdl.handle.net/1969.1/2998"/>
+        <summary>Kenova folio -- Kentucky -Ohio - West Virginia</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -83</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 185</title>
+        <link href="http://hdl.handle.net/1969.1/3624"/>
+        <summary>Murphysboro-Herrin folio -- Illinois</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -89.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 186</title>
+        <link href="http://hdl.handle.net/1969.1/3626"/>
+        <summary>Apishapa folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -104.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 187</title>
+        <link href="http://hdl.handle.net/1969.1/2999"/>
+        <summary>Ellijay folio -- Georgia - North Carolina - Tennessee</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35 -84.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 188</title>
+        <link href="http://hdl.handle.net/1969.1/3627"/>
+        <summary>Tallula-Springfield folio -- Illinois</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -90</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 189</title>
+        <link href="http://hdl.handle.net/1969.1/3635"/>
+        <summary>Barnesboro-Patton folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.75 -79</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 190</title>
+        <link href="http://hdl.handle.net/1969.1/3640"/>
+        <summary>Niagara folio -- New York</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43.5 -79</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 191</title>
+        <link href="http://hdl.handle.net/1969.1/3641"/>
+        <summary>Raritan folio -- New Jersey</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>41 -75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 192</title>
+        <link href="http://hdl.handle.net/1969.1/3642"/>
+        <summary>Eastport folio -- Maine</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45 -67.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 193</title>
+        <link href="http://hdl.handle.net/1969.1/3643"/>
+        <summary>San Francisco folio -- California</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -122.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 194</title>
+        <link href="http://hdl.handle.net/1969.1/3000"/>
+        <summary>Van Horn folio -- Texas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>31.5 -105</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 195</title>
+        <link href="http://hdl.handle.net/1969.1/3644"/>
+        <summary>Belleville-Breese folio -- Illinois</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.75 -90</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 196</title>
+        <link href="http://hdl.handle.net/1969.1/3001"/>
+        <summary>Philipsburg folio -- Montana</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>46.5 -113.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 197</title>
+        <link href="http://hdl.handle.net/1969.1/3002"/>
+        <summary>Columbus folio -- Ohio</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.25 -83.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 198</title>
+        <link href="http://hdl.handle.net/1969.1/3645"/>
+        <summary>Castle Rock folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -105</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 199</title>
+        <link href="http://hdl.handle.net/1969.1/3667"/>
+        <summary>Silver City folio -- New Mexico</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>33 -108.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 200</title>
+        <link href="http://hdl.handle.net/1969.1/3668"/>
+        <summary>Galena-Elizabeth folio -- Illinois - Iowa</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42.50472222 -90.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 201</title>
+        <link href="http://hdl.handle.net/1969.1/3003"/>
+        <summary>Minneapolis-St. Paul folio -- Minnesota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45.25 -93.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 202</title>
+        <link href="http://hdl.handle.net/1969.1/3669"/>
+        <summary>Eureka Springs-Harrison folio -- Arkansas - Missouri</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>36.5 -94</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 203</title>
+        <link href="http://hdl.handle.net/1969.1/3670"/>
+        <summary>Colorado Springs folio -- Colorado</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.91666667 -105.0833333</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 204</title>
+        <link href="http://hdl.handle.net/1969.1/3671"/>
+        <summary>Tolchester folio -- Maryland</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -76.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 205</title>
+        <link href="http://hdl.handle.net/1969.1/3672"/>
+        <summary>Detroit folio -- Michigan</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>42.5 -83.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 206</title>
+        <link href="http://hdl.handle.net/1969.1/3673"/>
+        <summary>Leavenworth-Smithville folio -- Kansas - Missouri</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.5 -95</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 207</title>
+        <link href="http://hdl.handle.net/1969.1/3674"/>
+        <summary>Deming folio -- New Mexico</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>32.5 -108</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 208</title>
+        <link href="http://hdl.handle.net/1969.1/3675"/>
+        <summary>Colchester-Macomb folio -- Illinois</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.5 -91</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 209</title>
+        <link href="http://hdl.handle.net/1969.1/3676"/>
+        <summary>Newell folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>45 -103.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 210</title>
+        <link href="http://hdl.handle.net/1969.1/3004"/>
+        <summary>Herman-Morris folio -- Minnesota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>46 -96.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 211</title>
+        <link href="http://hdl.handle.net/1969.1/3677"/>
+        <summary>Elkton-Wilmington folio -- Delaware - Maryland - New Jersey - Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.75 -76</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 212</title>
+        <link href="http://hdl.handle.net/1969.1/3678"/>
+        <summary>Syracuse-Lakin folio -- Kansas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38 -102</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 213</title>
+        <link href="http://hdl.handle.net/1969.1/3679"/>
+        <summary>New Athens-Okawville folio -- Illinois</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.5 -90</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 214</title>
+        <link href="http://hdl.handle.net/1969.1/3681"/>
+        <summary>Raton-Brilliant-Koehler folio -- Colorado - New Mexico</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>37 -104.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 215</title>
+        <link href="http://hdl.handle.net/1969.1/3685"/>
+        <summary>Hot Springs folio -- Arkansas</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>34.6325 -93.17972222</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 216</title>
+        <link href="http://hdl.handle.net/1969.1/3686"/>
+        <summary>Carlyle-Centralia folio -- Illinois</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>38.75 -89.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 217</title>
+        <link href="http://hdl.handle.net/1969.1/3687"/>
+        <summary>Ray folio -- Arizona</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>33.25 -111</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 218</title>
+        <link href="http://hdl.handle.net/1969.1/3688"/>
+        <summary>Riddle folio -- Oregon</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>43 -123.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 219</title>
+        <link href="http://hdl.handle.net/1969.1/3680"/>
+        <summary>Central Black Hills folio -- South Dakota</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>44.5 -104</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 220</title>
+        <link href="http://hdl.handle.net/1969.1/3689"/>
+        <summary>Gillespie-Mount Olive folio -- Illinois</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>39.25 -90</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 221</title>
+        <link href="http://hdl.handle.net/1969.1/3690"/>
+        <summary>Bessemer-Vandiver folio -- Alabama</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>33.5 -87</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 222</title>
+        <link href="http://hdl.handle.net/1969.1/3414"/>
+        <summary>Gaffney-Kings Mountain folio -- North Carolina - South Carolina</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>35.25 -81.75</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 223</title>
+        <link href="http://hdl.handle.net/1969.1/3005"/>
+        <summary>Coatesville-West Chester folio -- Delaware - Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -76</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 224</title>
+        <link href="http://hdl.handle.net/1969.1/3415"/>
+        <summary>Somerset-Windber folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.25 -79.25</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 225</title>
+        <link href="http://hdl.handle.net/1969.1/3438"/>
+        <summary>Fairfield-Gettysburg folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40 -77.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 226</title>
+        <link href="http://hdl.handle.net/1969.1/3416"/>
+        <summary>Montevallo-Columbiana folio -- Alabama</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>33.25 -87</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+    <entry>
+        <title>Folio 227</title>
+        <link href="http://hdl.handle.net/1969.1/3437"/>
+        <summary>Hollidaysburg-Huntingdon folio -- Pennsylvania</summary>
+        <georss:where>
+            <gml:Point>
+                <gml:pos>40.5 -78.5</gml:pos>
+            </gml:Point>
+        </georss:where>
+    </entry>
+</feed>

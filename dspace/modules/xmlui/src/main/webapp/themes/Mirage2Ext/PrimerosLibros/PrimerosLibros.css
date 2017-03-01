@@ -1,0 +1,123 @@
+.image-gallery-tile {
+    background-color: #E8E8E8;
+    border: 1px solid #D1D1D1;
+    height: 260px;
+    margin: 10px 5px;
+    margin-left: 18px;
+    display: inline-block;
+    vertical-align:top;
+    padding: 14px;
+    padding-top: 17px;
+    text-align: center;
+    position: relative;
+    min-width: 175px;
+    max-width: 175px;
+}
+
+.image-gallery-tile img.image-gallery-thumbnail {
+    width: 100%;
+    height: auto;
+}
+
+.image-gallery-tile .image-gallery-title {   
+    font-weight: bolder;
+    font-size: 100%;
+    height: 1.2em;
+    overflow: hidden;
+}
+
+.image-gallery-tile .image-gallery-date
+{
+    font-size: 90%;
+    margin: 0 0 8px;
+}
+
+.image-gallery-tile .image-gallery-links {
+  position: absolute;
+  width: 82%;
+  bottom: 20px;
+}
+
+.image-gallery-tile .image-gallery-links a {
+  float: left;
+}
+
+.image-gallery-tile .image-gallery-links a {
+  float: left;
+}
+
+.image-gallery-tile .image-gallery-links span {
+  cursor: pointer;
+  float: right;
+}
+
+.image-gallery-tile .image-gallery-links a img
+{
+    padding: 0 3px 0 0;
+}
+
+.image-gallery-save-link img {
+    margin-left: 46px;
+}
+
+.image-gallery-save-options
+{
+    border: 1px solid #aaa;
+    border-width: 1px 1px 0;
+    display: inline-block;
+    position: relative;
+    background-color: #eee;
+    z-index: 100;
+}
+
+.image-gallery-save-options a
+{
+    display: block;
+    border-bottom: 1px solid #aaa;
+    text-decoration: none !important;
+    color: #666 !important;
+    font-size: 80%;
+    padding: 3px 6px;
+}
+
+.clear
+{
+    clear: both;
+}
+
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-dateissued-results,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-title-results,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results
+{
+  border: none;
+}
+
+
+
+p.linkbox {
+  border: 1px solid #CCCCCC;
+  background-color: #E8E8E8;
+  margin: 25px auto;
+  padding: 25px 0px;
+  font-weight: bolder;
+  width: 311px;
+}
+
+p.linkbox a {
+  text-decoration: none !important;
+}
+
+#pdflink {
+  background-image:url("imgs/pdficon-sm.png");
+}
+
+span.linkboxlink {
+  background-position:8px 8px;
+  background-repeat:no-repeat;
+  clear:both;
+  margin:5px 65px;
+  padding:20px 20px 20px 55px;
+}
+
+

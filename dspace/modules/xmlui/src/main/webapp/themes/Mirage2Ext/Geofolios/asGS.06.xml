@@ -1,0 +1,67 @@
+<!-- Example of an overlay file used with Yahoo maps -->
+<root>
+	<move>
+		<lat>37.787335</lat>
+		<lon>-122.40684</lon>
+	</move>
+	
+	<!-- DRAW LINE FROM SF TO NYC-->
+	<style>
+		<thickness>4</thickness>
+		<color>0xFF0000</color>
+		<alpha>90</alpha>
+		<!--<fillcolor>0x000000</fillcolor>
+		<fillstyle>solid</fillstyle>
+		<fillalpha>100</fillalpha>-->
+	</style>
+	<line>
+		<points>
+			<point>
+				<lat>37.787335</lat>
+				<lon>-122.40684</lon>
+			</point>
+			<point>
+				<lat>40.71136</lat>
+				<lon>-74.00855</lon>
+			</point>
+		</points>
+	</line>
+	
+	<!--DRAW CURVES FROM BOSTON > SEATTLE > PHOENIX > ORLANDO -->
+	<style>
+		<thickness>3</thickness>
+		<color>0x0066FF</color>
+		<alpha>90</alpha>
+		<!--<fillcolor>0x000000</fillcolor>
+		<fillstyle>solid</fillstyle>
+		<fillalpha>100</fillalpha>-->
+	</style>
+	<curve><!--Seattle to Boston-->
+		<points>
+			<point><lat>47.635784</lat><lon>-122.39209</lon></point>
+			<point><lat>48.806963</lat><lon>-95.143799</lon></point>
+			<point><lat>42.392631</lat><lon>-71.107910</lon></point>
+		</points>
+	</curve>
+	<curve><!--Seattle to Phoenix-->
+		<points>
+			<point><lat>47.635784</lat><lon>-122.39209</lon></point>			
+			<point><lat>39.97712</lat><lon>-120.544189</lon></point>
+			<point><lat>33.432759</lat><lon>-112.019365</lon></point>
+		</points>
+	</curve>
+	<curve><!--Phoenix to ORL-->
+		<points>
+			<point><lat>33.432759</lat><lon>-112.019365</lon></point>			
+			<point><lat>29.021821</lat><lon>-96.9711</lon></point>
+			<point><lat>28.435804</lat><lon>-81.324938</lon></point>
+		</points>
+	</curve>
+	<curve><!--ORL to Bos-->
+		<points>
+			<point><lat>28.435804</lat><lon>-81.324938</lon></point>			
+			<point><lat>35.960223</lat><lon>-74.850128</lon></point>
+			<point><lat>42.392631</lat><lon>-71.107910</lon></point>
+		</points>
+	</curve>
+</root>
