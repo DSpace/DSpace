@@ -285,6 +285,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return false;
         }
 
+        // Set all of the publication's information in a manuscript that we will then propagate to the item.
         Manuscript manuscript = new Manuscript(journalConcept);
 
         // Look for a manuscript number
@@ -299,51 +300,39 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         if (journalConcept.getIntegrated()) {
             addEmailsAndEmbargoSettings(journalConcept, item);
             if (manuscriptNumber != null && manuscriptNumber.equals("")) {
-                // we just use this empty manuscript with the journal only.
-                log.debug("manuscript number is empty or nonexistent");
+                // set the status of the manuscript to whatever the user specified:
+                log.error("manuscript number is empty or nonexistent");
+                manuscript.setStatus(translateStatus(Integer.parseInt(articleStatus)));
             } else {
                 manuscript = JournalUtils.getManuscriptFromManuscriptStorage(manuscriptNumber, journalConcept);
-                if (manuscript.getMessage().equals("")) {
-                    // No matter which radio button was chosen, if the manuscript is rejected, say so.
-                    if (manuscript.getStatus() != null && Manuscript.statusIsRejected(manuscript.getStatus())) {
-                        request.getSession().setAttribute("submit_error", "This manuscript has been rejected by the journal.");
-                        return false;
-                    }
-
-                    if (articleStatus != null) {
-                        // the Article Status chosen must match the specified manuscript's status. Otherwise, it's invalid.
-                        if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_ACCEPTED) {
-                            if (manuscript.isAccepted() || manuscript.isPublished()) {
-                                item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "true");
-                            }
-                        } else if (Integer.parseInt(articleStatus) == ARTICLE_STATUS_IN_REVIEW) {
-                            if (manuscript.isSubmitted() || manuscript.isNeedsRevision()) {
-                                item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
-                            }
-                        }
-                    }
-                } else if (manuscript.getMessage().equals("Invalid manuscript number")) {
-                    // We do not have metadata for this manuscript number
-                    // Store the manuscriptNumber and continue as in-review
-                    manuscript.setManuscriptId(manuscriptNumber);
-                } else {
-                    request.getSession().setAttribute("submit_error", manuscript.getMessage());
+                if (manuscript.getMessage().equals("Invalid manuscript number")) {
+                    // We do not have metadata for this manuscript number. Return error.
+                    request.getSession().setAttribute("submit_error", "Invalid manuscript number. Please recheck or leave blank to continue.");
                     return false;
                 }
+            }
+            // No matter which radio button was chosen, if the manuscript is rejected, say so.
+            if (manuscript.getStatus() != null && Manuscript.statusIsRejected(manuscript.getStatus())) {
+                request.getSession().setAttribute("submit_error", "This manuscript has been rejected by the journal.");
+                return false;
             }
         } else {
             log.debug("Journal " + journalConcept.getJournalID() + " is not integrated");
         }
         manuscript.propagateMetadataToItem(context, item);
-
-        // at this point, the item has been populated with metadata for the journal concept and any manuscript metadata.
-        // submitted manuscripts go through the review workflow, so don't skipReviewStage
-        if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW) {
-            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY, "false");
-        }
-
         item.update();
         return true;
+    }
+
+    private String translateStatus(Integer status) {
+        if (status.equals(ARTICLE_STATUS_PUBLISHED)) {
+            return Manuscript.STATUS_PUBLISHED;
+        } else if (status.equals(ARTICLE_STATUS_ACCEPTED)) {
+            return Manuscript.STATUS_ACCEPTED;
+        } else if (status.equals(ARTICLE_STATUS_IN_REVIEW)) {
+            return Manuscript.STATUS_SUBMITTED;
+        }
+        return Manuscript.STATUS_INVALID;
     }
 
     public int getNumberOfPages(HttpServletRequest request, SubmissionInfo submissionInfo) throws ServletException {
