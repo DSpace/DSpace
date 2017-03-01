@@ -295,7 +295,7 @@
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.department">Department</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Keyword">Keyword</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Abstract">Abstract</message>
-	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.series">Series</message>
+	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Series">Series</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Sponsor">Sponsor</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Identifier">Identifier</message>
 	<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.LanguageISO">LanguageISO</message>
