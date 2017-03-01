@@ -81,6 +81,12 @@
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
 
+        <!-- ============
+             TAMU ASPECTS
+             ============ -->
+
+        <aspect name="Community Tree Browser" path="resource://aspects/CommunityTreeBrowser/" />
+
         <!-- ========================
              Usage Statistics Engines
              ======================== -->
