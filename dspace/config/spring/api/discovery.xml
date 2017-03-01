@@ -102,13 +102,37 @@
         </property>
         <!-- Set TagCloud configuration per discovery configuration -->
         <property name="tagCloudFacetConfiguration" ref="defaultTagCloudFacetConfiguration"/>
+
         <!--The search filters which can be used on the discovery search page-->
+        <!-- TAMU Customization
+            Title,Author,Subject,Issued, and ContentInOriginalBundle are 6x defaults.
+            The rest are TAMU configured
+        -->
         <property name="searchFilters">
             <list>
                 <ref bean="searchFilterTitle" />
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
+                <ref bean="searchFilterDepartment" />
+                <ref bean="searchFilterKeyword" />
+                <ref bean="searchFilterAbstract" />
+                <ref bean="searchFilterSeries" />
+                <ref bean="searchFilterSponsor" />
+                <ref bean="searchFilterIdentifier" />
+                <ref bean="searchFilterLanguageISO" />
+                <ref bean="searchFilterETDLevel" />
+                <ref bean="searchFilterETDDiscipline" />
+                <ref bean="searchFilterETDGrantor" />
+                <ref bean="searchFilterETDAuthors" />
+                <ref bean="searchFilterETDSubmissionDate" />
+                <ref bean="searchFilterETDChair" />
+                <ref bean="searchFilterETDCommitteeMember" />
+                <ref bean="searchFilterDescription" />
+                <ref bean="searchFilterCoverage" />
+                <ref bean="searchFilterRights" />
+                <ref bean="searchFilterIsPartOf" />
+                <ref bean="searchFilterType" />
 		        <ref bean="searchFilterContentInOriginalBundle"/>
             </list>
         </property>
@@ -210,6 +234,7 @@
         <!-- Set TagCloud configuration per discovery configuration -->
         <property name="tagCloudFacetConfiguration" ref="homepageTagCloudFacetConfiguration"/>
         <!--The search filters which can be used on the discovery search page (same as defaultConfiguration above)-->
+        <!-- TAMU Customization -- searchFilterSeries -->
         <property name="searchFilters">
             <list>
                 <ref bean="searchFilterTitle" />
@@ -217,6 +242,7 @@
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
 		        <ref bean="searchFilterContentInOriginalBundle"/>
+                <ref bean="searchFilterSeries" />
             </list>
         </property>
         <!--The sort filters for the discovery search (same as defaultConfiguration above)-->
@@ -421,6 +447,212 @@
         <property name="sortOrderSidebar" value="COUNT"/>
         <property name="sortOrderFilterPage" value="COUNT"/>
     </bean>
+
+    <!-- BEGIN TAMU Customization -->
+    <bean id="searchFilterDepartment" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="department"/>
+        <property name="metadataFields">
+            <list>
+                <value>local.department</value>
+                <value>thesis.degree.department</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterKeyword" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Keyword"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.subject.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterAbstract" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Abstract"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.description.abstract</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+
+    <bean id="searchFilterSeries" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Series"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.ispartofseries</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+     <bean id="searchFilterSponsor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Sponsor"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.description.sponsorship</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterIdentifier" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Identifier"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.identifier.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+     <bean id="searchFilterLanguageISO" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="LanguageISO"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.language.iso</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterETDLevel" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ETDLevel"/>
+        <property name="metadataFields">
+            <list>
+                <value>thesis.degree.level</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+     <bean id="searchFilterETDDiscipline" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ETDDiscipline"/>
+        <property name="metadataFields">
+            <list>
+                <value>thesis.degree.discipline</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterETDGrantor" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ETDGrantor"/>
+        <property name="metadataFields">
+            <list>
+                <value>thesis.degree.grantor</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterETDAuthors" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ETDAuthors"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.creator.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+    <bean id="searchFilterETDSubmissionDate" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ETDSubmissionDate"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.date.created</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+    <bean id="searchFilterETDChair" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ETDChair"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.advisor</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+     <bean id="searchFilterETDCommitteeMember" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="ETDCommitteeMember"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.committeeMember</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+    <bean id="searchFilterDescription" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Description"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.description.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+    <bean id="searchFilterCoverage" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Coverage"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.coverage.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+    <bean id="searchFilterRights" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Rights"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.rights.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+    <bean id="searchFilterIsPartOf" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="IsPartOf"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.relation.ispartof</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="searchFilterType" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">
+        <property name="indexFieldName" value="Type"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.type</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+    <!-- END TAMU Customization -->
 
     <!--Sort properties-->
     <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
