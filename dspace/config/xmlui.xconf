@@ -164,13 +164,16 @@
         <theme name="Voucher XRays" handle="1969.1/148733" path="Mirage2Ext/ImageGallery/"/>
         <theme name="CVMBS photo collection" handle="1969.1/155981" path="Mirage2Ext/ImageGallery/"/>
 
-        <!-- Periodicals Theme -->
-        <theme name="Tx H20 Collection" handle="1969.1/6062" path="Mirage2Ext/Periodicals/"/>
-        <theme name="17th News Collection" handle="1969.1/94990" path="Mirage2Ext/Periodicals/"/> 
-        
         <!-- ESL -->
         <theme name="ESL Community" handle="1969.1/1656" path="Mirage2Ext/ESL/"/>
 
+        <!-- Periodicals Theme -->
+        <theme name="Tx H20 Collection" handle="1969.1/6062" path="Mirage2Ext/Periodicals/"/>
+        <theme name="17th News Collection" handle="1969.1/94990" path="Mirage2Ext/Periodicals/"/>
+
+        <!-- Bush Capstone Themes -->
+        <theme name="Bush Capstone: MPSA" handle="1969.1/94972" path="Mirage2Ext/Capstones/"/>
+        <theme name="Bush Capstone: MPIA" handle="1969.1/94973" path="Mirage2Ext/Capstones/"/>
 
         <theme name="Mirage 2" regex=".*" path="Mirage2/" />
         <!-- Mirage theme, @mire contributed theme, default since DSpace 3.0 -->
