@@ -2,49 +2,42 @@ package edu.tamu.dspace.profilepagetweaks;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
-import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Field;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.Subscribe;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.xml.sax.SAXException;
 
 public class ProfilePageTweaks extends AbstractDSpaceTransformer 
 {
+	protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+	protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+	protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     
     /** Determine if the user is registering for the first time */
     private String registering;
     private String epersonID;
     
     // A list of groups that this user is apart of.
-    private Group[] memberships = null;
+    private List<Group> memberGroups = null;
 
     public void setup(SourceResolver resolver, Map objectModel, String src,
                       Parameters parameters) throws ProcessingException, SAXException, IOException
@@ -63,27 +56,29 @@ public class ProfilePageTweaks extends AbstractDSpaceTransformer
     {
     	// First, figure out which page we're on: eperson view or profile
     	if (epersonID != null) {
-    		EPerson eperson = EPerson.find(context, Integer.parseInt(epersonID));
-    		memberships = Group.allMemberGroups(context, eperson);
+    		EPerson eperson = ePersonService.find(context, UUID.fromString(epersonID));
+    		memberGroups = groupService.allMemberGroups(context, eperson);
     	}
     	else if (!"true".equals(registering)) {
-            memberships = Group.allMemberGroups(context, context.getCurrentUser());
+            memberGroups = groupService.allMemberGroups(context, context.getCurrentUser());
     	}
     	
-    	if (memberships == null)
+    	if (memberGroups == null)
     		return;
         
-        for (Group member : memberships) {
-            String[] name = member.getName().split("_");
+        for (Group memberGroup : memberGroups) {
+            String[] name = memberGroup.getName().split("_");
             if (name.length >= 3 && ("COLLECTION".equals(name[0]) || "COMMUNITY".equals(name[0])))
             {
                 DSpaceObject dso;
-                if ("COLLECTION".equals(name[0]))
-                    dso = Collection.find(context, Integer.parseInt(name[1]));
-                else
-                    dso = Community.find(context, Integer.parseInt(name[1]));
-                    
-                pageMeta.addMetadata(member.getName(), dso.getName()).addContent(dso.getHandle());
+                if ("COLLECTION".equals(name[0])) {
+                	dso = collectionService.findByGroup(context, memberGroup);
+                } else {
+                    dso = communityService.findByAdminGroup(context, memberGroup);
+                }
+                if (dso != null) {
+                	pageMeta.addMetadata(memberGroup.getName(), dso.getName()).addContent(dso.getHandle());
+                }
             }
         }
         
