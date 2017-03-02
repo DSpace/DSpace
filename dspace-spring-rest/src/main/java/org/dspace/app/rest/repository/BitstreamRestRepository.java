@@ -8,6 +8,8 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,11 +59,15 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 
 	@Override
 	public Page<BitstreamRest> findAll(Context context, Pageable pageable) {
-		List<Bitstream> bit = null;
+		List<Bitstream> bit = new ArrayList<Bitstream>();
+		Iterator<Bitstream> it = null;
 		int total = 0;
 		try {
 			total = bs.countTotal(context);
-			bit = bs.findAll(context);
+			it = bs.findAll(context, pageable.getPageSize(), pageable.getOffset());
+			while(it.hasNext()) {
+				bit.add(it.next());
+			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
