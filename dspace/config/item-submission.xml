@@ -268,6 +268,15 @@
       </step>
       -->
 
+    <!--Step 6.5 will be to possibly add a Creative Commons License and/or a proxy license, and sign off on the License-->
+    <step>
+      <heading>submit.progressbar.license</heading>
+      <processing-class>edu.tamu.dspace.proxylicense.ProxyLicenseStep</processing-class>
+      <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
+      <xmlui-binding>edu.tamu.dspace.proxylicense.XmluiProxyLicenseStep</xmlui-binding>
+      <workflow-editable>false</workflow-editable>
+    </step> 
+
       <!--Step 7 will be to Sign off on the License-->
       <step>
         <heading>submit.progressbar.license</heading>
