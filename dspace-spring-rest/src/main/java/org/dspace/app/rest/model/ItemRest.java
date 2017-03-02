@@ -10,6 +10,8 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * The Item REST Resource
  * 
@@ -22,7 +24,9 @@ public class ItemRest extends DSpaceObjectRest {
 	private boolean discoverable = false;
 	private boolean withdrawn = false;
 	private Date lastModified = new Date();
+	@JsonIgnore
 	private CollectionRest owningCollection;
+	@JsonIgnore
 	private CollectionRest templateItemOf;
 	//private EPerson submitter;
 
