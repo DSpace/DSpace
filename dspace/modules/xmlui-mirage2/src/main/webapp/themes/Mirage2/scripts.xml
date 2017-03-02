@@ -38,6 +38,11 @@
     <script src="scripts/forms.js">&#160;</script>
     <script src="scripts/vendor-extensions.js">&#160;</script>
     <script src="scripts/google-stats-dates.js">&#160;</script>
+
+    <!-- TAMU Customization - proxy license step -->
+    <!-- NOTE: Something in templates.js is breaking the license-step.js functionality, so license-step needs to be included before it, or the conflict resolved -->
+    <script src="scripts/license-step.js">&#160;</script>
+
     <script src="scripts/templates.js">&#160;</script>
 
     <!-- authorLookup and its dependencies -->
