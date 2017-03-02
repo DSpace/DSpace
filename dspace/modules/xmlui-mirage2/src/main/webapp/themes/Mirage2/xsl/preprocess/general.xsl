@@ -36,11 +36,10 @@
     <xsl:variable name="context-path" select="$page-meta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
 
    <!--TAMU Customization - The modified list on the user's profile -->
-    <xsl:template match="dri:list[@id='aspect.eperson.EditProfile.list.memberships']">
+    <xsl:template match="dri:list[@id='aspect.administrative.eperson.EditEPersonForm.list.eperson-member-of']">
         <list id="{@id}" rend="membership-wrapper">
             <xsl:apply-templates select="dri:head"/>
             <xsl:apply-templates select="dri:item" mode="profile">
-                <xsl:sort select="text()"/>
             </xsl:apply-templates>
         </list>
     </xsl:template>
@@ -48,16 +47,19 @@
    <!--TAMU Customization - The modified list on the user's profile -->
    <xsl:template match="dri:item" mode="profile">
         <item>
-            <xsl:value-of select="text()"/>
-            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element=current()/text()]/@qualifier">
+            <xsl:apply-templates select="dri:xref" />
+            <xsl:apply-templates select="dri:hi"/>
+            <xsl:variable name="link-text" select="dri:xref" />
+            <xsl:if test="$page-meta/dri:metadata[@element=$link-text]/@qualifier">
                 <xsl:text> (</xsl:text>
-                <xref target="{$context-path}/handle/{/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element=current()/text()]}">
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element=current()/text()]/@qualifier"/>
+                <xref target="{$context-path}/handle/{$page-meta/dri:metadata[@element=$link-text]}">
+                    <xsl:value-of select="$page-meta/dri:metadata[@element=$link-text]/@qualifier"/>
                 </xref> 
                 <xsl:text>)</xsl:text>
             </xsl:if>
+
         </item>
-</xsl:template>
+    </xsl:template>
 
     <xsl:template match="@*|node()">
         <xsl:copy>
