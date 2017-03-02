@@ -12,6 +12,8 @@ We don't use Spring Data REST as we haven't a spring data layer and we want to p
 ## How to contribute
 Check the infomation available on the DSpace Official Wiki page for the [DSpace 7 Working Group](https://wiki.duraspace.org/display/DSPACE/DSpace+7+UI+Working+Group)
 
+[DSpace 7 REST: Coding DSpace Objects](https://wiki.duraspace.org/display/DSPACE/DSpace+7+REST%3A+Coding+DSpace+Objects)
+
 ## How to run
 The only tested way right now is to run this webapp inside your IDE (Eclipse). Just create a new Tomcat 8 server and deploy the dspace-spring-rest maven module to it.
 > The *dspace.dir* is configured in the *dspace-spring-rest/src/main/resources/application.properties* file
