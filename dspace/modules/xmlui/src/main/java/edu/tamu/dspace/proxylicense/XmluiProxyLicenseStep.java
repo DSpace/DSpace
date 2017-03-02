@@ -13,15 +13,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.util.Map;
 
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
-import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
-import org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -32,9 +27,8 @@ import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.LicenseUtils;
-import org.dspace.license.CreativeCommons;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -192,7 +186,8 @@ public class XmluiProxyLicenseStep extends AbstractSubmissionStep
 	String license;
 	
 	// Load in default license
-        File licenseFile = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator
+	
+        File licenseFile = new File(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir") + File.separator
                 + "config" + File.separator + fileName);
 
         FileInputStream  fir = null;

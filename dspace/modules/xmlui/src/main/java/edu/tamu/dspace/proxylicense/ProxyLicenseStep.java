@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -15,19 +14,21 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.submit.step.LicenseStep;
 
 public class ProxyLicenseStep extends LicenseStep 
@@ -37,6 +38,11 @@ public class ProxyLicenseStep extends LicenseStep
     
     public static final int STATUS_BAD_PROXY_FILE = 2;
 
+    protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+	protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    
     /** log4j logger */
     private static Logger log = Logger.getLogger(LicenseStep.class);    
     
@@ -63,8 +69,6 @@ public class ProxyLicenseStep extends LicenseStep
             AuthorizeException
     {
         String buttonPressed = Util.getSubmitButton(request, CANCEL_BUTTON);
-
-        boolean licenseGranted = false;
 
         // For Manakin:
         // Add the license to the item
@@ -100,7 +104,7 @@ public class ProxyLicenseStep extends LicenseStep
 	    // Otherwise, it's accepted; it's just a matter of which one
 	    log.info(LogManager.getHeader(context, "accept_license", subInfo.getSubmissionLogInfo()));
             // remove any existing DSpace license (just in case the user accepted it previously)
-            item.removeDSpaceLicense();
+            itemService.removeDSpaceLicense(context, item);
 	}
 	
 	if (buttonPressed.equals(NEXT_BUTTON) && licenseType.equalsIgnoreCase("default")) {
@@ -114,26 +118,25 @@ public class ProxyLicenseStep extends LicenseStep
             // If Proxy, create the extra file if we have one
             if (filePath != null && fileInputStream != null) 
             {
-                Bundle[] bundles = item.getBundles("LICENSE");
-                Bitstream bs = bundles[0].createBitstream(fileInputStream);
+                List<Bundle> bundles = itemService.getBundles(item,"LICENSE");
+                Bitstream bs = bitstreamService.create(context, bundles.get(0),fileInputStream);
                 
                 List<String> pieces = Arrays.asList(filePath.split("\\."));
                 if (pieces.size() == 1)
-                    bs.setName("PERMISSION.license");
+                    bs.setName(context,"PERMISSION.license");
                 else
-                    bs.setName("PERMISSION." + pieces.get(pieces.size()-1));
+                    bs.setName(context,"PERMISSION." + pieces.get(pieces.size()-1));
                 
-                bs.setSource(filePath);
-                bs.setDescription("Proxy license");
+                bs.setSource(context,filePath);
+                bs.setDescription(context,"Proxy license");
                 
                 // Identify the format
-                BitstreamFormat bf = FormatIdentifier.guessFormat(context, bs);
-                bs.setFormat(bf);
+                BitstreamFormat bf = bitstreamFormatService.guessFormat(context, bs);
+                bs.setFormat(context,bf);
                 
                 // FIXME: this does not seem to work for some reason. Maybe you can't change policies on pre-archived items?
-                List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(context, bs, Constants.READ);
-                for (ResourcePolicy policy : policies)
-                    policy.delete();
+                // FIXME: The previous line may or may not still be true, as we have now switched to an AuthorizeService with a different removal mechanism for 6x+
+            	authorizeService.removePoliciesActionFilter(context, bs, Constants.READ);
             }
             context.commit();
 	}
