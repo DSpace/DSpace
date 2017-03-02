@@ -64,7 +64,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 		int total = 0;
 		try {
 			total = cs.countTotal(context);
-			it = cs.findAll(context);
+			it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
 			for (Collection c: it) {
 				collections.add(c);
 			}
