@@ -13,8 +13,8 @@ import java.io.IOException;
 
 import org.apache.poi.POITextExtractor;
 import org.apache.poi.extractor.ExtractorFactory;
-import org.apache.poi.hwpf.extractor.WordExtractor;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
+import org.apache.xmlbeans.XmlException;
 import org.dspace.content.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,35 +55,27 @@ public class PoiWordFilter
     public InputStream getDestinationStream(Item currentItem, InputStream source, boolean verbose)
             throws Exception
     {
+        String text;
         try  
         {
             // get input stream from bitstream, pass to filter, get string back
-            String text;
             POITextExtractor extractor = ExtractorFactory.createExtractor(source);
-            if (extractor instanceof XWPFWordExtractor)
-                text = ((XWPFWordExtractor) extractor).getText();
-            else if (extractor instanceof WordExtractor)
-                text = ((WordExtractor) extractor).getText();
-            else
-                throw new IllegalArgumentException(
-                        "Bitstream is neither .doc nor .docx format.  Extractor returned a "
-                                + extractor.getClass().getCanonicalName());
-
-            // if verbose flag is set, print out extracted text to STDOUT
-            if (verbose)
-            {
-                System.out.println(text);
-            }
-
-            // return the extracted text as a stream.
-            return new ByteArrayInputStream(text.getBytes());
-        } 
-        catch (IOException ioe)
-        {
-            System.out.println("Invalid File Format");
-            LOG.error("Error detected - Microsoft Word file format not recognized: "
-                    + ioe.getMessage(), ioe);
-            throw ioe;
+            text = extractor.getText();
         }
+        catch (IOException | OpenXML4JException | XmlException e)
+        {
+            System.err.format("Invalid File Format:  %s%n", e.getMessage());
+            LOG.error("Unable to parse the bitstream:  ", e);
+            throw e;
+        }
+
+        // if verbose flag is set, print out extracted text to STDOUT
+        if (verbose)
+        {
+            System.out.println(text);
+        }
+
+        // return the extracted text as a stream.
+        return new ByteArrayInputStream(text.getBytes());
     }
 }
