@@ -318,3 +318,7 @@ embargo.field.terms = local.embargo.terms
 # DC metadata field to hold computed "lift date" of embargo
 embargo.field.lift = local.embargo.lift
 
+#### Metadata Tree Browser ####
+xmlui.community-list.render.full = true
+xmlui.community-list.render.browse = true
+
