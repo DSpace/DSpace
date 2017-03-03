@@ -308,3 +308,13 @@ search.index.24 = ispartof:dc.relation.ispartof
 search.index.25 = type:dc.type.*
 search.index.26 = department:thesis.degree.department
 
+#### Embargo Settings ####
+# DC metadata field to hold the user-supplied embargo terms
+# DC metadata field to hold the user-supplied embargo terms
+embargo.field.terms = local.embargo.terms
+ 
+ 
+# DC metadata field to hold computed "lift date" of embargo
+# DC metadata field to hold computed "lift date" of embargo
+embargo.field.lift = local.embargo.lift
+
