@@ -322,3 +322,8 @@ embargo.field.lift = local.embargo.lift
 xmlui.community-list.render.full = true
 xmlui.community-list.render.browse = true
 
+# Metadata Tree Browser - Cushing Historic Images
+xmlui.mdbrowser.1969.1/97043.field = dc.relation.ispartof
+xmlui.mdbrowser.1969.1/97043.separator = ;
+xmlui.mdbrowser.1969.1/97043.reverse = true
+
