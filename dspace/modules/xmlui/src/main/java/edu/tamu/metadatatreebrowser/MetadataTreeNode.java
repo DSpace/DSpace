@@ -2,22 +2,22 @@ package edu.tamu.metadatatreebrowser;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
  * 
@@ -35,18 +35,18 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * 
  * @author Scott Phillips, http://www.scottphillips.com/
  * @author Alexey Maslov
+ * @author Jason Savell
  */
 public class MetadataTreeNode {
 
-    private static Logger log = Logger.getLogger(MetadataTreeNode.class);
-	
 	/** Member Variables **/
 	private int node_id;
 	private String name; // e.g. TAMU Organizations
 	private String fieldValue; // e.g. TAMU Organizations, Historical Images of Texas A&M University
-	private int thumbnail_id;
+	private UUID thumbnail_id;
 	private MetadataTreeNode parent;
 	private List<MetadataTreeNode> children;
+	
 	
 	/** Create a root node **/
 	private MetadataTreeNode() {
@@ -58,7 +58,7 @@ public class MetadataTreeNode {
 	}
 	
 	/** Create a stem/content node **/
-	private MetadataTreeNode(MetadataTreeNode parent, String name, int thumbnail_id,  int node_id) {
+	private MetadataTreeNode(MetadataTreeNode parent, String name, UUID thumbnail_id,  int node_id) {
 		this.node_id = node_id;
 		this.parent = parent;
 		this.name = name;
@@ -147,7 +147,7 @@ public class MetadataTreeNode {
 	}
 	
 	
-	public int getThumbnailId() {
+	public UUID getThumbnailId() {
 		return thumbnail_id;
 	}
 	
@@ -168,15 +168,19 @@ public class MetadataTreeNode {
 	 * @return A root node for the browse tree, or null if not configured.
 	 */
 	public static MetadataTreeNode generateBrowseTree(Context context, DSpaceObject dso) throws SQLException, AuthorizeException {
+	    ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+	    BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+
 		// We only apply to communities or collections. 
 		if ( !(dso instanceof Collection || dso instanceof Community))
 			return null;
 		
 		// Step 1: Get our config and determine if we should build a tree
 		String handle = dso.getHandle();
-		String fieldLabel = ConfigurationManager.getProperty("xmlui.mdbrowser."+handle+".field");
-		String separator = ConfigurationManager.getProperty("xmlui.mdbrowser."+handle+".separator");
-		boolean reverse = ConfigurationManager.getBooleanProperty("xmlui.mdbrowser."+handle+".reverse",false);
+
+		String fieldLabel = configurationService.getProperty("xmlui.mdbrowser."+handle+".field");
+		String separator = configurationService.getProperty("xmlui.mdbrowser."+handle+".separator");
+		boolean reverse = configurationService.getBooleanProperty("xmlui.mdbrowser."+handle+".reverse",false);
 	
 		if (fieldLabel == null || fieldLabel.length() == 0)
 			return null;
@@ -184,78 +188,42 @@ public class MetadataTreeNode {
 		if (separator == null || separator.length() == 0)
 			separator = ",";
 		
-		String[] fieldParts = fieldLabel.split("\\.");
-		String schemaPart = fieldParts[0];
-		String elementPart = fieldParts[1];
-		String qualifierPart = null;
-		if (fieldParts.length > 2)
-			qualifierPart = fieldParts[2];
-		
-		MetadataSchema schema = MetadataSchema.find(context, schemaPart);
-		MetadataField field = MetadataField.findByElement(context, schema.getSchemaID(), elementPart, qualifierPart);
-		int fieldId = field.getFieldID();
-		int dsoId = dso.getID();
-		
 		// Step 2: Query for the complete list of metadata elements, and process each one.
 		MetadataTreeNode root = new MetadataTreeNode();
 		int currentID = 1;
-		
-		// Find all distinct text_values for the metadata field in the given collection. And select 
-		String query = "SELECT mv.text_value, MAX(b2b.bitstream_id) AS bitstream_id "
-			+ "FROM metadatavalue mv, item i, collection2item c2i, item2bundle i2b, bundle b,metadatavalue tmv, bundle2bitstream b2b "
-			+ "WHERE mv.resource_id = i.item_id "
-			+ "AND i.item_id = c2i.item_id "
-			+ "AND i.item_id = i2b.item_id "
-			+ "AND i2b.bundle_id = b2b.bundle_id "
-			+ "AND b2b.bundle_id = b.bundle_id "
-			+ "AND (tmv.text_value = 'THUMBNAIL' AND b.bundle_id=tmv.resource_id)"
-			+ "AND c2i.collection_id = ? "
-			+ "AND mv.metadata_field_id = ? "
-			+ "GROUP BY mv.text_value "
-			+ "ORDER BY mv.text_value ";
-		
-		if (dso instanceof Community) {
-			// The same query as above but searches through a community and all lower collections as well.
-			query = "SELECT mv.text_value, max(b2b.bitstream_id) AS bitstream_id"
-				+ "FROM metadatavalue mv, item i, collection2item c2i, community2collection c2c, item2bundle i2b, bundle b,metadatavalue tmv, bundle2bitstream b2b "
-				+ "WHERE mv.resource_id = i.item_id "
-				+ "AND i.item_id = c2i.item_id "
-				+ "AND c2i.collection_id = c2c.collection_id "
-				+ "AND i.item_id = i2b.item_id "
-				+ "AND i2b.bundle_id = b2b.bundle_id "
-				+ "AND b2b.bundle_id = b.bundle_id "
-				+ "AND (tmv.text_value = 'THUMBNAIL' AND b.bundle_id=tmv.resource_id)"
-				+ "AND c2c.community_id = ? "
-				+ "AND mv.metadata_field_id = ? "
-				+ "GROUP BY mv.text_value "
-				+ "ORDER BY mv.text_value";
-		}
-		
-		TableRowIterator rowItr = DatabaseManager.query(context, query, dsoId, fieldId);
-		while (rowItr.hasNext()) {
 
-			TableRow row = rowItr.next();
-			String value = row.getStringColumn("text_value");
-			int bitstream_id = row.getIntColumn("bitstream_id");
-			String[] nameParts = value.split(separator);
-			if (reverse)
-				ArrayUtils.reverse(nameParts);
-			
-			// Iterate over the parts to establish all the parent nodes down to this leaf node.
-			MetadataTreeNode parent = root;
-			for (String namePart : nameParts) {
-				MetadataTreeNode child = parent.getChild(namePart);
-						
-				if (child == null) {
-					child = new MetadataTreeNode(parent,namePart, bitstream_id, currentID++);
-				}
-				parent = child;
-			}
-			
-			// Set the leaf node to the exact path
-			parent.setFieldValue(value);
+		Iterator<Bitstream> bitstreamsIterator = null;
+		if (dso instanceof Community) {
+			bitstreamsIterator = bitstreamService.getCommunityBitstreams(context, (Community) dso);
+		} else {
+			bitstreamsIterator = bitstreamService.getCollectionBitstreams(context, (Collection) dso);
 		}
-		
+
+		while (bitstreamsIterator.hasNext()) {
+			Bitstream bitstream = bitstreamsIterator.next();
+			Iterator<Bundle> bundleIterator = bitstream.getBundles().iterator();
+			while (bundleIterator.hasNext()) {
+				Bundle bundle = bundleIterator.next();
+				if (bundle.getName().equals("THUMBNAIL")) {
+					Iterator<Item> itemsIterator = bundle.getItems().iterator();
+					while (itemsIterator.hasNext()) {
+						Item item = itemsIterator.next();
+						String nameHierarchy = item.getItemService().getMetadata(item, fieldLabel);
+						String[] nameParts = nameHierarchy.split(separator);
+						// Iterate over the parts to establish all the parent nodes down to this leaf node.
+						MetadataTreeNode parent = root;
+						for (String namePart : nameParts) {
+							MetadataTreeNode child = parent.getChild(namePart);
+									
+							if (child == null) {
+								child = new MetadataTreeNode(parent,namePart, bitstream.getID(), currentID++);
+							}
+							parent = child;
+						}
+					}
+				}
+			}
+		}
 		return root;
 	}
 	
