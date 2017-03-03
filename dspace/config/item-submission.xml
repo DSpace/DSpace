@@ -230,8 +230,6 @@
        -->
 
       <!--Step 4 will be to Upload the item -->
-      <!-- TAMU Customization - use Upload Item with Embargo instead of simple Uploader -->
-      <!--
       <step>
         <heading>submit.progressbar.upload</heading>
         <processing-class>org.dspace.submit.step.UploadStep</processing-class>
@@ -239,11 +237,11 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
-      -->
 
        <!-- Step 4 Upload Item with Embargo Features
             to enable this step, please make sure to comment-out the previous step "UploadStep"  -->
       <!-- TAMU Customization - use Upload Item with Embargo instead of simple Uploader -->
+      <!-- Disabling Embargo uploader until bug is investigated 
        <step>
            <heading>submit.progressbar.upload</heading>
            <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
@@ -251,6 +249,7 @@
            <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
            <workflow-editable>true</workflow-editable>
        </step>
+      -->
 
  	  <!--Step 5 will be to Verify/Review everything -->
  	  <step>
