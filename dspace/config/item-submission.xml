@@ -185,10 +185,12 @@
 	 <!-- Step 1. Since DSpace 4.0, the initial questions has been disabled. Metadata are shown exactly as 
 	 	  required in input-forms and items are assumed to have always multiple-files attached.
 	      If re-enable the initial questions step you should comment out this step-->
+    <!-- TAMU Customization - We enable initial questions, so we should disable this hidden step -->
+    <!--
 	 <step>
 		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
 	 </step>
-          
+    -->          
      <!--Disabled by default Since DSpace 4.0: Step 1 will be to gather initial information -->
     <!-- TAMU Customization - Enable initial questions -->
 	  <step>
