@@ -278,25 +278,46 @@
         </div>
     </xsl:template>
 
+    <!-- TAMU CUstomization - Preferentially show DOIs over URIs if they are present -->
     <xsl:template name="itemSummaryView-DIM-URI">
-        <xsl:if test="dim:field[@element='identifier' and @qualifier='uri' and descendant::text()]">
-            <div class="simple-item-view-uri item-page-field-wrapper table">
-                <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text></h5>
-                <span>
-                    <xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
-                        <a>
-                            <xsl:attribute name="href">
+        <xsl:choose>
+            <xsl:when test="dim:field[@element='identifier' and @qualifier='doi' and descendant::text()]">
+                <div class="simple-item-view-uri item-page-field-wrapper table">
+                    <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-doi</i18n:text></h5>
+                    <span>
+                        <xsl:for-each select="dim:field[@element='identifier' and @qualifier='doi']">
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:copy-of select="./node()"/>
+                                </xsl:attribute>
                                 <xsl:copy-of select="./node()"/>
-                            </xsl:attribute>
-                            <xsl:copy-of select="./node()"/>
-                        </a>
-                        <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='uri']) != 0">
-                            <br/>
-                        </xsl:if>
-                    </xsl:for-each>
-                </span>
-            </div>
-        </xsl:if>
+                            </a>
+                            <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='doi']) != 0">
+                                <br/>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </span>
+                </div>
+            </xsl:when>
+            <xsl:otherwise>
+                <div class="simple-item-view-uri item-page-field-wrapper table">
+                    <h5><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text></h5>
+                    <span>
+                        <xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:copy-of select="./node()"/>
+                                </xsl:attribute>
+                                <xsl:copy-of select="./node()"/>
+                            </a>
+                            <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='uri']) != 0">
+                                <br/>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </span>
+                </div>
+            </xsl:otherwise>
+        </xsl:choose>            
     </xsl:template>
 
     <!-- TAMU CUstomization -->
