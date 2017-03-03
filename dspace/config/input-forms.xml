@@ -38,6 +38,7 @@
  <!-- serves as a 'this field is required' flag.                           -->
 
  <form-definitions>
+    <form name="oscSubmission">
      <page number="1">
        <field>
          <dc-schema>dc</dc-schema>
