@@ -11,8 +11,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.util.List;
 
+import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
+import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -64,11 +66,20 @@ public class Utils {
 		return linkTo(data.getController(), data.getType()).slash(data).slash(rel).withRel(rel);
 	}
 
-	public DSpaceRestRepository getResourceRepository(String model) {
+	public DSpaceRestRepository getResourceRepository(String modelPlural) {
+		String model = makeSingular(modelPlural);
 		try {
 			return applicationContext.getBean(model, DSpaceRestRepository.class);
 		} catch (NoSuchBeanDefinitionException e) {
 			throw new RepositoryNotFoundException(model);
 		}
+	}
+	
+	public static String makeSingular(String modelPlural) {
+		//The old dspace res package includes the evo inflection library which has a plural() function but no singular function
+		if (modelPlural.equals("communities")) {
+			return CommunityRest.NAME;
+		}
+		return modelPlural.replaceAll("s$", "");
 	}
 }

@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@RequestMapping("/api/core/{model}s")
+@RequestMapping("/api/core/{model}")
 @SuppressWarnings("rawtypes")
 public class RestResourceController {
 	@Autowired
