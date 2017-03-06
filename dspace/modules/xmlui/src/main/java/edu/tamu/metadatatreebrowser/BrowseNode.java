@@ -7,48 +7,48 @@
  */
 package edu.tamu.metadatatreebrowser;
 
-import org.dspace.app.xmlui.aspect.discovery.AbstractSearch;
-import org.dspace.app.xmlui.aspect.discovery.DiscoveryUIUtils;
-
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.aspect.discovery.AbstractSearch;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.*;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
-import org.dspace.discovery.*;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchServiceException;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
-import org.dspace.discovery.configuration.DiscoverySearchFilter;
-import org.dspace.discovery.configuration.DiscoverySortConfiguration;
-import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
-import org.dspace.utils.DSpace;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
- * Perform a simple search of the repository. The user provides a simple one
- * field query (the url parameter is named query) and the results are processed.
+ *  Custom search for the Metadata Tree Browser (Adapted from org.dspace.app.xmlui.aspect.discovery.SimpleSearch) 
  *
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
- * @author Adán Román Ruiz <aroman@arvo.es> (Bugfix)
+ * @author Scott Phillips, http://www.scottphillips.com/
+ * @author Alexey Maslov
+ * @author Jason Savell <jsavell@library.tamu.edu>
  */
 public class BrowseNode extends AbstractSearch implements CacheableProcessingComponent {
 	private static final Logger log = Logger.getLogger(BrowseNode.class);
@@ -67,13 +67,9 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
     private static final Message T_result_head_3 = message("xmlui.Discovery.AbstractSearch.head3");
     private static final Message T_result_head_2 = message("xmlui.Discovery.AbstractSearch.head2");
 
-    private SearchService searchService = null;
     
-    public BrowseNode() throws UIException {
-        DSpace dspace = new DSpace();
-        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
-    }
-  
+    protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+    
     /**
      * Add Page metadata.
      */
@@ -85,7 +81,7 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if ((dso instanceof org.dspace.content.Collection) || (dso instanceof Community)) {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
+            HandleUtil.buildHandleTrail(context, dso, pageMeta, contextPath, true);
         }
     }
 
@@ -96,7 +92,6 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
      */
     public void addBody(Body body) throws SAXException, WingException,
             SQLException, IOException, AuthorizeException {
-
         DSpaceObject currentScope = getScope();
 
     	if (node == null) {
@@ -132,7 +127,7 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
 			Division childDiv = contentDiv.addDivision("child-div");
 			org.dspace.app.xmlui.wing.element.List childList = childDiv.addList("child-list");
 			for(MetadataTreeNode child : node.getChildren()) {
-				Bitstream thumbnail = Bitstream.find(context, child.getThumbnailId());
+				Bitstream thumbnail = bitstreamService.find(context, child.getThumbnailId());
 				String thumbnailURL = contextPath + "/bitstream/id/"+thumbnail.getID()+"/?sequence="+thumbnail.getSequenceID();
 				String nodeURL = baseURL + "?node=" + child.getId();
 
@@ -191,13 +186,7 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
            totalResults = queryResults.getTotalSearchResults();
            searchTime = ((float) queryResults.getSearchTime() / 1000) % 60;
 
-           if (searchScope instanceof org.dspace.content.Community) {
-        	   org.dspace.content.Community community = (org.dspace.content.Community) searchScope;
-               String communityName = community.getMetadata("name");
-           } else if (searchScope instanceof org.dspace.content.Collection) {
-        	   org.dspace.content.Collection collection = (org.dspace.content.Collection) searchScope;
-               String collectionName = collection.getMetadata("name");
-           } else {
+           if (!(searchScope instanceof org.dspace.content.Community) && !(searchScope instanceof org.dspace.content.Collection)) {
                results.setHead(T_head1_none.parameterize(displayedResults, totalResults, searchTime));
            }
        }
@@ -315,7 +304,6 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
        
        String handle = null;
        try {
-	        Request request = ObjectModelHelper.getRequest(objectModel);
 		    String nodeString = getQuery();
 		    
 			MetadataTreeNode root = MetadataTreeNode.generateBrowseTree(context, scope);
@@ -332,7 +320,6 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
            log.error(e.getMessage(), e);
        }
 
-       String query = getQuery();
        int page = getParameterPage();
 
        java.util.List<String> filterQueries = new ArrayList<String>();
@@ -356,12 +343,11 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
        queryArgs.setMaxResults(getParameterRpp());
 
        String sortBy = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
-       DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
        sortBy = "dc.title_sort";
 
        queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.asc);
 
-       String fieldLabel = ConfigurationManager.getProperty("xmlui.mdbrowser."+handle+".field");
+       String fieldLabel = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.mdbrowser."+handle+".field");
 
        if (fieldLabel == null || fieldLabel.length() == 0) {
 			fieldLabel = "dc.relation.ispartof";

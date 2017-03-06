@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+  sitemap.xmap
+-->
+
+<!-- 
+
+This aspect displays a hierarchy of metadata from specific field.
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:components>
+				
+		<map:transformers>  
+			<map:transformer name="BrowseOverview" src="edu.tamu.metadatatreebrowser.BrowseOverview"/>
+			<map:transformer name="BrowseNode" src="edu.tamu.metadatatreebrowser.BrowseNode"/>
+		</map:transformers>
+
+		
+		<map:matchers default="wildcard">
+			<map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+		</map:matchers>
+		
+	</map:components>
+	
+	<map:pipelines>
+		<map:pipeline>
+			<map:generate/>
+						
+			<map:match type="HandleTypeMatcher" pattern="community,collection">
+			
+				<!-- Collection or Community view -->
+				<map:match pattern="handle/*/*">
+					<map:transform type="BrowseOverview"/>
+				</map:match>
+				
+				<!-- Results page -->
+				<map:match pattern="handle/*/*/mdbrowse">
+					<map:transform type="BrowseNode" />
+				</map:match>
+				
+			</map:match>
+			
+			<!-- Not a URL we care about, so just pass it on. -->
+			<map:serialize type="xml"/>
+			
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>
