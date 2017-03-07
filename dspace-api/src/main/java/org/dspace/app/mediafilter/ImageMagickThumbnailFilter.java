@@ -23,6 +23,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.im4java.core.ConvertCmd;
+import org.im4java.core.Info;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.process.ProcessStarter;
@@ -43,6 +44,9 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter
 	static final String defaultPattern = "Generated Thumbnail";
 	static Pattern replaceRegex = Pattern.compile(defaultPattern);
     protected final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
+	static String cmyk_profile;
+	static String srgb_profile;
 	
 	static {
 		String pre = ImageMagickThumbnailFilter.class.getName();
@@ -52,6 +56,8 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter
 		height = ConfigurationManager.getIntProperty("thumbnail.maxheight", height);
                 flatten = ConfigurationManager.getBooleanProperty(pre + ".flatten", flatten);
 		String description = ConfigurationManager.getProperty(pre + ".bitstreamDescription");
+		cmyk_profile = ConfigurationManager.getProperty(pre + ".cmyk_profile");
+		srgb_profile = ConfigurationManager.getProperty(pre + ".srgb_profile");
 		if (description != null) {
 			bitstreamDescription = description;
 		}
@@ -136,12 +142,19 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter
     	f2.deleteOnExit();
     	ConvertCmd cmd = new ConvertCmd();
 		IMOperation op = new IMOperation();
+		Info imageInfo = new Info(f.getAbsolutePath(),true);
 		String s = "[" + page + "]";
 		op.addImage(f.getAbsolutePath()+s);
                 if (flatten)
                 {
                     op.flatten();
                 }
+		String imageClass = imageInfo.getImageClass();
+		// PDFs using the CMYK color system can be handled specially if profiles are defined
+		if (imageClass.contains("CMYK") && cmyk_profile != null && srgb_profile != null) {
+			op.profile(cmyk_profile);
+			op.profile(srgb_profile);
+		}
 		op.addImage(f2.getAbsolutePath());
         if (verbose) {
 		    System.out.println("IM Image Param: "+op);
