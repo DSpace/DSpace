@@ -55,6 +55,7 @@
 <%@page import="com.coverity.security.Escape"%>
 <%@page import="org.dspace.discovery.configuration.DiscoverySearchFilterFacet"%>
 <%@page import="org.dspace.app.webui.util.UIUtil"%>
+<%@ page import="org.dspace.eperson.EPerson" %>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="org.dspace.discovery.DiscoverFacetField"%>
@@ -119,11 +120,14 @@
 
     String[] options = new String[]{"equals","contains","authority","notequals","notcontains","notauthority"};
     
+    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
+    
     // Admin user or not
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
     
 	boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.list.enabled", false);
+	boolean exportBiblioAll =  ConfigurationManager.getBooleanProperty("exportcitation.show.all", false);
 	String cfg = ConfigurationManager.getProperty("exportcitation.options");
 
 	DiscoverResult qResults = (DiscoverResult)request.getAttribute("queryresults");
@@ -645,7 +649,7 @@ else if( qResults != null)
     <div class="panel-heading"><h6><fmt:message key="jsp.search.results.itemhits"/></h6></div>
     
     <%  
-	if (exportBiblioEnabled && admin_button) {
+	if (exportBiblioEnabled && ( exportBiblioAll || user!=null ) ) {
 %>
 
 		<form target="blank" class="form-inline"  id="exportform" action="<%= request.getContextPath() %>/references">
