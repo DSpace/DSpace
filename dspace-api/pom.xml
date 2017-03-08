@@ -131,15 +131,15 @@
                         </goals>
                         <configuration>
                             <source>
-                            pom.properties['agnostic.build.dir']=project.build.directory.replace('\\','/');
-                            println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
+                                pom.properties['agnostic.build.dir']=project.build.directory.replace('\\','/');
+                                println("Initializing Maven property 'agnostic.build.dir' to: " + project.properties['agnostic.build.dir']);
                             </source>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
             <!-- FileWeaver plugin is in charge of initializing & "weaving" together
-                 the dspace.cfg file to be used by the Unit Testing framework -->
+            the dspace.cfg file to be used by the Unit Testing framework -->
             <plugin>
                 <groupId>edu.iu.ul.maven.plugins</groupId>
                 <artifactId>fileweaver</artifactId>
@@ -179,20 +179,20 @@
                 The dspace service manager needs this "woven" configuration file when it starts
             -->
             <plugin>
-              <artifactId>maven-antrun-plugin</artifactId>
-              <executions>
-                <execution>
-                  <phase>process-test-resources</phase>
-                  <configuration>
-                    <target>
-                        <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
-                    </target>
-                  </configuration>
-                  <goals>
-                    <goal>run</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -345,12 +345,12 @@
             <artifactId>pdfbox</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.apache.pdfbox</groupId>
-           <artifactId>fontbox</artifactId>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>fontbox</artifactId>
         </dependency>
         <dependency>
-           <groupId>org.apache.pdfbox</groupId>
-           <artifactId>jempbox</artifactId>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>jempbox</artifactId>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -527,11 +527,33 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 		
-		<dependency>
-	    	<groupId>backport-util-concurrent</groupId>
-	    	<artifactId>backport-util-concurrent</artifactId>
-	    	<version>3.1</version>
-		</dependency>
+        <dependency>
+            <groupId>backport-util-concurrent</groupId>
+            <artifactId>backport-util-concurrent</artifactId>
+            <version>3.1</version>
+        </dependency>
+		
+        <!-- CAS: Needed for CAS authentication -->
+        <dependency>
+            <groupId>org.jasig.cas.client</groupId>
+            <artifactId>cas-client-core</artifactId>
+            <version>3.1.11</version>
+        </dependency>
+        <dependency>
+            <groupId>cas</groupId>
+            <artifactId>casclient</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opensaml</groupId>
+            <artifactId>opensaml</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>xml-security</groupId>
+            <artifactId>xmlsec</artifactId>
+            <version>1.3.0</version>
+        </dependency>
     </dependencies>
 
 </project>
