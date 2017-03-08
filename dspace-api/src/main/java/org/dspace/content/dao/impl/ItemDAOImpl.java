@@ -104,7 +104,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         addMetadataLeftJoin(query, Item.class.getSimpleName().toLowerCase(), Collections.singletonList(metadataField));
         query.append(" WHERE item.inArchive = :in_archive");
         query.append(" AND item.submitter =:submitter");
-        addMetadataSortQuery(query, Collections.singletonList(metadataField), null);
+        //submissions should sort in reverse by date by default
+        addMetadataSortQuery(query, Collections.singletonList(metadataField), null, Collections.singletonList("desc"));
 
         Query hibernateQuery = createQuery(context, query.toString());
         hibernateQuery.setParameter(metadataField.toString(), metadataField.getID());
