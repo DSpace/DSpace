@@ -139,9 +139,8 @@ public class EmbargoServiceImpl implements EmbargoService
         }
 
         /*
-         *  DS-3348 In DSpace 5x and prior, this method returned an IllegalArgumentException if the lift date was in the past.
-         *  This exception was being triggered when performing an AIP restored which is not desirable.
-         *  In XMLUI, the date check (if needed) should be performed in the EmbargoSetter
+         * NOTE: We do not check here for past dates as it can result in errors during AIP restoration. 
+         * Therefore, UIs should perform any such date validation on input. See DS-3348
          */
         return result;
     }
