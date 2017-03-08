@@ -479,8 +479,8 @@ public class BrowseListTag extends TagSupport
             if (inputName != null) { // cilea, add the checkbox column
                 out.println("<th>");
                 if (!radioButton) { // add a "checkall" button
-                    out.print("<input name=\""+inputName+"checker\" id=\""+inputName+"checker\" type=\"checkbox\" onclick=\"");
-                    out.print("javascript:changeAll('" + inputName
+                    out.print("<input data-checkboxname=\""+inputName+"\" name=\""+inputName+"checker\" id=\""+inputName+"checker\" type=\"checkbox\" onclick=\"");
+                    out.print("javascript:itemListCheckAll('" + inputName
                             + "', this)\" />");
                 }
                 out.print("</th>");
