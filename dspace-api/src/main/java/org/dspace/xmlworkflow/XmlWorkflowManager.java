@@ -132,7 +132,7 @@ public class XmlWorkflowManager {
         }
         //Make sure we don't add duplicate policies
         if(!userHasPolicies.contains(Constants.READ))
-            addPolicyToItem(context, item, Constants.READ, submitter);
+            addPolicyToItem(context, item, Constants.READ, submitter, ResourcePolicy.TYPE_SUBMISSION);
     }
 
 
@@ -571,18 +571,23 @@ public class XmlWorkflowManager {
     }
 
     private static void addPolicyToItem(Context context, Item item, int type, EPerson epa) throws AuthorizeException, SQLException {
+        addPolicyToItem(context, item, type, epa, null);
+    }
+
+    private static void addPolicyToItem(Context context, Item item, int type, EPerson epa, String policyType) throws AuthorizeException, SQLException {
         if(epa != null){
-            AuthorizeManager.addPolicy(context ,item, type, epa);
+            AuthorizeManager.addPolicy(context ,item, type, epa, policyType);
             Bundle[] bundles = item.getBundles();
             for (Bundle bundle : bundles) {
-                AuthorizeManager.addPolicy(context ,bundle, type, epa);
+                AuthorizeManager.addPolicy(context ,bundle, type, epa, policyType);
                 Bitstream[] bits = bundle.getBitstreams();
                 for (Bitstream bit : bits) {
-                    AuthorizeManager.addPolicy(context, bit, type, epa);
+                    AuthorizeManager.addPolicy(context, bit, type, epa, policyType);
                 }
             }
         }
     }
+
     private static void addGroupPolicyToItem(Context context, Item item, int type, Group group) throws AuthorizeException, SQLException {
         if(group != null){
             AuthorizeManager.addPolicy(context ,item, type, group);
