@@ -389,7 +389,7 @@ public class DOIOrganiser {
         
         if(line.hasOption("delete-doi"))
         {
-            String identifier = line.getOptionValue('d');
+            String identifier = line.getOptionValue("delete-doi");
 
             if (null == identifier) 
             {
