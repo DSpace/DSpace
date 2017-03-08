@@ -76,7 +76,14 @@ public class MetadataChecker {
         for (String field : mandatory){
             Metadatum value[] = item.getMetadataByMetadataString(field);
             if(value.length == 0){
-                if(!"dc.contributor".equals(field)){ // ignore data creator
+                if(field.equals(MetaDataUtil.DEPOSITOR_STR)){
+                    // always ignore depositor
+                }
+                else if(field.equals(MetaDataUtil.PUBLISHER_STR) &&
+                        item.getMetadataByMetadataString(MetaDataUtil.CREATOR_STR).length > 0){
+                    // ignore publisher if data creator defined
+                }
+                else {
                     throw new IllegalStateException(field + " is a mandatory metadata field for DataShare");
                 }
             }

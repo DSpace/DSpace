@@ -21,12 +21,15 @@ public class MetaDataUtil
     private static final String CONTRIBUTOR_OTHER_QUALIFIER = "other";
     
     private static final String CREATOR_ELEMENT = "creator";
+    static final String         CREATOR_STR = MetadataSchema.DC_SCHEMA + "." +
+            CREATOR_ELEMENT; 
     
     private static final String DATASHARE_SCHEMA = "ds";
-    
     private static final String DATE_ELEMENT             = "date";
     private static final String DATE_AVAILABLE_QUALIFIER = "available";
     private static final String DATE_COPYRIGHT_QUALIFIER = "copyright";
+    static final String         DEPOSITOR_STR = MetadataSchema.DC_SCHEMA + "." +
+            CONTRIBUTOR_ELEMENT;
     
     private static final String FORMAT_ELEMENT = "format";
     
@@ -34,6 +37,7 @@ public class MetaDataUtil
     private static final String IDENTIFIER_URI_ELEMENT = "uri";
     
     private static final String PUBLISHER_ELEMENT = "publisher";
+    static final String         PUBLISHER_STR = MetadataSchema.DC_SCHEMA + "." + PUBLISHER_ELEMENT;
     
     private static final String RELATION_IS_FORMAT_ELEMENT   = "relation";
     private static final String RELATION_IS_FORMAT_QUALIFIER = "isformatof";
