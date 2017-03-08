@@ -7,6 +7,12 @@
  */
 package org.dspace.app.xmlui.utils;
 
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.AuthorityValueFinder;
+import org.dspace.core.Context;
+
+import java.sql.SQLException;
+
 /**
  * Utilities that are needed in XSL transformations.
  *
@@ -53,4 +59,21 @@ public class XSLUtils {
         return string.substring(0, targetLength) + " ...";
 
     }
+
+	public static String getDiscoveryFilterDisplay(String display) throws SQLException {
+		Context ctx = new Context();
+
+		if (display != null) {
+			if (display.length() == 36 && display.contains("-")) {
+				AuthorityValue authorityValue = new AuthorityValueFinder().findByUID(ctx, display);
+				if (authorityValue != null) {
+					display = authorityValue.getValue();
+				}
+			}
+		}
+
+		ctx.complete();
+
+		return display;
+	}
 }
