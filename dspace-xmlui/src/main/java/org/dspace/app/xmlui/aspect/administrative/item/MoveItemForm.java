@@ -78,19 +78,15 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         if (owningCollection == null) {
             select.addOption("",T_collection_default);
         }
-        
-        for (Collection collection : collections)
-        {
-            String name = collection.getMetadata("name");
-            if (name.length() > 50)
-            {
-                name = name.substring(0, 47) + "...";
-            }
 
+        CollectionDropDown.CollectionPathEntry[] dropdownEntries = CollectionDropDown.annotateWithPaths(collections);
+        
+        for (CollectionDropDown.CollectionPathEntry entry : dropdownEntries)
+        {
             // Only add the item if it isn't already the owner
-            if (!item.isOwningCollection(collection))
+            if (!item.isOwningCollection(entry.collection))
             {
-                select.addOption(collection.equals(owningCollection), collection.getID(), CollectionDropDown.collectionPath(collection));
+                select.addOption(entry.collection.equals(owningCollection), entry.collection.getID(), entry.path);
             }
         }
         
