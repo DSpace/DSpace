@@ -37,6 +37,16 @@
 
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
+    <!-- TAMU Customization for Metadata Tree Browser  -->
+    <xsl:template match="dri:div[@id='aspect.discovery.CollectionRecentSubmissions.div.collection-recent-submission' and //dri:div[@id='edu.tamu.metadatatreebrowser.BrowseOverview.div.metadata-tree-browser-overview']]" priority="100">
+        <!-- don't display the recent submission when the metadata tree browser is being used for collections. -->
+    </xsl:template>
+     
+    <!-- TAMU Customization for Metadata Tree Browser  -->
+    <xsl:template match="dri:div[@id='aspect.discovery.CommunityRecentSubmissions.div.collection-recent-submission' and //dri:div[@id='edu.tamu.metadatatreebrowser.BrowseOverview.div.metadata-tree-browser-overview']]" priority="100">
+        <!-- don't display the recent submission when the metadata tree browser is being used for communities. -->
+    </xsl:template>
+
     <!--
         Requested Page URI. Some functions may alter behavior of processing depending if URI matches a pattern.
         Specifically, adding a static page will need to override the DRI, to directly add content.
