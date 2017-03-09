@@ -616,7 +616,7 @@
     	<servlet-name>doiqueued</servlet-name>
     	<servlet-class>org.dspace.app.webui.servlet.DoiQueuedServlet</servlet-class>
   	</servlet>
-  	
+
 	<!-- Servlet Mappings -->
 
   	<servlet-mapping>
@@ -1123,6 +1123,19 @@
 		<url-pattern>/pmcCitedBy</url-pattern>
 	</servlet-mapping>
 
+	<!-- JASPER reports export -->
+	<servlet>
+		<servlet-name>jasper</servlet-name>
+		<servlet-class>
+			it.cilea.surplus.oa.servlet.admin.JasperReportServlet
+		</servlet-class>
+	</servlet>
+    <servlet-mapping>
+		<servlet-name>jasper</servlet-name>
+		<url-pattern>/dspace-admin/export</url-pattern>
+	</servlet-mapping>	
+	<!--  -->
+	
 	<!-- CRIS Web-Services -->
 	<servlet>
 		<servlet-name>wsuploadcommonxs</servlet-name>
