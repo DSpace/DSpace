@@ -35,12 +35,6 @@ public class BrowseOverview extends AbstractDSpaceTransformer implements
 	/** Cached validity object */
 	private SourceValidity validity;
 	
-	private MetadataTreeNode root;
-	/** The age of the metadat tree */
-	private Long rootAge;
-	/** Life of the root cache in minutes **/
-	private	Long rootLife = 480L;
-	
 	/**
 	 * Generate the unique caching key.
 	 */
@@ -79,12 +73,7 @@ public class BrowseOverview extends AbstractDSpaceTransformer implements
 
 		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 		
-		Long now = System.currentTimeMillis() / 1000L;
-		
-		if (root == null || (now > (rootAge+(rootLife*60)))) {
-			rootAge = now;
-			root = MetadataTreeNode.generateBrowseTree(context, dso);
-		}
+	    MetadataTreeNode root = MetadataTreeService.getInstance().getFullTree(context, dso); 
 
 		String baseURL = contextPath + "/handle/" + dso.getHandle()+ "/mdbrowse";
 

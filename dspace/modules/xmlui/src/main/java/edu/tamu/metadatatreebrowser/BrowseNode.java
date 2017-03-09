@@ -306,14 +306,13 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
        try {
 		    String nodeString = getQuery();
 		    
-			MetadataTreeNode root = MetadataTreeNode.generateBrowseTree(context, scope);
-		
-			node = root.findById(Integer.valueOf(nodeString));
-			
 			DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 			handle = dso.getHandle();
-       } catch (AuthorizeException e) {
-    	   log.error(e.getMessage(), e);
+			
+		    MetadataTreeNode root = MetadataTreeService.getInstance().getFullTree(context, dso); 
+			
+			node = root.findById(Integer.valueOf(nodeString));
+
        } catch (UIException e) {
            log.error(e.getMessage(), e);
        } catch (SQLException e) {
