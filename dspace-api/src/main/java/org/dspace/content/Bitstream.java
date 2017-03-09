@@ -261,6 +261,16 @@ public class Bitstream extends DSpaceObject
         return bRow.getIntColumn("bitstream_id");
     }
 
+    /**
+     * Get the internal identifier of this bitstream
+     * 
+     * @return the internal identifier
+     */
+    public String getInternalID()
+    {
+        return bRow.getStringColumn("internal_id");
+    }
+
     public String getHandle()
     {
         // No Handles for bitstreams

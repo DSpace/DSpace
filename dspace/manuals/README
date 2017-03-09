@@ -1,0 +1,8 @@
+1. Create the following folders
+/dspace/backup
+/dspace/scripts
+/dspace/locks
+
+2. copy dspace-src/dspace/scripts/* to /dspace/scripts
+3. Create a file ${dspace.dir}/locks/backuprestore.lock
+
