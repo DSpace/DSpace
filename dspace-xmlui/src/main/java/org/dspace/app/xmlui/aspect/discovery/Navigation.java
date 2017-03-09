@@ -20,12 +20,22 @@ import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Context;
+import org.dspace.content.Item;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.xml.sax.SAXException;
+
+import org.apache.log4j.Logger;
+
 
 /**
  * Navigation that adds code needed for discovery search
@@ -36,6 +46,10 @@ import org.xml.sax.SAXException;
  */
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+	private static final Logger log = Logger.getLogger(Navigation.class);
+	private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
+	private static final Message T_export_metadata = message("xmlui.administrative.Navigation.context_export_metadata");
+	
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -85,17 +99,15 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     public void addOptions(Options options) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-//        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+    	Context context = ContextUtil.obtainContext(objectModel);
+    	Request request = ObjectModelHelper.getRequest(objectModel);
+    	
+        //List test = options.addList("browse");
+        //List discovery = options.addList("discovery-search");
+        //discovery.setHead("Discovery");
+        //discovery.addItem().addXref(contextPath + "/discover" , "Discover");
 
-//        List test = options.addList("browse");
-
-//        List discovery = options.addList("discovery-search");
-
-//        discovery.setHead("Discovery");
-//
-//        discovery.addItem().addXref(contextPath + "/discover" , "Discover");
-
-         /*
+        /*
         List browse = options.addList("browse");
 
         browse.setHead(T_head_browse);
@@ -104,7 +116,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         List browseContext = browse.addList("context");
 
         browseGlobal.setHead(T_head_all_of_dspace);
-
 
         if (dso != null)
         {
@@ -118,15 +129,21 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
         }
         browseGlobal.addItem().addXref(contextPath + "/community-list", T_head_all_of_dspace );
-    */
+        */
 
         /* regulate the ordering */
         options.addList("discovery");
         options.addList("browse");
         options.addList("account");
-        options.addList("context");
         options.addList("administrative");
-
+                
+        String uri = request.getSitemapURI(); 
+        
+        if(uri.contains("discover")) {
+        	List results = options.addList("context");    		
+        	results.setHead(T_context_head);
+        	results.addItem().addXref(contextPath + "/discover/csv", T_export_metadata);
+        }
     }
 
     /**
@@ -147,3 +164,4 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     }
 
 }
+
