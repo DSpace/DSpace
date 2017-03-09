@@ -160,6 +160,8 @@
       The server is based on the value of -Denv= while building drum.
       Ex. Build by 'mvn clean install -Denv=prod -Dlicense.skip=true' and the 
       dspace-installer-${version}.tar.gz is the distribution for production.
+     
+      https://issues.umd.edu/browse/LIBITD-767
     -->
 	<profile>
 	  <id>installer-dist</id>
