@@ -24,6 +24,9 @@ import org.xml.sax.SAXException;
  * Display entire metadata browse tree in one nested list, typically for the community or collection homepage.s
  * 
  * @author Scott Phillips, http://www.scottphillips.com
+ * @author Jason Savell <jsavell@library.tamu.edu>
+ * 
+ * TODO Leverage Cocoon's caching mechanism
  */
 
 public class BrowseOverview extends AbstractDSpaceTransformer implements
@@ -31,7 +34,13 @@ public class BrowseOverview extends AbstractDSpaceTransformer implements
 
 	/** Cached validity object */
 	private SourceValidity validity;
-
+	
+	private MetadataTreeNode root;
+	/** The age of the metadat tree */
+	private Long rootAge;
+	/** Life of the root cache in minutes **/
+	private	Long rootLife = 480L;
+	
 	/**
 	 * Generate the unique caching key.
 	 */
@@ -69,18 +78,26 @@ public class BrowseOverview extends AbstractDSpaceTransformer implements
 			UIException, SQLException, IOException, AuthorizeException {
 
 		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-		MetadataTreeNode root = MetadataTreeNode.generateBrowseTree(context, dso);
+		
+		Long now = System.currentTimeMillis() / 1000L;
+		
+		if (root == null || (now > (rootAge+(rootLife*60)))) {
+			rootAge = now;
+			root = MetadataTreeNode.generateBrowseTree(context, dso);
+		}
 
-		if (root == null || !root.hasChildren())
-			return;
 		String baseURL = contextPath + "/handle/" + dso.getHandle()+ "/mdbrowse";
 
 		Division div = body.addDivision("metadata-tree-browser-overview");
 		div.setHead("Browse Sets");
 		List rootList = div.addList("overview-list",List.TYPE_SIMPLE,"root-list");
+		
 		displayBrowseTree(root, rootList, baseURL);
 
+
 	}
+	
+
 
 	/**
 	 * Recursively translate the metadataTree into a DRI list for display.
@@ -99,12 +116,10 @@ public class BrowseOverview extends AbstractDSpaceTransformer implements
 
 			Item item = list.addItem();
 			item.addXref(baseURL + "?node=" + childNode.getId(),childNode.getName());
-
 			if (childNode.hasChildren()) {
 				List childList = list.addList("sub-list-" + childNode.getId(),List.TYPE_SIMPLE,"sub-list");
 				displayBrowseTree(childNode, childList, baseURL);
 			}
 		}
 	}
-
 }

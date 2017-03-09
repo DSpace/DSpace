@@ -2,6 +2,8 @@ package edu.tamu.metadatatreebrowser;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -46,7 +48,6 @@ public class MetadataTreeNode {
 	private UUID thumbnail_id;
 	private MetadataTreeNode parent;
 	private List<MetadataTreeNode> children;
-	
 	
 	/** Create a root node **/
 	private MetadataTreeNode() {
@@ -209,7 +210,10 @@ public class MetadataTreeNode {
 					while (itemsIterator.hasNext()) {
 						Item item = itemsIterator.next();
 						String nameHierarchy = item.getItemService().getMetadata(item, fieldLabel);
-						String[] nameParts = nameHierarchy.split(separator);
+						List<String> nameParts = Arrays.asList(nameHierarchy.split(separator));
+						if (reverse) {
+							Collections.reverse(nameParts);
+						}
 						// Iterate over the parts to establish all the parent nodes down to this leaf node.
 						MetadataTreeNode parent = root;
 						for (String namePart : nameParts) {
