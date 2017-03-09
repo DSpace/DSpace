@@ -73,7 +73,10 @@ public class BrowseOverview extends AbstractDSpaceTransformer implements
 
 		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 		
-	    MetadataTreeNode root = MetadataTreeService.getInstance().getFullTree(context, dso); 
+	    MetadataTreeNode root = MetadataTreeService.getInstance().getFullTree(context, dso);
+	    
+	    if (root == null || !root.hasChildren())
+	    	return;
 
 		String baseURL = contextPath + "/handle/" + dso.getHandle()+ "/mdbrowse";
 
