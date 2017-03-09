@@ -154,6 +154,39 @@
            </build>
         </profile>
 
+	<!-- An added <profile>
+      Run 'mvn -P installer-dist' to create a tarball of target/dspace-installer-${version}.tar.gz.
+      Transfer the tarcall to server and un-tar it at /apps/drum.
+      The server is based on the value of -Denv= while building drum.
+      Ex. Build by 'mvn clean install -Denv=prod -Dlicense.skip=true' and the 
+      dspace-installer-${version}.tar.gz is the distribution for production.
+    -->
+	<profile>
+	  <id>installer-dist</id>
+      	  <build>
+            <defaultGoal>validate</defaultGoal>
+            <plugins>
+              <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                  <descriptors>
+                    <descriptor>src/main/assembly/dspace-installer-distribution.xml</descriptor>
+                  </descriptors>
+                </configuration>
+                <executions>
+                  <execution>
+                    <id>distro-assembly</id>
+                    <phase>validate</phase>
+                    <goals>
+                      <goal>single</goal>
+                    </goals>
+                  </execution>
+                </executions>
+              </plugin>
+            </plugins>
+          </build>
+	</profile>
+
     </profiles>
 
     <dependencies>
