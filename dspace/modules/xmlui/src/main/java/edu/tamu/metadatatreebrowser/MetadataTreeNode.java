@@ -224,6 +224,8 @@ public class MetadataTreeNode {
 							}
 							parent = child;
 						}
+						// Set the leaf node to the exact path
+						parent.setFieldValue(nameHierarchy);
 					}
 				}
 			}

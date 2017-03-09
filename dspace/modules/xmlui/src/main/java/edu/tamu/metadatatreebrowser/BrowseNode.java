@@ -358,6 +358,7 @@ public class BrowseNode extends AbstractSearch implements CacheableProcessingCom
        } else {
            queryArgs.setStart(0);
        }
-       this.queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
+       
+       this.queryResults = SearchUtils.getSearchService().search(context, scope, prepareQuery(scope, getQuery(), getFilterQueries()));
    }
 }
