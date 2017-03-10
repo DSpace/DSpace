@@ -10,7 +10,7 @@
 #communitylist-top-menu a, #userloggedin-top-menu a {padding-top:0.3em;padding-bottom:0.3em;}
 #user-top-menu, #userloggedin-top-menu {margin-right: 15px;}
 footer {padding-top: 1em;}
-footer.navbar-inverse *:not(.panel > *) {color: white;}
+footer.navbar-inverse {color: white;}
 footer .extra-footer{background-color: black; color:white;}
 #designedby img {margin-right: 5px;}
 #formsearch-top-menu {width: 310px;}
