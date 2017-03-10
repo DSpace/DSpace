@@ -22,6 +22,7 @@ import org.dspace.content.authority.Scheme;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.DryadWorkflowUtils;
 
@@ -454,30 +455,31 @@ public class JournalUtils {
      * Return a list of archived packages for a journal, starting with a particular item as a keyset
      * @param context
      * @param journalConcept
-     * @param limit
      * @param keyset
      * @return
      * @throws SQLException
      */
-    public static List<Item> getArchivedPackagesFromKeyset(Context context, DryadJournalConcept journalConcept, int limit, int keyset) throws SQLException {
-        ArrayList<Item> dataPackages = new ArrayList<Item>();
+    public static HashMap<Integer, Date> getArchivedPackagesFromKeyset(Context context, DryadJournalConcept journalConcept, int keyset) throws SQLException {
+        HashMap<Integer, Date> items = new HashMap<Integer, Date>();
+        SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
             log.error("starting search");
             int pubNameFieldID = MetadataField.findByElement(context,"prism.publicationName").getFieldID();
             int dateAccFieldID = MetadataField.findByElement(context,"dc.date.accessioned").getFieldID();
-            String querystring = "select * from ArchivedPackagesForJournal(?, ?, ?) where item_id > ? limit ?";
-            TableRowIterator tri = DatabaseManager.query(context, querystring, journalConcept.getFullName(), pubNameFieldID, dateAccFieldID, keyset, limit);
+            String querystring = "select * from ArchivedPackagesForJournal(?, ?, ?) where item_id > ?";
+            TableRowIterator tri = DatabaseManager.query(context, querystring, journalConcept.getFullName(), pubNameFieldID, dateAccFieldID, keyset);
             while (tri.hasNext()) {
-                int itemId = tri.next().getIntColumn("item_id");
+                TableRow tableRow = tri.next();
+                int itemId = tableRow.getIntColumn("item_id");
                 log.error("item " + itemId);
-                Item dso = Item.find(context, itemId);
-                dataPackages.add(dso);
+                Date date = dateIso.parse(tableRow.getStringColumn("mdv_date"));
+                items.put(itemId, date);
             }
             log.error("ending search");
         } catch (Exception e)  {
             throw new SQLException(e.getMessage());
         }
-        return dataPackages;
+        return items;
     }
 
 

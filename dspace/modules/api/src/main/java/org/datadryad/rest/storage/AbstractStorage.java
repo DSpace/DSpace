@@ -2,8 +2,11 @@
  */
 package org.datadryad.rest.storage;
 
+import org.datadryad.rest.models.Package;
+
 import java.lang.Integer;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,6 +63,10 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
         List<T> objects = new ArrayList<T>();
         addResults(path, objects, searchParam, limit, cursor);
         return objects;
+    }
+
+    public void addResultsInDateRange(StoragePath path, List<T> objects, Date dateFrom, Date dateTo, Integer limit, Integer cursor) throws StorageException {
+
     }
 
     @Override

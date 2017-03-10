@@ -16,7 +16,7 @@ import org.dspace.core.Context;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Dan Leehr <dan.leehr@nescent.org>
@@ -80,14 +80,34 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
 
     @Override
     protected void addResults(StoragePath path, List<Package> packageList, String searchParam, Integer limit, Integer cursor) throws StorageException {
+        addResultsInDateRange(path, packageList, null, null, limit, cursor);
+    }
+
+    @Override
+    public void addResultsInDateRange(StoragePath path, List<Package> packageList, Date dateFrom, Date dateTo, Integer limit, Integer cursor) throws StorageException {
         Context context = null;
+
+        if (dateTo == null) {
+            dateTo = new Date();
+        }
+        if (dateFrom == null) {
+            dateFrom = new Date(0);
+        }
         try {
             context = getContext();
             DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
-            List<Item> packages = JournalUtils.getArchivedPackagesFromKeyset(context, journal, limit, cursor);
-            for (Item item : packages) {
-                Package dataPackage = new Package(new DryadDataPackage(item));
-                packageList.add(dataPackage);
+            HashMap<Integer, Date> packages = JournalUtils.getArchivedPackagesFromKeyset(context, journal, cursor);
+            ArrayList<Integer> itemIDs = new ArrayList<Integer>();
+            itemIDs.addAll(packages.keySet());
+            Collections.sort(itemIDs);
+            for (Integer itemID : itemIDs) {
+                if (packages.get(itemID).before(dateTo) && packages.get(itemID).after(dateFrom)) {
+                    Package dataPackage = new Package(new DryadDataPackage(Item.find(context, itemID)));
+                    packageList.add(dataPackage);
+                }
+                if (limit != null && packageList.size() == limit) {
+                    break;
+                }
             }
         } catch (SQLException ex) {
             log.error("error: " + ex.getMessage());
