@@ -16,7 +16,6 @@ import org.dspace.core.Context;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -76,16 +75,16 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
 
     protected void addAll(StoragePath path, List<Package> packageConcepts) throws StorageException {
         // passing in a limit of null to addResults should return all records
-        addResults(path, packageConcepts, null, null);
+        addResults(path, packageConcepts, null, null, 0);
     }
 
     @Override
-    protected void addResults(StoragePath path, List<Package> packageList, String searchParam, Integer limit) throws StorageException {
+    protected void addResults(StoragePath path, List<Package> packageList, String searchParam, Integer limit, Integer cursor) throws StorageException {
         Context context = null;
         try {
             context = getContext();
             DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
-            List<Item> packages = JournalUtils.getArchivedPackagesFromKeyset(context, journal.getFullName(), limit, 0);
+            List<Item> packages = JournalUtils.getArchivedPackagesFromKeyset(context, journal.getFullName(), limit, cursor);
             for (Item item : packages) {
                 Package dataPackage = new Package(new DryadDataPackage(item));
                 packageList.add(dataPackage);

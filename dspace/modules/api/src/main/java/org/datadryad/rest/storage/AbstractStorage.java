@@ -15,7 +15,7 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
     protected abstract void updateObject(StoragePath path, T object) throws StorageException;
     protected abstract T readObject(StoragePath path) throws StorageException;
     protected abstract void deleteObject(StoragePath path) throws StorageException;
-    protected abstract void addResults(StoragePath path, List<T> objects, String searchParam, Integer limit) throws StorageException;
+    protected abstract void addResults(StoragePath path, List<T> objects, String searchParam, Integer limit, Integer cursor) throws StorageException;
 
     final void checkPath(StoragePath path, List<String> expectedKeyPath) throws StorageException {
         if(path == null) {
@@ -51,14 +51,14 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
     @Override
     public List<T> getAll(StoragePath path) throws StorageException {
         List<T> objects = new ArrayList<T>();
-        addResults(path, objects, null, null);
+        addResults(path, objects, null, null, 0);
         return objects;
     }
 
     @Override
-    public List<T> getResults(StoragePath path, String searchParam, Integer limit) throws StorageException {
+    public List<T> getResults(StoragePath path, String searchParam, Integer limit, Integer cursor) throws StorageException {
         List<T> objects = new ArrayList<T>();
-        addResults(path, objects, searchParam, limit);
+        addResults(path, objects, searchParam, limit, cursor);
         return objects;
     }
 

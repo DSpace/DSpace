@@ -38,7 +38,7 @@ public class ManuscriptResource {
         try {
             // Returning a list requires POJO turned on
             StoragePath path = StoragePath.createJournalPath(journalRef);
-            return Response.ok(manuscriptStorage.getResults(path, searchParam, resultParam)).build();
+            return Response.ok(manuscriptStorage.getResults(path, searchParam, resultParam, 0)).build();
         } catch (StorageException ex) {
             log.error("Exception getting manuscripts", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list manuscripts", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());

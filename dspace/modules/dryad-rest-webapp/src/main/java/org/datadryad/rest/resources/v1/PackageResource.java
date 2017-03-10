@@ -73,11 +73,12 @@ public class PackageResource {
     @Path("/{journalRef}/packages")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getPackages(@PathParam(StoragePath.JOURNAL_PATH) String journalRef, @QueryParam("search") String searchParam, @QueryParam("count") Integer resultParam) {
+    public Response getPackages(@PathParam(StoragePath.JOURNAL_PATH) String journalRef, @DefaultValue("") @QueryParam("search") String searchParam,
+                                @DefaultValue("20") @QueryParam("count") Integer countParam, @DefaultValue("0") @QueryParam("cursor") Integer cursorParam) {
         try {
             // Returning a list requires POJO turned on
             StoragePath path = StoragePath.createPackagesPath(journalRef);
-            return Response.ok(packageStorage.getResults(path,"",100)).build();
+            return Response.ok(packageStorage.getResults(path, searchParam, countParam, cursorParam)).build();
         } catch (StorageException ex) {
             log.error("Exception getting packages", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list packages", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());

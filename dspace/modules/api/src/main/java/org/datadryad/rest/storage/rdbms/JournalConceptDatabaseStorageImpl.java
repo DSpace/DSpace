@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -123,11 +122,11 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
 
     protected void addAll(StoragePath path, List<DryadJournalConcept> journalConcepts) throws StorageException {
         // passing in a limit of null to addResults should return all records
-        addResults(path, journalConcepts, null, null);
+        addResults(path, journalConcepts, null, null, 0);
     }
 
     @Override
-    protected void addResults(StoragePath path, List<DryadJournalConcept> journalConcepts, String searchParam, Integer limit) throws StorageException {
+    protected void addResults(StoragePath path, List<DryadJournalConcept> journalConcepts, String searchParam, Integer limit, Integer cursor) throws StorageException {
         Context context = null;
         try {
             ArrayList<DryadJournalConcept> allJournalConcepts = new ArrayList<DryadJournalConcept>();
