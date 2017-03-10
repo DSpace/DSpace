@@ -12,6 +12,8 @@ import java.util.List;
 import org.dspace.app.rest.RestResourceController;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 /**
  * Base REST representation for all the DSpaceObjects
@@ -27,7 +29,10 @@ public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
 	private String handle;
 	private String type;
 
-	List<MetadataEntryRest> metadata;
+//	List<MetadataEntryRest> metadata;
+	
+	@JsonProperty(access = Access.WRITE_ONLY)
+	MetadataEmbeddedRest metadata;
 
 	@Override
 	@JsonIgnore
@@ -59,14 +64,22 @@ public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
 		this.handle = handle;
 	}
 
-	public List<MetadataEntryRest> getMetadata() {
+//	public List<MetadataEntryRest> getMetadata() {
+//		return metadata;
+//	}
+//
+//	public void setMetadata(List<MetadataEntryRest> metadata) {
+//		this.metadata = metadata;
+//	}
+
+	public MetadataEmbeddedRest getMetadata() {
 		return metadata;
 	}
-
-	public void setMetadata(List<MetadataEntryRest> metadata) {
-		this.metadata = metadata;
+	
+	public void setMetadata(MetadataEmbeddedRest meta) {
+		this.metadata = meta;
 	}
-
+	
 	@Override
 	@JsonIgnore
 	public Class getController() {

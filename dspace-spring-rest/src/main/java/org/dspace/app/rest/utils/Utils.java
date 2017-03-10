@@ -11,7 +11,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.util.List;
 
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.CommunityRest;
@@ -37,7 +36,7 @@ import org.springframework.stereotype.Component;
 public class Utils {
 	@Autowired
 	ApplicationContext applicationContext;
-
+	
 	public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
 		int total = fullContents.size();
 		List<T> pageContent = null;
@@ -81,5 +80,9 @@ public class Utils {
 			return CommunityRest.NAME;
 		}
 		return modelPlural.replaceAll("s$", "");
+	}
+
+	public Link linkToSubResource(String baseUrl, String name) {
+		return new Link(baseUrl + "/" + name).withRel(name);
 	}
 }
