@@ -111,7 +111,7 @@ public class CrisDropdownDisplayStrategy implements
         {
             try 
             {
-                PropertiesDefinition pd = applicationService.findPropertiesDefinitionByShortName(crisObject.getClassPropertiesDefinition(), field);
+                PropertiesDefinition pd = applicationService.findPropertiesDefinitionByShortName(crisObject.getClassPropertiesDefinition(), field.split("\\.")[1]);
                 for(Metadatum mm : metadataArray) {
                     metadata += JDynATagLibraryFunctions.getCheckRadioDisplayValue((((WidgetCheckRadio)pd.getRendering()).getStaticValues()), mm.value);
                 }
@@ -119,6 +119,10 @@ public class CrisDropdownDisplayStrategy implements
             catch (Exception ex)
             {
                 log.error(ex.getMessage(), ex);
+                //failover insert the stored value
+                for(Metadatum mm : metadataArray) {
+                    metadata += mm.value;
+                }                
             }
         }
         return metadata;
