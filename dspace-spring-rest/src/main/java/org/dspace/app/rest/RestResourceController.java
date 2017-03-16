@@ -11,8 +11,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.BitstreamRest;
@@ -20,6 +22,7 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.utils.Utils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -48,9 +51,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/core/{model}")
 @SuppressWarnings("rawtypes")
-public class RestResourceController {
+public class RestResourceController implements InitializingBean {
+	@Autowired
+	DiscoverableEndpointsService discoverableEndpointsService;
+	
 	@Autowired
 	Utils utils;
+
+	@Override
+	public void afterPropertiesSet()  {
+		List<Link> links = new ArrayList<Link>();
+		for (String r : utils.getRepositories()) {
+			// this doesn't work as we don't have an active http request
+			// see https://github.com/spring-projects/spring-hateoas/issues/408
+			// Link l = linkTo(this.getClass(), r).withRel(r);
+			String plural = English.plural(r);
+			Link l = new Link("/api/core/" + plural, plural);
+			links.add(l);
+			System.out.println(l.getRel() + " " + l.getHref());
+		}
+		discoverableEndpointsService.register(this, links);
+	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}")
 	@SuppressWarnings("unchecked")
