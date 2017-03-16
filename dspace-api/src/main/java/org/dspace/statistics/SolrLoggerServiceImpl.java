@@ -287,6 +287,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                     }
                 }
             }
+            if (!isUseProxies() && request.getHeader("X-Forwarded-For") != null){
+                log.warn("X-Forwarded-For header detected but useProxies is not enabled. If your dspace is behind a proxy set it to true");
+            }
 
             doc1.addField("ip", ip);
 
@@ -366,7 +369,9 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
         SolrInputDocument doc1 = new SolrInputDocument();
         // Save our basic info that we already have
 
-
+			if (!isUseProxies() && xforwardedfor != null){
+				log.warn("X-Forwarded-For header detected but useProxies is not enabled. If your dspace is behind a proxy set it to true");
+			}
             if (isUseProxies() && xforwardedfor != null) {
                 /* This header is a comma delimited list */
                 for (String xfip : xforwardedfor.split(",")) {
