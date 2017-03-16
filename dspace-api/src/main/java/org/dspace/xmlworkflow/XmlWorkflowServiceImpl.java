@@ -661,7 +661,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         grantUserAllItemPolicies(context, wi.getItem(), e);
     }
 
-    protected void grantUserAllItemPolicies(Context context, Item item, EPerson epa) throws AuthorizeException, SQLException {
+    public void grantUserAllItemPolicies(Context context, Item item, EPerson epa) throws AuthorizeException, SQLException {
         if (epa != null){
             //A list of policies the user has for this item
             List<Integer>  userHasPolicies = new ArrayList<Integer>();
@@ -739,7 +739,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
         }
     }
 
-    protected void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException {
+    public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException {
         if (e != null){
             //Also remove any lingering authorizations from this user
             authorizeService.removeEPersonPolicies(context, item, e);

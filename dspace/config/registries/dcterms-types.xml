@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 
 <!--
-  - dcterms-types.xml
-  -
-  - Version:  $Revision$
-  -
-  - Date:     $Date$
-  -
   - DCTerms registry contributed to eventually replace dublin-core-types.xml
   - 
   - <dc-type>
@@ -16,8 +10,6 @@
   -   <scope_note></scope_note>
   - </dc-type>
   -->
-
-<!-- start of XML -->
 
 <dspace-dc-types>
 

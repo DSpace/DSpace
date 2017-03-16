@@ -679,6 +679,7 @@
                 <module>dspace-spring-rest</module>
             </modules>
         </profile>
+
         <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
@@ -1328,6 +1329,11 @@
                 <artifactId>annotations</artifactId>
                 <version>3.0.1u2</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>1.10.19</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
