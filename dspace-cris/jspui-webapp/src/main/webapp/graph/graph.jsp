@@ -86,7 +86,7 @@
     <%--script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.layout-1.3rc.js"></script--%>
     <script src="<%=request.getContextPath()%>/js/jquery.layout-latest.min.js"></script>
     <script type="text/javascript" src="<%=request.getContextPath()%>/js/collaborationNetwork.js"></script>
-    <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.dataTables.min.js"></script>
         
     <!--[if IE]>
     	<script type="text/javascript" src="<%=request.getContextPath()%>/js/excanvas.js"></script>
