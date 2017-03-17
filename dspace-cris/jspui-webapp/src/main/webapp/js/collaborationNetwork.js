@@ -95,18 +95,18 @@ function init(graph, rp, network, typo) {
 
 											if (othernetwork != undefined
 													&& othernetwork != null) {
-												for (index in othernetwork) {
+												for (subIndex in othernetwork) {
 													
-													if(othernetwork[index].id == adj.nodeTo.id && othernetwork[index].fromid == authority) {
+													if(othernetwork[subIndex].id == adj.nodeTo.id && othernetwork[subIndex].fromid == authority) {
 											
 														
-														if(j.inArray(othernetwork[index].type, bezierRatioSettings)==-1) {
+														if(j.inArray(othernetwork[subIndex].type, bezierRatioSettings)==-1) {
 
-															bezierRatioSettings.push(othernetwork[index].type);
+															bezierRatioSettings.push(othernetwork[subIndex].type);
 																													
 														}
 														
-														var color = othernetwork[index].color;
+														var color = othernetwork[subIndex].color;
 														
 														
 														if (color != null) {
@@ -134,7 +134,7 @@ function init(graph, rp, network, typo) {
 															var y = to.y;
 //															var ratio = Math
 //																	.random();
-															var ratio = 0.1 * (j.inArray(othernetwork[index].type, bezierRatioSettings)+1);
+															var ratio = 0.1 * (j.inArray(othernetwork[subIndex].type, bezierRatioSettings)+1);
 															// if the Bezier is
 															// approximating an
 															// elliptic arc
