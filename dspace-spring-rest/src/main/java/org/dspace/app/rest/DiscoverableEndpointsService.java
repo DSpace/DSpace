@@ -49,6 +49,7 @@ public class DiscoverableEndpointsService {
 
 	public void unregister(Object controller) {
 		synchronized (this) {
+			initialized = false;
 			registeredEndpoints.remove(controller);
 		}
 	}
@@ -73,6 +74,7 @@ public class DiscoverableEndpointsService {
 					}
 				}
 			}
+			initialized = true;
 
 			return discoverableEndpoints;
 		}
