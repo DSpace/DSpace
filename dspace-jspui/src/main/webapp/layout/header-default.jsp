@@ -212,6 +212,15 @@
 <%    	
     }
 %>
+	<div class="hidden-xs locbar row">
+   		 	<div class="col-md-3">|&nbsp;<a href=""><fmt:message key="jsp.layout.header-default.locbar.home"/></a></div>
+   		 	<div class="col-md-1">|&nbsp;<a href="http://www.ingv.it/biblioteche"><fmt:message key="jsp.layout.header-default.locbar.roma"/></a></div>
+   		 	<div class="col-md-1">|&nbsp;<a href="http://www.bo.ingv.it/italiano/biblioteca.html"><fmt:message key="jsp.layout.header-default.locbar.bologna"/></a></div>
+   		 	<div class="col-md-1">|&nbsp;<a href="http://www.ct.ingv.it/index.php?option=com_content&view=article&id=18&Itemid=304"><fmt:message key="jsp.layout.header-default.locbar.catania"/></a></div>
+   		 	<div class="col-md-1">|&nbsp;<a href="http://www.mi.ingv.it/"><fmt:message key="jsp.layout.header-default.locbar.milano"/></a></div>
+   		 	<div class="col-md-1">|&nbsp;<a href="http://www.ov.ingv.it/biblioteca.html"><fmt:message key="jsp.layout.header-default.locbar.napoli"/></a></div>
+   		 	<div class="col-md-1">|&nbsp;<a href="http://www.pa.ingv.it/"><fmt:message key="jsp.layout.header-default.locbar.palermo"/></a></div>
+	</div>
 </header>
 
 <main id="content" role="main">
@@ -242,11 +251,11 @@
 		
 		
 		</div>
-		  <div class="col-sm-8 brand pull-<%= isRtl ?"right" :"left" %>">
+		  <div class="col-sm-10 brand pull-<%= isRtl ?"right" :"left" %>">
 		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
         <fmt:message key="jsp.layout.header-default.brand.description" /> 
         </div>
-        <div class="col-sm-4 hidden-xs pull-<%= isRtl ?"left" :"right" %>"><img class="img-responsive" src="<%= request.getContextPath() %>/image/logo.gif" alt="DSpace logo" />
+        <div class="col-sm-2 hidden-xs pull-<%= isRtl ?"left" :"right" %>"><img class="img-responsive" src="<%= request.getContextPath() %>/image/logo.gif" alt="Earth-Prints logo" />
         </div>
 	</div>
 </div>	

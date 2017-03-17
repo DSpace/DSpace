@@ -88,7 +88,7 @@
 	<% } %>        
 		  </div>
 	<div class="col-md-4 sm-12 pull-<%= isRtl? "left":"right" %>">
-    <%@ include file="components/recent-submissions.jsp" %>
+	<%= sideNews %>
 	</div>
 </div>
 <div class="row">
@@ -99,7 +99,8 @@
 		<%@ include file="components/most-downloaded.jsp" %>
 	</div>
 	<div class="col-md-4 <%= isRtl ? "pull-left":""%>">
-	<%= sideNews %>
+    <%@ include file="components/recent-submissions.jsp" %>
+
 	<%-- <%@ include file="discovery/static-tagcloud-facet.jsp" %> --%>
 	<%-- <%@ include file="components/most-cited.jsp" %> --%>
 	</div>

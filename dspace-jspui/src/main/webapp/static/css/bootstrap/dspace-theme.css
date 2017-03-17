@@ -11,7 +11,7 @@
 #user-top-menu, #userloggedin-top-menu {margin-right: 15px;}
 footer {padding-top: 1em;}
 footer.navbar-inverse *:not(.panel > *) {color: white;}
-footer .extra-footer{background-color: black; color:white;}
+footer .extra-footer{background-color: #FFFFFF; color:#006666;}
 #designedby img {margin-right: 5px;}
 #formsearch-top-menu {width: 310px;}
 div.panel.panel-primary ul.list-group li.list-group-item.active {border-left: 3px solid #428bca; background: white;}
@@ -291,3 +291,67 @@ footer .container {
 	right:auto;
 }
 .fullheight {min-height: 35em;}
+
+
+/*CUSTOM INGV*/
+.container {background-color:#F4F4F4;}
+
+ol.btn-success {
+		background-color: #006666 !important;
+  		background-image: -webkit-gradient(linear, left 0%, left 100%, from(#006666), to(#006666));
+  		background-image: -webkit-linear-gradient(top, #006666, 0%, #006666, 100%);
+  		background-image: -moz-linear-gradient(top, #006666 0%, #006666 100%);
+  		background-image: linear-gradient(to bottom, #006666 0%, #006666 100%);
+  		background-repeat: repeat-x;
+  		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#006666', endColorstr='#006666', GradientType=0);		 
+		border-color: #003333;
+		} 
+ol.btn-primary {
+		background-color: #006666 !important;
+  		background-image: -webkit-gradient(linear, left 0%, left 100%, from(#006666), to(#006666));
+  		background-image: -webkit-linear-gradient(top, #006666, 0%, #006666, 100%);
+  		background-image: -moz-linear-gradient(top, #006666 0%, #006666 100%);
+  		background-image: linear-gradient(to bottom, #006666 0%, #006666 100%);
+  		background-repeat: repeat-x;
+  		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#006666', endColorstr='#006666', GradientType=0);		 
+		border-color: #003333;
+		}
+		
+.navbar-inverse .navbar-nav > li > a{
+		color:#FFFFFF;
+		}
+.banner img {
+    background-color: #006666;
+    border-color: #003333;
+    padding: 15px;
+    margin-top: 0px;
+}			
+
+.locbar{
+	background-color:#fefecd;
+	color: #006666;
+	font-size:0.8em;
+}
+
+.locbar .navbar-nav > li > a{
+	color: #006666;
+    text-decoration: underline;
+}
+.locbar .navbar-nav > li > a:hover{
+	color: #006666;
+    text-decoration: underline;
+}
+
+.nav-pills > li > a:hover{
+    background-color: #006666;
+    border-color: #003333;
+	color:#FFFFFF;
+}
+
+.nav-tabs > li > a:hover{
+    background-color: #006666;
+    border-color: #003333;
+	color:#FFFFFF;
+} 
+
+		

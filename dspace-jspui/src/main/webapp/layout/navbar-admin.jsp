@@ -84,6 +84,7 @@
                <li><a href="<%= request.getContextPath() %>/dspace-admin/metadataimport"><fmt:message key="jsp.layout.navbar-admin.metadataimport"/></a></li>
                <li><a href="<%= request.getContextPath() %>/dspace-admin/batchimport"><fmt:message key="jsp.layout.navbar-admin.batchimport"/></a></li>               
                <li><a href="<%= request.getContextPath() %>/dspace-admin/authority"><fmt:message key="jsp.layout.navbar-admin.authority"/></a></li>
+               <li><a href="<%= request.getContextPath() %>/dspace-admin/export"><fmt:message key="jsp.layout.navbar-admin.exportJasper"/></a></li>
                <% if(mintDoiToolEnabled) { %>
                		<li><a href="<%= request.getContextPath() %>/dspace-admin/doi"><fmt:message key="jsp.layout.navbar-admin.doi"/></a></li>			
                <% }
