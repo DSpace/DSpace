@@ -505,7 +505,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 }
                 // DATAFILE
                 else if (collection.equals(myDataFileColl)) {
-                    doi = calculateDOIDataFile(item, vh);
+                    doi = calculateDOIDataFile(context, item, vh);
                 }
 
             } catch (ClassCastException details) {
@@ -572,7 +572,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         return false;
     }
 
-    private DOI calculateDOIDataFile(Item item, VersionHistory history) throws IOException, IdentifierException, AuthorizeException, SQLException {
+    private DOI calculateDOIDataFile(Context context, Item item, VersionHistory history) throws IOException, IdentifierException, AuthorizeException, SQLException {
         DCValue[] pkgLink = item.getMetadata("dc.relation.ispartof");
 
         if (pkgLink == null) {
