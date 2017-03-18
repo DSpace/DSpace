@@ -32,19 +32,9 @@ public class PluggableVersioningService implements VersioningService{
         try{
             Item item = Item.find(c, itemId);
             Version version = null;
-            VersionHistory vh = versionHistoryDAO.find(c, item.getID(), versionDAO);;
-            if(vh==null){
-                // first time: create 2 versions, .1(old version) and .2(new version)
-                vh=versionHistoryDAO.create(c);
-
-		// get dc:date.accessioned to be set as first version date...
-                DCValue[] values = item.getMetadata("dc", "date", "accessioned", Item.ANY);
-                Date versionDate = new Date();
-                if(values!=null && values.length > 0){
-                    String date = values[0].value;
-                    versionDate = new DCDate(date).toDate();
-                }
-                version = createVersion(c, vh, item, "", versionDate);
+            VersionHistory vh = versionHistoryDAO.find(c, itemId, versionDAO);;
+            if(vh==null) {
+                vh = startNewVersionHistoryAt(c, item,"",1);
             }
 
             ItemVersionProvider provider = getProvider();
@@ -59,6 +49,29 @@ public class PluggableVersioningService implements VersioningService{
             provider.updateItemState(c, itemNew, item);
 
             return version;
+        }catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public VersionHistory startNewVersionHistoryAt(Context c, Item item, String summary, int versionNumber) {
+        try{
+            Version version = null;
+            VersionHistory vh = versionHistoryDAO.find(c, item.getID(), versionDAO);;
+            if(vh==null) {
+                // first time: create version starting at versionNumber
+                vh=versionHistoryDAO.create(c);
+
+                // get dc:date.accessioned to be set as first version date...
+                DCValue[] values = item.getMetadata("dc", "date", "accessioned", Item.ANY);
+                Date versionDate = new Date();
+                if(values!=null && values.length > 0){
+                    String date = values[0].value;
+                    versionDate = new DCDate(date).toDate();
+                }
+                version = createVersion(c, vh, item, "", versionDate, versionNumber);
+            }
+            return vh;
         }catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
