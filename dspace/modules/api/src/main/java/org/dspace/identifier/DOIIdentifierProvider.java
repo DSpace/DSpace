@@ -5,7 +5,6 @@ import org.dspace.app.util.NoidGenerator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.doi.CDLDataCiteService;
@@ -17,7 +16,6 @@ import org.dspace.doi.Minter;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
-import org.dspace.versioning.DryadPublicationDataUtil;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersioningService;
@@ -27,7 +25,6 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.net.URL;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
@@ -154,7 +151,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             addNewDOItoItem(getCanonicalDOIString(doiString), item, true, collection);
 
             // if 1st version mint .1
-            mintDOIFirstVersion(context, item, true);
+            mintDOIAtVersion(context, item, true, 1);
 
         }catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to addNewDOItoItem doi", "Item id: " + dso.getID()));
@@ -269,7 +266,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     // When a DOI needs to be versioned for the first time:
     // if the item has a versionhistory and the previous version was the first version,
     // update that previous item to be version 1: dryad.xxxx.1
-    private void mintDOIFirstVersion(Context context, Item item, boolean register) throws SQLException, IOException, AuthorizeException {
+    private void mintDOIAtVersion(Context context, Item item, boolean register, int versionNumber) throws SQLException, IOException, AuthorizeException {
         VersionHistory history = retrieveVersionHistory(context, item);
 
         if (history != null) {
@@ -312,6 +309,10 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     mint(firstDOI, register, createListMetadata(previousItem));
                 }
             }
+        } else {
+            log.warn("Item " + getDoiValue(item) + " has no versions yet: start at " + versionNumber);
+            VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+            versioningService.startNewVersionHistoryAt(context, item, "added file at version " + versionNumber, versionNumber);
         }
     }
 
@@ -643,6 +644,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                         return new DOI(getDataFileDOIString(packageDOIString,index), item);
                     } else {
                         // versioned; file version needs to match package version
+                        mintDOIAtVersion(context, item, true, Integer.valueOf(packageVersion));
                         return new DOI(getVersionedDataFileDOIString(packageDOIString,index,Integer.parseInt(packageVersion)), item);
                     }
                 }
