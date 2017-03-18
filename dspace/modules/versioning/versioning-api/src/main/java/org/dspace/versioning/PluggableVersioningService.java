@@ -149,12 +149,11 @@ public class PluggableVersioningService implements VersioningService{
     }
 
 // **** PRIVATE METHODS!!
-
-    private VersionImpl createVersion(Context c, VersionHistory vh, Item item, String summary, Date versionDate) {
+    private VersionImpl createVersion(Context c, VersionHistory vh, Item item, String summary, Date versionDate, int versionNumber) {
         try {
             VersionImpl version = versionDAO.create(c);
 
-            version.setVersionNumber(getNextVersionNumer(vh.getLatestVersion()));
+            version.setVersionNumber(versionNumber);
             version.setVersionDate(versionDate);
             version.setEperson(item.getSubmitter());
             version.setItemID(item.getID());
@@ -166,6 +165,13 @@ public class PluggableVersioningService implements VersioningService{
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private VersionImpl createVersion(Context c, VersionHistory vh, Item item, String summary, Date versionDate) {
+        if (vh != null) {
+            return createVersion(c, vh, item, summary, versionDate, getNextVersionNumber(vh.getLatestVersion()));
+        }
+        return createVersion(c, vh, item, summary, versionDate, 1);
     }
 
     private ItemVersionProvider getProvider(){
@@ -180,7 +186,7 @@ public class PluggableVersioningService implements VersioningService{
     }
 
 
-    private int getNextVersionNumer(Version latest){
+    private int getNextVersionNumber(Version latest){
         if(latest==null) return 1;
 
         return latest.getVersionNumber()+1;
