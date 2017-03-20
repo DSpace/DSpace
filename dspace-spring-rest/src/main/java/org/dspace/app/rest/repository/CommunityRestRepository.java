@@ -85,4 +85,20 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 		return new CommunityResource(community, utils, rels);
 	}
 
+	//TODO: Add methods in dspace api to support pagination of top level communities
+	public Page<CommunityRest> findAllTop(Pageable pageable) {
+		List<Community> topCommunities = new ArrayList<Community>();
+		int total = 0;
+		try {
+			List<Community> it = cs.findAllTop(obtainContext());
+			total = it.size();
+			for (Community c: it) {
+				topCommunities.add(c);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		Page<CommunityRest> page = new PageImpl<Community>(topCommunities, pageable, total).map(converter);
+		return page;
+	}
 }
