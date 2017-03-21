@@ -45,4 +45,19 @@
         <scope_note>Metadata field used to store the width of the image</scope_note>
     </dc-type>
 
+    <dc-type>
+        <schema>bitstream</schema>
+        <element>image</element>
+        <qualifier>thumbnail</qualifier>
+        <scope_note>Metadata field used to store the ID of the thumbnail image</scope_note>
+    </dc-type>
+
+
+    <dc-type>
+        <schema>bitstream</schema>
+        <element>image</element>
+        <qualifier>preview</qualifier>
+        <scope_note>Metadata field used to store the ID of the preview image</scope_note>
+    </dc-type>
+
 </dspace-dc-types>
