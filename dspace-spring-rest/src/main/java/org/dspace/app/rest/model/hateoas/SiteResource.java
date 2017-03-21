@@ -32,6 +32,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 public class SiteResource extends DSpaceResource<SiteRest> {
 	public SiteResource(SiteRest site, Utils utils, String... rels) {
 		super(site, utils, rels);
-		super.add(linkTo(CommunityResourceController.class, CommunityRest.NAME).slash("tops").withRel("top-communities"));
+		super.add(linkTo(CommunityResourceController.class, CommunityRest.NAME).slash("top").withRel("top-communities"));
 	}
 }
