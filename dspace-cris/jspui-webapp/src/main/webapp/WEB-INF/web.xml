@@ -1127,7 +1127,7 @@
 	<servlet>
 		<servlet-name>jasper</servlet-name>
 		<servlet-class>
-			it.cilea.surplus.oa.servlet.admin.JasperReportServlet
+			org.dspace.app.webui.servlet.admin.JasperReportServlet
 		</servlet-class>
 	</servlet>
     <servlet-mapping>
