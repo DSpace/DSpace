@@ -120,9 +120,9 @@ public class JasperReportServlet extends DSpaceServlet {
 		while (tableRowIterator.hasNext()) {
 			TableRow row = tableRowIterator.next();
 			// nuovo item, devo avviare la creazione del DTO
-			if (currItem != row.getIntColumn("item_id")) {
+			if (currItem != row.getIntColumn("resource_id")) {
 				//System.out.println("====Nuovo ITEM: " + ++count);
-				currItem = row.getIntColumn("item_id");
+				currItem = row.getIntColumn("resource_id");
 				currFieldId = row.getIntColumn("metadata_field_id");
 				currMetadataKey = getMetadataKey(context, currFieldId);
 				if (metadata != null) {
@@ -134,7 +134,7 @@ public class JasperReportServlet extends DSpaceServlet {
 			// l'item non � cambiato ma se � cambiato il field devo rigenerare
 			// la key
 			else if (currFieldId != row.getIntColumn("metadata_field_id")) {
-				currItem = row.getIntColumn("item_id");
+				currItem = row.getIntColumn("resource_id");
 				currFieldId = row.getIntColumn("metadata_field_id");
 				currMetadataKey = getMetadataKey(context, currFieldId);
 			}
