@@ -15,7 +15,7 @@ footer .extra-footer{background-color: #FFFFFF; color:#006666;}
 #designedby img {margin-right: 5px;}
 #formsearch-top-menu {width: 310px;}
 div.panel.panel-primary ul.list-group li.list-group-item.active {border-left: 3px solid #428bca; background: white;}
-div.panel.panel-primary ul.list-group li.list-group-item.active .badge {background-color: #428bca;}
+/*div.panel.panel-primary ul.list-group li.list-group-item.active .badge {background-color: #428bca;}*/
 ol.breadcrumb li {color: white; font-style: italic;}
 ol.breadcrumb li a {color: white; font-weight: bold; font-style: normal;}
 body.undernavigation {overflow-x: hidden;
@@ -353,5 +353,57 @@ ol.btn-primary {
     border-color: #003333;
 	color:#FFFFFF;
 } 
+
+.thumbnail .thumb-home-atmo {
+    background-color: #663399;
+    margin: 0px;
+    color:#FFFFFF;
+    max-height:30px;
+}
+.thumbnail .thumb-home-atmo >p > a {
+    color:#FFFFFF;
+}
+
+.thumbnail .thumb-home-cryo {
+    background-color: #003366;
+    margin: 0px;
+    color:#FFFFFF;
+    max-height:30px;
+}
+.thumbnail .thumb-home-cryo >p > a {
+    color:#FFFFFF;
+}
+
+.thumbnail .thumb-home-hydro {
+    background-color: #009999;
+    margin: 0px;
+    color:#FFFFFF;
+    max-height:30px;
+}
+.thumbnail .thumb-home-hydro >p > a {
+    color:#FFFFFF;
+}
+
+.thumbnail .thumb-home-solid {
+    background-color: #ff6600;
+    margin: 0px;
+    color: #FFFFFF;
+    max-height:30px;
+}
+.thumbnail .thumb-home-solid >p > a {
+    color:#FFFFFF;
+}
+
+.thumbnail .thumb-home-gen {
+    background-color: #339900;
+    margin: 0px;
+    color:#FFFFFF;
+    max-height:30px;
+}
+.thumbnail .thumb-home-gen >p > a {
+    color:#FFFFFF;
+}
+
+div.panel.panel-primary ul.list-group li.list-group-item.active .badge {background-color: #fefecd;}
 
 		

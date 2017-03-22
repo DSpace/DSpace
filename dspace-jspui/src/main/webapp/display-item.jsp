@@ -64,8 +64,8 @@
     String handle = item.getHandle();
 
     // CC URL & RDF
-    String cc_url = CreativeCommons.getLicenseURL(item);
-    String cc_rdf = CreativeCommons.getLicenseRDF(item);
+    //String cc_url = CreativeCommons.getLicenseURL(item);
+    //String cc_rdf = CreativeCommons.getLicenseRDF(item);
 
     // Full title needs to be put into a string to use as tag argument
     String title = "";
@@ -165,6 +165,11 @@ j(document).ready(function() {
 </c:set>
 <% } %>
 
+<script type="text/javascript">
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
 <dspace:layout title="<%= title %>">
 <%
     if (handle != null)
@@ -590,7 +595,7 @@ if (dedupEnabled && admin_button) { %>
 %>
 <br/>
     <%-- Create Commons Link --%>
-<%
+<%--
     if (cc_url != null)
     {
 %>
@@ -600,13 +605,14 @@ if (dedupEnabled && admin_button) { %>
     <!--
     <%= cc_rdf %>
     -->
+  
 <%
     } else {
 %>
     <p class="text-center alert alert-info"><fmt:message key="jsp.display-item.copyright"/></p>
 <%
     } 
-%>
+--%>
 	</div>
     
 </dspace:layout>

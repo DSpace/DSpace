@@ -248,14 +248,12 @@
    }
  %>		
 		
-		
-		
 		</div>
-		  <div class="col-sm-10 brand pull-<%= isRtl ?"right" :"left" %>">
+		  <div class="col-sm-12 brand pull-<%= isRtl ?"right" :"left" %>">
 		<h1><fmt:message key="jsp.layout.header-default.brand.heading" /></h1>
         <fmt:message key="jsp.layout.header-default.brand.description" /> 
         </div>
-        <div class="col-sm-2 hidden-xs pull-<%= isRtl ?"left" :"right" %>"><img class="img-responsive" src="<%= request.getContextPath() %>/image/logo.gif" alt="Earth-Prints logo" />
+        <%-- <div class="col-sm-2 hidden-xs pull-<%= isRtl ?"left" :"right" %>"><img class="img-responsive" src="<%= request.getContextPath() %>/image/logo.gif" alt="Earth-Prints logo" />--%>
         </div>
 	</div>
 </div>	
