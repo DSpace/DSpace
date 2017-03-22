@@ -192,7 +192,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                         // if the item isn't archived, the canonical DOI already points to the previous item.
                         // update the metadata for the previous version of the item.
                         if (history.size() == 2 && !item.isArchived()) {
-                            updateItemDOIMetadata(previous, getCanonicalDOIString(doiString));
                         }
                     }
                 }
@@ -266,7 +265,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     // When a DOI needs to be versioned for the first time:
     // if the item has a versionhistory and the previous version was the first version,
     // update that previous item to be version 1: dryad.xxxx.1
-    private void mintDOIAtVersion(Context context, Item item, boolean register, int versionNumber) throws SQLException, IOException, AuthorizeException {
+    private DOI mintDOIAtVersion(Context context, Item item, boolean register, int versionNumber) throws SQLException, IOException, AuthorizeException {
         VersionHistory history = retrieveVersionHistory(context, item);
 
         if (history != null) {
@@ -309,10 +308,14 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     mint(firstDOI, register, createListMetadata(previousItem));
                 }
             }
+            return getDOI(getDoiValue(item), item);
         } else {
             log.warn("Item " + getDoiValue(item) + " has no versions yet: start at " + versionNumber);
             VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
             versioningService.startNewVersionHistoryAt(context, item, "added file at version " + versionNumber, versionNumber);
+            DOI versionedDOI = new DOI(getVersionedDataFileDOIString(getDoiValue(item),versionNumber), item);
+            mint(versionedDOI,false,createListMetadata(item));
+            return versionedDOI;
         }
     }
 
@@ -644,8 +647,9 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                         return new DOI(getDataFileDOIString(packageDOIString,index), item);
                     } else {
                         // versioned; file version needs to match package version
+                        DOI versionedDOI = new DOI(getVersionedDataFileDOIString(packageDOIString,index,Integer.parseInt(packageVersion)), item);
                         mintDOIAtVersion(context, item, true, Integer.valueOf(packageVersion));
-                        return new DOI(getVersionedDataFileDOIString(packageDOIString,index,Integer.parseInt(packageVersion)), item);
+                        return versionedDOI;
                     }
                 }
             }
@@ -745,6 +749,10 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     public String getVersionedDataFileDOIString(String doiString, int fileSuffix, int versionN) {
         return getCanonicalDOIString(getDataPackageDOIString(doiString)) + DOT + versionN + SLASH + fileSuffix + DOT + versionN;
+    }
+
+    public String getVersionedDataFileDOIString(String doiString, int versionN) {
+        return getCanonicalDOIString(getDataPackageDOIString(doiString)) + DOT + versionN + SLASH + getDataFileSuffix(doiString) + DOT + versionN;
     }
 
     public String getVersionedDataPackageDOIString (String doiString, int versionN) {
