@@ -49,6 +49,7 @@ public class CommunityConverter
 			log.error("Error setting parent community for community "+communityRest.getHandle(), e);
 		}
 
+		/*
 		try {
 			List<CommunityRest> commrestlist = new ArrayList<>();
 			for (Community c: obj.getSubcommunities()) {
@@ -67,6 +68,7 @@ public class CommunityConverter
 		} catch (Exception e) {
 			log.error("Error setting collections for community "+communityRest.getHandle(), e);
 		}
+		*/
 		return communityRest;
 	}
 
