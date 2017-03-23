@@ -49,6 +49,7 @@ public class CommunityResourceController {
 	@Autowired
 	Utils utils;
 	
+	@SearchRestMethod
 	@RequestMapping(method = RequestMethod.GET, value = "/search/top")
 	@SuppressWarnings("unchecked")
 	PagedResources<CommunityResource> findTopCommunies(Pageable page, PagedResourcesAssembler assembler, @RequestParam(required=false) String projection) {
