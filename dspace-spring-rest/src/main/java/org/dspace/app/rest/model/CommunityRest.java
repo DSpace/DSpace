@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.List;
+
 /**
  * The Community REST Resource
  * 
@@ -21,4 +23,22 @@ public class CommunityRest extends DSpaceObjectRest {
 		return NAME;
 	}
 
+	List<CommunityRest>  subcommunities;
+	List<CollectionRest> collections;
+
+	public List<CommunityRest> getSubcommunities() {
+		return subcommunities;
+	}
+
+	public void setSubcommunities(List<CommunityRest> subcommunities) {
+		this.subcommunities = subcommunities;
+	}
+
+	public List<CollectionRest> getCollections() {
+		return collections;
+	}
+
+	public void setCollections(List<CollectionRest> collections) {
+		this.collections = collections;
+	}
 }
