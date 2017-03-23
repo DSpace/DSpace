@@ -15,7 +15,11 @@ public abstract class DSpaceConverter<M, R> implements Converter<M, R> {
 		return fromModel(source);
 	}
 
-	public abstract R fromModel(M obj);
+	public R fromModel(M obj) {
+		return fromModel(obj, DSpaceObjectRest.PRJ_DEFAULT);
+	}
+	
+	public abstract R fromModel(M obj, String projection);
 
 	public abstract M toModel(R obj);
 }

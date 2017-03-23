@@ -33,8 +33,8 @@ public class CollectionConverter
 	}
 
 	@Override
-	public CollectionRest fromModel(org.dspace.content.Collection obj) {
-		CollectionRest collectionRest = super.fromModel(obj);
+	public CollectionRest fromModel(org.dspace.content.Collection obj, String projection) {
+		CollectionRest collectionRest = super.fromModel(obj, projection);
 		try {
 			for (Community c: obj.getCommunities()) {
 				collectionRest.setParentCommunity(communityConverter.fromModel(c));

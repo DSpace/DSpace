@@ -89,7 +89,7 @@ public class RestResourceController implements InitializingBean {
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(model);
 		RestModel modelObject = null;
 		try {
-			modelObject = repository.findOne(id);
+			modelObject = repository.findOne(id, projection);
 		} catch (ClassCastException e) {
 		}
 		if (modelObject == null) {
@@ -113,7 +113,7 @@ public class RestResourceController implements InitializingBean {
 		// FIXME this is a very bad implementation as it leads most of times to
 		// more round-trip on the database and retrieval of unneeded infromation
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(model);
-		RestModel modelObject = repository.findOne(uuid);
+		RestModel modelObject = repository.findOne(uuid, projection);
 		DSpaceResource result = repository.wrapResource(modelObject, rel);
 		if (result.getLink(rel) == null) {
 			//TODO create a custom exception

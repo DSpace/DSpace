@@ -39,7 +39,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 	}
 
 	@Override
-	public BitstreamFormatRest findOne(Context context, Integer id) {
+	public BitstreamFormatRest findOne(Context context, Integer id, String projection) {
 		BitstreamFormat bit = null;
 		try {
 			bit = bfs.find(context, id);
@@ -49,7 +49,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 		if (bit == null) {
 			return null;
 		}
-		return converter.fromModel(bit);
+		return converter.fromModel(bit, projection);
 	}
 
 	@Override

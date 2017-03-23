@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,8 @@ public class CommunityConverter
 	}
 
 	@Override
-	public CommunityRest fromModel(org.dspace.content.Community obj) {
-		CommunityRest communityRest = super.fromModel(obj);
+	public CommunityRest fromModel(org.dspace.content.Community obj, String projection) {
+		CommunityRest communityRest = super.fromModel(obj, projection);
 		try {
 			for (Community c: obj.getParentCommunities()) {
 				communityRest.setParentCommunity(fromModel(c));
@@ -49,26 +50,26 @@ public class CommunityConverter
 			log.error("Error setting parent community for community "+communityRest.getHandle(), e);
 		}
 
-		/*
-		try {
-			List<CommunityRest> commrestlist = new ArrayList<>();
-			for (Community c: obj.getSubcommunities()) {
-				commrestlist.add(fromModel(c));
+		if (checkProjection(projection, DSpaceObjectRest.PRJ_CONTEXT)) {
+			try {
+				List<CommunityRest> commrestlist = new ArrayList<>();
+				for (Community c: obj.getSubcommunities()) {
+					commrestlist.add(fromModel(c));
+				}
+				communityRest.setSubcommunities(commrestlist);
+			} catch (Exception e) {
+				log.error("Error setting subcommunities for community "+communityRest.getHandle(), e);
 			}
-			communityRest.setSubcommunities(commrestlist);
-		} catch (Exception e) {
-			log.error("Error setting subcommunities for community "+communityRest.getHandle(), e);
+			try {
+				List<CollectionRest> collrestlist = new ArrayList<>();
+				for (Collection c: obj.getCollections()) {
+					collrestlist.add(collectionConverter.fromModel(c));
+				}
+				communityRest.setCollections(collrestlist);
+			} catch (Exception e) {
+				log.error("Error setting collections for community "+communityRest.getHandle(), e);
+			}			
 		}
-		try {
-			List<CollectionRest> collrestlist = new ArrayList<>();
-			for (Collection c: obj.getCollections()) {
-				collrestlist.add(collectionConverter.fromModel(c));
-			}
-			communityRest.setCollections(collrestlist);
-		} catch (Exception e) {
-			log.error("Error setting collections for community "+communityRest.getHandle(), e);
-		}
-		*/
 		return communityRest;
 	}
 

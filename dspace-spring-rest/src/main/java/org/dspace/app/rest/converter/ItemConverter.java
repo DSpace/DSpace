@@ -36,8 +36,8 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
 	private static final Logger log = Logger.getLogger(ItemConverter.class);
 	
 	@Override
-	public ItemRest fromModel(org.dspace.content.Item obj) {
-		ItemRest item = super.fromModel(obj);
+	public ItemRest fromModel(org.dspace.content.Item obj, String projection) {
+		ItemRest item = super.fromModel(obj, projection);
 		item.setInArchive(obj.isArchived());
 		item.setDiscoverable(obj.isDiscoverable());
 		item.setWithdrawn(obj.isWithdrawn());

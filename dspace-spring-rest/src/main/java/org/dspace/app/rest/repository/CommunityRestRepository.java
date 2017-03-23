@@ -44,7 +44,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 	}
 
 	@Override
-	public CommunityRest findOne(Context context, UUID id) {
+	public CommunityRest findOne(Context context, UUID id, String projection) {
 		Community community = null;
 		try {
 			community = cs.find(context, id);
@@ -54,7 +54,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 		if (community == null) {
 			return null;
 		}
-		return converter.fromModel(community);
+		return converter.fromModel(community, projection);
 	}
 
 	@Override

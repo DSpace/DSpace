@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BitstreamFormatConverter extends DSpaceConverter<org.dspace.content.BitstreamFormat, BitstreamFormatRest> {
 	@Override
-	public BitstreamFormatRest fromModel(org.dspace.content.BitstreamFormat obj) {
+	public BitstreamFormatRest fromModel(org.dspace.content.BitstreamFormat obj, String projection) {
 		BitstreamFormatRest bf = new BitstreamFormatRest();
 		bf.setDescription(obj.getDescription());
 		bf.setExtensions(bf.getExtensions());

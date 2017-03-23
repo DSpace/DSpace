@@ -30,7 +30,7 @@ import org.springframework.core.convert.converter.Converter;
 public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model.DSpaceObjectRest>
 		extends DSpaceConverter<M, R> {
 	@Override
-	public R fromModel(M obj) {
+	public R fromModel(M obj, String projection) {
 		R resource = newInstance();
 		resource.setHandle(obj.getHandle());
 		if (obj.getID() != null) {
@@ -55,4 +55,16 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
 	}
 
 	protected abstract R newInstance();
+	
+	public boolean checkProjection(String projection, String value) {
+		if (projection == null) {
+			return false;
+		}
+		for (String s: projection.split(",")) {
+			if (s.equals(value)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
