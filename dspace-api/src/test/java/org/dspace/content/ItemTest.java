@@ -1480,6 +1480,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         context.turnOffAuthorisationSystem();
         Collection from = createCollection();
         Collection to = createCollection();
+        it.addCollection(from);
         it.setOwningCollection(from);
 
         itemService.move(context, it, from, to);
