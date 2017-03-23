@@ -103,6 +103,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
                 if(collection != null)
                 {
                     collectionService.delete(context, collection);
+                    context.commit();
                     communityService.delete(context, communityService.find(context, owningCommunity.getID()));
                 }
                 context.restoreAuthSystemState();
