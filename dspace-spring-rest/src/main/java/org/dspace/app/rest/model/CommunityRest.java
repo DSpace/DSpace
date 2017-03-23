@@ -9,6 +9,8 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * The Community REST Resource
  * 
@@ -18,13 +20,25 @@ import java.util.List;
 public class CommunityRest extends DSpaceObjectRest {
 	public static final String NAME = "community";
 
+	@JsonIgnore
+	CommunityRest        parentCommunity;
+	@JsonIgnore
+	List<CommunityRest>  subcommunities;
+	@JsonIgnore
+	List<CollectionRest> collections;
+
 	@Override
 	public String getType() {
 		return NAME;
 	}
 
-	List<CommunityRest>  subcommunities;
-	List<CollectionRest> collections;
+	public CommunityRest getParentCommunity() {
+		return parentCommunity;
+	}
+
+	public void setParentCommunity(CommunityRest parentCommunity) {
+		this.parentCommunity = parentCommunity;
+	}
 
 	public List<CommunityRest> getSubcommunities() {
 		return subcommunities;

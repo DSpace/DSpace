@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * The Collection REST Resource
  * 
@@ -16,8 +18,19 @@ package org.dspace.app.rest.model;
 public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";
 
+	@JsonIgnore
+	CommunityRest        parentCommunity;
+
 	@Override
 	public String getType() {
 		return NAME;
+	}
+
+	public CommunityRest getParentCommunity() {
+		return parentCommunity;
+	}
+
+	public void setParentCommunity(CommunityRest parentCommunity) {
+		this.parentCommunity = parentCommunity;
 	}
 }

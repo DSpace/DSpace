@@ -42,6 +42,14 @@ public class CommunityConverter
 	public CommunityRest fromModel(org.dspace.content.Community obj) {
 		CommunityRest communityRest = super.fromModel(obj);
 		try {
+			for (Community c: obj.getParentCommunities()) {
+				communityRest.setParentCommunity(fromModel(c));
+			}
+		} catch (Exception e) {
+			log.error("Error setting parent community for community "+communityRest.getHandle(), e);
+		}
+
+		try {
 			List<CommunityRest> commrestlist = new ArrayList<>();
 			for (Community c: obj.getSubcommunities()) {
 				commrestlist.add(fromModel(c));
