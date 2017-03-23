@@ -110,7 +110,12 @@
     VersionHistory history = (VersionHistory)request.getAttribute("versioning.history");
     List<Version> historyVersions = (List<Version>)request.getAttribute("versioning.historyversions");
     
+    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
     boolean dedupEnabled = ConfigurationManager.getBooleanProperty("deduplication", "deduplication.admin.feature", false);
+    
+	boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.item.enabled", false);
+	boolean exportBiblioAll =  ConfigurationManager.getBooleanProperty("exportcitation.show.all", false);
+	String cfg = ConfigurationManager.getProperty("exportcitation.options");
 %>
 
 <%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
@@ -336,7 +341,35 @@ $(function () {
     </form>
 <%
     } else {
+    	if (exportBiblioEnabled && ( exportBiblioAll || user!=null ) ) {
+    %>
 
+    		<form target="blank" class="form-inline"  id="exportform" action="<%= request.getContextPath() %>/references">
+
+    		<div id="export-biblio-panel">
+    	<%		
+    		if (cfg == null)
+    		{
+    			cfg = "refman, endnote, bibtex, refworks";
+    		}
+    		String[] cfgSplit = cfg.split("\\s*,\\s*");
+    		for (String format : cfgSplit) {
+    	%>
+    		<c:set var="format"><%= format %></c:set>	    
+    		<label class="radio-inline">
+        		  <input id="${format}" type="radio" name="format" value="${format}" <c:if test="${format=='bibtex'}"> checked="checked"</c:if>/><fmt:message key="exportcitation.option.${format}" />
+    	    </label>
+
+    		
+    	<% } %>
+    		<label class="checkbox-inline">
+    			<input type="checkbox" id="email" name="email" value="true"/><fmt:message key="exportcitation.option.email" />
+    		</label>
+    			<input type="hidden" name="item_id" value="<%= item.getID() %>" />
+    			<input id="export-submit-button" class="btn btn-default" type="submit" name="submit_export" value="<fmt:message key="exportcitation.option.submitexport" />" />
+    		</div>	
+    		</form>
+    <% }
 		if (suggestLink)
         {
 %>
