@@ -100,7 +100,7 @@
         <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
-            <version>2.4.3</version>
+            <version>2.6.11</version>
             <scope>compile</scope>
         </dependency>
         <!-- for filters -->
@@ -165,6 +165,11 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
         </dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>1.2</version>
+		</dependency>
     </dependencies>
 
     <developers>

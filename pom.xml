@@ -23,17 +23,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
-        <java.version>1.7</java.version>
+        <java.version>1.8</java.version>
         <postgresql.driver.version>9.4.1211</postgresql.driver.version>
         <solr.version>4.10.4</solr.version>
         <jena.version>2.13.0</jena.version>
-        <slf4j.version>1.7.14</slf4j.version>
-        <!--
-            Hibernate version pinned to 4.2, 4.3 does not work with the spring version we are currently using
-            Upgrading the spring version will make the XMLUI crash
-        -->
-        <hibernate.version>4.2.21.Final</hibernate.version>
-        <spring.version>3.2.16.RELEASE</spring.version>
+        <slf4j.version>1.7.22</slf4j.version>
+        <hibernate.version>5.2.8.Final</hibernate.version>
+        <spring.version>4.3.6.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -64,7 +60,7 @@
                             </configuration>
                         </execution>
                         <!-- Make sure that we do not have conflicting dependencies-->
-                        <execution>
+                        <!-- <execution>
                             <id>enforce-versions</id>
                             <goals>
                                 <goal>enforce</goal>
@@ -74,7 +70,7 @@
                                     <DependencyConvergence />
                                 </rules>
                             </configuration>
-                        </execution>
+                        </execution> -->
                     </executions>
                 </plugin>
                 <!-- Used to compile all Java classes -->
@@ -672,6 +668,18 @@
             </modules>
         </profile>
 
+		<profile>
+            <id>dspace-spring-rest</id>
+            <activation>
+                <file>
+                    <exists>dspace-spring-rest/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>dspace-spring-rest</module>
+            </modules>
+        </profile>
+
         <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
@@ -694,6 +702,7 @@
                 <module>dspace-solr</module>
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
+                <module>dspace-spring-rest</module>
             </modules>
             <build>
                 <plugins>
@@ -845,6 +854,12 @@
             </dependency>
             <dependency>
                 <groupId>org.dspace</groupId>
+                <artifactId>dspace-spring-rest</artifactId>
+                <version>7.0-SNAPSHOT</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>org.dspace</groupId>
                 <artifactId>dspace-solr</artifactId>
                 <version>7.0-SNAPSHOT</version>
                 <type>jar</type>
@@ -857,7 +872,6 @@
                 <type>war</type>
                 <classifier>skinny</classifier>
             </dependency>
-
             <!-- DSpace Localization Packages -->
             <dependency>
                 <groupId>org.dspace</groupId>
@@ -1439,4 +1453,16 @@
         </repository>
     </distributionManagement>
 
+    <dependencies>
+    	<dependency>
+    		<groupId>org.apache.poi</groupId>
+    		<artifactId>poi-ooxml</artifactId>
+    		<exclusions>
+    			<exclusion>
+    				<groupId>stax</groupId>
+    				<artifactId>stax-api</artifactId>
+    			</exclusion>
+    		</exclusions>
+    	</dependency>
+    </dependencies>
 </project>

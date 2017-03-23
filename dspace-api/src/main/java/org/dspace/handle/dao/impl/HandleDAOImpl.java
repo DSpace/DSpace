@@ -10,22 +10,23 @@ package org.dspace.handle.dao.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.handle.Handle;
 import org.dspace.handle.dao.HandleDAO;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
+import org.hibernate.engine.jdbc.dialect.spi.DatabaseMetaDataDialectResolutionInfoAdapter;
+import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
 import org.hibernate.jdbc.ReturningWork;
-import org.hibernate.service.jdbc.dialect.internal.StandardDialectResolver;
-import org.hibernate.service.jdbc.dialect.spi.DialectResolver;
-
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Handle object.
@@ -123,7 +124,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
 
                 // Determine what dialect we are using for this DB
                 DialectResolver dialectResolver = new StandardDialectResolver();
-                Dialect dialect = dialectResolver.resolveDialect(connection.getMetaData());
+                Dialect dialect = dialectResolver.resolveDialect(new DatabaseMetaDataDialectResolutionInfoAdapter(connection.getMetaData()));
 
                 // Find the next value in our sequence (based on DB dialect)
                 try (PreparedStatement preparedStatement = connection.prepareStatement(dialect.getSequenceNextValString(HANDLE_SEQUENCE)))

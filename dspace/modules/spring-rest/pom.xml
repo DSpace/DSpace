@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace.modules</groupId>
+    <artifactId>spring-rest</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace Spring Rest:: Local Customizations</name>
+    <description>Overlay REST customizations.
+This is probably a temporary solution to the build problems. We like to investigate about 
+the possibility to remove the overlays enable a more flexible extension mechanism. 
+The use of web-fragment and spring mvc technology allow us to add request handlers 
+just adding new jar in the classloader</description>
+
+    <parent>
+        <artifactId>modules</artifactId>
+        <groupId>org.dspace</groupId>
+        <version>7.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <properties>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../../..</root.basedir>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- Unpack the "additions" module into our target directory,
+                 so that any custom classes in that module can be included
+                 into this WAR's WEB-INF/classes (see maven-war-plugin below). -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>org.dspace.modules</includeGroupIds>
+                            <includeArtifactIds>additions</includeArtifactIds>
+                            <!--NOTE: by default this will also unpack transitive dependencies. To disable, uncomment this next line:
+                            <excludeTransitive>true</excludeTransitive>
+                            -->
+                            <outputDirectory>${project.build.directory}/additions</outputDirectory>
+                            <excludes>META-INF/**</excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archiveClasses>false</archiveClasses>
+                    <!-- Filter the web.xml (needed for IDE compatibility/debugging) -->
+                    <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+                    <!-- Copy any 'additions' (see m-dependency-p above) into WEB-INF/classes.
+                         This ensures they are loaded prior to dependencies in WEB-INF/lib
+                         (per Servlet 3.0 spec, section 10.5), and allows them to override
+                         default classes in this WAR -->
+                    <webResources>
+                        <resource>
+                            <directory>${project.build.directory}/additions</directory>
+                            <targetPath>WEB-INF/classes</targetPath>
+                        </resource>
+                    </webResources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>oracle-support</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.dspace.modules</groupId>
+            <artifactId>additions</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-spring-rest</artifactId>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+
+</project>

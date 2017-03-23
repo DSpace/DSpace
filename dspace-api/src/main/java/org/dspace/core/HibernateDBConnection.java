@@ -7,7 +7,13 @@
  */
 package org.dspace.core;
 
-import org.dspace.content.DSpaceObject;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
@@ -15,15 +21,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.proxy.HibernateProxyHelper;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.orm.hibernate4.SessionFactoryUtils;
-
-import javax.sql.DataSource;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
+import org.springframework.orm.hibernate5.SessionFactoryUtils;
 
 /**
  * Hibernate implementation of the DBConnection
@@ -35,7 +36,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Autowired(required = true)
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
-
+    
     private boolean batchModeEnabled = false;
 
     @Override
@@ -50,7 +51,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Override
     public boolean isTransActionAlive() {
         Transaction transaction = getTransaction();
-        return transaction != null && transaction.isActive();
+        return transaction != null && transaction.getStatus().isOneOf(TransactionStatus.ACTIVE);
     }
 
     protected Transaction getTransaction() {
@@ -59,7 +60,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
 
     @Override
     public boolean isSessionAlive() {
-        return sessionFactory.getCurrentSession() != null && sessionFactory.getCurrentSession().getTransaction() != null && sessionFactory.getCurrentSession().getTransaction().isActive();
+        return sessionFactory.getCurrentSession() != null && sessionFactory.getCurrentSession().getTransaction() != null && sessionFactory.getCurrentSession().getTransaction().getStatus().isOneOf(TransactionStatus.ACTIVE);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
 
     @Override
     public void commit() throws SQLException {
-        if(isTransActionAlive() && !getTransaction().wasRolledBack())
+        if(isTransActionAlive() && !getTransaction().getStatus().isOneOf(TransactionStatus.MARKED_ROLLBACK, TransactionStatus.ROLLING_BACK))
         {
             getSession().flush();
             getTransaction().commit();

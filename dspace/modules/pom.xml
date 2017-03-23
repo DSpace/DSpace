@@ -105,5 +105,16 @@
                 <module>oai</module>
             </modules>
         </profile>
+        <profile>
+            <id>dspace-spring-rest</id>
+            <activation>
+                <file>
+                    <exists>spring-rest/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>spring-rest</module>
+            </modules>
+        </profile>
     </profiles>
 </project>

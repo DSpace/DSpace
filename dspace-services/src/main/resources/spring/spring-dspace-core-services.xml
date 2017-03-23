@@ -49,6 +49,7 @@
                 </constructor-arg>
             </bean>
         </property>
+        <property name="shared" value="true"/>
     </bean>
     <!-- CACHING end beans -->
 

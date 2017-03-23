@@ -96,6 +96,12 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     }
 
     @Override
+    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException
+    {
+        return bitstreamDAO.findAll(context, limit, offset);
+    }
+
+    @Override
     public Bitstream create(Context context, InputStream is) throws IOException, SQLException {
         // Store the bits
         UUID bitstreamID = bitstreamStorageService.store(context, bitstreamDAO.create(context, new Bitstream()), is);
