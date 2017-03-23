@@ -73,7 +73,7 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
             throws SQLException
     {
 	String queryString;
-	if(DatabaseUtils.getDbType().equals(DatabaseUtils.DBMS_ORACLE)){
+	if(context.getDbType().equals(DatabaseUtils.DBMS_ORACLE)){
 	    queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField WHERE m.metadataField.id = :metadata_field_id ORDER BY DBMS_LOB.substr(text_value , 4000 , 1)";
 	}else{
 	    queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField WHERE m.metadataField.id = :metadata_field_id ORDER BY text_value";

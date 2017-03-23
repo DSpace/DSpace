@@ -51,7 +51,6 @@ import org.flywaydb.core.internal.info.MigrationInfoDumper;
  *
  * @see org.dspace.storage.rdbms.DatabaseUtils
  * @author Tim Donohue
- * @author Adán Román Ruiz at arvo.es (DS-3453)
  */
 public class DatabaseUtils
 {
@@ -1345,19 +1344,6 @@ public class DatabaseUtils
         }
     }
 
-    /**
-     * Determine the type of Database, based on the DB connection.
-     * 
-     * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
-     * @throws SQLException if database error
-     */
-    public static String getDbType()
-            throws SQLException
-    {
-	Connection connection=getDataSource().getConnection();
-        return getDbType(connection);
-    }
-    
     /**
      * Determine the type of Database, based on the DB connection.
      * 
