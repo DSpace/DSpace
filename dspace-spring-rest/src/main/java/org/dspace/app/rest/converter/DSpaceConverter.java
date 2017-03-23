@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
+import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.springframework.core.convert.converter.Converter;
 
 public abstract class DSpaceConverter<M, R> implements Converter<M, R> {
