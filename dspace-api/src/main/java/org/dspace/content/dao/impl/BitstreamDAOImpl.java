@@ -153,4 +153,12 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
                 " and bit.id not in (select col.logo.id from Collection col)" +
                 " and bit.id not in (select bun.primaryBitstream.id from Bundle bun)"));
     }
+
+    @Override
+    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException {
+	Query query = createQuery(context, "select b FROM Bitstream b");
+	query.setFirstResult(offset);
+	query.setMaxResults(limit);
+	return iterate(query);
+    }
 }

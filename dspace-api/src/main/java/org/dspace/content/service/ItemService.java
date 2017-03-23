@@ -70,6 +70,18 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Iterator<Item> findAll(Context context) throws SQLException;
 
     /**
+     * Get all the items in the archive. Only items with the "in archive" flag
+     * set are included. The order of the list is indeterminate.
+     *
+     * @param context DSpace context object
+     * @param limit limit
+     * @param offset offset
+     * @return an iterator over the items in the archive.
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * Get all "final" items in the archive, both archived ("in archive" flag) or
      * withdrawn items are included. The order of the list is indeterminate.
      *

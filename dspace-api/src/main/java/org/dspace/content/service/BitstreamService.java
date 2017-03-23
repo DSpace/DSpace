@@ -27,6 +27,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     public List<Bitstream> findAll(Context context) throws SQLException;
 
+    public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException;
+
     /**
      * Create a new bitstream, with a new ID. The checksum and file size are
      * calculated. No authorization checks are made in this method.
