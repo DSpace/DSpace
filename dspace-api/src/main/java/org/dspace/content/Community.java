@@ -9,6 +9,7 @@ package org.dspace.content;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.*;
@@ -140,6 +141,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Collection> getCollections()
     {
+        Collections.sort(collections, new NameAscendingComparator());
         return collections;
     }
 
@@ -162,6 +164,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Community> getSubcommunities()
     {
+        Collections.sort(subCommunities, new NameAscendingComparator());
         return subCommunities;
     }
 
@@ -173,6 +176,7 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Community> getParentCommunities()
     {
+        Collections.sort(parentCommunities, new NameAscendingComparator());
         return parentCommunities;
     }
 
