@@ -641,7 +641,7 @@
         <!--
            Builds SOLR WAR for DSpace
         -->
-        <!-- <profile>
+        <profile>
             <id>dspace-solr</id>
             <activation>
                 <file>
@@ -651,7 +651,7 @@
             <modules>
                 <module>dspace-solr</module>
             </modules>
-        </profile>-->
+        </profile>
 
         <!--
            Builds SWORDv2 WAR for DSpace
@@ -699,7 +699,7 @@
                 <module>dspace-rdf</module>
                 <module>dspace-rest</module>
                 <module>dspace-services</module>
-                <!-- <module>dspace-solr</module> -->
+                <module>dspace-solr</module>
                 <module>dspace-sword</module>
                 <module>dspace-swordv2</module>
                 <module>dspace-spring-rest</module>
@@ -858,7 +858,7 @@
                 <version>7.0-SNAPSHOT</version>
                 <type>war</type>
             </dependency>
-<!--             <dependency>
+            <dependency>
                 <groupId>org.dspace</groupId>
                 <artifactId>dspace-solr</artifactId>
                 <version>7.0-SNAPSHOT</version>
@@ -872,7 +872,6 @@
                 <type>war</type>
                 <classifier>skinny</classifier>
             </dependency>
- -->
             <!-- DSpace Localization Packages -->
             <dependency>
                 <groupId>org.dspace</groupId>

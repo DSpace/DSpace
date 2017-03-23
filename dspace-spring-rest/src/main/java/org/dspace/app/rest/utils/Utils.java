@@ -75,6 +75,10 @@ public class Utils {
 		}
 	}
 	
+	public String[] getRepositories() {
+		return applicationContext.getBeanNamesForType(DSpaceRestRepository.class);
+	}
+	
 	public static String makeSingular(String modelPlural) {
 		//The old dspace res package includes the evo inflection library which has a plural() function but no singular function
 		if (modelPlural.equals("communities")) {
