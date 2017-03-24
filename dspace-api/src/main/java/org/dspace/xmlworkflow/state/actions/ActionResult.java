@@ -8,15 +8,22 @@
 package org.dspace.xmlworkflow.state.actions;
 
 /**
- * A class that represent the result of an action
- * The result consists of 2 parts a type and a result
- * The type is represented by an enum and can either be something like
- * TYPE_OUTCOME: we have a certain outcome so move to another action/step
- * TYPE_ERROR: an error has occurred while processing the action
- * ...
+ * A class that represent the result of an {@link Action}.
+ * The result consists of 2 parts:  a type and a result.
  *
- * The optional results integer is used to determine
- * the next step once the action has completed
+ * <p>
+ * The type is represented by an Enum and can be something like:
+ * <dl>
+ *   <dt>TYPE_OUTCOME:</dt>         <dd>we have a certain outcome so move to another action/step.</dd>
+ *   <dt>TYPE_ERROR:</dt>           <dd>an error has occurred while processing the action.</dd>
+ *   <dt>TYPE_PAGE:</dt>
+ *   <dt>TYPE_CANCEL:</dt>
+ *   <dt>TYPE_SUBMISSION_PAGE:</dt>
+ * </dl>
+ *
+ * <p>
+ * The optional result integer is used to determine
+ * the next step once the action has completed.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -40,8 +47,9 @@ public class ActionResult {
      * step, ...
      */
     private TYPE type;
+
     /**
-     * The result int will determine what our next step is
+     * The result int will determine what our next step is.
      */
     private int result;
 
