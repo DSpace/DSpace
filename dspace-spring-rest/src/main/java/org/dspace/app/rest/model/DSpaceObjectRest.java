@@ -29,7 +29,6 @@ public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
 	private String name;
 	private String handle;
 	private String type;
-	private String projection = "foo";
 	
 	List<MetadataEntryRest> metadata;
 
@@ -53,14 +52,6 @@ public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getProjection() {
-		return projection;
-	}
-
-	public void setProjection(String projection) {
-		this.projection = projection;
 	}
 
 	public String getHandle() {

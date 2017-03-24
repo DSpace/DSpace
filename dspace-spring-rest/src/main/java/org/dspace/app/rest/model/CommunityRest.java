@@ -22,9 +22,7 @@ public class CommunityRest extends DSpaceObjectRest {
 
 	@JsonIgnore
 	CommunityRest        parentCommunity;
-	@JsonIgnore
 	List<CommunityRest>  subcommunities;
-	@JsonIgnore
 	List<CollectionRest> collections;
 
 	@Override

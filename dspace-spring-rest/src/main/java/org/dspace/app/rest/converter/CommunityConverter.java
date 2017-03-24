@@ -50,7 +50,6 @@ public class CommunityConverter
 			log.error("Error setting parent community for community "+communityRest.getHandle(), e);
 		}
 
-		communityRest.setProjection(projection);
 		if (checkProjection(projection, DSpaceObjectRest.PRJ_CONTEXT)) {
 			try {
 				List<CommunityRest> commrestlist = new ArrayList<>();

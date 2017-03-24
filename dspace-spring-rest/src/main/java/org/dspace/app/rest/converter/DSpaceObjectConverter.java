@@ -10,6 +10,7 @@ package org.dspace.app.rest.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
@@ -29,6 +30,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends org.dspace.app.rest.model.DSpaceObjectRest>
 		extends DSpaceConverter<M, R> {
+	private static final Logger log = Logger.getLogger(DSpaceObjectConverter.class);
 	@Override
 	public R fromModel(M obj, String projection) {
 		R resource = newInstance();
@@ -57,11 +59,14 @@ public abstract class DSpaceObjectConverter<M extends DSpaceObject, R extends or
 	protected abstract R newInstance();
 	
 	public boolean checkProjection(String projection, String value) {
+		log.error("TBTB1 "+projection);
 		if (projection == null) {
 			return false;
 		}
 		for (String s: projection.split(",")) {
+			log.error("TBTB2 "+s);
 			if (s.equals(value)) {
+				log.error("TBTB3 "+true);
 				return true;
 			}
 		}
