@@ -32,7 +32,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * When an item is submitted and is somewhere in a workflow, it has a row in the
  * WorkflowItem table pointing to it.
  *
- * Once the item has completed the workflow it will be archived
+ * Once the item has completed the workflow it will be archived.
  *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -47,7 +47,23 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
     public WorkflowActionConfig doState(Context c, EPerson user, HttpServletRequest request, int workflowItemId,
                                         Workflow workflow, WorkflowActionConfig currentActionConfig)
         throws SQLException, AuthorizeException, IOException, MessagingException, WorkflowException;
-
+    /**
+     * Execute the actions associated with a state, and return the next state.
+     *
+     * @param c session context.
+     * @param user current user.
+     * @param workflow item is in this workflow.
+     * @param currentStep workflow step being executed.
+     * @param currentActionConfig describes the current step's action.
+     * @param currentOutcome the result of executing the current step (accept/reject/etc).
+     * @param wfi the Item being processed through workflow.
+     * @param enteredNewStep is the Item advancing to a new workflow step?
+     * @return the next step's action.
+     * @throws SQLException passed through.
+     * @throws AuthorizeException passed through.
+     * @throws IOException passed through.
+     * @throws WorkflowException if the current step's outcome is unrecognized.
+     */
     public WorkflowActionConfig processOutcome(Context c, EPerson user, Workflow workflow, Step currentStep,
                                                WorkflowActionConfig currentActionConfig, ActionResult currentOutcome,
                                                XmlWorkflowItem wfi, boolean enteredNewStep)
@@ -74,6 +90,22 @@ public interface XmlWorkflowService extends WorkflowService<XmlWorkflowItem> {
         throws AuthorizeException, SQLException;
 
     public void removeUserItemPolicies(Context context, Item item, EPerson e) throws SQLException, AuthorizeException;
+
+    /**
+     * Send email to interested parties when curation tasks run.
+     *
+     * @param c session context.
+     * @param wi the item being curated.
+     * @param ePeople the interested parties.
+     * @param taskName the task that has been run.
+     * @param action the action indicated by the task (reject, approve, etc.)
+     * @param message anything the code wants to say about the task.
+     * @throws SQLException passed through.
+     * @throws IOException passed through.
+     */
+    public void notifyOfCuration(Context c, XmlWorkflowItem wi,
+            List<EPerson> ePeople, String taskName, String action, String message)
+            throws SQLException, IOException;
 
     public String getEPersonName(EPerson ePerson);
 }
