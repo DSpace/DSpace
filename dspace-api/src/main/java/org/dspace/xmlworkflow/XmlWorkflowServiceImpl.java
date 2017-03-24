@@ -18,6 +18,7 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.*;
+import org.dspace.curate.service.XmlWorkflowCuratorService;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.GroupService;
@@ -40,6 +41,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+import org.apache.commons.lang.StringUtils;
+import org.dspace.workflowbasic.BasicWorkflowItem;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
@@ -57,7 +60,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     /* support for 'no notification' */
     protected Map<UUID, Boolean> noEMail = new HashMap<>();
 
-    private Logger log = Logger.getLogger(XmlWorkflowServiceImpl.class);
+    private final Logger log = Logger.getLogger(XmlWorkflowServiceImpl.class);
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
@@ -85,6 +88,8 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
     protected XmlWorkflowItemService xmlWorkflowItemService;
     @Autowired(required = true)
     protected GroupService groupService;
+    @Autowired(required = true)
+    protected XmlWorkflowCuratorService xmlWorkflowCuratorService;
 
     protected XmlWorkflowServiceImpl()
     {
@@ -268,12 +273,21 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
      * Executes an action and returns the next.
      */
     @Override
-    public WorkflowActionConfig doState(Context c, EPerson user, HttpServletRequest request, int workflowItemId, Workflow workflow, WorkflowActionConfig currentActionConfig) throws SQLException, AuthorizeException, IOException, MessagingException, WorkflowException {
+    public WorkflowActionConfig doState(Context c, EPerson user,
+            HttpServletRequest request, int workflowItemId, Workflow workflow,
+            WorkflowActionConfig currentActionConfig)
+            throws SQLException, AuthorizeException, IOException,
+            MessagingException, WorkflowException
+    {
         try {
             XmlWorkflowItem wi = xmlWorkflowItemService.find(c, workflowItemId);
             Step currentStep = currentActionConfig.getStep();
             if(currentActionConfig.getProcessingAction().isAuthorized(c, request, wi)){
                 ActionResult outcome = currentActionConfig.getProcessingAction().execute(c, wi, currentStep, request);
+                if (outcome.getType() != ActionResult.TYPE.TYPE_ERROR && outcome.getType() != ActionResult.TYPE.TYPE_CANCEL)
+                {
+                    xmlWorkflowCuratorService.doCuration(c, wi);
+                }
                 return processOutcome(c, user, workflow, currentStep, currentActionConfig, outcome, wi, false);
             }else{
                 throw new AuthorizeException("You are not allowed to to perform this task.");
@@ -532,6 +546,68 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
             log.warn(LogManager.getHeader(context, "notifyOfArchive",
                     "cannot email user" + " item_id=" + item.getID()));
         }
+    }
+
+    // send notices of curation activity
+    @Override
+    public void notifyOfCuration(Context c, XmlWorkflowItem wi,
+            List<EPerson> ePeople, String taskName, String action, String message)
+            throws SQLException, IOException
+    {
+        try
+        {
+            // Get the item title
+            String title = getItemTitle(wi);
+
+            // Get the submitter's name
+            String submitter = getSubmitterName(wi);
+
+            // Get the collection
+            Collection coll = wi.getCollection();
+
+            for (EPerson epa : ePeople)
+            {
+                Locale supportedLocale = I18nUtil.getEPersonLocale(epa);
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "flowtask_notify"));
+                email.addArgument(title);
+                email.addArgument(coll.getName());
+                email.addArgument(submitter);
+                email.addArgument(taskName);
+                email.addArgument(message);
+                email.addArgument(action);
+                email.addRecipient(epa.getEmail());
+                email.send();
+            }
+        }
+        catch (MessagingException e)
+        {
+            log.warn(LogManager.getHeader(c, "notifyOfCuration",
+                    "cannot email users of workflow_item_id " + wi.getID()
+                            + ":  " + e.getMessage()));
+        }
+    }
+
+    protected String getItemTitle(XmlWorkflowItem wi) throws SQLException
+    {
+        Item myitem = wi.getItem();
+        String title = myitem.getName();
+
+        // only return the first element, or "Untitled"
+        if (StringUtils.isNotBlank(title))
+        {
+            return title;
+        }
+        else
+        {
+            return I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled ");
+        }
+    }
+
+    protected String getSubmitterName(XmlWorkflowItem wi) throws SQLException
+    {
+        EPerson e = wi.getSubmitter();
+
+        return getEPersonName(e);
     }
 
     /***********************************
