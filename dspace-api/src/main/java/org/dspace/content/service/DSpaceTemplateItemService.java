@@ -51,4 +51,13 @@ public class DSpaceTemplateItemService implements TemplateItemService {
                     md[n].value, md[n].authority, md[n].confidence);
         }
 	}
+	
+    public void clearTemplate(Context context, Item targetItem, Item templateItem)
+    {
+        Metadatum md[] = templateItem.getMetadata("*", "*", "*", "*");
+        for(int n = 0; n < md.length; n++) {
+            targetItem.clearMetadata(md[n].schema, md[n].element, md[n].qualifier, "*");
+        }
+
+    }
 }
