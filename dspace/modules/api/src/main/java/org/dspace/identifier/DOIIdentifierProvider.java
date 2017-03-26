@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -55,8 +54,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private String myHdlPrefix;
 
-    private String myHostname;
-
     private String myDataPkgColl;
 
     private String myDataFileColl;
@@ -68,8 +65,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private int mySuffixVarLength;
 
-    private final SecureRandom myRandom = new SecureRandom();
-
     Minter perstMinter = null;
 
     private String[] supportedPrefixes = new String[]{"info:doi/", "doi:" , "http://dx.doi.org/"};
@@ -78,7 +73,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     public void afterPropertiesSet() throws Exception {
 
         myHdlPrefix = configurationService.getProperty("handle.prefix");
-        myHostname = configurationService.getProperty("dryad.url");
         myBlackoutURL = configurationService.getProperty("dryad.blackout.url");
         myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
         myDataFileColl = configurationService.getProperty("stats.datafiles.coll");
@@ -165,7 +159,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             if (dso instanceof Item) {
                 Item item = (Item) dso;
                 String doiString = getDoiValue((Item) dso);
-
                 if(doiString!=null){
                     // Remove from DOI service only if the item is not registered
                     if(!item.isArchived()){
@@ -187,11 +180,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                         if (history.getLatestVersion().getItem().equals(item)) {
                             String collection = getCollection(context, previous);
                             addNewDOItoItem(getCanonicalDOIString(doiString), previous, true, collection);
-                        }
-
-                        // if the item isn't archived, the canonical DOI already points to the previous item.
-                        // update the metadata for the previous version of the item.
-                        if (history.size() == 2 && !item.isArchived()) {
                         }
                     }
                 }
@@ -251,15 +239,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
         }
         return doi;
-    }
-
-    private void revertDoisFirstItem(Context context, VersionHistory history) throws SQLException, IOException, AuthorizeException {
-        Item previous = history.getPrevious(history.getLatestVersion()).getItem();
-        String doiString = getDoiValue(previous);
-        if (doiString != null) {
-            String canonicalDOIString = getCanonicalDOIString(doiString);
-            updateItemDOIMetadata(previous, canonicalDOIString);
-        }
     }
 
     // When a DOI needs to be versioned for the first time:
