@@ -151,7 +151,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             addNewDOItoItem(getCanonicalDOIString(doiString), item, true, collection);
 
             // if 1st version mint .1
-            mintDOIAtVersion(context, item, true, 1);
+            mintDOIAtVersion(context, doiString, item, 1);
 
         }catch (Exception e) {
             log.error(LogManager.getHeader(context, "Error while attempting to addNewDOItoItem doi", "Item id: " + dso.getID()));
@@ -265,7 +265,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     // When a DOI needs to be versioned for the first time:
     // if the item has a versionhistory and the previous version was the first version,
     // update that previous item to be version 1: dryad.xxxx.1
-    private DOI mintDOIAtVersion(Context context, Item item, boolean register, int versionNumber) throws SQLException, IOException, AuthorizeException {
+    private DOI mintDOIAtVersion(Context context, String doiString, Item item, int versionNumber) throws SQLException, IOException, AuthorizeException {
         VersionHistory history = retrieveVersionHistory(context, item);
 
         if (history != null) {
@@ -303,18 +303,17 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 updateItemDOIMetadata(previousItem, previousDOI);
                 DOI firstDOI = new DOI(previousDOI, previousItem);
                 if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                    mint(firstDOI, myBlackoutURL, register, createListMetadata(previousItem));
+                    mint(firstDOI, myBlackoutURL, true, createListMetadata(previousItem));
                 } else {
-                    mint(firstDOI, register, createListMetadata(previousItem));
+                    mint(firstDOI, true, createListMetadata(previousItem));
                 }
             }
             return getDOI(getDoiValue(item), item);
         } else {
-            log.warn("Item " + getDoiValue(item) + " has no versions yet: start at " + versionNumber);
+            log.warn("Item " + doiString + " has no versions yet: start at " + versionNumber);
             VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
             versioningService.startNewVersionHistoryAt(context, item, "added file at version " + versionNumber, versionNumber);
-            DOI versionedDOI = new DOI(getVersionedDataFileDOIString(getDoiValue(item),versionNumber), item);
-            mint(versionedDOI,false,createListMetadata(item));
+            DOI versionedDOI = new DOI(getVersionedDataFileDOIString(doiString, versionNumber), item);
             return versionedDOI;
         }
     }
@@ -647,9 +646,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                         return new DOI(getDataFileDOIString(packageDOIString,index), item);
                     } else {
                         // versioned; file version needs to match package version
-                        DOI versionedDOI = new DOI(getVersionedDataFileDOIString(packageDOIString,index,Integer.parseInt(packageVersion)), item);
-                        mintDOIAtVersion(context, item, true, Integer.valueOf(packageVersion));
-                        return versionedDOI;
+                        return mintDOIAtVersion(context, canonicalFileDOIString, item, Integer.valueOf(packageVersion));
                     }
                 }
             }
