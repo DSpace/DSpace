@@ -291,9 +291,12 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                             if(dpHistoryPrevious!=null && oldDOIstring!=null)
                             {
                                 Item previousDataPackage = dpHistoryPrevious.getItem();
-
-                                updateHasPartDataFile(context,previousDataPackage,previousDOI,oldDOIstring);
-                                updateIsPartDataFile(context,previousItem,previousDataPackage);
+                                // check to see if the version number for the previous package matches the previous file:
+                                // if so, update the hasPart and isPart for that previous package.
+                                if (getDOIVersion(getDoiValue(previousDataPackage)).equals(getDOIVersion(previousDOI))) {
+                                    updateHasPartDataFile(context, previousDataPackage, previousDOI, oldDOIstring);
+                                    updateIsPartDataFile(context, previousItem, previousDataPackage);
+                                }
                             }
                         }
                     }
