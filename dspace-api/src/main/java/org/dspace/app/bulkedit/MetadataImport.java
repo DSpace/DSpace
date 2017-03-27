@@ -1235,7 +1235,8 @@ public class MetadataImport
         options.addOption("s", "silent", false, "silent operation - doesn't request confirmation of changes USE WITH CAUTION");
         options.addOption("w", "workflow", false, "workflow - when adding new items, use collection workflow");
         options.addOption("n", "notify", false, "notify - when adding new items using a workflow, send notification emails");
-        options.addOption("t", "template", false, "template - when adding new items, use the collection template (if it exists)");        
+        options.addOption("t", "template", false, "template - when adding new items, use the collection template (if it exists)");
+        options.addOption("r", "rebuild", false, "rebuild template and inherit default collection authorization");
         options.addOption("h", "help", false, "help");
 
         // Parse the command line arguments
