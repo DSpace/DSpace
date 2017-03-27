@@ -12,10 +12,11 @@
 # {10}   Membership Year Start
 # {11}   Membership Year Duration (yearsa)
 # {12}   Dryad Representative Name
-# {13}  Dryad Representative Email
-# {14}  Comments
-# {15}  User Agent
-# {16}  Session ID
+# {13}  Dryad Representative Title
+# {14}  Dryad Representative Email
+# {15}  Comments
+# {16}  User Agent
+# {17}  Session ID
 #
 Subject: Dryad: Membership Application Submitted
 
@@ -33,10 +34,11 @@ Billing address:				{8}
 Publications:					{9}
 Membership Term:				{10}, {11}
 Dryad Representative Name:		{12}
-Dryad Representative Email:		{13}
-Comments:						{14}
-User Agent:						{15}
-Session ID:						{16}
+Dryad Representative Title:     {13}
+Dryad Representative Email:		{14}
+Comments:						{15}
+User Agent:						{16}
+Session ID:						{17}
 
 Thanks,
 
