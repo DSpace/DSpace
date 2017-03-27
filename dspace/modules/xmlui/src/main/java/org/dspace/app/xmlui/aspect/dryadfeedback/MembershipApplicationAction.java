@@ -176,10 +176,9 @@ public class MembershipApplicationAction extends AbstractAction
         }
 
 
-        // All data is there, send the email
+        // All data is there, send the application to membership processing:
         Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "membership_application"));
-        email.addRecipient(ConfigurationManager
-                .getProperty("membership.recipient"));
+        email.addRecipient(ConfigurationManager.getProperty("membership.recipient"));
 
         email.addArgument(new Date());
         email.addArgument(org_name);
@@ -202,6 +201,30 @@ public class MembershipApplicationAction extends AbstractAction
 
         // May generate MessageExceptions.
         email.send();
+
+        // Now send the confirmation email to the rep_email address provided.
+        Email confEmail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "membership_application_confirmation"));
+        confEmail.addRecipient(rep_email);
+
+        confEmail.addArgument(new Date());
+        confEmail.addArgument(org_name);
+        confEmail.addArgument(org_legalname);
+        confEmail.addArgument(org_type);
+        confEmail.addArgument(org_annual_revenue);
+        confEmail.addArgument(org_annual_revenue_currency);
+        confEmail.addArgument(billing_contact_name);
+        confEmail.addArgument(billing_email);
+        confEmail.addArgument(billing_address);
+        confEmail.addArgument(publications);
+        confEmail.addArgument(membership_year_start);
+        confEmail.addArgument(membership_length);
+        confEmail.addArgument(rep_name);
+        confEmail.addArgument(rep_title);
+        confEmail.addArgument(rep_email);
+        confEmail.addArgument(comments);
+
+        // May generate MessageExceptions.
+        confEmail.send();
 
         // Finished, allow to pass.
         return null;
