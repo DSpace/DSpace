@@ -1,0 +1,191 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<!-- We have to comment out the DTD to run, but use it to validate when editing -->
+<!--
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+-->
+<html>
+    <head>
+        <title>Human subjects data</title>
+        <style type="text/css">
+            div#ds-body { margin: 0px 0px 0px 0px;padding-right: 10px; top: 165px;}
+
+            #hsd-identifiers {
+                table-layout: fixed;
+                width: 100%;
+            }
+            #hsd-identifiers td, #hsd-identifiers th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+
+            #hsd-identifiers th {
+                padding-top: 12px;
+                padding-bottom: 12px;
+                background-color: #EEEEEE;
+                color: white;
+            }
+            h2{
+              margin-top:30px;
+            }
+            .listbox {
+                background:#dde6c5;
+                border: 1px solid #d4dcbd;
+                -moz-border-radius: 15px;
+                border-radius: 15px;
+                margin:18px 24px 24px 24px;
+                padding:6px 40px 20x 40px;
+            }
+            .innerlistbox {
+                background:#f8ffe6;
+                margin:18px;
+                padding: 12px;
+            }
+            p.light {
+                background-color: #f8ffe6;
+            }
+            p.dark {
+                background-color: #dde6c5;
+            } 
+        </style>
+    </head>
+    <body>
+        <div id="ds-body">
+            <h1 class="ds-div-head">Human subjects data</h1>
+            <div class="ds-static-div primary">
+                <p>Data archived in Dryad are publicly available,
+                and any human subjects data must be properly anonymized and prepared under applicable legal and ethical guidelines.
+                When de-identifying your data, both direct and indirect identifiers need to be considered.
+                </p>
+                <p>
+                <strong>Dryad does not allow any direct identifiers, but a dataset may contain up to 3 indirect identifiers</strong>.
+                Direct identifiers include variables such as participant’s name, initials, email, and postal code;
+                indirect identifiers are data that if combined might lead to identification (see below).
+                </p>
+                <p>
+                <strong>Note:</strong> While every submission is evaluated by our curation team and we provide guidance for researchers to follow,
+                the researchers themselves are responsible for ensuring that data do not contain information which identifies,
+                or which can be used in conjunction with other publicly available information to personally identify,
+                any individual (see <a href="http://datadryad.org/pages/policies">Dryad’s Terms of Service</a>).
+                </p>
+                <h2>Tips for preparing human subjects data for Dryad</h2>
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li>Ensure that there are no direct identifiers.</li>
+                    <li>Limit indirect identifiers. (Dryad allows a maximum of 3.)</li>
+                    <li>Remove any nonessential identifying details.</li>
+                    <li>Aggregate data – variables which may be potentially revealing, e.g., age, can be grouped.</li>
+                    <li>Reduce the precision of a variable – e.g., 
+                        remove day and month from year of birth; 
+                        use county instead of city; 
+                        add or subtract a small, randomly chosen number.</li>
+                    <li>Restrict the upper or lower ranges of a continuous variable to hide outliers by collapsing them into a single code.</li>
+                    <li>Provide good documentation of your data in a ReadMe file.</li>
+                </ul>
+                <p>
+                <a href="https://grants.nih.gov/grants/policy/data_sharing/data_sharing_guidance.htm#hs">NIH states</a> that
+                "researchers should consider removing indirect identifiers and other information that could lead to 
+                'deductive disclosure' of participants identities. 
+                Deductive disclosure of individual subjects becomes more likely when there are unusual characteristics or 
+                the joint occurrence of several unusual variables. Samples drawn from small geographic areas, 
+                rare populations, 
+                and linked datasets can present particular challenges to the protection of subjects' identities."
+                </p>
+                <h2>README File</h2>
+                <p>
+                All data in Dryad should be well documented. Variables and their allowable values should be defined.
+                If you have masked your data, removed variables, or otherwise altered your dataset to de-identify it,
+                it is best practice to include this information in your README file.
+                See <a href="http://datadryad.org/pages/readme">Dryad’s guidance on README files</a> for more information.
+                </p>
+                <h2>Direct and Indirect Identifiers*</h2>
+                <div class="listbox">
+                    <div class="innerlistbox">
+                        <p class="light">
+                            <strong>Direct Identifiers (none allowed)</strong>
+                        </p>
+                        <ul class="text-list" style="margin-bottom: 10px;">
+                            <li>Name </li>
+                            <li>Initials</li>
+                            <li>Address, including full or partial postal code</li>
+                            <li>Telephone or fax numbers or contact information </li>
+                            <li>Electronic mail addresses </li>
+                            <li>Unique identifying numbers (e.g., social security number, student ID)</li>
+                            <li>Vehicle identifiers </li>
+                            <li>Medical device identifiers </li>
+                            <li>Web or internet protocol addresses</li>
+                            <li>Biometric data</li>
+                            <li>Facial photograph or comparable image (fMRI data must have facial structures removed through tools such as pydeface or mri_deface)</li>
+                            <li>Audiotapes of participants’ voices</li>
+                            <li>Names of relatives </li>
+                            <li>Dates related to an individual (e.g., date of birth, date of doctor visit, date of interview)</li>
+                        </ul>
+                    </div>
+                    <div class="innerlistbox">
+                        <p class="light">
+                        <strong>Indirect Identifiers (may present a risk if combined with other data – Dryad allows up to 3)</strong>
+                        </p>
+                        <ul class="text-list" style="margin-bottom: 10px;">
+                            <li>Sex</li>
+                            <li>Rare disease or treatment</li>
+                            <li>Place of treatment</li>
+                            <li>Name of health professional responsible for care</li>
+                            <li>Sensitive data such as illicit drug use or risky behavior**</li>
+                            <li>Criminal record</li>
+                            <li>Place of birth</li>
+                            <li>Socioeconomic data, such as occupation or place of work, income, or education</li>
+                            <li>Household and family composition</li>
+                            <li>Organizations that participant belongs to (religious, political, trade, etc.)</li>
+                            <li>Anthropometric  measures (e.g., height, weight)</li>
+                            <li>Multiple pregnancies</li>
+                            <li>Ethnicity, race, indigenous status</li>
+                            <li>Small denominators—population size of less than 100</li>
+                            <li>Very small numerators—event counts of less than 3</li>
+                            <li>Year of birth or age</li>
+                            <li>Verbatim responses or transcripts</li>
+                        </ul>
+                    </div>
+                </div>
+                <p>
+                    <strong>*</strong> Sources used:
+                </p>
+                <ul style="list-style: none;">
+                    <li style="margin-bottom:12px;margin-top:0px">Australian National Data Service. Sharing sensitive data. (n.d.). Retrieved February 01, 2017, from 
+                        <a href="http://www.ands.org.au/working-with-data/sensitive-data/sharing-sensitive-data">http://www.ands.org.au/working-with-data/sensitive-data/sharing-sensitive-data</a></li>
+                    <li style="margin-bottom:12px;">Canadian Institutes of Health Research. CIHR best practices for protecting privacy in health research: Limiting the collection of personal data (September 2005). Retrieved January 23, from 
+                        <a href="http://www.cihr-irsc.gc.ca/e/29072.html#Element2">http://www.cihr-irsc.gc.ca/e/29072.html#Element2</a></li>
+                    <li style="margin-bottom:12px;">Guide to Social Science Data Preparation and Archiving: Introduction. (n.d.). Retrieved January 30, 2017, from 
+                        <a href="http://www.icpsr.umich.edu/icpsrweb/content/deposit/guide/index.html">http://www.icpsr.umich.edu/icpsrweb/content/deposit/guide/index.html</a></li>
+                    <li style="margin-bottom:12px;">HIPAA. HIPAA privacy rule: Information for researchers. Limited data set and data use agreement. (n.d.). Retrieved January 20, 2017 from 
+                        <a href="https://privacyruleandresearch.nih.gov/pr_08.asp#8d">https://privacyruleandresearch.nih.gov/pr_08.asp#8d</a></li>
+                    <li style="margin-bottom:12px;">Hrynaszkiewicz Iain, Norton Melissa L, Vickers Andrew J, Altman Douglas G. (2010). 
+                        <a href="http://www.bmj.com/content/340/bmj.c181">Preparing raw clinical data for publication: guidance for journal editors, authors, and peer reviewers</a> BMJ Open 340 :c181</li>
+                    <li style="margin-bottom:12px;">UK Data Archive. Create and manage data: Anonymisation. (n.d.). Retrieved February 01, 2017 from 
+                        <a href="http://www.data-archive.ac.uk/create-manage/consent-ethics/anonymisation">http://www.data-archive.ac.uk/create-manage/consent-ethics/anonymisation</a></li>
+                </ul>
+                <p>
+                <strong>**</strong> "The sensitivity of personal data is related to the potential for harm or stigma that might attach to 
+                the identification of an individual because of the nature of the information...
+                Researchers should also be aware of information that communities may consider sensitive because, 
+                for example, of its potential to stigmatize a community" (CIHR, p. 30).
+                </p>
+                <h2>Considerations regarding qualitative data</h2>
+                <p>Guidelines gathered from the Qualitative Data Repository (QDR) 
+                at Syracuse University’s Center for Qualitative and Multi-Method Inquiry:
+                </p>
+                <p>
+                Tips for anonymizing qualitative data:
+                </p>
+                <ul class="text-list" style="margin-bottom: 10px;">
+                    <li>Removing major (direct) identifying details (e.g., real names, locations); replacing them with pseudonyms, replacement terms (e.g., “paternal grandfather”), vaguer descriptors or coding system; and using a cross-referencing system for pseudonyms that will not be made available to users</li>
+                    <li>Removing information in a transcript or notes from a human encounter that may reveal the identity of project participants</li>
+                    <li>Aggregating or reducing the precision of information or a variable, e.g., replacing date of birth by age groups or city names by county names</li>
+                    <li>Generalizing the meaning of detailed text, e.g., replacing a doctor’s detailed area of medical expertise with an area of medical specialty</li>
+                    <li>Noting the replacement of identifying details in text and the removal or modification of information in a meaningful way (for instance, in transcribed interviews, indicating replaced text with [brackets])</li>
+                </ul>
+                <p>See also: 
+                    <a href="http://www.data-archive.ac.uk/create-manage/consent-ethics/anonymisation?index=2">UK Data Archive: Anonymisation</a>
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
