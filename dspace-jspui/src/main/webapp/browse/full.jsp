@@ -27,6 +27,7 @@
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
+<%@ page import="org.dspace.eperson.EPerson" %>
 
 <c:set var="dspace.layout.head" scope="request">
 <script type="text/javascript">
@@ -123,7 +124,7 @@ function sortBy(idx, ord)
 	}
 
 	String valueString = "";
-	if (value!=null)
+	if (value != null)
 	{
 		valueString = "&amp;" + argument + "=" + URLEncoder.encode(value, "UTF-8");
 	}
@@ -194,6 +195,18 @@ function sortBy(idx, ord)
     // Admin user or not
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    
+    EPerson user = (EPerson) request.getAttribute("dspace.current.user");    
+	boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.list.enabled", false);
+	boolean exportBiblioAll =  ConfigurationManager.getBooleanProperty("exportcitation.show.all", false);
+	String cfg = ConfigurationManager.getProperty("exportcitation.options");
+	
+	boolean exportBiblio = false;
+	if(exportBiblioEnabled && ( exportBiblioAll || user!=null) ){
+		exportBiblio = true;
+	}
+	String inputBiblio =null;
+    
 %>
 
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
@@ -204,7 +217,41 @@ function sortBy(idx, ord)
 </c:set>
 <c:set var="locbarType"><c:choose><c:when test="${location eq null}"><c:set var="fmtkey"></c:set></c:when><c:otherwise>link</c:otherwise></c:choose></c:set>
 <dspace:layout titlekey="browse.page-title" locbar="${locbarType}" parenttitlekey="${fmtkey}" parentlink="/cris/explore/${location}" navbar="<%=layoutNavbar %>">
+<script type="text/javascript">
+<!--
 
+jQuery(document).ready(function() {
+	jQuery("#item_idchecker").click(function() {
+		var inputbutton = jQuery(this).prop('id');
+		var var1 = jQuery(this).data('checkboxname');
+		var inputstatus = jQuery('#'+inputbutton).prop( "checked");
+		jQuery("input[name*='"+var1+"']").prop('checked', inputstatus);
+		jQuery('#submit_export').attr('disabled', !inputstatus);
+	});
+	
+	var checkboxes = jQuery("input[type='checkbox']"), submitButt = jQuery("#export-submit-button"), radio = jQuery("input[type='radio']");
+	
+	radio.click(function() {
+		if('refworks'==jQuery(this).prop('id')) {
+			jQuery('#email').attr("checked", false);
+			jQuery('#email').attr("disabled", true);
+		} else {
+			jQuery('#email').attr("disabled", false);
+		}
+	});
+	
+	checkboxes.click(function() {
+		if('email'==jQuery(this).prop('id')) {
+			//NOTHING TO DO	
+		}
+		else {
+			submitButt.attr("disabled", !checkboxes.is(":checked"));	
+		}		
+	});
+});
+-->
+
+</script>
 	<%-- Build the header (careful use of spacing) --%>
 	<h2>
 		<fmt:message key="browse.full.header"><fmt:param value="<%= scope %>"/></fmt:message> <fmt:message key="<%= typeKey %>"/> 
@@ -512,11 +559,43 @@ function sortBy(idx, ord)
 	</div>
 	
     <%-- output the results using the browselist tag --%>
+    
     <%
+	if (exportBiblio) {
+		inputBiblio="item_id";
+%>
+
+		<form target="blank" class="form-inline"  id="exportform" action="<%= request.getContextPath() %>/references">
+
+		<div id="export-biblio-panel">
+	<%		
+		if (cfg == null)
+		{
+			cfg = "refman, endnote, bibtex, refworks";
+		}
+		String[] cfgSplit = cfg.split("\\s*,\\s*");
+		for (String format : cfgSplit) {
+	%>
+		<c:set var="format"><%= format %></c:set>	    
+		<label class="radio-inline">
+    		  <input id="${format}" type="radio" name="format" value="${format}" <c:if test="${format=='bibtex'}"> checked="checked"</c:if>/><fmt:message key="exportcitation.option.${format}" />
+	    </label>
+		
+	<% 		}
+	  %>
+		<label class="checkbox-inline">
+			<input type="checkbox" id="email" name="email" value="true"/><fmt:message key="exportcitation.option.email" />
+		</label>
+			<input id="export-submit-button" class="btn btn-default" type="submit" name="submit_export" value="<fmt:message key="exportcitation.option.submitexport" />" disabled/>
+		</div>
+	<%
+	 	}
+    
     	if (bix.isMetadataIndex())
     	{
     %>
-	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getMetadata() %>" />
+    
+	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getMetadata() %>"  inputName="<%= inputBiblio %>" />
     <%
         }
         else if (withdrawn || privateitems)
@@ -528,10 +607,16 @@ function sortBy(idx, ord)
     	else
     	{
 	%>
-	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>" />
+	<dspace:browselist browseInfo="<%= bi %>" emphcolumn="<%= bix.getSortOption().getMetadata() %>" inputName="<%= inputBiblio %>"/>
 	<%
     	}
-	%>
+  
+	if (exportBiblio ) {
+	%>	
+
+	</form>
+	<% }%>
+	
 	<%-- give us the bottom report on what we are looking at --%>
 	<div class="panel-footer text-center">
 		<fmt:message key="browse.full.range">
