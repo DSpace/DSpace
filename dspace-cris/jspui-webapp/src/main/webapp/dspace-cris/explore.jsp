@@ -99,7 +99,7 @@ function submitForm() {
 <c:set var="fmtkey">
  jsp.layout.navbar-default.cris.${location}
 </c:set>
-<dspace:layout locbar="link" parenttitlekey="${fmtkey}" parentlink="/explore/${location}" titlekey="${fmtkey}">
+<dspace:layout locbar="link" parenttitlekey="${fmtkey}" parentlink="/cris/explore/${location}" titlekey="${fmtkey}">
 <div class="row">
 	<div class="col-sm-4 col-md-3">
 		<h2><fmt:message key="jsp.general.browse" /></h2>

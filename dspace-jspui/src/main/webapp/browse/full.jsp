@@ -199,7 +199,11 @@ function sortBy(idx, ord)
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
 
 <%@page import="java.util.Set"%>
-<dspace:layout titlekey="browse.page-title" navbar="<%=layoutNavbar %>">
+<c:set var="fmtkey">
+ jsp.layout.navbar-default.cris.${location}
+</c:set>
+<c:set var="locbarType"><c:choose><c:when test="${location eq null}"><c:set var="fmtkey"></c:set></c:when><c:otherwise>link</c:otherwise></c:choose></c:set>
+<dspace:layout titlekey="browse.page-title" locbar="${locbarType}" parenttitlekey="${fmtkey}" parentlink="/cris/explore/${location}" navbar="<%=layoutNavbar %>">
 
 	<%-- Build the header (careful use of spacing) --%>
 	<h2>
