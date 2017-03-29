@@ -334,6 +334,15 @@
         "embargo" : "Y"
      },
      {
+        "sponsor" : "Society for the Study of Evolution/European Society for Evolutionary Biology",
+        "title" : "Evolution Letters",
+        "integrated" : "Y",
+        "hidden" : "N",
+        "issn" : "2056-3744",
+        "submission" : "A",
+        "embargo" : "Y"
+     },
+     {
         "integrated" : "Y",
         "hidden" : "Y",
         "issn" : "1752-4571",
