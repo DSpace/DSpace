@@ -15,6 +15,8 @@ public interface VersioningService {
 
     Version createNewVersion(Context c, int itemId, String summary);
 
+    VersionHistory startNewVersionHistoryAt(Context c, Item item, String summary, int versionNumber);
+
     void removeVersion(Context c, int versionID);
 
     void removeVersion(Context c, Item item);
