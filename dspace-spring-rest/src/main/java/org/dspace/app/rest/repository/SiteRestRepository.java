@@ -40,7 +40,6 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 	
 	
 	public SiteRestRepository() {
-		System.out.println("Repository initialized by Spring");
 	}
 
 	@Override
@@ -60,7 +59,7 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 	@Override
 	public Page<SiteRest> findAll(Context context, Pageable pageable) {
 		List<Site> sites = new ArrayList<Site>();
-		int total = 0;
+		int total = 1;
 		try {
 			sites.add(sitesv.findSite(context));
 		} catch (SQLException e) {
