@@ -176,32 +176,89 @@ public class MembershipApplicationAction extends AbstractAction
         }
 
 
-        // All data is there, send the email
+        // All data is there, send the application to membership processing:
         Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "membership_application"));
-        email.addRecipient(ConfigurationManager
-                .getProperty("membership.recipient"));
+        email.addRecipient(ConfigurationManager.getProperty("membership.recipient"));
 
+//# {0}   Submission Date
         email.addArgument(new Date());
+//# {1}   Organization Name
         email.addArgument(org_name);
+//# {2}   Organization Legalname (if different)
         email.addArgument(org_legalname);
+//# {3}   Organization Type
         email.addArgument(org_type);
+//# {4}   Organization annual revenue
         email.addArgument(org_annual_revenue);
+//# {5}   Organization annual revenue currency
         email.addArgument(org_annual_revenue_currency);
+//# {6}   Billing Contact Name
         email.addArgument(billing_contact_name);
+//# {7}   Billing Contact Email
         email.addArgument(billing_email);
+//# {8}   Billing address
         email.addArgument(billing_address);
+//# {9}   Publications
         email.addArgument(publications);
+//# {10}   Membership Year Start
         email.addArgument(membership_year_start);
+//# {11}   Membership Year Duration (yearsa)
         email.addArgument(membership_length);
+//# {12}   Dryad Representative Name
         email.addArgument(rep_name);
+//# {13}  Dryad Representative Title
         email.addArgument(rep_title);
+//# {14}  Dryad Representative Email
         email.addArgument(rep_email);
+//# {15}  Comments
         email.addArgument(comments);
+//# {16}  User Agent
         email.addArgument(agent);
+//# {17}  Session ID
         email.addArgument(session);
 
         // May generate MessageExceptions.
         email.send();
+
+        // Now send the confirmation email to the rep_email address provided.
+        Email confEmail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "membership_application_confirmation"));
+        confEmail.addRecipient(rep_email);
+
+//# {0}   Submission Date
+        confEmail.addArgument(new Date());
+//# {1}   Organization Name
+        confEmail.addArgument(org_name);
+//# {2}   Organization Legalname (if different)
+        confEmail.addArgument(org_legalname);
+//# {3}   Organization Type
+        confEmail.addArgument(org_type);
+//# {4}   Organization annual revenue
+        confEmail.addArgument(org_annual_revenue);
+//# {5}   Organization annual revenue currency
+        confEmail.addArgument(org_annual_revenue_currency);
+//# {6}   Billing Contact Name
+        confEmail.addArgument(billing_contact_name);
+//# {7}   Billing Contact Email
+        confEmail.addArgument(billing_email);
+//# {8}   Billing address
+        confEmail.addArgument(billing_address);
+//# {9}   Publications
+        confEmail.addArgument(publications);
+//# {10}   Membership Year Start
+        confEmail.addArgument(membership_year_start);
+//# {11}   Membership Year Duration (yearsa)
+        confEmail.addArgument(membership_length);
+//# {12}   Dryad Representative Name
+        confEmail.addArgument(rep_name);
+//# {13}  Dryad Representative Title
+        confEmail.addArgument(rep_title);
+//# {14}  Dryad Representative Email
+        confEmail.addArgument(rep_email);
+//# {15}  Comments
+        confEmail.addArgument(comments);
+
+        // May generate MessageExceptions.
+        confEmail.send();
 
         // Finished, allow to pass.
         return null;

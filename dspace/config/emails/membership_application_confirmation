@@ -15,12 +15,19 @@
 # {13}  Dryad Representative Title
 # {14}  Dryad Representative Email
 # {15}  Comments
-# {16}  User Agent
-# {17}  Session ID
 #
-Subject: Dryad: Membership Application Submitted
+Subject: Your Dryad membership application has been received
 
-A new Dryad Membership Application has been submitted:
+Thank you for submitting your membership application to Dryad. We will contact you shortly.
+
+Thanks,
+
+The Dryad Team
+
+
+
+
+Application details:
 
 Submission Date:				{0}
 Organization Name:				{1}
@@ -37,9 +44,4 @@ Dryad Representative Name:		{12}
 Dryad Representative Title:     {13}
 Dryad Representative Email:		{14}
 Comments:						{15}
-User Agent:						{16}
-Session ID:						{17}
 
-Thanks,
-
-The Dryad Team
