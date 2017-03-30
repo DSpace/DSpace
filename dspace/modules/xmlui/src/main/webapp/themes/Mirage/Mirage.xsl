@@ -405,11 +405,11 @@
                         <!-- Journal of the American Medical Informatics Association -->
 		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+the%5C+american%5C+medical%5C+informatics%5C+association%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+the%5C+American%5C+Medical%5C+Informatics%5C+Association"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAMIA.png" alt="Journal of the American Medical Informatics Association" /></a>
 
-                        <!-- Research Ideas and Outcomes -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aresearch%5C+ideas%5$
-
                         <!-- Insect Systematics and Diversity -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ainsect%5C+systematics%5C+and%5C+diversity%5C%7C%5C%7C%5C%7CInsect%5C+Systematics%5C+and%5C+Diversity"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ISDIVE.png" alt="Insect Systematics and Diversity" /></a>
+
+                        <!-- Research Ideas and Outcomes -->
+		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aresearch%5C+ideas%5C+and%5C+outcomes%5C%7C%5C%7C%5C%7CResearch%5C+Ideas%5C+and%5C+Outcomes"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-RIO.png" alt="Research Ideas and Outcomes" /></a>
 
                     </div>
                 </div>
