@@ -137,12 +137,12 @@ public class DisplayItemMetadataUtils {
 			String postfix) throws SQLException, JspException {
 		List<DisplayMetadata> metadata = new ArrayList<DisplayMetadata>();
 
-		String style = styleSelection.getStyleForItem(item);
+		String style = styleSelection.getStyleForItem(context, item, req);
 		String configLine = "";
-		if (postfix != null && styleSelection.isConfigurationDefinedForStyle(style + "." + postfix)) {
-			configLine = styleSelection.getConfigurationForStyle(style + "." + postfix);
+		if (postfix != null && styleSelection.isConfigurationDefinedForStyle(context, style + "." + postfix, req)) {
+			configLine = styleSelection.getConfigurationForStyle(context, style + "." + postfix, req);
 		} else {
-			configLine = styleSelection.getConfigurationForStyle(style);
+			configLine = styleSelection.getConfigurationForStyle(context, style, req);
 		}
 
 		if (configLine == null) {
@@ -209,7 +209,7 @@ public class DisplayItemMetadataUtils {
 				String label = null;
 				try {
 					label = I18nUtil.getMessage("metadata." + ("default".equals(style) ? "" : style + ".") + field,
-							context);
+							context.getCurrentLocale(), true);
 				} catch (MissingResourceException e) {
 					// if there is not a specific translation for the style we
 					// use the default one

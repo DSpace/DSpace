@@ -9,7 +9,10 @@ package org.dspace.app.webui.util;
 
 import java.sql.SQLException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.content.Item;
+import org.dspace.core.Context;
 /**
  * Interface for a strategy of style selection
  *  
@@ -25,7 +28,7 @@ public interface StyleSelection
      * @return the style name to use for display simple metadata of the item 
      * @throws SQLException
      */
-    public String getStyleForItem(Item item) throws SQLException;
+    public String getStyleForItem(Context context, Item item, HttpServletRequest request) throws SQLException;
 
     /**
      * Get the configuration of the style passed as argument.
@@ -33,12 +36,12 @@ public interface StyleSelection
      * 
      * @param style
      */
-    public String getConfigurationForStyle(String style);
+    public String getConfigurationForStyle(Context context, String style, HttpServletRequest request) throws SQLException;
     
     /**
      * Return true if the requested configuration is defined, it doesn't fallback to default configuration
      * @param style
      * @return
      */
-    public boolean isConfigurationDefinedForStyle(String style);
+    public boolean isConfigurationDefinedForStyle(Context context, String style, HttpServletRequest request) throws SQLException;
 }

@@ -9,10 +9,13 @@ package org.dspace.app.webui.util;
 
 import java.sql.SQLException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 
 /**
  * Use the value of the metadata specified with the key <code>webui.display.metadata-style</code>
@@ -31,7 +34,7 @@ public class MetadataStyleSelection extends AKeyBasedStyleSelection
     /**
      * Get the style using an item metadata
      */
-    public String getStyleForItem(Item item) throws SQLException
+    public String getStyleForItem(Context context, Item item, HttpServletRequest req) throws SQLException
     {
         String metadata = ConfigurationManager.getProperty("webui.itemdisplay.metadata-style");
         Metadatum[] value = item.getMetadataByMetadataString(metadata);
@@ -50,7 +53,7 @@ public class MetadataStyleSelection extends AKeyBasedStyleSelection
         
        
         // Specific style specified. Check style exists
-        if (isConfigurationDefinedForStyle(styleName))
+        if (isConfigurationDefinedForStyle(context, styleName, req))
         {
             log.warn("metadata '" + metadata + "' specify undefined item display style '"
                     + styleName + "'.  Using default");

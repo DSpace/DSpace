@@ -11,10 +11,13 @@ import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 
 /**
  * This is the standard (until 1.4.x) configuration mode based on owning collection handle
@@ -35,14 +38,14 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
     /**
      * Get the style using the owning collection handle
      */
-    public String getStyleForItem(Item item) throws SQLException
+    public String getStyleForItem(Context context, Item item, HttpServletRequest req) throws SQLException
     {
         Collection c = item.getOwningCollection();
  
         if(c!=null)
         {    
             // Style specified & exists
-            return getFromMap(c.getHandle());
+            return getFromMap(context, req, c.getHandle());
         }
         else
         {
@@ -87,8 +90,9 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
      * 
      * @param handle
      * @return the specific style or the default if not properly defined
+     * @throws SQLException 
      */
-    public String getFromMap(String handle)
+    public String getFromMap(Context context, HttpServletRequest req, String handle) throws SQLException
     {
         if (styles == null)
         {
@@ -104,7 +108,7 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
         }
 
         // Specific style specified. Check style exists
-        if (isConfigurationDefinedForStyle(styleName))
+        if (isConfigurationDefinedForStyle(context, styleName, req))
         {
             log.warn("dspace.cfg specifies undefined item display style '"
                     + styleName + "' for collection handle " + handle + ".  Using default");
