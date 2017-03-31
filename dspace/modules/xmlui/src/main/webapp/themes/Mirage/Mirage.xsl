@@ -391,7 +391,7 @@ data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.ed
 </li>
 
 <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.139325/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item even">
+<li class="ds-artifact-item odd">
 <div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
 <a href="/resource/doi:10.5061/dryad.mb463">
 <span class="author">Blondiaux N, Moune M, Desroses M, Frita R, Flipo M, Mathys V, Soetaert K, Kiass M, Delorme V, Djaout K, Trebosc V, Kemmer C, Wintjens R, Wohlkönig A, Antoine R, Huot L, Hot D, Coscolla M, Feldmann J, Gagneux S, Locht C, Brodin P, Gitzinger M, Deprez B, Willand N, Baulard AR</span>
@@ -405,7 +405,7 @@ data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.ed
   </div>
   </li>
 <!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.136797/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item odd">
+<li class="ds-artifact-item even">
 <div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
 <a href="/resource/doi:10.5061/dryad.b2p3j">
 <span class="author">Johnson RE, Kording KP, Hargrove LJ, Sensinger JW</span>
