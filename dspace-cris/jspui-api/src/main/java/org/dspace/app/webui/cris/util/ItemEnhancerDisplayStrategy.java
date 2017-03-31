@@ -21,35 +21,46 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.core.I18nUtil;
+import org.dspace.discovery.IGlobalSearchResult;
 
 public class ItemEnhancerDisplayStrategy extends ASimpleDisplayStrategy
 {
-	
+
     /**
      * log4j category
      */
     public static final Log log = LogFactory
             .getLog(ItemEnhancerDisplayStrategy.class);
 
-	@Override
-	public String getMetadataDisplay(HttpServletRequest hrq, int limit,
-			boolean viewFull, String browseType, int colIdx, int itemId,
-			String field, Metadatum[] metadataArray, boolean disableCrossLinks,
-			boolean emph) throws JspException {
-	    Item item;
-	    String metadata = "";
+    @Override
+    public String getMetadataDisplay(HttpServletRequest hrq, int limit,
+            boolean viewFull, String browseType, int colIdx, int itemId,
+            String field, Metadatum[] metadataArray, boolean disableCrossLinks,
+            boolean emph) throws JspException
+    {
+        return commonDisplay(hrq, itemId, field);
+    }
+
+    private String commonDisplay(HttpServletRequest hrq, int itemId,
+            String field)
+    {
+        Item item;
+        String metadata = "";
         try
         {
             item = Item.find(UIUtil.obtainContext(hrq), itemId);
             List<String> results = item.getMetadataValue(field);
             int i = 0;
-            for (String result : results) {
-                if (i>0) {
+            for (String result : results)
+            {
+                if (i > 0)
+                {
                     metadata += "<br/>";
                 }
-                try { 
-                    metadata += I18nUtil
-                            .getMessage("ItemEnhancerDisplayStrategy." + result, true);
+                try
+                {
+                    metadata += I18nUtil.getMessage(
+                            "ItemEnhancerDisplayStrategy." + result, true);
                 }
                 catch (MissingResourceException e2)
                 {
@@ -61,7 +72,17 @@ public class ItemEnhancerDisplayStrategy extends ASimpleDisplayStrategy
         {
             log.error(e.getMessage(), e);
         }
-	    
-    	return metadata;
+
+        return metadata;
     }
+
+    @Override
+    public String getMetadataDisplay(HttpServletRequest hrq, int limit,
+            boolean viewFull, String browseType, int colIdx, String field,
+            List<String> metadataArray, IGlobalSearchResult item,
+            boolean disableCrossLinks, boolean emph) throws JspException
+    {
+        return commonDisplay(hrq, item.getID(), field);
+    }
+
 }
