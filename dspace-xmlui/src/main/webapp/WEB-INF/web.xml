@@ -101,19 +101,22 @@
   <!--
     - Declare a filter to force UTF-8 encoding for all servlet requests
     -->
-  <filter>
-    <filter-name>SetCharacterEncoding</filter-name>
-    <filter-class>org.dspace.app.xmlui.cocoon.SetCharacterEncodingFilter</filter-class>
-    <init-param>
-      <param-name>encoding</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-  </filter>
-
-  <!--
-       Declare a filter to do content negotiation in combination for our
-       Linked Data support.
-    -->
+    <filter>
+        <filter-name>SetCharacterEncoding</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <!--
+         Declare a filter to do content negotiation in combination for our
+         Linked Data support.
+      -->
   <filter>
       <filter-name>rdf-content-negotiation</filter-name>
       <filter-class>org.dspace.rdf.negotiation.NegotiationFilter</filter-class>
