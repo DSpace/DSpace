@@ -47,9 +47,6 @@ public class Context
 {
     private static final Logger log = Logger.getLogger(Context.class);
 
-    /** option flags */
-    public static final short READ_ONLY = 0x01;
-
     /** Current user - null means anonymous access */
     private EPerson currentUser;
 
@@ -723,15 +720,15 @@ public class Context
     }
 
     public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
-        if(mode == Mode.READ_ONLY) {
+        if(isReadOnly()) {
             return authorizedActionsCache.get(buildAuthorizedActionKey(dspaceObject, action, eperson));
         } else {
-            return false;
+            return null;
         }
     }
 
     public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result) {
-        if(mode == Mode.READ_ONLY) {
+        if(isReadOnly()) {
             authorizedActionsCache.put(buildAuthorizedActionKey(dspaceObject, action, eperson), result);
         }
     }

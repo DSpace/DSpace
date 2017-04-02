@@ -320,7 +320,7 @@ public class RDFConsumer implements Consumer
         // create a new context, to be sure to work as anonymous user
         // we don't want to store private data in a triplestore with public
         // SPARQL endpoint.
-        ctx = new Context(Context.READ_ONLY);
+        ctx = new Context(Context.Mode.READ_ONLY);
         if (toDelete == null) 
         {
             log.debug("Deletion queue does not exists, creating empty queue.");

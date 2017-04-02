@@ -40,6 +40,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
+import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
@@ -146,7 +147,10 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     	if (validity == null)
     	{
 	        try {
-	            DSpaceValidity theValidity = new DSpaceValidity();
+                Context.Mode originalMode = context.getCurrentMode();
+                context.setMode(Context.Mode.READ_ONLY);
+
+                DSpaceValidity theValidity = new DSpaceValidity();
 	            
 	            TreeNode treeRoot = buildTree(communityService.findAllTop(context));
 	            
@@ -187,6 +191,8 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
                 }
 	            
 	            this.validity = theValidity.complete();
+
+                context.setMode(originalMode);
 	        } 
 	        catch (SQLException sqle) 
 	        {
@@ -236,6 +242,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         division.setHead(T_head);
         division.addPara(T_select);
 
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+
         TreeNode treeRoot = buildTree(communityService.findAllTop(context));
 
         boolean full = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.community-list.render.full", true);
@@ -264,6 +273,8 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
  	        }
         	
         }
+
+        context.setMode(originalMode);
     } 
     
     /**
