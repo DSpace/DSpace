@@ -371,6 +371,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return false;
         }
 
+        Boolean cachedResult = c.getCachedAuthorizationResult(o, Constants.ADMIN, c.getCurrentUser());
+        if (cachedResult != null) {
+            return cachedResult.booleanValue();
+        }
+
         //
         // First, check all Resource Policies directly on this object
         //
@@ -383,6 +388,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
             {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(c.getCurrentUser()))
                 {
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), true);
                     return true; // match
                 }
 
@@ -391,6 +397,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
                 {
                     // group was set, and eperson is a member
                     // of that group
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), true);
                     return true;
                 }
             }
@@ -403,9 +410,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
         DSpaceObject parent = serviceFactory.getDSpaceObjectService(o).getParentObject(c, o);
         if (parent != null)
         {
-            return isAdmin(c, parent);
+            boolean admin = isAdmin(c, parent);
+            c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), admin);
+            return admin;
         }
 
+        c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), false);
         return false;
     }
 

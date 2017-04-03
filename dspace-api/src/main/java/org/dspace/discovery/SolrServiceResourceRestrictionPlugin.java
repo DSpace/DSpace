@@ -29,10 +29,8 @@ import org.dspace.eperson.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
@@ -98,7 +96,7 @@ public class SolrServiceResourceRestrictionPlugin implements SolrServiceIndexPlu
                 }
 
                 //Retrieve all the groups the current user is a member of !
-                List<Group> groups = groupService.allMemberGroups(context, currentUser);
+                Set<Group> groups = groupService.allMemberGroupsSet(context, currentUser);
                 for (Group group : groups) {
                     resourceQuery.append(" OR g").append(group.getID());
                 }

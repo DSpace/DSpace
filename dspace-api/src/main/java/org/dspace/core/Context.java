@@ -7,7 +7,10 @@
  */
 package org.dspace.core;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
@@ -80,9 +83,8 @@ public class Context
     /** Context mode */
     private Mode mode = Mode.READ_WRITE;
 
-    /** Authorized actions cache that is used when the context is in READ_ONLY mode.
-     * The key of the cache is: DSpace Object ID, action ID, Eperson ID. */
-    private final HashMap<Triple<String, Integer, String>, Boolean> authorizedActionsCache = new HashMap<>();
+    /** Cache that is only used the context is in READ_ONLY mode */
+    private ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
 
     protected EventService eventService;
 
@@ -391,12 +393,16 @@ public class Context
             log.info("commit() was called on a closed Context object. No changes to commit.");
         }
 
+        if(isReadOnly()) {
+            throw new UnsupportedOperationException("You cannot commit a read-only context");
+        }
+
         // Our DB Connection (Hibernate) will decide if an actual commit is required or not
         try
         {
             // As long as we have a valid, writeable database connection,
             // commit any changes made as part of the transaction
-            if (isValid() && !isReadOnly())
+            if (isValid())
             {
                 dispatchEvents();
             }
@@ -721,7 +727,7 @@ public class Context
 
     public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
         if(isReadOnly()) {
-            return authorizedActionsCache.get(buildAuthorizedActionKey(dspaceObject, action, eperson));
+            return readOnlyCache.getCachedAuthorizationResult(dspaceObject, action, eperson);
         } else {
             return null;
         }
@@ -729,14 +735,36 @@ public class Context
 
     public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result) {
         if(isReadOnly()) {
-            authorizedActionsCache.put(buildAuthorizedActionKey(dspaceObject, action, eperson), result);
+            readOnlyCache.cacheAuthorizedAction(dspaceObject, action, eperson, result);
         }
     }
 
-    private ImmutableTriple<String, Integer, String> buildAuthorizedActionKey(DSpaceObject dspaceObject, int action, EPerson eperson) {
-        return new ImmutableTriple<>(dspaceObject == null ? "" : dspaceObject.getID().toString(),
-                Integer.valueOf(action),
-                eperson == null ? "" : eperson.getID().toString());
+    public Boolean getCachedGroupMembership(Group group, EPerson eperson) {
+        if(isReadOnly()) {
+            return readOnlyCache.getCachedGroupMembership(group, eperson);
+        } else {
+            return null;
+        }
+    }
+
+    public void cacheGroupMembership(Group group, EPerson eperson, Boolean isMember) {
+        if(isReadOnly()) {
+            readOnlyCache.cacheGroupMembership(group, eperson, isMember);
+        }
+    }
+
+    public void cacheAllMemberGroupsSet(EPerson ePerson, Set<Group> groups) {
+        if(isReadOnly()) {
+            readOnlyCache.cacheAllMemberGroupsSet(ePerson, groups);
+        }
+    }
+
+    public Set<Group> getCachedAllMemberGroupsSet(EPerson ePerson) {
+        if(isReadOnly()) {
+            return readOnlyCache.getCachedAllMemberGroupsSet(ePerson);
+        } else {
+            return null;
+        }
     }
 
     /**

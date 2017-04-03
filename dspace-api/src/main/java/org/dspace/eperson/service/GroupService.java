@@ -9,6 +9,7 @@ package org.dspace.eperson.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
@@ -153,6 +154,8 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @throws SQLException if database error
      */
     public List<Group> allMemberGroups(Context context, EPerson ePerson) throws SQLException;
+
+    Set<Group> allMemberGroupsSet(Context context, EPerson ePerson) throws SQLException;
 
     /**
      * Get all of the epeople who are a member of the

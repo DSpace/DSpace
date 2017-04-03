@@ -381,7 +381,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        List member = edit.addList("eperson-member-of");
 	        member.setHead(T_member_head);
 
-	        java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
+	        java.util.Set<Group> groups = groupService.allMemberGroupsSet(context, eperson);
 	        for (Group group : groups)
 	        {
 	        	String url = contextPath + "/admin/groups?administrative-continue="+knot.getId()+"&submit_edit_group&groupID="+group.getID();
@@ -433,7 +433,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		// Otherwise check what group this eperson is a member through
 		java.util.List<Group> targets = group.getMemberGroups();
 		
-		java.util.List<Group> groups = groupService.allMemberGroups(context, eperson);
+		java.util.Set<Group> groups = groupService.allMemberGroupsSet(context, eperson);
 		for (Group member : groups)
 		{
 			for (Group target : targets)

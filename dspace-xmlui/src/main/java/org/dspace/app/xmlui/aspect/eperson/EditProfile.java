@@ -452,7 +452,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        if (!registering)
        {
                 // Add a list of groups that this user is apart of.
-                        java.util.List<Group> memberships = groupService.allMemberGroups(context, context.getCurrentUser());
+                        java.util.Set<Group> memberships = groupService.allMemberGroupsSet(context, context.getCurrentUser());
                 
                 
                         // Not a member of any groups then don't do anything.

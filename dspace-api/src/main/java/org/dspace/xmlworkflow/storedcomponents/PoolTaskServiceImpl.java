@@ -20,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Service implementation for the PoolTask object.
@@ -92,7 +89,7 @@ public class PoolTaskServiceImpl implements PoolTaskService {
             else{
                 //If the user does not have a claimedtask yet, see whether one of the groups of the user has pooltasks
                 //for this workflow item
-                List<Group> groups = groupService.allMemberGroups(context, ePerson);
+                Set<Group> groups = groupService.allMemberGroupsSet(context, ePerson);
                 for (Group group : groups) {
                     poolTask = poolTaskDAO.findByWorkflowItemAndGroup(context, group, workflowItem);
                     if(poolTask != null)
