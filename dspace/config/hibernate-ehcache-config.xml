@@ -300,6 +300,11 @@
 
     <!-- DSpace classes in the second level cache -->
 
+    <cache name="org.dspace.content.Site"
+           maxElementsInMemory="1" eternal="false" timeToIdleSeconds="86400"
+           timeToLiveSeconds="86400" overflowToDisk="false" diskExpiryThreadIntervalSeconds="60"
+           memoryStoreEvictionPolicy="LRU"/>
+
     <cache name="org.dspace.content.MetadataSchema"
            maxElementsInMemory="1000" eternal="false" timeToIdleSeconds="3600"
            timeToLiveSeconds="3600" overflowToDisk="true" diskExpiryThreadIntervalSeconds="60"
@@ -313,6 +318,11 @@
     <cache name="org.dspace.eperson.Group"
            maxElementsInMemory="3000" eternal="false" timeToIdleSeconds="1800"
            timeToLiveSeconds="3600" overflowToDisk="false" diskExpiryThreadIntervalSeconds="60"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="org.dspace.eperson.EPerson"
+           maxElementsInMemory="1000" eternal="false" timeToIdleSeconds="1800"
+           timeToLiveSeconds="1800" overflowToDisk="false" diskExpiryThreadIntervalSeconds="60"
            memoryStoreEvictionPolicy="LRU"/>
 
 <!-- DISTRIBUTED CACHING

@@ -32,6 +32,7 @@ public class SiteDAOImpl extends AbstractHibernateDAO<Site> implements SiteDAO
     @Override
     public Site findSite(Context context) throws SQLException {
         Criteria criteria = createCriteria(context, Site.class);
+        criteria.setCacheable(true);
         return uniqueResult(criteria);
     }
 }
