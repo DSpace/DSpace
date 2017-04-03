@@ -7,11 +7,6 @@
  */
 package org.dspace.core;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.EPerson;
@@ -112,6 +107,7 @@ public class Context
     }
 
     protected Context(EventService eventService, DBConnection dbConnection)  {
+        this.mode = Mode.READ_WRITE;
         this.eventService = eventService;
         this.dbConnection = dbConnection;
         init();
@@ -124,6 +120,7 @@ public class Context
      */
     public Context()
     {
+        this.mode = Mode.READ_WRITE;
         init();
     }
 
@@ -685,6 +682,7 @@ public class Context
             case READ_WRITE:
                 dbConnection.setOptimizedForBatchProcessing(false);
                 dbConnection.setReadOnly(false);
+                break;
             default:
                 log.warn("New context mode detected that has nog been configured.");
                 break;
