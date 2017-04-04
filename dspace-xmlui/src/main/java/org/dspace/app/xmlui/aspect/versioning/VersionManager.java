@@ -83,6 +83,7 @@ public class VersionManager {
             context.abort();
             throw new RuntimeException(ex);
         }
+        context.complete();
         return result;
     }
 
