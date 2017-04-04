@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.core;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -13,11 +20,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
+ * Object that manages the read-only caches for the Context class
  */
 public class ContextReadOnlyCache {
 
