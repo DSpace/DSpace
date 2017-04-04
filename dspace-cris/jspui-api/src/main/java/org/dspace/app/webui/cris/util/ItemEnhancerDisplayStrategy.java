@@ -49,21 +49,14 @@ public class ItemEnhancerDisplayStrategy extends ASimpleDisplayStrategy
         try
         {
             item = Item.find(UIUtil.obtainContext(hrq), itemId);
-            List<String> results = item.getMetadataValue(field);
-            int i = 0;
-            for (String result : results)
-            {
-                if (i > 0)
-                {
-                    metadata += "<br/>";
-                }
-                try
-                {
+            String result = item.getMetadata(field);
+            
+            if(result != null) {
+                try {      
                     metadata += I18nUtil.getMessage(
-                            "ItemEnhancerDisplayStrategy." + result, true);
+                                "ItemEnhancerDisplayStrategy." + result, true);
                 }
-                catch (MissingResourceException e2)
-                {
+                catch(Exception ex) {
                     metadata += result;
                 }
             }
