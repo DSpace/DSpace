@@ -11,6 +11,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.*;
 import org.dspace.eperson.Group;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -34,6 +35,8 @@ import java.util.List;
  */
 @Entity
 @Table(name="collection")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport
 {
 

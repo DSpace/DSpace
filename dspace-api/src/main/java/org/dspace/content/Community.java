@@ -13,6 +13,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.*;
 import org.dspace.eperson.Group;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -30,6 +31,8 @@ import java.util.*;
  */
 @Entity
 @Table(name="community")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 {
     /** log4j category */
