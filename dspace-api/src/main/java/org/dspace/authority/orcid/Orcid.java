@@ -9,8 +9,10 @@ package org.dspace.authority.orcid;
 
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.orcid.model.Bio;
+import org.dspace.authority.orcid.model.Profile;
 import org.dspace.authority.orcid.model.Work;
 import org.dspace.authority.orcid.xml.XMLtoBio;
+import org.dspace.authority.orcid.xml.XMLtoProfile;
 import org.dspace.authority.orcid.xml.XMLtoWork;
 import org.dspace.authority.rest.RestSource;
 import org.apache.commons.lang.StringUtils;
@@ -58,6 +60,15 @@ public class Orcid extends RestSource {
         return bio;
     }
 
+    public Profile getProfile(String id) {
+        // The affiliations are only available using the v1.2 (or greater) API
+        Document document = restConnector.get("v1.2/" + id + "/orcid-profile");
+        XMLtoProfile converter = new XMLtoProfile();
+        Profile profile = converter.convertProfile(document).get(0);
+        profile.setOrcid(id);
+        return profile;
+    }
+
     public List<Work> getWorks(String id) {
         Document document = restConnector.get(id + "/orcid-works");
         XMLtoWork converter = new XMLtoWork();
@@ -99,14 +110,15 @@ public class Orcid extends RestSource {
         List<Bio> bios = queryBio(text, 0, max);
         List<AuthorityValue> authorities = new ArrayList<AuthorityValue>();
         for (Bio bio : bios) {
-            authorities.add(OrcidAuthorityValue.create(bio));
+            // Do a separate query for each person to get their full profile including affiliations
+            authorities.add(queryAuthorityID(bio.getOrcid()));
         }
         return authorities;
     }
 
     @Override
     public AuthorityValue queryAuthorityID(String id) {
-        Bio bio = getBio(id);
-        return OrcidAuthorityValue.create(bio);
+        Profile profile = getProfile(id);
+        return OrcidAuthorityValue.create(profile);
     }
 }

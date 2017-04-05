@@ -10,10 +10,10 @@ package org.dspace.authority.orcid;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueServiceImpl;
 import org.dspace.authority.PersonAuthorityValue;
-import org.dspace.authority.orcid.model.Bio;
 import org.dspace.authority.orcid.model.BioExternalIdentifier;
 import org.dspace.authority.orcid.model.BioName;
 import org.dspace.authority.orcid.model.BioResearcherUrl;
+import org.dspace.authority.orcid.model.Profile;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
@@ -118,23 +118,23 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
     }
 
     /**
-     * Create an authority based on a given orcid bio
-     * @param bio Bio
+     * Create an authority based on a given orcid profile
+     * @param profile Profile
      * @return OrcidAuthorityValue
      */
-    public static OrcidAuthorityValue create(Bio bio) {
+    public static OrcidAuthorityValue create(Profile profile) {
         OrcidAuthorityValue authority = OrcidAuthorityValue.create();
 
-        authority.setValues(bio);
+        authority.setValues(profile);
 
         return authority;
     }
 
-    public boolean setValues(Bio bio) {
-        BioName name = bio.getName();
+    public boolean setValues(Profile profile) {
+        BioName name = profile.getName();
 
-        if (updateValue(bio.getOrcid(), getOrcid_id())) {
-            setOrcid_id(bio.getOrcid());
+        if (updateValue(profile.getOrcid(), getOrcid_id())) {
+            setOrcid_id(profile.getOrcid());
         }
 
         if (updateValue(name.getFamilyName(), getLastName())) {
@@ -158,30 +158,40 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
             }
         }
 
-        if (updateOtherMetadata("country", bio.getCountry())) {
-            addOtherMetadata("country", bio.getCountry());
+        if (updateOtherMetadata("country", profile.getCountry())) {
+            addOtherMetadata("country", profile.getCountry());
         }
 
-        for (String keyword : bio.getKeywords()) {
+        if (updateOtherMetadata("email", profile.getEmail())) {
+            addOtherMetadata("email", profile.getEmail());
+        }
+
+        for (String keyword : profile.getKeywords()) {
             if (updateOtherMetadata("keyword", keyword)) {
                 addOtherMetadata("keyword", keyword);
             }
         }
 
-        for (BioExternalIdentifier externalIdentifier : bio.getBioExternalIdentifiers()) {
+        for (BioExternalIdentifier externalIdentifier : profile.getBioExternalIdentifiers()) {
             if (updateOtherMetadata("external_identifier", externalIdentifier.toString())) {
                 addOtherMetadata("external_identifier", externalIdentifier.toString());
             }
         }
 
-        for (BioResearcherUrl researcherUrl : bio.getResearcherUrls()) {
+        for (BioResearcherUrl researcherUrl : profile.getResearcherUrls()) {
             if (updateOtherMetadata("researcher_url", researcherUrl.toString())) {
                 addOtherMetadata("researcher_url", researcherUrl.toString());
             }
         }
 
-        if (updateOtherMetadata("biography", bio.getBiography())) {
-            addOtherMetadata("biography", bio.getBiography());
+        if (updateOtherMetadata("biography", profile.getBiography())) {
+            addOtherMetadata("biography", profile.getBiography());
+        }
+
+        for (String affiliation : profile.getAffiliations()) {
+            if (updateOtherMetadata("affiliation", affiliation)) {
+                addOtherMetadata("affiliation", affiliation);
+            }
         }
 
         setValue(getName());
@@ -222,6 +232,14 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
         Map<String, String> map = super.choiceSelectMap();
 
         map.put("orcid", getOrcid_id());
+
+        if (otherMetadata.containsKey("email") && !otherMetadata.get("email").isEmpty()) {
+            map.put("email", otherMetadata.get("email").get(0));
+        }
+
+        if (otherMetadata.containsKey("affiliation") && !otherMetadata.get("affiliation").isEmpty()) {
+            map.put("affiliation", StringUtils.join(otherMetadata.get("affiliation"), "; "));
+        }
 
         return map;
     }

@@ -54,6 +54,7 @@ public class XMLtoBio extends Converter {
 
     protected String CONTACT_DETAILS = "contact-details";
     protected String COUNTRY = CONTACT_DETAILS + "/address/country";
+    protected String EMAIL = CONTACT_DETAILS + "/email[@primary='true']";
 
     protected String KEYWORDS = "keywords";
     protected String KEYWORD = KEYWORDS + "/keyword";
@@ -70,9 +71,7 @@ public class XMLtoBio extends Converter {
     protected String URL_NAME = "url-name";
     protected String URL = "url";
 
-    protected String BIOGRAPHY = ORCID_BIO + "/biography";
-
-    protected String AFFILIATIONS = ORCID_BIO + "/affiliation";
+    protected String BIOGRAPHY = "biography";
 
     /**
      * Regex
@@ -130,7 +129,7 @@ public class XMLtoBio extends Converter {
     }
 
 
-    private void setOrcid(Node node, Bio bio) {
+    protected void setOrcid(Node node, Bio bio) {
         try {
             String orcid = XMLUtils.getTextContent(node, ORCID);
             bio.setOrcid(orcid);
@@ -209,6 +208,13 @@ public class XMLtoBio extends Converter {
             bio.setCountry(country);
         } catch (XPathExpressionException e) {
             log.error("Error in finding the country in bio xml.", e);
+        }
+
+        try {
+            String email = XMLUtils.getTextContent(xml, EMAIL);
+            bio.setEmail(email);
+        } catch (XPathExpressionException e) {
+            log.error("Error in finding the email in bio xml.", e);
         }
     }
 
