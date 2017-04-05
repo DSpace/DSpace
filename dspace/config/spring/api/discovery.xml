@@ -90,6 +90,25 @@
 	<bean
 		id="org.dspace.discovery.configuration.DiscoveryConfigurationService"
 		class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
+		<property name="extraConfigurationMapping">
+			<map>
+				<entry key="crisrp">
+					<list>
+						<value>researcherprofiles</value>
+					</list>
+				</entry>
+				<entry key="crisou">
+					<list>
+						<value>orgunits</value>
+					</list>
+				</entry>
+				<entry key="crispj">
+					<list>
+						<value>fundings</value>
+					</list>
+				</entry>
+			</map>
+		</property>
 		<property name="map">
 			<map>
 				<!--The map containing all the settings, the key is used to refer to 
@@ -100,23 +119,14 @@
 	            <entry key="global" value-ref="globalConfiguration" />
 	            <!--Use site to override the default configuration for the home page & default discovery page-->
 				<entry key="site" value-ref="homepageConfiguration" />	            
-	            <entry key="dspaceitem" value-ref="itemConfiguration" />
-	            <entry key="crisrp" value-ref="crisRPConfiguration" />
-	            <entry key="crisproject" value-ref="crisPJConfiguration" />
-	            <entry key="crisou" value-ref="crisOUConfiguration" />
 	            <entry key="researcherprofiles" value-ref="crisRPConfiguration" />	            
 	            <entry key="fundings" value-ref="crisPJConfiguration" />	            
 	            <entry key="orgunits" value-ref="crisOUConfiguration" />
 	            <entry key="publications" value-ref="itemConfiguration" />	            
-	            <entry key="dspacepublications" value-ref="itemConfiguration" />
 	            <entry key="theses" value-ref="thesisConfiguration" />
-	            <entry key="dspacetheses" value-ref="thesisConfiguration" />
 	            <entry key="patents" value-ref="patentsConfiguration" />
-	            <entry key="dspacepatents" value-ref="patentsConfiguration" />
 	            <entry key="conferencematerials" value-ref="conferencePaperConfiguration" />
-	            <entry key="dspaceconferencematerials" value-ref="conferencePaperConfiguration" />
 	            <entry key="datasets" value-ref="datasetConfiguration" />
-	            <entry key="dspacedatasets" value-ref="datasetConfiguration" />
 				<entry key="crisjournals" value-ref="crisJournalsConfiguration" />
 				<entry key="crisevents" value-ref="crisEventsConfiguration" />	            
 				<!--Use site to override the default configuration for the home page 

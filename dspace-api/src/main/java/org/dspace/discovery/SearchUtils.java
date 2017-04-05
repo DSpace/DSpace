@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.dspace.discovery.configuration.DiscoveryMostViewedConfiguration;
@@ -106,38 +107,34 @@ public class SearchUtils {
 		}
 		
         //Also add one for the default
-        DiscoveryConfiguration configuration = getDiscoveryConfiguration(null);
-        if(!result.containsKey(configuration.getId())){
-            result.put(configuration.getId(), configuration);
-        }
+        addConfigurationIfExists(result, null);
         
         //Add special dspacebasic discoveryConfiguration
-        DiscoveryConfiguration configurationExtra = getDiscoveryConfigurationByName("dspacebasic");
-        if(!result.containsKey(configurationExtra.getId())){
-            result.put(configurationExtra.getId(), configurationExtra);
+        DiscoveryConfiguration configurationExtra;
+        addConfigurationIfExists(result, "dspacebasic");
+
+        String typeText = item.getTypeText();
+        String isDefinedAsSystemEntity = ConfigurationManager.getProperty(
+                "cris", "facet.type." + typeText);
+        String extra = null;
+        if (StringUtils.isNotBlank(isDefinedAsSystemEntity)) {
+            extra = isDefinedAsSystemEntity.split("###")[1];
+            addConfigurationIfExists(result, extra);
         }
 
-        DiscoveryConfiguration configurationDSpaceObject = null;
-        if("item".equals(item.getTypeText())) {
-        	configurationDSpaceObject = getDiscoveryConfigurationByName("dspaceitem");	
-        }
-        else {
-        	configurationDSpaceObject = getDiscoveryConfigurationByName("dspace"+item.getTypeText());
-        }
-        if(configurationDSpaceObject!=null) {
-            if(!result.containsKey(configurationDSpaceObject.getId())){
-                result.put(configurationDSpaceObject.getId(), configurationDSpaceObject);
-            }        	
-        }
+        addConfigurationIfExists(result, "dspace"+typeText);
         
         //Add special global discoveryConfiguration
-        configurationExtra = getDiscoveryConfigurationByName(DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME);
-        if(!result.containsKey(configurationExtra.getId())){
-            result.put(configurationExtra.getId(), configurationExtra);
-        }
+        addConfigurationIfExists(result, DiscoveryConfiguration.GLOBAL_CONFIGURATIONNAME);
         return Arrays.asList(result.values().toArray(new DiscoveryConfiguration[result.size()]));
     }
 
+    private static void addConfigurationIfExists(Map<String, DiscoveryConfiguration> result, String confName) {
+        DiscoveryConfiguration configurationExtra = getDiscoveryConfigurationByName(confName);
+        if(!result.containsKey(configurationExtra.getId())){
+            result.put(configurationExtra.getId(), configurationExtra);
+        }
+    }
     
     public static DiscoveryViewAndHighlightConfiguration getDiscoveryViewAndHighlightConfigurationByName(
             String configurationName)

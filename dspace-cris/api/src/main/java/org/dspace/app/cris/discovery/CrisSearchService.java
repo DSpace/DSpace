@@ -872,6 +872,19 @@ public class CrisSearchService extends SolrServiceImpl
             {
                 discoveryConfigurations.add(crisConfiguration);
             }
+            
+            List<String> listExtraConfiguration = SearchUtils.getConfigurationService().getExtraConfigurationMapping().get(confName);
+            if (listExtraConfiguration != null) {
+                for (String eConf : listExtraConfiguration) {
+                    DiscoveryConfiguration extraCrisConfiguration = SearchUtils
+                            .getDiscoveryConfigurationByName(eConf);
+                    if (extraCrisConfiguration != null)
+                    {
+                        discoveryConfigurations.add(extraCrisConfiguration);
+                    }
+                }
+            }
+            
             for (DiscoveryConfiguration discoveryConfiguration : discoveryConfigurations)
             {
                 for (int i = 0; i < discoveryConfiguration.getSearchFilters()
