@@ -134,20 +134,15 @@ public class HibernateDBConnection implements DBConnection<Session> {
     }
 
     @Override
-    public void setOptimizedForBatchProcessing(final boolean batchOptimized) throws SQLException {
+    public void setConnectionMode(final boolean batchOptimized, final boolean readOnlyOptimized) throws SQLException {
         this.batchModeEnabled = batchOptimized;
+        this.readOnlyEnabled = readOnlyOptimized;
         configureDatabaseMode();
     }
 
     @Override
     public boolean isOptimizedForBatchProcessing() {
         return batchModeEnabled;
-    }
-
-    @Override
-    public void setReadOnly(boolean readOnlyOptimized) throws SQLException {
-        this.readOnlyEnabled = readOnlyOptimized;
-        configureDatabaseMode();
     }
 
     private void configureDatabaseMode() throws SQLException {

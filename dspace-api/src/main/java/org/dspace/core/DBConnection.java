@@ -40,11 +40,9 @@ public interface DBConnection<T> {
 
     public DatabaseConfigVO getDatabaseConfig() throws SQLException;
     
-    public void setOptimizedForBatchProcessing(boolean batchOptimized) throws SQLException;
+    public void setConnectionMode(boolean batchOptimized, boolean readOnlyOptimized) throws SQLException;
 
     public boolean isOptimizedForBatchProcessing();
-
-    public void setReadOnly(boolean readOnlyOptimized) throws SQLException;
 
     public long getCacheSize() throws SQLException;
 

@@ -665,28 +665,28 @@ public class Context
      * READ_WRITE: This is the default mode and enables the normal database behaviour. This behaviour is optimal for querying and updating a
      * small number of records.
      *
-     * @param mode The mode to put this context in
+     * @param newMode The mode to put this context in
      * @throws SQLException When configuring the database connection fails.
      */
-    public void setMode(Mode mode) throws SQLException {
-        
-        switch (mode) {
+    public void setMode(Mode newMode) throws SQLException {
+        //update the database settings
+        switch (newMode) {
             case BATCH_EDIT:
-                dbConnection.setOptimizedForBatchProcessing(true);
-                dbConnection.setReadOnly(false);
+                dbConnection.setConnectionMode(true, false);
                 break;
             case READ_ONLY:
-                dbConnection.setReadOnly(true);
-                dbConnection.setOptimizedForBatchProcessing(false);
+                dbConnection.setConnectionMode(false, true);
                 break;
             case READ_WRITE:
-                dbConnection.setOptimizedForBatchProcessing(false);
-                dbConnection.setReadOnly(false);
+                dbConnection.setConnectionMode(false, false);
                 break;
             default:
                 log.warn("New context mode detected that has nog been configured.");
                 break;
         }
+
+        //save the new mode
+        this.mode = newMode;
     }
 
     /**
@@ -695,6 +695,36 @@ public class Context
      */
     public Mode getCurrentMode() {
         return mode;
+    }
+
+    /**
+     * Enable or disable "batch processing mode" for this context.
+     *
+     * Enabling batch processing mode means that the database connection is configured so that it is optimized to
+     * process a large number of records.
+     *
+     * Disabling batch processing mode restores the normal behaviour that is optimal for querying and updating a
+     * small number of records.
+     *
+     * @param batchModeEnabled When true, batch processing mode will be enabled. If false, it will be disabled.
+     * @throws SQLException When configuring the database connection fails.
+     */
+    @Deprecated
+    public void enableBatchMode(boolean batchModeEnabled) throws SQLException {
+        if(batchModeEnabled) {
+            setMode(Mode.BATCH_EDIT);
+        } else {
+            setMode(Mode.READ_WRITE);
+        }
+    }
+
+    /**
+     * Check if "batch processing mode" is enabled for this context.
+     * @return True if batch processing mode is enabled, false otherwise.
+     */
+    @Deprecated
+    public boolean isBatchModeEnabled() {
+        return mode != null && mode == Mode.BATCH_EDIT;
     }
 
     /**
