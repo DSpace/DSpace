@@ -102,7 +102,7 @@
                     <dc-schema>dwc</dc-schema>
                     <dc-element>ScientificName</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Taxonomic names</label>
+                    <label>Taxonomic names (e.g., Thalassia hemprichii, Panthera pardus)</label>
                     <input-type>onebox</input-type>
                     <hint>Please enter taxonomic names associated with the data file. These may be names at any level (species or higher-level clade). Names may be added individually or separated by commas or semicolons. For example:
                         &lt;ul&gt;&lt;li&gt;Drosophila melanogaster&lt;/li&gt;&lt;li&gt;Geospizinae&lt;/li&gt;&lt;li&gt;Elaeis guineensis&lt;/li&gt;&lt;/ul&gt;
@@ -224,7 +224,7 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>correspondingAuthor</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Primary contact for data associated with this article</label>
+                    <label>Primary contact for data associated with this article (use author format)</label>
                     <input-type>onebox</input-type>
                     <hint></hint>
                 </field>
@@ -234,7 +234,7 @@
                     <dc-schema>dwc</dc-schema>
                     <dc-element>ScientificName</dc-element>
                     <repeatable>true</repeatable>
-                    <label>Taxonomic names</label>
+                    <label>Taxonomic names (e.g., Thalassia hemprichii, Panthera pardus)</label>
                     <input-type>onebox</input-type>
                     <hint>Please enter taxonomic names associated with the data file. These may be names at any level (species or higher-level clade). Names may be added individually or separated by commas or semicolons. For example:
                         &lt;ul&gt;&lt;li&gt;Drosophila melanogaster&lt;/li&gt;&lt;li&gt;Geospizinae&lt;/li&gt;&lt;li&gt;Elaeis guineensis&lt;/li&gt;&lt;/ul&gt;
