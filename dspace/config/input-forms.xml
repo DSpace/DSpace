@@ -71,7 +71,10 @@
                     <dc-element>readme</dc-element>
                     <label>ReadMe file</label>
                     <input-type>file</input-type>
-                    <hint>If additional user guidance is needed (e.g., codebook, definitions of variables or codes, de-identification methods), please upload a ReadMe file. See more information at http://datadryad.org/pages/readme.
+                    <hint>If additional user guidance is needed 
+                          (e.g., codebook, definitions of variables or codes, de-identification methods),
+                           please upload a ReadMe file.
+                           See more information at http://datadryad.org/pages/readme.
                     </hint>
                 </field>
                 <field>
