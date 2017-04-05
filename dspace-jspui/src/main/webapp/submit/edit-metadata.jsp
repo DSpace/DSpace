@@ -1150,7 +1150,7 @@
         .append(fieldName)
         .append("\"");
       if (repeatable)
-        sb.append(" size=\"6\"  multiple=\"multiple\"");
+        sb.append(" size=\"15\"  multiple=\"multiple\"");
       if (readonly)
       {
           sb.append(" disabled=\"disabled\"");
