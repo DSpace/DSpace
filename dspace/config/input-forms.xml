@@ -139,13 +139,9 @@
                     <repeatable>true</repeatable>
                     <label>Geologic timespans covered by this data file</label>
                     <input-type>onebox</input-type>
-
-
-                    <hint>Please enter geologic timespans associated with the data file. Timespans may be added individually or separated by commas or semicolons. For example:<br />
-                        * Mesozoic <br />* Devonian <br />* Holocene
+                    <hint>Please enter geologic timespans associated with the data file. Timespans may be added individually or separated by commas or semicolons. For example:
+                        &lt;ul&gt;&lt;li&gt;Mesozoic&lt;/li&gt;&lt;li&gt;Devonian&lt;/li&gt;&lt;li&gt;Holocene&lt;/li&gt;&lt;/ul&gt;
                     </hint>
-
-
                     <split>[,|;]</split>
                 </field>
             </page>
