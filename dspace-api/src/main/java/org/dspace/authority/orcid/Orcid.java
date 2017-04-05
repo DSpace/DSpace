@@ -13,6 +13,7 @@ import org.dspace.authority.orcid.model.Work;
 import org.dspace.authority.orcid.xml.XMLtoBio;
 import org.dspace.authority.orcid.xml.XMLtoWork;
 import org.dspace.authority.rest.RestSource;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.w3c.dom.Document;
@@ -20,6 +21,7 @@ import org.w3c.dom.Document;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -63,7 +65,31 @@ public class Orcid extends RestSource {
     }
 
     public List<Bio> queryBio(String name, int start, int rows) {
-        Document bioDocument = restConnector.get("search/orcid-bio?q=" + URLEncoder.encode("\"" + name + "\"") + "&start=" + start + "&rows=" + rows);
+        name = name.trim();
+
+        String query;
+        if (Pattern.matches("\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dX]", name)) {
+            // It's an ORCID
+            query = "orcid:" + name;
+        } else {
+            List<String> queryParts = new ArrayList<String>();
+
+            // Split the name into parts to search for
+            String[] parts = name.split(" ");
+
+            for (String part : parts) {
+                // Search only the name fields. The default search also includes the work-titles field which sometimes contains names.
+                queryParts.add("(given-names:" + part + " OR family-name:" + part + " OR credit-name:" + part + " OR other-names:" + part + ")");
+            }
+
+            // Additionally, make sure one of the parts matches the family-name field
+            queryParts.add("(family-name:" + StringUtils.join(parts, " OR family-name:") + ")");
+
+            query = StringUtils.join(queryParts, " AND ");
+        }
+
+        Document bioDocument = restConnector.get("search/orcid-bio?q=" + URLEncoder.encode(query) + "&start=" + start + "&rows=" + rows);
+
         XMLtoBio converter = new XMLtoBio();
         return converter.convert(bioDocument);
     }
