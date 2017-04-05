@@ -71,11 +71,13 @@
                     <dc-element>readme</dc-element>
                     <label>ReadMe file</label>
                     <input-type>file</input-type>
-                    <hint>If additional user guidance is needed 
-                          (e.g., codebook, definitions of variables or codes, de-identification methods),
-                           please upload a ReadMe file.
-                           See more information at http://datadryad.org/pages/readme.
+
+                    <hint>Please describe your data file. Include details such as the original source of the information
+                        (e.g., collected in the field, simulated electronically), software used to create the data file,
+                        and a description of any abbreviations (e.g., for column headings). If more than two paragraphs
+                        are required for adequate description, please upload a ReadMe file.
                     </hint>
+
                 </field>
                 <field>
                     <dc-schema>dc</dc-schema>
