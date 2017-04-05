@@ -121,6 +121,8 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
                 Restrictions.eq("resourcePolicy.eperson", ePerson),
                 actionQuery
         ));
+        criteria.setCacheable(true);
+
         return list(criteria);
     }
 
@@ -160,6 +162,8 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
         query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in elements(epeople))");
         Query hibernateQuery = createQuery(context, query.toString());
         hibernateQuery.setParameter("eperson_id", ePerson.getID());
+        hibernateQuery.setCacheable(true);
+
         return list(hibernateQuery);
 
 
