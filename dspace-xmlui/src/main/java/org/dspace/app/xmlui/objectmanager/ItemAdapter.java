@@ -13,14 +13,11 @@ import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.crosswalk.METSRightsCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -37,8 +34,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.*;
-
-import org.dspace.content.DSpaceObject;
 
 
 /**
@@ -356,7 +351,7 @@ public class ItemAdapter extends AbstractAdapter
                 // ///////////////////////////////
                 // Send the actual XML content
                 try {
-                        Element dissemination = crosswalk.disseminateElement(item);
+                Element dissemination = disseminateElement(crosswalk, item);
         
                         SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
                         // Allow the basics for XML
@@ -625,7 +620,7 @@ public class ItemAdapter extends AbstractAdapter
         // Send the actual XML content,
         // using the PREMIS crosswalk for each bitstream
         try {
-            Element dissemination = crosswalk.disseminateElement(dso);
+            Element dissemination = disseminateElement(crosswalk, dso);
 
             SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
             // Allow the basics for XML
@@ -651,6 +646,16 @@ public class ItemAdapter extends AbstractAdapter
         endElement(METS,"xmlData");
         endElement(METS,"mdWrap");
         endElement(METS,amdSecName);
+    }
+
+    private Element disseminateElement(DisseminationCrosswalk crosswalk, DSpaceObject dso) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+        Element dissemination;
+        if (crosswalk instanceof METSRightsCrosswalk) {
+            dissemination = ((METSRightsCrosswalk)crosswalk).disseminateElement(context,dso);
+        } else {
+            dissemination = crosswalk.disseminateElement(dso);
+        }
+        return dissemination;
     }
 
     /**

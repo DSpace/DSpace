@@ -8,6 +8,7 @@
 package org.dspace.storage.rdbms;
 
 import org.apache.log4j.Logger;
+import org.dspace.core.Context;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -149,6 +150,32 @@ public class TableRowIterator
         hasAdvanced = false;
 
         return DatabaseManager.process(results, table, columnNames);
+    }
+
+    /**
+     * Advance to the next row and return it. Returns null if there are no more
+     * rows.
+     *
+     * @param context An existing database connection to reuse
+     * @return - The next row, or null if no more rows
+     * @exception SQLException -
+     *                If a database error occurs while fetching values
+     */
+    public TableRow next(Context context) throws SQLException
+    {
+        if (results == null)
+        {
+            return null;
+        }
+
+        if (!hasNext())
+        {
+            return null;
+        }
+
+        hasAdvanced = false;
+
+        return DatabaseManager.process(context, results, table, columnNames);
     }
 
     /**
