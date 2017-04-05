@@ -913,7 +913,11 @@ public class DatabaseManager
         return process(null,results, table, null);
     }
 
-    static TableRow process( ResultSet results, String table, List<String> pColumnNames) throws SQLException{
+    /**
+     * @deprecated You should try to pass an existing database connection to this method to prevent opening a new one.
+     */
+    @Deprecated
+    static TableRow process(ResultSet results, String table, List<String> pColumnNames) throws SQLException{
         return process(null,results,table,pColumnNames);
     }
 
@@ -1249,7 +1253,7 @@ public class DatabaseManager
             if (context != null && !context.getDBConnection().isClosed()) {
                 connection = context.getDBConnection();
             } else {
-            connection = getConnection();
+                connection = getConnection();
             }
 
             // Get current database schema name
