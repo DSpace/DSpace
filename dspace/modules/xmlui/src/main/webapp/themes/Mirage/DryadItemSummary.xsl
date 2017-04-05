@@ -1431,7 +1431,7 @@
         <xsl:if test="$author/@authority">
             <!-- will be generated::orcid::0000-0002-1497-1284-->
             <xsl:text>#</xsl:text>
-            <xsl:value-of select="substring-after($author/@authority,'orcid::')"/>
+            <xsl:value-of select="substring-after($author/@authority,'orcid:')"/>
             <xsl:text>#</xsl:text>
         </xsl:if>
         <xsl:text>,</xsl:text>
