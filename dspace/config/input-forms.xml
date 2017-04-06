@@ -71,10 +71,10 @@
                     <dc-element>readme</dc-element>
                     <label>ReadMe file</label>
                     <input-type>file</input-type>
-                    <hint>If additional user guidance is needed, please upload a ReadMe file. ReadMe files supplement 
-                        the file description and should provide any information needed to ensure that the data can be 
-                        correctly interpreted. If your ReadMe pertains to your data package as a whole, please upload 
-                        it with each individual data file. View additional ReadMe guidance.
+                    <hint>Please upload a ReadMe file if needed.
+                          If additional user guidance is needed 
+                          (e.g., codebook, definitions of variables or codes, de-identification methods), please upload a ReadMe file.
+                          See more information at http://datadryad.org/pages/readme.
                     </hint>
                 </field>
                 <field>
@@ -101,6 +101,17 @@
                     </hint>
                 </field>
                 <field>
+                    <dc-schema>dwc</dc-schema>
+                    <dc-element>ScientificName</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Taxonomic names (e.g., Thalassia hemprichii, Panthera pardus)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Please enter taxonomic names associated with the data file. These may be names at any level (species or higher-level clade). Names may be added individually or separated by commas or semicolons. For example:
+                        &lt;ul&gt;&lt;li&gt;Drosophila melanogaster&lt;/li&gt;&lt;li&gt;Geospizinae&lt;/li&gt;&lt;li&gt;Elaeis guineensis&lt;/li&gt;&lt;/ul&gt;
+                    </hint>
+                    <split>[,|;]</split>
+                </field>
+                <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
                     <repeatable>true</repeatable>
@@ -108,17 +119,6 @@
                     <input-type>onebox</input-type>
                     <hint>Please enter general keywords associated with the data file. Keywords may be added individually or separated by commas or semicolons. For example:
                         &lt;ul&gt;&lt;li&gt;adaptation&lt;/li&gt;&lt;li&gt;evolutionary contingency&lt;/li&gt;&lt;li&gt;founder effects&lt;/li&gt;&lt;/ul&gt;
-                    </hint>
-                    <split>[,|;]</split>
-                </field>
-                <field>
-                    <dc-schema>dwc</dc-schema>
-                    <dc-element>ScientificName</dc-element>
-                    <repeatable>true</repeatable>
-                    <label>Taxonomic names</label>
-                    <input-type>onebox</input-type>
-                    <hint>Please enter taxonomic names associated with the data file. These may be names at any level (species or higher-level clade). Names may be added individually or separated by commas or semicolons. For example:
-                        &lt;ul&gt;&lt;li&gt;Drosophila melanogaster&lt;/li&gt;&lt;li&gt;Geospizinae&lt;/li&gt;&lt;li&gt;Elaeis guineensis&lt;/li&gt;&lt;/ul&gt;
                     </hint>
                     <split>[,|;]</split>
                 </field>
@@ -226,32 +226,32 @@
                     <dc-element>contributor</dc-element>
                     <dc-qualifier>correspondingAuthor</dc-qualifier>
                     <repeatable>false</repeatable>
-                    <label>Primary contact for data associated with this article</label>
+                    <label>Primary contact for data associated with this article (use author format)</label>
                     <input-type>onebox</input-type>
                     <hint></hint>
                 </field>
 
                 <!--Always editable fields-->
                 <field>
+                    <dc-schema>dwc</dc-schema>
+                    <dc-element>ScientificName</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>Taxonomic names (e.g., Thalassia hemprichii, Panthera pardus)</label>
+                    <input-type>onebox</input-type>
+                    <hint>Please enter taxonomic names associated with the data file. These may be names at any level (species or higher-level clade). Names may be added individually or separated by commas or semicolons. For example:
+                        &lt;ul&gt;&lt;li&gt;Drosophila melanogaster&lt;/li&gt;&lt;li&gt;Geospizinae&lt;/li&gt;&lt;li&gt;Elaeis guineensis&lt;/li&gt;&lt;/ul&gt;
+                    </hint>
+                    <split>[,|;]</split>
+                </field>
+                <field>
                     <dc-schema>dc</dc-schema>
                     <dc-element>subject</dc-element>
                     <repeatable>true</repeatable>
                     <label>Subject keywords</label>
                     <input-type>onebox</input-type>
-                    <hint>Please enter general keywords associated with the publication. Keywords may be added individually or separated by commas or semicolons. For example:
+                    <hint>Please enter general keywords associated with the data file. Keywords may be added individually or separated by commas or semicolons. For example:
                         &lt;ul&gt;&lt;li&gt;adaptation&lt;/li&gt;&lt;li&gt;evolutionary contingency&lt;/li&gt;&lt;li&gt;founder effects&lt;/li&gt;&lt;/ul&gt;
                     </hint>
-                    <split>[,|;]</split>
-                </field>
-                <field>
-                    <dc-schema>dwc</dc-schema>
-                    <dc-element>ScientificName</dc-element>
-                    <repeatable>true</repeatable>
-                    <label>Taxonomic names</label>
-                    <input-type>onebox</input-type>
-                    <hint>Please enter taxonomic names associated with the publication. These may be names at any level (species or higher-level clade). Names may be added individually or separated by commas or semicolons. For example:
-		      &lt;ul&gt;&lt;li&gt;Drosophila melanogaster&lt;/li&gt;&lt;li&gt;Geospizinae&lt;/li&gt;&lt;li&gt;Elaeis guineensis&lt;/li&gt;&lt;/ul&gt;
-		    </hint>
                     <split>[,|;]</split>
                 </field>
                 <field>
