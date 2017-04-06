@@ -27,8 +27,8 @@ import java.util.UUID;
  */
 public class AuthorityValueGenerator {
 
-    public static final String SPLIT = "::";
-    public static final String GENERATE = "will be generated" + SPLIT;
+    public static final String SPLIT = ":";
+    public static final String GENERATE = "";
 
 
     public static AuthorityValue generate(String uid, String content, String field) {

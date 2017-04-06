@@ -194,7 +194,7 @@ public class DryadWorkflowUtils {
 
             // check for orcid:
             if (metadata.authority != null) {
-                Pattern p = Pattern.compile(".+orcid::(.+)");
+                Pattern p = Pattern.compile(".*orcid:(.+)");
                 Matcher m = p.matcher(metadata.authority);
                 if (m.matches()) {
                     authorString.append("#").append(m.group(1)).append("#");

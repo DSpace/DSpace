@@ -7,6 +7,7 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DCValue;
@@ -22,8 +23,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -76,6 +76,7 @@ public class CuratorEditMetadataForm extends AbstractDSpaceTransformer {
         String actionURL = contextPath + "/submit-edit-metadata/" + knot.getId() + ".continue";
         Request request = ObjectModelHelper.getRequest(objectModel);
         String previousFieldID = request.getParameter("field");
+        Map<Integer, String> confOptions = Choices.getConfidenceOptions();
 
         Division main = body.addInteractiveDivision("edit-item-status", actionURL, Division.METHOD_POST,"primary administrative item");
         main.setHead(T_main_head);
@@ -169,12 +170,22 @@ public class CuratorEditMetadataForm extends AbstractDSpaceTransformer {
                 mdValue.setValue(value.value);
                 boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                 if (isAuth) {
-                    mdValue.setAuthorityControlled();
-                    mdValue.setAuthorityRequired(MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey));
-                    Value authValue = mdValue.setAuthorityValue((value.authority == null) ? "" : value.authority, Choices.getConfidenceText(value.confidence));
-                    // add the "unlock" button to auth field
-                    Button unlock = authValue.addButton("authority_unlock_" + index, "ds-authority-lock");
-                    unlock.setHelp(T_unlock);
+                    Cell authCell = row.addCell();
+
+                    TextArea authArea = authCell.addTextArea("value_"+index+"_authority");
+                    authArea.setSize(2, 20);
+                    authArea.setValue(value.authority);
+
+                    Select confSelect = authCell.addSelect("value_"+index+"_confidence");
+
+                    // add in descending order:
+                    SortedSet<Integer> confKeys = new TreeSet<Integer>(confOptions.keySet());
+                    while (confKeys.size() > 0) {
+                        Integer currKey = confKeys.last();
+                        confKeys.remove(currKey);
+                        confSelect.addOption(confOptions.get(currKey),confOptions.get(currKey));
+                    }
+                    confSelect.setOptionSelected(confOptions.get(value.confidence));
                 }
                 if (ChoiceAuthorityManager.getManager().isChoicesConfigured(fieldKey)) {
                     mdValue.setChoices(fieldKey);

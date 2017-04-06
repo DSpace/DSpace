@@ -9,6 +9,9 @@ package org.dspace.content.authority;
 
 import org.apache.commons.lang.ArrayUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Record class to hold a set of Choices returned by an authority in response
  * to a search.
@@ -204,5 +207,13 @@ public class Choices
             }
         }
         return dflt;
+    }
+
+    public static Map<Integer, String> getConfidenceOptions() {
+        HashMap<Integer, String> result = new HashMap<Integer, String>();
+        for (int i=0; i<confidenceValue.length; i++) {
+            result.put(confidenceValue[i], confidenceText[i]);
+        }
+        return result;
     }
 }
