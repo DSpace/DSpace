@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
@@ -39,6 +41,7 @@ import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.filters.StringInputStream;
 import org.dspace.services.EmailService;
 import org.dspace.utils.DSpace;
 
@@ -461,7 +464,25 @@ public class Email
         BufferedReader reader = null;
         try
         {
-            is = new FileInputStream(emailFile);
+            File file = new File(emailFile);
+            String template = null;
+            try 
+            {
+                template = I18nUtil.getMessage("mail.template."+file.getName(), true);
+            }
+            catch (Exception ex)
+            {
+                // do nothing, the custom template is undefined
+            }
+            
+            if (template == null)
+            {
+                is = new FileInputStream(file);
+            }
+            else
+            {
+                is = new StringInputStream(template);
+            }
             ir = new InputStreamReader(is, "UTF-8");
             reader = new BufferedReader(ir);
             boolean more = true;
