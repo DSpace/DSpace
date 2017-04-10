@@ -211,13 +211,15 @@ public class XOAI {
                         | XMLStreamException | WritingXmlException ex) {
                     log.error(ex.getMessage(), ex);
                 }
+                // clear cache to avoid memory and performance problems.
+                context.clear();
                 i++;
                 if (i % 100 == 0) System.out.println(i + " items imported so far...");
             }
             System.out.println("Total: " + i + " items");
             server.commit();
             return i;
-        } catch (SolrServerException | IOException ex) {
+        } catch (SolrServerException | IOException | SQLException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
     }

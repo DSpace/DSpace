@@ -164,4 +164,10 @@ public class HibernateDBConnection implements DBConnection<Session> {
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
         getSession().evict(entity);        
     }
+
+    @Override
+    public void clear() throws SQLException
+    {
+        getSession().clear();
+    }
 }
