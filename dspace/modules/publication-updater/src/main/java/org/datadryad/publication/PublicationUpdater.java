@@ -83,6 +83,7 @@ public class PublicationUpdater extends HttpServlet {
                         context = new Context();
                         context.turnOffAuthorisationSystem();
                         String issn = getISSN(queryParams);
+                        Integer itemID = getItemID(queryParams);
                         if (issn != null) {
                             DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(issn);
                             if (journalConcept == null) {
@@ -93,6 +94,10 @@ public class PublicationUpdater extends HttpServlet {
                             } else {
                                 aResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "no journal concept found by the identifier " + issn);
                             }
+                        } else if (itemID != null) {
+                            Item item = Item.find(context, itemID);
+                            String result = matchItemToCrossref(context, item);
+                            LOGGER.info(result);
                         } else {
                             checkPublications(context);
                         }
@@ -141,6 +146,15 @@ public class PublicationUpdater extends HttpServlet {
         for (NameValuePair param : queryParams) {
             if (param.getName().equals("issn")) {
                 return param.getValue();
+            }
+        }
+        return null;
+    }
+
+    private Integer getItemID(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("item")) {
+                return Integer.valueOf(param.getValue());
             }
         }
         return null;
