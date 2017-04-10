@@ -501,7 +501,7 @@ public class PublicationUpdater extends HttpServlet {
     private boolean isManuscriptMismatchForItem(Item item, Manuscript manuscript) {
         // normalize the pubDOI from the manuscript: remove leading "doi:" or "dx.doi.org/"
         String msDOI = null;
-        Pattern doi = Pattern.compile(".*(10.\\d+/.+)");
+        Pattern doi = Pattern.compile(".*(10\\.\\d+/.+)");
         Matcher m = doi.matcher(manuscript.getPublicationDOI().toLowerCase());
         if (m.matches()) {
             msDOI = m.group(1);
