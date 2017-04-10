@@ -460,10 +460,18 @@ public class PublicationUpdater extends HttpServlet {
             item.clearMetadata(PUBLICATION_DOI);
             item.addMetadata(PUBLICATION_DOI, null, manuscript.getPublicationDOI(), null, -1);
         }
-        if (!"".equals(manuscript.getFullCitation()) && !item.hasMetadataEqualTo(FULL_CITATION, manuscript.getFullCitation())) {
-            changed = true;
-            item.clearMetadata(FULL_CITATION);
-            item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
+        if (!"".equals(manuscript.getFullCitation())) {
+            String itemCitation = "";
+            DCValue[] citations = item.getMetadata(FULL_CITATION);
+            if (citations != null && citations.length > 0) {
+                itemCitation = citations[0].value;
+            }
+            double score = JournalUtils.getHamrScore(manuscript.getFullCitation().toLowerCase(), itemCitation.toLowerCase());
+            if (score < 0.9) {
+                changed = true;
+                item.clearMetadata(FULL_CITATION);
+                item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
+            }
         }
         if (!"".equals(manuscript.getManuscriptId()) && !item.hasMetadataEqualTo(MANUSCRIPT_NUMBER, manuscript.getManuscriptId())) {
             changed = true;
