@@ -335,17 +335,6 @@ public class PublicationUpdater extends HttpServlet {
             return items;
         }
 
-        // Add these items to the incomplete list
-        try {
-            for (TableRow row : rows) {
-                int itemID = row.getIntColumn("item_id");
-                Item item = Item.find(context, itemID);
-                items.add(item);
-            }
-        } catch (SQLException e) {
-            LOGGER.error("couldn't find item");
-        }
-
         // Look for items with a FULL_CITATION && CITATION_IN_PROGRESS exists && CITATION_IN_PROGRESS == TRUE
         MetadataField citationInProgressField = null;
         try {
@@ -542,13 +531,6 @@ public class PublicationUpdater extends HttpServlet {
             String config = getServletContext().getInitParameter("dspace.config");
             ConfigurationManager.loadConfig(config);
         }
-
-//        LOGGER.debug("scheduling publication checker");
-//        myPublicationUpdaterTimer = new Timer();
-        // schedule harvesting to the number of days set in the configuration:
-        // timers are set in units of milliseconds.
-//        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("publication.updater.timer"));
-//        myPublicationUpdaterTimer.schedule(new PublicationHarvester(), 0, 1000 * 60 * 60 * 24 * timerInterval);
     }
 
     /**
@@ -568,16 +550,8 @@ public class PublicationUpdater extends HttpServlet {
      * @return A <code>PrintWriter</code> to send text through
      * @throws IOException If there is trouble getting a writer
      */
-    private PrintWriter getWriter(HttpServletResponse aResponse)
-            throws IOException {
+    private PrintWriter getWriter(HttpServletResponse aResponse) throws IOException {
         aResponse.setContentType("xml/application; charset=UTF-8");
         return aResponse.getWriter();
-    }
-
-    private class PublicationHarvester extends TimerTask {
-        @Override
-        public void run() {
-            checkPublications();
-        }
     }
 }
