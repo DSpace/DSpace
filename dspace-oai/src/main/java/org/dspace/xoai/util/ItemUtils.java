@@ -13,17 +13,26 @@ import com.lyncode.xoai.util.Base64Utils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Utils;
+import org.dspace.embargo.factory.EmbargoServiceFactory;
+import org.dspace.embargo.service.EmbargoService;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.xoai.data.DSpaceItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
@@ -49,6 +58,15 @@ public class ItemUtils
 
     private static final BitstreamService bitstreamService
             = ContentServiceFactory.getInstance().getBitstreamService();
+
+    private static final ResourcePolicyService resourcePolicyService
+            = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+
+    private static final GroupService groupService
+            = EPersonServiceFactory.getInstance().getGroupService();
+
+    private static final EmbargoService embargoService
+            = EmbargoServiceFactory.getInstance().getEmbargoService();
 
     private static Element getElement(List<Element> list, String name)
     {
@@ -167,9 +185,13 @@ public class ItemUtils
         Element bundles = create("bundles");
         metadata.getElement().add(bundles);
 
+        Date bitstreamMinEmbargoDate = null;
+        Date bitstreamMaxEmbargoDate = null;
+
         List<Bundle> bs;
         try
         {
+            Group groupAnonymous = groupService.findByName(context, Group.ANONYMOUS);
             bs = item.getBundles();
             for (Bundle b : bs)
             {
@@ -220,6 +242,25 @@ public class ItemUtils
                         url = URLUtils.encode(bsName);
                     }
 
+                    // Find Embargo end date of the bitstream (if there is one)
+                    Date embargoEndDate = null;
+                    List<ResourcePolicy> policies = resourcePolicyService.find(
+                            context,
+                            bit,
+                            groupAnonymous,
+                            Constants.READ,
+                            -1);
+                    // There should be at most one policy for this group, action and bitstream.
+                    // If there is a start date, this is the read start date a.k.a. the embargo end date
+                    for (ResourcePolicy policy : policies)
+                    {
+                        if (policy.getStartDate() != null)
+                        {
+                            embargoEndDate = policy.getStartDate();
+                            break;
+                        }
+                    }
+
                     String cks = bit.getChecksum();
                     String cka = bit.getChecksumAlgorithm();
                     String oname = bit.getSource();
@@ -248,6 +289,19 @@ public class ItemUtils
                     bitstream.getField().add(
                             createValue("sid", bit.getSequenceID()
                                     + ""));
+                    if (embargoEndDate != null)
+                    {
+                        bitstream.getField().add(
+                                createValue("embargoEndDate", embargoEndDate.toString()));
+                        if (bitstreamMinEmbargoDate == null || embargoEndDate.before(bitstreamMinEmbargoDate))
+                        {
+                            bitstreamMinEmbargoDate = embargoEndDate;
+                        }
+                        if (bitstreamMaxEmbargoDate == null || embargoEndDate.after(bitstreamMaxEmbargoDate))
+                        {
+                            bitstreamMaxEmbargoDate = embargoEndDate;
+                        }
+                    }
                 }
             }
         }
@@ -267,6 +321,28 @@ public class ItemUtils
         other.getField().add(
                 createValue("lastModifyDate", item
                         .getLastModified().toString()));
+        if (bitstreamMaxEmbargoDate != null)
+        {
+            other.getField().add(
+                    createValue("bitstreamMaxEmbargoEnd", bitstreamMaxEmbargoDate.toString()));
+        }
+        if (bitstreamMinEmbargoDate != null)
+        {
+            other.getField().add(
+                    createValue("bitstreamMinEmbargoEnd", bitstreamMinEmbargoDate.toString()));
+        }
+        try {
+            DCDate itemEmbargo = null;
+            if ((itemEmbargo = embargoService.getEmbargoTermsAsDate(context, item)) != null) {
+                other.getField().add(
+                        createValue("itemEmbargoEnd", itemEmbargo.toString()));
+            }
+        }
+        catch (SQLException | AuthorizeException e)
+        {
+            log.warn("Unable to get item embargo: " + e, e);
+        }
+
         metadata.getElement().add(other);
 
         // Repository Info
