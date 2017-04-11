@@ -489,9 +489,9 @@ public class JournalUtils {
             int numMatched = 0;
             for (int j = 0; j < itemAuthors.length; j++) {
                 for (Author a : manuscript.getAuthorList()) {
-                    double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value), a.getNormalizedFullName());
-                    if (score > 0.7) {
-                        log.debug("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score);
+                    double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), a.getNormalizedFullName().toLowerCase());
+                    result.append("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score + "\n");
+                    if (score > 0.6) {
                         numMatched++;
                         break;
                     }
