@@ -45,6 +45,12 @@ public interface DBConnection<T> {
     public boolean isOptimizedForBatchProcessing();
 
     public long getCacheSize() throws SQLException;
+    
+    /**
+     * Completely clear the session. Evict all loaded instances and cancel all pending saves, updates and deletions. Do not close open iterators or instances of ScrollableResults.
+     * @throws SQLException 
+     */
+    public void clear() throws SQLException;
 
     /**
      * Reload a DSpace object from the database. This will make sure the object is valid and stored in the cache.

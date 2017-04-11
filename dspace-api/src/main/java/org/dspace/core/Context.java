@@ -640,6 +640,18 @@ public class Context
     public long getCacheSize() throws SQLException {
         return this.getDBConnection().getCacheSize();
     }
+    
+    /**
+     * Completely clear the database Session. Evict all loaded instances and cancel all pending saves, updates and deletions. 
+     * Does not close open iterators or instances of ScrollableResults.
+     * 
+     * Note: You will lose all pending saves, updates and deletions.
+     * 
+     * @throws SQLException 
+     */
+    public void clear() throws SQLException{
+            dbConnection.clear();
+    }
 
     /**
      * Enable or disable "batch processing mode" for this context.
