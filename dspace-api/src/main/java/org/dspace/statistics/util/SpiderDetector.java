@@ -175,6 +175,7 @@ public class SpiderDetector {
                             file.getPath(), ex.getMessage());
                     continue;
                 }
+                //If case insensitive matching is enabled, lowercase the patterns so they can be lowercase matched
                 if(isUseCaseInsensitiveMatching()) {
                     for (String pattern : patterns) {
                         patternList.add(Pattern.compile(pattern.toLowerCase()));
