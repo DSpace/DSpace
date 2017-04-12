@@ -37,6 +37,8 @@ public class SpiderDetector {
 
     private static Boolean useProxies;
 
+    private static Boolean useCaseInsensitiveMatching;
+
     /**
      * Sparse HashTable structure to hold IP address ranges.
      */
@@ -173,9 +175,15 @@ public class SpiderDetector {
                             file.getPath(), ex.getMessage());
                     continue;
                 }
-                for (String pattern : patterns)
-                {
-                    patternList.add(Pattern.compile(pattern,Pattern.CASE_INSENSITIVE));
+                if(isUseCaseInsensitiveMatching()) {
+                    for (String pattern : patterns) {
+                        patternList.add(Pattern.compile(pattern.toLowerCase()));
+                    }
+                }
+                else {
+                    for (String pattern : patterns) {
+                        patternList.add(Pattern.compile(pattern));
+                    }
                 }
                 log.info("Loaded pattern file:  {}", file.getPath());
             }
@@ -209,12 +217,20 @@ public class SpiderDetector {
                 if (agents.isEmpty())
                     loadPatterns("agents", agents);
             }
-            for (Pattern candidate : agents)
-            {
-		// prevent matcher() invocation from a null Pattern object
-                if (null != candidate && candidate.matcher(agent).find())
-                {
-                    return true;
+            if(useCaseInsensitiveMatching) {
+                for (Pattern candidate : agents) {
+                    // prevent matcher() invocation from a null Pattern object
+                    if (null != candidate && candidate.matcher(agent.toLowerCase()).find()) {
+                        return true;
+                    }
+                }
+            }
+            else {
+                for (Pattern candidate : agents) {
+                    // prevent matcher() invocation from a null Pattern object
+                    if (null != candidate && candidate.matcher(agent).find()) {
+                        return true;
+                    }
                 }
             }
         }
@@ -292,6 +308,14 @@ public class SpiderDetector {
         return false;
 
 
+    }
+
+    private static boolean isUseCaseInsensitiveMatching() {
+        if (useCaseInsensitiveMatching == null) {
+            useCaseInsensitiveMatching = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("usage-statistics.bots.case-insensitive");
+        }
+
+        return useCaseInsensitiveMatching;
     }
 
     private static boolean isUseProxies() {
