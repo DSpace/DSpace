@@ -84,6 +84,10 @@ public class PublicationUpdater extends HttpServlet {
                         context.turnOffAuthorisationSystem();
                         String issn = getISSN(queryParams);
                         Integer itemID = getItemID(queryParams);
+                        String startLetter = getStartLetter(queryParams);
+                        if ("".equals(startLetter)) {
+                            startLetter = "a";
+                        }
                         if (issn != null) {
                             DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(issn);
                             if (journalConcept == null) {
@@ -99,7 +103,7 @@ public class PublicationUpdater extends HttpServlet {
                             String result = matchItemToCrossref(context, item);
                             LOGGER.info(result);
                         } else {
-                            checkPublications(context);
+                            checkPublications(context, startLetter);
                         }
                         context.restoreAuthSystemState();
                     } catch (SQLException e) {
@@ -160,19 +164,33 @@ public class PublicationUpdater extends HttpServlet {
         return null;
     }
 
-    private void checkPublications(Context context) {
-        LOGGER.info("checking all publications");
+    private String getStartLetter(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("start")) {
+                return param.getValue();
+            }
+        }
+        return null;
+    }
+
+    private void checkPublications(Context context, String startLetter) {
+        LOGGER.info("checking all publications starting from " + startLetter);
         List<DryadJournalConcept> journalConcepts = Arrays.asList(JournalUtils.getAllJournalConcepts());
         for (DryadJournalConcept dryadJournalConcept : journalConcepts) {
-            if (!"".equals(dryadJournalConcept.getISSN())) {
-                checkSinglePublication(context, dryadJournalConcept);
+            String fullName = dryadJournalConcept.getFullName();
+            if (fullName.length() > 0 && fullName.substring(0,1).compareToIgnoreCase(startLetter) >= 0) {
+                if (!"".equals(dryadJournalConcept.getISSN())) {
+                    checkSinglePublication(context, dryadJournalConcept);
+                }
+            } else {
+                LOGGER.debug("skipping " + dryadJournalConcept.getFullName());
             }
         }
         LOGGER.info("finished updating publications");
     }
 
     private void checkSinglePublication(Context context, DryadJournalConcept dryadJournalConcept) {
-        LOGGER.info("checking single publication " + dryadJournalConcept.getFullName());
+        LOGGER.info("checking publication " + dryadJournalConcept.getFullName());
         updateWorkflowItems(context, dryadJournalConcept);
         updateArchivedItems(context, dryadJournalConcept);
         LOGGER.info("finished updating publication");
@@ -270,7 +288,6 @@ public class PublicationUpdater extends HttpServlet {
     private String matchItemToCrossref(Context context, Item item) {
         String message = "";
         Manuscript queryManuscript = manuscriptFromItem(item);
-        LOGGER.debug("queryManuscript is " + queryManuscript.toString());
 
         // look for this item in crossref:
         StringBuilder resultString = new StringBuilder();
