@@ -71,6 +71,7 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 
 	@Override
 	public Iterable<T> findAll(Iterable<ID> ids) {
+
 		throw new RuntimeException("findAll MUST be paginated");
 	}
 

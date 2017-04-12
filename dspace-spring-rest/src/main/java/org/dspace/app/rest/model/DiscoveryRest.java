@@ -8,9 +8,6 @@
 package org.dspace.app.rest.model;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.RestResourceController;
-
 public class DiscoveryRest extends DSpaceObjectRest {
 
     public static final String NAME = "discovery";
@@ -20,10 +17,6 @@ public class DiscoveryRest extends DSpaceObjectRest {
         return NAME;
     }
 
-    @Override
-    @JsonIgnore
-    public Class getController() {
-        return RestResourceController.class;
-    }
+
     
 }

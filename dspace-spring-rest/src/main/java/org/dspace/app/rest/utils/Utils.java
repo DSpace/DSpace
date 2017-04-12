@@ -15,6 +15,7 @@ import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.DiscoveryRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -83,6 +84,8 @@ public class Utils {
 		//The old dspace res package includes the evo inflection library which has a plural() function but no singular function
 		if (modelPlural.equals("communities")) {
 			return CommunityRest.NAME;
+		} else if (modelPlural.equals("discoveries")){
+			return DiscoveryRest.NAME;
 		}
 		return modelPlural.replaceAll("s$", "");
 	}
