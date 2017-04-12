@@ -305,7 +305,8 @@ public class WorkflowItem implements InProgressSubmission {
                 }
 
                 if (matched == false) {
-                    matched = JournalUtils.compareItemAuthorsToManuscript(item, manuscript);
+                    StringBuilder authormatches = new StringBuilder();
+                    matched = JournalUtils.compareItemAuthorsToManuscript(item, manuscript, authormatches);
                 }
 
                 if (matched) {
