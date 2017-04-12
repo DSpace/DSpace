@@ -457,12 +457,13 @@ public class PublicationUpdater extends HttpServlet {
         queryManuscript.setAuthors(authorsList);
 
         DCValue[] msids = item.getMetadata(MANUSCRIPT_NUMBER);
-        if (msids != null && msids.length > 0) {
+        if (msids != null && msids.length > 0 && !"".equals(msids[0].value)) {
             queryManuscript.setManuscriptId(msids[0].value);
         }
 
         DCValue[] itemPubDOIs = item.getMetadata(PUBLICATION_DOI);
-        if (itemPubDOIs != null && itemPubDOIs.length > 0) {
+        if (itemPubDOIs != null && itemPubDOIs.length > 0 && !"".equals(itemPubDOIs[0].value)) {
+            LOGGER.debug("found a DOI <" + itemPubDOIs[0].value + ">");
             queryManuscript.setPublicationDOI(itemPubDOIs[0].value);
         }
         return queryManuscript;
@@ -538,6 +539,9 @@ public class PublicationUpdater extends HttpServlet {
     }
 
     private boolean isManuscriptMismatchForItem(Item item, Manuscript manuscript) {
+        if ("".equals(manuscript.getPublicationDOI())) {
+            return false;
+        }
         LOGGER.debug("looking for mismatches for " + manuscript.getPublicationDOI());
         // normalize the pubDOI from the manuscript: remove leading "doi:" or "dx.doi.org/"
         String msDOI = null;
@@ -546,7 +550,10 @@ public class PublicationUpdater extends HttpServlet {
         if (m.matches()) {
             msDOI = m.group(1);
         }
-        LOGGER.error("looking for mismatches for " + msDOI);
+        if (msDOI == null) {
+            LOGGER.error("msDOI not in correct format");
+            return false;
+        }
         DCValue[] itemMismatches = item.getMetadata("dryad", "citationMismatchedDOI", Item.ANY, Item.ANY);
         if (itemMismatches.length > 0) {
             for (DCValue dcv : itemMismatches) {
