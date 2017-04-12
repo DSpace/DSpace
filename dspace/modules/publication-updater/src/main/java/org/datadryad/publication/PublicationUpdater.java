@@ -225,6 +225,7 @@ public class PublicationUpdater extends HttpServlet {
                     String message = "";
                     Item item = wfi.getItem();
                     Manuscript queryManuscript = manuscriptFromItem(item);
+                    LOGGER.debug(">>> processing workflow item with internal ID " + item.getID());
                     // First, compare this item with anything in manuscript metadata storage:
                     // If this workflow item does not have a msid, it might have come from a submitter
                     // who didn't use a journal link.
@@ -274,6 +275,7 @@ public class PublicationUpdater extends HttpServlet {
         LOGGER.debug("processing " + items.size() + " items");
         // For all found items, look for matches in CrossRef publications.
         for (Item item : items) {
+            LOGGER.debug(">>> processing archived item with internal ID " + item.getID());
             String message = matchItemToCrossref(context, item);
             if (!"".equals(message)) {
                 updatedItems.add(message);
