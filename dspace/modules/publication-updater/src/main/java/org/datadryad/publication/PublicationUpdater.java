@@ -248,16 +248,15 @@ public class PublicationUpdater extends HttpServlet {
                     message = matchItemToCrossref(context, item);
                     if (!"".equals(message)) {
                         updatedItems.add(message);
-                    }
-
-                    // was there a manuscript record saved for this? If so, update it.
-                    if (databaseManuscript != null) {
-                        databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
-                        try {
-                            LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
-                            JournalUtils.writeManuscriptToDB(databaseManuscript);
-                        } catch (Exception e) {
-                            LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
+                        // was there a manuscript record saved for this? If so, update it.
+                        if (databaseManuscript != null) {
+                            databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
+                            try {
+                                LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
+                                JournalUtils.writeManuscriptToDB(databaseManuscript);
+                            } catch (Exception e) {
+                                LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
+                            }
                         }
                     }
                 }
