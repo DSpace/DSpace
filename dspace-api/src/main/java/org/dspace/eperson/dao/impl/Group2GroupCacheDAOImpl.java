@@ -44,7 +44,7 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     }
 
     @Override
-    public List<Group2GroupCache> findByChildren(Context context, Set<Group> groups) throws SQLException {
+    public List<Group2GroupCache> findByChildren(Context context, Iterable<Group> groups) throws SQLException {
         Criteria criteria = createCriteria(context, Group2GroupCache.class);
 
         Disjunction orDisjunction = Restrictions.or();
