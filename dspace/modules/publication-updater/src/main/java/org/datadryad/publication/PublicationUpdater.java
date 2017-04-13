@@ -236,8 +236,10 @@ public class PublicationUpdater extends HttpServlet {
                         if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
                             databaseManuscript = databaseManuscripts.get(0);
                             if (isInReview) {     // only update the metadata if the item is in review.
-                                message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
-                                updateItemMetadataFromManuscript(item, databaseManuscript, context, message);
+                                String provenance = "";
+                                if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
+                                    message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. " + provenance;
+                                }
                             }
                         }
                     } catch (ParseException e) {
@@ -245,7 +247,7 @@ public class PublicationUpdater extends HttpServlet {
                         LOGGER.error("Problem updating item " + item.getID() + ": Manuscript ID is incorrect.");
                     }
 
-                    message = matchItemToCrossref(context, item);
+                    message = message + matchItemToCrossref(context, item);
                     if (!"".equals(message)) {
                         updatedItems.add(message);
                         // was there a manuscript record saved for this? If so, update it.
@@ -306,9 +308,9 @@ public class PublicationUpdater extends HttpServlet {
             if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
                 LOGGER.debug("same authors");
                 // update the item's metadata
-                message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
-                    message = buildItemSummary(item) + "\n\t" + message;
+                String provenance = "";
+                if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
+                    message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" " + buildItemSummary(item) + "\n\t" + provenance;
                 }
             } else {
                 LOGGER.debug("different authors: " + authormatches);
