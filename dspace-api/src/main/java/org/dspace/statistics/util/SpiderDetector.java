@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.Collections;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,16 +178,14 @@ public class SpiderDetector {
                     continue;
                 }
                 //If case insensitive matching is enabled, lowercase the patterns so they can be lowercase matched
-                if(isUseCaseInsensitiveMatching()) {
-                    for (String pattern : patterns) {
-                        patternList.add(Pattern.compile(pattern.toLowerCase()));
+                for (String pattern : patterns) {
+                    if(isUseCaseInsensitiveMatching()) {
+                        pattern = StringUtils.lowerCase(pattern);
                     }
+                    patternList.add(Pattern.compile(pattern));
                 }
-                else {
-                    for (String pattern : patterns) {
-                        patternList.add(Pattern.compile(pattern));
-                    }
-                }
+
+
                 log.info("Loaded pattern file:  {}", file.getPath());
             }
         }
@@ -208,7 +208,7 @@ public class SpiderDetector {
      * @return true if the client matches any spider characteristics list.
      */
     public static boolean isSpider(String clientIP, String proxyIPs,
-            String hostname, String agent)
+                                   String hostname, String agent)
     {
         // See if any agent patterns match
         if (null != agent)
@@ -218,21 +218,20 @@ public class SpiderDetector {
                 if (agents.isEmpty())
                     loadPatterns("agents", agents);
             }
-            if(useCaseInsensitiveMatching) {
-                for (Pattern candidate : agents) {
-                    // prevent matcher() invocation from a null Pattern object
-                    if (null != candidate && candidate.matcher(agent.toLowerCase()).find()) {
-                        return true;
-                    }
-                }
+
+            if(isUseCaseInsensitiveMatching()) {
+                agent = StringUtils.lowerCase(agent);
+                hostname = StringUtils.lowerCase(hostname);
             }
-            else {
-                for (Pattern candidate : agents) {
-                    // prevent matcher() invocation from a null Pattern object
-                    if (null != candidate && candidate.matcher(agent).find()) {
-                        return true;
-                    }
+
+            for (Pattern candidate : agents) {
+
+                // prevent matcher() invocation from a null Pattern object
+                if (null != candidate && candidate.matcher(agent).find()) {
+                    return true;
                 }
+
+
             }
         }
 
@@ -260,8 +259,8 @@ public class SpiderDetector {
             }
             for (Pattern candidate : domains)
             {
-		// prevent matcher() invocation from a null Pattern object
-		if (null != candidate && candidate.matcher(hostname).find())
+                // prevent matcher() invocation from a null Pattern object
+                if (null != candidate && candidate.matcher(hostname).find())
                 {
                     return true;
                 }
