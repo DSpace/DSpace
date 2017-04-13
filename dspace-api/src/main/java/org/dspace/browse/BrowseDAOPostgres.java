@@ -7,11 +7,6 @@
  */
 package org.dspace.browse;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -19,6 +14,11 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is the PostgreSQL driver class for reading information from the
@@ -59,6 +59,7 @@ public class BrowseDAOPostgres implements BrowseDAO
 
     /** field to look for focus value in */
     private String focusField = null;
+    private String startsWith = null;
 
     /** value to start browse from in focus field */
     private String focusValue = null;
@@ -1440,5 +1441,14 @@ public class BrowseDAOPostgres implements BrowseDAO
 
     public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies) {
         this.enableBrowseFrequencies = enableBrowseFrequencies;
+    }
+    @Override
+    public void setStartsWith(String startsWith) {
+        this.startsWith = startsWith;
+    }
+
+    @Override
+    public String getStartsWith() {
+        return startsWith;
     }
 }

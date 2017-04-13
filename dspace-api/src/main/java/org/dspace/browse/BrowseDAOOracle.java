@@ -7,11 +7,6 @@
  */
 package org.dspace.browse;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -19,6 +14,11 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is the Oracle driver class for reading information from the Browse
@@ -62,6 +62,8 @@ public class BrowseDAOOracle implements BrowseDAO
 
     /** value to start browse from in focus field */
     private String focusValue = null;
+
+    private String startsWith = null;
 
     /** field to look for value in */
     private String valueField = null;
@@ -1441,5 +1443,15 @@ public class BrowseDAOOracle implements BrowseDAO
 
     public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies) {
         this.enableBrowseFrequencies = enableBrowseFrequencies;
+    }
+
+    @Override
+    public void setStartsWith(String startsWith) {
+        this.startsWith = startsWith;
+    }
+
+    @Override
+    public String getStartsWith() {
+        return startsWith;
     }
 }
