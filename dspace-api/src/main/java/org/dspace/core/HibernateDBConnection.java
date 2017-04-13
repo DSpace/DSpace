@@ -177,10 +177,10 @@ public class HibernateDBConnection implements DBConnection<Session> {
                     }
                 }
 
-                //We always need to explicitly check Resource Policies because they could have been fetched by
-                // a direct query and thus not through an initialized collection.
-                for (ResourcePolicy policy : Utils.emptyIfNull(dso.getResourcePolicies())) {
-                    uncacheEntity(policy);
+                if(Hibernate.isInitialized(dso.getResourcePolicies())) {
+                    for (ResourcePolicy policy : Utils.emptyIfNull(dso.getResourcePolicies())) {
+                        uncacheEntity(policy);
+                    }
                 }
             }
 
