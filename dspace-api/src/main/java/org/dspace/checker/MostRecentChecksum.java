@@ -59,7 +59,7 @@ public class MostRecentChecksum implements Serializable
     private boolean bitstreamFound;
 
     @OneToOne
-    @JoinColumn(name= "result")
+    @JoinColumn(name= "result", referencedColumnName = "result_code")
     private ChecksumResult checksumResult;
 
     /**

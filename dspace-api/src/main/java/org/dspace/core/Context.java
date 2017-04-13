@@ -750,7 +750,9 @@ public class Context
      */
     @SuppressWarnings("unchecked")
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
-        dbConnection.uncacheEntity(entity);
+        if(entity != null) {
+            dbConnection.uncacheEntity(entity);
+        }
     }
 
     public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
