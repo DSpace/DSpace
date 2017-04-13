@@ -158,49 +158,65 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public boolean isMember(Context context, Group group) throws SQLException {
-        EPerson currentUser = context.getCurrentUser();
+        return isMember(context, context.getCurrentUser(), group);
+    }
 
-        if(group == null) {
-            return false;
-
-            // special, everyone is member of group 0 (anonymous)
-        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
-            return true;
-        } else if(currentUser != null) {
-
-            Boolean cachedGroupMembership = context.getCachedGroupMembership(group, currentUser);
-            if(cachedGroupMembership != null) {
-                return cachedGroupMembership.booleanValue();
-
-            } else if(CollectionUtils.isNotEmpty(context.getSpecialGroups())) {
-                Set<Group> allMemberGroups = allMemberGroupsSet(context, currentUser);
-                boolean result = allMemberGroups.contains(group);
-
-                context.cacheGroupMembership(group, currentUser, result);
-                return result;
-            } else {
-                //lookup eperson in normal groups and subgroups
-                boolean result = epersonInGroup(context, group.getName(), currentUser);
-                context.cacheGroupMembership(group, currentUser, result);
-                return result;
-            }
-        } else {
-            // Check also for anonymous users if IP authentication used
-            List<Group> specialGroups = context.getSpecialGroups();
-            if(CollectionUtils.isNotEmpty(specialGroups)) {
-                for(Group specialGroup : specialGroups){
-                    if (StringUtils.equals(specialGroup.getName(), group.getName())) {
-                        return true;
-                    }
-                }
-            }
+    @Override
+    public boolean isMember(Context context, EPerson ePerson, Group group)
+            throws SQLException
+    {
+        if (group == null)
+        {
             return false;
         }
+
+        // special, everyone is member of the anonymous group
+        if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+            return true;
+        }
+
+        Boolean cachedGroupMembership = context.getCachedGroupMembership(group, ePerson);
+        if(cachedGroupMembership != null)
+        {
+            return cachedGroupMembership.booleanValue();
+        }
+
+        // if we have special groups they may be set by IP authentication
+        // check special groups for anonymous users and if the user is currently
+        // logged in
+        if (CollectionUtils.isNotEmpty(context.getSpecialGroups())
+                && (ePerson == null || ePerson.equals(context.getCurrentUser())))
+        {
+            for (Group specialGroup : context.getSpecialGroups())
+            {
+                if (specialGroup.equals(group) || group2GroupCacheDAO.find(context, group, specialGroup) != null)
+                {
+                    context.cacheGroupMembership(group, ePerson, true);
+                    return true;
+                }
+            }
+        }
+
+        // we checked all possible memberships for anonymous users
+        if (ePerson == null)
+        {
+            return false;
+        }
+
+        //lookup eperson in normal groups and subgroups
+        boolean result = epersonInGroup(context, group.getName(), ePerson);
+        context.cacheGroupMembership(group, ePerson, result);
+        return result;
     }
 
     @Override
     public boolean isMember(final Context context, final String groupName) throws SQLException {
         return isMember(context, findByName(context, groupName));
+    }
+
+    @Override
+    public boolean isMember(final Context context, EPerson eperson, final String groupName) throws SQLException {
+        return isMember(context, eperson, findByName(context, groupName));
     }
 
     @Override

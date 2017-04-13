@@ -181,11 +181,28 @@ public interface AuthorizeService {
      */
     public boolean isAdmin(Context c, DSpaceObject o) throws SQLException;
 
+    /**
+     * Check to see if a specific user is an Administrator of a given object
+     * within DSpace. Always return {@code true} if the user is a System
+     * Admin
+     *
+     * @param c current context
+     * @param e the user to check
+     * @param o current DSpace Object, if <code>null</code> the call will be
+     *         equivalent to a call to the <code>isAdmin(Context c)</code>
+     *         method
+     * @return {@code true} if the user has administrative privileges on the
+     *         given DSpace object
+     * @throws SQLException if database error
+     */
+    public boolean isAdmin(Context c, EPerson e, DSpaceObject o) throws SQLException;
+
 
     /**
      * Check to see if the current user is a System Admin. Always return
-     * {@code true} if c.ignoreAuthorization is set. Anonymous users
-     * can't be Admins (EPerson set to NULL)
+     * {@code true} if c.ignoreAuthorization is set. If no EPerson is
+     * logged in and context.getCurrentUser() returns null, this method
+     * returns false as anonymous users can never be administrators.
      *
      * @param c current context
      * @return {@code true} if user is an admin or ignore authorization
@@ -194,6 +211,17 @@ public interface AuthorizeService {
      *     An exception that provides information on a database access error or other errors.
      */
     public boolean isAdmin(Context c) throws SQLException;
+
+    /**
+     * Check to see if a specific user is system admin. Always return
+     * {@code true} if c.ignoreAuthorization is set.
+     *
+     * @param c current context
+     * @return {@code true} if user is an admin or ignore authorization
+     *         flag set
+     * @throws SQLException if database error
+     */
+    public boolean isAdmin(Context c, EPerson e) throws SQLException;
     
     public boolean isCommunityAdmin(Context c) throws SQLException;
     
