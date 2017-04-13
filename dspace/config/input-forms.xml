@@ -62,18 +62,18 @@
                     <hint>Please describe your data file. Include details such as the original source of the information
                         (e.g., collected in the field, simulated electronically), software used to create the data file,
                         and a description of any abbreviations (e.g., for column headings). If more than two paragraphs
-                        are required for adequate description, please upload a ReadMe file.
+                        are required for adequate description, please upload a README file.
                     </hint>
                 </field>
                 <field>
                     <!--The schema & element are not used for this field since it is a file-->
                     <dc-schema>dc</dc-schema>
                     <dc-element>readme</dc-element>
-                    <label>ReadMe file</label>
+                    <label>README file</label>
                     <input-type>file</input-type>
-                    <hint>Please upload a ReadMe file if needed.
+                    <hint>Please upload a README file if needed.
                           If additional user guidance is needed 
-                          (e.g., codebook, definitions of variables or codes, de-identification methods), please upload a ReadMe file.
+                          (e.g., codebook, definitions of variables or codes, de-identification methods), please upload a README file.
                           See more information at http://datadryad.org/pages/readme.
                     </hint>
                 </field>
