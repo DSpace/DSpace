@@ -8,7 +8,9 @@
 package org.dspace.core;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -16,6 +18,7 @@ import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
+import org.dspace.handle.Handle;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
@@ -168,6 +171,7 @@ public class Context
 
         authStateChangeHistory = new Stack<Boolean>();
         authStateClassCallHistory = new Stack<String>();
+        setMode(this.mode);
     }
 
     /**
@@ -666,23 +670,26 @@ public class Context
      * small number of records.
      *
      * @param newMode The mode to put this context in
-     * @throws SQLException When configuring the database connection fails.
      */
-    public void setMode(Mode newMode) throws SQLException {
-        //update the database settings
-        switch (newMode) {
-            case BATCH_EDIT:
-                dbConnection.setConnectionMode(true, false);
-                break;
-            case READ_ONLY:
-                dbConnection.setConnectionMode(false, true);
-                break;
-            case READ_WRITE:
-                dbConnection.setConnectionMode(false, false);
-                break;
-            default:
-                log.warn("New context mode detected that has nog been configured.");
-                break;
+    public void setMode(Mode newMode) {
+        try {
+            //update the database settings
+            switch (newMode) {
+                case BATCH_EDIT:
+                    dbConnection.setConnectionMode(true, false);
+                    break;
+                case READ_ONLY:
+                    dbConnection.setConnectionMode(false, true);
+                    break;
+                case READ_WRITE:
+                    dbConnection.setConnectionMode(false, false);
+                    break;
+                default:
+                    log.warn("New context mode detected that has nog been configured.");
+                    break;
+            }
+        } catch(SQLException ex) {
+            log.warn("Unable to set database connection mode", ex);
         }
 
         //save the new mode
@@ -750,9 +757,7 @@ public class Context
      */
     @SuppressWarnings("unchecked")
     public <E extends ReloadableEntity> void uncacheEntity(E entity) throws SQLException {
-        if(entity != null) {
-            dbConnection.uncacheEntity(entity);
-        }
+        dbConnection.uncacheEntity(entity);
     }
 
     public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {

@@ -33,6 +33,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.handle.Handle;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
@@ -198,8 +199,8 @@ public class XOAI {
                     Item item = iterator.next();
                     server.add(this.index(item));
 
-                    uncacheItem(item);
-                    System.out.println("Indexed item " + i + ". Cache size is " + context.getCacheSize());
+                    //Uncache the item to keep memory consumption low
+                    context.uncacheEntity(item);
 
                 } catch (SQLException | MetadataBindException | ParseException
                         | XMLStreamException | WritingXmlException ex) {
@@ -214,22 +215,6 @@ public class XOAI {
         } catch (SolrServerException | IOException ex) {
             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
         }
-    }
-
-    private void uncacheItem(final Item item) throws SQLException {
-        context.uncacheEntity(item.getOwningCollection());
-        context.uncacheEntity(item.getSubmitter());
-        context.uncacheEntity(item.getTemplateItemOf());
-
-        for (Bundle bundle : Utils.emptyIfNull(item.getBundles())) {
-            context.uncacheEntity(bundle);
-        }
-
-        for (Collection collection : Utils.emptyIfNull(item.getCollections())) {
-            context.uncacheEntity(collection);
-        }
-
-        context.uncacheEntity(item);
     }
 
     private SolrInputDocument index(Item item) throws SQLException, MetadataBindException, ParseException, XMLStreamException, WritingXmlException {
