@@ -236,9 +236,9 @@ public class PublicationUpdater extends HttpServlet {
                         if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
                             databaseManuscript = databaseManuscripts.get(0);
                             if (isInReview) {     // only update the metadata if the item is in review.
-                                String provenance = "";
+                                String provenance = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
                                 if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
-                                    message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. " + provenance;
+                                    message = provenance;
                                 }
                             }
                         }
@@ -249,7 +249,7 @@ public class PublicationUpdater extends HttpServlet {
 
                     message = message + matchItemToCrossref(context, item);
                     if (!"".equals(message)) {
-                        updatedItems.add(message);
+                        updatedItems.add(buildItemSummary(item) + "\n\t" + message);
                         // was there a manuscript record saved for this? If so, update it.
                         if (databaseManuscript != null) {
                             databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
@@ -279,7 +279,7 @@ public class PublicationUpdater extends HttpServlet {
             LOGGER.debug(">>> processing archived item with internal ID " + item.getID());
             String message = matchItemToCrossref(context, item);
             if (!"".equals(message)) {
-                updatedItems.add(message);
+                updatedItems.add(buildItemSummary(item) + "\n\t" + message);
             }
         }
 
@@ -308,9 +308,9 @@ public class PublicationUpdater extends HttpServlet {
             if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
                 LOGGER.debug("same authors");
                 // update the item's metadata
-                String provenance = "";
+                String provenance = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\"\n\t";
                 if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
-                    message = provenance + "\n\tAssociated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" " + buildItemSummary(item) + "\n\t";
+                    message = provenance;
                 }
             } else {
                 LOGGER.debug("different authors: " + authormatches);
