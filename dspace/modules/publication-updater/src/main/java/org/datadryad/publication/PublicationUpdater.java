@@ -310,7 +310,7 @@ public class PublicationUpdater extends HttpServlet {
                 // update the item's metadata
                 String provenance = "";
                 if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
-                    message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" " + buildItemSummary(item) + "\n\t" + provenance;
+                    message = provenance + "\n\tAssociated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" " + buildItemSummary(item) + "\n\t";
                 }
             } else {
                 LOGGER.debug("different authors: " + authormatches);
@@ -541,8 +541,8 @@ public class PublicationUpdater extends HttpServlet {
         if (changed) {
             item.clearMetadata(CITATION_IN_PROGRESS);
             item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
-            LOGGER.info("writing provenance for item " + item.getID() + ": " + provenance);
             if (!"".equals(provenance)) {
+                LOGGER.info("writing provenance for item " + item.getID() + ": " + provenance);
                 item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + provenance + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
             }
 
