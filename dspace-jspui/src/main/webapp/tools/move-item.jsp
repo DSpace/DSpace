@@ -42,7 +42,7 @@
         for (int i = 0; i < linkedCollections.length; i++)
         {
 %>
-            <option value="<%= linkedCollections[i].getID() %>"><%= linkedCollections[i].getMetadata("name") %></option>
+            <option value="<%= linkedCollections[i].getID() %>"><%= linkedCollections[i].getParentObject().getMetadata("name")%>@<%= linkedCollections[i].getMetadata("name") %></option>
 <%
         }
 %>
@@ -54,17 +54,7 @@
 		  	<span class="input-group-addon">
 				<label for="collection_to_id"><fmt:message key="jsp.tools.move-item.collection.to.msg"/></label>
 			</span>
-			<select class="form-control" name="collection_to_id">
-<%
-		//Later on find a away to display in a tree format with the linked one disabled?
-        for (int i = 0; i < notLinkedCollections.length; i++)
-        {
-%>
-            <option value="<%= notLinkedCollections[i].getID() %>"><%= notLinkedCollections[i].getMetadata("name") %></option>
-<%
-        }
-%>
-				</select>
+				<dspace:selectcollection klass="form-control" id="tcollection" collection="-1" name="collection"/>
 			</div>
 		</div>
 		<div class="form-group">

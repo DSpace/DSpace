@@ -303,6 +303,7 @@ public class EditItemServlet extends DSpaceServlet
                 
                         request.setAttribute("linkedCollections", linkedCollections);
                         request.setAttribute("notLinkedCollections", notLinkedCollections);
+                        request.setAttribute("collections", notLinkedCollections);
                                     
                         JSPManager.showJSP(request, response, "/tools/move-item.jsp");
                 } else
@@ -316,7 +317,7 @@ public class EditItemServlet extends DSpaceServlet
                 if (AuthorizeManager.isAdmin(context,item))
                 {
                         Collection fromCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_from_id"));
-                        Collection toCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_to_id"));
+                        Collection toCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection"));
 
                         Boolean inheritPolicies = false;
                         if (request.getParameter("inheritpolicies") != null)
