@@ -406,4 +406,10 @@ ol.btn-primary {
 
 div.panel.panel-primary ul.list-group li.list-group-item.active .badge {background-color: #fefecd;}
 
-		
+.input-group-addon{
+	color: #FFFFFF;
+}
+
+.help-block {
+	color: #000000;
+}		
