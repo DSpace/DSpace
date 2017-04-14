@@ -308,7 +308,7 @@ public class PublicationUpdater extends HttpServlet {
             if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
                 LOGGER.debug("same authors");
                 // update the item's metadata
-                String provenance = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\"\n\t";
+                String provenance = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\"";
                 if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
                     message = provenance;
                 }
