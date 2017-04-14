@@ -262,7 +262,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
             if (isAdmin(c, adminObject))
             {
-                c.cacheAuthorizedAction(o, action, e, true);
+                c.cacheAuthorizedAction(o, action, e, true, null);
                 return true;
             }
         }
@@ -304,7 +304,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
             if (ignoreCustomPolicies
                     && ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType()))
             {
-                c.uncacheEntity(rp);
+                if(c.isReadOnly()) {
+                    //When we are in read-only mode, we will cache authorized actions in a different way
+                    //So we remove this resource policy from the cache.
+                    c.uncacheEntity(rp);
+                }
                 continue;
             }
 
@@ -313,8 +317,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
             {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(userToCheck))
                 {
-                    c.cacheAuthorizedAction(o, action, e, true);
-                    c.uncacheEntity(rp);
+                    c.cacheAuthorizedAction(o, action, e, true, rp);
                     return true; // match
                 }
 
@@ -323,16 +326,20 @@ public class AuthorizeServiceImpl implements AuthorizeService
                 {
                     // group was set, and eperson is a member
                     // of that group
-                    c.cacheAuthorizedAction(o, action, e, true);
-                    c.uncacheEntity(rp);
+                    c.cacheAuthorizedAction(o, action, e, true, rp);
                     return true;
                 }
             }
-            c.uncacheEntity(rp);
+
+            if(c.isReadOnly()) {
+                //When we are in read-only mode, we will cache authorized actions in a different way
+                //So we remove this resource policy from the cache.
+                c.uncacheEntity(rp);
+            }
         }
 
         // default authorization is denial
-        c.cacheAuthorizedAction(o, action, e, false);
+        c.cacheAuthorizedAction(o, action, e, false, null);
         return false;
     }
 
@@ -392,8 +399,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
             {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(c.getCurrentUser()))
                 {
-                    c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), true);
-                    c.uncacheEntity(rp);
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), true, rp);
                     return true; // match
                 }
 
@@ -402,12 +408,16 @@ public class AuthorizeServiceImpl implements AuthorizeService
                 {
                     // group was set, and eperson is a member
                     // of that group
-                    c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), true);
-                    c.uncacheEntity(rp);
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), true, rp);
                     return true;
                 }
             }
-            c.uncacheEntity(rp);
+
+            if(c.isReadOnly()) {
+                //When we are in read-only mode, we will cache authorized actions in a different way
+                //So we remove this resource policy from the cache.
+                c.uncacheEntity(rp);
+            }
         }
 
         // If user doesn't have specific Admin permissions on this object,
@@ -418,11 +428,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
         if (parent != null)
         {
             boolean admin = isAdmin(c, parent);
-            c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), admin);
+            c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), admin, null);
             return admin;
         }
 
-        c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), false);
+        c.cacheAuthorizedAction(o, Constants.ADMIN, c.getCurrentUser(), false, null);
         return false;
     }
 

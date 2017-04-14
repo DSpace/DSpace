@@ -768,9 +768,14 @@ public class Context
         }
     }
 
-    public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result) {
+    public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result, ResourcePolicy rp) {
         if(isReadOnly()) {
             readOnlyCache.cacheAuthorizedAction(dspaceObject, action, eperson, result);
+            try {
+                uncacheEntity(rp);
+            } catch (SQLException e) {
+                log.warn("Unable to uncache a resource policy when in read-only mode", e);
+            }
         }
     }
 
