@@ -43,7 +43,6 @@ public class WidgetBannerSelector extends WidgetBannerLookup implements Selector
         }
 
         boolean result = (packageDOI != null);
-        log.debug("returning " + result);
         return result;
     }
 
