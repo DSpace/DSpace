@@ -47,7 +47,8 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
     }
 
     public String lookup(String pubId, String referrer, Map objectModel) throws SQLException {
-
+        log.debug("looking up ID " + pubId);
+        
             if(referrer == null || referrer.length() == 0) {
                 return null;
             }
@@ -71,6 +72,8 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
                 // default case, treat it raw
                 solrPubId = pubId;
             }
+
+            log.debug("processed ID " + solrPubId);
             
             // Incoming pubId should identify a publication/article.  See if we have
             // a data package that references this article
@@ -92,6 +95,7 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
 
                 SolrDocument document = documentList.get(0);
                 String firstDOI = (String)document.getFirstValue("dc.identifier");
+                log.debug("found DOI " + firstDOI);
                 return firstDOI;
                 
         } catch (MalformedURLException ex) {

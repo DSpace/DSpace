@@ -30,6 +30,7 @@ public class WidgetBannerAction extends WidgetBannerLookup implements Action {
             String pubId = parameters.getParameter("pubId","");
             String packageDOI = null;
         try {
+            log.debug("looking up " + pubId);
             packageDOI = lookup(pubId, referrer, objectModel);
         } catch (SQLException ex) {
             log.error("Error looking up article identifier:", ex);
@@ -38,6 +39,7 @@ public class WidgetBannerAction extends WidgetBannerLookup implements Action {
             throw new ResourceNotFoundException("No data package was found for pubId:" + pubId);
         }
         Map returnMap = new HashMap();
+        log.debug("returning " + packageDOI);
         returnMap.put("package", packageDOI);
         return returnMap;
     }
