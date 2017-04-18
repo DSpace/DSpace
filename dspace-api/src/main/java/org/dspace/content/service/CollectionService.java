@@ -161,7 +161,8 @@ public interface CollectionService extends DSpaceObjectService<Collection>, DSpa
      * @param group
      *            the new workflow group, or <code>null</code>
      */
-    public void setWorkflowGroup(Collection collection, int step, Group group);
+    public void setWorkflowGroup(Context context, Collection collection, int step, Group group)
+            throws SQLException, AuthorizeException;
 
     /**
      * Get the the workflow group corresponding to a particular workflow step.

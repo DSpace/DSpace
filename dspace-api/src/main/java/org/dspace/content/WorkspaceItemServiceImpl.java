@@ -93,11 +93,8 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
         Item item = itemService.create(context, workspaceItem);
         item.setSubmitter(context.getCurrentUser());
 
-        // Now create the policies for the submitter and workflow
-        // users to modify item and contents
+        // Now create the policies for the submitter to modify item and contents
         // contents = bitstreams, bundles
-        // FIXME: icky hardcoded workflow steps
-        workflowService.addInitialWorkspaceItemPolicies(context, workspaceItem);
         // read permission
         authorizeService.addPolicy(context, item, Constants.READ, item.getSubmitter(), ResourcePolicy.TYPE_SUBMISSION);
         // write permission

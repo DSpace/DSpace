@@ -121,11 +121,11 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
     /**
      * Find a group by its name and the membership of the given EPerson
      * @param context The DSpace context
-     * @param groupName The name of the group to look for
+     * @param id The id of the group to look for
      * @param ePerson The EPerson which has to be a member
      * @return The group with the specified name
      * @throws SQLException if database error
      */
-    Group findByNameAndMembership(Context context, String groupName, EPerson ePerson) throws SQLException;
+    Group findByIdAndMembership(Context context, UUID id, EPerson ePerson) throws SQLException;
 
 }

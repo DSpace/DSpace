@@ -93,11 +93,6 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
 
 
     @Override
-    public void addInitialWorkspaceItemPolicies(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
-        //Not used, rights are added dynamically.
-    }
-
-    @Override
     public void deleteCollection(Context context, Collection collection) throws SQLException, IOException, AuthorizeException {
         xmlWorkflowItemService.deleteByCollection(context, collection);
         collectionRoleService.deleteByCollection(context, collection);
@@ -463,8 +458,7 @@ public class XmlWorkflowServiceImpl implements XmlWorkflowService {
      *
      * @return the fully archived item.
      */
-    @Override
-    public Item archive(Context context, XmlWorkflowItem wfi)
+    protected Item archive(Context context, XmlWorkflowItem wfi)
             throws SQLException, IOException, AuthorizeException {
         // FIXME: Check auth
         Item item = wfi.getItem();
