@@ -19,6 +19,7 @@
 <%@page import="org.dspace.authorize.AuthorizeManager"%>
 <%@page import="org.dspace.authorize.ResourcePolicy"%>
 <%@page import="java.util.List"%>
+<%@page import="java.util.Date"%>
 <%@ page import="org.dspace.app.webui.servlet.SubmissionController" %>
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
@@ -27,6 +28,7 @@
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.Utils" %>
+<%@ page import="org.dspace.eperson.Group" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
@@ -102,32 +104,27 @@
 if(isUploadWithEmbargo) {
 List<ResourcePolicy> rpolicies = AuthorizeManager.findPoliciesByDSOAndType(context, bitstreams[i], ResourcePolicy.TYPE_CUSTOM); %>
 <% if(rpolicies!=null && !rpolicies.isEmpty()) { %>
-		<% int countPolicies = 0;
-		   //show information about policies setting only in the case of advanced embargo form
-		   if(advanced) {  
-		       countPolicies = rpolicies.size();
-		%>
-			<% if(countPolicies>0) { %>		
-				<i class="label label-info"><fmt:message key="jsp.submit.review.policies.founded"><fmt:param><%= countPolicies %></fmt:param></fmt:message></i>
-			<% } %>
-		<% } else { %>
-				<% for(ResourcePolicy rpolicy : rpolicies) { 
-						if(rpolicy.getStartDate()!=null) {
+				<% for(ResourcePolicy rpolicy : rpolicies) {
+						Date startDate =rpolicy.getStartDate();
+						if(startDate!=null && rpolicy.isDateValid()) {
 						%>
-							<c:set var="policyStartDate" value="<%= rpolicy.getStartDate() %>" target="java.util.Date"/>
+							<c:set var="policyStartDate" value="<%= startDate %>" target="java.util.Date"/>
 							<i class="label label-info"><fmt:message key="jsp.submit.review.policies.embargoed"><fmt:param value="${policyStartDate}"/></fmt:message></i>				    
 						<%
 						}
-						else { 
-						%>
-							<i class="label label-success"><fmt:message key="jsp.submit.review.policies.openaccess"/></i>														    
-					    <%
-						}
+						else {
+							if(rpolicy.getGroupID() == Group.ANONYMOUS_ID ){%>
+								<i class="label label-success"><fmt:message key="jsp.submit.review.policies.openaccess"/></i>
+							<%	}
+							else if(rpolicy.getGroupID() ==Group.ADMIN_ID ){%>
+								<i class="label label-danger"><fmt:message key="jsp.submit.review.policies.closedccess"/></i>				
+							<% 	}
+							else{%>
+								<i class="label label-warning"><fmt:message key="jsp.submit.review.policies.restrictedccess"/></i>							
+							<% 	}
+							}
 					}
 				%>
-				
-				
-		<% } %>
 <% } 
 }
 %>
