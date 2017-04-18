@@ -81,7 +81,7 @@ public class PackageResource {
                                 @DefaultValue("") @QueryParam("date_from") String dateFromString,
                                 @DefaultValue("") @QueryParam("date_to") String dateToString,
                                 @DefaultValue("") @QueryParam("search") String searchParam,
-                                @QueryParam("count") Integer countParam,
+                                @DefaultValue("20") @QueryParam("count") Integer countParam,
                                 @DefaultValue("0") @QueryParam("cursor") Integer cursorParam) {
         try {
             // Returning a list requires POJO turned on
