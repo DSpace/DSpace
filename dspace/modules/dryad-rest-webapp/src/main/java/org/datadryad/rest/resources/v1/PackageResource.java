@@ -106,7 +106,7 @@ public class PackageResource {
                 ErrorsResponse error = ResponseFactory.makeError(e.getMessage(), "Unable to parse date", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
                 return error.toResponse().build();
             }
-            if (dateFrom != null || dateTo != null) {
+            if (dateFrom != null && dateTo != null) {
                 packageStorage.addResultsInDateRange(path, packages, dateFrom, dateTo, countParam, cursorParam);
             } else {
                 packages.addAll(packageStorage.getResults(path, searchParam, countParam, cursorParam));
