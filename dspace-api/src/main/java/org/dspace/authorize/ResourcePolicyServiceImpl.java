@@ -104,13 +104,22 @@ public class ResourcePolicyServiceImpl implements ResourcePolicyService
     }
 
     @Override
-    public List<ResourcePolicy> find(Context c, DSpaceObject dso, Group group, int action, int notPolicyID) throws SQLException {
-        return resourcePolicyDAO.findByTypeIdGroupAction(c, dso, group, action, notPolicyID);
+    public List<ResourcePolicy> find(Context c, DSpaceObject dso, Group group, int action) throws SQLException {
+        return resourcePolicyDAO.findByTypeGroupAction(c, dso, group, action);
     }
     
+    @Override
     public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id) throws SQLException{
         return resourcePolicyDAO.findByEPersonGroupTypeIdAction(c, e, groups, action, type_id);
     }
+    
+    @Override
+    public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group, int action, int notPolicyID)
+            throws SQLException
+    {
+        return resourcePolicyDAO.findByTypeGroupActionExceptId(context, dso, group, action, notPolicyID);
+    }
+            
 
     /**
      * Delete an ResourcePolicy

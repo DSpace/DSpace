@@ -642,13 +642,14 @@ public class AuthorizeServiceImpl implements AuthorizeService
     @Override
     public boolean isAnIdenticalPolicyAlreadyInPlace(Context c, DSpaceObject dso, Group group, int action, int policyID) throws SQLException
     {
-        return findByTypeIdGroupAction(c, dso, group, action, policyID) != null;
+        return !resourcePolicyService.findByTypeGroupActionExceptId(c, dso, group, action, policyID).isEmpty();
     }
 
     @Override
-    public ResourcePolicy findByTypeIdGroupAction(Context c, DSpaceObject dso, Group group, int action, int policyID) throws SQLException
+    public ResourcePolicy findByTypeGroupAction(Context c, DSpaceObject dso, Group group, int action)
+            throws SQLException
     {
-        List<ResourcePolicy> policies = resourcePolicyService.find(c, dso, group, action, policyID);
+        List<ResourcePolicy> policies = resourcePolicyService.find(c, dso, group, action);
 
         if (CollectionUtils.isNotEmpty(policies))
         {
@@ -657,7 +658,6 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return null;
         }
     }
-
 
     /**
      * Generate Policies policies READ for the date in input adding reason. New policies are assigned automatically at the groups that
@@ -740,12 +740,19 @@ public class AuthorizeServiceImpl implements AuthorizeService
     public ResourcePolicy createOrModifyPolicy(ResourcePolicy policy, Context context, String name, Group group, EPerson ePerson,
                                                       Date embargoDate, int action, String reason, DSpaceObject dso) throws AuthorizeException, SQLException
     {
+        ResourcePolicy policyTemp = null;
+        if (policy != null)
+        {
+            List<ResourcePolicy> duplicates = resourcePolicyService.findByTypeGroupActionExceptId(context, dso, group, action, policy.getID());
+            if (!duplicates.isEmpty())
+            {
+                policy = duplicates.get(0);
+            }
+        } else {
+            // if an identical policy (same Action and same Group) is already in place modify it...
+            policyTemp = findByTypeGroupAction(context, dso, group, action);
+        }
 
-        int policyID = -1;
-        if (policy != null) policyID = policy.getID();
-
-        // if an identical policy (same Action and same Group) is already in place modify it...
-        ResourcePolicy policyTemp = findByTypeIdGroupAction(context, dso, group, action, policyID);
         if (policyTemp != null)
         {
             policy = policyTemp;
