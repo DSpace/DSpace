@@ -9,6 +9,8 @@
 package org.dspace.identifier;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -97,10 +99,9 @@ public class EZIDIdentifierProviderTest
      * @throws AuthorizeException if authorization error
      * @throws IOException if IO error
      */
-    private Item newItem(Context ctx)
-            throws SQLException, AuthorizeException, IOException, WorkflowException {
-        ctx.turnOffAuthorisationSystem();
-       
+    private Item newItem()
+            throws SQLException, AuthorizeException, IOException, WorkflowException
+    {
          //Install a fresh item
         context.turnOffAuthorisationSystem();
 
@@ -117,7 +118,7 @@ public class EZIDIdentifierProviderTest
         itemService.update(context, item);
 
         // Commit work, clean up
-        ctx.restoreAuthSystemState();
+        context.restoreAuthSystemState();
 
         return item;
     }
@@ -409,6 +410,7 @@ public class EZIDIdentifierProviderTest
     public void testCrosswalkMetadata()
             throws Exception
     {
+        try {
         System.out.println("crosswalkMetadata");
 
         // Set up the instance to be tested
@@ -418,7 +420,7 @@ public class EZIDIdentifierProviderTest
 //        instance.setCrosswalkTransform(crosswalkTransforms);
 
         // Let's have a fresh Item to work with
-        DSpaceObject dso = newItem(context);
+        DSpaceObject dso = newItem();
         String handle = dso.getHandle();
 
         // Test!
@@ -439,6 +441,14 @@ public class EZIDIdentifierProviderTest
         for (Entry metadatum : metadata.entrySet())
         {
             System.out.printf("  %s : %s\n", metadatum.getKey(), metadatum.getValue());
+        }
+        } catch (NullPointerException ex) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            ex.printStackTrace(pw);
+            System.out.println(sw.toString());
+            org.apache.log4j.Logger.getLogger(EZIDIdentifierProviderTest.class).fatal("Caught NPE", ex);
+            throw ex;
         }
     }
 }

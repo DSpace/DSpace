@@ -29,9 +29,8 @@ import java.util.List;
  * @param <T> some implementation of workflow item.
  */
 public interface WorkflowService<T extends WorkflowItem> {
-
-    public void addInitialWorkspaceItemPolicies(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException;
-
+    
+    
     /**
      * startWorkflow() begins a workflow - in a single transaction do away with
      * the PersonalWorkspace entry and turn it into a WorkflowItem.
@@ -72,8 +71,6 @@ public interface WorkflowService<T extends WorkflowItem> {
      * @throws WorkflowException if workflow error
      */
     public T startWithoutNotify(Context c, WorkspaceItem wsi) throws SQLException, AuthorizeException, IOException, WorkflowException;
-
-    public Item archive(Context context, T workflowItem) throws SQLException, IOException, AuthorizeException;
 
     /**
      * abort() aborts a workflow, completely deleting it (administrator do this)

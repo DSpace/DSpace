@@ -18,6 +18,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 import javax.persistence.*;
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.authorize.AuthorizeException;
 
 /**
  * Class representing a collection.
@@ -335,9 +336,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         return Constants.COLLECTION;
     }
 
-    public void setWorkflowGroup(int step, Group g)
+    public void setWorkflowGroup(Context context, int step, Group g)
+            throws SQLException, AuthorizeException 
     {
-        getCollectionService().setWorkflowGroup(this, step, g);
+        getCollectionService().setWorkflowGroup(context, this, step, g);
     }
 
     @Override

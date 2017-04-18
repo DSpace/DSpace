@@ -190,7 +190,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
                 //If we have an ePerson, check we can find membership in the database
                 if(ePerson != null) {
                     //lookup eperson in normal groups and subgroups with 1 query
-                    isMember = isEPersonInGroup(context, group.getName(), ePerson);
+                    isMember = isEPersonInGroup(context, group, ePerson);
                 }
 
                 //If we did not find the group membership in the database, check the special groups.
@@ -539,10 +539,10 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
 
 
-    protected boolean isEPersonInGroup(Context context, String groupName, EPerson ePerson)
+    protected boolean isEPersonInGroup(Context context, Group group, EPerson ePerson)
             throws SQLException
     {
-        return groupDAO.findByNameAndMembership(context, groupName, ePerson) != null;
+        return groupDAO.findByIdAndMembership(context, group.getID(), ePerson) != null;
     }
 
 

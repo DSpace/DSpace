@@ -518,9 +518,29 @@ public class CollectionTest extends AbstractDSpaceObjectTest
         int step = 1;
         Group g = groupService.create(context);
         context.restoreAuthSystemState();
-        collection.setWorkflowGroup(step, g);
+        collection.setWorkflowGroup(context, step, g);
         assertThat("testSetWorkflowGroup 0",collectionService.getWorkflowGroup(collection, step), notNullValue());
         assertThat("testSetWorkflowGroup 1",collectionService.getWorkflowGroup(collection, step), equalTo(g));
+    }
+    
+    /**
+     * Test of setWorkflowGroup method, of class Collection.
+     * The setWorkflowGroup ajust the policies for the basic Workflow. This test
+     * shall assure that now exception (e.g. ConcurrentModificationException is
+     * thrown during these adjustments.
+     */
+    @Test
+    public void testChangeWorkflowGroup() throws SQLException, AuthorizeException
+    {
+        context.turnOffAuthorisationSystem(); //must be an Admin to create a Group
+        int step = 1;
+        Group g1 = groupService.create(context);
+        Group g2 = groupService.create(context);
+        context.restoreAuthSystemState();
+        collection.setWorkflowGroup(context, step, g1);
+        collection.setWorkflowGroup(context, step, g2);
+        assertThat("testSetWorkflowGroup 0",collectionService.getWorkflowGroup(collection, step), notNullValue());
+        assertThat("testSetWorkflowGroup 1",collectionService.getWorkflowGroup(collection, step), equalTo(g2));
     }
 
     /**
