@@ -410,8 +410,8 @@ public interface AuthorizeService {
      * @throws SQLException if there's a database problem
      */
     public boolean isAnIdenticalPolicyAlreadyInPlace(Context c, DSpaceObject o, Group group, int actionID, int policyID) throws SQLException;
-
-    public ResourcePolicy findByTypeIdGroupAction(Context c, DSpaceObject dso, Group group, int action, int policyID) throws SQLException;
+    
+    public ResourcePolicy findByTypeGroupAction(Context c, DSpaceObject dso, Group group, int action) throws SQLException;
 
 
     /**
