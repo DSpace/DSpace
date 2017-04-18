@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 
 package org.dspace.workflow;
 
@@ -91,26 +98,24 @@ public class CurationTaskConfig
                         if (null != eName) switch (eName)
                         {
                         case "mapping":
-                            collMap.put(reader.getAttributeValue(0),
-                                    reader.getAttributeValue(1));
+                            collMap.put(reader.getAttributeValue(null, "collection-handle"),
+                                    reader.getAttributeValue(null, "taskset"));
                             break;
                         case "taskset":
-                            taskSet = new TaskSet(reader.getAttributeValue(0));
+                            taskSet = new TaskSet(reader.getAttributeValue(null, "name"));
                             break;
                         case "flowstep":
-                            int count = reader.getAttributeCount();
-                            String queue = (count == 2) ?
-                                    reader.getAttributeValue(1) : null;
-                            flowStep = new FlowStep(reader.getAttributeValue(0), queue);
+                            flowStep = new FlowStep(reader.getAttributeValue(null, "name"),
+                                    reader.getAttributeValue(null, "queue"));
                             break;
                         case "task":
-                            task = new Task(reader.getAttributeValue(0));
+                            task = new Task(reader.getAttributeValue(null, "name"));
                             break;
                         case "workflow":
                             type = "power";
                             break;
                         case "notify":
-                            type = reader.getAttributeValue(0);
+                            type = reader.getAttributeValue(null, "on");
                             break;
                         default:
                             break;
@@ -143,7 +148,8 @@ public class CurationTaskConfig
                             break;
                         default:
                             break;
-                        }   break;
+                        }
+                        break;
                     }
                 default:
                     break;
