@@ -238,13 +238,13 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         return finalRows;
     }
 
-    private static List<Manuscript> getManuscripts(Context context, String journalRef, int limit) throws SQLException, IOException {
+    private static List<Manuscript> getManuscripts(Context context, DryadJournalConcept journalConcept, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, journalRef);
-        if (journal == null) {
+        log.error("journal is " + journalConcept.getFullName());
+        if (journalConcept == null) {
             return manuscripts;
         } else {
-            Integer journalConceptID = journal.getConceptID();
+            Integer journalConceptID = journalConcept.getConceptID();
             String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
             TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, limit);
             while(rows.hasNext()) {
@@ -256,13 +256,12 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private static List<Manuscript> getManuscriptsMatchingQuery(Context context, String journalRef, String searchParam, int limit) throws SQLException, IOException {
+    private static List<Manuscript> getManuscriptsMatchingQuery(Context context, DryadJournalConcept journalConcept, String searchParam, int limit) throws SQLException, IOException {
         List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, journalRef);
-        if (journal == null) {
+        if (journalConcept == null) {
             return manuscripts;
         } else {
-            Integer journalConceptID = journal.getConceptID();
+            Integer journalConceptID = journalConcept.getConceptID();
             String searchWords[] = searchParam.split("\\s", 2);
             String queryParam = "%" + searchWords[0] + "%";
             String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
@@ -393,9 +392,9 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
                     manuscripts.add(manuscript);
                 }
             } else if (searchParam == null) {
-                manuscripts.addAll(getManuscripts(context, journal.getJournalID(), limitInt));
+                manuscripts.addAll(getManuscripts(context, journal, limitInt));
             } else {
-                manuscripts.addAll(getManuscriptsMatchingQuery(context, journal.getJournalID(), searchParam, limitInt));
+                manuscripts.addAll(getManuscriptsMatchingQuery(context, journal, searchParam, limitInt));
             }
             completeContext(context);
         } catch (SQLException ex) {
