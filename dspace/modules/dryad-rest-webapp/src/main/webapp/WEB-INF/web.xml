@@ -10,20 +10,12 @@
         <servlet-name>Dryad REST API</servlet-name>
         <servlet-class>org.datadryad.rest.servlet.DryadAPIServletContainer</servlet-class>
         <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>org.datadryad.rest.resources.v1,org.datadryad.rest.providers</param-value>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>org.datadryad.rest.servlet.DryadAPIResourceConfig</param-value>
         </init-param>
         <init-param>
-            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-            <param-value>org.datadryad.rest.auth.AuthenticationRequestFilter</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.spi.container.ResourceFilters</param-name>
-            <param-value>org.datadryad.rest.auth.ResourceAuthorizationFilterFactory</param-value>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>org.datadryad.rest.resources.v1;org.datadryad.rest.binders;org.datadryad.rest.handler;org.datadryad.rest.storage.rdbms</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

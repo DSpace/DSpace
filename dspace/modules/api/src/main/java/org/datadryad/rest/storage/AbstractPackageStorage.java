@@ -10,10 +10,13 @@ import java.util.List;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.Package;
 
+import javax.inject.Singleton;
+
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
+@Singleton
 public abstract class AbstractPackageStorage extends AbstractStorage<Package> {
     @Override
     public final void checkCollectionPath(StoragePath path) throws StorageException {

@@ -15,6 +15,8 @@ import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.PackageDatabaseStorageImpl;
 import org.dspace.content.authority.Concept;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
@@ -29,10 +31,8 @@ import java.util.*;
 @Path("journals")
 public class PackageResource {
     private static final Logger log = Logger.getLogger(PackageResource.class);
-    @Context
-    AbstractOrganizationConceptStorage journalStorage;
-    @Context
-    AbstractPackageStorage packageStorage;
+    @Inject AbstractOrganizationConceptStorage journalStorage;
+    @Inject AbstractPackageStorage packageStorage;
     @Context UriInfo uriInfo;
     @Context SecurityContext securityContext;
 

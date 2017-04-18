@@ -1,11 +1,12 @@
 /*
  */
-package org.datadryad.rest.auth;
+package org.datadryad.rest.filters;
 
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 
@@ -14,6 +15,13 @@ import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.ParameterStyle;
 import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest;
+import org.datadryad.rest.auth.AuthHelper;
+import org.datadryad.rest.auth.EPersonSecurityContext;
+import org.datadryad.rest.auth.EPersonUserPrincipal;
+import org.datadryad.rest.storage.AuthorizationStorageInterface;
+import org.datadryad.rest.storage.OAuthTokenStorageInterface;
+import org.datadryad.rest.storage.rdbms.AuthorizationDatabaseStorageImpl;
+import org.datadryad.rest.storage.rdbms.OAuthTokenDatabaseStorageImpl;
 
 /**
  *
@@ -22,10 +30,16 @@ import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest;
 public class AuthenticationRequestFilter implements ContainerRequestFilter {
     private static final Logger log = Logger.getLogger(AuthenticationRequestFilter.class);
     @Context private HttpServletRequest servletRequest;
-    @Context private AuthHelper authHelper;
+    OAuthTokenStorageInterface tokenStorage = new OAuthTokenDatabaseStorageImpl();
+    AuthorizationStorageInterface authzStorage = new AuthorizationDatabaseStorageImpl();
+    private AuthHelper authHelper;
+
+    public AuthenticationRequestFilter() {
+        authHelper =  new AuthHelper(tokenStorage, authzStorage);
+    }
 
     @Override
-    public ContainerRequest filter(ContainerRequest containerRequest) {
+    public void filter(ContainerRequestContext containerRequest) {
         log.info("Filtering request for authentication");
         // TODO: Make sure HTTPs if we can
         OAuthAccessResourceRequest oAuthRequest = null;
@@ -45,6 +59,6 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
             EPersonSecurityContext securityContext = new EPersonSecurityContext(userPrincipal);
             containerRequest.setSecurityContext(securityContext);
         }
-        return containerRequest;
+        return;
     }
 }

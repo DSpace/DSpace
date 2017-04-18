@@ -1,7 +1,7 @@
 /*
  */
 package org.datadryad.rest.servlet;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
+import org.glassfish.jersey.servlet.ServletContainer;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import org.apache.log4j.Logger;

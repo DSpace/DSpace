@@ -10,6 +10,7 @@ import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.JournalUtils;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -25,8 +26,7 @@ import java.util.List;
 
 @Path("organizations")
 public class OrganizationConceptResource {
-    @Context
-    AbstractOrganizationConceptStorage journalStorage;
+    @Inject AbstractOrganizationConceptStorage journalStorage;
     @Context UriInfo uriInfo;
     @Context HttpServletRequest request;
 

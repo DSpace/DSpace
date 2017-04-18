@@ -7,10 +7,13 @@ import java.util.Arrays;
 import java.util.List;
 import org.datadryad.rest.models.Manuscript;
 
+import javax.inject.Singleton;
+
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
+@Singleton
 public abstract class AbstractManuscriptStorage extends AbstractStorage<Manuscript> {
 
     @Override

@@ -2,8 +2,6 @@
  */
 package org.datadryad.rest.storage;
 
-import org.datadryad.rest.models.Package;
-
 import java.lang.Integer;
 import java.util.ArrayList;
 import java.util.Date;

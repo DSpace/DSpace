@@ -12,6 +12,7 @@ import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
@@ -25,12 +26,11 @@ import java.net.URI;
 
 public class ManuscriptResource {
     private static final Logger log = Logger.getLogger(ManuscriptResource.class);
-    @Context AbstractManuscriptStorage manuscriptStorage;
-    @Context
-    AbstractOrganizationConceptStorage journalStorage;
+    @Inject AbstractManuscriptStorage manuscriptStorage;
+    @Inject AbstractOrganizationConceptStorage journalStorage;
     @Context UriInfo uriInfo;
     @Context SecurityContext securityContext;
-    @Context ManuscriptHandlerGroup handlers;
+    private ManuscriptHandlerGroup handlers = new ManuscriptHandlerGroup();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -122,24 +122,7 @@ public class ManuscriptResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateManuscript(@PathParam(StoragePath.JOURNAL_PATH) String journalCode, Manuscript manuscript) {
         String manuscriptId = manuscript.getManuscriptId();
-        StoragePath path = StoragePath.createManuscriptPath(journalCode, manuscriptId);
-        if(manuscript.isValid()) {
-            try {
-                StoragePath journalPath = StoragePath.createJournalPath(journalCode);
-                manuscript.setJournalConcept(journalStorage.findByPath(journalPath));
-                manuscriptStorage.update(path, manuscript);
-            } catch (StorageException ex) {
-                log.error("Exception updating manuscript", ex);
-                ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to update manuscript", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
-                return error.toResponse().build();
-            }
-            // call handlers - must set journal first.
-            handlers.handleObjectUpdated(path, manuscript);
-            return Response.ok(manuscript).build();
-        } else {
-            ErrorsResponse error = ResponseFactory.makeError("Please check the structure of your object",  "Invalid manuscript object", uriInfo, Status.BAD_REQUEST.getStatusCode());
-            return error.toResponse().build();
-        }
+        return updateManuscript(journalCode, manuscriptId, manuscript);
     }
 
     @Path("/{manuscriptId}")
