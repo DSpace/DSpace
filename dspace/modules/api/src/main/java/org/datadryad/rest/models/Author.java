@@ -45,9 +45,16 @@ public class Author {
         // initialize to empty strings, in case there isn't actually anything in the authorString.
         setGivenNames("");
         setFamilyName("");
-        String suffix = "";
 
         if (authorString != null) {
+            setFullName(authorString);
+        }
+        return;
+    }
+
+    public void setFullName(String authorString) {
+        if ("".equals(familyName) || "".equals(givenNames)) {
+            String suffix = "";
             authorString = StringUtils.stripToEmpty(authorString);
             // Remove any leading title, like Dr.
             authorString = authorString.replaceAll("^[D|M]+rs*\\.*\\s*","");
@@ -84,7 +91,6 @@ public class Author {
                 setFamilyName(authorString);
             }
         }
-        return;
     }
 
     public void setFamilyName(String familyName) {
