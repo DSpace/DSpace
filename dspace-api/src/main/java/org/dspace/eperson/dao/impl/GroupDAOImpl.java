@@ -54,7 +54,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> findAll(Context context, List<MetadataField> sortMetadataFields) throws SQLException
+    public List<Group> findAll(Context context, List<MetadataField> sortMetadataFields, int pageSize, int offset) throws SQLException
     {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
@@ -64,16 +64,33 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         addMetadataSortQuery(queryBuilder, sortMetadataFields, null);
 
         Query query = createQuery(context, queryBuilder.toString());
+        if (pageSize > 0) {
+        	query.setMaxResults(pageSize);
+        }
+        if (offset > 0) {
+        	query.setFirstResult(offset);
+        }
         for (MetadataField sortField : sortMetadataFields) {
             query.setParameter(sortField.toString(), sortField.getID());
         }
         return list(query);
     }
 
+//    @Override
+//    public List<Group> findAll(Context context) throws SQLException {
+//    	return findAll()
+//    }
+    
     @Override
-    public List<Group> findAll(Context context) throws SQLException {
+    public List<Group> findAll(Context context, int pageSize, int offset) throws SQLException {
         Query query = createQuery(context,
                 "SELECT g FROM Group g ORDER BY g.name ASC");
+        if (pageSize > 0) {
+        	query.setMaxResults(pageSize);
+        }
+        if (offset > 0) {
+        	query.setFirstResult(offset);
+        }
         query.setCacheable(true);
 
         return list(query);

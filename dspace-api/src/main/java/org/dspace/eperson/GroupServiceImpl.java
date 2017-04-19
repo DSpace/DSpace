@@ -278,14 +278,20 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             throw new UnsupportedOperationException("You can only find all groups sorted by name with this method");
         }
     }
-
+    
     @Override
     public List<Group> findAll(Context context, List<MetadataField> metadataSortFields) throws SQLException
     {
+    	return findAll(context, metadataSortFields, -1, -1);
+    }
+    
+    @Override
+    public List<Group> findAll(Context context, List<MetadataField> metadataSortFields, int pageSize, int offset) throws SQLException
+    {
         if (CollectionUtils.isEmpty(metadataSortFields)) {
-            return groupDAO.findAll(context);
+            return groupDAO.findAll(context, pageSize, offset);
         } else {
-            return groupDAO.findAll(context, metadataSortFields);
+            return groupDAO.findAll(context, metadataSortFields, pageSize, offset);
         }
     }
 

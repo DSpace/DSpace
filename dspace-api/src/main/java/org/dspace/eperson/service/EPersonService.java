@@ -124,7 +124,7 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
             throws SQLException;
 
     /**
-     * Find all the epeople that match a particular query
+     * @deprecated use the paginated method. Find all the epeople in a specific order
      * <ul>
      * <li><code>ID</code></li>
      * <li><code>LASTNAME</code></li>
@@ -136,11 +136,36 @@ public interface EPersonService extends DSpaceObjectService<EPerson>, DSpaceObje
      *     The relevant DSpace Context.
      * @param sortField
      *     which field to sort EPersons by
-     * @return array of EPerson objects
+     * @return list of EPerson objects
      * @throws SQLException
      *     An exception that provides information on a database access error or other errors.
      */
+    @Deprecated
     public List<EPerson> findAll(Context context, int sortField)
+            throws SQLException;
+    
+    /**
+     * Find all the epeople in a specific order
+     * <ul>
+     * <li><code>ID</code></li>
+     * <li><code>LASTNAME</code></li>
+     * <li><code>EMAIL</code></li>
+     * <li><code>NETID</code></li>
+     * </ul>
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param sortField
+     *     which field to sort EPersons by
+     * @param pageSize
+     *     how many results return
+     * @param offset
+     * 	   the position of the first result to return    
+     * @return list of EPerson objects
+     * @throws SQLException
+     *     An exception that provides information on a database access error or other errors.
+     */
+    public List<EPerson> findAll(Context context, int sortField, int pageSize, int offset)
             throws SQLException;
 
     /**
