@@ -3,12 +3,12 @@
 package org.datadryad.rest.filters;
 
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.log4j.Logger;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
@@ -16,6 +16,7 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.ParameterStyle;
 import org.apache.oltu.oauth2.rs.request.OAuthAccessResourceRequest;
 import org.datadryad.rest.auth.AuthHelper;
+import org.datadryad.rest.auth.AuthorizationTuple;
 import org.datadryad.rest.auth.EPersonSecurityContext;
 import org.datadryad.rest.auth.EPersonUserPrincipal;
 import org.datadryad.rest.storage.AuthorizationStorageInterface;
@@ -33,6 +34,7 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
     OAuthTokenStorageInterface tokenStorage = new OAuthTokenDatabaseStorageImpl();
     AuthorizationStorageInterface authzStorage = new AuthorizationDatabaseStorageImpl();
     private AuthHelper authHelper;
+    private static final String NO_ACCESS = "You do not have access to the requested resource";
 
     public AuthenticationRequestFilter() {
         authHelper =  new AuthHelper(tokenStorage, authzStorage);
@@ -54,11 +56,34 @@ public class AuthenticationRequestFilter implements ContainerRequestFilter {
             AuthHelper.throwExceptionResponse(ex, Status.INTERNAL_SERVER_ERROR, "OAuth System Exception");
         }
         EPersonUserPrincipal userPrincipal = authHelper.getPrincipalFromToken(accessToken);
-        if(userPrincipal != null) {
-            // User found, set it into the context.
-            EPersonSecurityContext securityContext = new EPersonSecurityContext(userPrincipal);
-            containerRequest.setSecurityContext(securityContext);
+        EPersonSecurityContext securityContext = new EPersonSecurityContext(userPrincipal);
+        AuthorizationTuple tuple = getTupleFromSecurityContext(securityContext, containerRequest);
+        if(!authHelper.isAuthorized(tuple)) {
+            AuthHelper.throwExceptionResponse(null, Status.UNAUTHORIZED, NO_ACCESS);
         }
-        return;
+        containerRequest.setSecurityContext(securityContext);
     }
+
+    private AuthorizationTuple getTupleFromSecurityContext(SecurityContext securityContext, ContainerRequestContext containerRequestContext) {
+        // Three things to extract: person, verb, and path
+        EPersonUserPrincipal principal = null;
+        AuthorizationTuple tuple = null;
+        String path = containerRequestContext.getUriInfo().getPath();
+        String httpMethod = containerRequestContext.getMethod();
+        if(securityContext.getUserPrincipal() instanceof EPersonUserPrincipal) {
+            principal = (EPersonUserPrincipal) securityContext.getUserPrincipal();
+        }
+        if (principal == null) {
+            tuple = new AuthorizationTuple(-1, httpMethod, path);
+        } else {
+            Integer ePersonId = principal.getID();
+            log.info("Authenticated user is " + principal.getName());
+            log.info("Eperson id is " + ePersonId);
+            log.info("HTTP Method is " + httpMethod);
+            tuple = new AuthorizationTuple(ePersonId, httpMethod, path);
+        }
+
+        return tuple;
+    }
+
 }

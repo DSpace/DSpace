@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class AuthorizationTuple {
-    public static final String JOURNAL_PATH = "journals";
+    public static final String JOURNAL_PATH = "journals/";
     public final Integer ePersonId;
     public final String httpMethod;
     public final String path;

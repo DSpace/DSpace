@@ -83,7 +83,7 @@ public class AuthorizationDatabaseStorageImpl implements AuthorizationStorageInt
     private List<AuthorizationTuple> getTuplesToCheck(AuthorizationTuple tuple) throws SQLException {
         List<AuthorizationTuple> tuples = new ArrayList<AuthorizationTuple>();
         // the journals resource path is always authorized.
-        AuthorizationTuple journalsTuple = new AuthorizationTuple(0, "", AuthorizationTuple.JOURNAL_PATH);
+        AuthorizationTuple journalsTuple = new AuthorizationTuple(-1, "GET", AuthorizationTuple.JOURNAL_PATH);
         tuples.add(journalsTuple);
         if (tuple.ePersonId == -1) {
             log.info("no eperson provided");
@@ -105,8 +105,11 @@ public class AuthorizationDatabaseStorageImpl implements AuthorizationStorageInt
     }
 
     private Boolean matches(AuthorizationTuple candidateTuple, List<AuthorizationTuple> databaseTuples) {
+        log.debug("checking tuple " + candidateTuple);
         for(AuthorizationTuple tuple : databaseTuples) {
+            log.debug("\tagainst tuple " + tuple);
             if(tuple.containsPath(candidateTuple)) {
+                log.debug("tuple matches");
                 return Boolean.TRUE;
             }
         }
