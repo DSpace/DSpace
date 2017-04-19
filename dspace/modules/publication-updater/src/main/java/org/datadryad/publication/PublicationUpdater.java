@@ -78,20 +78,48 @@ public class PublicationUpdater extends HttpServlet {
                     aResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, "could not parse query string");
                 }
                 if (isAuthorized(queryParams)) {
-                    String issn = getISSN(queryParams);
-                    if (issn != null) {
-                        DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(issn);
-                        if (journalConcept == null) {
-                            journalConcept = JournalUtils.getJournalConceptByISSN(issn);
+                    Context context = null;
+                    try {
+                        context = new Context();
+                        context.turnOffAuthorisationSystem();
+                        String issn = getISSN(queryParams);
+                        Integer itemID = getItemID(queryParams);
+                        String startLetter = getStartLetter(queryParams);
+                        if ("".equals(startLetter)) {
+                            startLetter = "a";
                         }
-                        if (journalConcept != null) {
-                            checkSinglePublication(journalConcept);
+                        if (issn != null) {
+                            DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalID(issn);
+                            if (journalConcept == null) {
+                                journalConcept = JournalUtils.getJournalConceptByISSN(issn);
+                            }
+                            if (journalConcept != null) {
+                                checkSinglePublication(context, journalConcept);
+                            } else {
+                                aResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "no journal concept found by the identifier " + issn);
+                            }
+                        } else if (itemID != null) {
+                            Item item = Item.find(context, itemID);
+                            String result = matchItemToCrossref(context, item);
+                            LOGGER.info(result);
                         } else {
-                            aResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "no journal concept found by the identifier " + issn);
+                            checkPublications(context, startLetter);
                         }
-                    } else {
-                        checkPublications();
+                        context.restoreAuthSystemState();
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Couldn't get context", e);
                     }
+                    finally {
+                        try {
+                            if (context != null) {
+                                context.complete();
+                            }
+                        } catch (SQLException e) {
+                            context.abort();
+                            throw new RuntimeException("Context.complete threw an exception, aborting instead");
+                        }
+                    }
+
                 } else {
                     aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "no or incorrect authorization token provided");
                 }
@@ -127,66 +155,55 @@ public class PublicationUpdater extends HttpServlet {
         return null;
     }
 
-    private void checkPublications() {
-        Context context = null;
-        try {
-            context = new Context();
-            context.turnOffAuthorisationSystem();
-            List<DryadJournalConcept> journalConcepts = Arrays.asList(JournalUtils.getAllJournalConcepts());
-            for (DryadJournalConcept dryadJournalConcept : journalConcepts) {
-                if (!"".equals(dryadJournalConcept.getISSN())) {
-                    updateWorkflowItems(context, dryadJournalConcept);
-                    updateArchivedItems(context, dryadJournalConcept);
-                }
-            }
-            context.restoreAuthSystemState();
-            LOGGER.info("finished updating publications");
-        } catch (SQLException e) {
-            throw new RuntimeException("Couldn't get context", e);
-        }
-        finally {
-            try {
-                if (context != null) {
-                    context.complete();
-                }
-            } catch (SQLException e) {
-                context.abort();
-                throw new RuntimeException("Context.complete threw an exception, aborting instead");
+    private Integer getItemID(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("item")) {
+                return Integer.valueOf(param.getValue());
             }
         }
+        return null;
     }
 
-    private void checkSinglePublication(DryadJournalConcept dryadJournalConcept) {
-        Context context = null;
-        try {
-            LOGGER.info("checking single publication " + dryadJournalConcept.getFullName());
-            context = new Context();
-            context.turnOffAuthorisationSystem();
-            updateWorkflowItems(context, dryadJournalConcept);
-            updateArchivedItems(context, dryadJournalConcept);
-            context.restoreAuthSystemState();
-            LOGGER.info("finished updating publication");
-        } catch (SQLException e) {
-            throw new RuntimeException("Couldn't get context", e);
-        }
-        finally {
-            try {
-                if (context != null) {
-                    context.complete();
-                }
-            } catch (SQLException e) {
-                context.abort();
-                throw new RuntimeException("Context.complete threw an exception, aborting instead");
+    private String getStartLetter(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("start")) {
+                return param.getValue();
             }
         }
+        return null;
+    }
+
+    private void checkPublications(Context context, String startLetter) {
+        LOGGER.info("checking all publications starting from " + startLetter);
+        List<DryadJournalConcept> journalConcepts = Arrays.asList(JournalUtils.getAllJournalConcepts());
+        for (DryadJournalConcept dryadJournalConcept : journalConcepts) {
+            String fullName = dryadJournalConcept.getFullName();
+            if (fullName.length() > 0 && fullName.substring(0,1).compareToIgnoreCase(startLetter) >= 0) {
+                if (!"".equals(dryadJournalConcept.getISSN())) {
+                    checkSinglePublication(context, dryadJournalConcept);
+                }
+            } else {
+                LOGGER.debug("skipping " + dryadJournalConcept.getFullName());
+            }
+        }
+        LOGGER.info("finished updating publications");
+    }
+
+    private void checkSinglePublication(Context context, DryadJournalConcept dryadJournalConcept) {
+        LOGGER.info("checking publication " + dryadJournalConcept.getFullName());
+        updateWorkflowItems(context, dryadJournalConcept);
+        updateArchivedItems(context, dryadJournalConcept);
+        LOGGER.info("finished updating publication");
     }
 
     private void updateWorkflowItems(Context context, DryadJournalConcept dryadJournalConcept) {
         ArrayList<WorkflowItem> items = new ArrayList<WorkflowItem>();
         ArrayList<String> updatedItems = new ArrayList<String>();
+        LOGGER.debug("finding workflow items");
         try {
             WorkflowItem[] itemArray = WorkflowItem.findAllByISSN(context, dryadJournalConcept.getISSN());
             items.addAll(Arrays.asList(itemArray));
+            LOGGER.debug("processing " + items.size() + " items");
         } catch (Exception e) {
             LOGGER.error("couldn't find workflowItems for journal " + dryadJournalConcept.getJournalID());
             return;
@@ -207,7 +224,8 @@ public class PublicationUpdater extends HttpServlet {
                     }
                     String message = "";
                     Item item = wfi.getItem();
-                    Manuscript queryManuscript = manuscriptFromItem(item, dryadJournalConcept);
+                    Manuscript queryManuscript = manuscriptFromItem(item);
+                    LOGGER.debug(">>> processing workflow item with internal ID " + item.getID());
                     // First, compare this item with anything in manuscript metadata storage:
                     // If this workflow item does not have a msid, it might have come from a submitter
                     // who didn't use a journal link.
@@ -218,35 +236,28 @@ public class PublicationUpdater extends HttpServlet {
                         if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
                             databaseManuscript = databaseManuscripts.get(0);
                             if (isInReview) {     // only update the metadata if the item is in review.
-                                message = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
-                                updateItemMetadataFromManuscript(item, databaseManuscript, context, message);
+                                String provenance = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
+                                if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
+                                    message = provenance;
+                                }
                             }
                         }
                     } catch (ParseException e) {
                         // do we want to collect workflow items with faulty manuscript IDs?
                         LOGGER.error("Problem updating item " + item.getID() + ": Manuscript ID is incorrect.");
                     }
-                    // look for this item in crossref:
-                    Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
-                    if (matchedManuscript != null) {
-                        // does this manuscript have the same authors?
-                        if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript)) {
-                            // update the item's metadata
-                            message = "Associated publication (match score " + matchedManuscript.optionalProperties.get("crossref-score") + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                            if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
-                                updatedItems.add(buildItemSummary(item) + "\n\t" + message);
-                            }
-                            // was there a manuscript record saved for this? If so, update it.
-                            if (databaseManuscript != null) {
-                                databaseManuscript.setPublicationDOI(matchedManuscript.getPublicationDOI());
-                                databaseManuscript.setPublicationDate(matchedManuscript.getPublicationDate());
-                                databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
-                                try {
-                                    LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
-                                    JournalUtils.writeManuscriptToDB(databaseManuscript);
-                                } catch (Exception e) {
-                                    LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
-                                }
+
+                    message = message + matchItemToCrossref(context, item);
+                    if (!"".equals(message)) {
+                        updatedItems.add(buildItemSummary(item) + "\n\t" + message);
+                        // was there a manuscript record saved for this? If so, update it.
+                        if (databaseManuscript != null) {
+                            databaseManuscript.setStatus(Manuscript.STATUS_PUBLISHED);
+                            try {
+                                LOGGER.debug("writing publication data back to " + databaseManuscript.getManuscriptId());
+                                JournalUtils.writeManuscriptToDB(databaseManuscript);
+                            } catch (Exception e) {
+                                LOGGER.debug("couldn't write manuscript " + databaseManuscript.getManuscriptId() + " to database, " + e.getMessage());
                             }
                         }
                     }
@@ -260,30 +271,54 @@ public class PublicationUpdater extends HttpServlet {
 
     private void updateArchivedItems(Context context, DryadJournalConcept dryadJournalConcept) {
         ArrayList<String> updatedItems = new ArrayList<String>();
+        LOGGER.debug("finding archived items");
         HashSet<Item> items = findIncompleteArchivedItems(context, dryadJournalConcept);
+        LOGGER.debug("processing " + items.size() + " items");
         // For all found items, look for matches in CrossRef publications.
         for (Item item : items) {
-            String message = "";
-            Manuscript queryManuscript = manuscriptFromItem(item, dryadJournalConcept);
-
-            // look for this item in crossref:
-            Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript);
-            if (matchedManuscript != null) {
-                // does the matched manuscript have the same authors?
-                if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript)) {
-                    // update the item's metadata
-                    String score = matchedManuscript.optionalProperties.get("crossref-score");
-                    message = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\" ";
-                    if (updateItemMetadataFromManuscript(item, matchedManuscript, context, message)) {
-                        updatedItems.add(buildItemSummary(item) + "\n\t" + message);
-                    }
-                }
+            LOGGER.debug(">>> processing archived item with internal ID " + item.getID());
+            String message = matchItemToCrossref(context, item);
+            if (!"".equals(message)) {
+                updatedItems.add(buildItemSummary(item) + "\n\t" + message);
             }
         }
 
         if (updatedItems.size() > 0) {
             emailSummary(context, updatedItems, dryadJournalConcept, ARCHIVED_EMAIL_SUBJECT);
         }
+    }
+
+    private String matchItemToCrossref(Context context, Item item) {
+        String message = "";
+        Manuscript queryManuscript = manuscriptFromItem(item);
+
+        // look for this item in crossref:
+        StringBuilder resultString = new StringBuilder();
+        Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript, resultString);
+        LOGGER.debug("crossref lookup for item " + item.getID() + " returned " + resultString);
+        if (matchedManuscript != null) {
+            String score = matchedManuscript.optionalProperties.get("crossref-score");
+            if (!"".equals(queryManuscript.getPublicationDOI())){
+                LOGGER.debug("matching with given publication DOI " + queryManuscript.getPublicationDOI());
+            }
+            LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" matched a title \"" + matchedManuscript.getTitle() + "\" with score " + score);
+            LOGGER.debug("matched publication DOI is " + matchedManuscript.getPublicationDOI());
+            // does the matched manuscript have the same authors?
+            StringBuilder authormatches = new StringBuilder();
+            if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
+                LOGGER.debug("same authors");
+                // update the item's metadata
+                String provenance = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\"";
+                if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
+                    message = provenance;
+                }
+            } else {
+                LOGGER.debug("different authors: " + authormatches);
+            }
+        } else {
+            LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" didn't match anything in crossref");
+        }
+        return message;
     }
 
     private HashSet<Item> findIncompleteArchivedItems(Context context, DryadJournalConcept dryadJournalConcept) {
@@ -333,17 +368,6 @@ public class PublicationUpdater extends HttpServlet {
         } else {
             LOGGER.error("no metadata field for FULL_CITATION");
             return items;
-        }
-
-        // Add these items to the incomplete list
-        try {
-            for (TableRow row : rows) {
-                int itemID = row.getIntColumn("item_id");
-                Item item = Item.find(context, itemID);
-                items.add(item);
-            }
-        } catch (SQLException e) {
-            LOGGER.error("couldn't find item");
         }
 
         // Look for items with a FULL_CITATION && CITATION_IN_PROGRESS exists && CITATION_IN_PROGRESS == TRUE
@@ -426,9 +450,16 @@ public class PublicationUpdater extends HttpServlet {
         return "Item " + item.getID() + " with DOI " + dryadDOI + " and title \"" + title + "\":";
     }
 
-    private Manuscript manuscriptFromItem(Item item, DryadJournalConcept dryadJournalConcept) {
+    private Manuscript manuscriptFromItem(Item item) {
         // get metadata from item:
-        Manuscript queryManuscript = new Manuscript(dryadJournalConcept);
+        Manuscript queryManuscript = new Manuscript();
+        String journalName = "";
+        DCValue[] journalNames = item.getMetadata(PUBLICATION_NAME);
+        if (journalNames != null && journalNames.length > 0) {
+            DryadJournalConcept dryadJournalConcept = JournalUtils.getJournalConceptByJournalName(journalNames[0].value);
+            queryManuscript.setJournalConcept(dryadJournalConcept);
+        }
+
         String title = "";
         DCValue[] titles = item.getMetadata(TITLE);
         if (titles != null && titles.length > 0) {
@@ -446,12 +477,13 @@ public class PublicationUpdater extends HttpServlet {
         queryManuscript.setAuthors(authorsList);
 
         DCValue[] msids = item.getMetadata(MANUSCRIPT_NUMBER);
-        if (msids != null && msids.length > 0) {
+        if (msids != null && msids.length > 0 && !"".equals(msids[0].value)) {
             queryManuscript.setManuscriptId(msids[0].value);
         }
 
         DCValue[] itemPubDOIs = item.getMetadata(PUBLICATION_DOI);
-        if (itemPubDOIs != null && itemPubDOIs.length > 0) {
+        if (itemPubDOIs != null && itemPubDOIs.length > 0 && !"".equals(itemPubDOIs[0].value)) {
+            LOGGER.debug("found a DOI <" + itemPubDOIs[0].value + ">");
             queryManuscript.setPublicationDOI(itemPubDOIs[0].value);
         }
         return queryManuscript;
@@ -459,7 +491,7 @@ public class PublicationUpdater extends HttpServlet {
 
     private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, String provenance) {
         boolean changed = false;
-
+        LOGGER.debug("updating metadata for item " + item.getID() + " to manuscript " + manuscript.toString());
         // first, check to see if this is one of the known mismatches:
         if (isManuscriptMismatchForItem(item, manuscript)) {
             LOGGER.error("pub " + manuscript.getPublicationDOI() + " is known to be a mismatch for " + item.getID());
@@ -470,16 +502,13 @@ public class PublicationUpdater extends HttpServlet {
             changed = true;
             item.clearMetadata(PUBLICATION_DOI);
             item.addMetadata(PUBLICATION_DOI, null, manuscript.getPublicationDOI(), null, -1);
-        }
-        if (!"".equals(manuscript.getFullCitation()) && !item.hasMetadataEqualTo(FULL_CITATION, manuscript.getFullCitation())) {
-            changed = true;
-            item.clearMetadata(FULL_CITATION);
-            item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
+            LOGGER.debug("adding publication DOI " + manuscript.getPublicationDOI());
         }
         if (!"".equals(manuscript.getManuscriptId()) && !item.hasMetadataEqualTo(MANUSCRIPT_NUMBER, manuscript.getManuscriptId())) {
             changed = true;
             item.clearMetadata(MANUSCRIPT_NUMBER);
             item.addMetadata(MANUSCRIPT_NUMBER, null, manuscript.getManuscriptId(), null, -1);
+            LOGGER.debug("adding msid " + manuscript.getManuscriptId());
         }
 
         SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
@@ -489,13 +518,31 @@ public class PublicationUpdater extends HttpServlet {
                 changed = true;
                 item.clearMetadata(PUBLICATION_DATE);
                 item.addMetadata(PUBLICATION_DATE, null, dateString, null, -1);
+                LOGGER.debug("adding pub date " + manuscript.getPublicationDate());
+            }
+        }
+        if (!"".equals(manuscript.getFullCitation())) {
+            String itemCitation = "";
+            DCValue[] citations = item.getMetadata(FULL_CITATION);
+            if (citations != null && citations.length > 0) {
+                itemCitation = citations[0].value;
+            }
+            double score = JournalUtils.getHamrScore(manuscript.getFullCitation().toLowerCase(), itemCitation.toLowerCase());
+            LOGGER.debug("old citation was: " + itemCitation);
+            LOGGER.debug("new citation is: " + manuscript.getFullCitation());
+            LOGGER.debug("citation match score is " + score);
+            if (score < 0.9) {
+                changed = true;
+                item.clearMetadata(FULL_CITATION);
+                item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
+                LOGGER.debug("adding citation " + manuscript.getFullCitation());
             }
         }
         if (changed) {
             item.clearMetadata(CITATION_IN_PROGRESS);
             item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
-            LOGGER.info("writing provenance for item " + item.getID() + ": " + provenance);
             if (!"".equals(provenance)) {
+                LOGGER.info("writing provenance for item " + item.getID() + ": " + provenance);
                 item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + provenance + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
             }
 
@@ -505,19 +552,28 @@ public class PublicationUpdater extends HttpServlet {
             } catch (Exception e) {
                 LOGGER.error("couldn't save metadata: " + e.getMessage());
             }
+        } else {
+            LOGGER.debug("nothing changed");
         }
         return changed;
     }
 
     private boolean isManuscriptMismatchForItem(Item item, Manuscript manuscript) {
+        if ("".equals(manuscript.getPublicationDOI())) {
+            return false;
+        }
+        LOGGER.debug("looking for mismatches for " + manuscript.getPublicationDOI());
         // normalize the pubDOI from the manuscript: remove leading "doi:" or "dx.doi.org/"
         String msDOI = null;
-        Pattern doi = Pattern.compile(".*(10.\\d+/.+)");
+        Pattern doi = Pattern.compile(".*(10\\.\\d+/.+)");
         Matcher m = doi.matcher(manuscript.getPublicationDOI().toLowerCase());
         if (m.matches()) {
             msDOI = m.group(1);
         }
-        LOGGER.error("looking for mismatches for " + msDOI);
+        if (msDOI == null) {
+            LOGGER.error("msDOI not in correct format");
+            return false;
+        }
         DCValue[] itemMismatches = item.getMetadata("dryad", "citationMismatchedDOI", Item.ANY, Item.ANY);
         if (itemMismatches.length > 0) {
             for (DCValue dcv : itemMismatches) {
@@ -542,13 +598,6 @@ public class PublicationUpdater extends HttpServlet {
             String config = getServletContext().getInitParameter("dspace.config");
             ConfigurationManager.loadConfig(config);
         }
-
-//        LOGGER.debug("scheduling publication checker");
-//        myPublicationUpdaterTimer = new Timer();
-        // schedule harvesting to the number of days set in the configuration:
-        // timers are set in units of milliseconds.
-//        int timerInterval = Integer.parseInt(ConfigurationManager.getProperty("publication.updater.timer"));
-//        myPublicationUpdaterTimer.schedule(new PublicationHarvester(), 0, 1000 * 60 * 60 * 24 * timerInterval);
     }
 
     /**
@@ -568,16 +617,8 @@ public class PublicationUpdater extends HttpServlet {
      * @return A <code>PrintWriter</code> to send text through
      * @throws IOException If there is trouble getting a writer
      */
-    private PrintWriter getWriter(HttpServletResponse aResponse)
-            throws IOException {
+    private PrintWriter getWriter(HttpServletResponse aResponse) throws IOException {
         aResponse.setContentType("xml/application; charset=UTF-8");
         return aResponse.getWriter();
-    }
-
-    private class PublicationHarvester extends TimerTask {
-        @Override
-        public void run() {
-            checkPublications();
-        }
     }
 }
