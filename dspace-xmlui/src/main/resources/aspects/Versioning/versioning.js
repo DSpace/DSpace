@@ -127,6 +127,7 @@ function doCreateNewVersion(itemID, result){
             result = VersionManager.processCreateNewVersion(getDSContext(),itemID, summary);
 
             var wsid = result.getParameter("wsid");
+            getDSContext().complete();
             cocoon.redirectTo(cocoon.request.getContextPath()+"/submit?workspaceID=" + wsid,true);
 	        cocoon.exit();
         }
