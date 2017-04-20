@@ -289,7 +289,7 @@ public class SubscribeCLITool {
         Context context = null;
 
         try {
-            context = new Context();
+            context = new Context(Context.Mode.READ_ONLY);
             processDaily(context, test);
             context.complete();
         } catch (Exception e) {
