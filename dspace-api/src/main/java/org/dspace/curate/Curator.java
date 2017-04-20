@@ -507,10 +507,14 @@ public class Curator
             {
                 return false;
             }
-            Iterator<Item> iter = itemService.findByCollection(curationContext(), coll);
+            Context context = curationContext();
+            Iterator<Item> iter = itemService.findByCollection(context, coll);
             while (iter.hasNext())
             {
-                if (! tr.run(iter.next()))
+                Item item = iter.next();
+                boolean shouldContinue = tr.run(item);
+                context.uncacheEntity(item);
+                if (!shouldContinue)
                 {
                     return false;
                 }

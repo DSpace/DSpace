@@ -69,7 +69,7 @@ public class BitStoreMigrate {
                 System.exit(0);
             }
 
-            Context context = new Context();
+            Context context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
 
             if(line.hasOption('p')) {
