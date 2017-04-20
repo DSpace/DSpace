@@ -76,11 +76,6 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
         return list(query);
     }
 
-//    @Override
-//    public List<Group> findAll(Context context) throws SQLException {
-//    	return findAll()
-//    }
-    
     @Override
     public List<Group> findAll(Context context, int pageSize, int offset) throws SQLException {
         Query query = createQuery(context,
