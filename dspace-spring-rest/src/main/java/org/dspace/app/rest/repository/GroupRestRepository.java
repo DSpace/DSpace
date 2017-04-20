@@ -11,9 +11,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import org.dspace.app.rest.converter.EPersonGroupConverter;
-import org.dspace.app.rest.model.EPersonGroupRest;
-import org.dspace.app.rest.model.hateoas.EPersonGroupResource;
+import org.dspace.app.rest.converter.GroupConverter;
+import org.dspace.app.rest.model.GroupRest;
+import org.dspace.app.rest.model.hateoas.GroupResource;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -25,21 +25,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 /**
- * This is the repository responsible to manage EPerson Rest object
+ * This is the repository responsible to manage Group Rest object
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
 
-@Component(EPersonGroupRest.NAME)
-public class EPersonGroupRestRepository extends DSpaceRestRepository<EPersonGroupRest, UUID> {
+@Component(GroupRest.NAME)
+public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
 	GroupService gs = EPersonServiceFactory.getInstance().getGroupService();
 	
 	@Autowired
-	EPersonGroupConverter converter;
+	GroupConverter converter;
 	
 	@Override
-	public EPersonGroupRest findOne(Context context, UUID id) {
+	public GroupRest findOne(Context context, UUID id) {
 		Group group = null;
 		try {
 			group = gs.find(context, id);
@@ -53,7 +53,7 @@ public class EPersonGroupRestRepository extends DSpaceRestRepository<EPersonGrou
 	}
 
 	@Override
-	public Page<EPersonGroupRest> findAll(Context context, Pageable pageable) {
+	public Page<GroupRest> findAll(Context context, Pageable pageable) {
 		List<Group> groups = null;
 		int total = 0;
 		try {
@@ -62,18 +62,18 @@ public class EPersonGroupRestRepository extends DSpaceRestRepository<EPersonGrou
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<EPersonGroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter);
+		Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter);
 		return page;
 	}
 	
 	@Override
-	public Class<EPersonGroupRest> getDomainClass() {
-		return EPersonGroupRest.class;
+	public Class<GroupRest> getDomainClass() {
+		return GroupRest.class;
 	}
 	
 	@Override
-	public EPersonGroupResource wrapResource(EPersonGroupRest eperson, String... rels) {
-		return new EPersonGroupResource(eperson, utils, rels);
+	public GroupResource wrapResource(GroupRest eperson, String... rels) {
+		return new GroupResource(eperson, utils, rels);
 	}
 
 }

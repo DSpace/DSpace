@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.model.EPersonGroupRest;
+import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.app.rest.model.EPersonRest> {
 	@Autowired(required = true)
-	private EPersonGroupConverter epersonGroupConverter;
+	private GroupConverter epersonGroupConverter;
 
 	private static final Logger log = Logger.getLogger(EPersonConverter.class);
 	
@@ -41,7 +41,7 @@ public class EPersonConverter extends DSpaceObjectConverter<EPerson, org.dspace.
 		eperson.setRequireCertificate(obj.getRequireCertificate());
 		eperson.setSelfRegistered(obj.getSelfRegistered());
 		eperson.setEmail(obj.getEmail());
-		List<EPersonGroupRest> groups = new ArrayList<EPersonGroupRest>();
+		List<GroupRest> groups = new ArrayList<GroupRest>();
 		for (Group g : obj.getGroups()) {
 			groups.add(epersonGroupConverter.convert(g));
 		}

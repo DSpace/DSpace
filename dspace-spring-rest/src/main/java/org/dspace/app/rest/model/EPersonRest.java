@@ -38,7 +38,7 @@ public class EPersonRest extends DSpaceObjectRest {
 	// FIXME this should be annotated with @JsonIgnore but right now only simple
 	// rest resource can be embedded not list, see
 	// https://jira.duraspace.org/browse/DS-3483
-	private List<EPersonGroupRest> groups;
+	private List<GroupRest> groups;
 
 	@Override
 	public String getType() {
@@ -93,11 +93,11 @@ public class EPersonRest extends DSpaceObjectRest {
 		this.selfRegistered = selfRegistered;
 	}
 	
-	public List<EPersonGroupRest> getGroups() {
+	public List<GroupRest> getGroups() {
 		return groups;
 	}
 	
-	public void setGroups(List<EPersonGroupRest> groups) {
+	public void setGroups(List<GroupRest> groups) {
 		this.groups = groups;
 	}
 

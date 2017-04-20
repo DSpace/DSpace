@@ -14,13 +14,13 @@ import org.dspace.app.rest.RestResourceController;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * The EPerson Group REST Resource
+ * The Group REST Resource
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class EPersonGroupRest extends DSpaceObjectRest {
-	public static final String NAME = "epersongroup";
+public class GroupRest extends DSpaceObjectRest {
+	public static final String NAME = "group";
 
 	private String name;
 
@@ -29,7 +29,7 @@ public class EPersonGroupRest extends DSpaceObjectRest {
 	// FIXME this should be annotated with @JsonIgnore but right now only simple
 	// rest resource can be embedded not list, see
 	// https://jira.duraspace.org/browse/DS-3483
-	private List<EPersonGroupRest> groups;
+	private List<GroupRest> groups;
 
 	@Override
 	public String getType() {
@@ -52,11 +52,11 @@ public class EPersonGroupRest extends DSpaceObjectRest {
 		this.permanent = permanent;
 	}
 
-	public List<EPersonGroupRest> getGroups() {
+	public List<GroupRest> getGroups() {
 		return groups;
 	}
 
-	public void setGroups(List<EPersonGroupRest> groups) {
+	public void setGroups(List<GroupRest> groups) {
 		this.groups = groups;
 	}
 
