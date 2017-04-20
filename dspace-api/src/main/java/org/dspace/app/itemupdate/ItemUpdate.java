@@ -7,21 +7,7 @@
  */
 package org.dspace.app.itemupdate;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -30,6 +16,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+
+import java.io.*;
+import java.util.*;
 
 /**
  *   
@@ -353,7 +342,7 @@ public class ItemUpdate {
 	        
 	        pr("ItemUpdate - initializing run on " + (new Date()).toString());
 	               	
-	        context = new Context();  
+	        context = new Context(Context.Mode.BATCH_EDIT);
 	        iu.setEPerson(context, iu.eperson);	
 	        context.turnOffAuthorisationSystem();
 	        
@@ -460,6 +449,7 @@ public class ItemUpdate {
 	    		{
     				Item item = itarch.getItem();
                     itemService.update(context, item);  //need to update before commit
+					context.uncacheEntity(item);
 	    		}
     			ItemUpdate.pr("Item " + dirname + " completed");
     			successItemCount++;

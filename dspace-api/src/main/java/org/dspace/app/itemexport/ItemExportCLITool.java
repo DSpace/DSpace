@@ -176,7 +176,7 @@ public class ItemExportCLITool {
             System.exit(1);
         }
 
-        Context c = new Context();
+        Context c = new Context(Context.Mode.READ_ONLY);
         c.turnOffAuthorisationSystem();
 
         if (myType == Constants.ITEM)
@@ -263,6 +263,6 @@ public class ItemExportCLITool {
             }
         }
 
-        c.complete();
+        c.abort();
     }
 }
