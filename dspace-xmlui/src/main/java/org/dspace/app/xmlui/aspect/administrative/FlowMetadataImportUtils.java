@@ -7,24 +7,18 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.io.File;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.servlet.multipart.Part;
-import org.apache.cocoon.servlet.multipart.PartOnDisk;
-import org.dspace.app.bulkedit.BulkEditChange;
-import org.dspace.app.bulkedit.DSpaceCSV;
-import org.dspace.app.bulkedit.MetadataImport;
-import org.dspace.app.bulkedit.MetadataImportException;
-import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.authorize.AuthorizeException;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+import org.apache.cocoon.environment.*;
+import org.apache.cocoon.servlet.multipart.*;
+import org.apache.log4j.*;
+import org.dspace.app.bulkedit.*;
+import org.dspace.app.xmlui.cocoon.servlet.multipart.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.authorize.*;
+import org.dspace.core.*;
 import org.dspace.core.Context;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
 
 /**
@@ -121,7 +115,7 @@ public class FlowMetadataImportUtils
             if (object instanceof Part)
             {
                     filePart = (Part) object;
-                    file = ((PartOnDisk)filePart).getFile();
+                    file = ((DSpacePartOnDisk)filePart).getFile();
             }
 
             if (filePart != null && filePart.getSize() > 0)

@@ -7,23 +7,21 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.servlet.multipart.Part;
-import org.apache.cocoon.servlet.multipart.PartOnDisk;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.dspace.app.itemimport.ItemImport;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
+import java.io.*;
+import java.sql.*;
+import org.apache.cocoon.environment.*;
+import org.apache.cocoon.servlet.multipart.*;
+import org.apache.commons.io.*;
+import org.apache.commons.lang.*;
+import org.apache.log4j.*;
+import org.dspace.app.itemimport.*;
+import org.dspace.app.xmlui.cocoon.servlet.multipart.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.authorize.*;
+import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
+import org.dspace.handle.*;
 
 /**
  * Utility methods to processes BatchImport actions. These methods are used
@@ -90,7 +88,7 @@ public class FlowBatchImportUtils {
 
             if (object instanceof Part) {
                 filePart = (Part) object;
-                file = ((PartOnDisk) filePart).getFile();
+                file = ((DSpacePartOnDisk) filePart).getFile();
             }
 
             if (filePart != null && filePart.getSize() > 0) {
