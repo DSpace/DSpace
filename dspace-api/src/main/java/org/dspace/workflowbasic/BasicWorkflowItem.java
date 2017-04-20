@@ -25,7 +25,7 @@ import java.sql.SQLException;
  */
 @Entity
 @Table(name = "workflowitem")
-public class BasicWorkflowItem implements WorkflowItem, ReloadableEntity<Integer>
+public class BasicWorkflowItem implements WorkflowItem
 {
 
     @Id
