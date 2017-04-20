@@ -77,6 +77,12 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     private String[] supportedPrefixes = new String[]{"info:doi/", "doi:" , "http://dx.doi.org/"};
 
+    static {
+        identifierMetadata.schema = MetadataSchema.DC_SCHEMA;
+        identifierMetadata.element = "identifier";
+        identifierMetadata.qualifier = null;
+    }
+
 
     public void afterPropertiesSet() throws Exception {
 
@@ -99,9 +105,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             mySuffixVarLength=5;
         }
 
-        identifierMetadata.schema = MetadataSchema.DC_SCHEMA;
-        identifierMetadata.element = "identifier";
-        identifierMetadata.qualifier = null;
     }
 
     public static String getDryadDOIPrefix() {
