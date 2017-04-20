@@ -325,7 +325,7 @@
          so the cache would have to be updated frequently. In addition there are many processes that
          touch a lot of different items (discovery search, filter media, curation tasks...) which also makes
          the cache less efficient. The probably of having a cache hit is thus very low and that is why Items
-         should not be cached. The same reasoning applies to Metadata values, Bundles and Bitstreams. -->
+         should not be cached. The same reasoning applies to Metadata values, Bundles, Bitstreams and Handles. -->
 
     <!-- The number of groups in a repository can be very big, but only a small percentage of them is used
          very frequently. So it makes sense to cache Group records because the cache hit rate is likely to be high -->
