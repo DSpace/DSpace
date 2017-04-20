@@ -231,7 +231,10 @@ public class HandleServiceImpl implements HandleService
                 // can verify during a restore whether the same *type* of resource
                 // is reusing this handle!
                 handle.setDSpaceObject(null);
+
+                //Also remove the handle from the DSO list to keep a consistent model
                 dso.getHandles().remove(handle);
+                
                 handleDAO.save(context, handle);
 
                 if(log.isDebugEnabled())
