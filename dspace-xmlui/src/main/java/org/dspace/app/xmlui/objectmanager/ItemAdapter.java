@@ -15,9 +15,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.crosswalk.ContextAwareDisseminationCrosswalk;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.content.crosswalk.METSRightsCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -650,11 +650,12 @@ public class ItemAdapter extends AbstractAdapter
 
     private Element disseminateElement(DisseminationCrosswalk crosswalk, DSpaceObject dso) throws CrosswalkException, IOException, SQLException, AuthorizeException {
         Element dissemination;
-        if (crosswalk instanceof METSRightsCrosswalk) {
-            dissemination = ((METSRightsCrosswalk)crosswalk).disseminateElement(context,dso);
-        } else {
-            dissemination = crosswalk.disseminateElement(dso);
+        if(crosswalk instanceof ContextAwareDisseminationCrosswalk)
+        {
+            ((ContextAwareDisseminationCrosswalk)crosswalk).setContext(context);
         }
+        dissemination = crosswalk.disseminateElement(dso);
+
         return dissemination;
     }
 
@@ -885,7 +886,7 @@ public class ItemAdapter extends AbstractAdapter
                         SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
                         // Allow the basics for XML
                         filter.allowIgnorableWhitespace().allowCharacters().allowCDATA().allowPrefixMappings();
-                        // Special option, only allow elements below the second level to pass through. This
+                        // Sp@ecial option, only allow elements below the second level to pass through. This
                         // will trim out the METS declaration and only leave the actual METS parts to be
                         // included.
                         filter.allowElements(1);

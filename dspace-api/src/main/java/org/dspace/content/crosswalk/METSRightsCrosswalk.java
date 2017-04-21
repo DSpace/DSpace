@@ -46,7 +46,7 @@ import java.util.*;
  * @author Tim Donohue
  * @version $Revision: 2108 $
  */
-public class METSRightsCrosswalk 
+public class METSRightsCrosswalk extends ContextAwareDisseminationCrosswalk
     implements IngestionCrosswalk, DisseminationCrosswalk
 {
     /** log4j category */
@@ -289,16 +289,16 @@ public class METSRightsCrosswalk
      * @throws IOException
      * @throws SQLException
      * @throws AuthorizeException
-     * @deprecated Do not use this method, please opt for "{@link #disseminateElement(Context context,DSpaceObject dso)}" instead, as this does not internally need to create a new Context
+     * @deprecated Do not use this method, please opt for "{@link #disseminateElement(Context context, DSpaceObject dso)}" instead, as this does not internally need to create a new Context
      */
     @Override
     @Deprecated
     public Element disseminateElement(DSpaceObject dso)
             throws CrosswalkException,
             IOException, SQLException, AuthorizeException {
-        Context context = new Context();
+        Context context = getContext();
         Element element = disseminateElement(context, dso);
-        context.complete();
+        handleContextCleanup();
         return element;
     }
 
@@ -684,4 +684,5 @@ public class METSRightsCrosswalk
         // return -1 to signify failure (as 0 = READ permissions)
         return -1;
     }
+
 }
