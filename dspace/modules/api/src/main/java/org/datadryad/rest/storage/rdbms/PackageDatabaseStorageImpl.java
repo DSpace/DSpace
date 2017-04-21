@@ -69,13 +69,13 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
     }
 
     @Override
-    public Boolean objectExists(StoragePath path, Package packageConcept) {
+    public Boolean objectExists(StoragePath path, Package pkg) {
         return true;
     }
 
-    protected void addAll(StoragePath path, List<Package> packageConcepts) throws StorageException {
+    protected void addAll(StoragePath path, List<Package> pkgs) throws StorageException {
         // passing in a limit of null to addResults should return all records
-        addResults(path, packageConcepts, null, null, 0);
+        addResults(path, pkgs, null, null, 0);
     }
 
     @Override
@@ -117,13 +117,13 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
     }
 
     @Override
-    protected void createObject(StoragePath path, Package packageConcept) throws StorageException {
+    protected void createObject(StoragePath path, Package pkg) throws StorageException {
         throw new StorageException("can't create a package");
     }
 
     @Override
     protected Package readObject(StoragePath path) throws StorageException {
-        Package packageConcept = null;
+        Package pkg = null;
         Context context = null;
         try {
             context = getContext();
@@ -132,7 +132,7 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
             abortContext(context);
             throw new StorageException("Exception reading package: " + e.getMessage());
         }
-        return packageConcept;
+        return pkg;
     }
 
     @Override
@@ -141,7 +141,7 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
     }
 
     @Override
-    protected void updateObject(StoragePath path, Package packageConcept) throws StorageException {
+    protected void updateObject(StoragePath path, Package pkg) throws StorageException {
         throw new StorageException("can't update an package");
     }
 
