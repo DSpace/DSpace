@@ -143,6 +143,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
 
     @Override
     public List<EPerson> findAll(Context context, int sortField) throws SQLException {
+    	return findAll(context, sortField, -1, -1);
+    }
+    
+    @Override
+    public List<EPerson> findAll(Context context, int sortField, int pageSize, int offset) throws SQLException {
         String sortColumn = null;
         MetadataField metadataFieldSort = null;
         switch (sortField)
@@ -165,7 +170,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
             default:
                 metadataFieldSort = metadataFieldService.findByElement(context, "eperson", "lastname", null);
         }
-        return ePersonDAO.findAll(context, metadataFieldSort, sortColumn);
+        return ePersonDAO.findAll(context, metadataFieldSort, sortColumn, pageSize, offset);
     }
 
     @Override

@@ -42,19 +42,27 @@ public interface GroupDAO extends DSpaceObjectDAO<Group>, DSpaceObjectLegacySupp
      * Find all groups ordered by the specified metadata fields ascending
      * @param context The DSpace context
      * @param sortMetadataFields The metadata fields to sort on
+     * @param pageSize
+     *     how many results return
+     * @param offset
+     * 	   the position of the first result to return  
      * @return A list of all groups, ordered by metadata fields
      * @throws SQLException if database error
      */
-    List<Group> findAll(Context context, List<MetadataField> sortMetadataFields) throws SQLException;
+    List<Group> findAll(Context context, List<MetadataField> metadataSortFields, int pageSize, int offset) throws SQLException;
 
     /**
      * Find all groups ordered by name ascending
      * @param context The DSpace context
+     * @param pageSize
+     *     how many results return
+     * @param offset
+     * 	   the position of the first result to return  
      * @return A list of all groups, ordered by name
      * @throws SQLException if database error
      */
-    List<Group> findAll(Context context) throws SQLException;
-
+    List<Group> findAll(Context context, int pageSize, int offset) throws SQLException;
+    
     /**
      * Find all groups that the given ePerson belongs to
      * @param context The DSpace context

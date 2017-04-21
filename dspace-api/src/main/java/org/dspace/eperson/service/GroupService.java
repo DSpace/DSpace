@@ -188,12 +188,27 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      *     The relevant DSpace Context.
      * @param metadataSortFields
      *     metadata fields to sort by, leave empty to sort by Name
+     * @param pageSize
+     *     how many results return
+     * @param offset
+     * 	   the position of the first result to return   
+     * @return List of all groups in the site
+     * @throws SQLException if error
+     */
+    public List<Group> findAll(Context context, List<MetadataField> metadataSortFields, int pageSize, int offset) throws SQLException;
+
+    /**
+     * @deprecated Please use {@code findAll(Context context, List<MetadataField> metadataFieldsSort, int pageSize, int offset)} instead
+     *
+     * @param context
+     *     The relevant DSpace Context.
+     * @param metadataSortFields
+     *     metadata fields to sort by, leave empty to sort by Name
      *
      * @return List of all groups in the site
      * @throws SQLException if error
      */
     public List<Group> findAll(Context context, List<MetadataField> metadataSortFields) throws SQLException;
-
 
     /**
      * DEPRECATED: Please use {@code findAll(Context context, List<MetadataField> metadataFieldsSort)} instead

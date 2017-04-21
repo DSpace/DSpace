@@ -83,7 +83,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     @Override
-    public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField) throws SQLException {
+    public List<EPerson> findAll(Context context, MetadataField metadataSortField, String sortField, int pageSize, int offset) throws SQLException {
         String queryString = "SELECT " + EPerson.class.getSimpleName().toLowerCase() + " FROM EPerson as " + EPerson.class.getSimpleName().toLowerCase();
 
         List<MetadataField> sortFields = ListUtils.EMPTY_LIST;
@@ -92,7 +92,7 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
             sortFields =  Collections.singletonList(metadataSortField);
         }
 
-        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, sortFields, sortField);
+        Query query = getSearchQuery(context, queryString, null, ListUtils.EMPTY_LIST, sortFields, sortField, pageSize, offset);
         return list(query);
 
     }
@@ -132,6 +132,10 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     }
 
     protected Query getSearchQuery(Context context, String queryString, String queryParam, List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField) throws SQLException {
+    	return getSearchQuery(context, queryString, queryParam, queryFields, sortFields, sortField, -1, -1);
+    }
+    
+    protected Query getSearchQuery(Context context, String queryString, String queryParam, List<MetadataField> queryFields, List<MetadataField> sortFields, String sortField, int pageSize, int offset) throws SQLException {
 
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append(queryString);
@@ -150,6 +154,12 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         }
 
         Query query = createQuery(context, queryBuilder.toString());
+        if (pageSize > 0) {
+        	query.setMaxResults(pageSize);
+        }
+        if (offset > 0) {
+        	query.setFirstResult(offset);
+        }
         if(StringUtils.isNotBlank(queryParam)) {
             query.setParameter("queryParam", "%"+queryParam.toLowerCase()+"%");
         }
