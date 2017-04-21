@@ -134,7 +134,7 @@ public class TableRowIterator
      * @return - The next row, or null if no more rows
      * @exception SQLException -
      *                If a database error occurs while fetching values
-     * @deprecated You should try to pass an existing database connection to this method to prevent opening a new one.
+     * @deprecated use {@link #next(org.dspace.core.Context)} instead. Pass an existing database connection to this method to prevent opening a new one.
      */
     @Deprecated
     public TableRow next() throws SQLException

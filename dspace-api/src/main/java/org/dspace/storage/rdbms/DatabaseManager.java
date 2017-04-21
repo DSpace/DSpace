@@ -679,7 +679,7 @@ public class DatabaseManager
     }
     public static TableRow row(String table) throws SQLException
     {
-        return new TableRow(canonicalize(table), getColumnNames(null, table));
+        return new TableRow(canonicalize(table), getColumnNames(table));
     }
 
     /**
