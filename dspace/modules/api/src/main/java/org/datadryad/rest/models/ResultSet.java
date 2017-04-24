@@ -21,7 +21,7 @@ public class ResultSet {
         pageSize = pgsize;
         itemList = new ArrayList<Integer>(items);
         Collections.sort(itemList);
-        log.error("items in result set: " + itemList.toString());
+        log.debug("items in result set: " + itemList.toString());
         adjustCursors(0);
     }
 
@@ -50,7 +50,7 @@ public class ResultSet {
             lastCursor = itemList.get(itemList.size() - pageSize - 1);
         }
 
-        log.error("cursors are " + previousCursor + ", " + currentCursor + ", " + nextCursor);
+        log.debug("cursors are " + previousCursor + ", " + currentCursor + ", " + nextCursor);
     }
 
     public List<Integer> getCurrentSet(int currentCursor) {
@@ -63,7 +63,7 @@ public class ResultSet {
         if (indexTo >= itemList.size()) {
             indexTo = itemList.size();
         }
-        log.error("list from " + indexFrom + " to " + indexTo);
+        log.debug("list from " + indexFrom + " to " + indexTo);
         return itemList.subList(indexFrom, indexTo);
     }
 }
