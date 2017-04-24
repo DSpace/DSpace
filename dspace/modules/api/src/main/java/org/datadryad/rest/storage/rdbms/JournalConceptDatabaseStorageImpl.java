@@ -61,32 +61,6 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
         }
     }
     
-    private static Context getContext() {
-        Context context = null;
-        try {
-            context = new Context();
-        } catch (SQLException ex) {
-            log.error("Unable to instantiate DSpace context", ex);
-        }
-        return context;
-    }
-
-    private static void completeContext(Context context) throws SQLException {
-        try {
-            context.complete();
-        } catch (SQLException ex) {
-            // Abort the context to force a new connection
-            abortContext(context);
-            throw ex;
-        }
-    }
-
-    private static void abortContext(Context context) {
-        if (context != null) {
-            context.abort();
-        }
-    }
-
     public static DryadJournalConcept getJournalConceptByCodeOrISSN(Context context, String codeOrISSN) throws SQLException {
         boolean isISSN = Pattern.compile("\\d{4}-\\p{Alnum}{4}").matcher(codeOrISSN).matches();
         String query;

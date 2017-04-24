@@ -67,7 +67,15 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
     }
 
     public ResultSet addResultsInDateRange(StoragePath path, List<T> objects, Date dateFrom, Date dateTo, Integer limit, Integer cursor) throws StorageException {
-        return getResults(path, objects, null, limit, cursor);
+        ResultSet resultSet = null;
+
+        if (dateTo == null) {
+            dateTo = new Date();
+        }
+        if (dateFrom == null) {
+            dateFrom = new Date(0);
+        }
+        return resultSet;
     }
 
     @Override

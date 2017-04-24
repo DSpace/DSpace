@@ -91,29 +91,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         }
     }
 
-    private static Context getContext() {
-        Context context = null;
-        try {
-            context = new Context();
-        } catch (SQLException ex) {
-            log.error("Unable to instantiate DSpace context", ex);
-        }
-        return context;
-    }
-
-    private static void completeContext(Context context) {
-        try {
-            context.complete();
-        } catch (SQLException ex) {
-            // Abort the context to force a new connection
-            abortContext(context);
-        }
-    }
-
-    private static void abortContext(Context context) {
-        context.abort();
-    }
-
     private static Manuscript manuscriptFromTableRow(TableRow row) throws IOException {
         if(row != null) {
             String json_data = row.getStringColumn(COLUMN_JSON_DATA);
@@ -472,13 +449,11 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             } else {
                 updateTableRowFromManuscript(context, manuscript, rows.get(0));
             }
+            completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception saving manuscript", ex);
         } catch (IOException ex) {
             throw new StorageException("Exception writing manuscript", ex);
-        }
-        finally {
-            completeContext(context);
         }
     }
 }
