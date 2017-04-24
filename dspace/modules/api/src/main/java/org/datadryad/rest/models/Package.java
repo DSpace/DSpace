@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.dspace.JournalUtils;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
@@ -123,5 +125,17 @@ public class Package {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    public static ArrayList<Package> getPackagesForItemSet(Collection<Integer> itemList, Integer limit, Context context) throws SQLException {
+        ArrayList<Package> packageList = new ArrayList<Package>();
+        for (Integer itemID : itemList) {
+            Package dataPackage = new Package(new DryadDataPackage(Item.find(context, itemID)));
+            packageList.add(dataPackage);
+            if (limit != null && packageList.size() == limit) {
+                break;
+            }
+        }
+        return packageList;
     }
 }
