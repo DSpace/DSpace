@@ -452,26 +452,25 @@ public class JournalUtils {
     }
 
     /**
-     * Return a list of archived packages for a journal, starting with a particular item as a keyset
+     * Return a sorted map of archived packages for a journal, starting with a particular item as a keyset
      * @param context
      * @param journalConcept
      * @param keyset
      * @return
      * @throws SQLException
      */
-    public static HashMap<Integer, Date> getArchivedPackagesFromKeyset(Context context, DryadJournalConcept journalConcept, int keyset) throws SQLException {
-        HashMap<Integer, Date> items = new HashMap<Integer, Date>();
+    public static TreeMap<Integer, Date> getArchivedPackagesFromKeyset(Context context, DryadJournalConcept journalConcept, int keyset) throws SQLException {
+        TreeMap<Integer, Date> items = new TreeMap<Integer, Date>();
         SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
             log.error("starting search");
             int pubNameFieldID = MetadataField.findByElement(context,"prism.publicationName").getFieldID();
             int dateAccFieldID = MetadataField.findByElement(context,"dc.date.accessioned").getFieldID();
-            String querystring = "select * from ArchivedPackagesForJournal(?, ?, ?) where item_id > ?";
+            String querystring = "select * from ArchivedPackagesForJournal(?, ?, ?) where item_id >= ?";
             TableRowIterator tri = DatabaseManager.query(context, querystring, journalConcept.getFullName(), pubNameFieldID, dateAccFieldID, keyset);
             while (tri.hasNext()) {
                 TableRow tableRow = tri.next();
                 int itemId = tableRow.getIntColumn("item_id");
-                log.error("item " + itemId);
                 Date date = dateIso.parse(tableRow.getStringColumn("mdv_date"));
                 items.put(itemId, date);
             }
