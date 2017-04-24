@@ -76,12 +76,6 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
         super.addResultsInDateRange(path, packageList, dateFrom, dateTo, limit, cursor);
         log.error("date from " + dateFrom.toString() + " to " + dateTo.toString());
 
-        if (dateTo == null) {
-            dateTo = new Date();
-        }
-        if (dateFrom == null) {
-            dateFrom = new Date(0);
-        }
         try {
             context = getContext();
             DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());

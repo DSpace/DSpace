@@ -114,18 +114,13 @@ public class PackageResource {
                 resultSet = packageStorage.getResults(path, packages, searchParam, countParam, cursorParam);
             }
 
-            try {
-                URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
-                URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
-                URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
-                URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
-                Response response = Response.ok(packages).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").build();
-                return response;
-            } catch (Exception ex) {
-                ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list packages", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
-                return error.toResponse().build();
-            }
-        } catch (StorageException ex) {
+            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
+            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
+            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
+            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+            Response response = Response.ok(packages).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").build();
+            return response;
+        } catch (Exception ex) {
             log.error("Exception getting packages", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list packages", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
             return error.toResponse().build();

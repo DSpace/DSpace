@@ -75,6 +75,10 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
         if (dateFrom == null) {
             dateFrom = new Date(0);
         }
+
+        if (dateFrom.after(dateTo)) {
+            throw new StorageException("From date (" + dateFrom + ") is later than to date (" + dateTo + ")");
+        }
         return resultSet;
     }
 
