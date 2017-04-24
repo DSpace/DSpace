@@ -30,8 +30,4 @@ public abstract class AbstractPackageStorage extends AbstractStorage<Package> {
         final List<String> expectedKeyPath = Arrays.asList(StoragePath.JOURNAL_PATH, StoragePath.MANUSCRIPT_PATH);
         checkPath(path, expectedKeyPath);
     }
-
-    public List<Manuscript> getManuscriptsMatchingPath(StoragePath path, int limit) throws StorageException {
-        return new ArrayList<Manuscript>();
-    }
 }
