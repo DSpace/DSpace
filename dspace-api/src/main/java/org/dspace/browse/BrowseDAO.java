@@ -393,4 +393,8 @@ public interface BrowseDAO
     public boolean isEnableBrowseFrequencies();
 
 	public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies);
+
+    public void setStartsWith(String startsWith);
+
+    public String getStartsWith();
 }

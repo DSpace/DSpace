@@ -7,10 +7,7 @@
  */
 package org.dspace.browse;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.*;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
@@ -18,16 +15,16 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverFacetField;
-import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.*;
 import org.dspace.discovery.DiscoverQuery.SORT_ORDER;
-import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.DiscoverResult.FacetResult;
 import org.dspace.discovery.DiscoverResult.SearchDocument;
-import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.services.factory.DSpaceServicesFactory;
+
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  *
@@ -84,6 +81,8 @@ public class SolrBrowseDAO implements BrowseDAO
 
     /** value to start browse from in focus field */
     private String focusValue = null;
+
+    private String startsWith = null;
 
     /** field to look for value in */
     private String valueField = null;
@@ -152,9 +151,16 @@ public class SolrBrowseDAO implements BrowseDAO
             addStatusFilter(query);
             if (distinct)
             {
-                DiscoverFacetField dff = new DiscoverFacetField(facetField,
+                DiscoverFacetField dff;
+                if (StringUtils.isNotBlank(startsWith)) {
+                    dff = new DiscoverFacetField(facetField,
                         DiscoveryConfigurationParameters.TYPE_TEXT, -1,
+                            DiscoveryConfigurationParameters.SORT.VALUE, startsWith);
+                } else {
+                    dff = new DiscoverFacetField(facetField,
+                            DiscoveryConfigurationParameters.TYPE_TEXT, -1,
                         DiscoveryConfigurationParameters.SORT.VALUE);
+                }
                 query.addFacetField(dff);
                 query.setFacetMinCount(1);
                 query.setMaxResults(0);
@@ -484,6 +490,16 @@ public class SolrBrowseDAO implements BrowseDAO
     public String getJumpToValue()
     {
         return focusValue;
+    }
+
+    @Override
+    public void setStartsWith(String startsWith) {
+        this.startsWith = startsWith;
+    }
+
+    @Override
+    public String getStartsWith() {
+        return startsWith;
     }
 
     /*
