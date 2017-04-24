@@ -3,14 +3,13 @@
 package org.datadryad.rest.storage.rdbms;
 
 import org.apache.log4j.Logger;
-import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Package;
+import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.storage.AbstractPackageStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.JournalUtils;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -79,13 +78,27 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
     }
 
     @Override
-    protected void addResults(StoragePath path, List<Package> packageList, String searchParam, Integer limit, Integer cursor) throws StorageException {
-        addResultsInDateRange(path, packageList, null, null, limit, cursor);
+    protected ResultSet addResults(StoragePath path, List<Package> packageList, String searchParam, Integer limit, Integer cursor) throws StorageException {
+        Context context = null;
+        ResultSet resultSet = null;
+        try {
+            context = getContext();
+            DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
+            TreeMap<Integer, Date> rawItemList = JournalUtils.getArchivedPackagesFromKeyset(context, journal, 0);
+            resultSet = new ResultSet(rawItemList.keySet(), limit);
+            packageList.addAll(Package.getPackagesForItemSet(resultSet.getCurrentSet(cursor), limit, context));
+        } catch (SQLException ex) {
+            log.error("error: " + ex.getMessage());
+            abortContext(context);
+            throw new StorageException("Exception reading packages", ex);
+        }
+        return resultSet;
     }
 
     @Override
-    public void addResultsInDateRange(StoragePath path, List<Package> packageList, Date dateFrom, Date dateTo, Integer limit, Integer cursor) throws StorageException {
+    public ResultSet addResultsInDateRange(StoragePath path, List<Package> packageList, Date dateFrom, Date dateTo, Integer limit, Integer cursor) throws StorageException {
         Context context = null;
+        ResultSet resultSet = null;
 
         if (dateTo == null) {
             dateTo = new Date();
@@ -96,24 +109,21 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
         try {
             context = getContext();
             DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
-            HashMap<Integer, Date> packages = JournalUtils.getArchivedPackagesFromKeyset(context, journal, cursor);
-            ArrayList<Integer> itemIDs = new ArrayList<Integer>();
-            itemIDs.addAll(packages.keySet());
-            Collections.sort(itemIDs);
-            for (Integer itemID : itemIDs) {
-                if (packages.get(itemID).before(dateTo) && packages.get(itemID).after(dateFrom)) {
-                    Package dataPackage = new Package(new DryadDataPackage(Item.find(context, itemID)));
-                    packageList.add(dataPackage);
-                }
-                if (limit != null && packageList.size() == limit) {
-                    break;
+            TreeMap<Integer, Date> rawItemList = JournalUtils.getArchivedPackagesFromKeyset(context, journal, cursor);
+            TreeSet<Integer> itemSet = new TreeSet<Integer>();
+            for (Integer itemID : rawItemList.keySet()) {
+                if (rawItemList.get(itemID).before(dateTo) && rawItemList.get(itemID).after(dateFrom)) {
+                    itemSet.add(itemID);
                 }
             }
+            resultSet = new ResultSet(itemSet, limit);
+            packageList.addAll(Package.getPackagesForItemSet(itemSet, limit, context));
         } catch (SQLException ex) {
             log.error("error: " + ex.getMessage());
             abortContext(context);
             throw new StorageException("Exception reading packages", ex);
         }
+        return resultSet;
     }
 
     @Override

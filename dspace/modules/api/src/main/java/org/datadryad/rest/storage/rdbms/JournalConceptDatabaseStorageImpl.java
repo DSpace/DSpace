@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
+import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
@@ -126,8 +127,9 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
     }
 
     @Override
-    protected void addResults(StoragePath path, List<DryadJournalConcept> journalConcepts, String searchParam, Integer limit, Integer cursor) throws StorageException {
+    protected ResultSet addResults(StoragePath path, List<DryadJournalConcept> journalConcepts, String searchParam, Integer limit, Integer cursor) throws StorageException {
         Context context = null;
+        ResultSet resultSet = null;
         try {
             ArrayList<DryadJournalConcept> allJournalConcepts = new ArrayList<DryadJournalConcept>();
             context = getContext();
@@ -147,6 +149,7 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
             abortContext(context);
             throw new StorageException("Exception reading journals", ex);
         }
+        return resultSet;
     }
 
     @Override

@@ -5,6 +5,7 @@ package org.datadryad.rest.resources.v1;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.handler.ManuscriptHandlerGroup;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.responses.ErrorsResponse;
 import org.datadryad.rest.responses.ResponseFactory;
 import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
@@ -17,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.Status;
 import java.net.URI;
+import java.util.ArrayList;
 
 /**
  *
@@ -38,7 +40,9 @@ public class ManuscriptResource {
         try {
             // Returning a list requires POJO turned on
             StoragePath path = StoragePath.createJournalPath(journalRef);
-            return Response.ok(manuscriptStorage.getResults(path, searchParam, resultParam, 0)).build();
+            ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
+            ResultSet resultSet = manuscriptStorage.getResults(path, manuscripts, searchParam, resultParam, 0);
+            return Response.ok(manuscripts).build();
         } catch (StorageException ex) {
             log.error("Exception getting manuscripts", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list manuscripts", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());

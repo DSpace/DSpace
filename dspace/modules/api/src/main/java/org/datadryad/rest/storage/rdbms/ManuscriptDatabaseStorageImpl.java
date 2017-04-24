@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
@@ -377,7 +378,8 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     // This call is always limited to the default limit of entries, so as not to tie up the connection pool.
     @Override
-    protected void addResults(StoragePath path, List<Manuscript> manuscripts, String searchParam, Integer limit, Integer cursor) throws StorageException {
+    protected ResultSet addResults(StoragePath path, List<Manuscript> manuscripts, String searchParam, Integer limit, Integer cursor) throws StorageException {
+        ResultSet resultSet = null;
         String manuscriptId = path.getManuscriptId();
         int limitInt = DEFAULT_LIMIT;
         if (limit != null) {
@@ -402,6 +404,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         } catch (IOException ex) {
             throw new StorageException("Exception reading manuscripts", ex);
         }
+        return resultSet;
     }
 
     @Override

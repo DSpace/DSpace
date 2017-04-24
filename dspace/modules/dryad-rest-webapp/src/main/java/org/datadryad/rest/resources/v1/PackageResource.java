@@ -6,20 +6,21 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.models.Package;
+import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.responses.ErrorsResponse;
 import org.datadryad.rest.responses.ResponseFactory;
 import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
 import org.datadryad.rest.storage.AbstractPackageStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
-import org.datadryad.rest.storage.rdbms.PackageDatabaseStorageImpl;
 import org.dspace.content.authority.Concept;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
+import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -106,13 +107,24 @@ public class PackageResource {
                 ErrorsResponse error = ResponseFactory.makeError(e.getMessage(), "Unable to parse date", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
                 return error.toResponse().build();
             }
+            ResultSet resultSet = null;
             if (dateFrom != null && dateTo != null) {
-                packageStorage.addResultsInDateRange(path, packages, dateFrom, dateTo, countParam, cursorParam);
+                resultSet = packageStorage.addResultsInDateRange(path, packages, dateFrom, dateTo, countParam, cursorParam);
             } else {
-                packages.addAll(packageStorage.getResults(path, searchParam, countParam, cursorParam));
+                resultSet = packageStorage.getResults(path, packages, searchParam, countParam, cursorParam);
             }
-            Response response = Response.ok(packages).build();
-            return response;
+
+            try {
+                URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
+                URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
+                URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
+                URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+                Response response = Response.ok(packages).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").build();
+                return response;
+            } catch (Exception ex) {
+                ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list packages", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                return error.toResponse().build();
+            }
         } catch (StorageException ex) {
             log.error("Exception getting packages", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list packages", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
