@@ -64,8 +64,8 @@ public class PackageResource {
         try {
             DryadJournalConcept journalConcept = journalStorage.findByPath(path);
             if (journalConcept == null) {
-                ErrorsResponse error = ResponseFactory.makeError("Journal with code " + journalRef + " does not exist", "Journal not found", uriInfo, Status.NOT_FOUND.getStatusCode());
-                return Response.status(Status.NOT_FOUND).entity(error).build();
+                ErrorsResponse error = ResponseFactory.makeError("Journal with code " + journalRef + " does not exist", "Journal not found", uriInfo, Status.BAD_REQUEST.getStatusCode());
+                return Response.status(Status.BAD_REQUEST).entity(error).build();
             } else {
                 return Response.ok(new Journal(journalConcept)).build();
             }
@@ -104,7 +104,7 @@ public class PackageResource {
                 }
             } catch (ParseException e) {
                 log.error("couldn't parse date: " + e.getMessage());
-                ErrorsResponse error = ResponseFactory.makeError(e.getMessage(), "Unable to parse date", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                ErrorsResponse error = ResponseFactory.makeError(e.getMessage(), "Unable to parse date", uriInfo, Status.BAD_REQUEST.getStatusCode());
                 return error.toResponse().build();
             }
             ResultSet resultSet = null;
@@ -122,7 +122,7 @@ public class PackageResource {
             return response;
         } catch (Exception ex) {
             log.error("Exception getting packages", ex);
-            ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list packages", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list packages", uriInfo, Status.BAD_REQUEST.getStatusCode());
             return error.toResponse().build();
         }
     }
