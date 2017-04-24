@@ -3,11 +3,11 @@
 package org.datadryad.rest.storage;
 
 import org.datadryad.rest.models.ResultSet;
+import org.dspace.core.Context;
 
 import java.lang.Integer;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  *
@@ -74,5 +74,30 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
     public void deleteByPath(StoragePath path) throws StorageException {
         this.checkObjectPath(path);
         this.deleteObject(path);
+    }
+
+    protected static Context getContext() {
+        Context context = null;
+        try {
+            context = new Context();
+        } catch (SQLException ex) {
+        }
+        return context;
+    }
+
+    protected static void completeContext(Context context) throws SQLException {
+        try {
+            context.complete();
+        } catch (SQLException ex) {
+            // Abort the context to force a new connection
+            abortContext(context);
+            throw ex;
+        }
+    }
+
+    protected static void abortContext(Context context) {
+        if (context != null) {
+            context.abort();
+        }
     }
 }

@@ -41,32 +41,6 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
         }
     }
 
-    private static Context getContext() {
-        Context context = null;
-        try {
-            context = new Context();
-        } catch (SQLException ex) {
-            log.error("Unable to instantiate DSpace context", ex);
-        }
-        return context;
-    }
-
-    private static void completeContext(Context context) throws SQLException {
-        try {
-            context.complete();
-        } catch (SQLException ex) {
-            // Abort the context to force a new connection
-            abortContext(context);
-            throw ex;
-        }
-    }
-
-    private static void abortContext(Context context) {
-        if (context != null) {
-            context.abort();
-        }
-    }
-
     @Override
     public Boolean objectExists(StoragePath path, Package pkg) {
         return true;
@@ -99,6 +73,8 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
     public ResultSet addResultsInDateRange(StoragePath path, List<Package> packageList, Date dateFrom, Date dateTo, Integer limit, Integer cursor) throws StorageException {
         Context context = null;
         ResultSet resultSet = null;
+        super.addResultsInDateRange(path, packageList, dateFrom, dateTo, limit, cursor);
+        log.error("date from " + dateFrom.toString() + " to " + dateTo.toString());
 
         if (dateTo == null) {
             dateTo = new Date();
