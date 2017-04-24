@@ -118,7 +118,8 @@ public class PackageResource {
             URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
             URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
             URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
-            Response response = Response.ok(packages).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").build();
+            int total = resultSet.itemList.size();
+            Response response = Response.ok(packages).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total).build();
             return response;
         } catch (Exception ex) {
             log.error("Exception getting packages", ex);
