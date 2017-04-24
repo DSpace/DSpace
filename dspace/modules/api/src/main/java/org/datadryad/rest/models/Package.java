@@ -13,9 +13,7 @@ import org.dspace.JournalUtils;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -25,17 +23,10 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Package {
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    private AuthorsList authors = new AuthorsList();
-    private CorrespondingAuthor correspondingAuthor = new CorrespondingAuthor();
-
     private Integer itemID;
 
     @JsonIgnore
-    private DryadJournalConcept journalConcept;
-
-    @JsonIgnore
     private DryadDataPackage dataPackage;
-
 
     @JsonIgnore
     private static final Logger log = Logger.getLogger(Package.class);
