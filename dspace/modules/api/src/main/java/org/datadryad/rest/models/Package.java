@@ -67,8 +67,8 @@ public class Package {
         return publicationDOI;
     }
 
-    public Date getPublicationDate() {
-        return dataPackage.getDateAccessioned();
+    public String getPublicationDate() {
+        return sdf.format(dataPackage.getDateAccessioned());
     }
 
     public AuthorsList getAuthors() {
