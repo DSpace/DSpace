@@ -25,6 +25,9 @@ import java.util.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Package {
     static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    // can un-ignore itemID for debugging purposes
+    @JsonIgnore
     private Integer itemID;
 
     @JsonIgnore
