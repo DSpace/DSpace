@@ -7,6 +7,7 @@ import org.dspace.core.Context;
 
 import java.lang.Integer;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -68,6 +69,7 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
 
     public ResultSet addResultsInDateRange(StoragePath path, List<T> objects, Date dateFrom, Date dateTo, Integer limit, Integer cursor) throws StorageException {
         ResultSet resultSet = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         if (dateTo == null) {
             dateTo = new Date();
@@ -77,7 +79,7 @@ public abstract class AbstractStorage<T> implements StorageInterface<T> {
         }
 
         if (dateFrom.after(dateTo)) {
-            throw new StorageException("From date (" + dateFrom + ") is later than to date (" + dateTo + ")");
+            throw new StorageException("date_from " + sdf.format(dateFrom) + " is later than date_to " + sdf.format(dateTo));
         }
         return resultSet;
     }
