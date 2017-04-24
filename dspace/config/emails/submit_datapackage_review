@@ -22,13 +22,47 @@ Submitted by: {3}
 Data file(s):
 {2}
 
-Thank you for submitting your data package to Dryad for journal review. Please read the following information carefully, so you will know what to expect during the rest of the data archiving process.
+Thank you for submitting your data package to Dryad for journal review. Please read the following information carefully and save it for future reference. 
 
-YOUR DRYAD DOI
+(1) Your data package is temporarily available to journal editors and reviewers via a private review link (see below).
 
-Your data package has been assigned a unique identifier, called a DOI. This DOI is provisional for now, but may be included in the article manuscript. It will be fully registered with the DOI system when your submission has been approved by Dryad curation staff.
+(2) It has been assigned a Digital Object Identifier (DOI), but this DOI will not work until/unless your manuscript is accepted for publication and your data package is approved by our curators.
+
+(3) If/when your manuscript is accepted, please make sure that the DOI, and NOT the review link, is included in the published article. More information about citing your data is below. 
+
+(4) If you need to modify your submission, please see the instructions below. Do not create multiple Dryad submissions associated with the same manuscript.
+
+(5) If you were asked to enter a credit card number, your card will not be charged unless/until your manuscript is accepted and your submission is approved. You will receive a confirmation when your card is charged.
+
+
+YOUR TEMPORARY REVIEW LINK:
+
+{4}
+
+(for journal access prior to manuscript acceptance only, DO NOT link in your manuscript)
+
+
+YOUR DRYAD DOI:
 
 {1}
+
+(for inclusion in the published article)
+
+
+MODIFYING YOUR DRYAD SUBMISSION
+
+Should you need to modify your data package while it is in review, you may access it at https://datadryad.org/submissions. Do not create multiple Dryad submissions associated with the same manuscript.
+
+The actions you can perform while a submission is in review are limited. Since article titles, authors, and abstracts often change during the publication process, we will confirm and update this information if/when the manuscript is accepted and published.
+
+Dryad does not allow files to be deleted while a manuscript is under review. We only allow additions during this time. This restriction ensures that reviewers see the files that were originally submitted.
+
+To add new or corrected files:
+  - Go to https://datadryad.org/submissions and log in. 
+  - Select the appropriate data package. At the bottom of the page for this package, you will see an option to "Add new data file".
+  - After you have finished adding data files, please send an email to help@datadryad.org (including your Dryad DOI) to indicate which files should be retained during the final curation process.
+
+If/when your manuscript is accepted, Dryad curators will remove any files that you have indicated are duplicate or superseded. Your Dryad submission will automatically move into our queue for curation and archiving, and will no longer be accessible for modification. Should you need to make changes to the data after that point, please contact us at help@datadryad.org.
 
 
 CITING YOUR DRYAD DATA
@@ -43,37 +77,6 @@ Your journal may follow the CrossRef recommendation that the data package be cit
 
 Author(s) (Year). {0}. Dryad Digital Repository. {1}
 
-
-REVIEWER ACCESS TO YOUR DRYAD DATA
-
-Journal editors and anonymous peer reviewers may access your submission using the following temporary url:
-{4}
-
-This url SHOULD NOT be included in the manuscript. Please use your Dryad DOI (above) instead. 
-
-If/when we receive notice from the journal that your publication is accepted, your Dryad submission will move out of review and into our queue for curation and archiving.
-
-
-MODIFYING YOUR DRYAD SUBMISSION
-
-Should you need to modify your data package while it is in review, you may access it at https://datadryad.org/submissions.
-
-Do not create multiple Dryad submissions associated with the same publication, as this causes confusion for both reviewers and Dryad curators, who may not know which version is most recent/correct.
-
-The actions you can perform while a submission is in review are limited. Dryad does not allow files to be deleted while an article is under review. We only allow additions during this time. This restriction ensures that all reviewers see the files that were originally submitted.
-
-To add new or corrected files:
-  - Log into your Dryad account and click on the "My Submissions" link in the menu. 
-  - Select the appropriate data package. At the bottom of the page for this package, you will see an option to "Add new data file".
-  - After you have finished adding data files, please send an email to help@datadryad.org (including your Dryad DOI) to indicate which files should be retained during the final curation process.
-  - If/when your article has been accepted for publication, Dryad curators will remove any files that you have indicated are duplicate or superseded.
-
-If/when your publication is accepted, your Dryad submission will automatically move out of review and into our queue for curation and archiving, and will no longer be accessible for modification.
-
-
-PAYMENT
-
-If you were asked to enter a credit card number, your card has been verified, but will be not be charged unless/until your article is accepted and the curatorial team approves your submission. You will receive a confirmation and a receipt when your card is charged.
 
 Please email us at help@datadryad.org if you have questions.
 
