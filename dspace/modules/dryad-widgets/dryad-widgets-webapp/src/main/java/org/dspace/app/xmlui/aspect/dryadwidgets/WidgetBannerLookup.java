@@ -47,7 +47,7 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
     }
 
     public String lookup(String pubId, String referrer, Map objectModel) throws SQLException {
-
+        
             if(referrer == null || referrer.length() == 0) {
                 return null;
             }
@@ -71,6 +71,7 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
                 // default case, treat it raw
                 solrPubId = pubId;
             }
+
             
             // Incoming pubId should identify a publication/article.  See if we have
             // a data package that references this article

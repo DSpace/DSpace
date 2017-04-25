@@ -41,7 +41,9 @@ public class WidgetBannerSelector extends WidgetBannerLookup implements Selector
         } catch (SQLException ex) {
             log.error("Error looking up article identifier:", ex);
         }
-        return packageDOI != null;
+
+        boolean result = (packageDOI != null);
+        return result;
     }
 
 }

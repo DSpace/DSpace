@@ -20,11 +20,11 @@
                     <map:parameter name="referrer" value="{request-param:referrer}"/>
                     <map:when test="{request-param:pubId}">
                         <!-- Return the Dryad banner image -->
-                        <map:read type="image" src="../static/img/Dryad_web_banner_small_v4e.jpg" mime-type="image/jpeg"/>
+			<map:redirect-to uri="/static/img/Dryad_web_banner_small_v4e.jpg"/>
                     </map:when>
                     <map:otherwise>
                         <!-- Return 1px transparent gif -->
-                        <map:read type="image" src="../static/img/Transparent.gif" mime-type="image/gif"/>
+			<map:redirect-to uri="/static/img/Transparent.gif"/>
                     </map:otherwise>
                 </map:select>
             </map:match>
