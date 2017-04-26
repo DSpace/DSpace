@@ -97,6 +97,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             int journalConceptID = row.getIntColumn(COLUMN_JOURNAL_ID);
             Manuscript manuscript = reader.readValue(json_data);
             manuscript.setStatus(row.getStringColumn(COLUMN_STATUS));
+            manuscript.setInternalID(row.getIntColumn(COLUMN_ID));
             if (manuscript.optionalProperties == null) {
                 manuscript.optionalProperties = new LinkedHashMap<String, String>();
             }
@@ -216,41 +217,31 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
         return finalRows;
     }
 
-    private static List<Manuscript> getManuscripts(Context context, DryadJournalConcept journalConcept, int limit) throws SQLException, IOException {
-        List<Manuscript> manuscripts = new ArrayList<Manuscript>();
+    private static List<TableRow> getManuscriptTableRows(Context context, DryadJournalConcept journalConcept) throws SQLException, IOException {
+        List<TableRow> manuscripts = new ArrayList<TableRow>();
         log.error("journal is " + journalConcept.getFullName());
-        if (journalConcept == null) {
-            return manuscripts;
-        } else {
-            Integer journalConceptID = journalConcept.getConceptID();
-            String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
-            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, limit);
-            while(rows.hasNext()) {
-                TableRow row = rows.next();
-                Manuscript manuscript = manuscriptFromTableRow(row);
-                manuscripts.add(manuscript);
-            }
-            return manuscripts;
+        Integer journalConceptID = journalConcept.getConceptID();
+        String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? ORDER BY " + COLUMN_ID + " ASC";
+        TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
+        while(rows.hasNext()) {
+            TableRow row = rows.next();
+            manuscripts.add(row);
         }
+        return manuscripts;
     }
 
-    private static List<Manuscript> getManuscriptsMatchingQuery(Context context, DryadJournalConcept journalConcept, String searchParam, int limit) throws SQLException, IOException {
-        List<Manuscript> manuscripts = new ArrayList<Manuscript>();
-        if (journalConcept == null) {
-            return manuscripts;
-        } else {
-            Integer journalConceptID = journalConcept.getConceptID();
-            String searchWords[] = searchParam.split("\\s", 2);
-            String queryParam = "%" + searchWords[0] + "%";
-            String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like ? ORDER BY " + COLUMN_ID + " DESC LIMIT ? ";
-            TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, queryParam, limit);
-            while(rows.hasNext()) {
-                TableRow row = rows.next();
-                Manuscript manuscript = manuscriptFromTableRow(row);
-                manuscripts.add(manuscript);
-            }
-            return manuscripts;
+    private static List<TableRow> getManuscriptTableRowsMatchingQuery(Context context, DryadJournalConcept journalConcept, String searchParam) throws SQLException, IOException {
+        List<TableRow> manuscripts = new ArrayList<TableRow>();
+        Integer journalConceptID = journalConcept.getConceptID();
+        String searchWords[] = searchParam.split("\\s", 2);
+        String queryParam = "%" + searchWords[0] + "%";
+        String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? and " + COLUMN_JSON_DATA + " like ? ORDER BY " + COLUMN_ID + " ASC ";
+        TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE, queryParam);
+        while(rows.hasNext()) {
+            TableRow row = rows.next();
+            manuscripts.add(row);
         }
+        return manuscripts;
     }
 
     public List<Manuscript> getManuscriptsMatchingPath(StoragePath path, int limit) throws StorageException {
@@ -355,26 +346,34 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     // This call is always limited to the default limit of entries, so as not to tie up the connection pool.
     @Override
-    protected ResultSet addResults(StoragePath path, List<Manuscript> manuscripts, String searchParam, Integer limit, Integer cursor) throws StorageException {
+    protected ResultSet addResults(StoragePath path, List<Manuscript> resultManuscripts, String searchParam, Integer limit, Integer cursor) throws StorageException {
         ResultSet resultSet = null;
         String manuscriptId = path.getManuscriptId();
-        int limitInt = DEFAULT_LIMIT;
-        if (limit != null) {
-            limitInt = limit.intValue();
-        }
+        TreeMap<Integer, TableRow> msMap = new TreeMap<Integer, TableRow>();
+        ArrayList<TableRow> tableRows = new ArrayList<TableRow>();
         try {
             Context context = getContext();
             DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
             if (manuscriptId != null) {
                 Manuscript manuscript = getManuscriptById(context, manuscriptId, journal.getJournalID());
                 if (manuscript != null) {
-                    manuscripts.add(manuscript);
+                    resultManuscripts.add(manuscript);
                 }
             } else if (searchParam == null) {
-                manuscripts.addAll(getManuscripts(context, journal, limitInt));
+                tableRows.addAll(getManuscriptTableRows(context, journal));
             } else {
-                manuscripts.addAll(getManuscriptsMatchingQuery(context, journal, searchParam, limitInt));
+                tableRows.addAll(getManuscriptTableRowsMatchingQuery(context, journal, searchParam));
             }
+
+            for (TableRow row : tableRows) {
+                msMap.put(row.getIntColumn(COLUMN_ID), row);
+            }
+            resultSet = new ResultSet(msMap.keySet(), limit, cursor);
+
+            for (Integer internalID : resultSet.getCurrentSet(cursor)) {
+                resultManuscripts.add(manuscriptFromTableRow(msMap.get(internalID)));
+            }
+
             completeContext(context);
         } catch (SQLException ex) {
             throw new StorageException("Exception finding manuscripts", ex);

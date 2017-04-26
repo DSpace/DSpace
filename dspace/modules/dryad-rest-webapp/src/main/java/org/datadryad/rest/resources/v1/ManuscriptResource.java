@@ -3,7 +3,9 @@
 package org.datadryad.rest.resources.v1;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.handler.ManuscriptHandlerGroup;
+import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.models.Manuscript;
 import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.responses.ErrorsResponse;
@@ -12,6 +14,7 @@ import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
 import org.datadryad.rest.storage.AbstractManuscriptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
+import org.dspace.content.authority.Concept;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -36,13 +39,23 @@ public class ManuscriptResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getManuscripts(@PathParam(StoragePath.JOURNAL_PATH) String journalRef, @QueryParam("search") String searchParam, @QueryParam("count") Integer resultParam) {
+    public Response getManuscripts(@PathParam(StoragePath.JOURNAL_PATH) String journalRef,
+                                   @QueryParam("search") String searchParam,
+                                   @DefaultValue("20") @QueryParam("count") Integer resultParam,
+                                   @DefaultValue("0") @QueryParam("cursor") Integer cursorParam) {
         try {
             // Returning a list requires POJO turned on
             StoragePath path = StoragePath.createJournalPath(journalRef);
             ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
-            ResultSet resultSet = manuscriptStorage.getResults(path, manuscripts, searchParam, resultParam, 0);
-            return Response.ok(manuscripts).build();
+            ResultSet resultSet = manuscriptStorage.getResults(path, manuscripts, searchParam, resultParam, cursorParam);
+
+            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
+            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
+            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
+            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+            int total = resultSet.itemList.size();
+            Response response = Response.ok(manuscripts).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total).build();
+            return response;
         } catch (StorageException ex) {
             log.error("Exception getting manuscripts", ex);
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list manuscripts", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
