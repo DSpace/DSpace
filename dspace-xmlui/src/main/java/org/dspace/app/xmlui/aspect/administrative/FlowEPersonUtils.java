@@ -192,7 +192,7 @@ public class FlowEPersonUtils {
         		{
         			personModified.setEmail(email);
         		} 
-        		else if (potentialDupicate.equals(personModified)) 
+        		else
         		{	       
         			// set a special field in error so that the transformer can display a pretty error.
         			result.addError("eperson_email_key");
