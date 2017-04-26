@@ -101,24 +101,31 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
     }
 
     @Override
-    protected ResultSet addResults(StoragePath path, List<DryadJournalConcept> journalConcepts, String searchParam, Integer limit, Integer cursor) throws StorageException {
+    protected ResultSet addResults(StoragePath path, List<DryadJournalConcept> journalConcepts, String statusParam, Integer limit, Integer cursor) throws StorageException {
         Context context = null;
         ResultSet resultSet = null;
+        ArrayList<Integer> conceptIDs = new ArrayList<Integer>();
         try {
             ArrayList<DryadJournalConcept> allJournalConcepts = new ArrayList<DryadJournalConcept>();
             context = getContext();
             DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
             allJournalConcepts.addAll(Arrays.asList(dryadJournalConcepts));
-            completeContext(context);
-            if (searchParam != null) {
-                for (DryadJournalConcept journalConcept : allJournalConcepts) {
-                    if (journalConcept.getJournalID().equalsIgnoreCase(searchParam)) {
-                        journalConcepts.add(journalConcept);
+            for (DryadJournalConcept journalConcept : allJournalConcepts) {
+                if (statusParam == null) {
+                    // add all concepts
+                    conceptIDs.add(journalConcept.getConceptID());
+                } else {
+                    if (journalConcept.getStatus().equalsIgnoreCase(statusParam)) {
+                        conceptIDs.add(journalConcept.getConceptID());
                     }
                 }
-            } else {
-                journalConcepts.addAll(allJournalConcepts);
             }
+            resultSet = new ResultSet(conceptIDs, limit, cursor);
+
+            for (Integer conceptID : resultSet.getCurrentSet(cursor)) {
+                journalConcepts.add(getJournalConceptByConceptID(context, conceptID));
+            }
+            completeContext(context);
         } catch (SQLException ex) {
             abortContext(context);
             throw new StorageException("Exception reading journals", ex);

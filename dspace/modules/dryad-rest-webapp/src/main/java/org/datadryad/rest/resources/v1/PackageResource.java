@@ -39,17 +39,24 @@ public class PackageResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getJournals() {
+    public Response getJournals(@DefaultValue("20") @QueryParam("count") Integer countParam,
+                                @DefaultValue("0") @QueryParam("cursor") Integer cursorParam) {
         try {
-            List<DryadJournalConcept> allJournalConceptList = journalStorage.getAll(new StoragePath());
+            ArrayList<DryadJournalConcept> journalConcepts = new ArrayList<DryadJournalConcept>();
+            ResultSet resultSet = null;
+            resultSet = journalStorage.getResults(new StoragePath(), journalConcepts, Concept.Status.ACCEPTED.name(), countParam, cursorParam);
             ArrayList<Journal> journals = new ArrayList<Journal>();
-            for (DryadJournalConcept journalConcept : allJournalConceptList) {
-                if (Concept.Status.ACCEPTED.name().equals(journalConcept.getStatus())) {
-                    journals.add(new Journal(journalConcept));
-                }
+            for (DryadJournalConcept journalConcept : journalConcepts) {
+                journals.add(new Journal(journalConcept));
             }
 
-            return Response.ok(journals).build();
+            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
+            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
+            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
+            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+            int total = resultSet.itemList.size();
+            Response response = Response.ok(journals).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total).build();
+            return response;
         } catch (StorageException ex) {
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list journals", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
             return error.toResponse().build();
