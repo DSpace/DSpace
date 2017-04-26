@@ -95,15 +95,15 @@ public class WOSOnlineDataLoader extends NetworkSubmissionLookupDataLoader {
 	}
 
 	public String getWosUser() {
-		return wosUser;
-	}
-
-	public void setWosUser(String wosUser) {
         if (StringUtils.isBlank(this.wosUser))
         {
             this.wosUser = getConfigurationService()
                     .getProperty("submission.lookup.webofknowledge.user");
-        }
+        }		
+		return wosUser;
+	}
+
+	public void setWosUser(String wosUser) {
 		this.wosUser = wosUser;
 	}
 
