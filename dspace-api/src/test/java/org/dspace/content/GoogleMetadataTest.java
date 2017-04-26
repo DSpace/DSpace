@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.content;
 
 import org.apache.commons.io.Charsets;
@@ -22,9 +29,6 @@ import java.util.HashMap;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
-/**
- * Created by frederic on 25/04/17.
- */
 public class GoogleMetadataTest extends AbstractUnitTest {
 
     /** log4j category */
