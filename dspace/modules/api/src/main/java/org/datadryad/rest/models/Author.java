@@ -3,6 +3,7 @@
 package org.datadryad.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.DCValue;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Author {
     private String familyName;
     private String givenNames;
@@ -33,7 +35,7 @@ public class Author {
     public Author(DCValue authorMetadata) {
         this(authorMetadata.value);
         if (authorMetadata.authority != null) {
-            Matcher orcidpattern = Pattern.compile("will be generated::orcid::(.+)$").matcher(authorMetadata.authority);
+            Matcher orcidpattern = Pattern.compile("orcid:(.+)$").matcher(authorMetadata.authority);
             if (orcidpattern.find()) {
                 setIdentifier(orcidpattern.group(1));
                 setIdentifierType("ORCID");
@@ -91,6 +93,7 @@ public class Author {
                 setFamilyName(authorString);
             }
         }
+        return;
     }
 
     public void setFamilyName(String familyName) {
@@ -99,14 +102,6 @@ public class Author {
 
     public void setGivenNames(String givenNames) {
         this.givenNames = StringEscapeUtils.escapeHtml(givenNames);
-    }
-
-    public String getFamilyName() {
-        return getUnicodeFamilyName();
-    }
-
-    public String getGivenNames() {
-        return getUnicodeGivenNames();
     }
 
     @JsonIgnore
@@ -127,6 +122,19 @@ public class Author {
     public String getUnicodeGivenNames() {
         return StringEscapeUtils.unescapeHtml(givenNames);
     }
+
+    public String getFullName() {
+        return getUnicodeFullName();
+    }
+
+    public String getFamilyName() {
+        return getUnicodeFamilyName();
+    }
+
+    public String getGivenNames() {
+        return getUnicodeGivenNames();
+    }
+
 
     @JsonIgnore
     public final String getHTMLFullName() {
