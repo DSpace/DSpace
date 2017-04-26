@@ -17,12 +17,13 @@ public class ResultSet {
     public ArrayList<Integer> itemList;
     private static final Logger log = Logger.getLogger(ResultSet.class);
 
-    public ResultSet(Collection<Integer> items, int pgsize) {
-        pageSize = pgsize;
+    public ResultSet(Collection<Integer> items, Integer pgsize, Integer cursor) {
+        if (pgsize != null && pgsize > 0) {
+            pageSize = pgsize;
+        }
         itemList = new ArrayList<Integer>(items);
-        Collections.sort(itemList);
         log.debug("items in result set: " + itemList.toString());
-        adjustCursors(0);
+        adjustCursors(cursor);
     }
 
     public void adjustCursors(int currCursor) {

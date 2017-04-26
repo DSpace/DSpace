@@ -59,7 +59,7 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
             context = getContext();
             DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByCodeOrISSN(context, path.getJournalRef());
             TreeMap<Integer, Date> rawItemList = JournalUtils.getArchivedPackagesFromKeyset(context, journal, 0);
-            resultSet = new ResultSet(rawItemList.keySet(), limit);
+            resultSet = new ResultSet(rawItemList.keySet(), limit, cursor);
             packageList.addAll(Package.getPackagesForItemSet(resultSet.getCurrentSet(cursor), limit, context));
         } catch (SQLException ex) {
             log.error("error: " + ex.getMessage());
@@ -74,7 +74,6 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
         Context context = null;
         ResultSet resultSet = null;
         super.addResultsInDateRange(path, packageList, dateFrom, dateTo, limit, cursor);
-        log.error("date from " + dateFrom.toString() + " to " + dateTo.toString());
 
         try {
             context = getContext();
@@ -86,7 +85,7 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
                     itemSet.add(itemID);
                 }
             }
-            resultSet = new ResultSet(itemSet, limit);
+            resultSet = new ResultSet(itemSet, limit, cursor);
             packageList.addAll(Package.getPackagesForItemSet(itemSet, limit, context));
         } catch (SQLException ex) {
             log.error("error: " + ex.getMessage());

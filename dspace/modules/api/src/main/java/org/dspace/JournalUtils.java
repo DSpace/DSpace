@@ -466,8 +466,8 @@ public class JournalUtils {
             log.error("starting search");
             int pubNameFieldID = MetadataField.findByElement(context,"prism.publicationName").getFieldID();
             int dateAccFieldID = MetadataField.findByElement(context,"dc.date.accessioned").getFieldID();
-            String querystring = "select * from ArchivedPackagesForJournal(?, ?, ?) where item_id >= ?";
-            TableRowIterator tri = DatabaseManager.query(context, querystring, journalConcept.getFullName(), pubNameFieldID, dateAccFieldID, keyset);
+            String querystring = "select * from ArchivedPackagesForJournal(?, ?, ?)";
+            TableRowIterator tri = DatabaseManager.query(context, querystring, journalConcept.getFullName(), pubNameFieldID, dateAccFieldID);
             while (tri.hasNext()) {
                 TableRow tableRow = tri.next();
                 int itemId = tableRow.getIntColumn("item_id");
