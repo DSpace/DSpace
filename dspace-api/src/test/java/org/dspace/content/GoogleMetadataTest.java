@@ -218,7 +218,7 @@ public class GoogleMetadataTest extends AbstractUnitTest {
         Bitstream b3 = bundle.createBitstream(new ByteArrayInputStream("12121212121212".getBytes(Charsets.UTF_8)));
         b3.setName("large");
         b3.setFormat(BitstreamFormat.create(context));
-        b3.getFormat().setMIMEType("unknown type ");
+        b3.getFormat().setMIMEType("unknown type 3");
         bundle.addBitstream(b3);
         context.restoreAuthSystemState();
         context.commit();
@@ -250,6 +250,35 @@ public class GoogleMetadataTest extends AbstractUnitTest {
         context.commit();
         GoogleMetadata gm = new GoogleMetadata(this.context, it);
         assertEquals(0, gm.getPDFURL().size());
+    }
+
+    /**
+     * Test empty bitstreams
+     */
+    @Test
+    public void testGetPDFURLWithEmptyBitstreams() throws Exception{
+        context.turnOffAuthorisationSystem();
+        Bundle bundle = it.createBundle("ORIGINAL");
+        Bitstream b = bundle.createBitstream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)));
+        b.setName("small");
+        b.setFormat(BitstreamFormat.create(context));
+        b.getFormat().setMIMEType("unknown type 1");
+        bundle.addBitstream(b);
+        Bitstream b2 = bundle.createBitstream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)));
+        b2.setName("medium");
+        b2.setFormat(BitstreamFormat.create(context));
+        b2.getFormat().setMIMEType("unknown type 2");
+        bundle.addBitstream(b2);
+        Bitstream b3 = bundle.createBitstream(new ByteArrayInputStream("".getBytes(Charsets.UTF_8)));
+        b3.setName("large");
+        b3.setFormat(BitstreamFormat.create(context));
+        b3.getFormat().setMIMEType("unknown type 3");
+        bundle.addBitstream(b3);
+        context.restoreAuthSystemState();
+        context.commit();
+        GoogleMetadata gm = new GoogleMetadata(this.context, it);
+        String[] urlSplitted = gm.getPDFURL().get(0).split("/");
+        assertEquals("small", urlSplitted[urlSplitted.length - 1]);
     }
 
     @After
