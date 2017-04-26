@@ -24,19 +24,21 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
     HashMap<String, Integer> priorityMap = new HashMap<>();
 
     public GoogleBitstreamComparator(Map<String, String> googleScholarSettings){
-        String[] types = new String[]{};
-        try {
+        String[] types;
+        if (googleScholarSettings.containsKey("citation.prioritized_types")){
             types = splitAndTrim(googleScholarSettings.get("citation.prioritized_types"));
-        } catch (NullPointerException e){
+        } else {
             log.warn("Please define citation.prioritized_types in google-metadata.properties");
+            types = new String[0];
         }
         int priority = 1;
         for(String s: types){
-            String[] mimetypes = new String[]{};
-            try {
+            String[] mimetypes;
+            if (googleScholarSettings.containsKey("citation.mimetypes." + s)){
                 mimetypes = splitAndTrim(googleScholarSettings.get("citation.mimetypes." + s));
-            } catch (NullPointerException e){
+            } else {
                 log.warn("Make sure you define all the mimetypes of the citation.prioritized_types");
+                mimetypes = new String[0];
             }
             for (String mimetype: mimetypes) {
                 priorityMap.put(mimetype, priority);
@@ -46,7 +48,12 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
     }
 
     private String[] splitAndTrim(String toSplit){
-        return toSplit.replace(" ", "").split(",");
+        if(toSplit != null) {
+            return toSplit.replace(" ", "").split(",");
+        }
+        else {
+            return new String[0];
+        }
     }
 
 
@@ -65,7 +72,7 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
             return 1;
         }
         else if(priority1 == priority2){
-            if(b1.getSize() <= b2 .getSize()){
+            if(b1.getSize() <= b2.getSize()){
                 return 1;
             }
             else {
@@ -78,6 +85,7 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
     }
 
     private int getPriorityFromBitstream(Bitstream bitstream) {
+        String check = bitstream.getFormat().getMIMEType();
         if (priorityMap.containsKey(bitstream.getFormat().getMIMEType())){
             return priorityMap.get(bitstream.getFormat().getMIMEType());
         }

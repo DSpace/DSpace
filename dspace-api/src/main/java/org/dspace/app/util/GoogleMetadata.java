@@ -1056,7 +1056,6 @@ public class GoogleMetadata
 					}					
 				} else 
 					{
-						
 						if (bestSoFar == null && isPublic(candidate)) { //if bestSoFar is null but the candidate is not public you don't use it and try to find another
 						bestSoFar = candidate;
 						}					
