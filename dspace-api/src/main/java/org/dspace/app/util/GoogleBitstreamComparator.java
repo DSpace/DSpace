@@ -24,19 +24,19 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
     HashMap<String, Integer> priorityMap = new HashMap<>();
 
     public GoogleBitstreamComparator(Map<String, String> googleScholarSettings){
-        String[] types = null;
+        String[] types = new String[]{};
         try {
             types = splitAndTrim(googleScholarSettings.get("citation.prioritized_types"));
         } catch (NullPointerException e){
-            log.error("Please define citation.prioritized_types in google-metadata.properties");
+            log.warn("Please define citation.prioritized_types in google-metadata.properties");
         }
         int priority = 1;
         for(String s: types){
-            String[] mimetypes = null;
+            String[] mimetypes = new String[]{};
             try {
                 mimetypes = splitAndTrim(googleScholarSettings.get("citation.mimetypes." + s));
             } catch (NullPointerException e){
-                log.error("Make sure you define all the mimetypes of the citation.prioritized_types");
+                log.warn("Make sure you define all the mimetypes of the citation.prioritized_types");
             }
             for (String mimetype: mimetypes) {
                 priorityMap.put(mimetype, priority);
