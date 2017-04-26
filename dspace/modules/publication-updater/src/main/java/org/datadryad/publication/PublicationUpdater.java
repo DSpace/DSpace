@@ -85,7 +85,7 @@ public class PublicationUpdater extends HttpServlet {
                         String issn = getISSN(queryParams);
                         Integer itemID = getItemID(queryParams);
                         String startLetter = getStartLetter(queryParams);
-                        if ("".equals(startLetter)) {
+                        if (!startLetter.matches("[a-zA-Z]")) {
                             startLetter = "a";
                         }
                         if (issn != null) {
@@ -170,7 +170,7 @@ public class PublicationUpdater extends HttpServlet {
                 return param.getValue();
             }
         }
-        return null;
+        return "a";
     }
 
     private void checkPublications(Context context, String startLetter) {
