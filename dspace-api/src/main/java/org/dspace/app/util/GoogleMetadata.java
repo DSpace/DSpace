@@ -186,8 +186,6 @@ public class GoogleMetadata
             logConfiguration();
         }
 
-        googleBitstreamComparator = new GoogleBitstreamComparator(googleScholarSettings);
-
 
     }
 
@@ -218,6 +216,7 @@ public class GoogleMetadata
         // Hold onto the item in case we need to refresh a stale parse
         this.item = item;
         itemURL = HandleManager.resolveToURL(context, item.getHandle());
+        googleBitstreamComparator = new GoogleBitstreamComparator(context, googleScholarSettings);
         parseItem();
     }
 

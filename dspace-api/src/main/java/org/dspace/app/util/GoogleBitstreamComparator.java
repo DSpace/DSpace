@@ -9,13 +9,17 @@ package org.dspace.app.util;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.core.Context;
 
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by frederic on 24/04/17.
+ * This comparator is used to order files of an item, so that they are ordered in a way that the first one
+ * is the most useful for use in the citation_pdf_url for Google Scholar
  */
 public class GoogleBitstreamComparator implements Comparator<Bitstream>{
 
@@ -23,33 +27,37 @@ public class GoogleBitstreamComparator implements Comparator<Bitstream>{
 
     HashMap<String, Integer> priorityMap = new HashMap<>();
 
-    public GoogleBitstreamComparator(Map<String, String> googleScholarSettings){
-        String[] types;
+    public GoogleBitstreamComparator(Context context, Map<String, String> googleScholarSettings) {
+        String[] shortDescriptions;
         if (googleScholarSettings.containsKey("citation.prioritized_types")){
-            types = splitAndTrim(googleScholarSettings.get("citation.prioritized_types"));
+            shortDescriptions = splitAndTrim(googleScholarSettings.get("citation.prioritized_types"));
         } else {
             log.warn("Please define citation.prioritized_types in google-metadata.properties");
-            types = new String[0];
+            shortDescriptions = new String[0];
         }
         int priority = 1;
-        for(String s: types){
-            String[] mimetypes;
-            if (googleScholarSettings.containsKey("citation.mimetypes." + s)){
-                mimetypes = splitAndTrim(googleScholarSettings.get("citation.mimetypes." + s));
-            } else {
-                log.warn("Make sure you define all the mimetypes of the citation.prioritized_types");
-                mimetypes = new String[0];
+        for(String s: shortDescriptions){
+            try {
+                BitstreamFormat format = BitstreamFormat.findByShortDescription(context, s);
+                if (format != null) {
+                    priorityMap.put(format.getMIMEType(), priority);
+                } else {
+                    log.warn(s + " is not a valid short description, please add it to bitstream-formats.xml");
+                }
+                priority++;
+            } catch (SQLException e){
+                log.error(e.getMessage());
             }
-            for (String mimetype: mimetypes) {
-                priorityMap.put(mimetype, priority);
-            }
-            priority++;
         }
+
     }
 
     private String[] splitAndTrim(String toSplit){
         if(toSplit != null) {
-            return toSplit.replace(" ", "").split(",");
+            String[] splittedArray = toSplit.split(",");
+            for (int i = 0; i < splittedArray.length; i++)
+                splittedArray[i] = splittedArray[i].trim();
+            return splittedArray;
         }
         else {
             return new String[0];
