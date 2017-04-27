@@ -11,7 +11,12 @@ import mockit.Mock;
 import mockit.MockUp;
 import org.dspace.AbstractDSpaceTest;
 import org.dspace.statistics.SolrLoggerServiceImpl;
+import org.junit.After;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -133,6 +138,162 @@ public class SpiderDetectorTest extends AbstractDSpaceTest
 
     }
 
+    @Test
+    public void testCaseInsensitiveMatching() throws Exception
+    {
+        enableCaseInsensitiveMatching();
+
+        DummyHttpServletRequest req = new DummyHttpServletRequest();
+        req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
+        req.setRemoteHost("notabot.example.com"); // avoid surprises
+        req.setAgent("Firefox"); // avoid surprises
+
+        String candidate;
+
+        // Test agent patterns
+        req.setAgent("msnboT Is WaTching you");
+        assertTrue("'msnbot' did not match any pattern", SpiderDetector.isSpider(req));
+
+        req.setAgent("FirefOx");
+        assertFalse("'Firefox' matched a pattern", SpiderDetector.isSpider(req));
+
+        // Test IP patterns
+        candidate = "192.168.2.1";
+        req.setAddress(candidate);
+        assertTrue(candidate + " did not match IP patterns", SpiderDetector.isSpider(req));
+
+        req.setAddress(NOT_A_BOT_ADDRESS);
+        assertFalse(NOT_A_BOT_ADDRESS + " matched IP patterns", SpiderDetector.isSpider(req));
+
+        // Test DNS patterns
+        candidate = "baiduspider-dSPace-test.crawl.BaiDu.com";
+        req.setRemoteHost(candidate);
+        assertTrue(candidate + " did not match DNS patterns", SpiderDetector.isSpider(req));
+
+        candidate = "wIki.dsPace.oRg";
+        req.setRemoteHost(candidate);
+        assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
+
+    }
+
+    @Test
+    public void testCaseSensitiveMatching() throws Exception
+    {
+
+        DummyHttpServletRequest req = new DummyHttpServletRequest();
+        req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
+        req.setRemoteHost("notabot.example.com"); // avoid surprises
+        req.setAgent("Firefox"); // avoid surprises
+
+        String candidate;
+
+        // Test agent patterns
+        req.setAgent("msnboT Is WaTching you");
+        assertFalse("'msnbot' matched pattern", SpiderDetector.isSpider(req));
+
+        req.setAgent("FirefOx");
+        assertFalse("'Firefox' matched a pattern", SpiderDetector.isSpider(req));
+
+        // Test IP patterns
+        candidate = "192.168.2.1";
+        req.setAddress(candidate);
+        assertTrue(candidate + " did not match IP patterns", SpiderDetector.isSpider(req));
+
+        req.setAddress(NOT_A_BOT_ADDRESS);
+        assertFalse(NOT_A_BOT_ADDRESS + " matched IP patterns", SpiderDetector.isSpider(req));
+
+        // Test DNS patterns
+        candidate = "baiduspiDer-dSPace-test.crawl.baIDu.com";
+        req.setRemoteHost(candidate);
+        assertFalse(candidate + " did match DNS patterns", SpiderDetector.isSpider(req));
+
+        candidate = "wIki.dsPace.oRg";
+        req.setRemoteHost(candidate);
+        assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
+
+    }
+
+    /**
+     * Test to see that lowercased will be matched but uppercase won't
+     */
+    @Test
+    public void testInsensitiveSensitiveDifference() {
+
+        DummyHttpServletRequest req = new DummyHttpServletRequest();
+        req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
+        req.setRemoteHost("notabot.example.com"); // avoid surprises
+        req.setAgent("Firefox"); // avoid surprises
+
+        String candidate;
+
+        // Test agent patterns
+        req.setAgent("msnbot is WaTching you");
+        assertTrue("'msnbot' didn't match pattern", SpiderDetector.isSpider(req));
+
+        req.setAgent("MSNBOT Is WaTching you");
+        assertFalse("'msnbot' matched pattern", SpiderDetector.isSpider(req));
+
+        // Test DNS patterns
+        candidate = "baiduspider-dspace-test.crawl.baidu.com";
+        req.setRemoteHost(candidate);
+        assertTrue(candidate + " did not match DNS patterns", SpiderDetector.isSpider(req));
+
+        candidate = "baiduspiDer-dSPace-test.crawl.baIDu.com";
+        req.setRemoteHost(candidate);
+        assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
+    }
+
+    @Test
+    public void testBothLowerAndUpperCaseGetMatched() {
+
+        DummyHttpServletRequest req = new DummyHttpServletRequest();
+        req.setAddress(NOT_A_BOT_ADDRESS); // avoid surprises
+        req.setRemoteHost("notabot.example.com"); // avoid surprises
+        req.setAgent("Firefox"); // avoid surprises
+
+        String candidate;
+
+        // Test agent patterns
+        req.setAgent("msnbot is WaTching you");
+        assertTrue("'msnbot' didn't match pattern", SpiderDetector.isSpider(req));
+
+        req.setAgent("MSNBOT Is WaTching you");
+        assertTrue("'msnbot' matched pattern", SpiderDetector.isSpider(req));
+
+        // Test DNS patterns
+        candidate = "baiduspider-dspace-test.crawl.baidu.com";
+        req.setRemoteHost(candidate);
+        assertTrue(candidate + " did not match DNS patterns", SpiderDetector.isSpider(req));
+
+        candidate = "baiduspiDer-dSPace-test.crawl.baIDu.com";
+        req.setRemoteHost(candidate);
+        assertTrue(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
+    }
+
+    /**
+     * Help method to change the configuration to CaseInsensitiveMatching
+     * @throws Exception
+     */
+    public void enableCaseInsensitiveMatching() throws Exception {
+        Field useCaseField = SpiderDetector.class.getDeclaredField("useCaseInsensitiveMatching");
+        useCaseField.setAccessible(true);
+        useCaseField.set(Boolean.class, true);
+    }
+
+    /**
+     * Method to make sure the SpiderDetector is using CaseSensitive matching again after each test
+     * @throws Exception
+     */
+    @After
+    public void cleanup() throws Exception {
+        Field useCaseField = SpiderDetector.class.getDeclaredField("useCaseInsensitiveMatching");
+        useCaseField.setAccessible(true);
+        useCaseField.set(Boolean.class, false);
+    }
+
+
+
+
     /**
      * Dummy SolrLogger for testing.
      * @author mwood
@@ -151,5 +312,7 @@ public class SpiderDetectorTest extends AbstractDSpaceTest
         {
             return false;
         }
+
     }
+
 }
