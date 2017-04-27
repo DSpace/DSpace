@@ -326,8 +326,8 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
         List<Bitstream> toSort = Arrays.asList(bundle.getBitstreams());
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
         assertEquals("bitstream3", toSort.get(0).getName());
-        assertEquals("bitstream1", toSort.get(1).getName());
-        assertEquals("bitstream2", toSort.get(2).getName());
+        assertEquals("bitstream2", toSort.get(1).getName());
+        assertEquals("bitstream1", toSort.get(2).getName());
     }
 
 
