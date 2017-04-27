@@ -38,8 +38,8 @@
 			</xsl:choose>
 		</xsl:variable>
 
-        <resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+        <resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 
 			<xsl:variable name="identifier-doi" select="dspace:field[@element='identifier' and not(@qualifier)]" />
 			<!-- ********** Identifiers ********** -->
@@ -80,21 +80,26 @@
 			</subjects>
 
 			<!-- ************ Funding information ************** -->
-			<xsl:if test="dspace:field[@element='fundingEntity']">
-				<contributors>
+			<xsl:if test="dspace:field[@element='fundingEntity' and @confidence='ACCEPTED']">
+				<fundingReferences>
 					<xsl:for-each select="dspace:field[@element='fundingEntity']">
+						<xsl:variable name="awardNumber" select="substring-before(.,'@')"/>
 						<xsl:variable name="funderName" select="substring-after(.,'@')"/>
 						<xsl:variable name="funderID" select="substring-after(./@authority, 'http://dx.doi.org/')"/>
-						<contributor contributorType="Funder">
-							<contributorName>
-								<xsl:value-of select="$funderName"/>
-							</contributorName>
-							<nameIdentifier nameIdentifierScheme="FundRef">
-								<xsl:value-of select="$funderID"/>
-							</nameIdentifier>
-						</contributor>
+						<xsl:variable name="confidence" select="./@confidence"/>
+						<xsl:if test="$confidence='ACCEPTED'">
+							<fundingReference>
+								<funderName>
+									<xsl:value-of select="$funderName"/>
+								</funderName>
+								<funderIdentifier funderIdentifierType="Crossref Funder ID">
+									<xsl:value-of select="concat('http://doi.org/', $funderID)"/>
+								</funderIdentifier>
+								<awardNumber><xsl:value-of select="$awardNumber"/></awardNumber>
+							</fundingReference>
+						</xsl:if>
 					</xsl:for-each>
-				</contributors>
+				</fundingReferences>
 			</xsl:if>
 
 			<!-- ************ Dates - Only for Data Files ************** -->
@@ -162,7 +167,7 @@
 			<xsl:if test="dspace:field[@element='format' and @qualifier='extent']">
 				<sizes>
 					<xsl:for-each select="dspace:field[@element='format' and @qualifier='extent']">
-						<size xmlns="http://datacite.org/schema/kernel-3">
+						<size xmlns="http://datacite.org/schema/kernel-4">
 							<xsl:text>(:tba)</xsl:text>
 						</size>
 					</xsl:for-each>

@@ -42,8 +42,8 @@
 		<xsl:variable name="dateAccepted" select="dspace:field[@element='date' and @qualifier='issued']"/>
 
 
-        <resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+        <resource xmlns="http://datacite.org/schema/kernel-4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4/metadata.xsd">
 
 			<xsl:variable name="doi">
 				<xsl:call-template name="get_identifier"/>
@@ -134,23 +134,25 @@
 	        </xsl:if>
 			<!-- ************ Funding information ************** -->
 			<xsl:if test="dspace:field[@element='fundingEntity' and @confidence='ACCEPTED']">
-				<contributors>
+				<fundingReferences>
 					<xsl:for-each select="dspace:field[@element='fundingEntity']">
+						<xsl:variable name="awardNumber" select="substring-before(.,'@')"/>
 						<xsl:variable name="funderName" select="substring-after(.,'@')"/>
 						<xsl:variable name="funderID" select="substring-after(./@authority, 'http://dx.doi.org/')"/>
 						<xsl:variable name="confidence" select="./@confidence"/>
 						<xsl:if test="$confidence='ACCEPTED'">
-							<contributor contributorType="Funder">
-								<contributorName>
+							<fundingReference>
+								<funderName>
 									<xsl:value-of select="$funderName"/>
-								</contributorName>
-								<nameIdentifier nameIdentifierScheme="FundRef">
-									<xsl:value-of select="$funderID"/>
-								</nameIdentifier>
-							</contributor>
+								</funderName>
+								<funderIdentifier funderIdentifierType="Crossref Funder ID">
+									<xsl:value-of select="concat('http://doi.org/', $funderID)"/>
+								</funderIdentifier>
+								<awardNumber><xsl:value-of select="$awardNumber"/></awardNumber>
+							</fundingReference>
 						</xsl:if>
 					</xsl:for-each>
-				</contributors>
+				</fundingReferences>
 			</xsl:if>
 
 			<!-- ************ Dates - Only for Data Files ************** -->
@@ -249,7 +251,7 @@
 			<xsl:if test="dspace:field[@element='format' and @qualifier='extent']">
 				<sizes>
 					<xsl:for-each select="dspace:field[@element='format' and @qualifier='extent']">
-						<size xmlns="http://datacite.org/schema/kernel-3">
+						<size xmlns="http://datacite.org/schema/kernel-4">
 							<xsl:value-of select="."/>
 							<xsl:text> bytes</xsl:text>
 						</size>
@@ -427,7 +429,7 @@
 		<xsl:param name="canonical-doi"/>
 		<xsl:param name="current-version"/>
 		<xsl:if test="$current-version &gt; 0">
-			<relatedIdentifier xmlns="http://datacite.org/schema/kernel-3" relatedIdentifierType="DOI" relationType="IsNewVersionOf">
+			<relatedIdentifier xmlns="http://datacite.org/schema/kernel-4" relatedIdentifierType="DOI" relationType="IsNewVersionOf">
 				<xsl:call-template name="versioned-doi">
 					<xsl:with-param name="canonical-doi" select="$canonical-doi"/>
 					<xsl:with-param name="version" select="$current-version"/>
