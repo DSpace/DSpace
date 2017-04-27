@@ -85,7 +85,7 @@ public class PublicationUpdater extends HttpServlet {
                         String issn = getISSN(queryParams);
                         Integer itemID = getItemID(queryParams);
                         String startLetter = getStartLetter(queryParams);
-                        if ("".equals(startLetter)) {
+                        if (!startLetter.matches("[a-zA-Z]")) {
                             startLetter = "a";
                         }
                         if (issn != null) {
@@ -170,7 +170,7 @@ public class PublicationUpdater extends HttpServlet {
                 return param.getValue();
             }
         }
-        return null;
+        return "a";
     }
 
     private void checkPublications(Context context, String startLetter) {
@@ -308,7 +308,7 @@ public class PublicationUpdater extends HttpServlet {
             if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
                 LOGGER.debug("same authors");
                 // update the item's metadata
-                String provenance = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\"";
+                String provenance = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".";
                 if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
                     message = provenance;
                 }
@@ -503,12 +503,14 @@ public class PublicationUpdater extends HttpServlet {
             item.clearMetadata(PUBLICATION_DOI);
             item.addMetadata(PUBLICATION_DOI, null, manuscript.getPublicationDOI(), null, -1);
             LOGGER.debug("adding publication DOI " + manuscript.getPublicationDOI());
+            provenance = provenance + " " + PUBLICATION_DOI + " was updated.";
         }
         if (!"".equals(manuscript.getManuscriptId()) && !item.hasMetadataEqualTo(MANUSCRIPT_NUMBER, manuscript.getManuscriptId())) {
             changed = true;
             item.clearMetadata(MANUSCRIPT_NUMBER);
             item.addMetadata(MANUSCRIPT_NUMBER, null, manuscript.getManuscriptId(), null, -1);
             LOGGER.debug("adding msid " + manuscript.getManuscriptId());
+            provenance = provenance + " " + MANUSCRIPT_NUMBER + " was updated.";
         }
 
         SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
@@ -519,6 +521,7 @@ public class PublicationUpdater extends HttpServlet {
                 item.clearMetadata(PUBLICATION_DATE);
                 item.addMetadata(PUBLICATION_DATE, null, dateString, null, -1);
                 LOGGER.debug("adding pub date " + manuscript.getPublicationDate());
+                provenance = provenance + " " + PUBLICATION_DATE + " was updated.";
             }
         }
         if (!"".equals(manuscript.getFullCitation())) {
@@ -536,6 +539,7 @@ public class PublicationUpdater extends HttpServlet {
                 item.clearMetadata(FULL_CITATION);
                 item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
                 LOGGER.debug("adding citation " + manuscript.getFullCitation());
+                provenance = provenance + " " + FULL_CITATION + " was updated.";
             }
         }
         if (changed) {
