@@ -143,4 +143,10 @@
 	<function-signature>String getPropertyDefinitionLabel(java.lang.String,java.lang.String)</function-signature>
 </function>
 
+<function>
+	<description>Wrap the property definition to add i18n support</description>
+	<name>getPropertyDefinitionI18N</name>
+	<function-class>org.dspace.app.webui.cris.web.tag.ResearcherTagLibraryFunctions</function-class>
+	<function-signature>java.lang.Object getPropertyDefinitionI18N(java.lang.Object, java.lang.String)</function-signature>
+</function>
 </taglib>

@@ -13,6 +13,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <%@ taglib uri="jdynatags" prefix="dyna"%>
 <%@ taglib uri="researchertags" prefix="researcher"%>
@@ -32,7 +33,7 @@
 								<img style="width: 16px;vertical-align: middle;" border="0" 
 									src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}" alt="icon" />
 								</c:if>	
-								${area.title}</a>
+								<spring:message code="${entity.class.simpleName}.tab.${area.shortName}.label" text="${area.title}"></spring:message></a>
 							</c:when>
 							<c:otherwise>
 									<a href="${tablink}">
@@ -41,7 +42,7 @@
 										src="<%=request.getContextPath()%>/cris/researchertabimage/${area.id}"
 			    						alt="icon" />
 			    					</c:if>	
-			    					${area.title}</a>
+			    					<spring:message code="${entity.class.simpleName}.tab.${area.shortName}.label" text="${area.title}"></spring:message></a>
 							</c:otherwise>
 						</c:choose></li>
 

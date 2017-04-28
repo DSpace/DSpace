@@ -899,4 +899,14 @@ public class ResearcherTagLibraryFunctions
         }
         return null;
     }
+    
+    public static Object getPropertyDefinitionI18N(Object pd, String locale) {
+    	if (pd instanceof PropertiesDefinition) {
+    		return PropertyDefintionI18NWrapper.getWrapper((PropertiesDefinition) pd, locale);
+    	}
+    	else if (pd instanceof ADecoratorPropertiesDefinition) {
+    		return PropertyDefintionI18NWrapper.getWrapper((ADecoratorPropertiesDefinition) pd, locale);
+    	} 
+    	return pd;
+    }
 }
