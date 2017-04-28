@@ -99,15 +99,17 @@ public class PackageResource {
             Date dateTo = null;
             SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
             try {
-                if ("".equals(dateToString)) {
-                    dateTo = new Date();
-                } else {
-                    dateTo = dateIso.parse(dateToString);
-                }
-                if ("".equals(dateFromString)) {
-                    dateFrom = new Date(0);
-                } else {
-                    dateFrom = dateIso.parse(dateFromString);
+                if (!"".equals(dateFromString) || !"".equals(dateToString)) {
+                    if ("".equals(dateToString)) {
+                        dateTo = new Date();
+                    } else {
+                        dateTo = dateIso.parse(dateToString);
+                    }
+                    if ("".equals(dateFromString)) {
+                        dateFrom = new Date(0);
+                    } else {
+                        dateFrom = dateIso.parse(dateFromString);
+                    }
                 }
             } catch (ParseException e) {
                 log.error("couldn't parse date: " + e.getMessage());

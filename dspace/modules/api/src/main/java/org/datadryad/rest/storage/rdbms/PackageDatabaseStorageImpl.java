@@ -86,7 +86,7 @@ public class PackageDatabaseStorageImpl extends AbstractPackageStorage {
                 }
             }
             resultSet = new ResultSet(itemSet, limit, cursor);
-            packageList.addAll(Package.getPackagesForItemSet(itemSet, limit, context));
+            packageList.addAll(Package.getPackagesForItemSet(resultSet.getCurrentSet(cursor), limit, context));
         } catch (SQLException ex) {
             log.error("error: " + ex.getMessage());
             abortContext(context);
