@@ -19,7 +19,9 @@ import java.util.Collections;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.configuration.ConversionException;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,23 +39,30 @@ public class SpiderDetector {
 
     private static final Logger log = LoggerFactory.getLogger(SpiderDetector.class);
 
-    private static Boolean useProxies;
+    private Boolean useProxies;
 
-    private static Boolean useCaseInsensitiveMatching;
+    private Boolean useCaseInsensitiveMatching;
 
     /**
      * Sparse HashTable structure to hold IP address ranges.
      */
-    private static IPTable table = null;
+    private IPTable table = null;
 
     /** Collection of regular expressions to match known spiders' agents. */
-    private static final List<Pattern> agents
+    private final List<Pattern> agents
             = Collections.synchronizedList(new ArrayList<Pattern>());
 
     /** Collection of regular expressions to match known spiders' domain names. */
-    private static final List<Pattern> domains
+    private final List<Pattern> domains
             = Collections.synchronizedList(new ArrayList<Pattern>());
 
+    private ConfigurationService configurationService;
+
+    private static SpiderDetector spiderDetector = new SpiderDetector(DSpaceServicesFactory.getInstance().getConfigurationService());
+
+    public SpiderDetector(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+    }
     /**
      * Utility method which reads lines from a file & returns them in a Set.
      *
@@ -98,20 +107,19 @@ public class SpiderDetector {
      */
     public static Set<String> getSpiderIpAddresses() {
 
-        loadSpiderIpAddresses();
-        return table.toSet();
+        spiderDetector.loadSpiderIpAddresses();
+        return spiderDetector.table.toSet();
     }
 
     /*
      *  private loader to populate the table from files.
      */
-
-    private synchronized static void loadSpiderIpAddresses() {
+    private synchronized void loadSpiderIpAddresses() {
 
         if (table == null) {
             table = new IPTable();
 
-            String filePath = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir");
+            String filePath = configurationService.getProperty("dspace.dir");
 
             try {
                 File spidersDir = new File(filePath, "config/spiders");
@@ -158,9 +166,9 @@ public class SpiderDetector {
      * @param patternList patterns read from the files in {@code directory} will
      *      be added to this List.
      */
-    private static void loadPatterns(String directory, List<Pattern> patternList)
+    private void loadPatterns(String directory, List<Pattern> patternList)
     {
-        String dspaceHome = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir");
+        String dspaceHome = configurationService.getProperty("dspace.dir");
         File spidersDir = new File(dspaceHome, "config/spiders");
         File patternsDir = new File(spidersDir, directory);
         if (patternsDir.exists() && patternsDir.isDirectory())
@@ -207,7 +215,7 @@ public class SpiderDetector {
      * @param agent User-Agent header value, or null.
      * @return true if the client matches any spider characteristics list.
      */
-    public static boolean isSpider(String clientIP, String proxyIPs,
+    public boolean isSpiderAgent(String clientIP, String proxyIPs,
                                    String hostname, String agent)
     {
         // See if any agent patterns match
@@ -239,14 +247,14 @@ public class SpiderDetector {
         if (isUseProxies() && proxyIPs != null) {
             /* This header is a comma delimited list */
             for (String xfip : proxyIPs.split(",")) {
-                if (isSpider(xfip))
+                if (isSpiderAgent(xfip))
                 {
                     return true;
                 }
             }
         }
 
-        if (isSpider(clientIP))
+        if (isSpiderAgent(clientIP))
             return true;
 
         // No.  See if any DNS names match
@@ -271,6 +279,21 @@ public class SpiderDetector {
         return false;
     }
 
+    public static boolean isSpider(String clientIP, String proxyIPs,
+                                   String hostname, String agent)
+    {
+        return spiderDetector.isSpiderAgent(clientIP, proxyIPs, hostname, agent);
+    }
+
+    public boolean isSpiderAgent(HttpServletRequest request)
+    {
+        return isSpiderAgent(request.getRemoteAddr(),
+                request.getHeader("X-Forwarded-For"),
+                request.getRemoteHost(),
+                request.getHeader("User-Agent"));
+    }
+
+
     /**
      * Static Service Method for testing spiders against existing spider files.
      *
@@ -279,22 +302,13 @@ public class SpiderDetector {
      */
     public static boolean isSpider(HttpServletRequest request)
     {
-        return isSpider(request.getRemoteAddr(),
-                request.getHeader("X-Forwarded-For"),
-                request.getRemoteHost(),
-                request.getHeader("User-Agent"));
+        return spiderDetector.isSpiderAgent(request);
     }
 
-    /**
-     * Check individual IP is a spider.
-     *
-     * @param ip
-     * @return if is spider IP
-     */
-    public static boolean isSpider(String ip) {
+    public boolean isSpiderAgent(String ip) {
 
         if (table == null) {
-            SpiderDetector.loadSpiderIpAddresses();
+            loadSpiderIpAddresses();
         }
 
         try {
@@ -310,17 +324,35 @@ public class SpiderDetector {
 
     }
 
-    private static boolean isUseCaseInsensitiveMatching() {
+    /**
+     * Check individual IP is a spider.
+     *
+     * @param ip
+     * @return if is spider IP
+     */
+    public static boolean isSpider(String ip) {
+
+        return spiderDetector.isSpiderAgent(ip);
+
+
+    }
+
+    private boolean isUseCaseInsensitiveMatching() {
         if (useCaseInsensitiveMatching == null) {
-            useCaseInsensitiveMatching = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("usage-statistics.bots.case-insensitive");
+            try {
+                useCaseInsensitiveMatching = configurationService.getBooleanProperty("usage-statistics.bots.case-insensitive");
+            } catch (ConversionException e) {
+                useCaseInsensitiveMatching = false;
+                log.warn("Please use a boolean value for usage-statistics.bots.case-insensitive");
+            }
         }
 
         return useCaseInsensitiveMatching;
     }
 
-    private static boolean isUseProxies() {
+    private boolean isUseProxies() {
         if(useProxies == null) {
-            useProxies = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("useProxies");
+            useProxies = configurationService.getBooleanProperty("useProxies");
         }
 
         return useProxies;
