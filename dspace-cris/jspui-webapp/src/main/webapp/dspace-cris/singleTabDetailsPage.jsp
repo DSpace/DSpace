@@ -13,6 +13,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ page import="java.net.URL"%>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="java.util.Locale"%>
@@ -64,7 +65,7 @@
     										<div class="panel-heading">
       												<h4 class="panel-title">
         												<a data-toggle="collapse" data-parent="#${holder.shortName}" href="#collapseOne${holder.shortName}">
-          													${holder.title}
+          													<spring:message code="${entity.class.simpleName}.box.${holder.shortName}.label" text="${holder.title}"></spring:message>
         												</a>
       												</h4>
     										</div>
