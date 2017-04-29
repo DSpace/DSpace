@@ -351,7 +351,16 @@ public class Bitstream extends DSpaceObject
      *            the new description of the bitstream
      */
     public void setDescription(String n) {
-        setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "description", null, null, n);
+    	if (n == null)
+    	{
+            clearMetadata(MetadataSchema.DC_SCHEMA, "description", null, null);
+            modifiedMetadata = true;
+        }
+    	else
+    	{
+            setMetadataSingleValue(MetadataSchema.DC_SCHEMA, "description", null, null, n);
+    	}
+
     }
 
     /**
