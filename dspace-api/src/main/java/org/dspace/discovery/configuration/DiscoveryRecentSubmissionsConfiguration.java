@@ -17,7 +17,7 @@ public class DiscoveryRecentSubmissionsConfiguration {
     private String metadataSortField;
     private String type;
 
-    private int max = 5;
+    private int max = 20;
     private boolean useAsHomePage;
 
     public String getMetadataSortField() {
