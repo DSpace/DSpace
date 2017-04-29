@@ -6,18 +6,23 @@
 # {3}  Reason for the rejection
 # {4}  Link to 'My DSpace' page
 #
-Subject: DSpace: Submission Rejected
+Subject: Depósito negado
 
-You submitted: {0}
+Você depositou: {0}
 
-To collection: {1}
+Na coleção: {1}
 
-Your submission has been rejected by {2}
-with the following explanation:
+Seu depósito foi rejeitado
+com a seguinte explicação:
 
 {3}
 
-Your submission has not been deleted.  You can access it from your
-"My DSpace" page: {4}
+Seu depósito não foi deletado. Você pode acessá-lo em
+"Meu espaço" na página: {4}
 
-DSpace
+Deposita - Repositório Comum do Brasil
+deposita@ibict.br
++55 61 3217-6449
+
+Instituto Brasileiro de Informação em Ciência e Tencologia (IBICT)
+Ministério da Ciência, Tecnologia e Inovação (MCTI)
