@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    A RESTful web service on top of DSpace.
+    Copyright (C) 2010-2011 National Library of Finland
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+-->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+ debug="false">
+ <appender name="MyLogic" class="org.apache.log4j.FileAppender">
+  <param name="File" value="${mylogic.log.file}" />
+  <param name="Append" value="true" />
+  <layout class="org.apache.log4j.PatternLayout">
+   <param name="ConversionPattern" value="%-5p [%t] %c{1}.%M : %m%n" />
+  </layout>
+ </appender>
+ <appender name="Spring" class="org.apache.log4j.FileAppender">
+  <param name="File" value="${spring.log.file}" />
+  <param name="Append" value="false" />
+  <layout class="org.apache.log4j.PatternLayout">
+   <param name="ConversionPattern" value="%-5p [%t] %c{1}.%M : %m%n" />
+  </layout>
+ </appender>
+ <appender name="DSpace" class="org.apache.log4j.FileAppender">
+  <param name="File" value="${dspace.log.file}" />
+  <param name="Append" value="false" />
+  <layout class="org.apache.log4j.PatternLayout">
+   <param name="ConversionPattern" value="%-5p [%t] %c{1}.%M : %m%n" />
+  </layout>
+ </appender>
+ <logger name="fi.helsinki.lib.simplerest">
+  <level value="debug" />
+  <appender-ref ref="MyLogic" />
+ </logger>
+ <logger name="org.springframework">
+  <level value="debug" />
+  <appender-ref ref="Spring" />
+ </logger>
+ <logger name="org.dspace">
+  <level value="debug" />
+  <appender-ref ref="DSpace" />
+ </logger>
+</log4j:configuration>

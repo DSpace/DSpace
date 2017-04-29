@@ -1,0 +1,370 @@
+<html>
+  <head>
+    <title>SimpleREST</title>
+    <style type="text/css">
+body {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+table {
+    border: 1px solid black;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td {
+    text-align: center;
+}
+
+th {
+    border: 2px solid black;
+}
+
+th.inner {
+    border: none;
+    border-bottom: 2px solid black;
+}
+
+.resource {
+    background-color: yellow;
+    border-top: 1px solid black;
+}
+
+.empty {
+    border: none;
+}
+
+.url {
+    text-align: right;
+}
+
+.method {
+    font-weight: bold;
+    border-right: 1px solid #aaa;
+}
+
+.emptyrow {
+    height: 2em;
+}      
+    </style>
+  </head>
+  <body>
+    <table>
+
+      <tr><td colspan="5" class="resource">1. Root communities</td></tr>
+      <tr>
+	<td />
+	<td class="url">URL:</td>
+	<td colspan="3">/simplerest/rootcommunities</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr>
+	<td class="empty" />
+	<td class="empty" />
+	<td class="method">GET</td>
+        <td>-</td>
+	<td>Get a list of root communities</td>
+      </tr>
+      <tr>
+        <td class="empty" />
+	<td class="empty" />
+	<td class="method">POST</td>
+	<td>multipart/form-data</td>
+	<td>Create a new root community</td>
+      </tr>
+
+      <tr class="emptyrow"><td colspan="5" /></tr>
+      <tr>
+	<td colspan="5" class="resource">2. Community</td></tr>
+      <tr>
+	<td />
+	<td class="url">URL:</td>
+	<td colspan="3">/simplerest/community/{id}</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>XML</td><td>Modify</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">POST</td><td>multipart/form-data</td><td>Create a new subcommunity / collection</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td></td></tr>
+
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">3. Community logo</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/community/{id}/logo</td>
+      </tr>
+
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>multipart/form-data</td><td>Create/modify</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td></td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">4. (Sub)communities</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/community/{id}/communities</td>
+      </tr>
+
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td>Get a list of subcommunities</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">POST</td><td>multipart/form-data</td><td>Create a new subcommunity</td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">5. Collection</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/collection/{id}</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>XML</td><td>Modify collection</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td></td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">6. Collection logo</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/collection/{id}/logo</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>multipart/form-data</td><td>Create/modify</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td></td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">7. (Child) Collections</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/community/{id}/collections</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td>Get a list of child collections</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">POST</td><td>multipart/form-data</td><td>Create a new collection</td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">8. Items</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/community/{id}/items</td>
+      </tr>
+
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td>Get a list of items</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">POST</td><td>application/x-www-form-urlencoded</td><td>Create a new item</td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">9. Item</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/item/{id}</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>XML</td><td>Modify item</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">POST</td><td>application/x-www-form-urlencoded</td><td>Create a new bundle</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td></td></tr>
+
+
+      <tr class="emptyrow"><td colspan="5" /></tr>
+      <tr><td colspan="5" class="resource">10. Bundle</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/bundle/{id}</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>XML</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">POST</td><td>multipart/form-data</td><td>Create a new bitstream</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td></td></tr>
+
+
+      <tr class="emptyrow"><td colspan="5" /></tr>
+      <tr><td colspan="5" class="resource">11. Bitstream (*)</td></tr>
+      <tr><td />
+	<td class="url">URL:</td><td colspan="3">/simplerest/bitstream/{id}</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td>Get bitstream metadata</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>XML</td><td>Modify bitstream metadata</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td>(***)</td></tr>
+
+      <tr class="emptyrow"><td colspan="5" /></tr>
+      <tr><td />
+	<td class="url">(**) URL:</td><td colspan="3">/simplerest/bitstream/{id}.bin</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td>Get the actual bitstream bytes</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td>(***)</td></tr>
+
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">12. Metadata schemas</td></tr>
+      <tr>
+	<td />
+	<td class="url">URL:</td>
+	<td colspan="3">/simplerest/metadataschemas</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr>
+	<td class="empty" />
+	<td class="empty" />
+	<td class="method">GET</td>
+        <td>-</td>
+	<td>Get a list of metadata schemas</td>
+      </tr>
+      <tr>
+        <td class="empty" />
+	<td class="empty" />
+	<td class="method">POST</td>
+	<td>application/x-www-form-urlencoded</td>
+	<td>Create a new metadata schema</td>
+      </tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+	<td colspan="5" class="resource">13. Metadata schema</td></tr>
+      <tr>
+	<td />
+	<td class="url">URL:</td>
+	<td colspan="3">/simplerest/metadataschema/{id}</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>XML</td><td>Modify</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td></td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+      <tr><td colspan="5" class="resource">14. Metadata fields</td></tr>
+      <tr>
+	<td />
+	<td class="url">URL:</td>
+	<td colspan="3">/simplerest/metadatafields</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr>
+	<td class="empty" />
+	<td class="empty" />
+	<td class="method">GET</td>
+        <td>-</td>
+	<td>Get a list of metadata fields</td>
+      </tr>
+      <tr>
+        <td class="empty" />
+	<td class="empty" />
+	<td class="method">POST</td>
+	<td>application/x-www-form-urlencoded</td>
+	<td>Create a new metadata field</td>
+      </tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+	<td colspan="5" class="resource">15. Metadata field</td></tr>
+      <tr>
+	<td />
+	<td class="url">URL:</td>
+	<td colspan="3">/simplerest/metadatafield/{id}</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td></td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">PUT</td><td>XML</td><td>Modify</td></tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">DELETE</td><td>-</td><td></td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+	<td colspan="5" class="resource">16. Users</td></tr>
+      <tr>
+	<td />
+	<td class="url">URL:</td>
+	<td colspan="3">/simplerest/users</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td>Return all DSpace users</td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+	<td colspan="5" class="resource">17. User</td></tr>
+      <tr>
+	<td />
+	<td class="url">URL:</td>
+	<td colspan="3">/simplerest/user/{id}</td>
+      </tr>
+      <tr>
+	<th class="empty" />
+	<th class="empty" />
+	<th class="inner">method</th><th class="inner">input format</th><th class="inner">description</th>
+      </tr>
+      <tr><td class="empty" /><td class="empty" /><td class="method">GET</td><td>-</td><td>Return details of a specified user</td></tr>
+      <tr class="emptyrow"><td colspan="5" /></tr>
+
+
+    </table>
+    <pre>
+NOTES:
+------
+(*) Bitstream has two different representations (metadata and the actual data)
+
+(**) No PUT method because (current?) limitations of DSpace API.
+
+(***) These are the exactly same operation, you can use whichever you prefer.
+    </pre>
+  </body>
+</html>

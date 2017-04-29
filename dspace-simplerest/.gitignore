@@ -1,0 +1,5 @@
+target/
+THIRD-PARTY.properties
+nb-configuration.xml
+.DS_Store
+src/main/webapp/dspacevisual
