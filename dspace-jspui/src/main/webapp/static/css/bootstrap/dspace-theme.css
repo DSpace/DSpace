@@ -106,3 +106,68 @@ span.batchimport-error-tab {
 span.batchimport-error-caused {
 	font-weight:bold;
 }
+
+
+/*
+ The main HTML element on pages that relate to the display of an item, collection, or community
+ is annotated with classes that correspond to the handles of the enclosing collection and community/communities.
+ Handles are 'turned' into classes by prefixing them with 'hdl-' and by replacing '/' with '-'; for example
+ the handle 123456789/abcd becomes the CSS class  hdl-123456789-abcd
+*/
+
+/* hide all browse buttons on a small collection/community by using the class for its handle */
+/* hdl-123456789-3876 corresponds to the handle  123456789/3876 */
+/*
+.hdl-123456789-3874 .browse-buttons {
+	display: none;
+}
+*/
+
+/* hide the subject browse button on the page for the community with handle 123456789/3883,
+   as well as the pages of its collections */
+/*
+.hdl-123456789-3883 .browse-buttons .subject {
+	display: none;
+}
+*/
+
+/* by default: hide the graduation browse button everywhwre */
+/* show the graduation browse button in the senior thesis community with handle 123456789/3875 */
+/*
+.browse-buttons .graduation {
+	display: none;
+}
+
+.hdl-123456-3875 .browse-buttons .graduation {
+	display: block;
+}
+*/
+
+/* Item pages annotate the table rows for metadata values with matching classes:
+   dc.title         matches the class dc-title
+   dc.contributor.* matches the class dc-contributor-star
+   ...
+   the convention is to replace '.' by '-' and '*' by 'star'
+ */
+
+/* style all itemDisplay pages to show author values followed by semicolons and without line breaks */
+/*
+.itemDisplayTable .dc-contributor-star .metadataFieldValue br {
+	display: none;
+}
+.itemDisplayTable .dc-contributor-star .metadataFieldValue a::after {
+	content: "; ";
+}
+*/
+
+/* to style selected metadata values for items in a given collections / communities,
+   prefix CSS rules with the class matching the handle of the collection/community
+ */
+/*
+.hdl-123456789-4028 .itemDisplayTable .dc-relation-isformatof .metadataFieldValue,
+.hdl-123456789-4028 .itemDisplayTable .dc-title .metadataFieldValue {
+	background-color: #f5f5f5;
+	background-image: linear-gradient(to bottom, #e8e8e8 0px, #f5f5f5 100%);
+	background-repeat: repeat-x;
+}
+*/

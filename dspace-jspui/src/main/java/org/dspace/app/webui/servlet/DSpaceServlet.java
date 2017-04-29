@@ -9,6 +9,8 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,6 +22,8 @@ import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 
@@ -211,5 +215,19 @@ public class DSpaceServlet extends HttpServlet
         // If this is not overridden, we invoke the raw HttpServlet "doGet" to
         // indicate that POST is not supported by this servlet.
         super.doGet(request, response);
+    }
+
+    protected void setDSpaceObjectAndHandle(Context context, HttpServletRequest request, DSpaceObject dso) throws SQLException {
+        if (dso != null && request.getAttribute("dspaceObject") == null) {
+            request.setAttribute("dspaceObject", dso);
+            List<String> handles = new ArrayList<String>();
+            while (dso != null) {
+                if (dso.getType() != Constants.ITEM){
+                    handles.add(dso.getHandle());
+                }
+                dso = dso.getParentObject();
+            }
+            request.setAttribute("dspaceObject.parents.handles", handles);
+        }
     }
 }

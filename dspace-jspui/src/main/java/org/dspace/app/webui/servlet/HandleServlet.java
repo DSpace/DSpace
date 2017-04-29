@@ -136,6 +136,8 @@ public class HandleServlet extends DSpaceServlet
             return;
         }
 
+        setDSpaceObjectAndHandle(context, request, dso);
+
         if("/statistics".equals(extraPathInfo))
         {
             // Check configuration properties, auth, etc.

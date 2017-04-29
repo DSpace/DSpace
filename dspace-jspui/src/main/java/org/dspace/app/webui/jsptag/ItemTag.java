@@ -467,7 +467,9 @@ public class ItemTag extends TagSupport
             
             if (values.length > 0)
             {
-                out.print("<tr><td class=\"metadataFieldLabel\">");
+                String field_class = field.replace('.', '-').replace("*","star" );
+
+                out.print("<tr class='" + field_class + "'> <td class=\"metadataFieldLabel\">");
 
                 String label = null;
                 try
