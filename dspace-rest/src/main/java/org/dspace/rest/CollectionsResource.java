@@ -316,6 +316,8 @@ public class CollectionsResource extends Resource
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
+                } else {
+                    (void) dspaceItems.nextID();
                 }
             }
 
