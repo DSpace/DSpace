@@ -4,18 +4,23 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: DSpace: Submission Approved and Archived 
+Subject: Depósito aprovado
 
-You submitted: {0}
+Você depositou: {0}
 
-To collection: {1}
+Na coleção: {1}
 
-Your submission has been accepted and archived in DSpace,
-and it has been assigned the following identifier:
+Seu depósito foi aceito e arquivado no Deposita
+e a ele foi atribuído o seguinte identificador:
 {2}
 
-Please use this identifier when citing your submission.
+Por favor, use este identificador para citar o documento.
 
-Many thanks!
+Agradecemos sua colaboração!
 
-DSpace
+Deposita - Repositório Comum do Brasil
+deposita@ibict.br
++55 61 3217-6449
+
+Instituto Brasileiro de Informação em Ciência e Tencologia (IBICT)
+Ministério da Ciência, Tecnologia e Inovação (MCTI)
