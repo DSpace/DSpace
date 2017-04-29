@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import com.jonathanblood.content.RatingsManager;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -1327,6 +1328,10 @@ public class Item extends DSpaceObject
 
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
+
+        // @EC JB Delete an items rating
+        RatingsManager ratingsManager = new RatingsManager();
+        ratingsManager.deleteObjectRatings(ourContext, this.getID());
     }
     
     private void removeVersion() throws AuthorizeException, SQLException

@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
+import com.jonathanblood.content.RatingsManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -19,12 +20,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
+
+import com.jonathanblood.recommender.Recommender;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -33,10 +37,12 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.eperson.EPerson;
 import org.dspace.content.Collection;
 import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
@@ -103,6 +109,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     @Override
     public Serializable getKey() {
         try {
+
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
@@ -110,7 +117,25 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
                 return "0"; // no item, something is wrong.
             }
 
-            return HashUtil.hash(dso.getHandle() + "full:" + showFullItem(objectModel));
+            // @EC JB : Extend caching key with eperson + rating
+            StringBuilder sb = new StringBuilder();
+            sb.append(dso.getHandle());
+            sb.append("full:");
+            sb.append(showFullItem(objectModel));
+
+            EPerson currentUser = context.getCurrentUser();
+            if (currentUser != null)
+            {
+                RatingsManager ratingsManager = new RatingsManager();
+                int rating = ratingsManager.getRating(context, currentUser.getID(), dso.getID());
+                sb.append("_");
+                sb.append(currentUser.getID());
+                sb.append("_");
+                sb.append(rating);
+            }
+
+            return HashUtil.hash(sb.toString());
+            //return HashUtil.hash(dso.getHandle() + "full:" + showFullItem(objectModel));
         }
         catch (SQLException sqle)
         {
@@ -373,6 +398,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             showfullPara.addXref(link).addContent(T_show_full);
         }
 
+
         ReferenceSet referenceSet;
         if (showFullItem(objectModel))
         {
@@ -383,6 +409,49 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         {
             referenceSet = division.addReferenceSet("collection-viewer",
                     ReferenceSet.TYPE_SUMMARY_VIEW);
+        }
+
+        //@EC JB
+        EPerson currentUser = context.getCurrentUser();
+        if (item.isArchived() && currentUser != null) {
+            RatingsManager ratingsManager = new RatingsManager();
+            int rating = ratingsManager.getRating(context, currentUser.getID(), item.getID());
+            Division ratingDiv = division.addInteractiveDivision("add-rating", contextPath+"/add-rating", Division.METHOD_POST, "add-rating");
+            org.dspace.app.xmlui.wing.element.List form = ratingDiv.addList("submit-rating", org.dspace.app.xmlui.wing.element.List.TYPE_FORM);
+            form.setHead(message("xmlui.ArtifactBrowser.ItemViewer.addrating"));
+
+            // Plain old select list.
+            Select select = form.addItem().addSelect("rating","submit-select");
+            select.setRequired();
+            for (int i = 1; i <= 5; i++) {
+
+                select.addOption(i, Integer.toString(i));
+            }
+
+            if (rating != -1) {
+                select.setOptionSelected(rating);
+            }
+
+            form.addItem().addHidden("userid").setValue(currentUser.getID());
+            form.addItem().addHidden("itemid").setValue(item.getID());
+            form.addItem().addButton("submit").setValue("Submit");
+
+            //Print out recommendations
+            Division recDiv = division.addDivision("recommendations");
+            recDiv.setHead(message("xmlui.ArtifactBrowser.ItemViewer.recommendations"));
+            org.dspace.app.xmlui.wing.element.List recList = recDiv.addList("recommendations-list");
+            Recommender recommender = new Recommender();
+            List<RecommendedItem> recommendations = recommender.getRecommendations(item.getID(), 2);
+
+            if (recommendations != null) {
+                for (RecommendedItem recommendation : recommendations) {
+                    Item recommendedItem = Item.find(context, (int) recommendation.getItemID());
+                    String itemUrl = contextPath + "/handle/" + recommendedItem.getHandle();
+                    recList.addItem().addXref(itemUrl, recommendedItem.getName());
+
+                }
+            }
+
         }
 
         // Reference the actual Item
