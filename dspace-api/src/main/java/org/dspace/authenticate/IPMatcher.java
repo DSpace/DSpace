@@ -281,7 +281,11 @@ public class IPMatcher
             }
             catch (UnknownHostException e)
             {
-                throw new IPMatcherException("Malformed IPv6 address ",e);
+                throw new IPMatcherException("Malformed IPv6 address: " + ipIn,e);
+            }
+            catch (IllegalArgumentException ia)
+            {
+                throw new IPMatcherException("Very Malformed IPv6 address: " + ipIn , ia);
             }
 
         for (int i = 0; i < netmask.length; i++)
