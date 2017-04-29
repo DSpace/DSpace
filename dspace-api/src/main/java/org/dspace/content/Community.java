@@ -140,7 +140,9 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Collection> getCollections()
     {
-        return collections;
+        List<Collection> sortedCollections = new ArrayList<Collection>(collections);
+        Collections.sort(sortedCollections, new CollectionNameComparator());
+        return sortedCollections;
     }
 
     void addCollection(Collection collection)
@@ -162,7 +164,9 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Community> getSubcommunities()
     {
-        return subCommunities;
+        List<Community> sortedSubCommunities = new ArrayList<Community>(subCommunities);
+        Collections.sort(sortedSubCommunities, new CommunityNameComparator());
+        return sortedSubCommunities;
     }
 
     /**
@@ -173,7 +177,9 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Community> getParentCommunities()
     {
-        return parentCommunities;
+        List<Community> sortedParentCommunities = new ArrayList<Community>(parentCommunities);
+        Collections.sort(sortedParentCommunities, new CommunityNameComparator());
+        return sortedParentCommunities;
     }
 
     void addParentCommunity(Community parentCommunity) {
