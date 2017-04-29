@@ -4,9 +4,14 @@
 # Parameters: {0} is the details of the new collections and items
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace Subscription
-New items are available in the collections you have subscribed to:
+Subject: Assinatura de coleção no Deposita
+Novos itens estão disponíveis na coleção que você assinou:
 
 {0}
 
-DSpace
+Deposita - Repositório Comum do Brasil
+deposita@ibict.br
++55 61 3217-6449
+
+Instituto Brasileiro de Informação em Ciência e Tencologia (IBICT)
+Ministério da Ciência, Tecnologia e Inovação (MCTI)
