@@ -944,7 +944,7 @@ public abstract class DSpaceObject
                 // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so use a runtime exception
                 if (authorityRequired && (dcv.authority == null || dcv.authority.length() == 0))
                 {
-                    throw new IllegalArgumentException("The metadata field \"" + fieldName + "\" requires an authority key but none was provided. Vaue=\"" + dcv.value + "\"");
+                    throw new IllegalArgumentException("The metadata field \"" + fieldName + "\" requires an authority key but none was provided. Value=\"" + dcv.value + "\"");
                 }
             }
             if (values[i] != null)
