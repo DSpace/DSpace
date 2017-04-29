@@ -37,10 +37,17 @@ public class DSpaceAuthorizationFilter extends DSpaceFilter
         List<Object> params = new ArrayList<Object>();
         return new DatabaseFilterResult("EXISTS (SELECT p.action_id FROM "
                 + "resourcepolicy p, " + "bundle2bitstream b, " + "bundle bu, "
+                + "metadatavalue bumv, "
                 + "item2bundle ib " + "WHERE " + "p.resource_type_id=0 AND "
                 + "p.resource_id=b.bitstream_id AND "
                 + "p.epersongroup_id=0 AND " + "b.bundle_id=ib.bundle_id AND "
-                + "bu.bundle_id=b.bundle_id AND " + "bu.name='ORIGINAL' AND "
+                + "bu.bundle_id=b.bundle_id AND "
+                + "bumv.resource_id=bu.bundle_id AND bumv.resource_type_id=" + Constants.BUNDLE
+                + " AND bumv.metadata_field_id="
+                + "(SELECT metadata_field_id FROM metadatafieldregistry WHERE "
+                + "metadata_schema_id=(SELECT metadata_schema_id FROM metadataschemaregistry WHERE short_id='dc') AND "
+                + "element = 'title' AND qualifier IS NULL) AND "
+                + "bumv.text_value='ORIGINAL' AND "
                 + "ib.item_id=i.item_id)", params);
     }
 

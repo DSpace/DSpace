@@ -80,21 +80,18 @@ public class DSpaceItemDatabaseRepository extends DSpaceItemRepository
     private List<ReferenceSet> getSets(org.dspace.content.Item item)
     {
         List<ReferenceSet> sets = new ArrayList<ReferenceSet>();
-        List<Community> coms = new ArrayList<Community>();
         try
         {
             Collection[] itemCollections = item.getCollections();
+            // For the parity with XOAI#index(): add the communities first and
+            // then the collections.
+            for (Community com : collectionsService.flatParentCommunities(item)) {
+                ReferenceSet s = new DSpaceSet(com);
+                sets.add(s);
+            }
             for (Collection col : itemCollections)
             {
                 ReferenceSet s = new DSpaceSet(col);
-                sets.add(s);
-                for (Community com : collectionsService.flatParentCommunities(col))
-                    if (!coms.contains(com))
-                        coms.add(com);
-            }
-            for (Community com : coms)
-            {
-                ReferenceSet s = new DSpaceSet(com);
                 sets.add(s);
             }
         }
