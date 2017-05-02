@@ -374,6 +374,7 @@ https://wiki.duraspace.org/display/DSPACE/Code+Contribution+Guidelines
         * SLF4J API Module (org.slf4j:slf4j-api:1.6.1 - http://www.slf4j.org)
         * SLF4J JDK14 Binding (org.slf4j:slf4j-jdk14:1.6.1 - http://www.slf4j.org)
         * SLF4J LOG4J-12 Binding (org.slf4j:slf4j-log4j12:1.6.1 - http://www.slf4j.org)
+        * Cookie Consent by Insites (https://cookieconsent.insites.com/documentation/license/)
 
     Mozilla Public License:
 
