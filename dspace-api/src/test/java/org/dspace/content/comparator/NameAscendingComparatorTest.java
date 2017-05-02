@@ -61,7 +61,7 @@ public class NameAscendingComparatorTest {
 
     @Test
     public void testCompareSecondNull() throws Exception {
-        when(dso2.getName()).thenReturn("b");
+        when(dso1.getName()).thenReturn("a");
 
         assertTrue(comparator.compare(dso1, null) > 0);
     }
@@ -75,6 +75,22 @@ public class NameAscendingComparatorTest {
     public void testCompareNameNull() throws Exception {
         when(dso1.getName()).thenReturn(null);
         when(dso2.getName()).thenReturn("b");
+
+        assertTrue(comparator.compare(dso1, dso2) < 0);
+    }
+
+    @Test
+    public void testCompareCaseInsensitive() throws Exception {
+        when(dso1.getName()).thenReturn("a");
+        when(dso2.getName()).thenReturn("B");
+
+        assertTrue(comparator.compare(dso1, dso2) < 0);
+    }
+
+    @Test
+    public void testCompareCaseTrimmed() throws Exception {
+        when(dso1.getName()).thenReturn("a");
+        when(dso2.getName()).thenReturn(" b ");
 
         assertTrue(comparator.compare(dso1, dso2) < 0);
     }
