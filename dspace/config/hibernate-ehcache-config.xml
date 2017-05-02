@@ -330,7 +330,7 @@
     <!-- The number of groups in a repository can be very big, but only a small percentage of them is used
          very frequently. So it makes sense to cache Group records because the cache hit rate is likely to be high -->
     <cache name="org.dspace.eperson.Group"
-           maxElementsInMemory="3000" eternal="false" timeToIdleSeconds="1800"
+           maxElementsInMemory="5000" eternal="false" timeToIdleSeconds="1800"
            timeToLiveSeconds="3600" overflowToDisk="false"
            memoryStoreEvictionPolicy="LRU"/>
 
