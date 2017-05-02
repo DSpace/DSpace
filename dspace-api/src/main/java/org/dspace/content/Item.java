@@ -226,7 +226,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /**
-     * Get the collections this item is in. The order is indeterminate.
+     * Get the collections this item is in. The order is sorted ascending by collection name.
      *
      * @return the collections this item is in, if any.
      */

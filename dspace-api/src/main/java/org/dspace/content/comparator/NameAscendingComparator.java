@@ -7,7 +7,7 @@
  */
 package org.dspace.content.comparator;
 
-import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.DSpaceObject;
 
 import java.util.Comparator;
@@ -23,7 +23,9 @@ public class NameAscendingComparator implements Comparator<DSpaceObject>{
         }else if (dso2 == null){
             return 1;
         }else {
-            return ObjectUtils.compare(dso1.getName(),dso2.getName());
+            String name1 = StringUtils.trimToEmpty(dso1.getName());
+            String name2 = StringUtils.trimToEmpty(dso2.getName());
+            return name1.compareToIgnoreCase(name2);
         }
     }
 }
