@@ -9,8 +9,7 @@ package org.dspace.core;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.*;
-import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -18,7 +17,6 @@ import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
-import org.dspace.handle.Handle;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
@@ -692,8 +690,11 @@ public class Context
             log.warn("Unable to set database connection mode", ex);
         }
 
+        //clear our read-only cache to prevent any inconsistencies
+        readOnlyCache.clear();
+
         //save the new mode
-        this.mode = newMode;
+        mode = newMode;
     }
 
     /**
