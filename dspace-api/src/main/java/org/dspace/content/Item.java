@@ -7,6 +7,7 @@
  */
 package org.dspace.content;
 
+import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
@@ -16,6 +17,7 @@ import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -224,12 +226,13 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     /**
-     * Get the collections this item is in. The order is indeterminate.
+     * Get the collections this item is in. The order is sorted ascending by collection name.
      *
      * @return the collections this item is in, if any.
      */
     public List<Collection> getCollections()
     {
+        Collections.sort(collections, new NameAscendingComparator());
         return collections;
     }
 
