@@ -35,7 +35,7 @@
 		<org.hibernate.version>4.2.21.Final</org.hibernate.version>
 		<org.hibernate.ehcache.version>4.2.21.Final</org.hibernate.ehcache.version>
 		<org.hibernate.entitymanager.version>4.2.21.Final</org.hibernate.entitymanager.version>
-		<org.hibernate.annotations.version>4.0.1.Final</org.hibernate.annotations.version>
+		<org.hibernate.annotations.version>4.0.2.Final</org.hibernate.annotations.version>
 		<org.hibernate.jpa.version>1.0.1.Final</org.hibernate.jpa.version>
 		
 		<org.jdyna.version>5.8-SNAPSHOT</org.jdyna.version>		
