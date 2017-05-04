@@ -307,8 +307,35 @@ public class ContextTest extends AbstractUnitTest
         assertThat("testIsReadOnly 0", context.isReadOnly(), equalTo(false));
         
         // Create a new read-only context
-        Context instance = new Context(Context.READ_ONLY);
+        Context instance = new Context(Context.Mode.READ_ONLY);
         assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
+
+        //When in read-only, we only support abort().
+        instance.abort();
+
+        // Cleanup our context
+        cleanupContext(instance);
+    }
+
+    /**
+     * Test that commit cannot be called when the context is in read-only mode
+     */
+    @Test
+    public void testIsReadOnlyCommit() throws SQLException
+    {
+        // Create a new read-only context
+        Context instance = new Context(Context.Mode.READ_ONLY);
+        assertThat("testIsReadOnly 1", instance.isReadOnly(), equalTo(true));
+
+        try {
+            //When in read-only, calling commit() should result in an error
+            instance.commit();
+            fail();
+        } catch (Exception ex) {
+            assertTrue(ex instanceof UnsupportedOperationException);
+        }
+
+        instance.abort();
 
         // Cleanup our context
         cleanupContext(instance);

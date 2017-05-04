@@ -37,6 +37,8 @@ import java.util.*;
  */
 @Entity
 @Table(name="collection")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport
 {
 
