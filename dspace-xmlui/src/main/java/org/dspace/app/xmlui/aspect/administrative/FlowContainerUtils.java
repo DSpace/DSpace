@@ -339,8 +339,8 @@ public class FlowContainerUtils
 	 */
 	public static FlowResult processReimportCollection(Context context, UUID collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException, BrowseException
 	{
-		boolean originalMode = context.isBatchModeEnabled();
-		context.enableBatchMode(true);
+		Context.Mode originalMode = context.getCurrentMode();
+		context.setMode(Context.Mode.BATCH_EDIT);
 
 		Collection collection = collectionService.find(context, collectionID);
 		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
@@ -362,7 +362,7 @@ public class FlowContainerUtils
         // update the context?
 		//context.dispatchEvent() // not sure if this is required yet.ts();
 
-		context.enableBatchMode(originalMode);
+		context.setMode(originalMode);
 
 		return processRunCollectionHarvest(context, collectionID, request);
 	}

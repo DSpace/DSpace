@@ -25,6 +25,7 @@ import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
+import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -111,6 +112,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             SQLException, IOException, AuthorizeException {
+
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
 
         Request request = ObjectModelHelper.getRequest(objectModel);
         String queryString = getQuery();
@@ -231,6 +235,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             throw new UIException(e.getMessage(), e);
         }
 
+        context.setMode(originalMode);
     }
 
     protected void addFilterRow(java.util.List<DiscoverySearchFilter> filterFields, int index, Row row, String selectedFilterType, String relationalOperator, String value) throws WingException {
