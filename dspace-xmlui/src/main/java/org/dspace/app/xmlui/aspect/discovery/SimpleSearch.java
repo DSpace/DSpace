@@ -23,6 +23,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
+import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueFinder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -246,11 +247,13 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
 
 
-        if (StringUtils.equals(relationalOperator, "authority") && StringUtils.isNotBlank(value)) {
+        if (StringUtils.equals(relationalOperator, "authority") && StringUtils.isNotBlank(value) ) {
             //print the display value
-            row.addCell("", Cell.ROLE_DATA, "discovery-filter-display-value-cell").addText("filter_" + index, "discovery-filter-display-value").setValue(new AuthorityValueFinder().findByUID(context, value).getValue());
+            AuthorityValue authorityValue = new AuthorityValueFinder().findByUID(context, value);
+            if (authorityValue != null) {
+                row.addCell("", Cell.ROLE_DATA, "discovery-filter-display-value-cell").addText("filter_" + index, "discovery-filter-display-value").setValue(authorityValue.getValue());
+            }
         }
-
         //Add a box so we can search for our value
         row.addCell("", Cell.ROLE_DATA, "discovery-filter-input-cell").addText("filter_" + index, "discovery-filter-input").setValue(value == null ? "" : value);
 
