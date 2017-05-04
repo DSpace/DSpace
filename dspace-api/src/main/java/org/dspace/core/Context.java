@@ -690,8 +690,11 @@ public class Context
             log.warn("Unable to set database connection mode", ex);
         }
 
-        //clear our read-only cache to prevent any inconsistencies
-        readOnlyCache.clear();
+        //Always clear the cache, except when going from READ_ONLY to READ_ONLY
+        if(mode != Mode.READ_ONLY || newMode != Mode.READ_ONLY) {
+            //clear our read-only cache to prevent any inconsistencies
+            readOnlyCache.clear();
+        }
 
         //save the new mode
         mode = newMode;
