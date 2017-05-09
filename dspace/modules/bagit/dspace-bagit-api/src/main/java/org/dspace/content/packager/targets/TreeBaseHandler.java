@@ -10,19 +10,21 @@ import java.util.Locale;
 import org.apache.log4j.Logger;
 
 import javax.mail.MessagingException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.dspace.content.packager.BagItDisseminatorException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.WebResource.Builder;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.MultiPart;
+import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.glassfish.jersey.media.multipart.BodyPart;
+import org.glassfish.jersey.media.multipart.MultiPart;
 
 public class TreeBaseHandler implements RemoteRepoHandler {
 
@@ -52,8 +54,10 @@ public class TreeBaseHandler implements RemoteRepoHandler {
 					+ " to TreeBASE service at " + url);
 		}
 
-		Client c = Client.create();
-		WebResource service = c.resource(url);
+//		Client c = Client.create();
+//		WebResource service = c.resource(url);
+		Client client = JerseyClientBuilder.newClient();
+		WebTarget target = client.target(url).path("myresource/{param}");
 
 		try {
 			ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
@@ -71,16 +75,17 @@ public class TreeBaseHandler implements RemoteRepoHandler {
 			multiPart.bodyPart(new BodyPart(byteStream.toByteArray(),
 					MediaType.APPLICATION_OCTET_STREAM_TYPE));
 
-			WebResource webResource = service.path(SERVICE_PATH);
-			Builder builder = webResource.type(CONTENT_TYPE);
-			ClientResponse response = (ClientResponse) builder.put(
-					ClientResponse.class, multiPart);
+//			WebResource webResource = service.path(SERVICE_PATH);
+//			Builder builder = webResource.type(CONTENT_TYPE);
+//			ClientResponse response = (ClientResponse) builder.put(ClientResponse.class, multiPart);
+			WebTarget webTarget = target.path(SERVICE_PATH);
+			Response response = webTarget.request().put(Entity.entity(multiPart, multiPart.getMediaType()));
 
 			switch (response.getStatus()) {
 			case 200:
 			case 201:
 			case 202:
-				String treebaseURL = response.getEntity(String.class);
+				String treebaseURL = response.getEntity().toString();
 
 				if (LOGGER.isInfoEnabled()) {
 					LOGGER.info("TreeBASE reponded with: " + treebaseURL);

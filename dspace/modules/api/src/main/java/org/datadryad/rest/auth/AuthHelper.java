@@ -7,6 +7,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.datadryad.rest.models.OAuthToken;
+import org.datadryad.rest.storage.AuthorizationStorageInterface;
+import org.datadryad.rest.storage.OAuthTokenStorageInterface;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.rdbms.AuthorizationDatabaseStorageImpl;
 import org.datadryad.rest.storage.rdbms.OAuthTokenDatabaseStorageImpl;
@@ -19,14 +21,15 @@ import org.dspace.eperson.EPerson;
  */
 public class AuthHelper {
     private static final Logger log = Logger.getLogger(AuthHelper.class);
-    private final OAuthTokenDatabaseStorageImpl tokenStorage;
-    private final AuthorizationDatabaseStorageImpl authzStorage;
-    public AuthHelper(OAuthTokenDatabaseStorageImpl tokenStorage, AuthorizationDatabaseStorageImpl authzStorage) {
+    private final OAuthTokenStorageInterface tokenStorage;
+    private final AuthorizationStorageInterface authzStorage;
+
+    public AuthHelper(OAuthTokenStorageInterface tokenStorage, AuthorizationStorageInterface authzStorage) {
         this.tokenStorage = tokenStorage;
         this.authzStorage = authzStorage;
     }
 
-    static EPerson getEPerson(Integer id) throws SQLException {
+    public static EPerson getEPerson(Integer id) throws SQLException {
         if(id == OAuthToken.INVALID_PERSON_ID) {
             return null;
         }
@@ -36,7 +39,7 @@ public class AuthHelper {
         return eperson;
     }
 
-    Integer getEPersonIdFromToken(String accessToken) {
+    public Integer getEPersonIdFromToken(String accessToken) {
         try {
             OAuthToken oAuthToken = tokenStorage.getToken(accessToken);
             if(oAuthToken == null || !oAuthToken.isValid()) {
@@ -53,7 +56,7 @@ public class AuthHelper {
     }
 
 
-    EPersonUserPrincipal getPrincipalFromToken(String accessToken) {
+    public EPersonUserPrincipal getPrincipalFromToken(String accessToken) {
         EPersonUserPrincipal principal = null;
         if(accessToken == null) {
             return null;
@@ -70,7 +73,7 @@ public class AuthHelper {
         return principal;
     }
 
-    static void throwExceptionResponse(Throwable throwable, Response.Status status, String responseString) throws WebApplicationException {
+    public static void throwExceptionResponse(Throwable throwable, Response.Status status, String responseString) throws WebApplicationException {
         Response.ResponseBuilder builder;
         builder = Response.status(status).entity(responseString);
         if(throwable == null) {
@@ -80,14 +83,8 @@ public class AuthHelper {
         }
     }
 
-    Boolean isAuthorized(AuthorizationTuple tuple) {
+    public Boolean isAuthorized(AuthorizationTuple tuple) {
         if(tuple == null) {
-            return Boolean.FALSE;
-        }
-        if(!tuple.isComplete()) {
-            return Boolean.FALSE;
-        }
-        if(tuple.ePersonId == OAuthToken.INVALID_PERSON_ID) {
             return Boolean.FALSE;
         }
         try {

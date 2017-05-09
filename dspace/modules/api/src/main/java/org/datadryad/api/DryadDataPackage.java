@@ -8,16 +8,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.rest.models.Author;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -75,6 +71,10 @@ public class DryadDataPackage extends DryadObject {
 
     private static final String KEYWORD_SCHEMA = "dc";
     private static final String KEYWORD_ELEMENT = "subject";
+
+    private static final String AUTHOR_SCHEMA = "dc";
+    private static final String AUTHOR_ELEMENT = "contributor";
+    private static final String AUTHOR_QUALIFIER = "author";
 
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
@@ -528,7 +528,18 @@ public class DryadDataPackage extends DryadObject {
     public void setKeywords(List<String> keywords) throws SQLException {
         addMultipleMetadataValues(Boolean.TRUE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
+
     public void addKeywords(List<String> keywords) throws SQLException {
         addMultipleMetadataValues(Boolean.FALSE, KEYWORD_SCHEMA, KEYWORD_ELEMENT, null, keywords);
     }
+
+    public List<Author> getAuthors() throws SQLException {
+        ArrayList<Author> authors = new ArrayList<Author>();
+        DCValue[] metadata = item.getMetadata(AUTHOR_SCHEMA, AUTHOR_ELEMENT, AUTHOR_QUALIFIER, Item.ANY);
+        for(DCValue dcValue : metadata) {
+            authors.add(new Author(dcValue));
+        }
+        return authors;
+    }
+
 }

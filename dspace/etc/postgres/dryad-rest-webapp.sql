@@ -70,3 +70,10 @@ from journal_code_view
   inner join journal_name_view on journal_name_view.organization_id = journal_code_view.organization_id
   left join journal_issn_view on journal_issn_view.organization_id = journal_code_view.organization_id
 ;
+
+CREATE or replace VIEW journal AS
+SELECT journal_issn_view.organization_id as concept_id, code, name, issn
+from journal_issn_view
+  inner join journal_name_view on journal_issn_view.organization_id = journal_name_view.organization_id
+  inner join journal_code_view on journal_issn_view.organization_id = journal_code_view.organization_id
+;

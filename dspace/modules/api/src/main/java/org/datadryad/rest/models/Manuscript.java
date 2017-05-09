@@ -37,7 +37,6 @@ import org.dspace.content.authority.Choices;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Manuscript {
     // article-specific data:
-    public static final String MANUSCRIPT_ID = "manuscriptId";
     public static final String JOURNAL_CODE = "Journal_Code";
     public static final String JOURNAL = "Journal";
     public static final String ABSTRACT = "Abstract";
@@ -129,6 +128,8 @@ public class Manuscript {
     private String dataReviewURL = "";
     private String dataAvailabilityStatement = "";
     public Map<String, String> optionalProperties = new LinkedHashMap<String, String>();
+    @JsonIgnore
+    private Integer internalID = 0;
 
     // indicates whether the metadata for this publication was obtained directly from the journal
     @JsonIgnore
@@ -243,6 +244,14 @@ public class Manuscript {
             manuscriptId = "";
         }
         return manuscriptId;
+    }
+
+    public void setInternalID(Integer internalID) {
+        this.internalID = internalID;
+    }
+
+    public Integer getInternalID() {
+        return this.internalID;
     }
 
     public void setManuscriptId(String manuscriptId) {

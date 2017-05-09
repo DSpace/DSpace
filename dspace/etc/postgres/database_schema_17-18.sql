@@ -81,3 +81,20 @@ WHERE item_p.in_archive   = true
   AND mdv_pub.text_value  = $1                                                      -- journal name
 $$ LANGUAGE sql;
 
+--
+-- Query to return a list of item ids for archived data packages for a given journal.
+-- $1: journal name; $2: limit
+-- eg: EXECUTE ArchivedPackageDataFileItemIdsByJournal('Evolution');
+--
+CREATE OR REPLACE FUNCTION ArchivedPackagesForJournal (publicationName text, pubNameFieldID int, dateAccFieldID int) RETURNS table (item_id int, mdv_date text) AS $$
+SELECT item_p.item_id, mdv_date.text_value
+ FROM item item_p
+ JOIN metadatavalue          mdv_pub   ON item_p.item_id               = mdv_pub.item_id
+ JOIN metadatavalue          mdv_date  ON item_p.item_id               = mdv_date.item_id
+WHERE item_p.in_archive   = true
+  AND item_p.owning_collection = 2
+  AND mdv_pub.text_value  = $1
+  AND mdv_pub.metadata_field_id = $2
+  AND mdv_date.metadata_field_id = $3
+ORDER BY item_p.item_id ASC
+$$ LANGUAGE sql;

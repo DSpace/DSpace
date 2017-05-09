@@ -78,7 +78,7 @@ public class JournalDatabaseStorageImplTest extends ContextUnitTest {
 //        Journal journal = instance.readObject(path);
 //        assertNull("Object must not exist before creating", journal);
 //        journal = new Journal();
-//        journal.journalCode = TEST_JOURNAL_CODE_2;
+//        journal.journalRef = TEST_JOURNAL_CODE_2;
 //        journal.fullName = TEST_JOURNAL_NAME_2;
 //        path = new StoragePath();
 //        instance.createObject(path, journal);
@@ -97,7 +97,7 @@ public class JournalDatabaseStorageImplTest extends ContextUnitTest {
 //        instance.updateObject(path, journal);
 //        journal = instance.readObject(path);
 //        assertEquals("Updated object should have updated name", TEST_JOURNAL_NAME_2, journal.fullName);
-//        assertEquals("Updated object should have original code", TEST_JOURNAL_CODE_1, journal.journalCode);
+//        assertEquals("Updated object should have original code", TEST_JOURNAL_CODE_1, journal.journalRef);
     }
 
     /**
@@ -126,7 +126,7 @@ public class JournalDatabaseStorageImplTest extends ContextUnitTest {
 //        JournalDatabaseStorageImpl instance = new JournalDatabaseStorageImpl();
 //        instance.deleteObject(path);
 //        Journal dummyJournal = new Journal();
-//        dummyJournal.journalCode = TEST_JOURNAL_CODE_1;
+//        dummyJournal.journalRef = TEST_JOURNAL_CODE_1;
 //        Boolean exists = instance.objectExists(path, dummyJournal);
 //        assertFalse("Deleted object should not exist", exists);
     }

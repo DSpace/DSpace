@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.content.DCValue;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import java.lang.String;
 import java.text.Normalizer;
@@ -30,13 +32,31 @@ public class Author {
         setGivenNames(givenNames);
     }
 
+    public Author(DCValue authorMetadata) {
+        this(authorMetadata.value);
+        if (authorMetadata.authority != null) {
+            Matcher orcidpattern = Pattern.compile("orcid:(.+)$").matcher(authorMetadata.authority);
+            if (orcidpattern.find()) {
+                setIdentifier(orcidpattern.group(1));
+                setIdentifierType("ORCID");
+            }
+        }
+    }
+
     public Author(String authorString) {
         // initialize to empty strings, in case there isn't actually anything in the authorString.
         setGivenNames("");
         setFamilyName("");
-        String suffix = "";
 
         if (authorString != null) {
+            setFullName(authorString);
+        }
+        return;
+    }
+
+    public void setFullName(String authorString) {
+        if ("".equals(familyName) || "".equals(givenNames)) {
+            String suffix = "";
             authorString = StringUtils.stripToEmpty(authorString);
             // Remove any leading title, like Dr.
             authorString = authorString.replaceAll("^[D|M]+rs*\\.*\\s*","");

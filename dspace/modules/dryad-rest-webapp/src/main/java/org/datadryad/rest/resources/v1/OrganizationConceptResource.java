@@ -3,14 +3,14 @@
 package org.datadryad.rest.resources.v1;
 
 import org.datadryad.api.DryadJournalConcept;
-import org.datadryad.rest.models.Journal;
 import org.datadryad.rest.responses.ErrorsResponse;
 import org.datadryad.rest.responses.ResponseFactory;
-import org.datadryad.rest.storage.AbstractJournalStorage;
+import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.dspace.JournalUtils;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -25,9 +25,8 @@ import java.util.List;
  */
 
 @Path("organizations")
-public class JournalResource {
-    @Context
-    AbstractJournalStorage journalStorage;
+public class OrganizationConceptResource {
+    @Inject AbstractOrganizationConceptStorage journalStorage;
     @Context UriInfo uriInfo;
     @Context HttpServletRequest request;
 
@@ -56,15 +55,15 @@ public class JournalResource {
         }
     }
 
-    @Path("/{journalCode}")
+    @Path("/{journalRef}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getJournal(@PathParam(Journal.JOURNAL_CODE) String journalCode) {
-        StoragePath path = StoragePath.createJournalPath(journalCode);
+    public Response getJournal(@PathParam(StoragePath.JOURNAL_PATH) String journalRef) {
+        StoragePath path = StoragePath.createJournalPath(journalRef);
         try {
             DryadJournalConcept journalConcept = journalStorage.findByPath(path);
             if (journalConcept == null) {
-                ErrorsResponse error = ResponseFactory.makeError("Journal with code " + journalCode + " does not exist", "Journal not found", uriInfo, Status.NOT_FOUND.getStatusCode());
+                ErrorsResponse error = ResponseFactory.makeError("Journal with code " + journalRef + " does not exist", "Journal not found", uriInfo, Status.NOT_FOUND.getStatusCode());
                 return Response.status(Status.NOT_FOUND).entity(error).build();
             } else {
                 return Response.ok(journalConcept).build();
@@ -95,7 +94,6 @@ public class JournalResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createJournal(DryadJournalConcept[] journalConcepts) {
-        Response response = null;
         ArrayList<DryadJournalConcept> concepts = new ArrayList<DryadJournalConcept>();
         DryadJournalConcept storedJournalConcept = null;
         for (int i=0; i<journalConcepts.length; i++) {
@@ -134,7 +132,6 @@ public class JournalResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateJournal(DryadJournalConcept[] journalConcepts) {
-        Response response = null;
         ArrayList<DryadJournalConcept> concepts = new ArrayList<DryadJournalConcept>();
         DryadJournalConcept storedJournalConcept = null;
         for (int i=0; i<journalConcepts.length; i++) {
@@ -153,12 +150,12 @@ public class JournalResource {
         }
     }
 
-    @Path("/{journalCode}")
+    @Path("/{journalRef}")
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteJournal(@PathParam(Journal.JOURNAL_CODE) String journalCode) {
-        StoragePath path = StoragePath.createJournalPath(journalCode);
+    public Response deleteJournal(@PathParam(StoragePath.JOURNAL_PATH) String journalRef) {
+        StoragePath path = StoragePath.createJournalPath(journalRef);
         try {
             journalStorage.deleteByPath(path);
         } catch (StorageException ex) {
