@@ -53,8 +53,6 @@ public class Const {
     public enum QueryType { DOWNLOADS, DEPOSITS, SOLR_RESULTS };
 
     public static final Pattern issnPattern = Pattern.compile("\\d{4}-\\d{3}[\\dX]");
-    public static final String fmtDateView = "yyyy-MM-dd";
-    public static final String dcDateAccessioned = "dc.date.accessioned";
 
     // map query duration to string for use in DRI @id's
     public static final String solrQueryMonth = "month";
@@ -70,9 +68,6 @@ public class Const {
     // DryadJournal
     public static final String archivedDataFilesQuery    = "SELECT * FROM ArchivedPackageDataFileItemIdsByJournal(?)";
     public static final String archivedDataFilesQueryCol =               "archivedpackagedatafileitemidsbyjournal";
-
-    public static final String archivedDataPackageIds    = "SELECT * FROM ArchivedPackageItemIdsByJournal(?,?);";
-    public static final String archivedDataPackageIdsCol =               "archivedpackageitemidsbyjournal";
 
     public static final String archivedPackageCount      = "SELECT * FROM ArchivedPackageCountByJournal(?)";
     public static final String archivedPackageCountCol   =               "archivedpackagecountbyjournal";

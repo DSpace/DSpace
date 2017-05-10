@@ -68,8 +68,6 @@ public class JournalStats extends AbstractDSpaceTransformer
 
     private static final Message T_panel_head = message("xmlui.JournalLandingPage.JournalSearch.panel_head");
 
-    private final static SimpleDateFormat fmt = new SimpleDateFormat(Const.fmtDateView);
-
     protected static final int displayCount = ConfigurationManager.getIntProperty("landing-page.stats.item-count");
 
 
@@ -257,7 +255,7 @@ public class JournalStats extends AbstractDSpaceTransformer
             tablist.addItem(t.buttonLabel);
             if (t.queryType == QueryType.DEPOSITS) {
                 LinkedHashMap<Item, String> depositData =
-                        DryadJournalStats.getArchivedPackagesSortedRecent(context, journalName, fmt, displayCount);
+                        JournalUtils.getArchivedPackagesSortedRecent(context, journalName, displayCount);
                 addDepositTabData(statsOuter, t, depositData);
             } else if (t.queryType == QueryType.DOWNLOADS) {
                 addDownloadsMarkup(statsOuter, t);

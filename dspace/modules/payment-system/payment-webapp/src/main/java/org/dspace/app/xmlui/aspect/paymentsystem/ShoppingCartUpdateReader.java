@@ -99,14 +99,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         }
         String waiverMessage = "";
         String payername = paymentSystemService.getPayer(context,shoppingCart);
-        switch (paymentSystemService.getWaiver(context,shoppingCart))
-        {
-	case ShoppingCart.COUNTRY_WAIVER: waiverMessage = "Data Publishing Charge has been waived due to submitter's association with " + StringEscapeUtils.escapeJava(shoppingCart.getCountry()) + "."; break;
-	case ShoppingCart.JOUR_WAIVER: waiverMessage = "Your Data Publishing Charge is covered by " + shoppingCart.getJournal() + "."; break;
-	case ShoppingCart.VOUCHER_WAIVER: waiverMessage = "Voucher code applied to Data Publishing Charge."; break;
-	}
-
-
+        waiverMessage = paymentSystemService.getWaiverMessage(context, shoppingCart);
 
         String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"country\":\""+StringEscapeUtils.escapeJava(shoppingCart.getCountry())+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(result.getBytes("UTF-8"));

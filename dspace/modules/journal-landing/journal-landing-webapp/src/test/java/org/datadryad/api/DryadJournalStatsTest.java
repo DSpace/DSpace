@@ -7,6 +7,7 @@
  */
 package org.datadryad.api;
 
+import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.aspect.journal.landing.Const;
 import org.dspace.app.xmlui.aspect.journal.landing.JournalLandingBaseTest;
 import org.dspace.content.Item;
@@ -35,8 +36,6 @@ public class DryadJournalStatsTest extends JournalLandingBaseTest
 
     private static final String testJournalName = "Evolution";
     private static final String badJournalName = "noitulovE";
-
-    private final static SimpleDateFormat fmt = new SimpleDateFormat(Const.fmtDateView);
 
     @Before
     public void setUp() {
@@ -76,7 +75,7 @@ public class DryadJournalStatsTest extends JournalLandingBaseTest
 
     @Test
     public void testGetArchivedPackagesSortedRecent() throws Exception {
-        Map<Item, String> result = DryadJournalStats.getArchivedPackagesSortedRecent(context, testJournalName, fmt, 10);
+        Map<Item, String> result = JournalUtils.getArchivedPackagesSortedRecent(context, testJournalName, 10);
         assertEquals(result.size(), 2);
         String dda = result.entrySet().iterator().next().getValue();
         assertEquals(dda, "2015-02-25");
@@ -85,7 +84,7 @@ public class DryadJournalStatsTest extends JournalLandingBaseTest
     @Test
     public void testGetArchivedPackagesSortedRecentNoJournal() throws SQLException {
         SimpleDateFormat fmt = null;
-        Map<Item,String> result = DryadJournalStats.getArchivedPackagesSortedRecent(context, badJournalName, fmt, 10);
+        Map<Item,String> result = JournalUtils.getArchivedPackagesSortedRecent(context, badJournalName, 10);
         assertEquals(result.size(), 0);
     }
 }

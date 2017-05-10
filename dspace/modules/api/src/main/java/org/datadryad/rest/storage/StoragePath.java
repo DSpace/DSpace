@@ -5,14 +5,15 @@ package org.datadryad.rest.storage;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
-import org.datadryad.rest.models.Manuscript;
-import org.datadryad.rest.models.Journal;
 
 /**
  *
  * @author Dan Leehr <dan.leehr@nescent.org>
  */
 public class StoragePath extends ArrayList<StoragePathElement> {
+    public static final String JOURNAL_PATH = "journalRef";
+    public static final String MANUSCRIPT_PATH = "manuscript";
+
     public void addPathElement(String key, String value) {
         this.add(new StoragePathElement(key,value));
     }
@@ -42,44 +43,47 @@ public class StoragePath extends ArrayList<StoragePathElement> {
         return true;
     }
 
-    // Methods for accessing/creating StoragePaths for Manuscripts and Organizations
+    // Methods for accessing/creating StoragePaths for Manuscripts and Journals
 
-    public static StoragePath createJournalPath(String journalCode) {
+    public static StoragePath createJournalPath(String journalRef) {
         StoragePath path = new StoragePath();
-        path.addPathElement(Journal.JOURNAL_CODE, journalCode);
+        path.addPathElement(StoragePath.JOURNAL_PATH, journalRef);
         return path;
     }
 
-    public static StoragePath createManuscriptPath(String journalCode, String manuscriptId) {
+    public static StoragePath createManuscriptPath(String journalRef, String manuscriptId) {
         StoragePath path = new StoragePath();
-        path.addPathElement(Journal.JOURNAL_CODE, journalCode);
-        path.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
+        path.addPathElement(StoragePath.JOURNAL_PATH, journalRef);
+        path.addPathElement(StoragePath.MANUSCRIPT_PATH, manuscriptId);
         return path;
     }
 
-    public void setJournalCode(String journalCode) {
-        if (getJournalCode() == null) {   // can't add ManuscriptId to a path that doesn't have an journal
-            this.addPathElement(Journal.JOURNAL_CODE, journalCode);
+    public static StoragePath createPackagesPath(String journalRef) {
+        return createManuscriptPath(journalRef, "packages");
+    }
+
+    public void setJournalCode(String journalRef) {
+        if (getJournalRef() == null) {   // can't add ManuscriptId to a path that doesn't have an journal
+            this.addPathElement(StoragePath.JOURNAL_PATH, journalRef);
         } else {
-            this.set(0, new StoragePathElement(Journal.JOURNAL_CODE, journalCode));
+            this.set(0, new StoragePathElement(StoragePath.JOURNAL_PATH, journalRef));
         }
     }
 
     public void setManuscriptId(String manuscriptId) {
-        if (this.getJournalCode() == null) {   // can't add ManuscriptId to a path that doesn't have an journal
+        if (this.getJournalRef() == null) {   // can't add ManuscriptId to a path that doesn't have an journal
             return;
         }
         if (this.getManuscriptId() == null) {
-            this.addPathElement(Manuscript.MANUSCRIPT_ID, manuscriptId);
+            this.addPathElement(StoragePath.MANUSCRIPT_PATH, manuscriptId);
         } else {
-            this.set(1, new StoragePathElement(Manuscript.MANUSCRIPT_ID, manuscriptId));
+            this.set(1, new StoragePathElement(StoragePath.MANUSCRIPT_PATH, manuscriptId));
         }
     }
 
-    public String getJournalCode() {
+    public String getJournalRef() {
         if(this.size() >= 1) {
-            String journalCode = this.get(0).value;
-            return journalCode;
+            return this.get(0).value;
         } else {
             return null;
         }

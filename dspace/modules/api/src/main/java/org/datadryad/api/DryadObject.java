@@ -128,7 +128,7 @@ public abstract class DryadObject {
      * Return a set of related DryadObjects (packages or files) from the specified
      * collection. Since many metadata fields are package-only or file-only, this
      * allows us to easily get the related objects (or the object itself)
-     * @param c a DSpace collection, e.g. Dryad Data Files or Dryad Data Packages
+     * @param collection a DSpace collection, e.g. Dryad Data Files or Dryad Data Packages
      * @return a set of objects, related to this object, and in the specified collection
      */
     public Set<DryadObject> getRelatedObjectsInCollection(Context context, Collection collection) throws SQLException {
@@ -260,5 +260,9 @@ public abstract class DryadObject {
         } catch (AuthorizeException ex) {
             log.error("Authorize exception setting " + schema + "." + element + "." + qualifier, ex);
         }
+    }
+
+    public String getDryadDOI() {
+        return DOIIdentifierProvider.getDoiValue(item);
     }
 }

@@ -99,33 +99,6 @@ public class DryadJournalStats {
     }
 
     /**
-     * Return a sorted map of archived data packages (Item objects) for the journal
-     * associated with this object. The data packages are sorted according to 
-     * date-accessioned, with most recently accessioned package first.
-     * @param max total number of items to return
-     * @return List<org.dspace.content.Item> data packages
-     * @throws SQLException 
-     */
-    public static LinkedHashMap<Item,String> getArchivedPackagesSortedRecent(Context context, String journalName, SimpleDateFormat fmt, int max)
-        throws SQLException
-    {
-        LinkedHashMap<Item,String> dataPackages = new LinkedHashMap<Item,String>(max);
-        try {
-            TableRowIterator tri = DatabaseManager.query(context, Const.archivedDataPackageIds, journalName, max);
-            while (tri.hasNext() && dataPackages.size() < max) {
-                int itemId = tri.next().getIntColumn(Const.archivedDataPackageIdsCol);
-                Item dso = Item.find(context, itemId);
-                DCValue[] dateAccessioned = dso.getMetadata(Const.dcDateAccessioned);
-                String dateStr = fmt.format(fmt.parse(dateAccessioned[0].value));
-                dataPackages.put(dso, dateStr);
-            }
-        } catch (Exception e)  {
-            throw new SQLException(e.getMessage());
-        }
-        return dataPackages;
-    }
-
-    /**
      * Return ordered map of Item to download count.
      * @param context
      * @param items

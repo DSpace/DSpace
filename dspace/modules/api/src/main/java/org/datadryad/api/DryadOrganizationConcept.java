@@ -22,9 +22,6 @@ import java.util.Set;
 
 import org.dspace.authorize.AuthorizeException;
 
-import static org.datadryad.api.DryadJournalConcept.PAYMENT_PLAN;
-import static org.datadryad.api.DryadJournalConcept.WEBSITE;
-
 /**
  *
  * @author Daisie Huang <daisieh@datadryad.org>
@@ -36,6 +33,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     public static final String CUSTOMER_ID = "customerID";
     public static final String DESCRIPTION = "description";
     public static final String WEBSITE = "website";
+    public static final String PAYMENT_PLAN = "paymentPlanType";
 
     public static final String SUBSCRIPTION_PLAN = "SUBSCRIPTION";
     public static final String PREPAID_PLAN = "PREPAID";
