@@ -511,7 +511,7 @@ public class StatisticsDataVisits extends StatisticsData
                         {
                             break;
                         }
-                        return value;
+                        return bit.getName();
                     case Constants.ITEM:
                         Item item = itemService.findByIdOrLegacyId(context, dsoId);
                         if(item == null)
