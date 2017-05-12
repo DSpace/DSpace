@@ -12,7 +12,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class StoragePath extends ArrayList<StoragePathElement> {
     public static final String JOURNAL_PATH = "journalRef";
-    public static final String MANUSCRIPT_PATH = "manuscript";
+    public static final String MANUSCRIPT_PATH = "manuscriptId";
 
     public void addPathElement(String key, String value) {
         this.add(new StoragePathElement(key,value));
