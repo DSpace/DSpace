@@ -76,15 +76,6 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
         return null;
     }
 
-    public static DryadJournalConcept getJournalConceptByConceptID(Context context, int conceptID) throws SQLException {
-        String query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE " + COLUMN_ID + " = ?";
-        TableRow row = DatabaseManager.querySingleTable(context, JOURNAL_TABLE, query, conceptID);
-        if (row != null) {
-            return DryadJournalConcept.getJournalConceptMatchingConceptID(context, row.getIntColumn(COLUMN_ID));
-        }
-        return null;
-    }
-
     @Override
     public Boolean objectExists(StoragePath path, DryadJournalConcept journalConcept) {
         String name = journalConcept.getFullName();
@@ -123,7 +114,7 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
             resultSet = new ResultSet(conceptIDs, limit, cursor);
 
             for (Integer conceptID : resultSet.getCurrentSet(cursor)) {
-                journalConcepts.add(getJournalConceptByConceptID(context, conceptID));
+                journalConcepts.add(DryadJournalConcept.getJournalConceptMatchingConceptID(context, conceptID));
             }
             completeContext(context);
         } catch (SQLException ex) {
