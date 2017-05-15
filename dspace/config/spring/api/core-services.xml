@@ -96,6 +96,8 @@
     <bean id="elasticSearchLoggerService" class="org.dspace.statistics.ElasticSearchLoggerServiceImpl" lazy-init="true"/>
     <bean id="solrLoggerService" class="org.dspace.statistics.SolrLoggerServiceImpl" lazy-init="true"/>
 
+    <bean id="spiderDetectorService" class="org.dspace.statistics.util.SpiderDetectorServiceImpl"/>
+
     <bean class="org.dspace.versioning.VersionHistoryServiceImpl"/>
 
     <!--Basic workflow services, comment or remove when switching to the configurable workflow -->
