@@ -97,7 +97,7 @@ public class ChecksumHistoryDAOImplTest
         qry.setInteger("id", checkId);
         qry.setDate("date", matchDate);
         qry.setString("result", ChecksumResultCode.CHECKSUM_MATCH.name());
-        qry.setString("bitstream", bs.getID().toString()); // FIXME identifier not being set???
+        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
         // Row with nonmatching result code
@@ -107,7 +107,7 @@ public class ChecksumHistoryDAOImplTest
         qry.setInteger("id", checkId);
         qry.setDate("date", noMatchDate);
         qry.setString("result", ChecksumResultCode.CHECKSUM_NO_MATCH.name());
-        qry.setString("bitstream", bs.getID().toString());
+        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
         // Create one newer row
@@ -117,7 +117,7 @@ public class ChecksumHistoryDAOImplTest
         qry.setInteger("id", checkId);
         qry.setDate("date", new java.sql.Date(futureDate.getTime()));
         qry.setString("result", ChecksumResultCode.CHECKSUM_MATCH.name());
-        qry.setString("bitstream", bs.getID().toString());
+        qry.setParameter("bitstream", bs.getID()); // FIXME identifier not being set???
         qry.executeUpdate();
 
         // Test!
