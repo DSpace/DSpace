@@ -95,6 +95,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_my_account                       = message("xmlui.EPerson.Navigation.my_account");
 
+    private static final Message T_context_liveimport	= message("xmlui.administrative.Navigation.context_liveimport");
+
     /** Cached validity object */
 	private SourceValidity validity;
 	
@@ -324,6 +326,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
             admin.addItemXref(contextPath+"/statistics", T_statistics);
             admin.addItemXref(contextPath+ "/admin/curate", T_administrative_curation);
+
+            admin.addItemXref(contextPath+"/admin/external-import", T_context_liveimport);
         }
     }
     

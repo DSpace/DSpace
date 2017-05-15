@@ -7,31 +7,28 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.SourceResolver;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.aspect.submission.AbstractStep;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+import org.apache.avalon.framework.parameters.*;
+import org.apache.cocoon.*;
+import org.apache.cocoon.environment.*;
+import org.dspace.app.xmlui.aspect.submission.*;
+import org.dspace.app.xmlui.utils.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
+import org.dspace.authorize.*;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.xml.sax.SAXException;
+import org.dspace.content.factory.*;
+import org.dspace.content.service.*;
+import org.dspace.fileaccess.factory.*;
+import org.dspace.fileaccess.service.*;
+import org.dspace.importer.external.elsevier.entitlement.*;
+import org.dspace.services.factory.*;
+import org.xml.sax.*;
+import org.dspace.app.xmlui.aspect.administrative.fileaccess.*;
 
 /**
  * This is a sub step of the Upload step during item submission. This 
@@ -83,6 +80,7 @@ public class EditFileStep extends AbstractStep
 	private Bitstream bitstream;
 
     protected BitstreamFormatService bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+    protected FileAccessFromMetadataService fileAccessFromMetadataService = FileAccessServiceFactory.getInstance().getFileAccessFromMetadataService();
 
 	
 	/**
@@ -139,14 +137,22 @@ public class EditFileStep extends AbstractStep
         description.setHelp(T_description_help);
         description.setValue(bitstream.getDescription());
 
-        // if AdvancedAccessPolicy=false: add simmpleFormEmbargo in UploadStep
-        boolean isAdvancedFormEnabled= DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
-        if(!isAdvancedFormEnabled){
-            AccessStepUtil asu = new AccessStepUtil(context);
-            // this step is possible only in case of AdvancedForm
-            asu.addEmbargoDateSimpleForm(bitstream, edit, errorFlag);
-            // Reason
-            asu.addReason(null, edit, errorFlag);
+        if(DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.file.access.enabled")) {
+            ArticleAccess fileAccess = fileAccessFromMetadataService.getFileAccess(context, bitstream);
+            boolean fileAccessError = this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_NO_FIlE_ACCESS_ERROR;
+            FileAccessUI.addAccessSelection(edit, "file-access", fileAccess.getAudience(), fileAccessError);
+            FileAccessUI.addEmbargoDateField(edit, fileAccess);
+        }
+        else {
+            // if AdvancedAccessPolicy=false: add simmpleFormEmbargo in UploadStep
+            boolean isAdvancedFormEnabled = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
+            if (!isAdvancedFormEnabled) {
+                AccessStepUtil asu = new AccessStepUtil(context);
+                // this step is possible only in case of AdvancedForm
+                asu.addEmbargoDateSimpleForm(bitstream, edit, errorFlag);
+                // Reason
+                asu.addReason(null, edit, errorFlag);
+            }
         }
         
         edit.addItem(T_info1);

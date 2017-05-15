@@ -7,21 +7,14 @@
  */
 package org.dspace.importer.external.metadatamapping.contributor;
 
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.dspace.importer.external.metadatamapping.MetadataFieldConfig;
-import org.dspace.importer.external.metadatamapping.MetadataFieldMapping;
-import org.dspace.importer.external.metadatamapping.MetadatumDTO;
-import org.jaxen.JaxenException;
-import org.springframework.beans.factory.annotation.Required;
-
-import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import javax.annotation.*;
+import org.apache.axiom.om.*;
+import org.apache.axiom.om.xpath.*;
+import org.apache.commons.lang3.*;
+import org.dspace.importer.external.metadatamapping.*;
+import org.jaxen.*;
+import org.springframework.beans.factory.annotation.*;
 
 /**
  * Metadata contributor that takes an axiom OMElement and turns it into a metadatum
@@ -60,7 +53,7 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
      * Set the prefixToNamespaceMapping for this object,
      * @param prefixToNamespaceMapping
      */
-    @Resource(name="isiFullprefixMapping")
+    @Resource(name="FullprefixMapping")
     public void setPrefixToNamespaceMapping(Map<String, String> prefixToNamespaceMapping) {
         this.prefixToNamespaceMapping = prefixToNamespaceMapping;
     }
@@ -131,24 +124,33 @@ public class SimpleXpathMetadatumContributor implements MetadataContributor<OMEl
                 xpath.addNamespace(prefixToNamespaceMapping.get(ns),ns);
             }
             List<Object> nodes=xpath.selectNodes(t);
-            for(Object el:nodes)
+            for(Object el:nodes){
+                String value=null;
                 if(el instanceof OMElement)
-                    values.add(metadataFieldMapping.toDCValue(field, ((OMElement) el).getText()));
+                    value= ((OMElement) el).getText();
                 else if(el instanceof OMAttribute){
-                    values.add(metadataFieldMapping.toDCValue(field, ((OMAttribute) el).getAttributeValue()));
+                    value= ((OMAttribute) el).getAttributeValue();
                 } else if(el instanceof String){
-                    values.add(metadataFieldMapping.toDCValue(field, (String) el));
+                    value= (String) el;
                 } else if(el instanceof OMText)
-                    values.add(metadataFieldMapping.toDCValue(field, ((OMText) el).getText()));
+                    value= ((OMText) el).getText();
                 else
                 {
                     System.err.println("node of type: "+el.getClass());
                 }
+                if(StringUtils.isNotBlank(value)){
+                    addRetrievedValueToMetadata(values, value);
+                }
+            }
             return values;
         } catch (JaxenException e) {
             System.err.println(query);
             throw new RuntimeException(e);
         }
 
+    }
+
+    protected void addRetrievedValueToMetadata(List<MetadatumDTO> values, String value) {
+        values.add(metadataFieldMapping.toDCValue(field, value));
     }
 }

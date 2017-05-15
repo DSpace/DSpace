@@ -44,6 +44,8 @@
     <script src="vendor/datatables/media/js/jquery.dataTables.js">&#160;</script>
     <script src="scripts/person-lookup.js">&#160;</script>
 
+    <script src="scripts/submission-lookup.js">&#160;</script>
+
     <!-- endbuild -->
 
     <!--the build comments below need to be inline to fix the 'undefined'

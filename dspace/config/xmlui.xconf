@@ -80,6 +80,11 @@
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
+        <aspect name="ExternalImport" path="resource://aspects/ExternalImport/" />
+        <aspect name="ElsevierEntitlement" path="resource://aspects/ElsevierEntitlement/" />
+
+        <!-- To enable the Elsevier embed page, uncomment the following line -->
+        <!--<aspect name="ElsevierEmbed" path="resource://aspects/ElsevierEmbed/" />-->
 
         <!-- ========================
              Usage Statistics Engines

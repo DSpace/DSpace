@@ -1490,6 +1490,12 @@ ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
 .publication-records-modal, .publication-records-modal ul {
     list-style-type: none;
     padding-left: 0px;
+    margin-left:0;
+}
+
+.lookup-counter{
+    margin-top:35px;
+    margin-bottom:35px
 }
 
 .publication-records-import-btn {
@@ -1523,4 +1529,76 @@ ol.ds-ordered-list ol.ds-ordered-list ol.ds-ordered-list {
     -ms-word-break:   break-all;
     word-break:       break-all;
     word-wrap:        break-word;
+}
+
+.record-leftdiv {
+    width:10%;
+    float:left
+}
+
+.record-rightdiv {
+    width:90%;
+    float:left
+}
+
+.import-record {
+    padding-bottom: 15px;
+    clear:both;
+}
+
+.record-title {
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+#aspect_administrative_importer_external_ExternalImportResult_div_live-import-result .pagination-next, #aspect_submission_StepTransformer_field_submit_pagination_next {
+    float:right;
+}
+
+#aspect_administrative_importer_external_ExternalImportSelected_div_live-import-result .ds-radio-field label {
+    clear: both;
+    display: block;
+    padding-bottom: 5px;
+}
+
+#aspect_submission_StepTransformer_list_result, #aspect_submission_StepTransformer_list_record-right {
+    list-style-type: none;
+}
+
+#aspect_submission_StepTransformer_list_result {
+    margin-left:0px;
+}
+
+#aspect_submission_StepTransformer_item_record-left {
+    padding-bottom: 15px;
+}
+
+#aspect_submission_StepTransformer_item_record-left ul {
+    display: inline-block;
+    vertical-align: top;
+}
+
+#aspect_submission_StepTransformer_item_record-left ul {
+    display: inline-block;
+}
+
+#aspect_submission_StepTransformer_list_record-right {
+    margin-left: 30px;
+    width: 85%;
+}
+
+#aspect_submission_StepTransformer_item_import-title {
+    margin-bottom:5px;
+}
+
+#aspect_submission_StepTransformer_item_import-header div, #aspect_submission_StepTransformer_item_results-header div {
+    color: #1F3F5E;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#elsevier-embed-wrapper .checkmark{
+    color: green;
+    margin-right:5px;
+    margin-left:5px;
 }

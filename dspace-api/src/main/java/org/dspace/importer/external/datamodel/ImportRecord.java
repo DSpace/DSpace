@@ -98,4 +98,15 @@ public class ImportRecord {
     public void addValue(MetadatumDTO value){
         this.valueList.add(value);
     }
+
+    public Collection<MetadatumDTO> getValue(String field) {
+        String[] split = field.split("\\.");
+
+        if(split.length==2){
+            return getValue(split[0],split[1],null);
+        }
+        else {
+            return getValue(split[0],split[1],split[2]);
+        }
+    }
 }

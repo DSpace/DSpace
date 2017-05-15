@@ -449,4 +449,11 @@ public interface AuthorizeService {
 	void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
 			throws SQLException, AuthorizeException;
 
+	public void addPolicyOnce(Context context, DSpaceObject dSpaceObject, int action, Group group) throws AuthorizeException, SQLException;
+
+    public void addPolicyOnce(Context context, DSpaceObject dSpaceObject, int action, Group group, Date startDate) throws SQLException, AuthorizeException;
+
+    public boolean groupActionCheck(Context context, DSpaceObject dSpaceObject, int action, Group group) throws SQLException;
+
+    public boolean resourceAndActionCheck(DSpaceObject dSpaceObject, int action, List<ResourcePolicy> policies);
 }

@@ -32,6 +32,8 @@
 
     <xsl:output indent="yes"/>
 
+    <xsl:variable name="document" select="/dri:document"/>
+
     <!--the max thumbnail height & width from dspace.cfg, needed for item view and item list pages-->
     <xsl:variable name="thumbnail.maxheight" select="confman:getIntProperty('thumbnail.maxheight', 80)"/>
     <xsl:variable name="thumbnail.maxwidth" select="confman:getIntProperty('thumbnail.maxwidth', 80)"/>

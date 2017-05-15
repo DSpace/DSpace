@@ -8,54 +8,44 @@
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.sql.SQLException;
+import java.io.*;
+import java.sql.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletResponse;
-import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.http.HttpEnvironment;
-import org.apache.cocoon.util.HashUtil;
-import org.apache.excalibur.source.SourceValidity;
-import org.dspace.app.sfx.factory.SfxServiceFactory;
-import org.dspace.app.sfx.service.SFXFileReaderService;
-import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.authorize.AuthorizeException;
+import java.util.*;
+import java.util.Map.*;
+import java.util.regex.*;
+import javax.servlet.http.*;
+import org.apache.cocoon.caching.*;
+import org.apache.cocoon.environment.*;
+import org.apache.cocoon.environment.http.*;
+import org.apache.cocoon.util.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.excalibur.source.*;
+import org.dspace.app.sfx.factory.*;
+import org.dspace.app.sfx.service.*;
+import org.dspace.app.util.*;
+import org.dspace.app.xmlui.cocoon.*;
+import org.dspace.app.xmlui.utils.*;
+import org.dspace.app.xmlui.wing.*;
+import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.authorize.*;
 import org.dspace.content.Collection;
-import org.dspace.content.MetadataValue;
-import org.dspace.content.DSpaceObject;
+import org.dspace.content.*;
 import org.dspace.content.Item;
-import org.dspace.app.util.GoogleMetadata;
-import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.jdom.Element;
+import org.dspace.content.crosswalk.*;
+import org.dspace.content.factory.*;
+import org.dspace.content.service.*;
+import org.dspace.core.*;
+import org.dspace.core.factory.*;
+import org.dspace.fileaccess.factory.*;
+import org.dspace.fileaccess.service.*;
+import org.dspace.identifier.*;
+import org.dspace.services.factory.*;
+import org.jdom.*;
 import org.jdom.Text;
-import org.jdom.output.XMLOutputter;
-import org.xml.sax.SAXException;
-import org.dspace.app.xmlui.wing.element.Metadata;
-import org.dspace.core.factory.CoreServiceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jdom.output.*;
+import org.slf4j.*;
+import org.xml.sax.*;
 
 /**
  * Display a single item.
@@ -82,6 +72,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_withdrawn = message("xmlui.ArtifactBrowser.ItemViewer.withdrawn");
     
+    private static final Message T_elsevier_embed = message("xmlui.ArtifactBrowser.ItemViewer.elsevier_embed");
+    private static final Message T_elsevier_entitlement = message("xmlui.ArtifactBrowser.ItemViewer.elsevier_entitlement");
+
 	/** Cached validity object */
 	private SourceValidity validity = null;
 
@@ -94,6 +87,10 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
 
     protected SFXFileReaderService sfxFileReaderService = SfxServiceFactory.getInstance().getSfxFileReaderService();
+
+    protected static ItemMetadataService itemMetadataService = FileAccessServiceFactory.getInstance().getItemMetadataService();
+    protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+
 
     /**
      * Generate the unique caching key.
@@ -324,8 +321,40 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             // TODO: Is this the right exception class?
             throw new WingException(ce);
         }
+
+        pageMeta.addMetadata("javascript", "static", null, true).addContent("static/js/entitlement.js");
+        boolean entitlementCheck = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.entitlement.check.enabled", false);
+        if(entitlementCheck) {
+            pageMeta.addMetadata("window.DSpace", "item_pii").addContent(itemMetadataService.getPII(item));
+            pageMeta.addMetadata("window.DSpace", "item_eid").addContent(itemMetadataService.getEID(item));
+
+
+            String doi = itemMetadataService.getDOI(item);
+            pageMeta.addMetadata("window.DSpace", "doi_prefix").addContent(DOI.RESOLVER + "/");
+            pageMeta.addMetadata("window.DSpace", "item_doi").addContent(doi);
+            if (StringUtils.startsWith(doi, "10.1016")) {
+                pageMeta.addMetadata("window.DSpace", "elsevier_doi").addContent("true");
+            }
+            if (publisherIsElsevier(item)) {
+                pageMeta.addMetadata("window.DSpace", "item_pubmed_id").addContent(itemMetadataService.getPubmedID(item));
+                pageMeta.addMetadata("window.DSpace", "item_scopus_id").addContent(itemMetadataService.getScopusID(item));
+            }
+            pageMeta.addMetadata("window.DSpace", "elsevier_apikey").addContent(ConfigurationManager.getProperty("external-sources.elsevier.key"));
+            pageMeta.addMetadata("window.DSpace", "elsevier_entitlement_url").addContent(ConfigurationManager.getProperty("external-sources.elsevier.entitlement.url"));
+            pageMeta.addMetadata("window.DSpace", "elsevier_embargo_url").addContent(ConfigurationManager.getProperty("external-sources.elsevier.embargo.url"));
+        }
     }
 
+    private boolean publisherIsElsevier(Item item) {
+        List<MetadataValue> publisherMetadata = itemService.getMetadataByMetadataString(item,"dc.publisher");
+        boolean publisherIsElsevier = false;
+        for(MetadataValue metadatum : publisherMetadata){
+            if(metadatum.getValue().matches("^(?i)elsevier.*")){
+                publisherIsElsevier =true;
+            }
+        }
+        return publisherIsElsevier;
+    }
     /**
      * Display a single item
      * @throws org.xml.sax.SAXException passed through.
@@ -408,6 +437,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             appearsInclude.addReference(collection);
         }
 
+        division.addPara("entitlement", "entitlement-wrapper hidden").addXref("", T_elsevier_entitlement, "entitlement-link");
+
+
+        addEmbeddedDisplayLink(item, division);
+
+
         showfullPara = division.addPara(null,"item-view-toggle item-view-toggle-bottom");
 
         if (showFullItem(objectModel))
@@ -420,6 +455,49 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             String link = contextPath + "/handle/" + item.getHandle()
                     + "?show=full";
             showfullPara.addXref(link).addContent(T_show_full);
+        }
+    }
+
+    private void addEmbeddedDisplayLink(Item item, Division division) throws WingException {
+        boolean entitlementCheck = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("external-sources.elsevier.entitlement.check.enabled", false);
+        if(entitlementCheck) {
+            String pii = itemMetadataService.getPII(item);
+            String doi = itemMetadataService.getDOI(item);
+            String eid = itemMetadataService.getEID(item);
+            String scopus_id = itemMetadataService.getScopusID(item);
+            String pubmed_ID = itemMetadataService.getPubmedID(item);
+            String link = null;
+            String embeddedLink = null;
+            String baseLink = contextPath + "/handle/" + item.getHandle() + "/elsevier-embed/";
+            String embedURLBase = ConfigurationManager.getProperty("external-sources.elsevier.ui.article.url");
+            String doiURLBase = DOI.RESOLVER + "/";
+
+            if (StringUtils.isNotBlank(pii)) {
+                link = baseLink + pii + "?embeddedType=pii";
+                embeddedLink = embedURLBase + "/pii/" + pii;
+            } else if (StringUtils.isNotBlank(eid)) {
+                link = baseLink + eid + "?embeddedType=eid";
+                embeddedLink = embedURLBase + "/eid/" + eid;
+            } else if (StringUtils.isNotBlank(doi) && doi.startsWith("10.1016")) {
+                link = baseLink + doi + "?embeddedType=doi";
+                embeddedLink = doiURLBase + doi;
+            } else if (publisherIsElsevier(item)) {
+                if (StringUtils.isNotBlank(scopus_id)) {
+                    link = baseLink + scopus_id + "?embeddedType=scopus_id";
+                    embeddedLink = embedURLBase + "/scopus_id/" + scopus_id;
+                } else if (StringUtils.isNotBlank(pubmed_ID)) {
+                    link = baseLink + doi + "?embeddedType=pubmed_id";
+                    embeddedLink = embedURLBase + "/pubmed_ID/" + pubmed_ID;
+                }
+            } else if (StringUtils.isNoneBlank(doi)) {
+                link = doiURLBase + doi;
+                embeddedLink = doiURLBase + doi;
+            }
+            if (StringUtils.isNotBlank(link)) {
+                Para para = division.addPara("elsevier-embed-page", "elsevier-embed-page");
+                para.addXref(link, T_elsevier_embed);
+                para.addHidden("embeddedLink").setValue(embeddedLink);
+            }
         }
     }
 

@@ -23,6 +23,7 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.ConfigurationService;
 
 /**
  * Unauthenticate the current user. There is no way this action will fail, 
@@ -80,15 +81,17 @@ public class UnAuthenticateAction extends AbstractAction
         context.setCurrentUser(eperson);
         
         // Forward the user to the home page.
-        if((DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
+        ConfigurationService configurationService
+                = DSpaceServicesFactory.getInstance().getConfigurationService();
+        if((configurationService.getBooleanProperty("xmlui.public.logout"))
+                && (httpRequest.isSecure())) {
 				StringBuffer location = new StringBuffer("http://");
-				location.append(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname")).append(
-						httpRequest.getContextPath());
+				location.append(configurationService.getProperty("dspace.hostname"))
+                        .append(httpRequest.getContextPath());
 				httpResponse.sendRedirect(location.toString());
-			
 		}
         else{
-        	httpResponse.sendRedirect(httpRequest.getContextPath());
+            httpResponse.sendRedirect(configurationService.getProperty("dspace.url"));
         }
         
         return new HashMap();

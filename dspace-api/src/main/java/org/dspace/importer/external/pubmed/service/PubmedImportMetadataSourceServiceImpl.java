@@ -12,7 +12,9 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.axiom.om.xpath.AXIOMXPath;
+import org.apache.log4j.*;
 import org.dspace.content.Item;
+import org.dspace.core.*;
 import org.dspace.importer.external.exception.MetadataSourceException;
 import org.dspace.importer.external.datamodel.Query;
 import org.dspace.importer.external.datamodel.ImportRecord;
@@ -40,6 +42,8 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
     private String baseAddress;
 
     private WebTarget pubmedWebTarget;
+
+    private static Logger log = Logger.getLogger(PubmedImportMetadataSourceServiceImpl.class);
 
     /** Find the number of records matching a query;
      *
@@ -145,7 +149,7 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
     @Override
     public void init() throws Exception {
         Client client = ClientBuilder.newClient();
-        WebTarget webTarget = client.target(baseAddress);
+        WebTarget webTarget = client.target(getBaseAddress());
         pubmedWebTarget = webTarget.queryParam("db", "pubmed");
     }
 
@@ -154,15 +158,11 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
      * @return The String object that represents the baseAddress of this object
      */
     public String getBaseAddress() {
-        return baseAddress;
-    }
+        if(baseAddress == null){
+            baseAddress = ConfigurationManager.getProperty("external-sources.pubmed.url");
+        }
 
-    /**
-     * Set the baseAddress to this object
-     * @param baseAddress The String object that represents the baseAddress of this object
-     */
-    public void setBaseAddress(String baseAddress) {
-        this.baseAddress = baseAddress;
+        return baseAddress;
     }
 
     private class GetNbRecords implements Callable<Integer> {
@@ -192,26 +192,13 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
             String count = getSingleElementValue(responseString, "Count");
 
+            try {
             return Integer.parseInt(count);
-        }
-    }
-
-
-    private String getSingleElementValue(String src, String elementName){
-        OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(src));
-        OMElement element = records.getDocumentElement();
-        AXIOMXPath xpath = null;
-        String value = null;
-        try {
-            xpath = new AXIOMXPath("//" + elementName);
-            List<OMElement> recordsList = xpath.selectNodes(element);
-            if(!recordsList.isEmpty()) {
-                value = recordsList.get(0).getText();
+            } catch (NumberFormatException e) {
+                log.error("PubmedImportMetadataSourceServiceImpl: failed to parse number of results, server response: " + responseString);
+                return 0;
             }
-        } catch (JaxenException e) {
-            value = null;
         }
-        return value;
     }
 
     private class GetRecords implements Callable<Collection<ImportRecord>> {
@@ -278,7 +265,9 @@ public class PubmedImportMetadataSourceServiceImpl extends AbstractImportMetadat
             return records;
         }
     }
-    private List<OMElement> splitToRecords(String recordsSrc) {
+
+    @Override
+    protected List<OMElement> splitToRecords(String recordsSrc) {
         OMXMLParserWrapper records = OMXMLBuilderFactory.createOMBuilder(new StringReader(recordsSrc));
         OMElement element = records.getDocumentElement();
         AXIOMXPath xpath = null;

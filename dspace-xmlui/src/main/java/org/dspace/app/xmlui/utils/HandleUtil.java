@@ -243,8 +243,10 @@ public class HandleUtil
             String target;
             if (pop == dso && !linkOriginalObject)
                 target = null; // Do not link "back" to the terminal object
-            else
+            else {
+                pop = context.reloadEntity(pop);
                 target = contextPath + "/handle/" + pop.getHandle();
+            }
 
             if (pop instanceof Collection)
             {

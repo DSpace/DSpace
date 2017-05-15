@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config/>
+    <util:map id="pubmedImportFields">
+        <entry key="pubmedsearch" value=""/>
+    </util:map>
+
+    <bean id="PubmedImportService" class="org.dspace.importer.external.pubmed.service.PubmedImportMetadataSourceServiceImpl" scope="singleton">
+        <property name="metadataFieldMapping" ref="PubmedMetadataFieldMapping"/>
+        <property name="name" value="PubMed"/>
+        <property name="importFields" ref="pubmedImportFields"/>
+        <property name="idField" value="dc.identifier.pubmedid"/>
+        <property name="generateQueryForItem" ref="pubmedService"/>
+    </bean>
+    <bean id="PubmedMetadataFieldMapping"
+          class="org.dspace.importer.external.pubmed.metadatamapping.PubmedFieldMapping">
+    </bean>
+
+    <!-- Metadatafield used to check against if it's already imported or not during the JSONLookupSearcher-->
+    <bean id="lookupID" class="org.dspace.importer.external.metadatamapping.MetadataFieldConfig">
+        <constructor-arg value="dc.identifier.other"/>
+    </bean>
+
+
+    <util:map id="pubmedMetadataFieldMap" key-type="org.dspace.importer.external.metadatamapping.MetadataFieldConfig"
+              value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor">
+        <description>Defines which metadatum is mapped on which metadatum. Note that while the key must be unique it
+            only matters here for postprocessing of the value. The mapped MetadatumContributor has full control over
+            what metadatafield is generated.
+        </description>
+        <entry key-ref="dc.title" value-ref="pubmedTitleContrib"/>
+        <entry key-ref="dc.description.abstract" value-ref="pubmedAbstractContrib"/>
+        <entry key-ref="dc.identifier.pubmedid" value-ref="pubmedContrib"/>
+        <entry key-ref="dc.contributor.author" value-ref="pubmedAuthorContrib"/>
+        <entry key-ref="dc.date.issued" value-ref="pubmedDateContrib"/>
+        <entry key-ref="dc.language.iso" value-ref="pubmedLanguageContrib"/>
+        <entry key-ref="dc.subject" value-ref="pubmedKeywordContrib"/>
+        <entry key-ref="dc.identifier.doi" value-ref="pubmedDoiContrib"/>
+
+    </util:map>
+
+    <bean id="pubmedLanguageContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedLanguageMetadatumContributor">
+        <property name="field" ref="dc.language.iso"/>
+        <property name="language" ref="pubmedLanguageContribField"/>
+    </bean>
+    <bean id="pubmedDateContrib" class="org.dspace.importer.external.pubmed.metadatamapping.contributor.PubmedDateMetadatumContributor">
+        <property name="dateFormatsToAttempt">
+            <!-- The first format that is successful will be used and the rest will be skipped. Make sure to add the most specific at the top and add the more lenient at the bottom-->
+            <list>
+                <value>yyyy-MMM-dd</value>
+                <value>yyyy-MMM</value>
+                <value>yyyy-MM-dd</value>
+            </list>
+        </property>
+        <property name="year" ref="pubmedYearContrib"/>
+        <property name="month" ref="pubmedMonthContrib"/>
+        <property name="day" ref="pubmedDayContrib"/>
+        <property name="field" ref="dc.date.issued"/>
+    </bean>
+    <bean id="pubmedContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.pubmedid"/>
+        <property name="query" value="descendant::MedlineCitation/PMID"/>
+    </bean>
+    <bean id="pubmedTitleContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.title"/>
+        <property name="query" value="descendant::ArticleTitle"/>
+    </bean>
+
+    <bean id="pubmedAbstractContrib" class="org.dspace.importer.external.metadatamapping.contributor.MergeMultipleValuesXpathMetadatumContributor">
+        <property name="field" ref="dc.description.abstract"/>
+        <property name="query" value="descendant::AbstractText"/>
+    </bean>
+
+    <bean id="pubmedAuthorContrib" class="org.dspace.importer.external.metadatamapping.contributor.CombinedMetadatumContributor">
+        <property name="separator" value=", "/>
+
+        <property name="metadatumContributors" ref="pubmedCombinedauthorList"/>
+        <property name="field" ref="dc.contributor.author"/>
+    </bean>
+
+    <util:list id="pubmedCombinedauthorList" value-type="org.dspace.importer.external.metadatamapping.contributor.MetadataContributor" list-class="java.util.LinkedList">
+        <ref bean="pubmedLastNameContrib"/>
+        <ref bean="pubmedFirstNameContrib"/>
+    </util:list>
+    <bean id="pubmedLastNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="descendant::Author/LastName"/>
+    </bean>
+
+    <bean id="pubmedFirstNameContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.contributor.author"/>
+        <property name="query" value="descendant::Author/ForeName"/>
+    </bean>
+
+    <bean id="pubmedKeywordContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.subject"/>
+        <property name="query" value="descendant::Keyword"/>
+    </bean>
+    <bean id="pubmedYearContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.date.issued"/>
+        <property name="query" value="descendant::PubDate/Year"/>
+    </bean>
+
+    <bean id="pubmedMonthContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.date.issued"/>
+        <property name="query" value="descendant::PubDate/Month"/>
+    </bean>
+
+    <bean id="pubmedDayContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.date.issued"/>
+        <property name="query" value="descendant::PubDate/Day"/>
+    </bean>
+
+    <bean id="pubmedLanguageContribField" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.language.iso"/>
+        <property name="query" value="descendant::Language"/>
+    </bean>
+
+    <bean id="pubmedDoiContrib" class="org.dspace.importer.external.metadatamapping.contributor.SimpleXpathMetadatumContributor">
+        <property name="field" ref="dc.identifier.doi"/>
+        <property name="query" value="(descendant::*[@EIdType='doi' or @IdType='doi'])[1]"/>
+    </bean>
+
+    <bean class="java.lang.Integer" id="maxRetry">
+        <constructor-arg value="2"/>
+    </bean>
+
+    <bean class="org.dspace.importer.external.pubmed.metadatamapping.transform.GeneratePubmedQueryService" id="pubmedService">
+        <description>Defines how an org.dspace.content.Item is mapped to a query in scopus. Please note that exactly one of
+            these must be present. If multiple are present the result is undefined.
+        </description>
+    </bean>
+</beans>

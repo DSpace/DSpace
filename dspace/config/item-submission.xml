@@ -199,14 +199,25 @@
 	  </step> -->
 
        <!-- Find publications based on ID/DOI/Title/Author to pre-fill the submission. XMLUI ONLY.
-            For JSPUI version, see JSPUIStartSubmissionLookupStep under <step-definitions> above.
+       Both the SourceChoiceStep and the LiveImportStep should be enabled to look up publications during the submission.
+       For JSPUI version, see JSPUIStartSubmissionLookupStep under <step-definitions> above.
        <step>
-           <heading>submit.progressbar.lookup</heading>
-           <processing-class>org.dspace.submit.step.XMLUIStartSubmissionLookupStep</processing-class>
-           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.StartSubmissionLookupStep</xmlui-binding>
+           <heading>submit.progressbar.sourcechoice</heading>
+           <processing-class>org.dspace.submit.step.SourceChoiceStep</processing-class>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SourceChoiceStep</xmlui-binding>
            <workflow-editable>true</workflow-editable>
        </step>
-        -->
+       -->
+
+       <!--Additional step for the live import. This should be enabled to display the live import
+       <step>
+           <heading>submit.progressbar.sourceimport</heading>
+           <processing-class>org.dspace.submit.step.SourceImportStep</processing-class>
+           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SourceImportStep</xmlui-binding>
+           <workflow-editable>true</workflow-editable>
+       </step>
+       -->
+
       <!--Step 2 will be to Describe the item.-->
       <step>
         <heading>submit.progressbar.describe</heading>
@@ -234,10 +245,10 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>
       </step>
-      
+
 
        <!-- Step 4 Upload Item with Embargo Features
-            to enable this step, please make sure to comment-out the previous step "UploadStep"  
+            to enable this step, please make sure to comment-out the previous step "UploadStep"
        <step>
            <heading>submit.progressbar.upload</heading>
            <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>

@@ -8,16 +8,14 @@
 
 package org.dspace.importer.external.service;
 
-import org.apache.log4j.Logger;
-import org.dspace.content.Item;
-import org.dspace.importer.external.exception.MetadataSourceException;
-import org.dspace.importer.external.datamodel.Query;
-import org.dspace.importer.external.datamodel.ImportRecord;
-import org.dspace.importer.external.service.components.Destroyable;
-import org.dspace.importer.external.service.components.MetadataSource;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import java.util.Collection;
 import java.util.*;
+import org.apache.log4j.*;
+import org.dspace.content.*;
+import org.dspace.importer.external.datamodel.*;
+import org.dspace.importer.external.exception.*;
+import org.dspace.importer.external.service.components.*;
+import org.dspace.utils.*;
 
 /** Main entry point for the import framework.
  * Instead of calling the different importer implementations, the ImportService should be called instead.
@@ -26,7 +24,7 @@ import java.util.*;
  * @author Roeland Dillen (roeland at atmire dot com)
  */
 public class ImportService implements Destroyable {
-    private HashMap<String, MetadataSource> importSources = new HashMap<>();
+    private HashMap<String, MetadataSource> importSources;
 
     Logger log = Logger.getLogger(ImportService.class);
 
@@ -40,24 +38,19 @@ public class ImportService implements Destroyable {
     protected static final String ANY = "*";
 
     /**
-     * Sets the importsources that will be used to delegate the retrieving and matching of records to
-     * @param importSources A list of {@link MetadataSource} to set to this service
-     * @throws MetadataSourceException
-     */
-    @Autowired(required = false)
-    public void setImportSources(List<MetadataSource> importSources) throws MetadataSourceException {
-        log.info("Loading " + importSources.size() + " import sources.");
-        for (MetadataSource metadataSource : importSources) {
-            this.importSources.put(metadataSource.getImportSource(), metadataSource);
-        }
-
-    }
-
-    /**
      * Retrieve the importSources set to this class.
      * @return  An unmodifiableMap of importSources
      */
     protected Map<String, MetadataSource> getImportSources() {
+		if(importSources == null) {
+			importSources = new HashMap<>();
+			List<MetadataSource> importSources = new DSpace().getServiceManager().getServicesByType(MetadataSource.class);
+
+			for (MetadataSource metadataSource : importSources) {
+				this.importSources.put(metadataSource.getImportSource(), metadataSource);
+			}
+		}
+
         return Collections.unmodifiableMap(importSources);
     }
 
@@ -68,10 +61,10 @@ public class ImportService implements Destroyable {
 	 */
     protected Collection<MetadataSource> matchingImports(String uri) {
         if (ANY.equals(uri)) {
-            return importSources.values();
+            return getImportSources().values();
         } else {
-			if(importSources.containsKey(uri))
-				return Collections.singletonList(importSources.get(uri));
+			if(getImportSources().containsKey(uri))
+				return Collections.singletonList(getImportSources().get(uri));
 			else
 				return Collections.emptyList();
 		}
@@ -236,14 +229,14 @@ public class ImportService implements Destroyable {
      *  @return a Collection of string, representing the configured importUrls
      */
     public Collection<String> getImportUrls() {
-        return importSources.keySet();
+        return getImportSources().keySet();
     }
 
     /** Call destroy on all {@link Destroyable} {@link MetadataSource} objects set in this ImportService
      */
     @Override
     public void destroy() throws Exception {
-        for (MetadataSource metadataSource : importSources.values()) {
+        for (MetadataSource metadataSource : getImportSources().values()) {
             if (metadataSource instanceof Destroyable) ((Destroyable) metadataSource).destroy();
         }
     }
