@@ -1752,10 +1752,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     {
         SolrQuery solrQuery = new SolrQuery();
 
-        if (discoveryQuery.getSearchFields() != null)
-        for (String f : discoveryQuery.getSearchFields()) {
-        	solrQuery.addField(f);
-        }
         String query = "*:*";
         if(discoveryQuery.getQuery() != null)
         {
@@ -1766,9 +1762,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         // Add any search fields to our query. This is the limited list
         // of fields that will be returned in the solr result
-        for(String fieldName : discoveryQuery.getSearchFields())
-        {
-            solrQuery.addField(fieldName);
+        if (discoveryQuery.getSearchFields() != null) {
+            for(String fieldName : discoveryQuery.getSearchFields())
+            {
+                solrQuery.addField(fieldName);
+            }
         }
         // Also ensure a few key obj identifier fields are returned with every query
         solrQuery.addField(HANDLE_FIELD);

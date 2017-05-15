@@ -307,7 +307,7 @@ public class SolrBrowseDAO implements BrowseDAO
         List<BrowseItem> bitems = new ArrayList<BrowseItem>();
         for (DSpaceObject solrDoc : resp.getDspaceObjects())
         {
-            // FIXME introduce project, don't retrieve Item immediately when
+            // FIXME introduce projection, don't retrieve Item immediately when
             // processing the query...
             BrowseItem bitem = null;
             if (solrDoc instanceof BrowsableDSpaceObject)
