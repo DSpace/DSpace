@@ -206,6 +206,9 @@ public class GroupTest extends AbstractUnitTest {
         List<String> names = new ArrayList<>();
         List<String> sortedNames = new ArrayList<>();
         for (Group group : groups) {
+            if (group.getName() == null) {
+                continue;
+            }
             names.add(group.getName());
             sortedNames.add(group.getName());
         }
