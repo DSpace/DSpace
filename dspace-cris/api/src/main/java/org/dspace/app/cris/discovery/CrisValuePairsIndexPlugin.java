@@ -21,6 +21,7 @@ import org.dspace.app.cris.model.ACrisObject;
 import org.dspace.app.cris.model.ICrisObject;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.model.jdyna.DynamicNestedPropertiesDefinition;
+import org.dspace.app.cris.model.jdyna.DynamicObjectType;
 import org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUNestedPropertiesDefinition;
 import org.dspace.app.cris.model.jdyna.OUPropertiesDefinition;
@@ -138,44 +139,45 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
             ACNO crisObject, SolrInputDocument document,
             Map<String, List<DiscoverySearchFilter>> searchFilters)
     {
-        try
-        {
-            init();
-        }
-        catch (DCInputsReaderException e)
-        {
-            log.error(e.getMessage(), e);
-        }
-        if (crisObject != null)
-        {
-            ICrisObject<P, TP> parent = (ICrisObject<P, TP>) crisObject
-                    .getParent();
-            String confName = "ncris" + parent.getPublicPath();
-            String schema = confName + crisObject.getTypo().getShortName();
-            List<NTP> allPropertiesDefinition = applicationService
-                    .getAllPropertiesDefinitionWithRadioCheckDropdown(
-                            crisObject.getClassPropertiesDefinition());
-            for (NTP pd : allPropertiesDefinition)
-            {
-                List<NP> storedP = crisObject.getAnagrafica4view()
-                        .get(pd.getShortName());
-                for (NP stored_value : storedP)
-                {
-                    String field = schema + "."
-                            + stored_value.getTypo().getShortName();
-                    String displayVal = getCheckRadioDisplayValue(
-                            (((WidgetCheckRadio) pd.getRendering())
-                                    .getStaticValues()),
-                            stored_value.toString());
-                    document.removeField(field + "_authority");
-                    document.addField(field + "_authority", stored_value);
-                    document.removeField(field);
-                    document.addField(field, displayVal);
-                    buildSearchFilter(document, searchFilters,
-                            stored_value.toString(), field, field, displayVal);
-                }
-            }
-        }
+//        TODO manage nested
+//        try
+//        {
+//            init();
+//        }
+//        catch (DCInputsReaderException e)
+//        {
+//            log.error(e.getMessage(), e);
+//        }
+//        if (crisObject != null)
+//        {
+//            ICrisObject<P, TP> parent = (ICrisObject<P, TP>) crisObject
+//                    .getParent();
+//            String confName = "ncris" + parent.getPublicPath();
+//            String schema = confName + crisObject.getTypo().getShortName();
+//            List<NTP> allPropertiesDefinition = applicationService
+//                    .getAllPropertiesDefinitionWithRadioCheckDropdown(
+//                            crisObject.getClassPropertiesDefinition());
+//            for (NTP pd : allPropertiesDefinition)
+//            {
+//                List<NP> storedP = crisObject.getAnagrafica4view()
+//                        .get(pd.getShortName());
+//                for (NP stored_value : storedP)
+//                {
+//                    String field = schema + "."
+//                            + stored_value.getTypo().getShortName();
+//                    String displayVal = getCheckRadioDisplayValue(
+//                            (((WidgetCheckRadio) pd.getRendering())
+//                                    .getStaticValues()),
+//                            stored_value.toString());
+//                    document.removeField(field + "_authority");
+//                    document.addField(field + "_authority", stored_value);
+//                    document.removeField(field);
+//                    document.addField(field, displayVal);
+//                    buildSearchFilter(document, searchFilters,
+//                            stored_value.toString(), field, field, displayVal);
+//                }
+//            }
+//        }
     }
 
     @Override
@@ -262,14 +264,32 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
             result.add(iterator.next());
         }
 
-        additionalSearchParameter(RPPropertiesDefinition.class);
-        additionalSearchParameter(ProjectPropertiesDefinition.class);
-        additionalSearchParameter(OUPropertiesDefinition.class);
-        additionalSearchParameter(DynamicPropertiesDefinition.class);
-        additionalSearchParameter(RPNestedPropertiesDefinition.class);
-        additionalSearchParameter(ProjectNestedPropertiesDefinition.class);
-        additionalSearchParameter(OUNestedPropertiesDefinition.class);
-        additionalSearchParameter(DynamicNestedPropertiesDefinition.class);
+        Set<String> pds = additionalSearchParameter(RPPropertiesDefinition.class);
+        for(String pd : pds) {
+            result.add("crisrp." + pd);
+        }
+        pds = additionalSearchParameter(ProjectPropertiesDefinition.class);
+        for(String pd : pds) {
+            result.add("crisproject." + pd);
+        }
+        pds = additionalSearchParameter(OUPropertiesDefinition.class);
+        for(String pd : pds) {
+            result.add("crisou." + pd);
+        }
+        pds = additionalSearchParameter(DynamicPropertiesDefinition.class);
+        for(String pd : pds) {
+            List<DynamicObjectType> dyn = applicationService.getList(DynamicObjectType.class);
+            for(DynamicObjectType dy : dyn) {
+                if(pd.startsWith(dy.getShortName())) {
+                    result.add("cris" + dy.getShortName() + "." + pd);
+                }
+            }            
+        }
+//        TODO manage nested          
+//        result.addAll(additionalSearchParameter(RPNestedPropertiesDefinition.class));
+//        result.addAll(additionalSearchParameter(ProjectNestedPropertiesDefinition.class));
+//        result.addAll(additionalSearchParameter(OUNestedPropertiesDefinition.class));
+//        result.addAll(additionalSearchParameter(DynamicNestedPropertiesDefinition.class));
 
         for (String rr : result)
         {
