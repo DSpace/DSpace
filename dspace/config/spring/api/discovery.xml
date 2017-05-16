@@ -84,6 +84,11 @@
 
 	<!--  Additional indexing plugin to index multilanguage for authority field -->
 	<bean id="multiLanguageAuthorityIndexer" class="org.dspace.app.cris.discovery.MultilanguageAuthorityIndexer"/>
+
+	<!--  Additional indexing and retrieve index for valuepairs and check/dropdown widget -->
+	<bean id="valuePairsAuthorityIndexer" class="org.dspace.app.cris.discovery.CrisValuePairsIndexPlugin">
+		<property name="applicationService" ref="applicationService" />
+	</bean>
 					
 	<!--Bean that is used for mapping communities/collections to certain discovery 
 		configurations. -->

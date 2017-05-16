@@ -29,6 +29,7 @@ import javax.persistence.Transient;
     @NamedQuery(name = "ProjectPropertiesDefinition.findAllWithPolicyGroup", query = "from ProjectPropertiesDefinition where rendering in (from WidgetGroup)"),
     @NamedQuery(name = "ProjectPropertiesDefinition.likeAllWithPolicySingle", query = "from ProjectPropertiesDefinition where shortName = ? and rendering in (from WidgetEPerson)"),
     @NamedQuery(name = "ProjectPropertiesDefinition.likeAllWithPolicyGroup", query = "from ProjectPropertiesDefinition where shortName = ? and rendering in (from WidgetGroup)"),
+    @NamedQuery(name = "ProjectPropertiesDefinition.findAllWithCheckRadioDropdown", query = "from ProjectPropertiesDefinition where rendering in (from WidgetCheckRadio)"),
     @NamedQuery(name = "ProjectPropertiesDefinition.likeByShortName", query = "from ProjectPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
     
 })

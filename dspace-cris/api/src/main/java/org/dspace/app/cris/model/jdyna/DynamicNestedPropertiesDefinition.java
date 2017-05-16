@@ -33,6 +33,7 @@ import javax.persistence.Table;
     @NamedQuery(name = "DynamicNestedPropertiesDefinition.findAllWithPolicyGroup", query = "from DynamicNestedPropertiesDefinition where rendering in (from WidgetGroup)"),
     @NamedQuery(name = "DynamicNestedPropertiesDefinition.likeAllWithPolicySingle", query = "from DynamicNestedPropertiesDefinition where shortName = ? and rendering in (from WidgetEPerson)"),
     @NamedQuery(name = "DynamicNestedPropertiesDefinition.likeAllWithPolicyGroup", query = "from DynamicNestedPropertiesDefinition where shortName = ? and rendering in (from WidgetGroup)"),
+    @NamedQuery(name = "DynamicNestedPropertiesDefinition.findAllWithCheckRadioDropdown", query = "from DynamicNestedPropertiesDefinition where rendering in (from WidgetCheckRadio)"),
     @NamedQuery(name = "DynamicNestedPropertiesDefinition.likeByShortName", query = "from DynamicNestedPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
 })
 public class DynamicNestedPropertiesDefinition extends ANestedPropertiesDefinition
