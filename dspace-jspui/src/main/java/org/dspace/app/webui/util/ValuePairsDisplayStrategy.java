@@ -8,9 +8,9 @@
 package org.dspace.app.webui.util;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -19,12 +19,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.Util;
-import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
+import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 
@@ -65,33 +63,45 @@ public class ValuePairsDisplayStrategy extends ASimpleDisplayStrategy
             Context obtainContext = UIUtil.obtainContext(hrq);
             Map<String, List<String>> mappedValuePairs = dcInputsReader
                     .getMappedValuePairs();
-            String pairsname = "";
+            List<String> pairsnames = new ArrayList<String>();
             if (mappedValuePairs != null)
             {
-                external : for (String key : mappedValuePairs.keySet())
+                for (String key : mappedValuePairs.keySet())
                 {
                     List<String> values = mappedValuePairs.get(key);
-                    internal : for(String vv : values) {
-                        if(StringUtils.equals(field, vv)) {
-                            pairsname = key;
-                            break external;
+                    for (String vv : values)
+                    {
+                        if (StringUtils.equals(field, vv))
+                        {
+                            pairsnames.add(key);
                         }
                     }
                 }
             }
-            
-            ChoiceAuthority choice = (ChoiceAuthority) PluginManager
-                    .getNamedPlugin(ChoiceAuthority.class,
-                            pairsname);
-            
-            int ii = 0;
-            for (Metadatum r : metadataArray)
+
+            for (String pairsname : pairsnames)
             {
-                if (ii > 0)
+                ChoiceAuthority choice = (ChoiceAuthority) PluginManager
+                        .getNamedPlugin(ChoiceAuthority.class, pairsname);
+
+                int ii = 0;                
+                for (Metadatum r : metadataArray)
                 {
-                    result += " ";
+                    if (ii > 0)
+                    {
+                        result += " ";
+                    }
+                    Choices choices = choice.getBestMatch(field, r.value,
+                            colIdx,
+                            obtainContext.getCurrentLocale().toString());
+                    if (choices != null)
+                    {
+                        for (Choice ch : choices.values)
+                        {
+                            result += ch.label;
+                        }
+                    }
                 }
-                result += choice.getLabel(field, r.value, obtainContext.getCurrentLocale().toString());
             }
         }
         catch (SQLException e)
