@@ -13,6 +13,9 @@ import it.cilea.osd.jdyna.model.ATypeNestedObject;
 import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.model.Property;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.app.cris.integration.NameResearcherPage;
 import org.dspace.app.cris.model.ACrisObject;
@@ -20,6 +23,7 @@ import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.ACrisNestedObject;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.content.DCPersonName;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 /*
  * @author: Sergio Bilello
  * 
@@ -30,7 +34,7 @@ public class RPSurnameSolrIndexer implements CrisServiceIndexPlugin{
 	@Override
 	public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void additionalIndex(
 			ACrisObject<P, TP, NP, NTP, ACNO, ATNO> crisObject,
-			SolrInputDocument document) {
+			SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters) {
 
 		ResearcherPage rp = null;
 		if (crisObject instanceof ResearcherPage){
@@ -53,7 +57,7 @@ public class RPSurnameSolrIndexer implements CrisServiceIndexPlugin{
 	
 	@Override
 	public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void additionalIndex(
-			ACNO dso, SolrInputDocument sorlDoc) {
+			ACNO dso, SolrInputDocument sorlDoc, Map<String, List<DiscoverySearchFilter>> searchFilters) {
 		// FIXME NOT SUPPORTED OPERATION
 	}
 

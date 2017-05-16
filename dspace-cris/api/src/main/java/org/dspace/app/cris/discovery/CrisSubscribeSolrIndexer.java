@@ -8,6 +8,8 @@
 package org.dspace.app.cris.discovery;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -15,11 +17,12 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 public class CrisSubscribeSolrIndexer implements SolrServiceIndexPlugin {
 
 	@Override
-	public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
+	public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters) {
 		
        if (dso instanceof Item)
         {

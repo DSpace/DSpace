@@ -10,6 +10,7 @@ package org.dspace.app.cris.discovery;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -38,8 +39,11 @@ import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.SolrServiceIndexPlugin;
 import org.dspace.discovery.SolrServiceSearchPlugin;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
+import org.dspace.services.ConfigurationService;
 
 import it.cilea.osd.jdyna.model.ANestedPropertiesDefinition;
 import it.cilea.osd.jdyna.model.ANestedProperty;
@@ -62,10 +66,23 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
 
     private ApplicationService applicationService;
 
+    private ConfigurationService configurationService;
+
     private DCInputsReader dcInputsReader;
+
+    private String separator;
 
     private void init() throws DCInputsReaderException
     {
+        if (separator == null)
+        {
+            separator = configurationService
+                    .getProperty("discovery.solr.facets.split.char");
+            if (separator == null)
+            {
+                separator = SolrServiceImpl.FILTER_SEPARATOR;
+            }
+        }
         if (dcInputsReader == null)
         {
             dcInputsReader = new DCInputsReader();
@@ -75,8 +92,17 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
     @Override
     public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void additionalIndex(
             ACrisObject<P, TP, NP, NTP, ACNO, ATNO> crisObject,
-            SolrInputDocument document)
+            SolrInputDocument document,
+            Map<String, List<DiscoverySearchFilter>> searchFilters)
     {
+        try
+        {
+            init();
+        }
+        catch (DCInputsReaderException e)
+        {
+            log.error(e.getMessage(), e);
+        }
         if (crisObject != null)
         {
             String schema = "cris" + crisObject.getPublicPath();
@@ -95,8 +121,13 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                             (((WidgetCheckRadio) pd.getRendering())
                                     .getStaticValues()),
                             stored_value.toString());
-                    document.addField(field + "_authority", stored_value);
+                    document.removeField(field + "_authority");
+                    document.addField(field + "_authority",
+                            stored_value.toString());
+                    document.removeField(field);
                     document.addField(field, displayVal);
+                    buildSearchFilter(document, searchFilters,
+                            stored_value.toString(), field, field, displayVal);
                 }
             }
         }
@@ -104,8 +135,17 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
 
     @Override
     public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void additionalIndex(
-            ACNO crisObject, SolrInputDocument document)
+            ACNO crisObject, SolrInputDocument document,
+            Map<String, List<DiscoverySearchFilter>> searchFilters)
     {
+        try
+        {
+            init();
+        }
+        catch (DCInputsReaderException e)
+        {
+            log.error(e.getMessage(), e);
+        }
         if (crisObject != null)
         {
             ICrisObject<P, TP> parent = (ICrisObject<P, TP>) crisObject
@@ -127,8 +167,12 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                             (((WidgetCheckRadio) pd.getRendering())
                                     .getStaticValues()),
                             stored_value.toString());
+                    document.removeField(field + "_authority");
                     document.addField(field + "_authority", stored_value);
+                    document.removeField(field);
                     document.addField(field, displayVal);
+                    buildSearchFilter(document, searchFilters,
+                            stored_value.toString(), field, field, displayVal);
                 }
             }
         }
@@ -136,7 +180,8 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
 
     @Override
     public void additionalIndex(Context context, DSpaceObject dso,
-            SolrInputDocument document)
+            SolrInputDocument document,
+            Map<String, List<DiscoverySearchFilter>> searchFilters)
     {
         if (dso != null)
         {
@@ -157,7 +202,8 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                         {
                             if (StringUtils.isNotBlank(myInput.getPairsType()))
                             {
-                                for (Metadatum metadatum : item.getMetadata(myInput.getSchema(),
+                                for (Metadatum metadatum : item.getMetadata(
+                                        myInput.getSchema(),
                                         myInput.getElement(),
                                         myInput.getQualifier(), Item.ANY))
                                 {
@@ -165,13 +211,23 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                                     String displayVal = myInput
                                             .getDisplayString(null,
                                                     stored_value);
+                                    document.removeField(metadatum.getField()
+                                            + "_authority");
                                     document.addField(
                                             metadatum.getField() + "_authority",
                                             stored_value);
+                                    document.removeField(metadatum.getField());
                                     document.addField(metadatum.getField(),
                                             displayVal);
-                                    document.addField(myInput.getPairsType(),
-                                            displayVal);
+
+                                    String unqualifiedField = myInput
+                                            .getSchema() + "."
+                                            + myInput.getElement() + "."
+                                            + Item.ANY;
+                                    buildSearchFilter(document, searchFilters,
+                                            stored_value.toString(),
+                                            metadatum.getField(),
+                                            unqualifiedField, displayVal);
                                 }
                             }
                         }
@@ -264,5 +320,81 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
             }
         }
         return null;
+    }
+
+    private void buildSearchFilter(SolrInputDocument document,
+            Map<String, List<DiscoverySearchFilter>> searchFilters,
+            String stored_value, String field, String unqualifiedField,
+            String displayVal)
+    {
+        if (searchFilters.containsKey(field))
+        {
+            List<DiscoverySearchFilter> searchFilterConfigs = searchFilters
+                    .get(field);
+            if (searchFilterConfigs == null)
+            {
+                searchFilterConfigs = searchFilters
+                        .get(unqualifiedField + "." + Item.ANY);
+            }
+
+            for (DiscoverySearchFilter searchFilter : searchFilterConfigs)
+            {
+                document.removeField(searchFilter.getIndexFieldName());
+                document.addField(searchFilter.getIndexFieldName(), displayVal);
+
+                document.removeField(
+                        searchFilter.getIndexFieldName() + "_keyword");
+                document.addField(searchFilter.getIndexFieldName() + "_keyword",
+                        displayVal);
+                document.addField(searchFilter.getIndexFieldName() + "_keyword",
+                        displayVal + SolrServiceImpl.AUTHORITY_SEPARATOR
+                                + stored_value);
+
+                document.removeField(searchFilter.getIndexFieldName() + "_ac");
+                document.addField(searchFilter.getIndexFieldName() + "_ac",
+                        displayVal.toLowerCase() + separator + displayVal);
+
+                document.removeField(
+                        searchFilter.getIndexFieldName() + "_authority");
+                document.addField(
+                        searchFilter.getIndexFieldName() + "_authority",
+                        stored_value);
+
+                document.removeField(
+                        searchFilter.getIndexFieldName() + "_acid");
+                document.addField(searchFilter.getIndexFieldName() + "_acid",
+                        displayVal.toLowerCase() + separator + displayVal
+                                + SolrServiceImpl.AUTHORITY_SEPARATOR
+                                + stored_value);
+
+                document.removeField(
+                        searchFilter.getIndexFieldName() + "_filter");
+                document.addField(searchFilter.getIndexFieldName() + "_filter",
+                        displayVal.toLowerCase() + separator + displayVal
+                                + SolrServiceImpl.AUTHORITY_SEPARATOR
+                                + stored_value);
+            }
+        }
+    }
+
+    public ConfigurationService getConfigurationService()
+    {
+        return configurationService;
+    }
+
+    public void setConfigurationService(
+            ConfigurationService configurationService)
+    {
+        this.configurationService = configurationService;
+    }
+
+    public String getSeparator()
+    {
+        return separator;
+    }
+
+    public void setSeparator(String separator)
+    {
+        this.separator = separator;
     }
 }

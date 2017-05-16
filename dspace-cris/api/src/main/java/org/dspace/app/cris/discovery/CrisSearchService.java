@@ -289,7 +289,7 @@ public class CrisSearchService extends SolrServiceImpl
                         CrisServiceIndexPlugin.class);
         for (CrisServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
         {
-            solrServiceIndexPlugin.additionalIndex(dso, doc);
+            solrServiceIndexPlugin.additionalIndex(dso, doc, searchFilters);
         }
 
         // write the index and close the inputstreamreaders
@@ -695,7 +695,7 @@ public class CrisSearchService extends SolrServiceImpl
                         CrisServiceIndexPlugin.class);
         for (CrisServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
         {
-            solrServiceIndexPlugin.additionalIndex(dso, doc);
+            solrServiceIndexPlugin.additionalIndex(dso, doc, null);
         }
         
         log.debug("  Added Metadata");

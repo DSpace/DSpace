@@ -8,6 +8,8 @@
 package org.dspace.app.cris.discovery;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
@@ -16,6 +18,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 public class HasDoiSolrIndexer implements SolrServiceIndexPlugin
 {
@@ -24,7 +27,7 @@ public class HasDoiSolrIndexer implements SolrServiceIndexPlugin
 
     @Override
     public void additionalIndex(Context context, DSpaceObject dso,
-            SolrInputDocument document)
+            SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters)
     {
         if (dso instanceof Item)
         {
