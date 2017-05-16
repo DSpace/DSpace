@@ -92,6 +92,15 @@ public class XmlWorkflowManager {
      * startWithoutNotify() starts the workflow normally, but disables
      * notifications (useful for large imports,) for the first workflow step -
      * subsequent notifications happen normally
+     * @param c
+     * @param wsi
+     * @return a new workflow item wrapping the item removed from the workspace.
+     * @throws java.sql.SQLException passed through
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.xmlworkflow.WorkflowException passed through.
+     * @throws org.dspace.xmlworkflow.WorkflowConfigurationException passed through.
+     * @throws javax.mail.MessagingException passed through.
      */
     public static XmlWorkflowItem startWithoutNotify(Context c, WorkspaceItem wsi)
             throws SQLException, AuthorizeException, IOException, WorkflowException, WorkflowConfigurationException, MessagingException {
@@ -352,9 +361,14 @@ public class XmlWorkflowManager {
      * with the relevant collection, added to the search index, and any other
      * tasks such as assigning dates are performed.
      *
+     * @param c
+     * @param wfi
      * @return the fully archived item.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
-    public static Item archive(Context c, XmlWorkflowItem wfi)
+    protected static Item archive(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException, AuthorizeException {
         // FIXME: Check auth
         Item item = wfi.getItem();

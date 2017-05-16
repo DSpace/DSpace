@@ -13,17 +13,14 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
+import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.identifier.ezid.DateToYear;
 import org.dspace.identifier.ezid.Transform;
-import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
 import org.junit.*;
 
 import static org.junit.Assert.*;
@@ -87,10 +84,10 @@ public class EZIDIdentifierProviderTest
      * @throws AuthorizeException
      * @throws IOException
      */
-    private Item newItem(Context ctx)
+    private Item newItem()
             throws SQLException, AuthorizeException, IOException
     {
-        ctx.turnOffAuthorisationSystem();
+        context.turnOffAuthorisationSystem();
        
          //Install a fresh item
         WorkspaceItem wsItem = WorkspaceItem.create(context, collection, false);
@@ -104,8 +101,8 @@ public class EZIDIdentifierProviderTest
         item.update();
 
         // Commit work, clean up
-        ctx.commit();
-        ctx.restoreAuthSystemState();
+        context.commit();
+        context.restoreAuthSystemState();
 
         return item;
     }
@@ -391,36 +388,42 @@ public class EZIDIdentifierProviderTest
     public void testCrosswalkMetadata()
             throws Exception
     {
-        System.out.println("crosswalkMetadata");
+        try {
+            System.out.println("crosswalkMetadata");
 
-        // Set up the instance to be tested
-        EZIDIdentifierProvider instance = new EZIDIdentifierProvider();
-        instance.setConfigurationService(config);
-        instance.setCrosswalk(aCrosswalk);
-        instance.setCrosswalkTransform(crosswalkTransforms);
+            // Set up the instance to be tested
+            EZIDIdentifierProvider instance = new EZIDIdentifierProvider();
+            instance.setConfigurationService(config);
+            instance.setCrosswalk(aCrosswalk);
+            instance.setCrosswalkTransform(crosswalkTransforms);
 
-        // Let's have a fresh Item to work with
-        DSpaceObject dso = newItem(context);
-        String handle = dso.getHandle();
+            // Let's have a fresh Item to work with
+            DSpaceObject dso = newItem();
+            String handle = dso.getHandle();
 
-        // Test!
-        Map<String, String> metadata = instance.crosswalkMetadata(dso);
+            // Test!
+            Map<String, String> metadata = instance.crosswalkMetadata(dso);
 
-        // Evaluate
-        String target = (String) metadata.get("_target");
-        assertEquals("Generates correct _target metadatum",
-                config.getProperty("dspace.url") + "/handle/" + handle,
-                target);
-        assertTrue("Has title", metadata.containsKey("datacite.title"));
-        assertTrue("Has publication year", metadata.containsKey("datacite.publicationyear"));
-        assertTrue("Has publisher", metadata.containsKey("datacite.publisher"));
-        assertTrue("Has creator", metadata.containsKey("datacite.creator"));
+            // Evaluate
+            String target = (String) metadata.get("_target");
+            assertEquals("Generates correct _target metadatum",
+                    config.getProperty("dspace.url") + "/handle/" + handle,
+                    target);
+            assertTrue("Has title", metadata.containsKey("datacite.title"));
+            assertTrue("Has publication year", metadata.containsKey("datacite.publicationyear"));
+            assertTrue("Has publisher", metadata.containsKey("datacite.publisher"));
+            assertTrue("Has creator", metadata.containsKey("datacite.creator"));
 
-        // Dump out the generated metadata for inspection
-        System.out.println("Results:");
-        for (Entry metadatum : metadata.entrySet())
-        {
-            System.out.printf("  %s : %s\n", metadatum.getKey(), metadatum.getValue());
+            // Dump out the generated metadata for inspection
+            System.out.println("Results:");
+            for (Entry metadatum : metadata.entrySet())
+            {
+                System.out.printf("  %s : %s\n", metadatum.getKey(), metadatum.getValue());
+            }
+        } catch (NullPointerException ex) {
+            ex.printStackTrace(System.err);
+            Logger.getLogger(EZIDIdentifierProviderTest.class).fatal("Caught NPE", ex);
+            throw ex;
         }
     }
 }
