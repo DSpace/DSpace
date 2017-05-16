@@ -344,15 +344,40 @@ public class DCInputsReader
                                                         Map<String, String> field = new HashMap<String, String>();
                                                         page.add(field);
                                                         processPageParts(formName, pgNum, nfld, field);
-                                                        if(mappedValuePairs.containsKey(field.get(PAIR_TYPE_NAME))) {
+                                                        
+                                                        String key = field.get(PAIR_TYPE_NAME);
+                                                        if (StringUtils
+                                                                .isNotBlank(key))
+                                                        {
                                                             String schema = field.get("dc-schema");
                                                             String element = field.get("dc-element");
-                                                            String qualifier = field.get("dc-qualifier");
-                                                            String metadataField = schema + "." + element;
-                                                            if(StringUtils.isNotBlank(qualifier)) {
+                                                            String qualifier = field
+                                                                    .get("dc-qualifier");
+                                                            String metadataField = schema + "."
+                                                                    + element;
+                                                            if (StringUtils.isNotBlank(qualifier))
+                                                            {
                                                                 metadataField += "." + qualifier;
                                                             }
-                                                            mappedValuePairs.get(field.get(PAIR_TYPE_NAME)).add(metadataField);
+                        
+                                                            if (mappedValuePairs.containsKey(
+                                                                    key))
+                                                            {
+                                                                if(!mappedValuePairs
+                                                                        .get(key).contains(metadataField)) {
+                                                                    mappedValuePairs
+                                                                    .get(key).add(metadataField);
+                                                                }
+                                                                    
+                                                            }
+                                                            else
+                                                            {
+                                                                List<String> newval = new ArrayList<String>();
+                                                                newval.add(metadataField);
+                                                                mappedValuePairs.put(
+                                                                        key,
+                                                                        newval);
+                                                            }
                                                         }
                                                         // we omit the duplicate validation, allowing multiple fields definition for 
                                                         // the same metadata and different visibility/type-bind
