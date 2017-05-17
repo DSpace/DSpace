@@ -52,7 +52,7 @@
 			<display:column headerClass="id" titleKey="jsp.layout.table.cris.admin-list.id" property="id" url="/cris/rp/details.htm" paramId="id" paramProperty="id" sortable="true"/>							
 			<display:column headerClass="uuid" titleKey="jsp.layout.table.cris.admin-list.uuid" property="uuid" url="/cris/rp/details.htm" paramId="id" paramProperty="id" sortable="true"/>		
 			<display:column headerClass="sourceID" class="sourceID" titleKey="jsp.layout.table.cris.admin-list.sourceID" sortable="false">
-							<a href="<%=request.getContextPath()%>/cris/rp/details.htm?sourceid=${objectList.sourceID}&sourceref=${objectList.rp.sourceRef}">${objectList.sourceID}</a>
+							<a href="<%=request.getContextPath()%>/cris/rp/details.htm?sourceid=${objectList.sourceID}&sourceref=${objectList.rp.sourceRef}">${objectList.sourceID}<c:if test="${!empty objectList.rp.sourceRef}">/${objectList.rp.sourceRef}</c:if></a>
 			</display:column>								
 			<display:column headerClass="names" class="names" titleKey="jsp.layout.table.cris.admin-list.rp.fullName" property="fullName" sortable="false"/>			
 			<display:column headerClass="dept" class="dept" titleKey="jsp.layout.table.cris.admin-list.rp.department" sortable="false">				

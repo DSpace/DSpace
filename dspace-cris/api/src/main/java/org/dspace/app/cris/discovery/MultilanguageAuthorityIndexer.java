@@ -3,6 +3,7 @@ package org.dspace.app.cris.discovery;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -15,6 +16,7 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.utils.DSpace;
 
 public class MultilanguageAuthorityIndexer implements SolrServiceIndexPlugin
@@ -24,7 +26,7 @@ public class MultilanguageAuthorityIndexer implements SolrServiceIndexPlugin
 
     @Override
     public void additionalIndex(Context context, DSpaceObject dso,
-            SolrInputDocument document)
+            SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters)
     {
         if (dso instanceof Item)
         {

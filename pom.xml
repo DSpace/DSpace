@@ -32,14 +32,14 @@
     <properties>		
 		<!-- Warning hibernate core many pom point to 3.3.2.GA to be compliant with hibernate-annotation 3.4.0.GA (required by spring ORM 3.1.1.RELEASE)-->
 		<!--<org.hibernate.version>3.6.10.Final</org.hibernate.version> -->
-		<org.hibernate.version>4.1.8.Final</org.hibernate.version>
-		<org.hibernate.ehcache.version>4.0.1.Final</org.hibernate.ehcache.version>
-		<org.hibernate.entitymanager.version>4.1.8.Final</org.hibernate.entitymanager.version>
-		<org.hibernate.annotations.version>4.0.1.Final</org.hibernate.annotations.version>
+		<org.hibernate.version>4.2.21.Final</org.hibernate.version>
+		<org.hibernate.ehcache.version>4.2.21.Final</org.hibernate.ehcache.version>
+		<org.hibernate.entitymanager.version>4.2.21.Final</org.hibernate.entitymanager.version>
+		<org.hibernate.annotations.version>4.0.2.Final</org.hibernate.annotations.version>
 		<org.hibernate.jpa.version>1.0.1.Final</org.hibernate.jpa.version>
 		
 		<org.jdyna.version>5.8-SNAPSHOT</org.jdyna.version>		
-		<it.cilea.ccommons.version>2.2</it.cilea.ccommons.version>
+		<it.cilea.ccommons.version>2.3-SNAPSHOT</it.cilea.ccommons.version>
 		
 		<ckan.addon.modules>[5.1-SNAPSHOT,6.0-SNAPSHOT)</ckan.addon.modules>
 		<iiif.addon.modules>[5.0-SNAPSHOT,6.0-SNAPSHOT)</iiif.addon.modules>
@@ -1111,49 +1111,49 @@
         <dependency>
             <artifactId>spring-core</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.16.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-beans</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.16.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-aop</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.16.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-context</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.16.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-tx</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.16.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-jdbc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.16.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-web</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.16.RELEASE</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.2.16.RELEASE</version>
         </dependency>
 
          <dependency>

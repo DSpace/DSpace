@@ -8,6 +8,7 @@
 package org.dspace.app.cris.ws.discovery;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -18,6 +19,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 
 /**
@@ -52,7 +54,7 @@ public class CrisWebservicesExtraIndexPlugin implements SolrServiceIndexPlugin
        
     @Override
     public void additionalIndex(Context context, DSpaceObject dso,
-            SolrInputDocument document)
+            SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters)
     {
         if (!(dso instanceof Item))
         {

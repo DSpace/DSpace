@@ -14,6 +14,7 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 
@@ -81,6 +82,8 @@ public class DCInputsReader
      * form-interleaved, there will be a modest win.
      */
     private DCInputSet lastInputSet = null;
+    
+    private Map<String, List<String>> mappedValuePairs = new HashMap<String, List<String>>();
 
     /**
      * Parse an XML encoded submission forms template file, and create a hashmap
@@ -341,7 +344,41 @@ public class DCInputsReader
                                                         Map<String, String> field = new HashMap<String, String>();
                                                         page.add(field);
                                                         processPageParts(formName, pgNum, nfld, field);
-
+                                                        
+                                                        String key = field.get(PAIR_TYPE_NAME);
+                                                        if (StringUtils
+                                                                .isNotBlank(key))
+                                                        {
+                                                            String schema = field.get("dc-schema");
+                                                            String element = field.get("dc-element");
+                                                            String qualifier = field
+                                                                    .get("dc-qualifier");
+                                                            String metadataField = schema + "."
+                                                                    + element;
+                                                            if (StringUtils.isNotBlank(qualifier))
+                                                            {
+                                                                metadataField += "." + qualifier;
+                                                            }
+                        
+                                                            if (mappedValuePairs.containsKey(
+                                                                    key))
+                                                            {
+                                                                if(!mappedValuePairs
+                                                                        .get(key).contains(metadataField)) {
+                                                                    mappedValuePairs
+                                                                    .get(key).add(metadataField);
+                                                                }
+                                                                    
+                                                            }
+                                                            else
+                                                            {
+                                                                List<String> newval = new ArrayList<String>();
+                                                                newval.add(metadataField);
+                                                                mappedValuePairs.put(
+                                                                        key,
+                                                                        newval);
+                                                            }
+                                                        }
                                                         // we omit the duplicate validation, allowing multiple fields definition for 
                                                         // the same metadata and different visibility/type-bind
 
@@ -692,5 +729,17 @@ public class DCInputsReader
         }
         // Didn't find a text node
         return null;
+    }
+
+
+    public Map<String, List<String>> getMappedValuePairs()
+    {
+        return mappedValuePairs;
+    }
+
+
+    public void setMappedValuePairs(Map<String, List<String>> mappedValuePairs)
+    {
+        this.mappedValuePairs = mappedValuePairs;
     }
 }

@@ -12,18 +12,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.sort.OrderFormat;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
@@ -94,7 +96,7 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
     }
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument doc)
+    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument doc, Map<String, List<DiscoverySearchFilter>> searchFilters)
     {
         if (!(dso instanceof Item))
         {

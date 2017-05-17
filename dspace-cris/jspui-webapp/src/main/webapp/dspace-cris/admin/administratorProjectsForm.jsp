@@ -51,7 +51,7 @@
 			<display:column headerClass="id" titleKey="jsp.layout.table.cris.admin-list.id" property="id" url="/cris/project/details.htm" paramId="id" paramProperty="id" sortable="true"/>
 			<display:column headerClass="uuid" titleKey="jsp.layout.table.cris.admin-list.uuid" property="grant.uuid" url="/cris/project/details.htm" paramId="id" paramProperty="id" sortable="true"/>										
 			<display:column headerClass="sourceID" class="sourceID" titleKey="jsp.layout.table.cris.admin-list.sourceID" sortable="false">
-							<a href="<%=request.getContextPath()%>/cris/pj/details.htm?sourceid=${objectList.sourceID}&sourceref=${objectList.grant.sourceRef}">${objectList.sourceID}</a>
+							<a href="<%=request.getContextPath()%>/cris/pj/details.htm?sourceid=${objectList.sourceID}&sourceref=${objectList.grant.sourceRef}">${objectList.sourceID}<c:if test="${!empty objectList.grant.sourceRef}">/${objectList.grant.sourceRef}</c:if></a>
 			</display:column>					
 			<display:column headerClass="title" titleKey="jsp.layout.table.hku.projects.title" property="title" sortable="false"/>						
 			<display:column headerClass="active" titleKey="jsp.layout.table.cris.admin-list.status" sortable="true" sortProperty="status">				

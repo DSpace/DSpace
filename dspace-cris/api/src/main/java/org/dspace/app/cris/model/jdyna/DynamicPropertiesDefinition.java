@@ -28,6 +28,7 @@ import javax.persistence.Table;
     @NamedQuery(name = "DynamicPropertiesDefinition.findAllWithPolicyGroup", query = "from DynamicPropertiesDefinition where rendering in (from WidgetGroup)"),
     @NamedQuery(name = "DynamicPropertiesDefinition.likeAllWithPolicySingle", query = "from DynamicPropertiesDefinition where shortName = ? and rendering in (from WidgetEPerson)"),
     @NamedQuery(name = "DynamicPropertiesDefinition.likeAllWithPolicyGroup", query = "from DynamicPropertiesDefinition where shortName = ? and rendering in (from WidgetGroup)"),
+    @NamedQuery(name = "DynamicPropertiesDefinition.findAllWithCheckRadioDropdown", query = "from DynamicPropertiesDefinition where rendering in (from WidgetCheckRadio)"),
     @NamedQuery(name = "DynamicPropertiesDefinition.likeByShortName", query = "from DynamicPropertiesDefinition where shortName LIKE :par0", hints = { @javax.persistence.QueryHint(name = "org.hibernate.cacheable", value = "true") })
 })
 public class DynamicPropertiesDefinition extends PropertiesDefinition

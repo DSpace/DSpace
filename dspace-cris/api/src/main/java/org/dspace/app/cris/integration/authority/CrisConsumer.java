@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -166,8 +167,24 @@ public class CrisConsumer implements Consumer
                                                 "import.submission");
                                 if (activateImportInSubmission)
                                 {
-                                    String valueHashed = HashUtil
-                                            .hashMD5(dcval.value);
+                                    String valueHashed = "";
+
+                                    boolean buildFromUUID = ConfigurationManager
+                                            .getBooleanProperty("cris",
+                                                    "import.submission.strategy.uuid."
+                                                            + metadata,
+                                                    false);
+                                    if (buildFromUUID)
+                                    {
+                                        valueHashed = UUID.randomUUID()
+                                                .toString();
+                                    }
+                                    else
+                                    {
+                                        valueHashed = HashUtil
+                                                .hashMD5(dcval.value);
+                                    }
+                                        
                                     List<Metadatum> list = new ArrayList<Metadatum>();
                                     if (toBuild.containsKey(valueHashed))
                                     {

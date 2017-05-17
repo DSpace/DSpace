@@ -7,9 +7,13 @@
  */
 package org.dspace.discovery;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 /**
  * Indexing plugin used when indexing the communities/collections/items into DSpace
@@ -20,5 +24,5 @@ import org.dspace.core.Context;
  */
 public interface SolrServiceIndexPlugin {
 
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document);
+    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters);
 }

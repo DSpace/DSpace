@@ -15,6 +15,7 @@ import it.cilea.osd.jdyna.model.PropertiesDefinition;
 import it.cilea.osd.jdyna.model.Property;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +33,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 public class ResourceTypeSolrIndexer implements CrisServiceIndexPlugin,
 		SolrServiceIndexPlugin {
@@ -42,7 +44,7 @@ public class ResourceTypeSolrIndexer implements CrisServiceIndexPlugin,
 	@Override
 	public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void additionalIndex(
 			ACrisObject<P, TP, NP, NTP, ACNO, ATNO> crisObject,
-			SolrInputDocument document) {
+			SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters) {
 
 		String acvalue = "";
 		String fvalue = "";
@@ -80,7 +82,7 @@ public class ResourceTypeSolrIndexer implements CrisServiceIndexPlugin,
 
 	@Override
 	public void additionalIndex(Context context, DSpaceObject dso,
-			SolrInputDocument document) {
+			SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters) {
 
 		String acvalue = ConfigurationManager.getProperty(
 				CrisConstants.CFG_MODULE, "facet.type."
@@ -114,7 +116,7 @@ public class ResourceTypeSolrIndexer implements CrisServiceIndexPlugin,
 
 	@Override
 	public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void additionalIndex(
-			ACNO dso, SolrInputDocument sorlDoc) {
+			ACNO dso, SolrInputDocument sorlDoc, Map<String, List<DiscoverySearchFilter>> searchFilters) {
 		String acvalue = "";
 		String fvalue = "";
 

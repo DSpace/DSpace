@@ -7,9 +7,13 @@
  */
 package org.dspace.discovery;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
 
 /**
@@ -20,7 +24,7 @@ import org.dspace.core.Context;
 public class SolrServiceIndexOutputPlugin implements SolrServiceIndexPlugin{
 
     @Override
-    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document) {
+    public void additionalIndex(Context context, DSpaceObject dso, SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters) {
         System.out.println("Currently indexing: " + dso.getHandle());
     }
 }

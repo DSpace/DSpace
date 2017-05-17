@@ -721,7 +721,11 @@ public class BrowseListTag extends TagSupport
                     if (schema.equalsIgnoreCase("extra")) {
                     	
                     	String val = null;
-                    	Object obj = items[i].extraInfo.get(element);
+                        String key = element;
+                        if(StringUtils.isNotBlank(qualifier) && !Item.ANY.equals(qualifier)) {
+                            key = element + "." + qualifier;
+                        }
+                        Object obj = items[i].extraInfo.get(key);
 						if (obj != null) {
 							val = String.valueOf(obj);
 						}

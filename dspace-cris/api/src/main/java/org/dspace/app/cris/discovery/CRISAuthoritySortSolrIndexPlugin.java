@@ -38,6 +38,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.SolrServiceIndexPlugin;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 /*
  * @author: Sergio Bilello
  * 
@@ -48,7 +49,7 @@ public class CRISAuthoritySortSolrIndexPlugin implements CrisServiceIndexPlugin{
 	@Override
 	public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void additionalIndex(
 			ACrisObject<P, TP, NP, NTP, ACNO, ATNO> crisObject,
-			SolrInputDocument document) {
+			SolrInputDocument document, Map<String, List<DiscoverySearchFilter>> searchFilters) {
 		if (crisObject!=null){
 			document.addField("crisauthoritylookup_sort",crisObject.getName());
 		}
@@ -56,7 +57,7 @@ public class CRISAuthoritySortSolrIndexPlugin implements CrisServiceIndexPlugin{
 	
 	@Override
 	public <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> void additionalIndex(
-			ACNO dso, SolrInputDocument sorlDoc) {
+			ACNO dso, SolrInputDocument sorlDoc, Map<String, List<DiscoverySearchFilter>> searchFilters) {
 		// FIXME NOT SUPPORTED OPERATION
 	}
 
