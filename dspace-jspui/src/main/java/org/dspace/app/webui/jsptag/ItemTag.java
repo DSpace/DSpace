@@ -667,10 +667,7 @@ public class ItemTag extends TagSupport
 										out.print("<a class=\"btn btn-primary\" ");
 		            					out
 		                                    .print(bsLink
-		                                            + LocaleSupport
-		                                                    .getLocalizedMessage(
-		                                                            pageContext,
-		                                                            "org.dspace.app.webui.jsptag.ItemTag.view")
+		                                    		+ viewOptions.get(0).label
 		                                            + "</a>");
 									}
 									else {
@@ -797,7 +794,12 @@ public class ItemTag extends TagSupport
 		List<ViewOption> results = new ArrayList<ViewOption>();
 
 		List<String> externalProviders = bit.getMetadataValue(IViewer.METADATA_STRING_PROVIDER);
+		boolean showDownload = true;
 		for (String externalProvider : externalProviders) {
+			if (IViewer.STOP_DOWNLOAD.equals(externalProvider)) {
+				showDownload = false;
+				continue;
+			}
 			ViewOption opt = new ViewOption();
 			opt.link = request.getContextPath() + "/explore?bitstream_id=" + bit.getID() + "&handle=" + handle
 					+ "&provider=" + externalProvider;
@@ -806,21 +808,23 @@ public class ItemTag extends TagSupport
 			results.add(opt);
 		}
 
-		ViewOption opt = new ViewOption();
-		opt.link = request.getContextPath();
-
-		if ((handle != null) && (bit.getSequenceID() > 0)) {
-			opt.link = opt.link + "/bitstream/" + handle + "/" + bit.getSequenceID() + "/";
-		} else {
-			opt.link = opt.link + "/retrieve/" + bit.getID() + "/";
+		if (showDownload) {
+			ViewOption opt = new ViewOption();
+			opt.link = request.getContextPath();
+	
+			if ((handle != null) && (bit.getSequenceID() > 0)) {
+				opt.link = opt.link + "/bitstream/" + handle + "/" + bit.getSequenceID() + "/";
+			} else {
+				opt.link = opt.link + "/retrieve/" + bit.getID() + "/";
+			}
+	
+			opt.link = opt.link + UIUtil.encodeBitstreamName(bit.getName(), Constants.DEFAULT_ENCODING);
+			opt.label = LocaleSupport
+	                .getLocalizedMessage(
+	                        pageContext,
+	                        "org.dspace.app.webui.jsptag.ItemTag.view");
+			results.add(opt);
 		}
-
-		opt.link = opt.link + UIUtil.encodeBitstreamName(bit.getName(), Constants.DEFAULT_ENCODING);
-		opt.label = LocaleSupport
-                .getLocalizedMessage(
-                        pageContext,
-                        "org.dspace.app.webui.jsptag.ItemTag.view");
-		results.add(opt);
 		return results;
     }
 }

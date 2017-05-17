@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.IViewer;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -117,6 +118,12 @@ public class RetrieveServlet extends DSpaceServlet
             {
                 throw new AuthorizeException();
             }
+            
+			if (bitstream.getMetadataValue(IViewer.METADATA_STRING_PROVIDER).contains(IViewer.STOP_DOWNLOAD)
+					&& !AuthorizeManager.isAdmin(context, bitstream)) {
+				throw new AuthorizeException("Download not allowed by viewer policy");
+			}
+            
             log.info(LogManager.getHeader(context, "view_bitstream",
                     "bitstream_id=" + bitstream.getID()));
 

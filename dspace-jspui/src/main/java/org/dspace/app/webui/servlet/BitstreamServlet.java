@@ -17,9 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.IViewer;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
@@ -169,7 +171,11 @@ public class BitstreamServlet extends DSpaceServlet
 
         log.info(LogManager.getHeader(context, "view_bitstream",
                 "bitstream_id=" + bitstream.getID()));
-        
+ 
+		if (bitstream.getMetadataValue(IViewer.METADATA_STRING_PROVIDER).contains(IViewer.STOP_DOWNLOAD)
+				&& !AuthorizeManager.isAdmin(context, bitstream)) {
+			throw new AuthorizeException("Download not allowed by viewer policy");
+		}
         //new UsageEvent().fire(request, context, AbstractUsageEvent.VIEW,
 		//		Constants.BITSTREAM, bitstream.getID());
 
