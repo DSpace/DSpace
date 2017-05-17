@@ -11,10 +11,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -48,6 +52,7 @@ import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.I18nUtil;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
@@ -86,63 +91,38 @@ public class DescribeStep extends AbstractSubmissionStep
     protected static final Message T_report_no=
         message("xmlui.Submission.submit.DescribeStep.report_no");
         
-    /**
-     * A shared resource of the inputs reader. The 'inputs' are the
-     * questions we ask the user to describe an item during the
-     * submission process. The reader is a utility class to read
-     * that configuration file.
-     */
-    private static DCInputsReader INPUTS_READER = null;
-
     private static final Message T_vocabulary_link = message("xmlui.Submission.submit.DescribeStep.controlledvocabulary.link");
 
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected ChoiceAuthorityService choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
     protected MetadataAuthorityService metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
-
-    /**
-     * Ensure that the inputs reader has been initialized, this method may be
-     * called multiple times with no ill-effect.
-     */
-    private static void initializeInputsReader() throws DCInputsReaderException
-    {
-        if (INPUTS_READER == null)
-        {
-            INPUTS_READER = new DCInputsReader();
-        }
-    }
-    
-    /**
-     * Return the inputs reader. Note, the reader must have been
-     * initialized before the reader can be accessed.
-     *
-     * @return The input reader.
-     */
-    private static DCInputsReader getInputsReader()
-    {
-        return INPUTS_READER;
-    }
+    protected DCInputsReader inputsReader = null;
 
     /**
      * Establish our required parameters.  AbstractStep will enforce these.
-     * @throws javax.servlet.ServletException if the reader could not initialize.
      */
-        public DescribeStep() throws ServletException
+        public DescribeStep()
         {
                 this.requireSubmission = true;
                 this.requireStep = true;
-                
-                // Ensure that the InputsReader is initialized.
-                try
-                {
-                    initializeInputsReader();
-                }
-                catch (DCInputsReaderException e)
-                {
-                    throw new ServletException(e);
-                }
         }
-        
+
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException
+    {
+        super.setup(resolver, objectModel, src, parameters);
+
+        String formFileName = I18nUtil.getInputFormsFileName(context.getCurrentLocale());
+        try
+        {
+            this.inputsReader = org.dspace.submit.step.DescribeStep.getInputsReader(formFileName);
+        }
+        catch (ServletException e)
+        {
+            throw new ProcessingException(e);
+        }
+    }
+
     @Override
         public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
@@ -176,7 +156,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 DCInput[] inputs;
                 try
                 {
-                        inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+                        inputSet = inputsReader.getInputs(submission.getCollection().getHandle());
                         inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
                 }
                 catch (DCInputsReaderException se)
@@ -335,13 +315,13 @@ public class DescribeStep extends AbstractSubmissionStep
         DCInputSet inputSet = null;
         try
         {
-            inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
+            inputSet = inputsReader.getInputs(submission.getCollection().getHandle());
         }
         catch (DCInputsReaderException se)
         {
             throw new UIException(se);
         }
-        
+
         DCInput[] inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
 
         for (DCInput input : inputs)
@@ -1305,4 +1285,12 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 return clean;
         }
+
+    @Override
+    public void recycle()
+    {
+        super.recycle();
+
+        this.inputsReader = null;
+    }
 }
