@@ -221,7 +221,8 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                                     document.removeField(metadatum.getField());
                                     document.addField(metadatum.getField(),
                                             displayVal);
-
+                                    document.addField("valuepairsname_"+myInput.getPairsType(),
+                                            displayVal);
                                     String unqualifiedField = myInput
                                             .getSchema() + "."
                                             + myInput.getElement() + "."
@@ -261,7 +262,7 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
         Iterator<String> iterator = dcInputsReader.getPairsNameIterator();
         while (iterator.hasNext())
         {
-            result.add(iterator.next());
+            result.add("valuepairsname_"+iterator.next());
         }
 
         Set<String> pds = additionalSearchParameter(RPPropertiesDefinition.class);
