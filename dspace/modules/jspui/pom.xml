@@ -121,6 +121,12 @@
 				</dependency>
 				<dependency>
 					<groupId>it.4science.dspace</groupId>
+					<artifactId>addon-docviewer-jspui</artifactId>
+					<version>${docviewer.addon.modules}</version>
+					<type>war</type>
+				</dependency>
+				<dependency>
+					<groupId>it.4science.dspace</groupId>
 					<artifactId>addon-annoiiif-api</artifactId>
 					<version>${annoiiif.addon.modules}</version>
 					<type>jar</type>
