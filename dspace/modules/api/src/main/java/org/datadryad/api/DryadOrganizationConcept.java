@@ -1,7 +1,6 @@
 package org.datadryad.api;
 
 import org.apache.log4j.Logger;
-import org.dspace.JournalUtils;
 import org.dspace.content.authority.Concept;
 import org.dspace.content.authority.Scheme;
 import org.dspace.content.authority.Term;
@@ -63,7 +62,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     // these are mandatory elements
     protected Concept underlyingConcept;
-    protected String conceptIdentifier;
+    protected Integer conceptIdentifier;
     protected String fullName;
 
     public DryadOrganizationConcept() {
@@ -108,7 +107,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     @JsonIgnore
     public void setUnderlyingConcept(Context context, Concept concept) {
         this.underlyingConcept = concept;
-        this.conceptIdentifier = concept.getIdentifier();
+        this.conceptIdentifier = concept.getID();
     }
 
     @JsonIgnore
@@ -220,7 +219,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     }
 
     @JsonIgnore
-    public String getIdentifier() {
+    public Integer getIdentifier() {
         return conceptIdentifier;
     }
 

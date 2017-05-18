@@ -58,7 +58,7 @@ public class JournalUtils {
     public static final String dcDateAccessioned = "dc.date.accessioned";
     private final static SimpleDateFormat fmt = new SimpleDateFormat(fmtDateView);
 
-    private static HashMap<String, DryadJournalConcept> journalConceptHashMapByConceptIdentifier = new HashMap<String, DryadJournalConcept>();
+    private static HashMap<Integer, DryadJournalConcept> journalConceptHashMapByConceptIdentifier = new HashMap<Integer, DryadJournalConcept>();
 
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByJournalID = new HashMap<String, DryadJournalConcept>();
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByJournalName = new HashMap<String, DryadJournalConcept>();
