@@ -100,7 +100,7 @@ public class PublicationUpdater extends HttpServlet {
                             }
                         } else if (itemID != null) {
                             Item item = Item.find(context, itemID);
-                            String result = matchItemToCrossref(context, item);
+                            StringBuilder result = matchItemToCrossref(context, item);
                             LOGGER.info(result);
                         } else {
                             checkPublications(context, startLetter);
@@ -222,7 +222,7 @@ public class PublicationUpdater extends HttpServlet {
                     } catch (SQLException e) {
                         LOGGER.debug("couldn't find claimed task for item " + wfi.getItem().getID());
                     }
-                    String message = "";
+                    StringBuilder message = new StringBuilder();
                     Item item = wfi.getItem();
                     Manuscript queryManuscript = manuscriptFromItem(item);
                     LOGGER.debug(">>> processing workflow item with internal ID " + item.getID());
@@ -236,7 +236,7 @@ public class PublicationUpdater extends HttpServlet {
                         if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
                             databaseManuscript = databaseManuscripts.get(0);
                             if (isInReview) {     // only update the metadata if the item is in review.
-                                String provenance = "Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ";
+                                StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ");
                                 if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
                                     message = provenance;
                                 }
@@ -247,8 +247,8 @@ public class PublicationUpdater extends HttpServlet {
                         LOGGER.error("Problem updating item " + item.getID() + ": Manuscript ID is incorrect.");
                     }
 
-                    message = message + matchItemToCrossref(context, item);
-                    if (!"".equals(message)) {
+                    message.append(matchItemToCrossref(context, item));
+                    if (!"".equals(message.toString())) {
                         updatedItems.add(buildItemSummary(item) + "\n\t" + message);
                         // was there a manuscript record saved for this? If so, update it.
                         if (databaseManuscript != null) {
@@ -277,8 +277,8 @@ public class PublicationUpdater extends HttpServlet {
         // For all found items, look for matches in CrossRef publications.
         for (Item item : items) {
             LOGGER.debug(">>> processing archived item with internal ID " + item.getID());
-            String message = matchItemToCrossref(context, item);
-            if (!"".equals(message)) {
+            StringBuilder message = matchItemToCrossref(context, item);
+            if (!"".equals(message.toString())) {
                 updatedItems.add(buildItemSummary(item) + "\n\t" + message);
             }
         }
@@ -288,8 +288,8 @@ public class PublicationUpdater extends HttpServlet {
         }
     }
 
-    private String matchItemToCrossref(Context context, Item item) {
-        String message = "";
+    private StringBuilder matchItemToCrossref(Context context, Item item) {
+        StringBuilder message = new StringBuilder();
         Manuscript queryManuscript = manuscriptFromItem(item);
 
         // look for this item in crossref:
@@ -308,7 +308,7 @@ public class PublicationUpdater extends HttpServlet {
             if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
                 LOGGER.debug("same authors");
                 // update the item's metadata
-                String provenance = "Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".";
+                StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");
                 if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
                     message = provenance;
                 }
@@ -489,8 +489,8 @@ public class PublicationUpdater extends HttpServlet {
         return queryManuscript;
     }
 
-    private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, String provenance) {
-        boolean changed = false;
+    private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, StringBuilder provenance) {
+        HashSet<String> fieldsChanged = new HashSet<String>();
         LOGGER.debug("updating metadata for item " + item.getID() + " to manuscript " + manuscript.toString());
         // first, check to see if this is one of the known mismatches:
         if (isManuscriptMismatchForItem(item, manuscript)) {
@@ -499,29 +499,29 @@ public class PublicationUpdater extends HttpServlet {
         }
 
         if (!"".equals(manuscript.getPublicationDOI()) && !item.hasMetadataEqualTo(PUBLICATION_DOI, manuscript.getPublicationDOI())) {
-            changed = true;
+            fieldsChanged.add(PUBLICATION_DOI);
             item.clearMetadata(PUBLICATION_DOI);
             item.addMetadata(PUBLICATION_DOI, null, manuscript.getPublicationDOI(), null, -1);
             LOGGER.debug("adding publication DOI " + manuscript.getPublicationDOI());
-            provenance = provenance + " " + PUBLICATION_DOI + " was updated.";
+            provenance.append(" " + PUBLICATION_DOI + " was updated.");
         }
         if (!"".equals(manuscript.getManuscriptId()) && !item.hasMetadataEqualTo(MANUSCRIPT_NUMBER, manuscript.getManuscriptId())) {
-            changed = true;
+            fieldsChanged.add(MANUSCRIPT_NUMBER);
             item.clearMetadata(MANUSCRIPT_NUMBER);
             item.addMetadata(MANUSCRIPT_NUMBER, null, manuscript.getManuscriptId(), null, -1);
             LOGGER.debug("adding msid " + manuscript.getManuscriptId());
-            provenance = provenance + " " + MANUSCRIPT_NUMBER + " was updated.";
+            provenance.append(" " + MANUSCRIPT_NUMBER + " was updated.");
         }
 
         SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
         if (manuscript.getPublicationDate() != null) {
             String dateString = dateIso.format(manuscript.getPublicationDate());
             if (!item.hasMetadataEqualTo(PUBLICATION_DATE, dateString)) {
-                changed = true;
+                fieldsChanged.add(PUBLICATION_DATE);
                 item.clearMetadata(PUBLICATION_DATE);
                 item.addMetadata(PUBLICATION_DATE, null, dateString, null, -1);
                 LOGGER.debug("adding pub date " + manuscript.getPublicationDate());
-                provenance = provenance + " " + PUBLICATION_DATE + " was updated.";
+                provenance.append(" " + PUBLICATION_DATE + " was updated.");
             }
         }
         if (!"".equals(manuscript.getFullCitation())) {
@@ -535,17 +535,17 @@ public class PublicationUpdater extends HttpServlet {
             LOGGER.debug("new citation is: " + manuscript.getFullCitation());
             LOGGER.debug("citation match score is " + score);
             if (score < 0.9) {
-                changed = true;
+                fieldsChanged.add(FULL_CITATION);
                 item.clearMetadata(FULL_CITATION);
                 item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
                 LOGGER.debug("adding citation " + manuscript.getFullCitation());
-                provenance = provenance + " " + FULL_CITATION + " was updated.";
+                provenance.append(" " + FULL_CITATION + " was updated.");
             }
         }
-        if (changed) {
+        if (fieldsChanged.size() > 0) {
             item.clearMetadata(CITATION_IN_PROGRESS);
             item.addMetadata(CITATION_IN_PROGRESS, null, "true", null, -1);
-            if (!"".equals(provenance)) {
+            if (!"".equals(provenance.toString())) {
                 LOGGER.info("writing provenance for item " + item.getID() + ": " + provenance);
                 item.addMetadata(PROVENANCE, "en", "PublicationUpdater: " + provenance + " on " + DCDate.getCurrent().toString() + " (GMT)", null, -1);
             }
@@ -556,10 +556,13 @@ public class PublicationUpdater extends HttpServlet {
             } catch (Exception e) {
                 LOGGER.error("couldn't save metadata: " + e.getMessage());
             }
+
+            // only return true if we want to get email notifications about this update: FULL_CITATION or PUBLICATION_DOI was updated.
+            return (fieldsChanged.contains(FULL_CITATION) || fieldsChanged.contains(PUBLICATION_DOI));
         } else {
             LOGGER.debug("nothing changed");
+            return false;
         }
-        return changed;
     }
 
     private boolean isManuscriptMismatchForItem(Item item, Manuscript manuscript) {
