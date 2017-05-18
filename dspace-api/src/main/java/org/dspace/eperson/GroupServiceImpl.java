@@ -185,6 +185,15 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             //lookup eperson in normal groups and subgroups
             return epersonInGroup(context, groupName, currentUser);
         } else {
+            // Check also for anonymous users if IP authentication used
+            List<Group> specialGroups = context.getSpecialGroups();
+            if(CollectionUtils.isNotEmpty(specialGroups)) {
+                for(Group specialGroup : specialGroups){
+                    if (StringUtils.equals(specialGroup.getName(), groupName)) {
+                        return true;
+                    }
+                }
+            }
             return false;
         }
     }
