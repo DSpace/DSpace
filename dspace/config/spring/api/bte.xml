@@ -113,6 +113,7 @@
 	            <entry key="pubmed" value-ref="pubmedOnlineDataLoader"/>
 	            <!-- <entry key="pubmedEurope" value-ref="pubmedEuropeOnlineDataLoader"/> -->	            
 	            <entry key="crossref" value-ref="crossRefOnlineDataLoader"/>
+	            <entry key="orcid" value-ref="orcidOnlineDataLoader"/>
 	            <entry key="arxiv" value-ref="arXivOnlineDataLoader"/>
 	            <entry key="cinii" value-ref="ciniiOnlineDataLoader"/>
 <!-- 	            depending on your apiKey you should use scopusOnlineDataLoader or scivalOnlineDataLoader
@@ -546,6 +547,37 @@
 		</constructor-arg>
 	</bean>
 
+	<!-- Orcid Data Loaders -->
+	<bean id="orcidOnlineDataLoader" class="org.dspace.app.cris.integration.orcid.OrcidOnlineDataLoader">
+		<property name="fieldMap" ref="orcidInputMap" />
+	</bean>
+
+	<bean name="orcidInputMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="url" value="url" />
+				<entry key="title" value="title" />
+				<entry key="providerType" value="providerType" />
+				<entry key="sourceTitle" value="journal" />
+				<entry key="issued" value="issued" />
+				<entry key="abstract" value="abstract" />				
+				<entry key="language" value="language" />
+				<entry key="authors" value="authors" />				
+				<entry key="orcid" value="orcid" />		
+				<entry key="arxiv" value="arxiv" />
+				<entry key="eid" value="eid" />
+				<entry key="doi" value="doi" />
+				<entry key="pmid" value="pubmedID" />
+				<entry key="pmc" value="pubmedcentralID" />
+				<entry key="handle" value="handle" />
+				<entry key="isbn" value="pisbn" />
+				<entry key="issn" value="jissn" />
+				<entry key="uri" value="uri" />
+				<entry key="wosuid" value="isiId" />
+			</map>
+		</constructor-arg>
+	</bean>	
+
 	<!-- CrossRef Data Loaders -->
 	<bean id="crossRefOnlineDataLoader" class="org.dspace.submit.lookup.CrossRefOnlineDataLoader">
 		<property name="searchProvider" value="false" />
@@ -691,7 +723,8 @@
 				<entry value="meshqualifiers" key="dc.subject.meshqualifier" />
 				<entry value="eid" key="dc.identifier.scopus" />
 				<entry value="isiId" key="dc.identifier.isi" />
-				<entry value="providerType" key="dc.source.type" />				
+				<entry value="providerType" key="dc.source.type" />
+				<entry value="orcid" key="dc.contributor.orcid" />				
 				
 				<!-- Not used - new metadata fields need to be declared for them in DSpace registry -->
 				<!-- 
