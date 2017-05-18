@@ -190,7 +190,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             List<Group> specialGroups = context.getSpecialGroups();
             if(CollectionUtils.isNotEmpty(specialGroups)) {
                 for(Group specialGroup : specialGroups){
-                    if (StringUtils.equals(specialGroup.getName(), groupName)) {
+                    if (StringUtils.equals(specialGroup.getName(), group.getName())) {
                         return true;
                     }
                 }
