@@ -32,6 +32,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.submit.util.ItemSubmissionLookupDTO;
+import org.dspace.util.ItemUtils;
 import org.dspace.utils.DSpace;
 
 import gr.ekt.bte.core.DataOutputSpec;
@@ -341,21 +342,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
             String qualifier) throws DCInputsReaderException
     {
         DCInputSet dcinputset = new DCInputsReader().getInputs(formName);
-        for (int idx = 0; idx < dcinputset.getNumberPages(); idx++)
-        {
-            for (DCInput dcinput : dcinputset.getPageRows(idx, true, true))
-            {
-                if (dcinput.getSchema().equals(schema)
-                        && dcinput.getElement().equals(element)
-                        && ((dcinput.getQualifier() != null && dcinput
-                                .getQualifier().equals(qualifier))
-                        || (dcinput.getQualifier() == null && qualifier == null)))
-                {
-                    return dcinput;
-                }
-            }
-        }
-        return null;
+        return ItemUtils.getDCInput(schema, element, qualifier, dcinputset);
     }
 
     private boolean isRepeatableMetadata(String formName, String[] md)
