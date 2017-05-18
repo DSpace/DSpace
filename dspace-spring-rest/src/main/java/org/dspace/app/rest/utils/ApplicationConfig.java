@@ -25,7 +25,16 @@ public class ApplicationConfig {
 	@Value("${dspace.dir}")
 	private String dspaceHome;
 
+	@Value("${cors.allowed-origins}")
+	private String corsAllowedOrigins;
+
 	public String getDspaceHome() {
 		return dspaceHome;
+	}
+
+	public String[] getCorsAllowedOrigins() {
+		if (corsAllowedOrigins != null)
+			return corsAllowedOrigins.split("\\s*,\\s*");
+		return null;
 	}
 }

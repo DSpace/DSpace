@@ -33,6 +33,9 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.RelProvider;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * Define the Spring Boot Application settings itself. This class takes the place 
@@ -171,5 +174,18 @@ public class Application extends SpringBootServletInitializer
     @Bean
     protected RelProvider dspaceRelProvider() {
     	return new DSpaceRelProvider();
+    }
+    
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                String[] corsAllowedOrigins = configuration.getCorsAllowedOrigins();
+                if (corsAllowedOrigins != null) {
+                	registry.addMapping("/api/**").allowedOrigins(corsAllowedOrigins);
+                }
+            }
+        };
     }
 }
