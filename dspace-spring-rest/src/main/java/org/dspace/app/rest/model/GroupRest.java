@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class GroupRest extends DSpaceObjectRest {
 	public static final String NAME = "group";
+	
+	public static final String CATEGORY = RestModel.EPERSON;
 
 	private String name;
 
@@ -31,6 +33,11 @@ public class GroupRest extends DSpaceObjectRest {
 	// https://jira.duraspace.org/browse/DS-3483
 	private List<GroupRest> groups;
 
+	@Override
+	public String getCategory() {
+		return CATEGORY;
+	}
+	
 	@Override
 	public String getType() {
 		return NAME;

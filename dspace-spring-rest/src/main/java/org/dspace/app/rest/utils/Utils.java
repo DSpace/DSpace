@@ -59,19 +59,19 @@ public class Utils {
 	}
 
 	public Link linkToSingleResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getType()).slash(data).withRel(rel);
+		return linkTo(data.getController(), data.getCategory(), data.getType()).slash(data).withRel(rel);
 	}
 
 	public Link linkToSubResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getType()).slash(data).slash(rel).withRel(rel);
+		return linkTo(data.getController(), data.getCategory(), data.getType()).slash(data).slash(rel).withRel(rel);
 	}
 
-	public DSpaceRestRepository getResourceRepository(String modelPlural) {
+	public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {
 		String model = makeSingular(modelPlural);
 		try {
-			return applicationContext.getBean(model, DSpaceRestRepository.class);
+			return applicationContext.getBean(apiCategory + "." + model, DSpaceRestRepository.class);
 		} catch (NoSuchBeanDefinitionException e) {
-			throw new RepositoryNotFoundException(model);
+			throw new RepositoryNotFoundException(apiCategory, model);
 		}
 	}
 	

@@ -15,7 +15,13 @@ package org.dspace.app.rest.model;
  */
 public class SiteRest extends DSpaceObjectRest {
 	public static final String NAME = "site";
-
+	public static final String CATEGORY = RestModel.CORE;
+	
+	@Override
+	public String getCategory() {
+		return CATEGORY;
+	}
+	
 	@Override
 	public String getType() {
 		return NAME;

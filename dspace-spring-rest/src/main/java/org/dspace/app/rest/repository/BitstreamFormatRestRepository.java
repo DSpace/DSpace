@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(BitstreamFormatRest.NAME)
+@Component(BitstreamFormatRest.CATEGORY + "." + BitstreamFormatRest.NAME)
 public class BitstreamFormatRestRepository extends DSpaceRestRepository<BitstreamFormatRest, Integer> {
 	BitstreamFormatService bfs = ContentServiceFactory.getInstance().getBitstreamFormatService();
 	@Autowired

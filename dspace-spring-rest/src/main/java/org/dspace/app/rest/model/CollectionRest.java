@@ -15,7 +15,13 @@ package org.dspace.app.rest.model;
  */
 public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";
+	public static final String CATEGORY = RestModel.CORE;
 
+	@Override
+	public String getCategory() {
+		return CATEGORY;
+	}
+	
 	@Override
 	public String getType() {
 		return NAME;

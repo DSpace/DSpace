@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  *
  */
 
-@Component(EPersonRest.NAME)
+@Component(EPersonRest.CATEGORY + "." + EPersonRest.NAME)
 public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUID> {
 	EPersonService es = EPersonServiceFactory.getInstance().getEPersonService();
 	

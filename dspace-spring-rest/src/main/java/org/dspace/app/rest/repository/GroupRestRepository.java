@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  *
  */
 
-@Component(GroupRest.NAME)
+@Component(GroupRest.CATEGORY + "." + GroupRest.NAME)
 public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
 	GroupService gs = EPersonServiceFactory.getInstance().getGroupService();
 	

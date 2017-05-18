@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  */
 
-@Component(CollectionRest.NAME)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
 public class CollectionRestRepository extends DSpaceRestRepository<CollectionRest, UUID> {
 	CollectionService cs = ContentServiceFactory.getInstance().getCollectionService();
 	@Autowired

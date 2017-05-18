@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Methods to implement to make a REST resource addressable
  * 
@@ -14,7 +16,15 @@ package org.dspace.app.rest.model;
  *
  */
 public interface RestModel {
+	public static final String CORE = "core";
+	public static final String EPERSON = "eperson";
+	public static final String DISCOVER = "discover";
+	
+	@JsonIgnore
+	public String getCategory();
+	
 	public String getType();
 
+	@JsonIgnore
 	public Class getController();
 }

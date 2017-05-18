@@ -21,7 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class MetadataSchemaRest extends BaseObjectRest<Integer> {
 	public static final String NAME = "metadataschema";
-
+	public static final String CATEGORY = RestModel.CORE;
+	
 	private String prefix;
 
 	private String namespace;
@@ -48,8 +49,12 @@ public class MetadataSchemaRest extends BaseObjectRest<Integer> {
 	}
 
 	@Override
-	@JsonIgnore
 	public Class getController() {
 		return RestResourceController.class;
+	}
+	
+	@Override
+	public String getCategory() {
+		return CATEGORY;
 	}
 }

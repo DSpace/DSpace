@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class ItemRest extends DSpaceObjectRest {
 	public static final String NAME = "item";
+	public static final String CATEGORY = RestModel.CORE;
 	private boolean inArchive = false;
 	private boolean discoverable = false;
 	private boolean withdrawn = false;
@@ -31,6 +32,11 @@ public class ItemRest extends DSpaceObjectRest {
 	//private EPerson submitter;
 
 	List<BitstreamRest> bitstreams;
+	
+	@Override
+	public String getCategory() {
+		return CATEGORY;
+	}
 	
 	@Override
 	public String getType() {
