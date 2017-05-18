@@ -36,8 +36,8 @@ public class BitstreamConverter
 	}
 
 	@Override
-	public BitstreamRest fromModel(org.dspace.content.Bitstream obj) {
-		BitstreamRest b = super.fromModel(obj);
+	public BitstreamRest fromModel(org.dspace.content.Bitstream obj, String projection) {
+		BitstreamRest b = super.fromModel(obj, projection);
 		List<Bundle> bundles = null;
 		try {
 			bundles = obj.getBundles();

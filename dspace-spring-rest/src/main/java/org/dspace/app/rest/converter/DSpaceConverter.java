@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
+import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.springframework.core.convert.converter.Converter;
 
 public abstract class DSpaceConverter<M, R> implements Converter<M, R> {
@@ -15,7 +16,11 @@ public abstract class DSpaceConverter<M, R> implements Converter<M, R> {
 		return fromModel(source);
 	}
 
-	public abstract R fromModel(M obj);
+	public R fromModel(M obj) {
+		return fromModel(obj, DSpaceObjectRest.PRJ_DEFAULT);
+	}
+	
+	public abstract R fromModel(M obj, String projection);
 
 	public abstract M toModel(R obj);
 }

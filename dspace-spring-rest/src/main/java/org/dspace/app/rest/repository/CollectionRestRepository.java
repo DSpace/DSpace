@@ -44,7 +44,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 	}
 
 	@Override
-	public CollectionRest findOne(Context context, UUID id) {
+	public CollectionRest findOne(Context context, UUID id, String projection) {
 		Collection collection = null;
 		try {
 			collection = cs.find(context, id);
@@ -54,7 +54,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 		if (collection == null) {
 			return null;
 		}
-		return converter.fromModel(collection);
+		return converter.fromModel(collection, projection);
 	}
 
 	@Override

@@ -45,7 +45,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	}
 
 	@Override
-	public ItemRest findOne(Context context, UUID id) {
+	public ItemRest findOne(Context context, UUID id, String projection) {
 		Item item = null;
 		try {
 			item = is.find(context, id);
@@ -55,7 +55,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 		if (item == null) {
 			return null;
 		}
-		return converter.fromModel(item);
+		return converter.fromModel(item, projection);
 	}
 
 	@Override

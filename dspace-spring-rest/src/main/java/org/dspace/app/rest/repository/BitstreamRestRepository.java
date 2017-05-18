@@ -44,7 +44,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 	}
 
 	@Override
-	public BitstreamRest findOne(Context context, UUID id) {
+	public BitstreamRest findOne(Context context, UUID id, String projection) {
 		Bitstream bit = null;
 		try {
 			bit = bs.find(context, id);
@@ -54,7 +54,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 		if (bit == null) {
 			return null;
 		}
-		return converter.fromModel(bit);
+		return converter.fromModel(bit, projection);
 	}
 
 	@Override

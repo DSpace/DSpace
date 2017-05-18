@@ -9,6 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.Serializable;
 
+import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -52,11 +53,15 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 
 	@Override
 	public T findOne(ID id) {
-		Context context = obtainContext();
-		return findOne(context, id);
+		return findOne(id, DSpaceObjectRest.PRJ_DEFAULT);
 	}
 
-	public abstract T findOne(Context context, ID id);
+	public T findOne(ID id, String projection) {
+		Context context = obtainContext();
+		return findOne(context, id, projection);
+	}
+	
+	public abstract T findOne(Context context, ID id, String projection);
 
 	@Override
 	public boolean exists(ID id) {

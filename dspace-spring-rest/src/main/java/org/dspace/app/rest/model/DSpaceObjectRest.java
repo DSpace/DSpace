@@ -20,13 +20,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
+	public static final String PRJ_DEFAULT = "";
+	public static final String PRJ_CONTEXT = "context";
+	
 	@JsonIgnore
 	private String uuid;
 
 	private String name;
 	private String handle;
 	private String type;
-
+	
 	List<MetadataEntryRest> metadata;
 
 	@Override
