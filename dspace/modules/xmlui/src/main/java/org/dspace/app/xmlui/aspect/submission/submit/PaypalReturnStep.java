@@ -11,24 +11,14 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.Response;
 import org.apache.log4j.Logger;
-import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.xmlui.aspect.submission.AbstractStep;
-import org.dspace.app.xmlui.aspect.submission.FlowUtils;
-import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.paymentsystem.*;
-import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.utils.DSpace;
-import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -105,13 +95,13 @@ public class PaypalReturnStep extends AbstractStep {
                             }
                             else
                             {
-                                shoppingCart.setStatus(ShoppingCart.STATUS_DENIlED);
+                                shoppingCart.setStatus(ShoppingCart.STATUS_DENIED);
                                 addErrorLink(body,"Not a valid shopping cart");
                             }
                         }
                         else
                         {
-                            shoppingCart.setStatus(ShoppingCart.STATUS_DENIlED);
+                            shoppingCart.setStatus(ShoppingCart.STATUS_DENIED);
                             //error in trasaction
                             addErrorLink(body,"We're sorry, but Dryad experienced an error in validating your method of payment. Error code:"+result);
 			    log.error("There was an error in PayPal card validation. Code = " + result);

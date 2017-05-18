@@ -32,50 +32,9 @@ import java.util.List;
  * @author Lantian Gai, lantian at atmire.com
  */
 public class ShoppingCart {
-    /** The e-mail field (for sorting) */
-    public static final int CART_ID = 1;
-
-    /** The last name (for sorting) */
-    public static final int EXPIRATION = 2;
-
-    /** The e-mail field (for sorting) */
-    public static final int STATUS = 3;
-
-    /** The netid field (for sorting) */
-    public static final int DEPOSITOR = 4;
-
-    /** The e-mail field (for sorting) */
-    public static final int ITEM = 5;
-
-    /** The e-mail field (for sorting) */
-    public static final int CURRENCY = 6;
-
-    /** The e-mail field (for sorting) */
-    public static final int COUNTRY = 7;
-
-    /** The e-mail field (for sorting) */
-    public static final int VOUCHER = 8;
-
-    /** The e-mail field (for sorting) */
-    public static final int TOTAL = 9;
-
-    public static final int TRANSACTION_ID = 10;
-
-    public static final int SECURETOKEN = 11;
-
-    public static final int BASIC_FEE =12;
-    public static final int SURCHARGE =14;
-
-    public static final int JOURNAL =15;
-    public static final int JOURNAL_SUB =16;
-
-    public static final int ORDER_DATE =17;
-    public static final int PAYMENT_DATE =18;
-    public static final int NOTE =19;
-
     public static final String STATUS_COMPLETED = "completed";
     public static final String STATUS_OPEN = "open";
-    public static final String STATUS_DENIlED = "deniled";
+    public static final String STATUS_DENIED = "denied";
     public static final String STATUS_VERIFIED = "verified";
 
     public static final String COUNTRY_US = "US";
@@ -103,11 +62,17 @@ public class ShoppingCart {
     /** Flag set when data is modified, for events */
     private boolean modified;
 
+    private DryadOrganizationConcept sponsorConcept;
+
 
     ShoppingCart(Context context, TableRow row)
     {
         myContext = context;
         myRow = row;
+        setSponsorID(row.getIntColumn("sponsor_id"));
+        sponsorConcept = getSponsoringOrganization(myContext);
+
+
         // Cache ourselves
         context.cache(this, row.getIntColumn("cart_id"));
         modified = false;
@@ -704,8 +669,8 @@ public class ShoppingCart {
     {
         String params = "%"+query.toLowerCase()+"%";
         StringBuffer queryBuf = new StringBuffer();
-        queryBuf.append("SELECT * FROM shoppingcart WHERE cart_id = ? OR ");
-        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(transaction_id) LIKE LOWER(?) OR LOWER(country) LIKE LOWER(?) ORDER BY cart_id DESC ");
+        queryBuf.append("SELECT * FROM shoppingcart WHERE item = ? OR ");
+        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(transaction_id) LIKE LOWER(?) OR LOWER(country) LIKE LOWER(?) ORDER BY item DESC ");
 
         // Add offset and limit restrictions - Oracle requires special code
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
@@ -867,6 +832,7 @@ public class ShoppingCart {
             setJournal(organizationConcept.getFullName());
             setJournalSub(organizationConcept.getSubscriptionPaid());
             setSponsorID(organizationConcept.getConceptID());
+            sponsorConcept = organizationConcept;
         } else {
             setJournal(null);
             setJournalSub(false);
@@ -875,11 +841,13 @@ public class ShoppingCart {
     }
 
     public DryadOrganizationConcept getSponsoringOrganization(Context context) {
-        int concept_id = getSponsorID();
-        if (concept_id > 0) {
-            return DryadOrganizationConcept.getOrganizationConceptMatchingConceptID(context, concept_id);
+        if (sponsorConcept == null) {
+            int concept_id = getSponsorID();
+            if (concept_id > 0) {
+                sponsorConcept = DryadOrganizationConcept.getOrganizationConceptMatchingConceptID(context, concept_id);
+            }
         }
-        return null;
+        return sponsorConcept;
     }
 
     private void setSponsorID(int concept_id) {

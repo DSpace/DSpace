@@ -3477,38 +3477,38 @@
     <message key="xmlui.property.ManageShoppingcartMain.search_para1">Below is the list of Shopping Cart that matched your search query. Click on an Shopping Cart's name or value to edit them.</message>
 
     <message key="xmlui.property.ManageShoppingcartMain.search_head">Search results</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column1"></message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column2">ID</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column3">Item title</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column4">Depositor</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column5">Voucher</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column6">Secure Token</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column7">Transaction Id</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column8">Status</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column9">Currency</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column10">Total</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_column11">Status</message>
+    <message key="xmlui.property.ManageShoppingcartMain.col_select_box"></message>
+    <message key="xmlui.property.ManageShoppingcartMain.col_item_ID">Item ID</message>
+    <message key="xmlui.property.ManageShoppingcartMain.col_item_title">Item title</message>
+    <message key="xmlui.property.ManageShoppingcartMain.col_voucher">Voucher</message>
+    <message key="xmlui.property.ManageShoppingcartMain.col_status">Status</message>
+    <message key="xmlui.property.ManageShoppingcartMain.col_country">Waiver Country</message>
+    <message key="xmlui.property.ManageShoppingcartMain.col_sponsor">Sponsor</message>
+	<message key="xmlui.property.ManageShoppingcartMain.col_total">Submitter's Total</message>
 
-    <message key="xmlui.Shoppingcart.EditProfile.name">Item title</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name1">Depositor</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name2">Voucher</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name3">Secure Token</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name4">Transaction Id</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name5">Status</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name6">Currency</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name7">Total</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name8">Country</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name9">Resource Item</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name10">Resource Item</message>
+	<message key="xmlui.property.EditShoppingcart.title">Item title</message>
+	<message key="xmlui.property.EditShoppingcart.status">Status</message>
+	<message key="xmlui.property.EditShoppingcart.sponsor">Sponsor</message>
+    <message key="xmlui.property.EditShoppingcart.voucher">Voucher</message>
+	<message key="xmlui.property.EditShoppingcart.country">Country</message>
+	<message key="xmlui.property.EditShoppingcart.depositor">Depositor</message>
+    <message key="xmlui.property.EditShoppingcart.token">Secure Token</message>
+    <message key="xmlui.property.EditShoppingcart.transaction">Transaction ID</message>
+    <message key="xmlui.property.EditShoppingcart.currency">Currency</message>
+    <message key="xmlui.property.EditShoppingcart.total">Total</message>
+	<message key="xmlui.property.EditShoppingcart.basic_fee">Basic Fee Rate</message>
+	<message key="xmlui.property.EditShoppingcart.item">Resource Item</message>
+	<message key="xmlui.property.EditShoppingcart.surcharge">Surcharge Fee Rate</message>
 
 
-    <message key="xmlui.administrative.Navigation.administrative_shoppingcart">Manage Shopping Cart</message>
+
+	<message key="xmlui.administrative.Navigation.administrative_shoppingcart">Manage Shopping Cart</message>
 
     <message key="xmlui.property.ManageShoppingcart.search_head">Search Results</message>
     <message key="xmlui.property.ManageShoppingcartin.actions_head">Manage Shopping Cart</message>
-    <message key="xmlui.property.EditShoppingcartForm.head2">Shopping Cart values</message>
 
     <message key="xmlui.property.EditShoppingcartForm.head1">Edit Shopping Cart</message>
+	<message key="xmlui.property.EditShoppingcartForm.head2">Shopping Cart values</message>
 
     <message key="xmlui.property.ManageShoppingcartin.main_head">Manage Shopping Cart</message>
     <message key="xmlui.property.ManageShoppingcartin.actions_search">Search</message>
@@ -3569,10 +3569,6 @@
     <message key="xmlui.voucher.AddVoucherForm.number">Number of vouchers (min. of 25)</message>
     <message key="xmlui.voucher.AddVoucherForm.explanation">Explanation for generating vouchers</message>
     <message key="xmlui.voucher.ManageVoucherMain.search_column6">Generator</message>
-
-    <message key="xmlui.Shoppingcart.EditProfile.name9">Basic Fee Rate</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name10">No Integration Fee Rate</message>
-    <message key="xmlui.Shoppingcart.EditProfile.name11">Surcharge Fee Rate</message>
 
     <message key="xmlui.voucher.ManageVoucher.search_head">Search Result</message>
     <message key="xmlui.voucher.ManageVoucherin.actions_head">Manage Voucher</message>
