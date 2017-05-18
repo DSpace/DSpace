@@ -103,7 +103,7 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
             }
             try {
                 Context context = getContext();
-                DryadJournalConcept journal = JournalConceptDatabaseStorageImpl.getJournalConceptByConceptID(context, journalConceptID);
+                DryadJournalConcept journal = DryadJournalConcept.getJournalConceptMatchingConceptID(context, journalConceptID);
                 manuscript.setJournalConcept(JournalUtils.getJournalConceptByISSN(journal.getISSN()));
                 completeContext(context);
             } catch (SQLException e) {

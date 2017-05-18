@@ -439,7 +439,9 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         DryadJournalConcept journalConcept = null;
         try {
             Concept concept = Concept.find(context, conceptID);
-            journalConcept = new DryadJournalConcept(context, concept);
+            if (concept != null) {
+                journalConcept = new DryadJournalConcept(context, concept);
+            }
         } catch (SQLException e) {
             log.error("couldn't find a journal concept: " + e.getMessage());
         }

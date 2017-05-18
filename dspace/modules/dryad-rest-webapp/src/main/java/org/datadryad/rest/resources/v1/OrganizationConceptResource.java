@@ -3,6 +3,7 @@
 package org.datadryad.rest.resources.v1;
 
 import org.datadryad.api.DryadJournalConcept;
+import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.responses.ErrorsResponse;
 import org.datadryad.rest.responses.ResponseFactory;
 import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
@@ -32,23 +33,21 @@ public class OrganizationConceptResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getJournals(@QueryParam("status") String status) {
+    public Response getJournals(@QueryParam("status") String status,
+                                @DefaultValue("20") @QueryParam("count") Integer resultParam,
+                                @DefaultValue("0") @QueryParam("cursor") Integer cursorParam) {
         try {
-            List<DryadJournalConcept> allJournalConceptList = journalStorage.getAll(new StoragePath());
             ArrayList<DryadJournalConcept> journalConceptList = new ArrayList<DryadJournalConcept>();
-            if (status != null) {
-                for (DryadJournalConcept journalConcept : allJournalConceptList) {
-                    if (journalConcept != null) {
-                        if (status.equals(journalConcept.getStatus())) {
-                            journalConceptList.add(journalConcept);
-                        }
-                    }
-                }
-            } else {
-                journalConceptList.addAll(allJournalConceptList);
-            }
-            // Returning a list requires POJO turned on
-            return Response.ok(journalConceptList).build();
+
+            ResultSet resultSet = journalStorage.getResults(new StoragePath(), journalConceptList, status, resultParam, cursorParam);
+
+            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
+            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
+            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
+            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+            int total = resultSet.itemList.size();
+            Response response = Response.ok(journalConceptList).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total).build();
+            return response;
         } catch (StorageException ex) {
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list journals", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
             return error.toResponse().build();
