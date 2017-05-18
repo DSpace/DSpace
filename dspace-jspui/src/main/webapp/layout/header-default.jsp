@@ -230,6 +230,7 @@ window.cookieconsent.initialise({
       "background": "#4b81e8"
     }
   },
+  "position": "bottom-right",
   "theme": "classic",
   "content": {
     "message": "<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.layout.navbar-default.cookies.info.message") %>",
