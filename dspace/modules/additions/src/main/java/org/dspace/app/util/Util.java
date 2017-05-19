@@ -21,6 +21,7 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -32,7 +33,6 @@ import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 
 import uk.ac.edina.datashare.utils.DSpaceUtils;
-import uk.ac.edina.datashare.utils.MetaDataUtil;
 
 
 /**
@@ -501,6 +501,41 @@ public class Util {
     }
     
     /**
+     * Can all bistreams be read in an item? 
+     * @param context
+     * @param item
+     * @return
+     */
+    public static boolean canReadAllBitstreams(Context context, Item item)
+    {
+        boolean canRead = true;
+        
+        try
+        {
+            Bundle bundles[] = item.getBundles("ORIGINAL");
+            for(int i = 0; i < bundles.length && canRead; i++)
+            {
+                
+                Bitstream[] files = bundles[i].getBitstreams();
+                for(int j = 0; j < files.length && canRead; j++)
+                {
+                    System.out.println(j);
+                    canRead = AuthorizeManager.authorizeActionBoolean(
+                            context,
+                            files[j],
+                            Constants.READ);
+                }
+            }
+        }
+        catch(SQLException ex)
+        {
+            throw new RuntimeException(ex);
+        }
+
+        return canRead;
+    }
+
+    /**
      * Does the total size of bitstreams lead to a large download? 
      * @param item
      * @return
@@ -546,13 +581,13 @@ public class Util {
     public static boolean allowDownloadAll(Context context, Item item)
     {
         boolean allow = !hasEmbargo(context, item) &&
-                !isLargeDownload(item) &&
+                Util.canReadAllBitstreams(context, item) &&
                 !item.isWithdrawn() &&
                 !DSpaceUtils.showTombstone(context, item);
         
         if(!allow){
             log.warn("Download not allowed: hasEmbargo " + hasEmbargo(context, item) +
-                    ". isLargeDownload: " +  isLargeDownload(item) + 
+                    ". canReadAllBitstreams: " +  Util.canReadAllBitstreams(context, item) + 
                     ". isWithdrawn: " +  item.isWithdrawn() +
                     ". showTombstone: " + DSpaceUtils.showTombstone(context, item));
         }

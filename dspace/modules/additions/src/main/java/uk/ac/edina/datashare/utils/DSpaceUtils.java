@@ -447,8 +447,8 @@ public class DSpaceUtils
      */
     public static boolean hasEmbargo(Context context, Item item)
     {
-    	return Util.hasEmbargo(context, item);
-    }
+        return Util.hasEmbargo(context, item) || !Util.canReadAllBitstreams(context, item);
+    }    
     
     /**
      * Does this item has a DOI?

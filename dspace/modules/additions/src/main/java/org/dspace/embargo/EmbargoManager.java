@@ -23,6 +23,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.ItemDataset;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.Metadatum;
@@ -33,8 +34,6 @@ import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
-
-import com.hp.hpl.jena.tdb.sys.Session;
 
 import uk.ac.edina.datashare.utils.MetaDataUtil;
 
@@ -394,6 +393,11 @@ public class EmbargoManager
                         else if (!line.hasOption('c'))
                         {
                             liftEmbargo(context, item);
+                            
+                            // DATASHARE - start
+                            // create zip file
+                            new ItemDataset(item).createDataset();
+                            // DATASHARE - end
                         }
                     }
                     else if (!line.hasOption('l'))

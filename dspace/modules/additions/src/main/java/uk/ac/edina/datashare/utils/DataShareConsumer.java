@@ -2,6 +2,7 @@ package uk.ac.edina.datashare.utils;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.ItemDataset;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -61,6 +62,9 @@ public class DataShareConsumer implements Consumer
             // clear hijacked spatial field
             DSpaceUtils.clearHijackedSpatial(item);
            
+            // create zip file
+            new ItemDataset(this.item).createDataset();
+            
             context.turnOffAuthorisationSystem();
             
             try{

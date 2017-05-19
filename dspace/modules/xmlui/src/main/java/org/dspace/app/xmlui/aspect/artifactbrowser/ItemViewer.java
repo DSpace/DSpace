@@ -45,6 +45,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.ItemDataset;
 import org.dspace.content.Metadatum;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
@@ -275,9 +276,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // DATASHARE - start
         if(Util.allowDownloadAll(context, item))
         {
-            final String DA = contextPath + "/download/" +
-                    dso.getHandle() + "/" + dso.getName().replaceAll(" ", "_") + ".zip";
-            pageMeta.addMetadata("download-all-file").addContent(DA);
+            pageMeta.addMetadata("download-all-file").addContent(
+                    new ItemDataset(item).getURL().toString());
         }
         // DATASHARE - end
         
