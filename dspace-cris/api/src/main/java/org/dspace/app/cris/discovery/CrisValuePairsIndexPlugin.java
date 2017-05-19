@@ -299,7 +299,7 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
 
     }
 
-    private <P extends Property<TP>, TP extends PropertiesDefinition, NP extends ANestedProperty<NTP>, NTP extends ANestedPropertiesDefinition, ACNO extends ACrisNestedObject<NP, NTP, P, TP>, ATNO extends ATypeNestedObject<NTP>> Set<String> additionalSearchParameter(
+    private <TP extends PropertiesDefinition> Set<String> additionalSearchParameter(
             Class<TP> clazz)
     {
         Set<String> result = new HashSet<String>();
