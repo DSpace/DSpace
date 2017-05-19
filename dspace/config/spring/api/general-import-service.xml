@@ -22,7 +22,7 @@
           lazy-init="false" autowire="byType" destroy-method="destroy"/>
 
     <bean class="java.lang.String" id="apiKey" autowire-candidate="true">
-        <constructor-arg value="${external-sources.elsevier.key}"/>
+        <constructor-arg value=""/>
     </bean>
 
     <bean class="org.dspace.importer.external.metadatamapping.transform.GenerateQueryForItem" id="DOIBasedService">
