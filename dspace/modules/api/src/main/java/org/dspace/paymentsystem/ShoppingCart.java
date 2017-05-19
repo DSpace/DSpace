@@ -9,11 +9,8 @@ package org.dspace.paymentsystem;
 
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadOrganizationConcept;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DSpaceObject;
+import org.datadryad.rest.models.ResultSet;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -436,12 +433,9 @@ public class ShoppingCart {
     }
 
     public static ShoppingCart find(Context context, int cartId)
-            throws SQLException
-    {
-
+            throws SQLException {
         TableRowIterator rows = DatabaseManager.queryTable(context, "shoppingcart", "SELECT * FROM shoppingcart WHERE cart_id = "+ cartId+ "limit 1");
-        ArrayList<ShoppingCart> carts = getCartsForTableRows(context, rows);
-        return carts.get(0);
+        return getCartForTableRow(context, rows.next());
     }
 
     /**
@@ -529,105 +523,49 @@ public class ShoppingCart {
 
     public static ShoppingCart[] findAll(Context context) throws SQLException {
 
-        TableRowIterator rows = DatabaseManager.query(context,
-                "SELECT * FROM shoppingcart order by cart_id DESC");
+        TableRowIterator rows = DatabaseManager.query(context,"SELECT * FROM shoppingcart order by cart_id DESC");
 
         ArrayList<ShoppingCart> carts = getCartsForTableRows(context, rows);
         return carts.toArray(new ShoppingCart[carts.size()]);
     }
 
-    public static ShoppingCart[] search(Context context, String query)
+    public static ResultSet findAllCarts(Context context) throws SQLException {
+        TableRowIterator rows = DatabaseManager.query(context,"SELECT cart_id FROM shoppingcart order by cart_id ASC");
+        ArrayList<Integer> cartList = new ArrayList<Integer>();
+        for (TableRow row : rows.toList()) {
+            cartList.add(row.getIntColumn("cart_id"));
+        }
+        return new ResultSet(cartList, 20, 0);
+    }
+
+    public static ResultSet search(Context context, String query)
             throws SQLException
     {
         return search(context, query, -1, -1);
     }
 
-    public static ShoppingCart[] search(Context context, String query, int offset, int limit)
+    public static ResultSet search(Context context, String query, int cursor, int limit)
             throws SQLException {
         String params = "%"+query.toLowerCase()+"%";
-        StringBuffer queryBuf = new StringBuffer();
-        queryBuf.append("SELECT * FROM shoppingcart WHERE item = ? OR ");
-        queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(transaction_id) LIKE LOWER(?) OR LOWER(country) LIKE LOWER(?) ORDER BY item DESC ");
+        StringBuilder queryBuf = new StringBuilder();
+        queryBuf.append("SELECT cart_id FROM shoppingcart WHERE ");
+        queryBuf.append("item = ? OR LOWER(status) LIKE LOWER(?) OR LOWER(transaction_id) LIKE LOWER(?) ORDER BY item DESC ");
+        TableRowIterator rows = DatabaseManager.query(context, queryBuf.toString(), params, params, params);
+        ArrayList<Integer> cartList = new ArrayList<Integer>();
+        for (TableRow row : rows.toList()) {
+            cartList.add(row.getIntColumn("cart_id"));
+        }
+        return new ResultSet(cartList, limit, cursor);
+    }
 
-        // Add offset and limit restrictions - Oracle requires special code
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name"))) {
-            // First prepare the query to generate row numbers
-            if (limit > 0 || offset > 0) {
-                queryBuf.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
-                queryBuf.append(") ");
-            }
+    public static List<ShoppingCart> getCartsForIDs(Context context, List<Integer> cartIDs) throws SQLException {
+        ArrayList<ShoppingCart> carts = new ArrayList<ShoppingCart>();
 
-            // Restrict the number of rows returned based on the limit
-            if (limit > 0) {
-                queryBuf.append("rec WHERE rownum<=? ");
-                // If we also have an offset, then convert the limit into the maximum row number
-                if (offset > 0) {
-                    limit += offset;
-                }
-            }
-
-            // Return only the records after the specified offset (row number)
-            if (offset > 0) {
-                queryBuf.insert(0, "SELECT * FROM (");
-                queryBuf.append(") WHERE rnum>?");
-            }
-        } else {
-            if (limit > 0) {
-                queryBuf.append(" LIMIT ? ");
-            }
-
-            if (offset > 0) {
-                queryBuf.append(" OFFSET ? ");
-            }
+        for (Integer i : cartIDs) {
+            carts.add(find(context, i));
         }
 
-        String dbquery = queryBuf.toString();
-
-        // When checking against the shoppingcart-id, make sure the query can be made into a number
-        Integer int_param;
-        try {
-            int_param = Integer.valueOf(query);
-        }
-        catch (NumberFormatException e) {
-            int_param = Integer.valueOf(-1);
-        }
-
-        // Create the parameter array, including limit and offset if part of the query
-        Object[] paramArr = new Object[] {int_param,params,params,params};
-        if (limit > 0 && offset > 0) {
-            paramArr = new Object[]{int_param, params, params, params, limit, offset};
-        } else if (limit > 0) {
-            paramArr = new Object[]{int_param, params, params, params, limit};
-        } else if (offset > 0) {
-            paramArr = new Object[]{int_param, params, params, params, offset};
-        }
-
-        // Get all the shoppingcart that match the query
-        TableRowIterator rows = DatabaseManager.query(context, dbquery, paramArr);
-        try {
-            List<TableRow> shoppingcartRows = rows.toList();
-            ShoppingCart[] shoppingcart = new ShoppingCart[shoppingcartRows.size()];
-
-            for (int i = 0; i < shoppingcartRows.size(); i++) {
-                TableRow row = (TableRow) shoppingcartRows.get(i);
-
-                // First check the cache
-                ShoppingCart fromCache = (ShoppingCart) context.fromCache(ShoppingCart.class, row.getIntColumn("cart_id"));
-
-                if (fromCache != null) {
-                    shoppingcart[i] = fromCache;
-                } else {
-                    shoppingcart[i] = new ShoppingCart(context, row);
-                }
-            }
-
-            return shoppingcart;
-        }
-        finally {
-            if (rows != null) {
-                rows.close();
-            }
-        }
+        return carts;
     }
 
 //    public static final int BASIC_FEE =12;

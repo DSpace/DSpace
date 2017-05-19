@@ -8,8 +8,10 @@
 package org.dspace.app.xmlui.aspect.shoppingcart;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import org.datadryad.api.DryadOrganizationConcept;
+import org.datadryad.rest.models.ResultSet;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -120,22 +122,28 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
 
     public void addBody(Body body) throws WingException, SQLException {
         /* Get and setup our parameters */
-        int page = new Float(parameters.getParameterAsFloat("page", 0)).intValue();
+        int cursor = new Float(parameters.getParameterAsFloat("page", 0)).intValue();
 
         String query = decodeFromURL(parameters.getParameter("query", null));
 
         String baseURL = contextPath + "/admin/shoppingcart?administrative-continue=" + knot.getId();
 
-        ShoppingCart[] shoppingCarts = ShoppingCart.search(context, query, page * PAGE_SIZE, PAGE_SIZE);
+//        ShoppingCart[] shoppingCarts = ShoppingCart.search(context, query, page * PAGE_SIZE, PAGE_SIZE);
+        ResultSet resultSet = null;
+        if ("".equals(query)) {
+            resultSet = ShoppingCart.findAllCarts(context);
+        } else {
+            resultSet = ShoppingCart.search(context, query);
+        }
 
-        ShoppingCart[] totalCount = ShoppingCart.findAll(context);
+        java.util.List<ShoppingCart> shoppingCarts = ShoppingCart.getCartsForIDs(context, resultSet.getCurrentSet(cursor));
 
         // DIVISION: Shoppingcart-main
         Division main = body.addInteractiveDivision("shoppingcart-main", contextPath
                         + "/admin/shoppingcart", Division.METHOD_POST,
                 "primary administrative shoppingcart");
 
-        int resultCount = totalCount.length;
+        int resultCount = resultSet.itemList.size();
 
 
         main.setHead(T_main_head);
@@ -164,23 +172,23 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
         search.setHead(T_search_head);
 
         // If there are more than 10 results the paginate the division.
-        if (resultCount > PAGE_SIZE) {
+        if (resultSet.itemList.size() > PAGE_SIZE) {
             // If there are enough results then paginate the results
-            int firstIndex = page * PAGE_SIZE + 1;
-            int lastIndex = page * PAGE_SIZE + shoppingCarts.length;
+            int firstIndex = resultSet.itemList.get(0);
+            int lastIndex = resultSet.itemList.get(resultSet.pageSize - 1);
 
             String nextURL = null, prevURL = null;
-            if (page < (resultCount / PAGE_SIZE)) {
-                nextURL = baseURL + "&page=" + (page + 1);
+            if (cursor < (resultCount / PAGE_SIZE)) {
+                nextURL = baseURL + "&page=" + (cursor + 1);
             }
-            if (page > 0) {
-                prevURL = baseURL + "&page=" + (page - 1);
+            if (cursor > 0) {
+                prevURL = baseURL + "&page=" + (cursor - 1);
             }
 
             search.setSimplePagination(resultCount, firstIndex, lastIndex, prevURL, nextURL);
         }
 
-        Table table = search.addTable("shoppingcart-search-table", shoppingCarts.length + 1, 1);
+        Table table = search.addTable("shoppingcart-search-table", shoppingCarts.size() + 1, 1);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_col_select_box);   // 1: T_col_select_box
         header.addCell().addContent(T_col_item_ID);      // 2: T_col_item_ID
@@ -262,7 +270,7 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
             row.addCellContent(Double.toString(shoppingCart.getTotal()));
         }
 
-        if (shoppingCarts.length <= 0) {
+        if (shoppingCarts.size() <= 0) {
             Cell cell = table.addRow().addCell(1, 5);
             cell.addHighlight("italic").addContent(T_no_results);
         }
