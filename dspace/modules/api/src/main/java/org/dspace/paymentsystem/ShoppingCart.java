@@ -521,14 +521,6 @@ public class ShoppingCart {
         }
     }
 
-    public static ShoppingCart[] findAll(Context context) throws SQLException {
-
-        TableRowIterator rows = DatabaseManager.query(context,"SELECT * FROM shoppingcart order by cart_id DESC");
-
-        ArrayList<ShoppingCart> carts = getCartsForTableRows(context, rows);
-        return carts.toArray(new ShoppingCart[carts.size()]);
-    }
-
     public static ResultSet findAllCarts(Context context) throws SQLException {
         TableRowIterator rows = DatabaseManager.query(context,"SELECT cart_id FROM shoppingcart order by cart_id ASC");
         ArrayList<Integer> cartList = new ArrayList<Integer>();

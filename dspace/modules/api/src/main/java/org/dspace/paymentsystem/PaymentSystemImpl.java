@@ -153,23 +153,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return ShoppingCart.findByTransactionId(context, shoppingcartId);
     }
 
-    public ShoppingCart[] findAllShoppingCart(Context context, Integer itemId) throws SQLException, PaymentSystemException {
-        if (itemId == null || itemId == -1) {
-            return ShoppingCart.findAll(context);
-        } else {
-
-            VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
-            VersionHistory history = versioningService.findVersionHistory(context, itemId);
-            if (history != null) {
-                Item originalItem = history.getFirstVersion().getItem();
-                itemId = originalItem.getID();
-            }
-            ShoppingCart[] shoppingCarts = new ShoppingCart[1];
-            shoppingCarts[0] = getShoppingCartByItemId(context, itemId);
-            return shoppingCarts;
-        }
-    }
-
     public ShoppingCart getShoppingCartByItemId(Context context, Integer itemId) throws SQLException, PaymentSystemException {
         //make sure we get correct shoppingcart for data package
         Item item = Item.find(context, itemId);
