@@ -546,11 +546,18 @@ public class ShoppingCart {
 
     public static ResultSet search(Context context, String query, int cursor, int limit)
             throws SQLException {
-        String params = "%"+query.toLowerCase()+"%";
-        StringBuilder queryBuf = new StringBuilder();
-        queryBuf.append("SELECT cart_id FROM shoppingcart WHERE ");
-        queryBuf.append("item = ? OR LOWER(status) LIKE LOWER(?) OR LOWER(transaction_id) LIKE LOWER(?) ORDER BY item DESC ");
-        TableRowIterator rows = DatabaseManager.query(context, queryBuf.toString(), params, params, params);
+        TableRowIterator rows = null;
+        try {
+            Integer itemID = Integer.parseInt(query);
+            String queryStr = "SELECT cart_id FROM shoppingcart where item = " + itemID;
+            rows = DatabaseManager.query(context, queryStr);
+        } catch (NumberFormatException e) {
+            String params = "%"+query.toLowerCase()+"%";
+            StringBuilder queryBuf = new StringBuilder();
+            queryBuf.append("SELECT cart_id FROM shoppingcart WHERE ");
+            queryBuf.append("LOWER(status) LIKE LOWER(?) OR LOWER(transaction_id) LIKE LOWER(?) ORDER BY item DESC ");
+            rows = DatabaseManager.query(context, queryBuf.toString(), params, params);
+        }
         ArrayList<Integer> cartList = new ArrayList<Integer>();
         for (TableRow row : rows.toList()) {
             cartList.add(row.getIntColumn("cart_id"));
