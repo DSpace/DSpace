@@ -88,8 +88,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
             joinColumns = {@JoinColumn(name = "collection_id") },
             inverseJoinColumns = {@JoinColumn(name = "community_id") }
     )
-    @Sort(type = SortType.COMPARATOR, comparator = NameAscendingComparator.class)
-    private Set<Community> communities = new TreeSet<>(new NameAscendingComparator());
+    private Set<Community> communities = new HashSet<>();
 
     @Transient
     private transient CollectionService collectionService;
@@ -270,7 +269,10 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
     public List<Community> getCommunities() throws SQLException
     {
         // We return a copy because we do not want people to add elements to this collection directly.
-        return Arrays.asList(communities.toArray(new Community[]{}));
+        // We return a list to maintain backwards compatibility
+        Community[] output = communities.toArray(new Community[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     void addCommunity(Community community) {
@@ -278,7 +280,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
-    void removeCommunity(Community community){
+    void removeCommunity(Community community) {
         this.communities.remove(community);
         setModified();
     }
