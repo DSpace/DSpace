@@ -52,21 +52,6 @@ public class SendFeedbackAction extends AbstractAction
         String fromPage = request.getHeader("Referer");
         // Prevent spammers and splogbots from poisoning the feedback page
         String host = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.hostname");
-        String[] allowedReferrers = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("mail.allowed.referrers");
-
-        boolean validReferral = false;
-
-        if(allowedReferrers != null)
-        {
-            for(String allowedReferrer : allowedReferrers)
-            {
-                if(fromPage.contains(allowedReferrer))
-                {
-                    validReferral = true;
-                    break;
-                }
-            }
-        }
 
         String basicHost = "";
         if ("localhost".equals(host) || "127.0.0.1".equals(host)
@@ -82,7 +67,7 @@ public class SendFeedbackAction extends AbstractAction
             basicHost = host.substring(host.substring(0, lastDot).lastIndexOf('.'));
         }
 
-        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (!validReferral)))
+        if ((fromPage == null) || ((!fromPage.contains(basicHost)) && (!isValidReferral(fromPage))))
         {
             // N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
             throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));
@@ -146,6 +131,23 @@ public class SendFeedbackAction extends AbstractAction
 
         // Finished, allow to pass.
         return null;
+    }
+
+    private boolean isValidReferral(String fromPage)
+    {
+        String[] allowedReferrers = DSpaceServicesFactory.getInstance().getConfigurationService().getArrayProperty("mail.allowed.referrers");
+        if (allowedReferrers != null && fromPage != null)
+        {
+            for (String allowedReferrer : allowedReferrers)
+            {
+                if (fromPage.contains(allowedReferrer))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }
