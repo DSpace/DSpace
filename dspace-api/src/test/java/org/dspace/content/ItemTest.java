@@ -7,38 +7,39 @@
  */
 package org.dspace.content;
 
+import mockit.NonStrictExpectations;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.MetadataSchemaService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-
-import org.apache.commons.lang.time.DateUtils;
-import org.dspace.authorize.AuthorizeException;
-import org.apache.log4j.Logger;
-
 import java.util.*;
 
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.MetadataFieldService;
-import org.dspace.content.service.MetadataSchemaService;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.junit.*;
-import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
-import mockit.*;
-import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.core.Constants;
+import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class Item
  * @author pvillega
  */
-public class ItemTest  extends AbstractDSpaceObjectTest
+public class ItemTest extends AbstractDSpaceObjectTest
 {
 
     /** log4j category */

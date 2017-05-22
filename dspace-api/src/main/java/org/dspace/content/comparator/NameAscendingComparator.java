@@ -7,6 +7,7 @@
  */
 package org.dspace.content.comparator;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.DSpaceObject;
 
@@ -25,7 +26,14 @@ public class NameAscendingComparator implements Comparator<DSpaceObject>{
         }else {
             String name1 = StringUtils.trimToEmpty(dso1.getName());
             String name2 = StringUtils.trimToEmpty(dso2.getName());
-            return name1.compareToIgnoreCase(name2);
+
+            //When two DSO's have the same name, use their UUID to put them in an order
+            if(name1.equals(name2)) {
+                return ObjectUtils.compare(dso1.getID(), dso2.getID());
+            } else {
+                return name1.compareToIgnoreCase(name2);
+            }
         }
     }
+
 }
