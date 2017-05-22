@@ -21,7 +21,6 @@
 
     <bean id="ScopusImportService" class="org.dspace.importer.external.scopus.ScopusImportMetadataSourceServiceImpl" scope="singleton">
         <property name="metadataFieldMapping" ref="ScopusMetadataFieldMapping"/>
-        <property name="apiKey" ref="apiKey"/>
         <property name="name" value="Scopus"/>
         <property name="importFields" ref="scopusImportFields"/>
         <property name="idField" value="dc.identifier.eid"/>

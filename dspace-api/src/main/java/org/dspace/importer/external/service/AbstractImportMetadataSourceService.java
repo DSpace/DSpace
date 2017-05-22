@@ -33,7 +33,6 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Ab
 	private MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping;
     private String name;
     private Map<String, String> importFields;
-    private String apiKey;
     private String idField;
 
 	public AbstractImportMetadataSourceService(GenerateQueryService generateQueryService, MetadataFieldMapping<RecordType, MetadataContributor<RecordType>> metadataFieldMapping){
@@ -42,15 +41,6 @@ public abstract class AbstractImportMetadataSourceService<RecordType> extends Ab
 	}
 
 	protected AbstractImportMetadataSourceService() {
-	}
-
-	public String getApiKey() {
-		return apiKey;
-	}
-
-	@Autowired(required = false)
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
 	}
 
 	@Autowired(required = false)

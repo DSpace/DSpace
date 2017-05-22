@@ -13,12 +13,13 @@ import java.util.concurrent.*;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
 import org.apache.axiom.om.*;
+import org.apache.commons.lang.*;
 import org.apache.log4j.*;
 import org.dspace.content.*;
-import org.dspace.core.*;
 import org.dspace.importer.external.datamodel.*;
 import org.dspace.importer.external.exception.*;
 import org.dspace.importer.external.service.*;
+import org.dspace.services.factory.*;
 
 /**
  * Created by Philip Vissenaekens (philip at atmire dot com)
@@ -28,6 +29,7 @@ import org.dspace.importer.external.service.*;
 public class ScidirImportSourceServiceImpl extends AbstractImportMetadataSourceService<OMElement> {
     private WebTarget scidirWebTarget;
     private String apiUrl;
+    private String apiKey;
 
     private static Logger log = Logger.getLogger(ScidirImportSourceServiceImpl.class);
 
@@ -235,9 +237,17 @@ public class ScidirImportSourceServiceImpl extends AbstractImportMetadataSourceS
 
     public String getApiUrl() {
         if(apiUrl == null){
-            apiUrl = ConfigurationManager.getProperty("external-sources.scidir.url");
+            apiUrl = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("external-sources.scidir.url");
         }
 
         return apiUrl;
+    }
+
+    public String getApiKey() {
+        if(StringUtils.isBlank(apiKey)){
+            apiKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("external-sources.elsevier.key");
+        }
+
+        return apiKey;
     }
 }

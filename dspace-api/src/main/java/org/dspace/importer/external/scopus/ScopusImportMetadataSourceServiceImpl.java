@@ -14,15 +14,16 @@ import java.util.concurrent.*;
 import javax.ws.rs.core.*;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.xpath.*;
+import org.apache.commons.lang.*;
 import org.apache.cxf.jaxrs.client.*;
 import org.apache.log4j.*;
 import org.dspace.content.*;
-import org.dspace.core.*;
 import org.dspace.importer.external.datamodel.*;
 import org.dspace.importer.external.exception.*;
 import org.dspace.importer.external.metadatamapping.*;
 import org.dspace.importer.external.scopus.wadl.*;
 import org.dspace.importer.external.service.*;
+import org.dspace.services.factory.*;
 import org.springframework.beans.factory.annotation.*;
 
 /**
@@ -33,6 +34,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     protected String baseAddress;
     protected String view;
+    private String apiKey;
 
     private GenerateQueryForItem_Scopus generateQueryForItem = null;
 
@@ -286,7 +288,7 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     public String getBaseAddress() {
         if(baseAddress == null){
-            baseAddress = ConfigurationManager.getProperty("external-sources.scopus.url");
+            baseAddress = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("external-sources.scopus.url");
         }
 
         return baseAddress;
@@ -294,9 +296,17 @@ public class ScopusImportMetadataSourceServiceImpl extends AbstractImportMetadat
 
     public String getView() {
         if(view == null){
-            view = ConfigurationManager.getProperty("external-sources.scopus.view");
+            view = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("external-sources.scopus.view");
         }
 
         return view;
+    }
+
+    public String getApiKey() {
+        if(StringUtils.isBlank(apiKey)){
+            apiKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("external-sources.elsevier.key");
+        }
+
+        return apiKey;
     }
 }

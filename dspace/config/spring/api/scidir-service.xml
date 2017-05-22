@@ -16,7 +16,6 @@
         <property name="metadataFieldMapping" ref="ScidirMetadataFieldMapping"/>
         <property name="name" value="ScienceDirect"/>
         <property name="importFields" ref="scidirImportFields"/>
-        <property name="apiKey" ref="apiKey"/>
         <property name="idField" value="dc.identifier.eid"/>
         <property name="generateQueryForItem" ref="DOIBasedService"/>
     </bean>

@@ -21,10 +21,6 @@
     <bean id="importService" class="org.dspace.importer.external.service.ImportService" scope="singleton"
           lazy-init="false" autowire="byType" destroy-method="destroy"/>
 
-    <bean class="java.lang.String" id="apiKey" autowire-candidate="true">
-        <constructor-arg value=""/>
-    </bean>
-
     <bean class="org.dspace.importer.external.metadatamapping.transform.GenerateQueryForItem" id="DOIBasedService">
         <description>Defines how an org.dspace.content.Item is mapped to a query in ISI. Please note that exactly one of
             these must be present. If multiple are present the result is undefined.
