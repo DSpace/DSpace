@@ -79,8 +79,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "item_id") },
             inverseJoinColumns = {@JoinColumn(name = "collection_id") }
     )
-    @Sort(type = SortType.COMPARATOR, comparator = NameAscendingComparator.class)
-    private final Set<Collection> collections = new TreeSet<>(new NameAscendingComparator());
+    private final Set<Collection> collections = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "items")
     private final List<Bundle> bundles = new ArrayList<>();
@@ -233,7 +232,10 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
     public List<Collection> getCollections()
     {
         // We return a copy because we do not want people to add elements to this collection directly.
-        return Arrays.asList(collections.toArray(new Collection[]{}));
+        // We return a list to maintain backwards compatibility
+        Collection[] output = collections.toArray(new Collection[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     void addCollection(Collection collection)

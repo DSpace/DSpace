@@ -48,16 +48,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "parent_comm_id") },
             inverseJoinColumns = {@JoinColumn(name = "child_comm_id") }
     )
-    @Sort(type = SortType.COMPARATOR, comparator = NameAscendingComparator.class)
-    private Set<Community> subCommunities = new TreeSet<Community>(new NameAscendingComparator());
+    private Set<Community> subCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subCommunities")
-    @Sort(type = SortType.COMPARATOR, comparator = NameAscendingComparator.class)
-    private Set<Community> parentCommunities = new TreeSet<Community>(new NameAscendingComparator());;
+    private Set<Community> parentCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities", cascade = {CascadeType.PERSIST})
-    @Sort(type = SortType.COMPARATOR, comparator = NameAscendingComparator.class)
-    private Set<Collection> collections =new TreeSet<Collection>(new NameAscendingComparator());;
+    private Set<Collection> collections = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "admin")
@@ -148,7 +145,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     public List<Collection> getCollections()
     {
         // We return a copy because we do not want people to add elements to this collection directly.
-        return Arrays.asList(collections.toArray(new Collection[]{}));
+        // We return a list to maintain backwards compatibility
+        Collection[] output = collections.toArray(new Collection[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     void addCollection(Collection collection)
@@ -171,7 +171,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     public List<Community> getSubcommunities()
     {
         // We return a copy because we do not want people to add elements to this collection directly.
-        return Arrays.asList(subCommunities.toArray(new Community[]{}));
+        // We return a list to maintain backwards compatibility
+        Community[] output = subCommunities.toArray(new Community[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     /**
@@ -183,7 +186,10 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     public List<Community> getParentCommunities()
     {
         // We return a copy because we do not want people to add elements to this collection directly.
-        return Arrays.asList(parentCommunities.toArray(new Community[]{}));
+        // We return a list to maintain backwards compatibility
+        Community[] output = parentCommunities.toArray(new Community[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     void addParentCommunity(Community parentCommunity) {
@@ -191,13 +197,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
     }
 
     void clearParentCommunities(){
-        this.parentCommunities.clear();
-        this.parentCommunities = null;
+        parentCommunities.clear();
     }
 
     public void removeParentCommunity(Community parentCommunity)
     {
-        this.parentCommunities.remove(parentCommunity);
+        parentCommunities.remove(parentCommunity);
+        setModified();
     }
 
     /**
