@@ -82,7 +82,7 @@ public class ItemDataset {
         return th;
     }
     
-    private void delete(){
+    public void delete(){
         new File(this.getFullPath()).delete();
     }
     
