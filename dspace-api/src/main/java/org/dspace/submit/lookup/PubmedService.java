@@ -144,7 +144,9 @@ public class PubmedService
                             "IdList");
                     List<String> pubmedIDs = XMLUtils.getElementValueList(
                             idList, "Id");
-                    results = getByPubmedIDs(pubmedIDs);
+                    if(pubmedIDs!=null) {
+                        results = getByPubmedIDs(pubmedIDs);
+                    }
                 }
                 catch (ParserConfigurationException e1)
                 {
