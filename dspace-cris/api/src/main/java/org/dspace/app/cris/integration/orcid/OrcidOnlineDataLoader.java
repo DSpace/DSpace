@@ -88,39 +88,42 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
         OrcidService orcidService = OrcidService.getOrcid();
         String sourceName = orcidService.getSourceClientName();
 
-        
-        for (String orcid : orcids)
+        if (orcids != null)
         {
-            
-            try {
-                OrcidProfile profile = orcidService.getProfile(orcid);
-                if (profile != null)
+            for (String orcid : orcids)
+            {
+
+                try
                 {
-                    OrcidWorks orcidWorks = profile.getOrcidActivities()
-                            .getOrcidWorks();
-                    for (OrcidWork orcidWork : orcidWorks.getOrcidWork())
+                    OrcidProfile profile = orcidService.getProfile(orcid);
+                    if (profile != null)
                     {
-                        if (!StringUtils.equals(
-                                orcidWork.getSource().getSourceName().getContent(),
-                                sourceName))
+                        OrcidWorks orcidWorks = profile.getOrcidActivities()
+                                .getOrcidWorks();
+                        for (OrcidWork orcidWork : orcidWorks.getOrcidWork())
                         {
-                            PersonalDetails personalDetails = profile.getOrcidBio()
-                                    .getPersonalDetails();
-                            try
+                            if (!StringUtils.equals(orcidWork.getSource()
+                                    .getSourceName().getContent(), sourceName))
                             {
-                                results.add(convertOrcidWorkToRecord(
-                                        personalDetails, orcid, orcidWork));
-                            }
-                            catch (Exception e)
-                            {
-                                throw new IOException(e);
+                                PersonalDetails personalDetails = profile
+                                        .getOrcidBio().getPersonalDetails();
+                                try
+                                {
+                                    results.add(convertOrcidWorkToRecord(
+                                            personalDetails, orcid, orcidWork));
+                                }
+                                catch (Exception e)
+                                {
+                                    throw new IOException(e);
+                                }
                             }
                         }
                     }
                 }
-            }
-            catch(NotFoundException ex) {
-                return results;
+                catch (NotFoundException ex)
+                {
+                    return results;
+                }
             }
         }
         return results;
