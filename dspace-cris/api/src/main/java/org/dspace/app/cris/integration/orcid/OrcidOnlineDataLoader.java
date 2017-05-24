@@ -28,6 +28,7 @@ import org.dspace.authority.orcid.jaxb.OrcidWork;
 import org.dspace.authority.orcid.jaxb.OrcidWorks;
 import org.dspace.authority.orcid.jaxb.PersonalDetails;
 import org.dspace.authority.orcid.jaxb.PublicationDate;
+import org.dspace.authority.orcid.jaxb.Source;
 import org.dspace.authority.orcid.jaxb.Url;
 import org.dspace.authority.orcid.jaxb.WorkContributors;
 import org.dspace.authority.orcid.jaxb.WorkExternalIdentifier;
@@ -101,9 +102,13 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
                         OrcidWorks orcidWorks = profile.getOrcidActivities()
                                 .getOrcidWorks();
                         for (OrcidWork orcidWork : orcidWorks.getOrcidWork())
-                        {
-                            if (!StringUtils.equals(orcidWork.getSource()
-                                    .getSourceName().getContent(), sourceName))
+                        {       
+                            Source source = orcidWork.getSource();
+                            String sourceNameWork = "";
+                            if(source!=null) {
+                                sourceNameWork = source.getSourceName().getContent();
+                            }
+                            if (StringUtils.isBlank(sourceNameWork) || !StringUtils.equals(sourceNameWork, sourceName))
                             {
                                 PersonalDetails personalDetails = profile
                                         .getOrcidBio().getPersonalDetails();
