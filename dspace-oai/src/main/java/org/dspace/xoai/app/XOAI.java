@@ -32,6 +32,7 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.xoai.exceptions.CompilingException;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
@@ -211,6 +212,10 @@ public class XOAI {
             SolrServer server = solrServerResolver.getServer();
             while (iterator.hasNext()) {
                 try {
+                    /*TableRow row = iterator.next();
+                    int itemId = row.getIntColumn("item_id");
+                    log.info("index: " + itemId);
+                    server.add(this.index(find(context, itemId)));*/
                     server.add(this.index(find(context, iterator.next().getIntColumn("item_id"))));
                     context.clearCache();
                 } catch (SQLException ex) {

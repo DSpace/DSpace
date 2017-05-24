@@ -31,17 +31,21 @@ public class DataShareConsumer implements Consumer{
         if(this.event == null && event.getSubjectType() == Constants.COLLECTION){
             switch(event.getEventType()){
                 case Event.ADD:{
-                    Item item = this.getItem(context, event);
-                    if(item.isArchived()){
-                        // if a new item has been created and archived,
-                        // mark item for cleaning up
-                        this.event = new ConsumerEvent(item, event.getEventType());
+                    DSpaceObject dso = event.getObject(context);
+                    if(dso instanceof Item){
+                        Item item = (Item)dso;
+                        if(item.isArchived()){
+                            // if a new item has been created and archived,
+                            // mark item for cleaning up
+                            this.event = new ConsumerEvent(item, event.getEventType());
+                        }
                     }
                     break;
                 }
                 case Event.REMOVE:{
                     this.event = new ConsumerEvent(
-                            this.getItem(context, event), event.getEventType());
+                            // event detail is the item handle
+                            event.getDetail(), event.getEventType());
                     break;
                 }
                 default:{
@@ -51,24 +55,6 @@ public class DataShareConsumer implements Consumer{
         }
     }
         
-    private Item getItem(Context context, Event event) throws Exception{
-        Item item = null;
-        //event.getObjectID();
-        DSpaceObject dso = event.getObject(context);
-       /* LOG.info("****");
-        LOG.info(dso);
-        LOG.info(event.getObjectID());
-        LOG.info(Item.find(context, event.getObjectID()));
-        LOG.info(dso.getClass());
-        LOG.info(dso.getID());*/
-        if(dso instanceof Item)
-        {
-            item = (Item)dso;
-        }
-        
-        return item;
-    }
-
     /*
      * (non-Javadoc)
      * @see org.dspace.event.Consumer#end(org.dspace.core.Context)
@@ -79,16 +65,11 @@ public class DataShareConsumer implements Consumer{
         {
             switch(this.event.getType()){
                 case Event.ADD:{
-                    LOG.info("ADD ***********************");
                     this.addItem(context, this.event.getItem());
                     break;
                 }
                 case Event.REMOVE:{
-                    LOG.info("DELETE ***********************");
-                    LOG.info(this.event.getItem());
-                    LOG.info(this.event.getItem().getID());
-                    LOG.info(this.event.getItem().getHandle());
-                    new ItemDataset(this.event.getItem()).delete();
+                    new ItemDataset(this.event.getHandle()).delete();
                     break;
                 }
                 default:{
@@ -138,13 +119,22 @@ public class DataShareConsumer implements Consumer{
     
     private class ConsumerEvent{
         private Item item;
+        private String handle;
         private int type;
         public ConsumerEvent(Item item, int type){
             this.item = item;
             this.type = type;
         }
+        
+        public ConsumerEvent(String handle, int type){
+            this.handle = handle;
+            this.type = type;
+        }
         public Item getItem() {
             return item;
+        }
+        public String getHandle() {
+            return handle;
         }
         public int getType() {
             return type;

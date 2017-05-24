@@ -85,6 +85,35 @@ public class DbQuery
         return name;
     }
     
+    /*public static String fetchDatasetFilename(
+            Context context,
+            int itemId)
+    {
+        String fileName = null;
+        
+        final String QUERY =
+            "SELECT file_name " +
+            "FROM   dataset " +
+            "WHERE  item_id = ?";
+        
+        try
+        {
+            TableRow row = DatabaseManager.querySingle(
+                    context,
+                    QUERY,
+                    new Object[] {itemId});
+            if(row != null){
+                fileName = row.getStringColumn("file_name");
+            }
+        }
+        catch(SQLException ex)
+        {
+            LOG.error("Failed to fetch file name: " + ex);
+            DatabaseManager.freeConnection(context.getDBConnection());
+        }
+        
+        return fileName;
+    }*/
     
     /**
      * Fetch the owning item for a given bitstream.
@@ -92,7 +121,7 @@ public class DbQuery
      * @param bitstream DSpace bistream.
      * @return DSpace item.
      */
-    public static Item fetchIem(
+    public static Item fetchItem(
             Context context,
             Bitstream bitstream)
     {

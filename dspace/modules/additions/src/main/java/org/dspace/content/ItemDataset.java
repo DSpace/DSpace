@@ -1,12 +1,16 @@
 package org.dspace.content;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -16,9 +20,11 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 
+import uk.ac.edina.datashare.db.DbUpdate;
 import uk.ac.edina.datashare.utils.DSpaceUtils;
 
 
@@ -26,14 +32,23 @@ public class ItemDataset {
     private static final Logger LOG = Logger.getLogger(ItemDataset.class);
     private Context context = null;
     private Item item = null;
+    private String handle = null;
     private static final String DIR_PROP = "datasets.path";
     private static String dir = null;
     
-    static{
+    public ItemDataset(Context context, Item item){
+        this.context = context;
+        this.item = item;
+        this.init();
     }
     
     public ItemDataset(Item item){
         this.item = item;
+        this.init();
+    }
+    
+    public ItemDataset(String handle){
+        this.handle = handle;
         this.init();
     }
 
@@ -83,13 +98,27 @@ public class ItemDataset {
     }
     
     public void delete(){
-        new File(this.getFullPath()).delete();
+        File zip = null;
+        if(this.item != null){
+            zip = new File(this.getFullPath());
+        }
+        else{
+            zip = new File(dir + File.separator + ItemDataset.getFileName(this.handle));
+        }
+
+        if(!zip.delete()){
+            LOG.info("Problem deleting " + zip);
+        }
     }
     
     public boolean exists(){
         return new File(getFullPath()).exists();
     }
-     
+    
+    public static boolean exists(String handle){
+        return new File(dir + getFileName(handle)).exists();
+    }
+ 
     /**
      * @param bitstream The bitstream to check.
      * @return True is bitstream should be added to the zip file.
@@ -102,9 +131,7 @@ public class ItemDataset {
     }
     
     private String getFileName(){
-        //String handle[] = this.item.getHandle().split("/");
         return ItemDataset.getFileName(this.item.getHandle());
-        //return "DS_" + handle[0] + "_" + handle[1] + ".zip";
     }
     
     public static String getFileName(String handle){
@@ -123,8 +150,6 @@ public class ItemDataset {
             String protocol = bUrl[0];
             String host = bUrl[1];
             String fPath = "/download/" + getFileName();
-            //LOG.info("protocol: " + bUrl[0]);
-            //LOG.info("host: " + bUrl[1]);
             if(host.contains(":")){
                 String aHost[] = host.split(":");
                 host = aHost[0];
@@ -158,7 +183,11 @@ public class ItemDataset {
                 item = Item.find(context, item.getID());
                 
                 if(itemIsAvailable(context, item)){
-                    createZip(context);
+                    createZip(context);                    
+                    String cksum = createChecksum(context);
+                    
+                    DbUpdate.insertDataset(
+                            context, item.getID(), getFullPath(), cksum);
                 }
                 else{
                     System.out.println("Zip creation for " + item.getHandle() + " not allowed.");
@@ -175,6 +204,31 @@ public class ItemDataset {
                     LOG.warn(ex);
                 }
             }
+        }
+        private String createChecksum(Context context){
+            String cksum = null;
+            InputStream is = null;
+            DigestInputStream dis = null;
+            try{
+                is = new FileInputStream(getFullPath());
+                
+                try{
+                    dis = new DigestInputStream(is, MessageDigest.getInstance("MD5")); 
+                    cksum = Utils.toHex(dis.getMessageDigest().digest());
+                }
+                catch (NoSuchAlgorithmException ex){
+                    throw new RuntimeException(ex);
+                }
+                finally{
+                    dis.close();
+                    is.close();
+                }
+            }
+            catch(IOException ex){
+                throw new RuntimeException(ex);
+            }
+            
+            return cksum;
         }
         
         private void createZip(Context context){

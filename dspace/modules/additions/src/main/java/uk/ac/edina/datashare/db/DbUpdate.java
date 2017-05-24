@@ -84,6 +84,41 @@ public class DbUpdate
     }
 
     /**
+     * Insert dataset metadata. 
+     * @param context DSpace context.
+     * @param itemId Dspace item id.
+     * @param fileName dataset zip file full path.
+     * @param checksum zipfile checksum.
+     */
+    public static void insertDataset(Context context, int itemId, String fileName, String checksum)
+    {
+        PreparedStatement stmt = null;
+        
+        final String INSERT_DATASET = 
+            "INSERT INTO dataset (item_id, file_name, checksum, checksum_algorithm) VALUES (?,?,?,?)";
+        try
+        {
+            stmt = context.getDBConnection().prepareStatement(INSERT_DATASET);
+        
+            stmt.setInt(1, itemId);
+            stmt.setString(2, fileName);
+            stmt.setString(3, checksum);
+            stmt.setString(4, "MD5");
+            
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            LOG.error("Problem inserting dataset. " + e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            cleanUp(stmt);
+        }
+    }
+    
+    /**
      * Insert a new UUN/Email mapping entry 
      * @param context DSpace context
      * @param uun University User Name
