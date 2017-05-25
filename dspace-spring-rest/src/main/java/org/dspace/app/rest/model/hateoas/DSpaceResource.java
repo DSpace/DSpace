@@ -55,11 +55,12 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 							RestModel linkedObject = (RestModel) readMethod.invoke(data);
 							if (linkedObject != null) {
 								embedded.put(pd.getName(),
-										utils.getResourceRepository(linkedObject.getType()).wrapResource(linkedObject));
+										utils.getResourceRepository(linkedObject.getCategory(), linkedObject.getType())
+												.wrapResource(linkedObject));
 							} else {
 								embedded.put(pd.getName(), null);
 							}
-	
+
 							Method writeMethod = pd.getWriteMethod();
 							writeMethod.invoke(data, new Object[] { null });
 						}

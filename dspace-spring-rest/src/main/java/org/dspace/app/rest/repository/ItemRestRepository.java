@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  *
  */
 
-@Component(ItemRest.NAME)
+@Component(ItemRest.CATEGORY + "." + ItemRest.NAME)
 public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	ItemService is = ContentServiceFactory.getInstance().getItemService();
 	@Autowired

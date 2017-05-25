@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  */
 
-@Component(SiteRest.NAME)
+@Component(SiteRest.CATEGORY + "." + SiteRest.NAME)
 public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 	SiteService sitesv = ContentServiceFactory.getInstance().getSiteService();
 	@Autowired

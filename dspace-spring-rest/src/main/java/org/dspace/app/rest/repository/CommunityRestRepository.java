@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  */
 
-@Component(CommunityRest.NAME)
+@Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME)
 public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest, UUID> {
 	CommunityService cs = ContentServiceFactory.getInstance().getCommunityService();
 	@Autowired

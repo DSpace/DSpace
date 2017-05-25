@@ -12,8 +12,6 @@ import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * The EPerson REST Resource
  * 
@@ -22,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class EPersonRest extends DSpaceObjectRest {
 	public static final String NAME = "eperson";
-
+	public static final String CATEGORY = RestModel.EPERSON;
 	private String netid;
 
 	private Date lastActive;
@@ -102,7 +100,11 @@ public class EPersonRest extends DSpaceObjectRest {
 	}
 
 	@Override
-	@JsonIgnore
+	public String getCategory() {
+		return CATEGORY;
+	}
+	
+	@Override
 	public Class getController() {
 		return RestResourceController.class;
 	}

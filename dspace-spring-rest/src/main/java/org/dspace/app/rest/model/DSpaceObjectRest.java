@@ -11,8 +11,6 @@ import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * Base REST representation for all the DSpaceObjects
  * 
@@ -20,17 +18,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
-	@JsonIgnore
 	private String uuid;
 
 	private String name;
 	private String handle;
-	private String type;
 
 	List<MetadataEntryRest> metadata;
 
 	@Override
-	@JsonIgnore
 	public String getId() {
 		return uuid;
 	}
@@ -68,7 +63,6 @@ public abstract class DSpaceObjectRest extends BaseObjectRest<String> {
 	}
 
 	@Override
-	@JsonIgnore
 	public Class getController() {
 		return RestResourceController.class;
 	}

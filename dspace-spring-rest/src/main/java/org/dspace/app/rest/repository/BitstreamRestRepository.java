@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  *
  */
 
-@Component(BitstreamRest.NAME)
+@Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME)
 public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest, UUID> {
 	BitstreamService bs = ContentServiceFactory.getInstance().getBitstreamService();
 	@Autowired
