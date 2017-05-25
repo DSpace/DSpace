@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(MetadataFieldRest.NAME)
+@Component(MetadataFieldRest.CATEGORY + "." + MetadataFieldRest.NAME)
 public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFieldRest, Integer> {
 	MetadataFieldService metaFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
 	@Autowired

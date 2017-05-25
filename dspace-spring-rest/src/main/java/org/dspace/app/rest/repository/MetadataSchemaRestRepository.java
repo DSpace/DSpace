@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(MetadataSchemaRest.NAME)
+@Component(MetadataSchemaRest.CATEGORY + "." + MetadataSchemaRest.NAME)
 public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataSchemaRest, Integer> {
 	MetadataSchemaService metaScemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
 	@Autowired
