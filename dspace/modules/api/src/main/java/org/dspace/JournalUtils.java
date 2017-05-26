@@ -607,7 +607,7 @@ public class JournalUtils {
         }
         JsonNode titleNode = jsonNode.path("title");
         if (titleNode.isArray()) {
-            manuscript.setTitle(titleNode.elements().next().textValue());
+            manuscript.setTitle(titleNode.elements().next().textValue().replace("\n", " "));
         }
         if (jsonNode.path("publisher") != null) {
             manuscript.setPublisher(jsonNode.path("publisher").textValue());
