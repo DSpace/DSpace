@@ -496,7 +496,7 @@ public class PublicationUpdater extends HttpServlet {
 
         DCValue[] itemPubDOIs = item.getMetadata(PUBLICATION_DOI);
         if (itemPubDOIs != null && itemPubDOIs.length > 0 && !"".equals(itemPubDOIs[0].value)) {
-            LOGGER.debug("found a DOI <" + itemPubDOIs[0].value + ">");
+//            LOGGER.debug("found a DOI <" + itemPubDOIs[0].value + ">");
             queryManuscript.setPublicationDOI(itemPubDOIs[0].value);
         }
         return queryManuscript;
