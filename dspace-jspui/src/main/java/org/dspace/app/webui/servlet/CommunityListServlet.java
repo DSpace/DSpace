@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
@@ -26,9 +27,11 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 
 /**
@@ -68,10 +71,35 @@ public class CommunityListServlet extends DSpaceServlet
 
             Community[] communities = Community.findAllTop(context);
 
-            for (int com = 0; com < communities.length; com++) 
-            {
-                build(communities[com]);
+            String showCrisComm = ConfigurationManager.getProperty("community-list.topcommunity.show");
+
+        	if(AuthorizeManager.isAdmin(context) || 
+        			StringUtils.equalsIgnoreCase(showCrisComm, "all") ||
+        			( context.getCurrentUser() != null && StringUtils.equalsIgnoreCase(showCrisComm, "user") ) ){
+        		for (int com = 0; com < communities.length; com++)
+        		{
+        			build(communities[com]);
+        		}
+            }else{
+        		List<Community> topCom = new ArrayList<Community>();
+        		for (int com = 0; com < communities.length; com++)
+        		{
+            		Group[] groups = AuthorizeManager.getAuthorizedGroups(context, communities[com], Constants.READ);
+            		for(Group group : groups){
+            			if(group.getID()==0|| Group.isMember(context, group.getID())){
+            				build(communities[com]);
+            				topCom.add(communities[com]);
+            				break;
+            			}
+            		}
+        		}
+                
+                communities = new Community[topCom.size()];
+                communities = topCom.toArray(communities);        		
+
             }
+
+ 
 
             // can they admin communities?
             if (AuthorizeManager.isAdmin(context)) 
