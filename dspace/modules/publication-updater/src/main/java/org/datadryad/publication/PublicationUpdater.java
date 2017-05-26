@@ -539,7 +539,7 @@ public class PublicationUpdater extends HttpServlet {
             LOGGER.debug("old citation was: " + itemCitation);
             LOGGER.debug("new citation is: " + manuscript.getFullCitation());
             LOGGER.debug("citation match score is " + score);
-            if (score < 0.9) {
+            if (score < 0.95) {
                 fieldsChanged.add(FULL_CITATION);
                 item.clearMetadata(FULL_CITATION);
                 item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);
