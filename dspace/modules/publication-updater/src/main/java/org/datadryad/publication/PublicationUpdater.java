@@ -210,6 +210,8 @@ public class PublicationUpdater extends HttpServlet {
                 LocalDate dateItemModified = item.getLastModified().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 if (dateItemModified.isAfter(twoYearsAgo)) {
                     items.add(wfi);
+                } else {
+                    LOGGER.debug("skipping item " + item.getID() + " because it's too old");
                 }
             }
             LOGGER.debug("processing " + items.size() + " items");
