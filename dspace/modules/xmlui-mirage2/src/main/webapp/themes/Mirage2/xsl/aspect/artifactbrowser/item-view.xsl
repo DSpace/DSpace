@@ -81,7 +81,7 @@
                   <div id="item-page-tombstone">No download currently available for this item.</div>
                 </xsl:when>
                 <xsl:otherwise>
-                  <xsl:call-template name="downloadAllButton"/>
+                  <xsl:call-template name="downloadAllButton"><xsl:with-param name="show_checksum" select="'true'"/></xsl:call-template>
                   <h3><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h3>
                   <div class="file-list">
                     <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='LICENSE' or @USE='CC-LICENSE']">
@@ -599,14 +599,25 @@
       </xsl:if>
     </xsl:template>
     <xsl:template name="downloadAllButton">
-      <xsl:if test="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download-all-file']">
+      <xsl:param name="show_checksum" />
+      <!-- <xsl:variable name="var"><xsl:value-of select="$xyz" /></xsl:variable> -->
+      <xsl:if test="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download_all_file']">
         <div id="item-page-download-all">
-          <a>
-            <xsl:attribute name="href">
-              <xsl:value-of select="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download-all-file']"/>
-            </xsl:attribute>
-            <img alt="Download All" src="{$theme-path}/images/download-all.png"/>
-          </a>
+          <div id="item-page-download-all-button">
+            <a>
+              <xsl:attribute name="href">
+                <xsl:value-of select="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download_all_file']"/>
+              </xsl:attribute>
+              <img alt="Download All" src="{$theme-path}/images/download-all.png"/>
+            </a>
+          </div>
+          <div id="item-page-download-all-cs">
+            <xsl:if test="$show_checksum = 'true'">
+              <div>zip file MD5 Checksum:
+              <xsl:value-of select="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download_all_file_cs']"/>
+              </div>
+            </xsl:if>
+          </div>
         </div>
       </xsl:if>
     </xsl:template>
@@ -823,6 +834,9 @@
                             <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:label, 30, 5)"/>
                         </dd>
                 </xsl:if>
+				   <!-- DATASHARE - start -->
+                   <dt>MD5 Checksum</dt><dd><xsl:value-of select="@CHECKSUM"/></dd>
+				   <!-- DATASHARE - end -->
                 </dl>
             </div>
 

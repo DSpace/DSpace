@@ -24,6 +24,7 @@ import org.dspace.core.Utils;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 
+import uk.ac.edina.datashare.db.DbQuery;
 import uk.ac.edina.datashare.db.DbUpdate;
 import uk.ac.edina.datashare.utils.DSpaceUtils;
 
@@ -128,6 +129,10 @@ public class ItemDataset {
         final String WBFF = "Written by FormatFilter";
         return (!bitstream.getSource().startsWith(WBFF) &&
                 !bitstream.getName().equals(Constants.LICENSE_BITSTREAM_NAME));
+    }
+    
+    public String getChecksum(){
+        return DbQuery.fetchDatasetChecksum(context, item);
     }
     
     private String getFileName(){

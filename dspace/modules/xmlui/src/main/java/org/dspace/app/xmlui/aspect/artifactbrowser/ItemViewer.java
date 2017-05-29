@@ -59,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import uk.ac.edina.datashare.db.DbQuery;
 import uk.ac.edina.datashare.utils.DSpaceUtils;
 
 /**
@@ -276,8 +277,11 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         // DATASHARE - start
         if(Util.allowDownloadAll(context, item))
         {
-            pageMeta.addMetadata("download-all-file").addContent(
-                    new ItemDataset(item).getURL().toString());
+            ItemDataset ds = new ItemDataset(context, item);
+            pageMeta.addMetadata("download_all_file").addContent(
+                    ds.getURL().toString());
+            pageMeta.addMetadata("download_all_file_cs").addContent(
+                    ds.getChecksum());
         }
         // DATASHARE - end
         

@@ -85,14 +85,14 @@ public class DbQuery
         return name;
     }
     
-    /*public static String fetchDatasetFilename(
+    public static String fetchDatasetChecksum(
             Context context,
-            int itemId)
+            Item item)
     {
-        String fileName = null;
+        String checksum = null;
         
         final String QUERY =
-            "SELECT file_name " +
+            "SELECT checksum " +
             "FROM   dataset " +
             "WHERE  item_id = ?";
         
@@ -101,9 +101,9 @@ public class DbQuery
             TableRow row = DatabaseManager.querySingle(
                     context,
                     QUERY,
-                    new Object[] {itemId});
+                    new Object[] {item.getID()});
             if(row != null){
-                fileName = row.getStringColumn("file_name");
+                checksum = row.getStringColumn("checksum");
             }
         }
         catch(SQLException ex)
@@ -112,8 +112,8 @@ public class DbQuery
             DatabaseManager.freeConnection(context.getDBConnection());
         }
         
-        return fileName;
-    }*/
+        return checksum;
+    }
     
     /**
      * Fetch the owning item for a given bitstream.
