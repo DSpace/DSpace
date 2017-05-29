@@ -30,6 +30,8 @@ import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -202,7 +204,14 @@ public class PublicationUpdater extends HttpServlet {
         LOGGER.debug("finding workflow items");
         try {
             WorkflowItem[] itemArray = WorkflowItem.findAllByISSN(context, dryadJournalConcept.getISSN());
-            items.addAll(Arrays.asList(itemArray));
+            for (WorkflowItem wfi : itemArray) {
+                Item item = wfi.getItem();
+                LocalDate twoYearsAgo = LocalDate.now().minusYears(2);
+                LocalDate dateItemModified = item.getLastModified().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if (dateItemModified.isAfter(twoYearsAgo)) {
+                    items.add(wfi);
+                }
+            }
             LOGGER.debug("processing " + items.size() + " items");
         } catch (Exception e) {
             LOGGER.error("couldn't find workflowItems for journal " + dryadJournalConcept.getJournalID());
