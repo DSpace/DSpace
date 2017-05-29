@@ -496,7 +496,6 @@ public class PublicationUpdater extends HttpServlet {
 
         DCValue[] itemPubDOIs = item.getMetadata(PUBLICATION_DOI);
         if (itemPubDOIs != null && itemPubDOIs.length > 0 && !"".equals(itemPubDOIs[0].value)) {
-//            LOGGER.debug("found a DOI <" + itemPubDOIs[0].value + ">");
             queryManuscript.setPublicationDOI(itemPubDOIs[0].value);
         }
         return queryManuscript;
@@ -504,7 +503,7 @@ public class PublicationUpdater extends HttpServlet {
 
     private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, StringBuilder provenance) {
         HashSet<String> fieldsChanged = new HashSet<String>();
-        LOGGER.debug("updating metadata for item " + item.getID() + " to manuscript " + manuscript.toString());
+        LOGGER.debug("comparing metadata for item " + item.getID() + " to manuscript " + manuscript.toString());
         // first, check to see if this is one of the known mismatches:
         if (isManuscriptMismatchForItem(item, manuscript)) {
             LOGGER.error("pub " + manuscript.getPublicationDOI() + " is known to be a mismatch for " + item.getID());
