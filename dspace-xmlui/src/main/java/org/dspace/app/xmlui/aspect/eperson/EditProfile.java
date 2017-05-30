@@ -244,7 +244,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        Request request = ObjectModelHelper.getRequest(objectModel);
        
        String defaultFirstName="",defaultLastName="",defaultPhone="";
-       String defaultLanguage=null;
+       String defaultLanguage = context.getCurrentLocale().toString();
        if (request.getParameter("submit") != null)
        {
            defaultFirstName = request.getParameter("first_name");
