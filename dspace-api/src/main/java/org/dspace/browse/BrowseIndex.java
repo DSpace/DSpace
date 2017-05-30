@@ -130,7 +130,6 @@ public final class BrowseIndex
         try
         {
             boolean valid = true;
-            this.defaultOrder = SortOption.ASCENDING;
             this.number = number;
 
             String rx = "(\\w+):(\\w+):([\\w\\.\\*,]+):?(\\w*):?(\\w*):?(\\w*)";
