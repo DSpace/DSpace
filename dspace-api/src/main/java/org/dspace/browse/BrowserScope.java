@@ -13,6 +13,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
+import org.dspace.core.ConfigurationManager;
 
 /**
  * A class which represents the initial request to the browse system.
@@ -88,6 +89,11 @@ public class BrowserScope
     public BrowserScope(Context context)
     {
         this.context = context;
+
+        if (ConfigurationManager.getProperty("webui.browse.results_per_page") != null)
+        {
+            resultsPerPage = ConfigurationManager.getIntProperty("webui.browse.results_per_page");
+        }
     }
 
     /**
