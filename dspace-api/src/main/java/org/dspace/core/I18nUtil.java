@@ -102,21 +102,44 @@ public class I18nUtil
      */
     public static Locale getEPersonLocale(EPerson ep)
     {
-        if (ep == null)
+        return getEPersonLocale(ep, true);
+    }
+
+    /**
+     * Get the Locale for a specified EPerson.
+     *
+     * @param ep
+     *        Eperson
+     * @param useDefaultLocale
+     *        If true, return the default locale in case of any error (like invalid or no language set).
+     *        If false, null will be returned.
+     * @return Locale
+     */
+    public static Locale getEPersonLocale(EPerson ep, boolean useDefaultLocale)
+    {
+        if (ep != null)
+        {
+            String lang = ep.getLanguage();
+
+            if (!StringUtils.isBlank(lang))
+            {
+                return I18nUtil.getSupportedLocale(new Locale(lang), useDefaultLocale);
+            }
+            else
+            {
+                log.error("No language specified for EPerson " + ep.getID());
+            }
+        }
+        else
         {
             log.error("No EPerson specified, returning default locale");
-            return I18nUtil.getDefaultLocale();
         }
 
-        String lang = ep.getLanguage();
-        
-        if (StringUtils.isBlank(lang))
-        {
-            log.error("No language specified for EPerson " + ep.getID());
-            return I18nUtil.getDefaultLocale();
+        if (useDefaultLocale) {
+            return DEFAULTLOCALE;
         }
 
-        return I18nUtil.getSupportedLocale(new Locale(lang));
+        return null;
     }
 
     /**
@@ -151,76 +174,78 @@ public class I18nUtil
      * @return supportedLocale
      *         Locale for session according to locales supported by this DSpace instance as set in dspace.cfg
      */
-    
     public static Locale getSupportedLocale(Locale locale)
     {
+        return getSupportedLocale(locale, true);
+    }
 
+    /**
+     * Gets the appropriate supported Locale according for a given Locale.
+     *
+     * @param locale
+     *        Locale to find the corresponding Locale
+     * @param useDefaultLocale
+     *        If true, return DEFAULTLOCALE if no appropriate supported locale was found.
+     *        If false, return null in case of an error.
+     * @return supportedLocale
+     *         Locale for session according to locales supported by this DSpace instance as set in dspace.cfg
+     */
+    public static Locale getSupportedLocale(Locale locale, boolean useDefaultLocale)
+    {
         Locale[] availableLocales = getSupportedLocales();
-        boolean isSupported = false;
-        Locale supportedLocale = null;
         String testLocale = "";
-        if (availableLocales == null)
-        {
-            supportedLocale = DEFAULTLOCALE;
-        }
-        else
+
+        if (availableLocales != null)
         {
             if (!locale.getVariant().equals(""))
             {
                 testLocale = locale.toString();
-                for (int i = 0; i < availableLocales.length; i++)
+                for (Locale availableLocale : availableLocales)
                 {
-                    if (testLocale.equalsIgnoreCase(availableLocales[i]
+                    if (testLocale.equalsIgnoreCase(availableLocale
                             .toString()))
                     {
-                        isSupported = true;
-                        supportedLocale = availableLocales[i];
+                        return availableLocale;
                     }
 
                 }
             }
 
-            if (!(isSupported && locale.getCountry().equals("")))
+            if (!locale.getCountry().equals(""))
             {
                 testLocale = locale.getLanguage() + "_"
                         + locale.getCountry();
 
-                for (int i = 0; i < availableLocales.length; i++)
+                for (Locale availableLocale : availableLocales)
                 {
-                    if (testLocale.equalsIgnoreCase(availableLocales[i]
+                    if (testLocale.equalsIgnoreCase(availableLocale
                             .toString()))
                     {
-                        isSupported = true;
-                        supportedLocale = availableLocales[i];
+                        return availableLocale;
                     }
                 }
 
             }
-            if (!isSupported)
-            {
-                testLocale = locale.getLanguage();
 
-                for (int i = 0; i < availableLocales.length; i++)
+            testLocale = locale.getLanguage();
+            for (Locale availableLocale : availableLocales)
+            {
+                if (testLocale.equalsIgnoreCase(availableLocale
+                        .toString()))
                 {
-                    if (testLocale.equalsIgnoreCase(availableLocales[i]
-                            .toString()))
-                    {
-                        isSupported = true;
-                        supportedLocale = availableLocales[i];
-                    }
-
+                    return availableLocale;
                 }
-            }
-            if (!isSupported)
-            {
-                supportedLocale = DEFAULTLOCALE;
+
             }
         }
-        return supportedLocale;
+
+        if (useDefaultLocale)
+        {
+            return DEFAULTLOCALE;
+        }
+
+        return null;
     }
-
-
-
 
 
     /**

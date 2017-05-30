@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.utils;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.cocoon.i18n.I18nUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.SystemwideAlerts;
 import org.dspace.authenticate.AuthenticationMethod;
@@ -24,6 +26,7 @@ import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.core.I18nUtil;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -111,7 +114,7 @@ public class AuthenticationUtil
         if (implicitStatus == AuthenticationMethod.SUCCESS)
         {
             log.info(LogManager.getHeader(context, "login", "type=implicit"));
-            AuthenticationUtil.logIn(context, request, context.getCurrentUser());
+            AuthenticationUtil.logIn(objectModel, context, request, context.getCurrentUser());
         }
         else
         {
@@ -125,7 +128,7 @@ public class AuthenticationUtil
                 // Logged in OK.
                 log.info(LogManager
                         .getHeader(context, "login", "type=explicit"));
-                AuthenticationUtil.logIn(context, request, context
+                AuthenticationUtil.logIn(objectModel, context, request, context
                         .getCurrentUser());
             }
             else
@@ -165,7 +168,7 @@ public class AuthenticationUtil
         if (implicitStatus == AuthenticationMethod.SUCCESS)
         {
             log.info(LogManager.getHeader(context, "login", "type=implicit"));
-            AuthenticationUtil.logIn(context, request, context.getCurrentUser());
+            AuthenticationUtil.logIn(objectModel, context, request, context.getCurrentUser());
         }
 
         return context;
@@ -174,7 +177,8 @@ public class AuthenticationUtil
     /**
      * Log the given user in as a real authenticated user. This should only be used after 
      * a user has presented credentials and they have been validated. 
-     * 
+     *
+     * @param objectModel
      * @param context
      *            DSpace context
      * @param request
@@ -182,7 +186,7 @@ public class AuthenticationUtil
      * @param eperson
      *            the eperson logged in
      */
-    private static void logIn(Context context, HttpServletRequest request,
+    private static void logIn(Map objectModel, Context context, HttpServletRequest request,
             EPerson eperson) throws SQLException
     {
         if (eperson == null)
@@ -193,6 +197,17 @@ public class AuthenticationUtil
         HttpSession session = request.getSession();
 
         context.setCurrentUser(eperson);
+
+        Locale ePersonLocale = I18nUtil.getEPersonLocale(eperson, false);
+        if (ePersonLocale != null) {
+            I18nUtils.storeLocale(objectModel,
+                    "locale-attribute",
+                    ePersonLocale.toString(),
+                    false,
+                    true,
+                    false,
+                    false);
+        }
 
         // Check to see if systemwide alerts is restricting sessions
         if (!authorizeService.isAdmin(context) && !SystemwideAlerts.canUserStartSession())
@@ -236,7 +251,7 @@ public class AuthenticationUtil
         final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
         Context context = ContextUtil.obtainContext(objectModel);
         
-        logIn(context,request,eperson);
+        logIn(objectModel, context,request,eperson);
     }
 
     /**
@@ -269,7 +284,7 @@ public class AuthenticationUtil
                 {
                     EPerson eperson = ePersonService.find(context, id);
                     context.setCurrentUser(eperson);
-                    
+
                     // Check to see if systemwide alerts is restricting sessions
                     if (!authorizeService.isAdmin(context) && !SystemwideAlerts.canUserMaintainSession())
                     {
