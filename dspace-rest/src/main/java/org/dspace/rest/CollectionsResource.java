@@ -34,6 +34,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
@@ -336,9 +337,9 @@ public class CollectionsResource extends Resource
         {
             context = createContext(getUser(headers));
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
-                    org.dspace.core.Constants.WRITE);
+                    org.dspace.core.Constants.ADD);
 
-            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
+            writeStats(dspaceCollection, UsageEvent.Action.ADD, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             log.trace("Creating item in collection(id=" + collectionId + ").");
@@ -579,7 +580,7 @@ public class CollectionsResource extends Resource
         {
             context = createContext(getUser(headers));
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
-                    org.dspace.core.Constants.WRITE);
+                    Constants.REMOVE);
 
             org.dspace.content.Item item = null;
             org.dspace.content.ItemIterator dspaceItems = dspaceCollection.getItems();
@@ -597,19 +598,6 @@ public class CollectionsResource extends Resource
                 context.abort();
                 log.warn("Item(id=" + itemId + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
-            }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.REMOVE))
-            {
-                context.abort();
-                if (context.getCurrentUser() != null)
-                {
-                    log.error("User(" + context.getCurrentUser().getEmail() + ") has not permission to delete item!");
-                }
-                else
-                {
-                    log.error("User(anonymous) has not permission to delete item!");
-                }
-                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
             writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
