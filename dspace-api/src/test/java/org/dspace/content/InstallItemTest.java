@@ -122,7 +122,7 @@ public class InstallItemTest extends AbstractUnitTest
     public void testInstallItem_validHandle() throws Exception
     {
         context.turnOffAuthorisationSystem();
-        String handle = "123456789/567";
+        String handle = "123456789/56789";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
       
         //Test assigning a specified handle to an item
@@ -149,7 +149,7 @@ public class InstallItemTest extends AbstractUnitTest
                 authorizeService.isAdmin((Context) any); result = true;
         }};
 
-        String handle = "123456789/567";
+        String handle = "123456789/56789";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
         WorkspaceItem is2 = workspaceItemService.create(context, collection, false);
         
@@ -170,7 +170,7 @@ public class InstallItemTest extends AbstractUnitTest
     public void testRestoreItem() throws Exception
     {
         context.turnOffAuthorisationSystem();
-        String handle = "123456789/567";
+        String handle = "123456789/56789";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
         //get current date
@@ -240,7 +240,7 @@ public class InstallItemTest extends AbstractUnitTest
     {
         //create a dummy WorkspaceItem
         context.turnOffAuthorisationSystem();
-        String handle = "123456789/567";
+        String handle = "123456789/56789";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
         // Set "today" as "dc.date.issued"
@@ -274,7 +274,7 @@ public class InstallItemTest extends AbstractUnitTest
     {
         //create a dummy WorkspaceItem with no dc.date.issued
         context.turnOffAuthorisationSystem();
-        String handle = "123456789/567";
+        String handle = "123456789/56789";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
         Item result = installItemService.installItem(context, is, handle);
@@ -293,7 +293,7 @@ public class InstallItemTest extends AbstractUnitTest
     {
         //create a dummy WorkspaceItem
         context.turnOffAuthorisationSystem();
-        String handle = "123456789/567";
+        String handle = "123456789/56789";
         WorkspaceItem is = workspaceItemService.create(context, collection, false);
 
         // Set "today" as "dc.date.issued"
