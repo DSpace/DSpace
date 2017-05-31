@@ -7,13 +7,16 @@
  */
 package org.dspace.app.cris.discovery;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
@@ -39,6 +42,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.SolrServiceIndexPlugin;
@@ -69,11 +73,11 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
 
     private ConfigurationService configurationService;
 
-    private DCInputsReader dcInputsReader;
+    private Map<String,DCInputsReader> dcInputsReader = new HashMap<>();
 
     private String separator;
 
-    private void init() throws DCInputsReaderException
+    private void init(String language) throws DCInputsReaderException
     {
         if (separator == null)
         {
@@ -84,9 +88,11 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                 separator = SolrServiceImpl.FILTER_SEPARATOR;
             }
         }
-        if (dcInputsReader == null)
-        {
-            dcInputsReader = new DCInputsReader();
+        if(StringUtils.isNotBlank(language)) {
+            if (!dcInputsReader.containsKey(language))
+            {
+                dcInputsReader.put(language, new DCInputsReader(I18nUtil.getInputFormsFileName(LocaleUtils.toLocale(language))));
+            }
         }
     }
 
@@ -98,7 +104,7 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
     {
         try
         {
-            init();
+            init(null);
         }
         catch (DCInputsReaderException e)
         {
@@ -122,6 +128,9 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                             (((WidgetCheckRadio) pd.getRendering())
                                     .getStaticValues()),
                             stored_value.toString());
+                    if(StringUtils.isBlank(displayVal)) {
+                        displayVal = stored_value.toString();
+                    }
                     document.removeField(field + "_authority");
                     document.addField(field + "_authority",
                             stored_value.toString());
@@ -192,8 +201,12 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                 Item item = (Item) dso;
                 try
                 {
-                    init();
-                    DCInputSet dcInputSet = dcInputsReader
+                    String language = item.getSubmitter().getLanguage();
+                    if(StringUtils.isBlank(language)) {
+                        language = configurationService.getProperty("default.locale");
+                    }
+                    init(language);
+                    DCInputSet dcInputSet = dcInputsReader.get(language)
                             .getInputs(item.getOwningCollection().getHandle());
 
                     for (int i = 0; i < dcInputSet.getNumberPages(); i++)
@@ -213,6 +226,9 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
                                     String displayVal = myInput
                                             .getDisplayString(null,
                                                     stored_value);
+                                    if(StringUtils.isBlank(displayVal)) {
+                                        displayVal = stored_value;
+                                    }
                                     document.removeField(metadatum.getField()
                                             + "_authority");
                                     document.addField(
@@ -250,16 +266,21 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
     public void additionalSearchParameters(Context context,
             DiscoverQuery discoveryQuery, SolrQuery solrQuery)
     {
+        String language = null;
         try
         {
-            init();
+            language = context.getCurrentLocale().getLanguage();
+            if(StringUtils.isBlank(language)) {
+                language = configurationService.getProperty("default.locale");
+            }
+            init(language);
         }
         catch (DCInputsReaderException e)
         {
             log.error(e.getMessage(), e);
         }
         Set<String> result = new HashSet<String>();
-        Iterator<String> iterator = dcInputsReader.getPairsNameIterator();
+        Iterator<String> iterator = dcInputsReader.get(language).getPairsNameIterator();
         while (iterator.hasNext())
         {
             result.add("valuepairsname_"+iterator.next());
