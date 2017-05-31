@@ -40,11 +40,14 @@ import org.dspace.content.service.InstallItemService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.LogManager;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
+import org.dspace.workflow.WorkflowService;
+import org.dspace.workflow.factory.WorkflowServiceFactory;
 
 /**
  * This class provides all CRUD operation over collections.
@@ -58,7 +61,7 @@ public class CollectionsResource extends Resource
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
     protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
-    protected InstallItemService installItemService = ContentServiceFactory.getInstance().getInstallItemService();
+    protected WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();
 
     private static Logger log = Logger.getLogger(CollectionsResource.class);
 
@@ -365,11 +368,21 @@ public class CollectionsResource extends Resource
                 }
             }
 
-            log.trace("Installing item to collection(id=" + collectionId + ").");
-            dspaceItem = installItemService.installItem(context, workspaceItem);
             workspaceItemService.update(context, workspaceItem);
 
-            returnItem = new Item(dspaceItem, servletContext, "", context);
+            try
+            {
+                // Must insert the item into workflow
+                log.trace("Starting workflow for item(id=" + dspaceItem.getID() + ").");
+                workflowService.start(context, workspaceItem);
+            }
+            catch (Exception e)
+            {
+                log.error(LogManager.getHeader(context, "Error while starting workflow", "Item id: " + dspaceItem.getID()), e);
+                throw new ContextException("Error while starting workflow for item(id=" + dspaceItem.getID() + ")", e);
+            }
+
+            returnItem = new Item(workspaceItem.getItem(), servletContext, "",context);
 
             context.complete();
 
