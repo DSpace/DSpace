@@ -196,7 +196,7 @@ public class DSpaceCSV implements Serializable
             StringBuilder lineBuilder = new StringBuilder();
             String lineRead;
 
-            while (StringUtils.isNotBlank(lineRead = input.readLine()))
+            while ((lineRead = input.readLine()) != null)
             {
                 if (lineBuilder.length() > 0) {
                     // Already have a previously read value - add this line
