@@ -206,6 +206,10 @@ public class GroupTest extends AbstractUnitTest {
         List<String> names = new ArrayList<>();
         List<String> sortedNames = new ArrayList<>();
         for (Group group : groups) {
+            // Ignore any unnamed groups. This is only necessary when running unit tests via a persistent database (e.g. Postgres) as unnamed groups may be created by other tests.
+            if (group.getName() == null) {
+                continue;
+            }
             names.add(group.getName());
             sortedNames.add(group.getName());
         }

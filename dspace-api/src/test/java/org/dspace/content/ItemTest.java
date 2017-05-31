@@ -107,28 +107,30 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     @Override
     public void destroy()
     {
-//        try {
-            context.turnOffAuthorisationSystem();
-            //Get new instances, god knows what happended before
-//            it = itemService.find(context, it.getID());
-//            collection = collectionService.find(context, collection.getID());
-//            owningCommunity = communityService.find(context, owningCommunity.getID());
-//
-//            communityService.delete(context, owningCommunity);
-//            context.commit();
-//            context.restoreAuthSystemState();
-            it = null;
-            collection = null;
-            owningCommunity = null;
+        context.turnOffAuthorisationSystem();
+        try {
+            itemService.delete(context, it);
+        } catch(Exception e){
+        }
+        
+        try {
+            collectionService.delete(context, collection);
+        } catch(Exception e){
+        }
+        
+        try {
+            communityService.delete(context, owningCommunity);
+        } catch(Exception e){
+        }
+        
+        context.restoreAuthSystemState();
+        it = null;
+        collection = null;
+        owningCommunity = null;
+        try {
             super.destroy();
-//        } catch (SQLException | AuthorizeException | IOException ex) {
-//            if(context.isValid())
-//            {
-//                context.abort();
-//            }
-//            log.error("Error in destroy", ex);
-//            fail("Error in destroy: " + ex.getMessage());
-//        }
+        } catch(Exception e){
+        }
     }
 
 
