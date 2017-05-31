@@ -347,101 +347,26 @@
                     <a href="#most-viewed-data"><span>Popular</span></a>
                     <a id="by_author" href="#by-author"><span>By author</span></a>
                     <a id="by_journal" href="#by-journal"><span>By journal</span></a>
+
                 </div>
                 <div id="aspect_discovery_RecentlyAdded_div_Home" class="ds-static-div primary" style="height: 649px; overflow: auto;">
                     <div id="recently-published-data" class="browse-data-panel">
-   <!--                     <xsl:for-each select="dri:div[@n='site-home']">
+                        <xsl:for-each select="dri:div[@n='site-home']">
                             <xsl:apply-templates/>
                         </xsl:for-each>
--->
-<!-- Start of temp Recently Added -->
-
-<h1 class="ds-div-head">Recently published
-data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" href="/feed/atom_1.0/10255/3" class="single-image-link" title="Web feed of data packages recently added to Dryad">
-<img src="/themes/Dryad/images/rss.jpg" style="border: 0px;" alt="RSS feed - Recently published data" />
-</a>
-</h1>
-
-<div id="aspect_discovery_SiteRecentSubmissions_div_site-recent-submission" class="ds-static-div secondary recent-submission">
-<ul class="ds-artifact-list">
-
-<li class="ds-artifact-item odd">
-<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
-<a href="/resource/doi:10.5061/dryad.09d0k">
-<span class="author">Falkenberg CV, Azeloglu EU, Stothers M, Deerinck TJ, Chen Y, He JC, Ellisman MH, Hone JC, Iyenger R, Loew LM</span>
-<span class="pub-date"> (2017) </span>
-<span class="artifact-title">Data from: Fragility of foot process morphology in kidney podocytes arises from chaotic spatial propagation of cytoskeletal instability. </span>
-<span class="italics">PLOS Computational Biology</span> <span class="doi">http://dx.doi.org/10.5061/dryad.09d0k</span>
-</a>
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.09d0k&amp;rft_id=Falkenberg+CV%2C+Azeloglu+EU%2C+Stothers+M%2C+Deerinck+TJ%2C+Chen+Y%2C+He+JC%2C+Ellisman+MH%2C+Hone+JC%2C+Iyengar+R%2C+Loew+LM+%282017%29+Fragility+of+foot+process+morphology+in+kidney+podocytes+arises+from+chaotic+spatial+propagation+of+cytoskeletal+instability.+PLOS+Computational+Biology+13%283%29%3A+e1005433.&amp;rft_id=1553-734X&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.139590&amp;rft_id=PCOMPBIOL-D-16-01344&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Falkenberg%2C+Cibele+V.&amp;rft.contributor=Azeloglu%2C+Evren+U.&amp;rft.contributor=Stothers%2C+Mark&amp;rft.contributor=Deerinck%2C+Thomas+J.&amp;rft.contributor=Chen%2C+Yibang&amp;rft.contributor=He%2C+John+C.&amp;rft.contributor=Ellisman%2C+Mark+H.&amp;rft.contributor=Hone%2C+James+C.&amp;rft.contributor=Iyenger%2C+Ravi&amp;rft.contributor=Loew%2C+Leslie+M.&amp;rft.date=2017-03-21T16%3A32%3A33Z&amp;rft.date=2017-03-21T16%3A32%3A33Z&amp;rft.date=2017-03-16&amp;rft.identifier=doi%3A10.5061%2Fdryad.09d0k&amp;rft.identifier=Falkenberg+CV%2C+Azeloglu+EU%2C+Stothers+M%2C+Deerinck+TJ%2C+Chen+Y%2C+He+JC%2C+Ellisman+MH%2C+Hone+JC%2C+Iyengar+R%2C+Loew+LM+%282017%29+Fragility+of+foot+process+morphology+in+kidney+podocytes+arises+from+chaotic+spatial+propagation+of+cytoskeletal+instability.+PLOS+Computational+Biology+13%283%29%3A+e1005433.&amp;rft.identifier=1553-734X&amp;rft.identifier=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.139590&amp;rft.description=The+kidney+podocyte%27s+function+depends+on+finger-like+projections+%28foot+processes%29+that+interdigitate+with+those+from+neighboring+cells+to+form+the+glomerular+filtration+barrier.+The+integrity+of+the+barrier+depends+on+spatial+control+of+dynamics+of+actin+cytoskeleton+in+the+foot+processes.+We+determined+how+imbalances+in+regulation+of+actin+cytoskeletal+dynamics+can+result+in+pathological+morphology.+We+obtained+3-D+electron+microscopy+images+of+podocytes+and+used+quantitative+features+to+build+dynamical+models+to+investigate+how+regulation+of+actin+dynamics+within+foot+processes+controls+local+morphology.+We+find+that+imbalances+in+regulation+of+actin+bundling%2C+lead+to+chaotic+spatial+patterns+that+could+impair+the+foot+process+morphology.+Simulation+results+are+consistent+with+experimental+observations+for+cytoskeletal+reconfiguration+by+dysregulated+RhoA+or+Rac1%2C+and+they+predict+compensatory+mechanisms+for+biochemical+stability.+We+conclude+that+podocyte+morphology%2C+optimized+for+filtration%2C+is+intrinsically+fragile%2C+whereby+local+transient+biochemical+imbalances+may+lead+to+permanent+morphological+changes+associated+with+pathophysiology.&amp;rft.relation=doi%3A10.5061%2Fdryad.09d0k%2F1&amp;rft.relation=doi%3A10.1371%2Fjournal.pcbi.1005433&amp;rft.subject=actin&amp;rft.subject=kidney&amp;rft.subject=electron+microscopy&amp;rft.subject=dynamical+systems&amp;rft.subject=reaction-diffusion&amp;rft.subject=simulation&amp;rft.title=Data+from%3A+Fragility+of+foot+process+morphology+in+kidney+podocytes+arises+from+chaotic+spatial+propagation+of+cytoskeletal+instability&amp;rft.type=Article&amp;rft.contributor=Loew%2C+Leslie+M.&amp;rft.identifier=PCOMPBIOL-D-16-01344&amp;rft.publicationName=PLOS+Computational+Biology&amp;rft.citationInProgress=false">
-                 
-</span>
-</div>
-</li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.141127/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item even">
-<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
-<a href="/resource/doi:10.5061/dryad.n7f6q">
-<span class="author">Matsubayashi KW, Kohyama TI, Kobayashi N, Yamasaki S, Kuwajima M, Katakura H</span>
-<span class="pub-date"> (2017) </span>
-<span class="artifact-title">Data from: Genetic divergence with ongoing gene flow is maintained by the use of different hosts in phytophagous ladybird beetles genus Henosepilachna. </span>
-<span class="italics">Journal of Evolutionary Biology</span> <span class="doi">http://dx.doi.org/10.5061/dryad.n7f6q</span>
-</a>
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.n7f6q&amp;rft_id=Matsubayashi+KW%2C+Kohyama+TI%2C+Kobayashi+N%2C+Yamasaki+S%2C+Kuwajima+M%2C+Katakura+H+%282017%29+Genetic+divergence+with+ongoing+gene+flow+is+maintained+by+the+use+of+different+hosts+in+phytophagous+ladybird+beetles+genus+Henosepilachna.+Journal+of+Evolutionary+Biology%2C+online+in+advance+of+print.&amp;rft_id=1010-061X&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.141127&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Matsubayashi%2C+Kei+W.&amp;rft.contributor=Kohyama%2C+Tetsuo+I.&amp;rft.contributor=Kobayashi%2C+Norio&amp;rft.contributor=Yamasaki%2C+Satoko&amp;rft.contributor=Kuwajima%2C+Masakazu&amp;rft.contributor=Katakura%2C+Haruo&amp;rft.coverage=Japan&amp;rft.date=2017-03-21T15%3A11%3A12Z&amp;rft.date=2017-03-21T15%3A11%3A12Z&amp;rft.date=2017-03-17&amp;rft.identifier=doi%3A10.5061%2Fdryad.n7f6q&amp;rft.identifier=Matsubayashi+KW%2C+Kohyama+TI%2C+Kobayashi+N%2C+Yamasaki+S%2C+Kuwajima+M%2C+Katakura+H+%282017%29+Genetic+divergence+with+ongoing+gene+flow+is+maintained+by+the+use+of+different+hosts+in+phytophagous+ladybird+beetles+genus+Henosepilachna.+Journal+of+Evolutionary+Biology%2C+online+in+advance+of+print.&amp;rft.identifier=1010-061X&amp;rft.identifier=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.141127&amp;rft.description=Adaptation+to+different+environments+can+promote+population+divergence+via+natural+selection+even+in+the+presence+of+gene+flow%E2%80%93a+phenomenon+that+typically+occurs+during+ecological+speciation.+To+elucidate+how+natural+selection+promotes+and+maintains+population+divergence+during+speciation%2C+we+investigated+the+population+genetic+structure%2C+degree+of+gene+flow+and+heterogeneous+genomic+divergence+in+three+closely+related+Japanese+phytophagous+ladybird+beetles%3A+Henosepilachna+pustulosa%2C+H.+niponica+and+H.+yasutomii.+These+species+act+as+a+generalist%2C+a+wild+thistle+%28Cirsium+spp.%29+specialist+and+a+blue+cohosh+%28Caulophyllum+robustum%29+specialist%2C+respectively%2C+and+their+ranges+differ+accordingly.+The+two+specialist+species+widely+co-occur+but+are+reproductively+isolated+solely+due+to+their+high+specialisation+to+a+particular+host+plant.+Genome-wide+amplified+fragment-length+polymorphism+%28AFLP%29+markers+and+mitochondrial+cytochrome+c+oxidase+subunit+I+%28COI%29+gene+sequences+demonstrated+obvious+genome-wide+divergence+associated+with+both+geographic+distance+and+ecological+divergence.+However%2C+a+hybridisation+assessment+for+both+AFLP+loci+and+the+mitochondrial+sequences+revealed+a+certain+degree+of+unidirectional+gene+flow+between+the+two+sympatric+specialist+species.+Principal+coordinates+analysis+%28PCoA%29+based+on+all+of+the+variable+AFLP+loci+demonstrated+that+there+are+genetic+similarities+between+populations+from+adjacent+localities+irrespective+of+the+species+%28i.e.+host+range%29.+However%2C+a+further+comparative+genome+scan+identified+a+few+fractions+of+loci+representing+approximately+1%25+of+all+loci+as+different-host+associated+outliers.+These+results+suggest+that+these+three+species+had+a+complex+origin%2C+which+could+be+obscured+by+current+gene+flow%2C+and+that+ecological+divergence+can+be+maintained+with+only+a+small+fraction+of+the+genome+is+related+to+different+host+use+even+when+there+is+a+certain+degree+of+gene+flow+between+sympatric+species+pairs.&amp;rft.relation=doi%3A10.5061%2Fdryad.n7f6q%2F1&amp;rft.relation=doi%3A10.1111%2Fjeb.13071&amp;rft.subject=AFLP&amp;rft.subject=ecological+speciation&amp;rft.subject=genome+scan&amp;rft.subject=host+range+evolution&amp;rft.subject=isolation-with-migration+model&amp;rft.subject=MIGRATE&amp;rft.title=Data+from%3A+Genetic+divergence+with+ongoing+gene+flow+is+maintained+by+the+use+of+different+hosts+in+phytophagous+ladybird+beetles+genus+Henosepilachna&amp;rft.type=Article&amp;rft.ScientificName=Henosepilachna&amp;rft.contributor=Matsubayashi%2C+Kei&amp;rft.publicationName=Journal+of+Evolutionary+Biology">
-                 
-</span>
-</div>
-</li>
-
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.139325/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item odd">
-<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
-<a href="/resource/doi:10.5061/dryad.mb463">
-<span class="author">Blondiaux N, Moune M, Desroses M, Frita R, Flipo M, Mathys V, Soetaert K, Kiass M, Delorme V, Djaout K, Trebosc V, Kemmer C, Wintjens R, Wohlkönig A, Antoine R, Huot L, Hot D, Coscolla M, Feldmann J, Gagneux S, Locht C, Brodin P, Gitzinger M, Deprez B, Willand N, Baulard AR</span>
-<span class="pub-date"> (2017) </span>
-<span class="artifact-title">Data from: Reversion of antibiotic resistance in Mycobacterium tuberculosis by spiroisoxazoline SMARt-420. </span>
-<span class="italics">Science</span> <span class="doi">http://dx.doi.org/10.5061/dryad.mb463</span>
-</a>
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.mb463&amp;rft_id=Blondiaux+N%2C+Moune+M%2C+Desroses+M%2C+Frita+R%2C+Flipo+M%2C+Mathys+V%2C+Soetaert+K%2C+Kiass+M%2C+Delorme+V%2C+Djaout+K%2C+Trebosc+V%2C+Kemmer+C%2C+Wintjens+R%2C+Wohlk%C3%B6nig+A%2C+Antoine+R%2C+Huot+L%2C+Hot+D%2C+Coscolla+M%2C+Feldmann+J%2C+Gagneux+S%2C+Locht+C%2C+Brodin+P%2C+Gitzinger+M%2C+D%C3%A9prez+B%2C+Willand+N%2C+Baulard+AR+%282017%29+Reversion+of+antibiotic+resistance+in+Mycobacterium+tuberculosis+by+spiroisoxazoline+SMARt-420.+Science+355%286330%29%3A+1206-1211.&amp;rft_id=0036-8075&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.139325&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Blondiaux%2C+Nicolas&amp;rft.contributor=Moune%2C+Martin&amp;rft.contributor=Desroses%2C+Matthieu&amp;rft.contributor=Frita%2C+Rosangela&amp;rft.contributor=Flipo%2C+Marion&amp;rft.contributor=Mathys%2C+Vanessa&amp;rft.contributor=Soetaert%2C+Karine&amp;rft.contributor=Kiass%2C+Mehdi&amp;rft.contributor=Delorme%2C+Vincent&amp;rft.contributor=Djaout%2C+Kamel&amp;rft.contributor=Trebosc%2C+Vincent&amp;rft.contributor=Kemmer%2C+Christian&amp;rft.contributor=Wintjens%2C+Ren%C3%A9&amp;rft.contributor=Wohlk%C3%B6nig%2C+Alexandre&amp;rft.contributor=Antoine%2C+Rudy&amp;rft.contributor=Huot%2C+Ludovic&amp;rft.contributor=Hot%2C+David&amp;rft.contributor=Coscolla%2C+Mireia&amp;rft.contributor=Feldmann%2C+Julia&amp;rft.contributor=Gagneux%2C+Sebastien&amp;rft.contributor=Locht%2C+Camille&amp;rft.contributor=Brodin%2C+Priscille&amp;rft.contributor=Gitzinger%2C+Marc&amp;rft.contributor=Deprez%2C+Benoit&amp;rft.contributor=Willand%2C+Nicolas&amp;rft.contributor=Baulard%2C+Alain+R.&amp;rft.date=2017-03-20T19%3A27%3A18Z&amp;rft.date=2017-03-20T19%3A27%3A18Z&amp;rft.date=2017-03-16&amp;rft.identifier=doi%3A10.5061%2Fdryad.mb463&amp;rft.identifier=Blondiaux+N%2C+Moune+M%2C+Desroses+M%2C+Frita+R%2C+Flipo+M%2C+Mathys+V%2C+Soetaert+K%2C+Kiass+M%2C+Delorme+V%2C+Djaout+K%2C+Trebosc+V%2C+Kemmer+C%2C+Wintjens+R%2C+Wohlk%C3%B6nig+A%2C+Antoine+R%2C+Huot+L%2C+Hot+D%2C+Coscolla+M%2C+Feldmann+J%2C+Gagneux+S%2C+Locht+C%2C+Brodin+P%2C+Gitzinger+M%2C+D%C3%A9prez+B%2C+Willand+N%2C+Baulard+AR+%282017%29+Reversion+of+antibiotic+resistance+in+Mycobacterium+tuberculosis+by+spiroisoxazoline+SMARt-420.+Science+355%286330%29%3A+1206-1211.&amp;rft.identifier=0036-8075&amp;rft.identifier=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.139325&amp;rft.descriptionrogress=false">
-                 
-  </span>
-  </div>
-  </li>
-<!-- External Metadata URL: cocoon://metadata/handle/10255/dryad.136797/mets.xml?sections=dmdSec,fileSec&fileGrpTypes=THUMBNAIL-->
-<li class="ds-artifact-item even">
-<div xmlns:xlink="http://www.w3.org/TR/xlink/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:mets="http://www.loc.gov/METS/" xmlns:dri="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" style="padding: 6px;" class="artifact-description">
-<a href="/resource/doi:10.5061/dryad.b2p3j">
-<span class="author">Johnson RE, Kording KP, Hargrove LJ, Sensinger JW</span>
-<span class="pub-date"> (2017) </span>
-<span class="artifact-title">Data from: Adaptation to random and systematic errors: Comparison of amputee and non-amputee control interfaces with varying levels of process noise. </span>
-<span class="italics">PLOS ONE</span> <span class="doi">http://dx.doi.org/10.5061/dryad.b2p3j</span>
-</a>
-<span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;rft_id=doi%3A10.5061%2Fdryad.b2p3j&amp;rft_id=Johnson+RE%2C+Kording+KP%2C+Hargrove+LJ%2C+Sensinger+JW+%282017%29+Adaptation+to+random+and+systematic+errors%3A+Comparison+of+amputee+and+non-amputee+control+interfaces+with+varying+levels+of+process+noise.+PLOS+ONE+12%283%29%3A+e0170473.&amp;rft_id=1932-6203&amp;rft_id=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.136797&amp;rft_id=PONE-D-16-20924&amp;rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;rft.contributor=Johnson%2C+Reva+E.&amp;rft.contributor=Kording%2C+Konrad+P.&amp;rft.contributor=Hargrove%2C+Levi+J.&amp;rft.contributor=Sensinger%2C+Jonathon+W.&amp;rft.date=2017-03-20T20%3A58%3A23Z&amp;rft.date=2017-03-20T20%3A58%3A23Z&amp;rft.date=2017-03-16&amp;rft.identifier=doi%3A10.5061%2Fdryad.b2p3j&amp;rft.identifier=Johnson+RE%2C+Kording+KP%2C+Hargrove+LJ%2C+Sensinger+JW+%282017%29+Adaptation+to+random+and+systematic+errors%3A+Comparison+of+amputee+and+non-amputee+control+interfaces+with+varying+levels+of+process+noise.+PLOS+ONE+12%283%29%3A+e0170473.&amp;rft.identifier=1932-6203&amp;rft.identifier=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.136797&amp;rft.description=The+objective+of+this+study+was+to+understand+how+people+adapt+to+errors+when+using+a+myoelectric+control+interface.+We+compared+adaptation+across+1%29+non-amputee+subjects+using+joint+angle%2C+joint+torque%2C+and+myoelectric+control+interfaces%2C+and+2%29+amputee+subjects+using+myoelectric+control+interfaces+with+residual+and+intact+limbs+%28five+total+control+interface+conditions%29.+We+measured+trial-by-trial+adaptation+to+self-generated+errors+and+random+perturbations+during+a+virtual%2C+single+degree-of-freedom+task+with+two+levels+of+feedback+uncertainty%2C+and+evaluated+adaptation+by+fitting+a+hierarchical+Kalman+filter+model.+We+have+two+main+results.+First%2C+adaptation+to+random+perturbations+was+similar+across+all+control+interfaces%2C+whereas+adaptation+to+self-generated+errors+differed.+These+patterns+matched+predictions+of+our+model%2C+which+was+fit+to+each+control+interface+by+changing+the+process+noise+parameter+that+represented+system+variability.+Second%2C+in+amputee+subjects%2C+we+found+similar+adaptation+rates+and+error+levels+between+residual+and+intact+limbs.+These+results+link+prosthesis+control+to+broader+areas+of+motor+learning+and+adaptation+and+provide+a+useful+model+of+adaptation+with+myoelectric+control.+The+model+of+adaptation+will+help+us+understand+and+solve+prosthesis+control+challenges%2C+such+as+providing+additional+sensory+feedback.&amp;rft.relation=doi%3A10.5061%2Fdryad.b2p3j%2F1&amp;rft.relation=doi%3A10.5061%2Fdryad.b2p3j%2F2&amp;rft.relation=doi%3A10.1371%2Fjournal.pone.0170473&amp;rft.subject=adaptation&amp;rft.subject=upper+limb+prosthesis&amp;rft.subject=myoelectric+control&amp;rft.subject=EMG+signals&amp;rft.subject=sensory+feedback&amp;rft.subject=uncertainty&amp;rft.subject=internal+model&amp;rft.subject=Bayesian+inference&amp;rft.title=Data.&amp;rft.contributor=Bakker%2C+Jaap&amp;rft.contributor=Helder%2C+Johannes&amp;rft.date=2017-03-21T13%3A21%3A22Z&amp;rft.date=2017-03-21T13%3A21%3A22Z&amp;rft.date=2017-03-21&amp;rft.identifier=doi%3A10.5061%2Fdryad.1g439&amp;rft.identifier=1755-098X&amp;rft.identifier=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.103322&amp;rft.description=Soil-biota+are+responsible+for+essential+ecosystem+services+such+as+carbon+storage%2C+nutrient+cycling+and+water+retention.+However%2C+assessment+of+the+condition+of+soil-biota+is+hampered+by+an+overwhelming+level+of+diversity.+With+representatives+in+all+trophic+levels+of+the+food+web%2C+nematode+communities+can+be+used+as+bio-indicators.+Accurate+assessment+of+nematode+assemblages+requires+insight+in+the+distribution+of+specimens+with+distinct+food+preferences.+With+the+availability+of+taxon-specific+quantitative-PCR+assays%2C+distribution+patterns+of+multiple+nematode+groups+can+be+investigated+simultaneously.+Here%2C+microscale+patchiness+of+45+nematode+taxa+was+studied+on+12+sampling+sites+%28each+with+four+adjacent+microplots%29+located+on+arable+fields+or+semi-natural+grasslands+%28%E2%80%98system%E2%80%99%29%2C+and+on+marine-%2C+river+clay+or+sandy+soils+%28%E2%80%98soil+type%E2%80%99%29.+From+each+microplot+five+composite+samples+were+collected.+Contrary+to+our+expectations%2C+an+increase+of+the+number+of+cores+per+composite+sample+did+not+result+in+more+accurate+measurements%2C+and+apparently+the+levels+of+microscale+patchiness+of+the+taxa+are+low+compared+to+what+has+been+reported+for+oligophagous+plant-parasites.+System+and+soil+type+did+not+affect+microscale+distribution.+To+investigate+the+level+of+patchiness+in+more+detail%2C+detection+probability+%28DP%29+and+variability+of+abundances+were+calculated.+Common+and+widespread+bacterivorous+and+fungivorous+taxa+had+DP+%E2%89%A5+90%25%2C+confirming+low+level+of+microscale+patchiness.+With+DPs+of+40-70%25%2C+predators+and+most+omnivores+showed+degrees+of+local+clustering.+An+overview+of+mean+variabilities+of+abundances+is+presented+that+offers+insight+in+how+feeding+preferences+impact+the+microscale+distribution+both+between+and+within+trophic+groups.&amp;rft.relation=doi%3A10.5061%2Fdryad.1g439%2F1&amp;rft.relation=&amp;rft.subject=nematode+community&amp;rft.subject=quantitative+PCR&amp;rft.subject=bio-indicators&amp;rft.subject=spatial+distribution&amp;rft.subject=trophic+group&amp;rft.title=Data+from%3A+Feeding+preference+as+a+main+determinant+of+microscale+patchiness+among+terrestrial+nematodes&amp;rft.type=Article&amp;rft.identifier=MER-17-0052&amp;rft.publicationName=Molecular+Ecology+Resources&amp;rft.citationInProgress=true">
-                 
-</span>
-</div>
-</li>
-
-</ul>
-</div>
-<!-- End of temp Recently Added -->
-
-</div>
-
+                    </div>
                     <div id="most-viewed-data" class="browse-data-panel">
-		      This display is currently unavailable.
+
                         <xsl:apply-templates select="//dri:document/dri:body/dri:div[@id='aspect.discovery.MostDownloadedBitstream.div.home']"/>
 
                     </div>
 
                     <div id="by-author" class="browse-data-panel">
-		      This display is currently unavailable.
                         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter']"/>
                         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-dc.contributor.author_filter-results']"/>
 
                     </div>
                     <div id="by-journal" class="browse-data-panel">
-		      This display is currently unavailable.
                         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter']"/>
                         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.discovery.SearchFilterTransformer.div.browse-by-prism.publicationName_filter-results']"/>
 
@@ -499,43 +424,7 @@ data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.ed
                     <div xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/"
                          id="aspect_statistics_StatisticsTransformer_div_stats" class="ds-static-div secondary stats">
                         <!--remove old static information and add real data-->
-                        <!-- <xsl:apply-templates select="/dri:document/dri:body/dri:div[@n='front-page-stats']"/> -->
-			<!-- Begin temporary stats -->
-			<div xmlns="http://www.w3.org/1999/xhtml" id="org_datadryad_dspace_statistics_SiteOverview_div_front-page-stats" class="ds-static-div">
-<table id="org_datadryad_dspace_statistics_SiteOverview_table_list-table" class="ds-table">
-<tr class="ds-table-header-row">
-<th class="ds-table-header-cell odd">Type</th>
-<th xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-header-cell even">Total</th>
-<th xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-header-cell odd">30 days</th>
-</tr>
-<tr xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-row even">
-<td class="ds-table-cell odd">Data packages</td>
-<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">15905</td>
-<td class="ds-table-cell odd">305</td>
-</tr>
-<tr class="ds-table-row odd">
-<td class="ds-table-cell odd">Data files</td>
-<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">50441</td>
-<td class="ds-table-cell odd">749</td>
-</tr>
-<tr class="ds-table-row even">
-<td class="ds-table-cell odd">Journals</td>
-<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">563</td>
-<td class="ds-table-cell odd">134</td>
-</tr>
-<tr class="ds-table-row odd">
-<td class="ds-table-cell odd">Authors</td>
-<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">56647</td>
-<td class="ds-table-cell odd">5466</td>
-</tr>
-<tr class="ds-table-row even">
-<td class="ds-table-cell odd">Downloads</td>
-<td xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.edu/DRI/1.0/" class="ds-table-cell even">9951</td>
-<td class="ds-table-cell odd">893</td>
-</tr>
-</table>
-			</div>
-<!-- End temporary stats -->
+                        <xsl:apply-templates select="/dri:document/dri:body/dri:div[@n='front-page-stats']"/>
                     </div>
                 </div>
             </div>

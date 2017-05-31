@@ -148,9 +148,8 @@ and searching the repository.
                       <map:parameter name="dspace.dir" value="dspace.dir" />
                       <map:transform type="Include" src="file://{dspace.dir}/config/news-xmlui.xml" />
                 </map:act>
+                <map:transform type="SiteStatsOverview"/>
                 <map:transform type="FrontPageSearch"/>
-<!--                <map:transform type="SiteStatsOverview"/>
-
                 <map:transform type="SiteRecentSubmissions"/>
 
                 <map:transform type="SearchFilterTransformer">
@@ -160,11 +159,11 @@ and searching the repository.
                          <map:parameter name="field" value="prism.publicationName_filter" />
                 </map:transform>
 
-                <map:transform type="MostDownloadedBitstream"/> -->
+                <map:transform type="MostDownloadedBitstream"/>
                 <map:serialize type="xml"/>
             </map:match>
             <map:match pattern="most_downloaded_bitstreams">
-<!--                <map:transform type="MostDownloadedBitstream"/> -->
+                <map:transform type="MostDownloadedBitstream"/>
                 <map:serialize type="xml"/>
             </map:match>
 
