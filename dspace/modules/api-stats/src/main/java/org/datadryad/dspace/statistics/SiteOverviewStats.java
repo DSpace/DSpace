@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.text.DateFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import static org.datadryad.dspace.statistics.SolrUtils.*;
@@ -14,6 +16,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SiteOverviewStats  {
 
     private static final Logger LOGGER = Logger.getLogger(SiteOverviewStats.class);
@@ -85,6 +91,8 @@ public class SiteOverviewStats  {
     public String getTotalFileDownload_30day() {
         return this.totalFileDownload_30day;
     }
+
+    public SiteOverviewStats() {}
     
     public SiteOverviewStats(Context context) throws SQLException, StatisticsException, MalformedURLException, SolrServerException {
         this.context = context;
@@ -123,5 +131,15 @@ public class SiteOverviewStats  {
             LOGGER.error("stats.datafiles.coll property isn't set properly");
         }
         return Integer.toString(result);
+    }
+
+    @Override
+    public String toString() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
