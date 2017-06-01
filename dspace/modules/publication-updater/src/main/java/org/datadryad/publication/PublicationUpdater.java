@@ -30,6 +30,8 @@ import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -202,7 +204,16 @@ public class PublicationUpdater extends HttpServlet {
         LOGGER.debug("finding workflow items");
         try {
             WorkflowItem[] itemArray = WorkflowItem.findAllByISSN(context, dryadJournalConcept.getISSN());
-            items.addAll(Arrays.asList(itemArray));
+            for (WorkflowItem wfi : itemArray) {
+                Item item = wfi.getItem();
+                LocalDate twoYearsAgo = LocalDate.now().minusYears(2);
+                LocalDate dateItemModified = item.getLastModified().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                if (dateItemModified.isAfter(twoYearsAgo)) {
+                    items.add(wfi);
+                } else {
+                    LOGGER.debug("skipping item " + item.getID() + " because it's too old");
+                }
+            }
             LOGGER.debug("processing " + items.size() + " items");
         } catch (Exception e) {
             LOGGER.error("couldn't find workflowItems for journal " + dryadJournalConcept.getJournalID());
@@ -300,20 +311,33 @@ public class PublicationUpdater extends HttpServlet {
             String score = matchedManuscript.optionalProperties.get("crossref-score");
             if (!"".equals(queryManuscript.getPublicationDOI())){
                 LOGGER.debug("matching with given publication DOI " + queryManuscript.getPublicationDOI());
-            }
-            LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" matched a title \"" + matchedManuscript.getTitle() + "\" with score " + score);
-            LOGGER.debug("matched publication DOI is " + matchedManuscript.getPublicationDOI());
-            // does the matched manuscript have the same authors?
-            StringBuilder authormatches = new StringBuilder();
-            if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
-                LOGGER.debug("same authors");
-                // update the item's metadata
-                StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");
+                StringBuilder provenance = new StringBuilder("Associated publication for doi " + queryManuscript.getPublicationDOI() + " was found: \"" + matchedManuscript.getTitle() + "\".");
                 if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
                     message = provenance;
                 }
             } else {
-                LOGGER.debug("different authors: " + authormatches);
+                LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" matched a title \"" + matchedManuscript.getTitle() + "\" with score " + score);
+                LOGGER.debug("matched publication DOI is " + matchedManuscript.getPublicationDOI());
+                if (Double.valueOf(score) < 1.0) {
+                    // does the matched manuscript have the same authors?
+                    StringBuilder authormatches = new StringBuilder();
+                    if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
+                        LOGGER.debug("same authors");
+                        // update the item's metadata
+                        StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");
+                        if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
+                            message = provenance;
+                        }
+                    } else {
+                        LOGGER.debug("different authors: " + authormatches);
+                    }
+                } else {
+                    LOGGER.debug("perfect title match");
+                    StringBuilder provenance = new StringBuilder("Associated publication with perfect title match was found: \"" + matchedManuscript.getTitle() + "\".");
+                    if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
+                        message = provenance;
+                    }
+                }
             }
         } else {
             LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" didn't match anything in crossref");
@@ -483,7 +507,6 @@ public class PublicationUpdater extends HttpServlet {
 
         DCValue[] itemPubDOIs = item.getMetadata(PUBLICATION_DOI);
         if (itemPubDOIs != null && itemPubDOIs.length > 0 && !"".equals(itemPubDOIs[0].value)) {
-            LOGGER.debug("found a DOI <" + itemPubDOIs[0].value + ">");
             queryManuscript.setPublicationDOI(itemPubDOIs[0].value);
         }
         return queryManuscript;
@@ -491,7 +514,7 @@ public class PublicationUpdater extends HttpServlet {
 
     private boolean updateItemMetadataFromManuscript(Item item, Manuscript manuscript, Context context, StringBuilder provenance) {
         HashSet<String> fieldsChanged = new HashSet<String>();
-        LOGGER.debug("updating metadata for item " + item.getID() + " to manuscript " + manuscript.toString());
+        LOGGER.debug("comparing metadata for item " + item.getID() + " to manuscript " + manuscript.toString());
         // first, check to see if this is one of the known mismatches:
         if (isManuscriptMismatchForItem(item, manuscript)) {
             LOGGER.error("pub " + manuscript.getPublicationDOI() + " is known to be a mismatch for " + item.getID());
@@ -534,7 +557,7 @@ public class PublicationUpdater extends HttpServlet {
             LOGGER.debug("old citation was: " + itemCitation);
             LOGGER.debug("new citation is: " + manuscript.getFullCitation());
             LOGGER.debug("citation match score is " + score);
-            if (score < 0.9) {
+            if (score < 0.95) {
                 fieldsChanged.add(FULL_CITATION);
                 item.clearMetadata(FULL_CITATION);
                 item.addMetadata(FULL_CITATION, null, manuscript.getFullCitation(), null, -1);

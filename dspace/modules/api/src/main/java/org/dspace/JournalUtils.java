@@ -546,8 +546,10 @@ public class JournalUtils {
             matchedManuscript.optionalProperties.put("crossref-score", String.valueOf(matchScore));
             // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
             if (matchScore < 0.5) {
-                resultString.append("\"" + queryManuscript.getTitle() + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
+                resultString.append("BAD MATCH: \"" + queryManuscript.getTitle() + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
                 return null;
+            } else {
+                resultString.append("GOOD MATCH: \"" + queryManuscript.getTitle() + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
             }
         }
         return matchedManuscript;
@@ -607,7 +609,8 @@ public class JournalUtils {
         }
         JsonNode titleNode = jsonNode.path("title");
         if (titleNode.isArray()) {
-            manuscript.setTitle(titleNode.elements().next().textValue());
+            String trimmedTitle = titleNode.elements().next().textValue().replace("\n", " ").replaceAll("\\s+", " ");
+            manuscript.setTitle(trimmedTitle);
         }
         if (jsonNode.path("publisher") != null) {
             manuscript.setPublisher(jsonNode.path("publisher").textValue());
