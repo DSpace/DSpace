@@ -189,15 +189,15 @@
 	<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Recent Submissions</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
-	<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">Community List</message>
-	<message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Community List</message>
-	<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Communities in VSim</message>
-	<message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Select a community to browse its collections.</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.title">Project Community List</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.trail">Project Community List</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.head">Project Communities in VSim</message>
+	<message key="xmlui.ArtifactBrowser.CommunityBrowser.select">Select a project community to browse its collections.</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityViewer.java -->
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.search_scope">Search Scope</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.all_of_dspace">All of VSim</message>
-	<message key="xmlui.ArtifactBrowser.CommunityViewer.full_text_search">Search within this community and its collections:</message>
+	<message key="xmlui.ArtifactBrowser.CommunityViewer.full_text_search">Search within this project community and its collections:</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.head_browse">Browse by</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_titles">Titles</message>
 	<message key="xmlui.ArtifactBrowser.CommunityViewer.browse_authors">Authors</message>
@@ -254,7 +254,7 @@
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateissued">By Issue Date</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.browse_dateaccessioned">By Submit Date</message>
 	<message key="xmlui.ArtifactBrowser.Navigation.head_this_collection">This Collection</message>
-	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Community</message>
+	<message key="xmlui.ArtifactBrowser.Navigation.head_this_community">This Project Community</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.SimpleSearch.java -->
         <!-- Note: As of VSim 6.0, org.dspace.app.xmlui.aspect.artifactbrowser.SimpleSearch has been removed. -->
@@ -994,13 +994,13 @@
 	<message key="xmlui.administrative.Navigation.context_edit_item">Edit this item</message>
 	<message key="xmlui.administrative.Navigation.context_edit_collection">Edit Collection</message>
 	<message key="xmlui.administrative.Navigation.context_item_mapper">Item Mapper</message>
-	<message key="xmlui.administrative.Navigation.context_edit_community">Edit Community</message>
+	<message key="xmlui.administrative.Navigation.context_edit_community">Edit Project Community</message>
 	<message key="xmlui.administrative.Navigation.context_create_collection">Create Collection</message>
 	<message key="xmlui.administrative.Navigation.context_create_subcommunity">Create Sub-community</message>
-	<message key="xmlui.administrative.Navigation.context_create_community">Create Community</message>
+	<message key="xmlui.administrative.Navigation.context_create_community">Create Project Community</message>
 	<message key="xmlui.administrative.Navigation.context_export_item">Export Item</message>
     <message key="xmlui.administrative.Navigation.context_export_collection">Export Collection</message>
-    <message key="xmlui.administrative.Navigation.context_export_community">Export Community</message>
+    <message key="xmlui.administrative.Navigation.context_export_community">Export Project Community</message>
     <message key="xmlui.administrative.Navigation.context_export_metadata">Export Metadata</message>
     <message key="xmlui.administrative.Navigation.context_search_export_metadata">Export Search Metadata</message>
 
@@ -1133,7 +1133,7 @@
 	<message key="xmlui.administrative.group.ManageGroupsMain.search_column2">ID</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.search_column3">Name</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.search_column4">Members</message>
-	<message key="xmlui.administrative.group.ManageGroupsMain.search_column5">Community / Collection</message>
+	<message key="xmlui.administrative.group.ManageGroupsMain.search_column5">Project Community / Collection</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.collection_link">View</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.submit_delete">Delete groups</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.no_results">Your search found no results...</message>
@@ -1336,7 +1336,7 @@
 	<message key="xmlui.administrative.authorization.AuthorizationMain.submit_find">Find</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced">Advanced authorizations tool</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced_link">Click here to go to the item wildcard policy admin tool</message>
-	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_head">Community/collection authorizations</message>
+	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_head">Project Community/collection authorizations</message>
 	<message key="xmlui.administrative.authorization.AuthorizationMain.containerList_para">Click on a community or collection to edit its policies.</message>
 
 
@@ -1345,7 +1345,7 @@
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.title">Edit Policies</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.trail">Policies List</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.main_head_collection">Policies for Collection "{0}" ({1},ID: {2})</message>
-	<message key="xmlui.administrative.authorization.EditContainerPolicies.main_head_community">Policies for Community "{0}" ({1},ID: {2})</message>
+	<message key="xmlui.administrative.authorization.EditContainerPolicies.main_head_community">Policies for Project Community "{0}" ({1},ID: {2})</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.main_add_link">Click here to add a new policy. </message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.submit_add">Add</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.head_id">ID</message>
@@ -1881,12 +1881,12 @@
         <message key="xmlui.administrative.community.general.options_queue">Queue</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.AssignCommunityRoles.java -->
-	<message key="xmlui.administrative.community.AssignCommunityRoles.title">Edit Community Roles</message>
+	<message key="xmlui.administrative.community.AssignCommunityRoles.title">Edit Project Community Roles</message>
 	<message key="xmlui.administrative.community.AssignCommunityRoles.trail">Roles</message>
-	<message key="xmlui.administrative.community.AssignCommunityRoles.main_head">Edit Community: {0}</message>
+	<message key="xmlui.administrative.community.AssignCommunityRoles.main_head">Edit Project Community: {0}</message>
 	<message key="xmlui.administrative.community.AssignCommunityRoles.no_role">none</message>
 	<message key="xmlui.administrative.community.AssignCommunityRoles.create">Create...</message>
-	<message key="xmlui.administrative.community.AssignCommunityRoles.help_admins">Community administrators can create sub-communities or collections, and manage or assign management for those sub-communities or collections.  In addition, they decide who can submit items to any sub-collections, edit item metadata (after submission), and add (map) existing items from other collections (subject to authorization).</message>
+	<message key="xmlui.administrative.community.AssignCommunityRoles.help_admins">Project Community administrators can create sub-communities or collections, and manage or assign management for those sub-communities or collections.  In addition, they decide who can submit items to any sub-collections, edit item metadata (after submission), and add (map) existing items from other collections (subject to authorization).</message>
 	<message key="xmlui.administrative.community.AssignCommunityRoles.default_read_custom">This community uses custom default access settings. </message>
 	<message key="xmlui.administrative.community.AssignCommunityRoles.default_read_anonymous">Default read for incoming items and bitstreams is currently set to Anonymous.</message>
 	<message key="xmlui.administrative.community.AssignCommunityRoles.edit_authorizations">Edit authorization policies directly.</message>
@@ -1897,17 +1897,17 @@
 	<message key="xmlui.administrative.community.AssignCommunityRoles.sysadmins_only"><nobr>(system administrators only)</nobr></message>
 
         <!-- org.dspace.app.xmlui.administrative.community.CurateCommunityForm.java -->
-        <message key="xmlui.administrative.community.CurateCommunityForm.main_head">Curate Community: {0}</message>
-        <message key="xmlui.administrative.community.CurateCommunityForm.title">Curate Community</message>
+        <message key="xmlui.administrative.community.CurateCommunityForm.main_head">Curate Project Community: {0}</message>
+        <message key="xmlui.administrative.community.CurateCommunityForm.title">Curate Project Community</message>
         <message key="xmlui.administrative.community.CurateCommunityForm.trail">Curator</message>
         <message key="xmlui.administrative.community.CurateCommunityForm.label_name">Task</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.DeleteCommunityConfirm.java -->
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.title">Confirm Deletion</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.trail">Confirm</message>
-	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_head">Confirm deletion for community {0}</message>
-	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_para">Are you sure community {0} should be deleted? This will delete:</message>
-	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item1">Any collections in the community that are not contained in other communities</message>
+	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_head">Confirm deletion for project community {0}</message>
+	<message key="xmlui.administrative.community.DeleteCommunityConfirm.main_para">Are you sure project community {0} should be deleted? This will delete:</message>
+	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item1">Any collections in the project community that are not contained in other communities</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item2">Any items and incomplete submissions in this community that aren't contained in other communities</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item3">The contents of those items</message>
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.confirm_item4">All associated authorization policies</message>
@@ -1919,9 +1919,9 @@
 	<message key="xmlui.administrative.community.DeleteCommunityRoleConfirm.main_para">Are you sure you want to delete this role? All changes and customizations made to the {0} group will be lost and would have to be created anew.</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.EditCommunityMetadataForm.java -->
-	<message key="xmlui.administrative.community.EditCommunityMetadataForm.title">Edit Community Metadata</message>
+	<message key="xmlui.administrative.community.EditCommunityMetadataForm.title">Edit Project Community Metadata</message>
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.trail">Metadata</message>
-	<message key="xmlui.administrative.community.EditCommunityMetadataForm.main_head">Edit Metadata for Community {0}</message>
+	<message key="xmlui.administrative.community.EditCommunityMetadataForm.main_head">Edit Metadata for Project Community {0}</message>
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.edit_authorizations">Edit authorization policies</message>
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.label_name">Name</message>
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.label_short_description">Short Description</message>
@@ -1934,10 +1934,10 @@
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.submit_delete">Delete community</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.CreateCommunityForm.java -->
-	<message key="xmlui.administrative.community.CreateCommunityForm.title">Create Community</message>
-	<message key="xmlui.administrative.community.CreateCommunityForm.trail">Create Community</message>
+	<message key="xmlui.administrative.community.CreateCommunityForm.title">Create Project Community</message>
+	<message key="xmlui.administrative.community.CreateCommunityForm.trail">Create Project Community</message>
 	<message key="xmlui.administrative.community.CreateCommunityForm.main_head_sub">Enter Metadata for a New Sub-Community of {0}</message>
-	<message key="xmlui.administrative.community.CreateCommunityForm.main_head_top">Edit Metadata for a New Top-Level Community</message>
+	<message key="xmlui.administrative.community.CreateCommunityForm.main_head_top">Edit Metadata for a New Top-Level Project Community</message>
 	<message key="xmlui.administrative.community.CreateCommunityForm.submit_save">Create</message>
 
 
@@ -2175,7 +2175,7 @@
 
 	<message key="xmlui.dri2xhtml.structural.search">Search VSim</message>
 	<message key="xmlui.dri2xhtml.structural.search-advanced">Advanced Search</message>
-	<message key="xmlui.dri2xhtml.structural.search-in-community">This Community</message>
+	<message key="xmlui.dri2xhtml.structural.search-in-community">This Project Community</message>
 	<message key="xmlui.dri2xhtml.structural.search-in-collection">This Collection</message>
 
 	<message key="xmlui.dri2xhtml.structural.pagination-previous">Previous Page</message>

@@ -16,7 +16,7 @@ $gray-light:             #AA9A66; // #777
 $gray-lighter:           #A8A8A1; // #eee
 
 $brand-primary:         #577492; // #337ab7
-$brand-success:         #5cb85c !default;
+$brand-success:         #739157 !default; //5cb85c
 $brand-info:            #5bc0de !default;
 $brand-warning:         #f0ad4e !default;
 $brand-danger:          #d9534f !default;
@@ -152,27 +152,27 @@ $btn-font-weight:                normal !default;
 
 $btn-default-color:              #333 !default;
 $btn-default-bg:                 #fff !default;
-$btn-default-border:             #ccc !default;
+$btn-default-border:             darken($btn-default-bg, 10%) !default;
 
 $btn-primary-color:              #fff !default;
 $btn-primary-bg:                 $brand-primary !default;
-$btn-primary-border:             darken($btn-primary-bg, 5%) !default;
+$btn-primary-border:             darken($btn-primary-bg, 10%) !default;
 
 $btn-success-color:              #fff !default;
 $btn-success-bg:                 $brand-success !default;
-$btn-success-border:             darken($btn-success-bg, 5%) !default;
+$btn-success-border:             darken($btn-success-bg, 10%) !default;
 
 $btn-info-color:                 #fff !default;
-$btn-info-bg:                    $brand-info !default;
-$btn-info-border:                darken($btn-info-bg, 5%) !default;
+$btn-info-bg:                    #779cc4 !default;
+$btn-info-border:                darken($btn-info-bg, 10%) !default;
 
 $btn-warning-color:              #fff !default;
 $btn-warning-bg:                 $brand-warning !default;
-$btn-warning-border:             darken($btn-warning-bg, 5%) !default;
+$btn-warning-border:             darken($btn-warning-bg, 10%) !default;
 
 $btn-danger-color:               #fff !default;
 $btn-danger-bg:                  $brand-danger !default;
-$btn-danger-border:              darken($btn-danger-bg, 5%) !default;
+$btn-danger-border:              darken($btn-danger-bg, 10%) !default;
 
 $btn-link-disabled-color:        $gray-light !default;
 
@@ -865,3 +865,11 @@ $page-header-border-color:    $gray-lighter !default;
 $dl-horizontal-offset:        $component-offset-horizontal !default;
 //** Horizontal line color.
 $hr-border:                   $gray-lighter !default;
+
+
+//** tweaks
+
+.btn {
+        font-family: $font-family-sans-serif;
+        text-decoration: none;
+    }

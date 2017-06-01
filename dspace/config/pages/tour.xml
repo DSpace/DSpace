@@ -1,0 +1,31 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+    version="1.1">
+
+    <body>
+        <div id="file.about.div.tour" n="tour" rend="primary">
+            <head>VSim Tour</head>
+
+            <p>This will eventually contain a slideshow about VSim. It will be amazing.</p>
+
+            <hi rend="bold">We can have bold type in this document!</hi>
+
+            <p>And paragraphs!</p>
+
+                <list><item>and lists</item>
+                    <item>of important things</item>
+                    <item>very important things</item></list>
+
+                <p> And we can also have hyperlinks, because they are
+                    <xref target="http://www.library.ucla.edu/">the best thing ever</xref>.</p>>
+            </div>
+    </body>
+
+
+    <meta>
+        <pageMeta>
+            <metadata element="title">VSim Tour</metadata>
+            <trail target="../">VSim Home</trail>
+        </pageMeta>
+    </meta>
+
+</document>
