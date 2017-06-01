@@ -89,6 +89,12 @@
         // Also email an alert
         UIUtil.sendAlert(request, se);
         JSPManager.showInternalError(request, response);
+    } finally {
+        // we need to close the database connection and free the resources
+        if(context != null && context.isValid())
+        {
+            context.abort();
+        }
     }
 
 %>
