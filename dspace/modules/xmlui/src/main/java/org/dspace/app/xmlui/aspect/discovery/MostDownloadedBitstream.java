@@ -17,6 +17,7 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.File;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -36,7 +37,10 @@ import org.dspace.statistics.content.StatisticsDataVisits;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.*;
 import java.text.ParseException;
@@ -90,11 +94,36 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
         items.setHead(message(T_head_download_title));
         count.setHead(message(T_head_download_count));
 
+        String cacheFilePath = ConfigurationManager.getProperty("cached.dir") + "downloads.txt";
+        long cacheTimeLimit = ConfigurationManager.getLongProperty("cached.timeout");
 
         int numberOfItemsAdded=0;
-        if (queryResults != null)  {
-            String searchUrl="discover?sort_by=popularity&order=DESC&submit=Go";
-            mostPopular.addList("most_popular").addItemXref(searchUrl,"View more");
+        String searchUrl="discover?sort_by=popularity&order=DESC&submit=Go";
+        mostPopular.addList("most_popular").addItemXref(searchUrl,"View more");
+        java.io.File cacheFile = new java.io.File(cacheFilePath);
+        // the time before which we should refresh the cache:
+        Date cacheRefreshTime = new Date(System.currentTimeMillis()-cacheTimeLimit);
+
+        if (cacheFile.exists() && cacheRefreshTime.before(new Date(cacheFile.lastModified()))) {
+            log.debug("cached file " + cacheFile.getAbsolutePath() + " is still good: " + new Date(cacheFile.lastModified()).toString() + " is after " + cacheRefreshTime.toString());
+            java.util.List<String> lines = Files.readAllLines(Paths.get(cacheFilePath), StandardCharsets.UTF_8);
+            for (String line : lines) {
+                String[] fields = line.split("\\t");
+                Item item = Item.find(context, Integer.valueOf(fields[0]));
+                referenceSet.addReference(item);
+                list.addItem().addContent(fields[1]);
+            }
+        } else {
+            if (cacheFile.exists()) {
+                log.debug("cached file " + cacheFile.getAbsolutePath() + " is bad: " + new Date(cacheFile.lastModified()).toString() + " is before " + cacheRefreshTime.toString());
+            }
+            try {
+                performSearch(null);
+            } catch (SearchServiceException e) {
+                log.error(e.getMessage(), e);
+            }
+            log.debug("writing new cached file " + cacheFile.getAbsolutePath());
+            BufferedWriter bw = new BufferedWriter(new FileWriter(cacheFile));
             for (SolrDocument doc : queryResults.getResults()) {
                 DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
                 if(obj != null)
@@ -102,16 +131,23 @@ public class MostDownloadedBitstream extends AbstractFiltersTransformer {
                     // filter out Items that are not world-readable
                     if (!includeRestrictedItems) {
                         if (DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item)obj)) {
+                            String downloads = doc.getFieldValue(SearchUtils.getConfig().getString("total.download.sort-option")).toString();
+                            bw.write(Integer.valueOf(obj.getID()).toString() + "\t" + downloads);
+                            bw.newLine();
                             referenceSet.addReference(obj);
-                            list.addItem().addContent(doc.getFieldValue(SearchUtils.getConfig().getString("total.download.sort-option")).toString());
+                            list.addItem().addContent(downloads);
                             numberOfItemsAdded++;
                             if(numberOfItemsAdded==numberOfItemsToShow)
-                                return;
+                                break;
                         }
                     }
                 }
             }
+            bw.close();
         }
+
+
+
     }
 
     public String getView()

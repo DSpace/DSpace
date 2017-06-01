@@ -1,9 +1,12 @@
 package org.datadryad.dspace.statistics;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.apache.log4j.Logger;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.excalibur.source.SourceValidity;
@@ -16,6 +19,7 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 public class SiteOverview extends AbstractDSpaceTransformer implements
@@ -38,8 +42,29 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
             UIException, SQLException, IOException, AuthorizeException 
     {
         SiteOverviewStats stats;
+        String cacheFilePath = ConfigurationManager.getProperty("cached.dir") + "stats.txt";
+        long cacheTimeLimit = ConfigurationManager.getLongProperty("cached.timeout");
+        File cachedSearch = new File(cacheFilePath);
+        // the time before which we should refresh the cache:
+        Date cacheRefreshTime = new Date(System.currentTimeMillis()-cacheTimeLimit);
+
         try {
-            stats = new SiteOverviewStats(context);
+            if (cachedSearch.exists() && cacheRefreshTime.before(new Date(cachedSearch.lastModified()))) {
+                log.debug("cached file " + cachedSearch.getAbsolutePath() + " is still good: " + new Date(cachedSearch.lastModified()).toString() + " is after " + cacheRefreshTime.toString());
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.setConfig(mapper.getSerializationConfig().with(new SimpleDateFormat("yyyy-MM-dd")));
+                ObjectReader reader = mapper.reader(SiteOverviewStats.class);
+                stats = reader.readValue(cachedSearch);
+            } else {
+                if (cachedSearch.exists()) {
+                    log.debug("cached file " + cachedSearch.getAbsolutePath() + " is bad: " + new Date(cachedSearch.lastModified()).toString() + " is before " + cacheRefreshTime.toString());
+                }
+                stats = new SiteOverviewStats(context);
+                log.debug("writing new cached file " + cachedSearch.getAbsolutePath());
+                BufferedWriter bw = new BufferedWriter(new FileWriter(cachedSearch));
+                bw.write(stats.toString());
+                bw.close();
+            }
         } catch (Exception ex) {
             log.error(ex.getMessage());
             throw new UIException("Failed to create stats overview object");
