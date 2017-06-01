@@ -525,6 +525,89 @@ public class DOIIdentifierProvider
         
         return doi;
     }
+    
+    /**
+     * Return the DOI for an DSpaceObject depending on type and id. Currently
+     * DOIs are minted for items only, nevertheless you can lookup DOIs for
+     * other DSO types as well. Until the implemented is changed to mint DOIs 
+     * for all kind of DSOs you will find DOIs for Items only.
+     * @param context
+     * @param type
+     * @param id
+     * @param deleted If set to false only DOIs that are not deleted or marked 
+     *                for deletion will be returned. If set true, even deleted
+     *                DOIs will be returned.
+     * @return The doi as a string prefixed with DOI.SCHEME.
+     * @throws SQLException 
+     */
+    public static String lookup(Context context, int type, int id, boolean deleted)
+            throws SQLException
+    {
+        TableRow doiRow = null;
+        String sql = "SELECT * FROM Doi WHERE resource_type_id = ? " +
+                "AND resource_id = ?";
+        if (!deleted)
+        {
+            sql += " AND ((status != ? AND status != ?) OR status IS NULL)";
+            doiRow = DatabaseManager.querySingleTable(context, "Doi", sql,
+                type, id, DOIIdentifierProvider.TO_BE_DELETED,
+                DOIIdentifierProvider.DELETED);
+        } else {
+            doiRow = DatabaseManager.querySingleTable(context, "Doi", sql, type, id);
+        }
+        
+        if (null == doiRow)
+        {
+            return null;
+        }
+
+        if (doiRow.isColumnNull("doi"))
+        {
+            log.error("A DOI with an empty doi column was found in the database. "
+                    + "DSO-Type: " + Integer.toString(type) + ", ID: " 
+                    + Integer.toString(id) + ".");
+            throw new IllegalStateException("A DOI with an empty doi column " +
+                    "was found in the database. DSO-Type: " 
+                    + Integer.toString(type) + ", ID: " + Integer.toString(id)
+                    + ".");
+        }
+        
+        return DOI.SCHEME + doiRow.getStringColumn("doi");
+    }
+    
+    /**
+     * Returns the status of doi (g.e. {@link DOIIdentifierProvider#IS_REGISTERED}).
+     * @param context
+     * @param identifier
+     * @return The status as Integer or null of no status is set.
+     * @throws SQLException
+     * @throws IdentifierNotFoundException If the DOI was not found in the database.
+     * @throws IllegalArgumentException If the DOI couldn't be recognized as DOI.
+     */
+    public static Integer getDOIStatus(Context context, String identifier)
+            throws SQLException, IdentifierNotFoundException, IllegalArgumentException
+    {
+        String doi = null;
+        try 
+        {
+            doi = DOI.formatIdentifier(identifier);
+        }
+        catch (DOIIdentifierException ex)
+        {
+            throw new IllegalArgumentException(ex.getMessage(), ex);
+        }
+        
+        TableRow doiRow = DatabaseManager.findByUnique(context, "Doi", "doi",
+                doi.substring(DOI.SCHEME.length()));
+        
+        if (null == doiRow)
+        {
+            throw new IdentifierNotFoundException("Cannot find doi '" 
+                    + doi.substring(DOI.SCHEME.length()) + "'.");
+        }
+        
+        return new Integer(doiRow.getIntColumn("status"));
+    }
 
     @Override
     public void delete(Context context, DSpaceObject dso)
