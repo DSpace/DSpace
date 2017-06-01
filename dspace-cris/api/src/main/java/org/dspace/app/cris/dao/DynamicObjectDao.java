@@ -30,4 +30,6 @@ public interface DynamicObjectDao extends CrisObjectDao<ResearchObject>
     
     public List<ResearchObject> findByShortNameType(String shortName);
     
+    public List<ResearchObject> findByIDType(Integer id);
+    
 }

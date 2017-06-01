@@ -963,6 +963,10 @@ public class ApplicationService extends ExtendedTabService
     	return researchDao.findByShortNameType(shortName);
     }
     
+    public List<ResearchObject> getResearchObjectByIDType(Integer id) {
+        return researchDao.findByIDType(id);
+    }
+    
     @Override
     public <P, PK extends Serializable> void delete(Class<P> model, PK pkey) {    	
     	super.delete(model, pkey);

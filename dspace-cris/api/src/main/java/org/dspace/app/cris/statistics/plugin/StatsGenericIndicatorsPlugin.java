@@ -66,9 +66,9 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
 
             if (crisEntityTypeId > 1000)
             {
+                Integer placeholderTypoID = CrisConstants.CRIS_DYNAMIC_TYPE_ID_START;
                 rs = (List<ACO>) applicationService
-                        .getResearchObjectByShortNameType(CrisConstants
-                                .getEntityTypeText(crisEntityTypeId));
+                        .getResearchObjectByIDType(crisEntityTypeId - placeholderTypoID);
             }
             else
             {
