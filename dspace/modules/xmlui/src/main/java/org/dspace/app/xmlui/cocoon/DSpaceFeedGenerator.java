@@ -287,19 +287,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
 
 
-    private boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
-        Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
-        for (Item i : datafiles) {
-            String lift = ConfigurationManager.getProperty("embargo.field.lift");
-            DCValue[] values = i.getMetadata(lift);
-            if (values == null || values.length == 0)
-                return true;
-
-        }
-        return false;
-    }
-
-
     /**
      * Recycle
      */
@@ -333,7 +320,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         for (SolrDocument doc : queryResults.getResults()) {
             Item item = (Item) SearchUtils.findDSpaceObject(context, doc);
             if (!includeRestrictedItems){
-                if (isAtLeastOneDataFileVisible(context, item)) {
+                if (DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, item)) {
                     result.add(item);
                     numberOfItemsAdded++;
                     if(numberOfItemsToShow==numberOfItemsAdded){

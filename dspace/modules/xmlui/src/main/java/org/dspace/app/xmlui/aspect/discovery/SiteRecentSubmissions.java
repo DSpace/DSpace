@@ -89,7 +89,7 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
                 {
                     // filter out Items that are not world-readable
                     if (!includeRestrictedItems) {
-                        if (isAtLeastOneDataFileVisible(context, (Item)obj)) {
+                        if (DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item)obj)) {
                             lastSubmitted.addReference(obj);
                             numberOfItemsAdded++;
                             if(numberOfItemsAdded==numberOfItemsToShow)
@@ -138,18 +138,6 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
         Context context = ContextUtil.obtainContext(objectModel);
         queryResults = service.search(context, queryArgs);
 
-    }
-
-    private boolean isAtLeastOneDataFileVisible(Context context, Item item) throws SQLException {
-        Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
-        for (Item i : datafiles) {
-            String lift = ConfigurationManager.getProperty("embargo.field.lift");
-            DCValue[] values = i.getMetadata(lift);
-            if (values == null || values.length == 0)
-                return true;
-
-        }
-        return false;
     }
 
 }
