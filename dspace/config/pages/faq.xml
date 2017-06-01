@@ -1,0 +1,52 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+    version="1.1">
+
+    <body>
+        <div id="file.help.div.FAQ" n="FAQ" rend="primary">
+            <head>VSim Repository and Archive Frequently Asked Questions</head>
+        </div>
+
+        <div id="top" n="top">
+            <hi rend="bold">Contents</hi>
+                <list n="toc" id="file.faq.list.toc" type="bulleted">
+                    <item><xref target="#latestrelease">What is the latest release?</xref></item>
+                    <item><xref target="#nextversion">When is the next version going to be released?</xref></item>
+                    <item><xref target="#dae">I'm loading a .dae file from 3D Warehouse, and it seems to load, but I don't see the model!</xref></item>
+                    <item><xref target="#narratives">My students are building narratives for an assignment. Some of them use PCs, some use Macs... what fonts should I have them use?</xref></item>
+                </list>
+        </div>
+
+        <div id="what.is.the.latest.release" n="latestrelease">
+            <hi rend="bold">What is the latest release</hi>
+            <p> The Windows prototype version 1.2.1. is the version to use! Even if you are on a Mac, run this version on Parallels.</p>
+            <p>[ <xref target="#top">back to top</xref> ]</p>
+        </div>
+
+        <div id="when.is.the.new.version.going.to.be.released" n="nextversion">
+            <hi rend="bold">When is the new version going to be released?</hi>
+            <p> We are working on it. Check back for beta releases beginning May 2017.</p>
+            <p>[ <xref target="#top">back to top</xref> ]</p>
+        </div>
+
+        <div id="dae" n="dae">
+            <hi rend="bold">I'm loading a .dae file from 3D Warehouse, and it seems to load, but I don't see the model!</hi>
+            <p> The model is probably beyond the far clip plane. Click Settings -> Navigation Settings and change the Far Clip from 5000 to 50000. If the model was built in inches or centimeters, you'll probably also want to change the Eye Height from 1.5 to something higher (20?) and the Flight Accel. Factor from 6 to something higher (160?) </p>
+            <p>[ <xref target="#top">back to top</xref> ]</p>
+        </div>
+
+        <div id="narratives" n="narratives">
+            <hi rend="bold">My students are building narratives for an assignment. Some of them use PCs, some use Macs... what fonts should I have them use?</hi>
+            <p> There are only three fonts that cross the PC/Mac divide: Arial, Georgia, and Verdana. If your students are going to be sharing narratives, they must use those fonts for text to display properly.</p>
+            <p>[ <xref target="#top">back to top</xref> ]</p>
+        </div>
+
+    </body>
+
+    <meta>
+        <pageMeta>
+            <metadata element="title">VSim FAQ</metadata>
+            <trail target="../">VSim Home</trail>
+        </pageMeta>
+    </meta>
+
+</document>

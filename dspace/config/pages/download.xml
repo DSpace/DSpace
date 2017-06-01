@@ -1,0 +1,31 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+    version="1.1">
+
+    <body>
+        <div id="file.about.div.download" n="about" rend="primary">
+            <head>Download VSim</head>
+
+            <p>This will eventually contain information on how to download VSim.</p>
+
+            <hi rend="bold">We can have bold type in this document!</hi>
+
+            <p>And paragraphs!</p>
+
+                <list><item>and lists</item>
+                    <item>of important things</item>
+                    <item>very important things</item></list>
+
+                <p> And we can also have hyperlinks, because they are
+                    <xref target="http://www.library.ucla.edu/">the best thing ever</xref>.</p>
+               </div>
+    </body>
+
+
+    <meta>
+        <pageMeta>
+            <metadata element="title">Download VSim</metadata>
+            <trail target="../">VSim Home</trail>
+        </pageMeta>
+    </meta>
+
+</document>

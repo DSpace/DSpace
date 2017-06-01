@@ -3,21 +3,19 @@
 
     <body>
         <div id="file.about.div.about" n="about" rend="primary">
-            <head>About the VSim Repository</head>
 
-            <p>The VSim Repository is a work in progress. This page will explain more about what it is and why you should like it.</p>
+            <head>About the VSim Repository and Archive</head>
 
-            <hi rend="bold">We can have bold type in this document!</hi>
-
-            <p>And paragraphs!</p>
-
-                <list><item>and lists</item>
-                    <item>of important things</item>
-                    <item>very important things</item></list>
-
-                <p> And we can also have hyperlinks, because they are
-                    <xref target="http://www.library.ucla.edu/">the best thing ever</xref>.</p>
-               </div>
+			<p>VSim facilitates the real-time exploration and educational use of highly detailed, three-dimensional computer models. The National Endowment for the Humanities (HD-50958-10 and HK-50164-14) and UCLA’s Institute for Digital Research and Education funded the development of VSim and the VSim Repository and Archive.</p>
+			<p><hi rend="bold">Project Team (all affiliated with UCLA unless otherwise noted):</hi></p>
+			<p>Principle Investigators: Lisa M. Snyder and Scott Friedman</p>
+			<p>Advisory Board: Diane Favro, Alyson Gill (University of Massachusetts Amherst), Steve Mintz (University of Texas at Austin), David Staley (Ohio State University), Elaine A. Sullivan (University of California, Santa Cruz)</p>
+			<p>Prototype Programmers: Eduardo Poyart, Jingyi (Franklin) Fang, and XinLi Cai</p>
+			<p>Usability Consultants: Elaine A. Sullivan and Joy Guey</p>
+			<p>Production Version Programmers: Cristina (Sam) Amin and David Stephan ... add others</p>
+			<p>Content Developers: Add as hired</p>
+			<p>Repository and Archive: Peter Broadwell (Project Manager), Hardy Pottinger (Lead Programmer), Lisa MacAulay ... add others</p>
+        </div>
     </body>
 
 

@@ -102,22 +102,26 @@
 
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
-                                        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-                                           <xsl:apply-templates select="dri:options"/>
-                                        </div>
                                         <div class="col-xs-12 col-sm-12 col-md-9 main-content">
                                             <xsl:apply-templates select="*[not(self::dri:options)]"/>
 
-                                            <div class="visible-xs visible-sm">
+                                            <script type="text/javascript">DSpace.getTemplate(vsim-carousel);</script>
+
+                                            <div class="hidden-lg">
                                                 <xsl:call-template name="buildFooter"/>
                                             </div>
                                         </div>
+                                        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+                                            <xsl:apply-templates select="dri:options"/>
+                                        </div>
+
                                     </div>
                                 </div>
+
                                 <!--
                             The footer div, dropping whatever extra information is needed on the page. It will
                             most likely be something similar in structure to the currently given example. -->
-                            <div class="hidden-xs hidden-sm">
+                            <div class="hidden-xs">
                             <xsl:call-template name="buildFooter"/>
                              </div>
                          </div>
@@ -346,14 +350,14 @@
                             <img src="{$theme-path}images/vsim.png" />
                         </a>
 
-                        <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
+                        <div class="navbar-header pull-right hidden-lg hidden-md hidden-sm">
                         <ul class="nav nav-pills pull-left ">
 
                             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
                                 <li id="ds-language-selection-xs" class="dropdown">
                                     <xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
                                     <button id="language-dropdown-toggle-xs" href="#" role="button" class="dropdown-toggle navbar-toggle navbar-link" data-toggle="dropdown">
-                                        <b class="visible-xs glyphicon glyphicon-globe" aria-hidden="true"/>
+                                        <b class="visible-xs visible-sm glyphicon glyphicon-globe" aria-hidden="true"/>
                                     </button>
                                     <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="language-dropdown-toggle-xs" data-no-collapse="true">
                                         <xsl:for-each
@@ -384,11 +388,11 @@
                             <xsl:choose>
                                 <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
                                     <li class="dropdown">
-                                        <button class="dropdown-toggle navbar-toggle navbar-link" id="user-dropdown-toggle-xs" href="#" role="button"  data-toggle="dropdown">
-                                            <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
+                                        <button class="dropdown-toggle navbar-toggle navbar-link" id="user-dropdown-toggle-sm" href="#" role="button"  data-toggle="dropdown">
+                                            <b class="hidden-lg glyphicon glyphicon-user" aria-hidden="true"/>
                                         </button>
                                         <ul class="dropdown-menu pull-right" role="menu"
-                                            aria-labelledby="user-dropdown-toggle-xs" data-no-collapse="true">
+                                            aria-labelledby="user-dropdown-toggle-sm" data-no-collapse="true">
                                             <li>
                                                 <a href="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='url']}">
@@ -409,17 +413,20 @@
                                         <form style="display: inline" action="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='loginURL']}" method="get">
                                             <button class="navbar-toggle navbar-link">
-                                            <b class="visible-xs glyphicon glyphicon-user" aria-hidden="true"/>
+                                            <b class="hidden-lg glyphicon glyphicon-user" aria-hidden="true"/>
                                             </button>
                                         </form>
                                     </li>
                                 </xsl:otherwise>
                             </xsl:choose>
 
-                            <li><a class="btn btn-default" role="button" href="/pages/add">add</a></li>
-                            <li><a class="btn btn-default" role="button" href="/pages/about">about</a></li>
-                            <li><a class="btn btn-default" role="button" href="/pages/contact">contact</a></li>
-                            <li><a class="btn btn-default" role="button" href="/pages/help">help</a></li>
+                            <!-- small navigation buttons for sm and xs screens, keep scrolling down for the full-sized buttons -->
+                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/discover">discover</a></li>
+                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/pages/add">submit works</a></li>
+                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/pages/about">about</a></li>
+                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/pages/tour">tour</a></li>
+                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/pages/faq">FAQ</a></li>
+                            <li><a class="btn btn-sm btn-success" role="button" href="{$app_path}/pages/download">download VSim</a></li>
 
                         </ul>
                               </div>
@@ -454,7 +461,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="{/dri:document/dri:meta/dri:userMeta/
+                                                <a class="btn btn-info btn-sm" href="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
                                                     <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
                                                 </a>
@@ -464,26 +471,49 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <li>
-                                        <a href="{/dri:document/dri:meta/dri:userMeta/
+                                        <a class="btn btn-info btn-sm" href="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='loginURL']}">
-                                            <span class="hidden-xs">
-                                                <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
-                                            </span>
+                                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span> <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
                                         </a>
                                     </li>
                                 </xsl:otherwise>
                             </xsl:choose>
+
+                                    <li>
+                                        <a class="btn btn-info btn-sm" href="{$app_path}/discover">
+                                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> Discover</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="btn btn-info btn-sm" href="{$app_path}/pages/add">
+                                          <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> Submit Works</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="btn btn-info btn-sm" href="{$app_path}/pages/about">
+                                          <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> About</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="btn btn-info btn-sm" href="{$app_path}/pages/tour">
+                                          <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> Tour</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="btn btn-info btn-sm" href="{$app_path}/pages/faq">
+                                          <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> FAQ</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="btn btn-success btn-sm" href="{$app_path}/pages/download">
+                                          <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download VSim
+                                        </a>
+                                    </li>
+
                         </ul>
-                              <span class="nav navbar-text pull-right">
-                                    | <a class="navbar-link" href="{$app_path}/discover">Advanced Search</a> |
-                                    <a class="navbar-link" href="{$app_path}/pages/add">Submit Works</a> |
-                                    <a class="navbar-link" href="{$app_path}/pages/about">About</a> |
-                                    <a class="navbar-link" href="{$app_path}/pages/help">Help</a> |
-                                    <a class="navbar-link" href="{$app_path}/pages/contact">Contact Us</a>
-                              </span>
 
 
-                        <button data-toggle="offcanvas" class="navbar-toggle visible-sm" type="button">
+                        <button data-toggle="offcanvas" class="navbar-toggle hidden-lg" type="button">
                             <span class="sr-only"><i18n:text>xmlui.mirage2.page-structure.toggleNavigation</i18n:text></span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
@@ -508,7 +538,7 @@
                     <div class="col-xs-12">
                         <xsl:choose>
                             <xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) > 1">
-                                <div class="breadcrumb dropdown visible-xs">
+                                <div class="breadcrumb dropdown hidden-lg">
                                     <a id="trail-dropdown-toggle" href="#" role="button" class="dropdown-toggle"
                                        data-toggle="dropdown">
                                         <xsl:variable name="last-node"
@@ -716,7 +746,7 @@
                     <hr/>
                     <div class="col-xs-7 col-sm-8">
                         <div>
-                            Insert VSim branding here.
+                            VSim: Explore. Interact. Understand.
                         </div>
                         <div class="hidden-print">
                             <a>
@@ -740,7 +770,7 @@
                     </div>
                     <div class="col-xs-5 col-sm-4 hidden-print">
                         <div class="pull-right">
-                            add some footer text here
+                            <!-- additional footer text can be put here -->
                         </div>
 
                     </div>
