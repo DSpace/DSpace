@@ -18,7 +18,6 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -28,13 +27,18 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
-import org.dspace.eperson.Group;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -59,14 +63,10 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException {
 
-        try {
-        performSearch(null);
-        } catch (SearchServiceException e) {
-            log.error(e.getMessage(), e);
-        }
-
         boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
         int numberOfItemsToShow= SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5);
+        String cacheFilePath = ConfigurationManager.getProperty("cached.dir") + "recent.txt";
+        long cacheTimeLimit = ConfigurationManager.getLongProperty("cached.timeout");
 
         Division home = body.addDivision("site-home", "primary repository");
 
@@ -80,24 +80,48 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
                 null, "recent-submissions");
 
         int numberOfItemsAdded=0;
-        if (queryResults != null)  {
-            String searchUrl="discover?sort_by=dc.date.issued_dt_sort&order=DESC&submit=Go";
-            lastSubmittedDiv.addList("most_recent").addItemXref(searchUrl,"View more");
+        String searchUrl="discover?sort_by=dc.date.issued_dt_sort&order=DESC&submit=Go";
+        lastSubmittedDiv.addList("most_recent").addItemXref(searchUrl,"View more");
+
+        File cacheFile = new File(cacheFilePath);
+        // the time before which we should refresh the cache:
+        Date cacheRefreshTime = new Date(System.currentTimeMillis()-cacheTimeLimit);
+
+        if (cacheFile.exists() && cacheRefreshTime.before(new Date(cacheFile.lastModified()))) {
+            log.debug("cached file " + cacheFile.getAbsolutePath() + " is still good: " + new Date(cacheFile.lastModified()).toString() + " is after " + cacheRefreshTime.toString());
+            List<String> lines = Files.readAllLines(Paths.get(cacheFilePath), StandardCharsets.UTF_8);
+            for (String line : lines) {
+                Item item = Item.find(context, Integer.valueOf(line));
+                lastSubmitted.addReference(item);
+            }
+        } else {
+            if (cacheFile.exists()) {
+                log.debug("cached file " + cacheFile.getAbsolutePath() + " is bad: " + new Date(cacheFile.lastModified()).toString() + " is before " + cacheRefreshTime.toString());
+            }
+            try {
+                performSearch(null);
+            } catch (SearchServiceException e) {
+                log.error(e.getMessage(), e);
+            }
+            log.debug("writing new cached file " + cacheFile.getAbsolutePath());
+            BufferedWriter bw = new BufferedWriter(new FileWriter(cacheFile));
             for (SolrDocument doc : queryResults.getResults()) {
                 DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
-                if(obj != null)
-                {
+                if(obj != null) {
                     // filter out Items that are not world-readable
                     if (!includeRestrictedItems) {
                         if (DryadWorkflowUtils.isAtLeastOneDataFileVisible(context, (Item)obj)) {
+                            bw.write(Integer.valueOf(obj.getID()).toString());
+                            bw.newLine();
                             lastSubmitted.addReference(obj);
                             numberOfItemsAdded++;
                             if(numberOfItemsAdded==numberOfItemsToShow)
-                                return;
+                                break;
                         }
                     }
                 }
             }
+            bw.close();
         }
     }
 
@@ -118,7 +142,6 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
         {
             return; // queryResults;
         }
-
         queryArgs = prepareDefaultFilters(getView());
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
