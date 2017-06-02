@@ -110,7 +110,7 @@ public class EditItemServlet extends DSpaceServlet
 
     /** User updates Creative Commons License */
     public static final int UPDATE_CC = 12;
-    
+
     /** JSP to upload bitstream */
     protected static final String UPLOAD_BITSTREAM_JSP = "/tools/upload-bitstream.jsp";
 
@@ -119,33 +119,33 @@ public class EditItemServlet extends DSpaceServlet
 
     private final transient CollectionService collectionService
              = ContentServiceFactory.getInstance().getCollectionService();
-    
+
     private final transient ItemService itemService
              = ContentServiceFactory.getInstance().getItemService();
-    
+
     private final transient BitstreamFormatService bitstreamFormatService
              = ContentServiceFactory.getInstance().getBitstreamFormatService();
-    
+
     private final transient BitstreamService bitstreamService
              = ContentServiceFactory.getInstance().getBitstreamService();
-    
+
     private final transient BundleService bundleService
              = ContentServiceFactory.getInstance().getBundleService();
-    
+
     private final transient HandleService handleService
              = HandleServiceFactory.getInstance().getHandleService();
-    
+
     private final transient MetadataFieldService metadataFieldService
              = ContentServiceFactory.getInstance().getMetadataFieldService();
-    
+
     private final transient MetadataSchemaService metadataSchemaService
              = ContentServiceFactory.getInstance().getMetadataSchemaService();
-    
+
     private final transient CreativeCommonsService creativeCommonsService
              = LicenseServiceFactory.getInstance().getCreativeCommonsService();
-    
+
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    
+
     @Override
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -242,14 +242,14 @@ public class EditItemServlet extends DSpaceServlet
 
         Item item = itemService.find(context, UIUtil.getUUIDParameter(request,
                 "item_id"));
- 
+
         if (request.getParameter("submit_cancel_cc") != null)
         {
             showEditForm(context, request, response, item);
 
             return;
         }
-        
+
         String handle = handleService.findHandle(context, item);
 
         // now check to see if person can edit item
@@ -271,9 +271,9 @@ public class EditItemServlet extends DSpaceServlet
         case CONFIRM_DELETE:
 
             // Delete the item - if "cancel" was pressed this would be
-            // picked up above            
+            // picked up above
             itemService.delete(context, item);
-            
+
             JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
             context.complete();
 
@@ -314,7 +314,7 @@ public class EditItemServlet extends DSpaceServlet
                         // Display move collection page with fields of collections and communities
                         List<Collection> allNotLinkedCollections = itemService.getCollectionsNotLinked(context, item);
                         List<Collection> allLinkedCollections = item.getCollections();
-                    
+
                         // get only the collection where the current user has the right permission
                         List<Collection> authNotLinkedCollections = new ArrayList<>();
                         for (Collection c : allNotLinkedCollections)
@@ -333,18 +333,18 @@ public class EditItemServlet extends DSpaceServlet
                         authLinkedCollections.add(c);
                     }
                 }
-                        
+
                         request.setAttribute("linkedCollections", authLinkedCollections);
                         request.setAttribute("notLinkedCollections", authNotLinkedCollections);
-                                    
+
                         JSPManager.showJSP(request, response, "/tools/move-item.jsp");
                 } else
                 {
                         throw new ServletException("You must be an administrator to move an item");
                 }
-                
+
                 break;
-                        
+
         case CONFIRM_MOVE_ITEM:
                 if (authorizeService.isAdmin(context, item))
                 {
@@ -361,17 +361,17 @@ public class EditItemServlet extends DSpaceServlet
                         {
                                 throw new ServletException("Missing or incorrect collection IDs for moving item");
                         }
-                                    
+
                         itemService.move(context, item, fromCollection, toCollection, inheritPolicies);
-                    
+
                     showEditForm(context, request, response, item);
-        
+
                     context.complete();
                 } else
                 {
                         throw new ServletException("You must be an administrator to move an item");
                 }
-                
+
                 break;
 
         case START_PRIVATING:
@@ -399,7 +399,7 @@ public class EditItemServlet extends DSpaceServlet
             context.complete();
 
             break;
-                
+
         case UPDATE_CC:
 
            	Map<String, String> map = new HashMap<String, String>();
@@ -412,15 +412,15 @@ public class EditItemServlet extends DSpaceServlet
         		map.put("sampling", request.getParameter("sampling_chooser"));
         	}
         	map.put("jurisdiction", jurisdiction);
-        	
+
         	LicenseMetadataValue uriField = creativeCommonsService.getCCField("uri");
         	LicenseMetadataValue nameField = creativeCommonsService.getCCField("name");
-        	
+
         	boolean exit = false;
-			if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.no_license")) 
+			if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.no_license"))
         	{
 				creativeCommonsService.removeLicense(context, uriField, nameField, item);
-				
+
 				itemService.update(context, item);
 	            context.dispatchEvents();
     			exit = true;
@@ -429,7 +429,7 @@ public class EditItemServlet extends DSpaceServlet
         		//none
         		exit = true;
 			}
-        	
+
 			if (!exit) {
 				CCLookup ccLookup = new CCLookup();
 				ccLookup.issue(licenseclass, map, configurationService.getProperty("cc.license.locale"));
@@ -504,7 +504,7 @@ public class EditItemServlet extends DSpaceServlet
             HttpServletResponse response, Item item) throws ServletException,
             IOException, SQLException, AuthorizeException
     {
-  
+
         // Get the handle, if any
         String handle = handleService.findHandle(context, item);
 
@@ -513,10 +513,10 @@ public class EditItemServlet extends DSpaceServlet
 
         // All DC types in the registry
         List<MetadataField> types = metadataFieldService.findAll(context);
-        
+
         // Get a HashMap of metadata field ids and a field name to display
         Map<Integer, String> metadataFields = new HashMap<>();
-        
+
         // Get all existing Schemas
         List<MetadataSchema> schemas = metadataSchemaService.findAll(context);
         for (MetadataSchema s : schemas)
@@ -542,7 +542,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("policy_button", Boolean.FALSE);
         }
-        
+
         if (authorizeService.authorizeActionBoolean(context, itemService
                 .getParentObject(context, item), Constants.REMOVE))
         {
@@ -552,7 +552,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("delete_button", Boolean.FALSE);
         }
-        
+
         try
         {
             authorizeService.authorizeAction(context, item, Constants.ADD);
@@ -562,7 +562,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("create_bitstream_button", Boolean.FALSE);
         }
-        
+
         try
         {
             authorizeService.authorizeAction(context, item, Constants.REMOVE);
@@ -572,7 +572,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("remove_bitstream_button", Boolean.FALSE);
         }
-        
+
         try
         {
             AuthorizeUtil.authorizeManageCCLicense(context, item);
@@ -582,7 +582,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             request.setAttribute("cclicense_button", Boolean.FALSE);
         }
-        
+
         try
         {
             if( 0 < itemService.getBundles(item, "ORIGINAL").size()){
@@ -620,17 +620,17 @@ public class EditItemServlet extends DSpaceServlet
             }
         }
 
-		if (item.isDiscoverable()) 
+		if (item.isDiscoverable())
 		{
 			request.setAttribute("privating_button", authorizeService
 					.authorizeActionBoolean(context, item, Constants.WRITE));
-		} 
-		else 
+		}
+		else
 		{
 			request.setAttribute("publicize_button", authorizeService
 					.authorizeActionBoolean(context, item, Constants.WRITE));
 		}
-        
+
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);
         request.setAttribute("collections", collections);
@@ -711,7 +711,7 @@ public class EditItemServlet extends DSpaceServlet
 
                 // Get a string with "element" for unqualified or
                 // "element_qualifier"
-                String key = metadataFieldService.findByElement(context, 
+                String key = metadataFieldService.findByElement(context,
                 		schema,element,qualifier).toString();
 
                 // Get the language
@@ -878,7 +878,7 @@ public class EditItemServlet extends DSpaceServlet
         {
             // Show cc-edit page
             request.setAttribute("item", item);
-            
+
             boolean exists = creativeCommonsService.hasLicense(context, item);
             request.setAttribute("cclicense.exists", Boolean.valueOf(exists));
 
@@ -886,15 +886,15 @@ public class EditItemServlet extends DSpaceServlet
             /** Default locale to 'en' */
             ccLocale = (StringUtils.isNotBlank(ccLocale)) ? ccLocale : "en";
             request.setAttribute("cclicense.locale", ccLocale);
-            
+
             CCLookup cclookup = new CCLookup();
             java.util.Collection<CCLicense> collectionLicenses = cclookup.getLicenses(ccLocale);
             request.setAttribute("cclicense.licenses", collectionLicenses);
-            
+
             JSPManager
                     .showJSP(request, response, "/tools/creative-commons-edit.jsp");
         }
-        
+
         if (button.equals("submit_addbitstream"))
         {
             // Show upload bitstream page
@@ -923,11 +923,11 @@ public class EditItemServlet extends DSpaceServlet
                     //Retrieve the button key
                     String inputKey = button.replace("submit_order_", "") + "_value";
                     if(inputKey.startsWith(bundle.getID() + "_")){
-                        List<UUID> vals = Util.getUUIDParameters(request, inputKey);
-                        int idx = 0;
-                        for (UUID v : vals) {
-                            newBitstreamOrder[idx] = v;
-                            idx++;
+                        // Field contains comma-separated, ordered list of Bitstream UUIDs
+                        String[] vals = request.getParameter(inputKey).split(",");
+                        for (int i = 0; i < vals.length; i++) {
+                            String val = vals[i];
+                            newBitstreamOrder[i] = UUID.fromString(val);
                         }
                     }else{
                         newBitstreamOrder = null;
@@ -950,7 +950,7 @@ public class EditItemServlet extends DSpaceServlet
             // Show edit page again
             showEditForm(context, request, response, item);
         }
-        
+
         // Complete transaction
         context.complete();
     }
@@ -976,11 +976,11 @@ public class EditItemServlet extends DSpaceServlet
             Bitstream b = null;
             Item item = itemService.find(context, UIUtil.getUUIDParameter(wrapper, "item_id"));
             File temp = wrapper.getFile("file");
-            
+
             if(temp == null)
             {
                 boolean noFileSelected = true;
-                
+
                 // Show upload bitstream page
                 request.setAttribute("noFileSelected", noFileSelected);
                 request.setAttribute("item", item);
@@ -1010,7 +1010,7 @@ public class EditItemServlet extends DSpaceServlet
                     bundleService.inheritCollectionDefaultPolicies(context, bnd,
                     		owningCollection);
                 }
-            } 
+            }
             else
             {
                 // we have a bundle already, just add bitstream
