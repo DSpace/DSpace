@@ -719,26 +719,42 @@ public class BundleTest extends AbstractDSpaceObjectTest
         bundleService.addBitstream(context, b, bs3);
 
         // Assert Bitstreams are in the order added
-        List<Bitstream> bitstreams = b.getBitstreams();
-        assertTrue("testSetOrder: starting count correct", bitstreams.size() == 3);
-        assertThat("testSetOrder: Bitstream 1 is first", bitstreams.get(0).getName(), equalTo(bs.getName()));
-        assertThat("testSetOrder: Bitstream 2 is second", bitstreams.get(1).getName(), equalTo(bs2.getName()));
-        assertThat("testSetOrder: Bitstream 3 is third", bitstreams.get(2).getName(), equalTo(bs3.getName()));
+        Bitstream[] bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
+        assertTrue("testSetOrder: starting count correct", bitstreams.length == 3);
+        assertThat("testSetOrder: Bitstream 1 is first", bitstreams[0].getName(), equalTo(bs.getName()));
+        assertThat("testSetOrder: Bitstream 2 is second", bitstreams[1].getName(), equalTo(bs2.getName()));
+        assertThat("testSetOrder: Bitstream 3 is third", bitstreams[2].getName(), equalTo(bs3.getName()));
 
         UUID bsID1 = bs.getID();
         UUID bsID2 = bs2.getID();
         UUID bsID3 = bs3.getID();
 
         // Now define a new order and call setOrder()
-        UUID[] newBitstreamOrder = { bsID3, bsID1, bsID2 };
+        UUID[] newBitstreamOrder = new UUID[] { bsID3, bsID1, bsID2 };
         bundleService.setOrder(context, b, newBitstreamOrder);
 
         // Assert Bitstreams are in the new order
-        bitstreams = b.getBitstreams();
-        assertTrue("testSetOrder: new count correct", bitstreams.size() == 3);
-        assertThat("testSetOrder: Bitstream 3 is now first", bitstreams.get(0).getName(), equalTo(bs3.getName()));
-        assertThat("testSetOrder: Bitstream 1 is now second", bitstreams.get(1).getName(), equalTo(bs.getName()));
-        assertThat("testSetOrder: Bitstream 2 is now third", bitstreams.get(2).getName(), equalTo(bs2.getName()));
+        bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
+        assertTrue("testSetOrder: new count correct", bitstreams.length == 3);
+        assertThat("testSetOrder: Bitstream 3 is now first", bitstreams[0].getName(), equalTo(bs3.getName()));
+        assertThat("testSetOrder: Bitstream 1 is now second", bitstreams[1].getName(), equalTo(bs.getName()));
+        assertThat("testSetOrder: Bitstream 2 is now third", bitstreams[2].getName(), equalTo(bs2.getName()));
+
+        // Now give only a partial list of bitstreams
+        newBitstreamOrder = new UUID[] { bsID1, bsID2 };
+        bundleService.setOrder(context, b, newBitstreamOrder);
+
+        // Assert Bitstream order is unchanged
+        Bitstream[] bitstreamsAfterPartialData = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
+        assertThat("testSetOrder: Partial data doesn't change order", bitstreamsAfterPartialData, equalTo(bitstreams));
+
+        // Now give bad data in the list of bitstreams
+        newBitstreamOrder = new UUID[] { bsID1, null, bsID2 };
+        bundleService.setOrder(context, b, newBitstreamOrder);
+
+        // Assert Bitstream order is unchanged
+        Bitstream[] bitstreamsAfterBadData = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
+        assertThat("testSetOrder: Partial data doesn't change order", bitstreamsAfterBadData, equalTo(bitstreams));
     }
 
     /**
