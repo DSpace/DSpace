@@ -156,6 +156,11 @@ public final class MockDatabaseManager
         }
     }
 
+    @Mock
+    static TableRow process(Invocation inv, ResultSet results, String table, List<String> pColumnNames) throws SQLException
+    {
+        return process(inv,null,results,table,pColumnNames);
+    }
     /**
      * Override/Mock the default "process()" method in order to add some custom
      * H2-specific code (look for the comments with "H2" in them below).
@@ -173,7 +178,7 @@ public final class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    static TableRow process(Invocation inv, ResultSet results, String table, List<String> pColumnNames) throws SQLException
+    static TableRow process(Invocation inv, Context context, ResultSet results, String table, List<String> pColumnNames) throws SQLException
     {
         // What type of database is this?
         String databaseType = DatabaseManager.getDbKeyword();
@@ -196,7 +201,7 @@ public final class MockDatabaseManager
 
             // If we haven't been passed the column names try to generate them from the metadata / table
             List<String> columnNames = pColumnNames != null ? pColumnNames :
-                                            ((table == null) ? getColumnNames(meta) : getColumnNames(table));
+                                            ((table == null) ? getColumnNames(meta) : getColumnNames(context, table));
 
             TableRow row = new TableRow(DatabaseManager.canonicalize(table), columnNames);
 
