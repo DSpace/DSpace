@@ -279,13 +279,6 @@ public class ShibAuthentication implements AuthenticationMethod
 	public int[] getSpecialGroups(Context context, HttpServletRequest request)
 	{
 		try {
-			// User has not successfuly authenticated via shibboleth.
-			if ( request == null || 
-					context.getCurrentUser() == null || 
-					request.getSession().getAttribute("shib.authenticated") == null ) {
-				return new int[0];
-			}
-
 			// If we have already calculated the special groups then return them.
 			if (request.getSession().getAttribute("shib.specialgroup") != null)
 			{
@@ -306,6 +299,14 @@ public class ShibAuthentication implements AuthenticationMethod
 
 			// Get the Shib supplied affiliation or use the default affiliation
 			List<String> affiliations = findMultipleAttributes(request, roleHeader);
+                        // Use EPerson Metadata as a fallback
+                        String metadataRoleAttribute = ConfigurationManager.getProperty("authentication-shibboleth","metadataRoleAttribute");
+                        if ( metadataRoleAttribute != null && (affiliations == null || (affiliations != null && affiliations.isEmpty())) ) {
+                                affiliations = new ArrayList<String>();
+                                if (context.getCurrentUser().getMetadata(metadataRoleAttribute) != null) {
+                                        affiliations.add(context.getCurrentUser().getMetadata(metadataRoleAttribute));
+                                }
+                        }
 			if (affiliations == null) {
 				if (defaultRoles != null)
 					affiliations = Arrays.asList(defaultRoles.split(","));
