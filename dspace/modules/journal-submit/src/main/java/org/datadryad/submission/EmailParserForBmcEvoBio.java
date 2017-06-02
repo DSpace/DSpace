@@ -9,7 +9,8 @@ import org.datadryad.rest.models.Manuscript;
 public class EmailParserForBmcEvoBio extends EmailParserForManuscriptCentral {
     
     // static block
-    static {
+    EmailParserForBmcEvoBio() {
+        super();
         fieldToXMLTagMap.put("Author Name",  Manuscript.CORRESPONDING_AUTHOR);
         fieldToXMLTagMap.put("Author Email",  Manuscript.EMAIL);
     }

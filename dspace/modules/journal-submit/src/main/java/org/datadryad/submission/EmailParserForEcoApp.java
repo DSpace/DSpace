@@ -6,7 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EmailParserForEcoApp extends EmailParser {
-	static {
+	EmailParserForEcoApp() {
+		super();
 		// corresponding author tags are parsed separately from the "contact author and address" field
 		fieldToXMLTagMap.put("Contact Author and Address", "Corresponding_Author_Address");
 

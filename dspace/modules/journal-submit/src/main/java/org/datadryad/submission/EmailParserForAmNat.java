@@ -10,7 +10,8 @@ import org.datadryad.rest.models.Manuscript;
  */
 public class EmailParserForAmNat extends EmailParser {
 
-	static {
+	EmailParserForAmNat() {
+		super();
 		// corresponding author information is parsed in a separate chunk
 		fieldToXMLTagMap.put("first name", "Corr_Auth_First_Name");
 		fieldToXMLTagMap.put("middle name", "Corr_Auth_Middle_Name");
