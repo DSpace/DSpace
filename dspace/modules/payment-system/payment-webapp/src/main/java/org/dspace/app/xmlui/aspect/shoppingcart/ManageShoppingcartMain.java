@@ -8,7 +8,6 @@
 package org.dspace.app.xmlui.aspect.shoppingcart;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import org.datadryad.api.DryadOrganizationConcept;
 import org.datadryad.rest.models.ResultSet;
@@ -27,8 +26,6 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.*;
 import org.dspace.paymentsystem.ShoppingCart;
 import org.dspace.paymentsystem.Voucher;
-
-import javax.swing.*;
 
 /**
  * The manage shoppingcart page is the starting point page for managing
@@ -171,18 +168,21 @@ public class ManageShoppingcartMain extends AbstractDSpaceTransformer {
         Division search = main.addDivision("shoppingcart-search");
         search.setHead(T_search_head);
 
-        // If there are more than 10 results the paginate the division.
+        // If there are more than PAGE_SIZE results the paginate the division.
         if (resultSet.itemList.size() > PAGE_SIZE) {
             // If there are enough results then paginate the results
-            int firstIndex = resultSet.itemList.get(0);
-            int lastIndex = resultSet.itemList.get(resultSet.pageSize - 1);
+            int firstIndex = resultSet.getCurrentIndex() + 1;
+            int lastIndex = resultSet.getCurrentIndex() + PAGE_SIZE;
 
             String nextURL = null, prevURL = null;
-            if (cursor < (resultCount / PAGE_SIZE)) {
-                nextURL = baseURL + "&page=" + (cursor + 1);
+            if (resultSet.hasNextPage()) {
+                nextURL = baseURL + "&page=" + (resultSet.getNextCursor());
+            } else {
+                // if there isn't a next page, the last index is only going to go up to the size of the list.
+                lastIndex = resultSet.itemList.size();
             }
-            if (cursor > 0) {
-                prevURL = baseURL + "&page=" + (cursor - 1);
+            if (resultSet.hasPreviousPage()) {
+                prevURL = baseURL + "&page=" + (resultSet.getPreviousCursor());
             }
 
             search.setSimplePagination(resultCount, firstIndex, lastIndex, prevURL, nextURL);
