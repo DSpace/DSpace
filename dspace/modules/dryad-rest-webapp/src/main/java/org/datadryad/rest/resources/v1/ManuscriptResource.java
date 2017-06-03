@@ -49,10 +49,10 @@ public class ManuscriptResource {
             ArrayList<Manuscript> manuscripts = new ArrayList<Manuscript>();
             ResultSet resultSet = manuscriptStorage.getResults(path, manuscripts, searchParam, resultParam, cursorParam);
 
-            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
-            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
-            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
-            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getNextCursor()).build();
+            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getPreviousCursor()).build();
+            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getFirstCursor()).build();
+            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getLastCursor()).build();
             int total = resultSet.itemList.size();
             Response response = Response.ok(manuscripts).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total).build();
             return response;

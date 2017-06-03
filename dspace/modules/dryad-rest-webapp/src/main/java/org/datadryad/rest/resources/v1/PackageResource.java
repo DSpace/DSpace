@@ -50,10 +50,10 @@ public class PackageResource {
                 journals.add(new Journal(journalConcept));
             }
 
-            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
-            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
-            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
-            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getNextCursor()).build();
+            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getPreviousCursor()).build();
+            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getFirstCursor()).build();
+            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getLastCursor()).build();
             int total = resultSet.itemList.size();
             Response response = Response.ok(journals).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total).build();
             return response;
@@ -123,10 +123,10 @@ public class PackageResource {
                 resultSet = packageStorage.getResults(path, packages, searchParam, countParam, cursorParam);
             }
 
-            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
-            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
-            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
-            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getNextCursor()).build();
+            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getPreviousCursor()).build();
+            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getFirstCursor()).build();
+            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getLastCursor()).build();
             int total = resultSet.itemList.size();
             Response response = Response.ok(packages).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total).build();
             return response;
