@@ -91,23 +91,32 @@ public class ResultSet {
 
 
     public void adjustCursors(int currCursor) {
+        if (itemList.size() == 0) {
+            return;
+        }
         if (currCursor <= 0) {
             currentCursor = itemList.get(0);
         } else {
             currentCursor = currCursor;
         }
         int currentIndex = itemList.indexOf(currentCursor);
-        if (currentIndex + pageSize < itemList.size()) {
+        nextCursor = -1;
+        if (currentIndex < itemList.size()) {
             // we have a valid next page
-            nextCursor = itemList.get(currentIndex + pageSize);
-        } else {
-            nextCursor = itemList.get(itemList.size()-1);
+            if (currentIndex + pageSize <= itemList.size()) {
+                 nextCursor = itemList.get(currentIndex + pageSize);
+            } else {
+                nextCursor = itemList.get(itemList.size() - 1);
+            }
         }
-        if (currentIndex - pageSize > 0) {
+        previousCursor = -1;
+        if (currentIndex > 0) {
             // we have a valid previous page
-            previousCursor = itemList.get(currentIndex - pageSize);
-        } else {
-            previousCursor = itemList.get(0);
+            if (currentIndex - pageSize >= 0) {
+                previousCursor = itemList.get(currentIndex - pageSize);
+            } else {
+                previousCursor = itemList.get(0);
+            }
         }
         firstCursor = itemList.get(0);
         lastCursor = firstCursor;
@@ -115,20 +124,33 @@ public class ResultSet {
             lastCursor = itemList.get(itemList.size() - pageSize - 1);
         }
 
+        log.debug("indices are " + getPreviousIndex() + ", " + getCurrentIndex() + ", " + getNextIndex());
+        log.debug("hasPrevPage = " + hasPreviousPage() + ", hasNextPage = " + hasNextPage());
         log.debug("cursors are " + previousCursor + ", " + currentCursor + ", " + nextCursor);
     }
 
-    public List<Integer> getCurrentSet(int currentCursor) {
-        adjustCursors(currentCursor);
-        int indexFrom = itemList.indexOf(currentCursor);
-        int indexTo = itemList.indexOf(nextCursor);
-        if (indexFrom <= 0) {
-            indexFrom = 0;
+    public List<Integer> getCurrentSet(int currCursor) {
+        List<Integer> resultList = new ArrayList<Integer>();
+        if (itemList.size() <= pageSize) {
+            resultList.addAll(itemList);
+        } else {
+            adjustCursors(currCursor);
+            int indexA = getCurrentIndex();
+            int indexB = getNextIndex();
+
+            int indexFrom = (indexA <= indexB) ? indexA : indexB;
+            int indexTo = (indexA > indexB) ? indexA : indexB;
+            if (indexFrom <= 0) {
+                indexFrom = 0;
+            }
+            if (indexTo >= itemList.size()) {
+                indexTo = itemList.size();
+            }
+            log.debug("list from " + indexFrom + " to " + indexTo);
+            for (int i = indexFrom; i <= indexTo; i++) {
+                resultList.add(itemList.get(i));
+            }
         }
-        if (indexTo >= itemList.size()) {
-            indexTo = itemList.size();
-        }
-        log.debug("list from " + indexFrom + " to " + indexTo);
-        return itemList.subList(indexFrom, indexTo);
+        return resultList;
     }
 }
