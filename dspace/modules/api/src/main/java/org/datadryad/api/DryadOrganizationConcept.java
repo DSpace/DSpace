@@ -316,7 +316,9 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         DryadOrganizationConcept organizationConcept = null;
         try {
             Concept concept = Concept.find(context, conceptID);
-            organizationConcept = new DryadOrganizationConcept(context, concept);
+            if (concept != null) {
+                organizationConcept = new DryadOrganizationConcept(context, concept);
+            }
         } catch (SQLException e) {
             log.error("couldn't find a concept: " + e.getMessage());
         }
