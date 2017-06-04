@@ -33,9 +33,10 @@ public class EmailParser {
     public static final String UNNECESSARY = "Unnecessary";
 
     // The field to XML-tag mapping table.
-    protected static Map<String, String> fieldToXMLTagMap = new LinkedHashMap<String,String>();
+    protected Map<String, String> fieldToXMLTagMap;
 
-    static {
+    EmailParser() {
+        fieldToXMLTagMap = new LinkedHashMap<String,String>();
         // commonly-used field names for required tags for Manuscript
         fieldToXMLTagMap.put("abstract", Manuscript.ABSTRACT);
         fieldToXMLTagMap.put("journal", Manuscript.JOURNAL);

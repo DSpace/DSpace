@@ -6,7 +6,8 @@ import org.datadryad.rest.models.Manuscript;
  * The Class EmailParserForManuscriptCentral. Rewritten by Daisie Huang.
  */
 public class EmailParserForManuscriptCentral extends EmailParser {
-    static {
+    EmailParserForManuscriptCentral() {
+        super();
         // optional XML tags
         fieldToXMLTagMap.put("print issn", Manuscript.ISSN);
         fieldToXMLTagMap.put("publication doi", Manuscript.PUBLICATION_DOI);
