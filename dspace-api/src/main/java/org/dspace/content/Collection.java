@@ -513,6 +513,34 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Get the items in this collection. The order is indeterminate.
+     * Provides the ability to use limit and offset, for efficient paging.
+     * @param limit Max number of results in set
+     * @param offset Number of results to jump ahead by. 100 = 100th result is first, not 100th page.
+     * @return an iterator over the items in the collection.
+     * @throws SQLException
+     */
+    public ItemIterator getItemsIncludingWithdrawn(Integer limit, Integer offset) throws SQLException
+    {
+        List<Serializable> params = new ArrayList<Serializable>();
+        StringBuffer myQuery = new StringBuffer(
+            "SELECT item.* " + 
+            "FROM item, collection2item " + 
+            "WHERE item.item_id = collection2item.item_id " +
+              "AND collection2item.collection_id = ? "
+        );
+
+        params.add(getID());
+        DatabaseManager.applyOffsetAndLimit(myQuery, params, offset, limit);
+
+        TableRowIterator rows = DatabaseManager.query(ourContext,
+                myQuery.toString(), params.toArray());
+
+        return new ItemIterator(ourContext, rows);
+    }
+
+    
+    /**
      * Get all the items in this collection. The order is indeterminate.
      *
      * @return an iterator over the items in the collection.
@@ -1683,6 +1711,51 @@ public class Collection extends DSpaceObject
         return itemcount;
      }
 
+ 	/**
+      * counts items in this collection including withdrawn and private items
+      *
+      * @return  total items
+      */
+      public int countAllItems()
+         throws SQLException
+      {
+          int itemcount = 0;
+          PreparedStatement statement = null;
+          ResultSet rs = null;
+
+          try
+          {
+              String query = "SELECT count(*) FROM collection2item, item WHERE "
+                     + "collection2item.collection_id =  ? "
+                     + "AND collection2item.item_id = item.item_id ";
+
+             statement = ourContext.getDBConnection().prepareStatement(query);
+             statement.setInt(1,getID());
+
+             rs = statement.executeQuery();
+             if (rs != null)
+             {
+                 rs.next();
+                 itemcount = rs.getInt(1);
+             }
+          }
+          finally
+          {
+              if (rs != null)
+              {
+                  try { rs.close(); } catch (SQLException sqle) { }
+              }
+
+              if (statement != null)
+              {
+                  try { statement.close(); } catch (SQLException sqle) { }
+              }
+          }
+
+         return itemcount;
+      }
+ 
+     
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;
