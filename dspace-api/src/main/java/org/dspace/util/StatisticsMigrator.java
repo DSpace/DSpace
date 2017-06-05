@@ -56,11 +56,13 @@ public class StatisticsMigrator {
         
         public void processFile() throws IOException, SQLException {
                 for(String[] row = csvRead.readNext(); row != null; row = csvRead.readNext()) {
+                        String comm = getColVal(row, COL.owningComm);
                         mapRowCol(row, COL.id);
                         mapRowCol(row, COL.owningComm);
                         mapRowCol(row, COL.owningColl);
                         mapRowCol(row, COL.owningItem);
                         csvWriter.writeNext(row);
+                        System.out.println(String.format("TBTB\t%s\t%s", comm, getColVal(row, COL.owningComm)));
                 }
                 csvWriter.close();
         }
