@@ -404,7 +404,7 @@ public class SolrImportExport
 		}
 	}
 	
-	public static void upgradeIndexFiles(String indexName, File fromDir) throws IOException, SQLException {
+	public static void upgradeIndexFiles(final String indexName, File fromDir) throws IOException, SQLException {
                 File[] files = fromDir.listFiles(new FilenameFilter()
                 {
                         @Override
