@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -62,7 +63,6 @@ public class StatisticsMigrator {
                         mapRowCol(row, COL.owningColl);
                         mapRowCol(row, COL.owningItem);
                         csvWriter.writeNext(row);
-                        System.out.println(String.format("TBTB\t%s\t%s", comm, getColVal(row, COL.owningComm)));
                 }
                 csvWriter.close();
         }
@@ -106,6 +106,17 @@ public class StatisticsMigrator {
         }
         
         private String mapVal(COL col, String val) throws SQLException {
+                if (val.contains(",")) {
+                        StringBuilder sb = new StringBuilder();
+                        for(String s: val.split(",")) {
+                                if (sb.length() > 0) {
+                                        sb.append(",");
+                                }
+                                sb.append(mapVal(col, s));
+                        }
+                        return sb.toString();
+                }
+                
                 String ret = val;
                 Integer ival = getInt(val);
                 if (ival != null) {

@@ -196,7 +196,6 @@ public class SolrImportExport
 				for (String indexName : indexNames)
 				{
 					try {
-						System.out.println("TBTB "+indexName +" "+action);
 					        boolean keepExport = line.hasOption(KEEP_OPTION);
 						boolean overwrite = line.hasOption(OVERWRITE_OPTION);
 						reindex(indexName, directoryName, keepExport, overwrite, "upgrade".equals(action));
@@ -350,7 +349,7 @@ public class SolrImportExport
 				
 				if (upgradeRecords) {
 	                                try {
-	                                        upgradeIndexFiles(tempIndexName, exportDir);
+	                                        upgradeIndexFiles(indexName, exportDir);
 	                                } catch (SQLException e) {
 	                                        log.error("Failure upgrading records in " + tempIndexName, e);
 	                                }
@@ -423,7 +422,6 @@ public class SolrImportExport
                         }
                 });
 
-
                 for (File file : files)
                 {
                         upgradeCsvRecords(file);
@@ -436,6 +434,8 @@ public class SolrImportExport
 	        if (f.renameTo(forig)) {
 	                StatisticsMigrator statMig = new StatisticsMigrator(new Context(), forig, out);
 	                statMig.processFile();
+	        } else {
+	                log.error(String.format("Cannot rename %s -> %s", forig.getName(), out.getName()));	                
 	        }
 	}
 
