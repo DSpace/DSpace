@@ -117,7 +117,7 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 
 	public abstract Page<T> findAll(Context context, Pageable pageable);
 
-	private Context obtainContext() {
+	protected Context obtainContext() {
 		Request currentRequest = requestService.getCurrentRequest();
 		Context context = (Context) currentRequest.getAttribute(ContextUtil.DSPACE_CONTEXT);
 		if (context != null && context.isValid()) {
