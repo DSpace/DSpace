@@ -243,6 +243,15 @@
         </step>
     </command>
     <command>
+        <name>solr-upgrade-statistics</name>
+        <description>Upgrade the Solr-based usage statistics (from DSpace 5 ids to DSpace 6 uuids)</description>
+        <step passuserargs="true">
+            <class>org.dspace.util.SolrImportExport</class>
+            <argument>-a</argument>
+            <argument>upgrade</argument>
+        </step>
+    </command>
+    <command>
         <name>stat-general</name>
         <description>Compile the general statistics</description>
         <step passuserargs="false">
