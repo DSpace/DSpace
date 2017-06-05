@@ -347,6 +347,14 @@ public class SolrImportExport
 			{
 				// export from the actual core (from temp core name, actual data dir)
 				exportIndex(indexName, exportDir, tempSolrUrl, timeField, overwrite);
+				
+				if (upgradeRecords) {
+	                                try {
+	                                        upgradeIndexFiles(tempIndexName, exportDir);
+	                                } catch (SQLException e) {
+	                                        log.error("Failure upgrading records in " + tempIndexName, e);
+	                                }
+	                        }
 
 				// clear actual core (temp core name, clearing actual data dir) & import
 				importIndex(indexName, exportDir, tempSolrUrl, true);
