@@ -196,7 +196,8 @@ public class SolrImportExport
 				for (String indexName : indexNames)
 				{
 					try {
-						boolean keepExport = line.hasOption(KEEP_OPTION);
+						System.out.println("TBTB "+indexName +" "+action);
+					        boolean keepExport = line.hasOption(KEEP_OPTION);
 						boolean overwrite = line.hasOption(OVERWRITE_OPTION);
 						reindex(indexName, directoryName, keepExport, overwrite, "upgrade".equals(action));
 					} catch (IOException | SolrServerException | SolrImportExportException e) {
