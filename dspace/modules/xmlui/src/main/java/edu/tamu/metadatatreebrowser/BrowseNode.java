@@ -50,7 +50,8 @@ public class BrowseNode extends SimpleSearch {
     
     private static final Message T_dspace_home =
             message("xmlui.general.dspace_home");
-
+    
+    
     /**
      * Add Page metadata.
      */
@@ -132,8 +133,11 @@ public class BrowseNode extends SimpleSearch {
     
     @Override
     public DiscoverQuery prepareQuery(DSpaceObject scope, String query, String[] fqs) throws UIException, SearchServiceException {
+    	
     	super.prepareQuery(scope, query, fqs);
     	getNode();
+
+    	
         String fieldLabel = null;
 		try {
 			fieldLabel = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.mdbrowser."+getScope().getHandle()+".field");
@@ -145,7 +149,7 @@ public class BrowseNode extends SimpleSearch {
         if (fieldLabel == null || fieldLabel.length() == 0) {
  			fieldLabel = "dc.relation.ispartof";
         }
-        queryArgs.setQuery(fieldLabel+": \""+node.getFieldValue()+"\"");
+        queryArgs.addFilterQueries(fieldLabel+": \""+node.getFieldValue()+"\"");
         return queryArgs;
  }
     
@@ -178,9 +182,6 @@ public class BrowseNode extends SimpleSearch {
     }
     
     private MetadataTreeNode getNode() {
-        if (node != null) {
-        	return node;
-        }
         try {
  		    String nodeString = getNodeId();
  		    
@@ -189,7 +190,7 @@ public class BrowseNode extends SimpleSearch {
  		    MetadataTreeNode root = MetadataTreeService.getInstance().getFullTree(context, dso); 
  			
  			node = root.findById(Integer.valueOf(nodeString));
-
+ 			
         } catch (UIException e) {
             log.error(e.getMessage(), e);
         } catch (SQLException e) {
