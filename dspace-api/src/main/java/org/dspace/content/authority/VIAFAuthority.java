@@ -23,6 +23,14 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Implementation to retrieve object from viaf.org "autosuggest" webservice
+ * 
+ * @see https://viaf.org/
+ *
+ * @author Riccardo Fazio (riccardo.fazio at 4science dot it)
+ *
+ */
 public class VIAFAuthority implements ChoiceAuthority {
 
 	Logger log = Logger.getLogger(VIAFAuthority.class);
