@@ -3468,13 +3468,13 @@
     <message key="xmlui.property.ManageShoppingcartMain.title">Manage Shopping Cart</message>
     <message key="xmlui.property.ManageShoppingcartMain.main_head">Shopping Cart management</message>
     <message key="xmlui.property.ManageShoppingcartMain.actions_head">Actions</message>
-    <message key="xmlui.property.ManageShoppingcartMain.actions_create">Create a new Shopping Cart</message>
-    <message key="xmlui.property.ManageShoppingcartMain.actions_create_link">Click here to add a new Shopping Cart.</message>
-    <message key="xmlui.property.ManageShoppingcartMain.actions_browse">Browse Shopping Cart</message>
-    <message key="xmlui.property.ManageShoppingcartMain.actions_browse_link">Click here to browse all Shopping carts.</message>
-    <message key="xmlui.property.ManageShoppingcartMain.actions_search">Search for Shopping Cart By key word</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_help">Shopping carts are searched by any partial match on status or transaction id</message>
-    <message key="xmlui.property.ManageShoppingcartMain.search_para1">Below is the list of Shopping Cart that matched your search query. Click on an Shopping Cart's name or value to edit them.</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_create">Create a new shopping cart</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_create_link">Click here to add a new shopping cart.</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_browse">Browse Shopping Carts</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_browse_link">Click here to browse all shopping carts.</message>
+    <message key="xmlui.property.ManageShoppingcartMain.actions_search">Search for a Shopping Cart</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_help">Shopping carts can be searched by status or item number.</message>
+    <message key="xmlui.property.ManageShoppingcartMain.search_para1">Below is the list of shopping carts that matched your search query. Click on a Shopping Cart's name or value to edit.</message>
 
     <message key="xmlui.property.ManageShoppingcartMain.search_head">Search results</message>
     <message key="xmlui.property.ManageShoppingcartMain.col_select_box"></message>
