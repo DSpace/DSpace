@@ -69,8 +69,9 @@ public class SolrUpgradeStatistics6
 {
 	private static final String INDEX_NAME_OPTION = "i";
 	private static final String NUMREC_OPTION = "n";
+        private static final String TYPE_OPTION = "t";
         private static final String HELP_OPTION = "h";
-        private static final int NUMREC_DEFAULT = 1000;
+        private static final int NUMREC_DEFAULT = 10000;
         private static final String INDEX_DEFAULT = "statistics";
 	private static final Logger log = Logger.getLogger(SolrUpgradeStatistics6.class);
 	private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
@@ -79,7 +80,8 @@ public class SolrUpgradeStatistics6
 	private int numProcessed = 0;
 	private enum FIELD{owningColl,owningComm,id,owningItem;}
         private Context context;
-
+        private Integer type;
+        
         protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
         protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
         protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
@@ -87,13 +89,14 @@ public class SolrUpgradeStatistics6
 
 	protected SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
 
-	public SolrUpgradeStatistics6(String indexName, int numRec) {
+	public SolrUpgradeStatistics6(String indexName, int numRec, Integer type) {
                 String serverPath = configurationService.getProperty("solr-statistics.server");
                 serverPath = serverPath.replaceAll("statistics$", indexName);
                 System.out.println("Connecting to " + serverPath);
                 server = new HttpSolrServer(serverPath);
                 this.numRec = numRec;
                 this.context = new Context();
+                this.type = type;
 	}
 
 	/**
@@ -108,6 +111,7 @@ public class SolrUpgradeStatistics6
 
                 String indexName = INDEX_DEFAULT;
                 int numrec = NUMREC_DEFAULT;
+                Integer type = null;
 		try
 		{
 			CommandLine line = parser.parse(options, args);
@@ -128,6 +132,15 @@ public class SolrUpgradeStatistics6
                         if (line.hasOption(NUMREC_OPTION)) {
 			        numrec = Integer.parseInt(line.getOptionValue(NUMREC_OPTION,""+NUMREC_DEFAULT));
 			}
+                        if (line.hasOption(TYPE_OPTION)) {
+                                String s = null;
+                                try {
+                                        s = line.getOptionValue(TYPE_OPTION);
+                                        type = Integer.parseInt(s);
+                                } catch (NumberFormatException e) {
+                                        log.warn("Non integer type parameter "+s);
+                                }
+                        }
 
 		}
 		catch (ParseException e)
@@ -136,7 +149,7 @@ public class SolrUpgradeStatistics6
 			printHelpAndExit(options, 1);
 		}
 		
-		SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec);
+		SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec, type);
 		try {
                         upgradeStats.run();
                 } catch (SolrServerException e) {
@@ -149,46 +162,87 @@ public class SolrUpgradeStatistics6
 	}
 
 	private void run() throws SolrServerException, SQLException, IOException {
-                String query = "NOT(id:*-*) AND type:2";
-	        SolrQuery sQ = new SolrQuery();
-	        sQ.setQuery(query);
-	        sQ.setFacet(true);
-	        sQ.addFacetField("id");
-	        sQ.setFacetMinCount(1);
-                System.out.println(server.getBaseURL() + sQ.toString() + "\n");
-	        QueryResponse sr = server.query(sQ);
-	        
-                for(FacetField ff: sr.getFacetFields()) {
-                        for(FacetField.Count count: ff.getValues()) {
-                                System.out.println(String.format("\t%s: %d", count.getName(), count.getCount()));
-                                updateItem(count.getName());
-                        }
-                }
+	        runReport();
+	        if (type != null) {
+	                run(type);
+	                System.out.println("\n\t\t *** Num Processed: "+numProcessed+"\n");
+	                runReport();
+	        }
                 System.out.println("Done!");
         }
-	
-	private void updateItem(String id) throws SolrServerException, SQLException, IOException {
-	        final List<SolrDocument> docsToUpdate = new ArrayList<SolrDocument>();
 
+	private void runReport() throws SolrServerException {
+                String query = "NOT(id:*-*)";
+                SolrQuery sQ = new SolrQuery();
+                sQ.setQuery(query);
+                sQ.setFacet(true);
+                sQ.addFacetField("type");
+                QueryResponse sr = server.query(sQ);
+                
+                System.out.println("=================================================================");
+                System.out.println("\t*** Statistics Records with Legacy Id ***");
+                for(FacetField ff: sr.getFacetFields()) {
+                        for(FacetField.Count count: ff.getValues()) {
+                                String name = count.getName();
+                                int id = Integer.parseInt(name);
+                                if (id == Constants.COMMUNITY) {
+                                        name = "Community";
+                                } else if (id == Constants.COLLECTION) {
+                                        name = "Collection";
+                                } else if (id == Constants.ITEM) {
+                                        name = "Item";
+                                } else if (id == Constants.BITSTREAM) {
+                                        name = "Bistream";
+                                } 
+                                System.out.println(String.format("\t%s: %d", name, count.getCount()));
+                        }
+                }
+                System.out.println("=================================================================");
+	}
+	
+	
+        private void run(int ptype) throws SolrServerException, SQLException, IOException {
+                String query = String.format("NOT(id:*-*) AND type:%d", ptype);
+                SolrQuery sQ = new SolrQuery();
+                sQ.setQuery(query);
+                sQ.setFacet(true);
+                sQ.addFacetField("id");
+                sQ.setFacetMinCount(1);
+                QueryResponse sr = server.query(sQ);
+                
+                for(FacetField ff: sr.getFacetFields()) {
+                        for(FacetField.Count count: ff.getValues()) {
+                                String id = count.getName();
+                                if (ptype == Constants.COMMUNITY) {
+                                        updateRecords(String.format("id:%s OR owningComm:%s", id, id));
+                                } else if (ptype == Constants.COLLECTION) {
+                                        updateRecords(String.format("id:%s OR owningColl:%s", id, id));
+                                } else if (ptype == Constants.ITEM) {
+                                        updateRecords(String.format("id:%s OR owningItem:%s", id, id));
+                                } else if (ptype == Constants.BITSTREAM) {
+                                        updateRecords(String.format("id:%s", id));
+                                }
+                        }
+                }
+        }
+        
+	private void updateRecords(String query) throws SolrServerException, SQLException, IOException {
 	        SolrQuery sQ = new SolrQuery();
-	        sQ.setQuery(String.format("id:%s OR owningItem:%s", id, id));
+	        sQ.setQuery(query);
 	        sQ.setRows(numRec - numProcessed);
-	        
-	        System.out.println(server.getBaseURL() + sQ.toString() + "\n");
 	        
 	        QueryResponse sr = server.query(sQ);
 	        SolrDocumentList sdl = sr.getResults();
-	        for(int i=0; i<sdl.size(); i++) {
+	        for(int i=0; i<sdl.size() && (numProcessed < numRec); i++) {
 	                SolrDocument sd = sdl.get(i);
-	                System.out.println(sd.get("uid") + "  " + sd.get("type") + " " + sd.get("id"));
 	                SolrInputDocument input = ClientUtils.toSolrInputDocument(sd);
 	                for(FIELD col: FIELD.values()) {
 	                        mapField(input, col);
 	                }
 	                server.add(input);
-	                System.out.println(++numProcessed + " Prepared doc for update: "+sd.get("uid"));
+	                ++numProcessed;
 	        }
-	        UpdateResponse ur = server.commit();
+	        server.commit();
 	}
 	
 
@@ -198,6 +252,7 @@ public class SolrUpgradeStatistics6
 		options.addOption(INDEX_NAME_OPTION, "index-name", true,
 				                 "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
 		options.addOption(NUMREC_OPTION, "num-rec", true, "Number of records to update.");
+                options.addOption(TYPE_OPTION, "type", true, "(4) Communities, (3) Collections, (2) Items (0) Bitstreams");
 		return options;
 	}
 
