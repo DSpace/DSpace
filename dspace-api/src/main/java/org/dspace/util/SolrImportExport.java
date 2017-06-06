@@ -27,11 +27,19 @@ import org.apache.solr.common.luke.FieldFlag;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.apache.solr.common.params.FacetParams;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.*;
 import java.util.*;
 
@@ -183,14 +191,14 @@ public class SolrImportExport
 					}
 				}
 			}
-			else if ("reindex".equals(action))
+			else if ("reindex".equals(action) || "upgrade".equals(action))
 			{
 				for (String indexName : indexNames)
 				{
 					try {
-						boolean keepExport = line.hasOption(KEEP_OPTION);
+					        boolean keepExport = line.hasOption(KEEP_OPTION);
 						boolean overwrite = line.hasOption(OVERWRITE_OPTION);
-						reindex(indexName, directoryName, keepExport, overwrite);
+						reindex(indexName, directoryName, keepExport, overwrite, "upgrade".equals(action));
 					} catch (IOException | SolrServerException | SolrImportExportException e) {
 						e.printStackTrace();
 					}
@@ -198,7 +206,7 @@ public class SolrImportExport
 			}
 			else
 			{
-				System.err.println("Unknown action " + action + "; must be import, export or reindex.");
+				System.err.println("Unknown action " + action + "; must be import, export, reindex or upgrade.");
 				printHelpAndExit(options, 1);
 			}
 		}
@@ -211,16 +219,16 @@ public class SolrImportExport
 
 	private static Options makeOptions() {
 		Options options = new Options();
-		options.addOption(ACTION_OPTION, "action", true, "The action to perform: import, export or reindex. Default: export.");
-		options.addOption(CLEAR_OPTION, "clear", false, "When importing, also clear the index first. Ignored when action is export or reindex.");
-		options.addOption(OVERWRITE_OPTION, "force-overwrite", false, "When exporting or re-indexing, allow overwrite of existing export files");
+		options.addOption(ACTION_OPTION, "action", true, "The action to perform: import, export, reindex or upgrade. Default: export.");
+		options.addOption(CLEAR_OPTION, "clear", false, "When importing, also clear the index first. Ignored when action is export, reindex or upgrade.");
+		options.addOption(OVERWRITE_OPTION, "force-overwrite", false, "When exporting,r re-indexing or upgrading, allow overwrite of existing export files");
 		options.addOption(DIRECTORY_OPTION, "directory", true,
 				                 "The absolute path for the directory to use for import or export. If omitted, [dspace]/solr-export is used.");
 		options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
 		options.addOption(INDEX_NAME_OPTION, "index-name", true,
 				                 "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
-		options.addOption(KEEP_OPTION, "keep", false, "When reindexing, keep the contents of the data export directory." +
-				                                              " By default, the contents of this directory will be deleted once the reindex has finished." +
+		options.addOption(KEEP_OPTION, "keep", false, "When reindexing or upgrading, keep the contents of the data export directory." +
+				                                              " By default, the contents of this directory will be deleted once the reindex/upgrade has finished." +
 				                                              " Ignored when action is export or import.");
 		options.addOption(LAST_OPTION, "last", true, "When exporting, export records from the last [timeperiod] only." +
 				                                             " This can be one of: 'd' (beginning of yesterday through to now);" +
@@ -237,9 +245,10 @@ public class SolrImportExport
 	 * @param exportDirName the name of the directory to use for export. If this directory doesn't exist, it will be created.
 	 * @param keepExport whether to keep the contents of the exportDir after the reindex. If keepExport is false and the
 	 *                      export directory was created by this method, the export directory will be deleted at the end of the reimport.
-     * @param overwrite allow export files to be overwritten during re-index
+         * @param overwrite allow export files to be overwritten during re-index
+         * @param upgradeRecords migrate DSpace 5 id fields to DSpace 6 uuid fields
 	 */
-	private static void reindex(String indexName, String exportDirName, boolean keepExport, boolean overwrite)
+	private static void reindex(String indexName, String exportDirName, boolean keepExport, boolean overwrite, boolean upgradeRecords)
 			throws IOException, SolrServerException, SolrImportExportException {
 		String tempIndexName = indexName + "-temp";
 
@@ -337,6 +346,14 @@ public class SolrImportExport
 			{
 				// export from the actual core (from temp core name, actual data dir)
 				exportIndex(indexName, exportDir, tempSolrUrl, timeField, overwrite);
+				
+				if (upgradeRecords) {
+	                                try {
+	                                        upgradeIndexFiles(indexName, exportDir);
+	                                } catch (SQLException e) {
+	                                        log.error("Failure upgrading records in " + tempIndexName, e);
+	                                }
+	                        }
 
 				// clear actual core (temp core name, clearing actual data dir) & import
 				importIndex(indexName, exportDir, tempSolrUrl, true);
@@ -362,6 +379,14 @@ public class SolrImportExport
 			// export all docs from now-temp core into export directory -- this won't cause name collisions with the actual export
 			// because the core name for the temporary export has -temp in it while the actual core doesn't
 			exportIndex(tempIndexName, exportDir, tempSolrUrl, timeField, overwrite);
+			
+			if (upgradeRecords) {
+			        try {
+                                        upgradeIndexFiles(tempIndexName, exportDir);
+                                } catch (SQLException e) {
+                                        log.error("Failure upgrading records in " + tempIndexName, e);
+                                }
+			}
 			// ...and import them into the now-again-actual core *without* clearing
 			importIndex(tempIndexName, exportDir, origSolrUrl, false);
 
@@ -385,6 +410,33 @@ public class SolrImportExport
 				FileUtils.deleteDirectory(exportDir);
 			}
 		}
+	}
+	
+	public static void upgradeIndexFiles(final String indexName, File fromDir) throws IOException, SQLException {
+                File[] files = fromDir.listFiles(new FilenameFilter()
+                {
+                        @Override
+                        public boolean accept(File dir, String name)
+                        {
+                                return name.startsWith(indexName + EXPORT_SEP) && name.endsWith(".csv");
+                        }
+                });
+
+                for (File file : files)
+                {
+                        upgradeCsvRecords(file);
+                }
+	}
+	
+	public static void upgradeCsvRecords(File f) throws IOException, SQLException {
+	        File forig = new File(f.getParentFile(), String.format("orig.%s", f.getName()));
+	        File out = new File(f.getParentFile(), f.getName());
+	        if (f.renameTo(forig)) {
+	                StatisticsMigrator statMig = new StatisticsMigrator(new Context(), forig, out);
+	                statMig.processFile();
+	        } else {
+	                log.error(String.format("Cannot rename %s -> %s", forig.getName(), out.getName()));	                
+	        }
 	}
 
 	/**
@@ -761,6 +813,7 @@ public class SolrImportExport
 		System.out.println("\tsolr-export-statistics  [-a export]  [-i statistics]");
 		System.out.println("\tsolr-import-statistics  [-a import]  [-i statistics]");
 		System.out.println("\tsolr-reindex-statistics [-a reindex] [-i statistics]");
+                System.out.println("\tsolr-upgrade-statistics [-a upgrade] [-i statistics]");
 		System.exit(exitCode);
 	}
 }
