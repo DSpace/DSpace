@@ -25,13 +25,30 @@ import org.apache.solr.client.solrj.response.FieldStatsInfo;
 import org.apache.solr.client.solrj.response.LukeResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.RangeFacet;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.luke.FieldFlag;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.apache.solr.common.params.FacetParams;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.ObjectCount;
+import org.dspace.statistics.SolrLoggerServiceImpl.ResultProcessor;
 import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +57,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.*;
 import java.util.*;
 
@@ -57,7 +75,15 @@ public class SolrUpgradeStatistics6
 	private static final Logger log = Logger.getLogger(SolrUpgradeStatistics6.class);
 	private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 	private HttpSolrServer server;
-	private int numRec;
+	private int numRec = NUMREC_DEFAULT;
+	private int numProcessed = 0;
+	private enum FIELD{owningColl,owningComm,id,owningItem;}
+        private Context context;
+
+        protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+        protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+        protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+        protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
 	protected SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
 
@@ -67,6 +93,7 @@ public class SolrUpgradeStatistics6
                 System.out.println("Connecting to " + serverPath);
                 server = new HttpSolrServer(serverPath);
                 this.numRec = numRec;
+                this.context = new Context();
 	}
 
 	/**
@@ -114,25 +141,56 @@ public class SolrUpgradeStatistics6
                         upgradeStats.run();
                 } catch (SolrServerException e) {
                         log.error("Error querying stats", e);
+                } catch (SQLException e) {
+                        log.error("Error querying stats", e);
+                } catch (IOException e) {
+                        log.error("Error querying stats", e);
                 }
 	}
 
-	private void run() throws SolrServerException {
+	private void run() throws SolrServerException, SQLException, IOException {
                 String query = "NOT(id:*-*) AND type:2";
 	        SolrQuery sQ = new SolrQuery();
 	        sQ.setQuery(query);
 	        sQ.setFacet(true);
 	        sQ.addFacetField("id");
 	        sQ.setFacetMinCount(1);
+                System.out.println(server.getBaseURL() + sQ.toString() + "\n");
 	        QueryResponse sr = server.query(sQ);
 	        
                 for(FacetField ff: sr.getFacetFields()) {
-                        System.out.println(ff);
                         for(FacetField.Count count: ff.getValues()) {
                                 System.out.println(String.format("\t%s: %d", count.getName(), count.getCount()));
+                                updateItem(count.getName());
                         }
                 }
+                System.out.println("Done!");
         }
+	
+	private void updateItem(String id) throws SolrServerException, SQLException, IOException {
+	        final List<SolrDocument> docsToUpdate = new ArrayList<SolrDocument>();
+
+	        SolrQuery sQ = new SolrQuery();
+	        sQ.setQuery(String.format("id:%s OR owningItem:%s", id, id));
+	        sQ.setRows(numRec - numProcessed);
+	        
+	        System.out.println(server.getBaseURL() + sQ.toString() + "\n");
+	        
+	        QueryResponse sr = server.query(sQ);
+	        SolrDocumentList sdl = sr.getResults();
+	        for(int i=0; i<sdl.size(); i++) {
+	                SolrDocument sd = sdl.get(i);
+	                System.out.println(sd.get("uid") + "  " + sd.get("type") + " " + sd.get("id"));
+	                SolrInputDocument input = ClientUtils.toSolrInputDocument(sd);
+	                for(FIELD col: FIELD.values()) {
+	                        mapField(input, col);
+	                }
+	                server.add(input);
+	                System.out.println(++numProcessed + " Prepared doc for update: "+sd.get("uid"));
+	        }
+	        UpdateResponse ur = server.commit();
+	}
+	
 
         private static Options makeOptions() {
 		Options options = new Options();
@@ -157,4 +215,76 @@ public class SolrUpgradeStatistics6
 		System.out.println("\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process]");
 		System.exit(exitCode);
 	}
+	
+        private void mapField(SolrInputDocument input, FIELD col) throws SQLException {
+                SolrInputField ifield = input.get(col.name());
+                if (ifield != null) {
+                        Collection<Object> vals = ifield.getValues();
+                        ArrayList<UUID> newvals = new ArrayList<>();
+                        for(Object oval: vals) {
+                                try {
+                                        int legacy = Integer.parseInt(oval.toString());
+                                        UUID uuid = null;
+                                        if (col == FIELD.id) {
+                                                Object otype = input.getFieldValue("type");
+                                                if (otype != null) {
+                                                        int type = Integer.parseInt(otype.toString());
+                                                        uuid = mapType(type, legacy);
+                                                }
+                                        } else {
+                                                uuid = mapId(col, legacy);
+                                        }
+                                        if (uuid != null) {
+                                                newvals.add(uuid);
+                                        }
+                                } catch (NumberFormatException e) {
+                                        log.warn("Non numeric legacy id "+ col.name() +":" + oval.toString());
+                                }
+                        }
+                        if (newvals.size() > 0) {
+                                input.removeField(col.name());
+                                for(UUID uuid: newvals) {
+                                        input.addField(col.name(), uuid.toString());
+                                }
+                                
+                        }
+                }
+        }
+	
+	private UUID mapId(FIELD col, int val) throws SQLException {
+	        
+                if (col == FIELD.owningComm) {
+                        Community comm = communityService.findByLegacyId(context, val);
+                        return comm == null ? null : comm.getID();
+                }
+                if (col == FIELD.owningColl) {
+                        org.dspace.content.Collection coll = collectionService.findByLegacyId(context, val);
+                        return coll == null ? null : coll.getID();
+                }
+                if (col == FIELD.owningItem) {
+                        Item item = itemService.findByLegacyId(context, val);
+                        return item == null ? null : item.getID();
+                }
+                return null;
+        }
+        private UUID mapType(int type, int val) throws SQLException {
+                if (type == Constants.COMMUNITY) {
+                        Community comm = communityService.findByLegacyId(context, val);
+                        return comm == null ? null : comm.getID();
+                }
+                if (type == Constants.COLLECTION) {
+                        org.dspace.content.Collection coll = collectionService.findByLegacyId(context, val);
+                        return coll == null ? null : coll.getID();
+                }
+                if (type == Constants.ITEM) {
+                        Item item = itemService.findByLegacyId(context, val);
+                        return item == null ? null : item.getID();
+                }
+                if (type == Constants.BITSTREAM) {
+                        Bitstream bit = bitstreamService.findByLegacyId(context, val);
+                        return bit == null ? null : bit.getID();
+                }
+                return null;
+        }
+
 }
