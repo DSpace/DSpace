@@ -40,7 +40,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
 {
     /** log4j category */
     private static final Logger log = Logger.getLogger(BundleTest.class);
- 
+
     /**
      * Bundle instance for the tests
      */
@@ -214,7 +214,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
      * Test of getPrimaryBitstreamID method, of class Bundle.
      */
     @Test
-    public void testGetPrimaryBitstreamID() 
+    public void testGetPrimaryBitstreamID()
     {
         //is -1 when not set
         assertThat("testGetPrimaryBitstreamID 0", b.getPrimaryBitstream(), equalTo(null));
@@ -275,7 +275,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
      */
     @Override
     @Test
-    public void testGetHandle() 
+    public void testGetHandle()
     {
         //no handle for bundles
         assertThat("testGetHandle 0", b.getHandle(), nullValue());
@@ -300,7 +300,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
         String name = "name";
         //by default there is no bitstream
         assertThat("testGetHandle 0", bundleService.getBitstreamByName(b, name), nullValue());
-        
+
         //let's add a bitstream
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
@@ -397,12 +397,12 @@ public class BundleTest extends AbstractDSpaceObjectTest
         assertThat("testCreateBitstreamAuth 1", bundleService.getBitstreamByName(b, name), equalTo(bs));
         assertThat("testCreateBitstreamAuth 2", bundleService.getBitstreamByName(b, name).getName(), equalTo(name));
     }
-    
+
     /**
      * Test of registerBitstream method, of class Bundle.
      */
     @Test(expected=AuthorizeException.class)
-    public void testRegisterBitstreamNoAuth() throws AuthorizeException, IOException, SQLException 
+    public void testRegisterBitstreamNoAuth() throws AuthorizeException, IOException, SQLException
     {
         new NonStrictExpectations(authorizeService.getClass())
         {{
@@ -422,7 +422,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
      * Test of registerBitstream method, of class Bundle.
      */
     @Test
-    public void testRegisterBitstreamAuth() throws AuthorizeException, IOException, SQLException 
+    public void testRegisterBitstreamAuth() throws AuthorizeException, IOException, SQLException
     {
         new NonStrictExpectations(authorizeService.getClass())
         {{
@@ -436,7 +436,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
 
         int assetstore = 0;  //default assetstore
         String name = "name bitstream";
-        File f = new File(testProps.get("test.bitstream").toString());        
+        File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.register(context, b, assetstore, f.getName());
         bs.setName(context, name);
         assertThat("testRegisterBitstream 0", bundleService.getBitstreamByName(b, name), notNullValue());
@@ -481,7 +481,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
                     Constants.WRITE); result = null;
 
         }};
-        
+
         File f = new File(testProps.get("test.bitstream").toString());
         Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
         bs.setName(context, "name");
@@ -546,7 +546,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
      * Test of update method, of class Bundle.
      */
     @Test
-    public void testUpdate() throws SQLException, AuthorizeException 
+    public void testUpdate() throws SQLException, AuthorizeException
     {
         //TODO: we only check for sql errors
         //TODO: note that update can't throw authorize exception!!
@@ -632,7 +632,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
             }
         }
         assertTrue("testInheritCollectionDefaultPolicies 2", exists);
-        
+
     }
 
     /**
@@ -646,7 +646,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
         newpolicies.add(resourcePolicyService.create(context));
         newpolicies.add(resourcePolicyService.create(context));
         bundleService.replaceAllBitstreamPolicies(context, b, newpolicies);
-        
+
         List<ResourcePolicy> bspolicies = bundleService.getBundlePolicies(context, b);
         assertTrue("testReplaceAllBitstreamPolicies 0", newpolicies.size() == bspolicies.size());
 
@@ -692,6 +692,69 @@ public class BundleTest extends AbstractDSpaceObjectTest
         //empty by default
         List<ResourcePolicy> bspolicies = bundleService.getBitstreamPolicies(context, b);
         assertTrue("testGetBitstreamPolicies 0", bspolicies.isEmpty());
+    }
+
+    @Test
+    public void testSetOrder() throws SQLException, AuthorizeException, FileNotFoundException, IOException
+    {
+        new NonStrictExpectations(authorizeService.getClass())
+        {{
+            // Allow Bundle ADD perms
+            authorizeService.authorizeAction((Context) any, (Bundle) any,
+                Constants.ADD); result = null;
+            authorizeService.authorizeAction((Context) any, (Bitstream) any,
+                Constants.WRITE); result = null;
+        }};
+
+        // Create three Bitstreams to test ordering with. Give them different names
+        File f = new File(testProps.get("test.bitstream").toString());
+        Bitstream bs = bitstreamService.create(context, new FileInputStream(f));
+        bs.setName(context, "bitstream1");
+        bundleService.addBitstream(context, b, bs);
+        Bitstream bs2 = bitstreamService.create(context, new FileInputStream(f));
+        bs2.setName(context, "bitstream2");
+        bundleService.addBitstream(context, b, bs2);
+        Bitstream bs3 = bitstreamService.create(context, new FileInputStream(f));
+        bs3.setName(context, "bitstream3");
+        bundleService.addBitstream(context, b, bs3);
+
+        // Assert Bitstreams are in the order added
+        Bitstream[] bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
+        assertTrue("testSetOrder: starting count correct", bitstreams.length == 3);
+        assertThat("testSetOrder: Bitstream 1 is first", bitstreams[0].getName(), equalTo(bs.getName()));
+        assertThat("testSetOrder: Bitstream 2 is second", bitstreams[1].getName(), equalTo(bs2.getName()));
+        assertThat("testSetOrder: Bitstream 3 is third", bitstreams[2].getName(), equalTo(bs3.getName()));
+
+        UUID bsID1 = bs.getID();
+        UUID bsID2 = bs2.getID();
+        UUID bsID3 = bs3.getID();
+
+        // Now define a new order and call setOrder()
+        UUID[] newBitstreamOrder = new UUID[] { bsID3, bsID1, bsID2 };
+        bundleService.setOrder(context, b, newBitstreamOrder);
+
+        // Assert Bitstreams are in the new order
+        bitstreams = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
+        assertTrue("testSetOrder: new count correct", bitstreams.length == 3);
+        assertThat("testSetOrder: Bitstream 3 is now first", bitstreams[0].getName(), equalTo(bs3.getName()));
+        assertThat("testSetOrder: Bitstream 1 is now second", bitstreams[1].getName(), equalTo(bs.getName()));
+        assertThat("testSetOrder: Bitstream 2 is now third", bitstreams[2].getName(), equalTo(bs2.getName()));
+
+        // Now give only a partial list of bitstreams
+        newBitstreamOrder = new UUID[] { bsID1, bsID2 };
+        bundleService.setOrder(context, b, newBitstreamOrder);
+
+        // Assert Bitstream order is unchanged
+        Bitstream[] bitstreamsAfterPartialData = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
+        assertThat("testSetOrder: Partial data doesn't change order", bitstreamsAfterPartialData, equalTo(bitstreams));
+
+        // Now give bad data in the list of bitstreams
+        newBitstreamOrder = new UUID[] { bsID1, null, bsID2 };
+        bundleService.setOrder(context, b, newBitstreamOrder);
+
+        // Assert Bitstream order is unchanged
+        Bitstream[] bitstreamsAfterBadData = b.getBitstreams().toArray(new Bitstream[b.getBitstreams().size()]);
+        assertThat("testSetOrder: Partial data doesn't change order", bitstreamsAfterBadData, equalTo(bitstreams));
     }
 
     /**
