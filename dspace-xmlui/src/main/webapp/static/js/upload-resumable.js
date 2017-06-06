@@ -88,9 +88,10 @@ if(doResumable){
         $(this).removeClass('resumable-dragover');
     });
 
+    /* hide old interface switch
     $('#aspect_submission_StepTransformer_div_resumable-upload').after(
         '<div id="switch-upload" title="This can be used to switch upload interface"><a href="#">Switch Interface</a></div>'
-    );
+    ); */
 
     if(localStorage.getItem('resumable') === '0'){
         $('#aspect_submission_StepTransformer_div_resumable-upload').hide();
