@@ -209,34 +209,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
 
-    private void addFieldsStatusPublished(Request request, List form) throws WingException {
-        List doi = form.addList("doi");
-        Text textArticleDOI = doi.addItem().addText("article_doi");
-        textArticleDOI.setLabel(T_enter_article_doi);
-        if(request.getParameter("article_doi") != null)
-            textArticleDOI.setValue(request.getParameter("article_doi"));
-
-        doi.addItem().addContent("OR");
-
-        Text journalField = addJournalAuthorityControlled(doi.addItem().addComposite("unknown-doi-comp"), "unknown_doi");
-
-        String pubName = request.getParameter("unknown_doi");
-        if (pubName != null) {
-            journalField.setValue(pubName);
-        }
-        journalField.setHelp(T_unknown_doi);
-
-
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_DOI){
-            textArticleDOI.addError("Invalid Identifier.");
-        }
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_NAME){
-            textArticleDOI.addError("No journal name.");
-        }
-
-
-    }
-
     private void addArticleStatusRadios(Request request, List form, Manuscript manuscript) throws WingException {
         // add "article status" radios
         Item articleStatus = form.addItem("jquery_radios", "");
@@ -281,12 +253,42 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
     }
 
+    private void addFieldsStatusPublished(Request request, List form) throws WingException {
+        List doi = form.addList("doi");
+        Text textArticleDOI = doi.addItem().addText("article_doi");
+        textArticleDOI.setLabel(T_enter_article_doi);
+        if(request.getParameter("article_doi") != null)
+            textArticleDOI.setValue(request.getParameter("article_doi"));
+
+        doi.addItem().addContent("OR");
+
+        Composite pubComp = doi.addItem().addComposite("unknown-doi-comp");
+        Text journalField = addJournalAuthorityControlled(pubComp, "unknown_doi");
+
+        String pubName = request.getParameter("unknown_doi");
+        if (pubName != null) {
+            journalField.setValue(pubName);
+        }
+        journalField.setLabel(T_unknown_doi);
+
+
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_DOI){
+            textArticleDOI.addError("Invalid Identifier.");
+        }
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_NAME){
+            textArticleDOI.addError("No journal name.");
+        }
+
+
+    }
 
     private void addfieldsStatusAccepted(Item newItem, Request request, Manuscript manuscript) throws WingException {
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
         Text journalField = addJournalAuthorityControlled(optionsList, "prism_publicationName");
 	    journalField.setHelp(T_asterisk_explanation);
+        journalField.setLabel(T_SELECT_LABEL_NEW);
+
 
         if (manuscript!=null && manuscript.isAccepted()) {
             journalField.setValue(manuscript.getJournalName());
@@ -352,7 +354,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         journal.setChoices(fieldkey);
         journal.setChoicesPresentation(ConfigurationManager.getProperty("choices.presentation.prism.publicationName"));
         journal.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldkey));
-        journal.setLabel(T_SELECT_LABEL_NEW);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
             journal.addError(T_SELECT_ERROR);
 
