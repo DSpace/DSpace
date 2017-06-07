@@ -67,18 +67,18 @@ import java.util.*;
  */
 public class SolrUpgradeStatistics6
 {
-	private static final String INDEX_NAME_OPTION = "i";
-	private static final String NUMREC_OPTION = "n";
+        private static final String INDEX_NAME_OPTION = "i";
+        private static final String NUMREC_OPTION = "n";
         private static final String TYPE_OPTION = "t";
         private static final String HELP_OPTION = "h";
         private static final int NUMREC_DEFAULT = 10000;
         private static final String INDEX_DEFAULT = "statistics";
-	private static final Logger log = Logger.getLogger(SolrUpgradeStatistics6.class);
-	private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-	private HttpSolrServer server;
-	private int numRec = NUMREC_DEFAULT;
-	private int numProcessed = 0;
-	private enum FIELD{owningColl,owningComm,id,owningItem,scopeId;}
+        private static final Logger log = Logger.getLogger(SolrUpgradeStatistics6.class);
+        private ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        private HttpSolrServer server;
+        private int numRec = NUMREC_DEFAULT;
+        private int numProcessed = 0;
+        private enum FIELD{owningColl,owningComm,id,owningItem,scopeId;}
         private Context context;
         private Integer type;
         
@@ -87,51 +87,52 @@ public class SolrUpgradeStatistics6
         protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
         protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
 
-	protected SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+        protected SolrLoggerService solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
 
-	public SolrUpgradeStatistics6(String indexName, int numRec, Integer type) {
+        public SolrUpgradeStatistics6(String indexName, int numRec, Integer type) {
                 String serverPath = configurationService.getProperty("solr-statistics.server");
                 serverPath = serverPath.replaceAll("statistics$", indexName);
                 System.out.println("Connecting to " + serverPath);
                 server = new HttpSolrServer(serverPath);
                 this.numRec = numRec;
                 this.context = new Context();
+                this.context.setMode(Context.Mode.READ_ONLY);
                 this.type = type;
-	}
+        }
 
-	/**
-	 * Entry point for command-line invocation
-	 * @param args command-line arguments; see help for description
-	 * @throws ParseException if the command-line arguments cannot be parsed
-	 */
-	public static void main(String[] args) throws ParseException
-	{
-		CommandLineParser parser = new PosixParser();
-		Options options = makeOptions();
+        /**
+         * Entry point for command-line invocation
+         * @param args command-line arguments; see help for description
+         * @throws ParseException if the command-line arguments cannot be parsed
+         */
+        public static void main(String[] args) throws ParseException
+        {
+                CommandLineParser parser = new PosixParser();
+                Options options = makeOptions();
 
                 String indexName = INDEX_DEFAULT;
                 int numrec = NUMREC_DEFAULT;
                 Integer type = null;
-		try
-		{
-			CommandLine line = parser.parse(options, args);
-			if (line.hasOption(HELP_OPTION))
-			{
-				printHelpAndExit(options, 0);
-			}
+                try
+                {
+                        CommandLine line = parser.parse(options, args);
+                        if (line.hasOption(HELP_OPTION))
+                        {
+                                printHelpAndExit(options, 0);
+                        }
 
-			if (line.hasOption(INDEX_NAME_OPTION))
-			{
-			    indexName = line.getOptionValue(INDEX_NAME_OPTION, INDEX_DEFAULT);
-			}
-			else
-			{
-			    System.err.println("No index name provided, defaulting to : "+ INDEX_DEFAULT);
-			}
-			
+                        if (line.hasOption(INDEX_NAME_OPTION))
+                        {
+                            indexName = line.getOptionValue(INDEX_NAME_OPTION, INDEX_DEFAULT);
+                        }
+                        else
+                        {
+                            System.err.println("No index name provided, defaulting to : "+ INDEX_DEFAULT);
+                        }
+                        
                         if (line.hasOption(NUMREC_OPTION)) {
-			        numrec = Integer.parseInt(line.getOptionValue(NUMREC_OPTION,""+NUMREC_DEFAULT));
-			}
+                                numrec = Integer.parseInt(line.getOptionValue(NUMREC_OPTION,""+NUMREC_DEFAULT));
+                        }
                         if (line.hasOption(TYPE_OPTION)) {
                                 String s = null;
                                 try {
@@ -142,15 +143,15 @@ public class SolrUpgradeStatistics6
                                 }
                         }
 
-		}
-		catch (ParseException e)
-		{
-			System.err.println("Cannot read command options");
-			printHelpAndExit(options, 1);
-		}
-		
-		SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec, type);
-		try {
+                }
+                catch (ParseException e)
+                {
+                        System.err.println("Cannot read command options");
+                        printHelpAndExit(options, 1);
+                }
+                
+                SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec, type);
+                try {
                         upgradeStats.run();
                 } catch (SolrServerException e) {
                         log.error("Error querying stats", e);
@@ -159,26 +160,26 @@ public class SolrUpgradeStatistics6
                 } catch (IOException e) {
                         log.error("Error querying stats", e);
                 }
-	}
+        }
 
-	private void run() throws SolrServerException, SQLException, IOException {
-	        runReport();
-	        if (type != null) {
-	                run(type);
-	        } else {
-	                //process items first minimize the number of objects that will be loaded from hibernate at one time
-	                run(Constants.ITEM);
+        private void run() throws SolrServerException, SQLException, IOException {
+                runReport();
+                if (type != null) {
+                        run(type);
+                } else {
+                        //process items first minimize the number of objects that will be loaded from hibernate at one time
+                        run(Constants.ITEM);
                         //process any bitstrem objects that did not have a match on onwingItem
                         run(Constants.BITSTREAM);
                         //process collections
                         run(Constants.COLLECTION);
                         //process collections
                         run(Constants.COMMUNITY);
-	        }
-	        if (numProcessed > 0) {
+                }
+                if (numProcessed > 0) {
                         System.out.println("\n\t\t *** Num Processed: "+numProcessed+"\n");
-	                runReport();
-	        }
+                        runReport();
+                }
         }
 
         private void runReport() throws SolrServerException {
@@ -188,8 +189,8 @@ public class SolrUpgradeStatistics6
                 runReport(true);
                 System.out.println("=================================================================");
         }
-	private void runReport(boolean search) throws SolrServerException {
-	        String field = search ? "scopeId" : "id";
+        private void runReport(boolean search) throws SolrServerException {
+                String field = search ? "scopeId" : "id";
                 String query = String.format("NOT(%s:*-*)", field); 
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
@@ -217,9 +218,9 @@ public class SolrUpgradeStatistics6
                                 System.out.println(String.format("\t%s: %d", name, count.getCount()));
                         }
                 }
-	}
-	
-	
+        }
+        
+        
         private void run(int ptype) throws SolrServerException, SQLException, IOException {
                 String query = String.format("NOT(id:*-*) AND type:%d", ptype);
                 SolrQuery sQ = new SolrQuery();
@@ -245,51 +246,51 @@ public class SolrUpgradeStatistics6
                 }
         }
         
-	private void updateRecords(String query) throws SolrServerException, SQLException, IOException {
-	        SolrQuery sQ = new SolrQuery();
-	        sQ.setQuery(query);
-	        sQ.setRows(numRec - numProcessed);
-	        
-	        QueryResponse sr = server.query(sQ);
-	        SolrDocumentList sdl = sr.getResults();
-	        for(int i=0; i<sdl.size() && (numProcessed < numRec); i++) {
-	                SolrDocument sd = sdl.get(i);
-	                SolrInputDocument input = ClientUtils.toSolrInputDocument(sd);
-	                for(FIELD col: FIELD.values()) {
-	                        mapField(input, col);
-	                }
-	                server.add(input);
-	                ++numProcessed;
-	        }
-	        server.commit();
-	}
-	
+        private void updateRecords(String query) throws SolrServerException, SQLException, IOException {
+                SolrQuery sQ = new SolrQuery();
+                sQ.setQuery(query);
+                sQ.setRows(numRec - numProcessed);
+                
+                QueryResponse sr = server.query(sQ);
+                SolrDocumentList sdl = sr.getResults();
+                for(int i=0; i<sdl.size() && (numProcessed < numRec); i++) {
+                        SolrDocument sd = sdl.get(i);
+                        SolrInputDocument input = ClientUtils.toSolrInputDocument(sd);
+                        for(FIELD col: FIELD.values()) {
+                                mapField(input, col);
+                        }
+                        server.add(input);
+                        ++numProcessed;
+                }
+                server.commit();
+        }
+        
 
         private static Options makeOptions() {
-		Options options = new Options();
-		options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
-		options.addOption(INDEX_NAME_OPTION, "index-name", true,
-				                 "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
-		options.addOption(NUMREC_OPTION, "num-rec", true, "Number of records to update.");
+                Options options = new Options();
+                options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
+                options.addOption(INDEX_NAME_OPTION, "index-name", true,
+                                                 "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
+                options.addOption(NUMREC_OPTION, "num-rec", true, "Number of records to update.");
                 options.addOption(TYPE_OPTION, "type", true, "(4) Communities, (3) Collections, (2) Items (0) Bitstreams");
-		return options;
-	}
+                return options;
+        }
 
-	/**
-	 * A utility method to print out all available command-line options and exit given the specified code.
-	 *
-	 * @param options the supported options.
-	 * @param exitCode the exit code to use. The method will call System#exit(int) with the given code.
-	 */
-	private static void printHelpAndExit(Options options, int exitCode)
-	{
-		HelpFormatter myhelp = new HelpFormatter();
-		myhelp.printHelp(SolrUpgradeStatistics6.class.getSimpleName() + "\n", options);
-		System.out.println("\n\nCommand Defaults");
-		System.out.println("\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process]");
-		System.exit(exitCode);
-	}
-	
+        /**
+         * A utility method to print out all available command-line options and exit given the specified code.
+         *
+         * @param options the supported options.
+         * @param exitCode the exit code to use. The method will call System#exit(int) with the given code.
+         */
+        private static void printHelpAndExit(Options options, int exitCode)
+        {
+                HelpFormatter myhelp = new HelpFormatter();
+                myhelp.printHelp(SolrUpgradeStatistics6.class.getSimpleName() + "\n", options);
+                System.out.println("\n\nCommand Defaults");
+                System.out.println("\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process]");
+                System.exit(exitCode);
+        }
+        
         private void mapField(SolrInputDocument input, FIELD col) throws SQLException {
                 SolrInputField ifield = input.get(col.name());
                 if (ifield != null) {
@@ -330,9 +331,9 @@ public class SolrUpgradeStatistics6
                         }
                 }
         }
-	
-	private UUID mapId(FIELD col, int val) throws SQLException {
-	        
+        
+        private UUID mapId(FIELD col, int val) throws SQLException {
+                
                 if (col == FIELD.owningComm) {
                         Community comm = communityService.findByLegacyId(context, val);
                         return comm == null ? null : comm.getID();
