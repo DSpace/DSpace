@@ -28,7 +28,7 @@
 # DSpace installation directory.
 # This is the location where you want to install DSpace.
 # Windows note: Please remember to use forward slashes for all paths (e.g. C:/dspace)
-dspace.dir=/dspace
+dspace.dir = /dspace
 
 # DSpace host name - should match base URL.  Do not include port number
 dspace.hostname = localhost
@@ -47,7 +47,7 @@ dspace.ui = xmlui
 #dspace.url = ${dspace.baseUrl}/${dspace.ui}
 
 # Name of the site
-dspace.name = DSpace at My University
+dspace.name = The TAMU Digital Repository
 
 # Default language for metadata values
 #default.language = en_US
@@ -92,15 +92,15 @@ db.schema = public
 ## Connection pool parameters
 
 # Maximum number of DB connections in pool (default = 30)
-#db.maxconnections = 30
+db.maxconnections = 30
 
 # Maximum time to wait before giving up if all connections in pool are busy (milliseconds)
 # (default = 5000ms or 5 seconds)
-#db.maxwait = 5000
+db.maxwait = 5000
 
 # Maximum number of idle connections in pool (-1 = unlimited)
 # (default = -1, unlimited)
-#db.maxidle = -1
+db.maxidle = -1
 
 
 #######################
@@ -108,25 +108,25 @@ db.schema = public
 #######################
 
 # SMTP mail server (allows DSpace to send email notifications)
-#mail.server = smtp.example.com
+mail.server = smtp-relay.tamu.edu
 
 # SMTP mail server authentication username and password (if required)
-#mail.server.username = myusername
-#mail.server.password = mypassword
+mail.server.username =
+mail.server.password =
 
 # SMTP mail server alternate port (defaults to 25)
-#mail.server.port = 25
+mail.server.port = 25
 
 # From address for mail
 # All mail from the DSpace site will use this 'from' address
-#mail.from.address = dspace-noreply@myu.edu
+mail.from.address = noreply@library.tamu.edu
 
 # When feedback is submitted via the Feedback form, it is sent to this address
 # Currently limited to one recipient!
-#feedback.recipient = dspace-help@myu.edu
+feedback.recipient = digital@library.tamu.edu
 
 # General site administration (Webmaster) e-mail
-#mail.admin = dspace-help@myu.edu
+mail.admin = helpdesk@library.tamu.edu
 
 # Recipient for server errors and alerts (defaults to mail.admin)
 #alert.recipient = ${mail.admin}
@@ -143,7 +143,7 @@ db.schema = public
 #
 # Items in DSpace receive a unique URL, stored in dc.identifier.uri
 # after it is generated during the submission process.
-# 
+#
 # If you register with CNRI's handle service at http://www.handle.net/,
 # these links can be generated as permalinks using http://hdl.handle.net/
 # as canonical prefix. Please make sure to change handle.canonical.prefix
@@ -312,8 +312,8 @@ search.index.26 = department:thesis.degree.department
 # DC metadata field to hold the user-supplied embargo terms
 # DC metadata field to hold the user-supplied embargo terms
 embargo.field.terms = local.embargo.terms
- 
- 
+
+
 # DC metadata field to hold computed "lift date" of embargo
 # DC metadata field to hold computed "lift date" of embargo
 embargo.field.lift = local.embargo.lift
@@ -327,3 +327,5 @@ xmlui.mdbrowser.1969.1/97043.field = dc.relation.ispartof
 xmlui.mdbrowser.1969.1/97043.separator = ;
 xmlui.mdbrowser.1969.1/97043.reverse = true
 
+# Versioning Configurations: admin or submitter
+item.level.versioning = submitter
