@@ -216,15 +216,15 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(request.getParameter("article_doi") != null)
             textArticleDOI.setValue(request.getParameter("article_doi"));
 
-
         doi.addItem().addContent("OR");
 
-        Text cb = doi.addItem().addText("unknown_doi");
+        Text journalField = addJournalAuthorityControlled(doi.addItem().addComposite("unknown-doi-comp"), "unknown_doi");
+
         String pubName = request.getParameter("unknown_doi");
         if (pubName != null) {
-            cb.setValue(pubName);
+            journalField.setValue(pubName);
         }
-        cb.setHelp(T_unknown_doi);
+        journalField.setHelp(T_unknown_doi);
 
 
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_DOI){
@@ -285,7 +285,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private void addfieldsStatusAccepted(Item newItem, Request request, Manuscript manuscript) throws WingException {
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
-        Text journalField = addJournalAuthorityControlled(optionsList);
+        Text journalField = addJournalAuthorityControlled(optionsList, "prism_publicationName");
 	    journalField.setHelp(T_asterisk_explanation);
 
         if (manuscript!=null && manuscript.isAccepted()) {
@@ -345,8 +345,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private Text addJournalAuthorityControlled(Composite comp) throws WingException {
-        String fieldName = "prism_publicationName";
+    private Text addJournalAuthorityControlled(Composite comp, String fieldName) throws WingException {
         String fieldkey = MetadataField.formKey("prism", "publicationName", null);
         Text journal = comp.addText(fieldName);
         journal.setAuthorityControlled();
