@@ -212,7 +212,7 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     private String toQuery(String searchField, String text) {
-        return searchField + ":" + text.toLowerCase().replaceAll(":", "\\:") + "* or " + searchField + ":" + text.toLowerCase().replaceAll(":", "\\:");
+        return searchField + ":*" + text.toLowerCase().replaceAll(":", "\\:").replaceAll("\\s", "") + "*";
     }
 
     @Override
