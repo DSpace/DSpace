@@ -243,16 +243,15 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         String journal = null;
         if (journalConcept == null) {
             // did the user enter a journal?
-            journal = request.getParameter("prism_publicationName");
+            if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) {
+                journal = request.getParameter("prism_publicationName");
+            } else if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED) {
+                journal = request.getParameter("unknown_doi");
+            }
 
             // if not, look in the item's metadata, in case the journal name was loaded by a crosswalk.
             if (StringUtils.isBlank(journal) && journalMDV.length > 0) {
                 journal = journalMDV[0].value;
-            }
-
-            // then look in the unknown_doi parameter.
-            if (StringUtils.isBlank(journal)) {
-                journal = request.getParameter("unknown_doi");
             }
 
             // clean the name

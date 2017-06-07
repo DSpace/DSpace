@@ -16,6 +16,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
+import org.dspace.content.MetadataField;
 import org.dspace.content.authority.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -217,6 +218,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
         doi.addItem().addContent("OR");
+
         Text cb = doi.addItem().addText("unknown_doi");
         String pubName = request.getParameter("unknown_doi");
         if (pubName != null) {
@@ -283,7 +285,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private void addfieldsStatusAccepted(Item newItem, Request request, Manuscript manuscript) throws WingException {
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
-        Text journalField = addJournalAuthorityControlled("prism.publicationName", optionsList, "prism_publicationName");
+        Text journalField = addJournalAuthorityControlled(optionsList);
 	    journalField.setHelp(T_asterisk_explanation);
 
         if (manuscript!=null && manuscript.isAccepted()) {
@@ -343,8 +345,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private Text addJournalAuthorityControlled(String fieldkey, Composite comp, String fieldName) throws WingException {
-        fieldkey = config2fkey(fieldkey);
+    private Text addJournalAuthorityControlled(Composite comp) throws WingException {
+        String fieldName = "prism_publicationName";
+        String fieldkey = MetadataField.formKey("prism", "publicationName", null);
         Text journal = comp.addText(fieldName);
         journal.setAuthorityControlled();
         journal.setChoices(fieldkey);
@@ -357,25 +360,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         return journal;
 
     }
-
-
-    private static String config2fkey(String field) {
-        // field is expected to be "schema.element.qualifier"
-        int dot = field.indexOf('.');
-        if (dot < 0) {
-            return null;
-        }
-        String schema = field.substring(0, dot);
-        String element = field.substring(dot + 1);
-        String qualifier = null;
-        dot = element.indexOf('.');
-        if (dot >= 0) {
-            qualifier = element.substring(dot + 1);
-            element = element.substring(0, dot);
-        }
-        return MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
-    }
-
 
     private void addPublicationNumberIfSubmitExisting(List form, boolean submitExisting, boolean pubIdError, Collection pubColl) throws WingException, SQLException {
            if(submitExisting){
@@ -432,9 +416,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
     private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,Request request) throws WingException{
-
-        PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
-        java.util.List<String> countryArray = manager.getSortedCountry();
+        java.util.List<String> countryArray = PaymentSystemConfigurationManager.getSortedCountry();
         try{
 	org.dspace.app.xmlui.wing.element.Item countryItem = info.addItem("country-help","country-help");
 	countryItem.addContent(T_Country_head);
