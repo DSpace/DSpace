@@ -144,7 +144,10 @@
         }
 
         template = getSimpleFiltersTemplate();
-        html = template(DSpace.discovery);
+        html = template({
+            filters: DSpace.discovery.orig_filters,
+            i18n: DSpace.i18n.discovery
+        });
 
         unAssignSimpleFilterEventHandlers();
         $('#filters-overview-wrapper').remove();

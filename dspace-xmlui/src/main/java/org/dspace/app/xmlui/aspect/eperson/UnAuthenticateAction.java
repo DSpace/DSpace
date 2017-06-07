@@ -53,7 +53,10 @@ public class UnAuthenticateAction extends AbstractAction
      *            Cocoon's object model
      * @param source
      * @param parameters
+     * @return an empty Map.
+     * @throws java.lang.Exception passed through
      */
+    @Override
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
@@ -81,7 +84,7 @@ public class UnAuthenticateAction extends AbstractAction
 			
 		}
         else{
-        	httpResponse.sendRedirect(httpRequest.getContextPath());
+            httpResponse.sendRedirect(ConfigurationManager.getProperty("dspace.url"));
         }
         
         return new HashMap();

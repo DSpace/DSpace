@@ -7,18 +7,28 @@
  */
 package org.dspace.app.util;
 
-import java.sql.SQLException;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.handle.HandleManager;
+import org.jdom.Element;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import java.util.*;
 
 import org.apache.log4j.Logger;
@@ -33,6 +43,11 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.jdom.Element;
+
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Map.Entry;
+
 
 /**
  * Configuration and mapping for Google Scholar output metadata
@@ -122,6 +137,8 @@ public class GoogleMetadata
     private static final int ALL_FIELDS_IN_OPTION = 2;
 
     private static GoogleBitstreamComparator googleBitstreamComparator = null;
+
+    private Context ourContext;
 
     // Load configured fields from google-metadata.properties
     static
@@ -216,8 +233,15 @@ public class GoogleMetadata
         // Hold onto the item in case we need to refresh a stale parse
         this.item = item;
         itemURL = HandleManager.resolveToURL(context, item.getHandle());
+
         googleBitstreamComparator = new GoogleBitstreamComparator(context, googleScholarSettings);
+
+        ourContext=context;
+        EPerson currentUser = ourContext.getCurrentUser();
+        ourContext.setCurrentUser(null);
+
         parseItem();
+        ourContext.setCurrentUser(currentUser);
     }
 
     /**
@@ -1070,16 +1094,10 @@ public class GoogleMetadata
 			return false;
 		}
 		boolean result = false;
-		Context context = null;
 		try {
-			context = new Context();
-			result = AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ, true);
+            result = AuthorizeManager.authorizeActionBoolean(ourContext, bitstream, Constants.READ, true);
 		} catch (SQLException e) {
 			log.error("Cannot determine whether bitstream is public, assuming it isn't. bitstream_id=" + bitstream.getID(), e);
-		} finally {
-			if (context != null) {
-				context.abort();
-			}
 		}
 		return result;
 	}

@@ -284,7 +284,7 @@ public class ItemImport
             if (line.hasOption('z'))
             {
                 zip = true;
-                zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
+                zipfilename = line.getOptionValue('z');
             }
 
             //By default assume collections will be given on the command line
@@ -733,7 +733,7 @@ public class ItemImport
                 {
                     clist = mycollections;
                 }
-                addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
+                addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
                 System.out.println(i + " " + dircontents[i]);
                 c.clearCache();
             }

@@ -7,35 +7,20 @@
  */
 package org.dspace.storage.rdbms;
 
-import java.io.*;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.sql.*;
+import java.sql.Date;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Executes SQL queries.
@@ -340,7 +325,7 @@ public class DatabaseManager
         try
         {
             iterator = query(context, query, parameters);
-            retRow = (!iterator.hasNext()) ? null : iterator.next();
+            retRow = (!iterator.hasNext()) ? null : iterator.next(context);
         } catch (SQLException e) {
             log.error("SQL query single Error - ", e);
             throw e;
@@ -386,7 +371,7 @@ public class DatabaseManager
 
         try
         {
-            retRow = (!iterator.hasNext()) ? null : iterator.next();
+            retRow = (!iterator.hasNext()) ? null : iterator.next(context);
         } catch (SQLException e) {
             log.error("SQL query singleTable Error - ", e);
             throw e;
@@ -472,7 +457,7 @@ public class DatabaseManager
 
     {
         try {
-            TableRow row = new TableRow(canonicalize(table), getColumnNames(table));
+            TableRow row = new TableRow(canonicalize(table), getColumnNames(context,table));
             insert(context, row);
             return row;
         } catch (SQLException e) {
@@ -502,7 +487,7 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         try {
-            return findByUnique(context, ctable, getPrimaryKeyColumn(ctable),
+            return findByUnique(context, ctable, getPrimaryKeyColumn(context, ctable),
                     Integer.valueOf(id));
         } catch (SQLException e) {
             log.error("SQL find Error - ", e);
@@ -568,7 +553,7 @@ public class DatabaseManager
     {
         try {
             String ctable = canonicalize(table);
-            return deleteByValue(context, ctable, getPrimaryKeyColumn(ctable),
+            return deleteByValue(context, ctable, getPrimaryKeyColumn(context, ctable),
                     Integer.valueOf(id));
         } catch (SQLException e) {
             log.error("SQL delete Error - ", e);
@@ -688,6 +673,10 @@ public class DatabaseManager
      * @return The newly created row
      * @throws SQLException
      */
+    public static TableRow row(Context context, String table) throws SQLException
+    {
+        return new TableRow(canonicalize(table), getColumnNames(context, table));
+    }
     public static TableRow row(String table) throws SQLException
     {
         return new TableRow(canonicalize(table), getColumnNames(table));
@@ -715,7 +704,7 @@ public class DatabaseManager
             newID = doInsertGeneric(context, row);
         }
 
-        row.setColumn(getPrimaryKeyColumn(row), newID);
+        row.setColumn(getPrimaryKeyColumn(context, row), newID);
     }
 
     /**
@@ -738,8 +727,8 @@ public class DatabaseManager
                 .append(" set ");
 
         List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
-        ColumnInfo pk = getPrimaryKeyColumnInfo(table);
-        Collection<ColumnInfo> info = getColumnInfo(table);
+        ColumnInfo pk = getPrimaryKeyColumnInfo(context, table);
+        Collection<ColumnInfo> info = getColumnInfo(context, table);
 
         String separator = "";
         for (ColumnInfo col : info)
@@ -786,7 +775,7 @@ public class DatabaseManager
             throw new IllegalArgumentException("Row not associated with a table");
         }
 
-        String pk = getPrimaryKeyColumn(row);
+        String pk = getPrimaryKeyColumn(context, row);
 
         if (row.isColumnNull(pk))
         {
@@ -805,9 +794,9 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static Collection<ColumnInfo> getColumnInfo(String table) throws SQLException
+    static Collection<ColumnInfo> getColumnInfo(Context context, String table) throws SQLException
     {
-        Map<String, ColumnInfo> cinfo = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> cinfo = getColumnInfoInternal(context, table);
 
         return (cinfo == null) ? null : cinfo.values();
     }
@@ -823,12 +812,16 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static ColumnInfo getColumnInfo(String table, String column)
+    static ColumnInfo getColumnInfo(Context context, String table, String column)
             throws SQLException
     {
-        Map<String, ColumnInfo> info = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> info = getColumnInfoInternal(context, table);
 
         return (info == null) ? null : info.get(column);
+    }
+
+    static List<String> getColumnNames(String table) throws SQLException{
+        return getColumnNames(null,table);
     }
 
     /**
@@ -841,10 +834,10 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static List<String> getColumnNames(String table) throws SQLException
+    static List<String> getColumnNames(Context context, String table) throws SQLException
     {
         List<String> results = new ArrayList<String>();
-        Collection<ColumnInfo> info = getColumnInfo(table);
+        Collection<ColumnInfo> info = getColumnInfo(context, table);
 
         for (ColumnInfo col : info)
         {
@@ -911,9 +904,21 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
+    static TableRow process(Context context, ResultSet results, String table) throws SQLException
+    {
+        return process(context,results, table, null);
+    }
     static TableRow process(ResultSet results, String table) throws SQLException
     {
-        return process(results, table, null);
+        return process(null,results, table, null);
+    }
+
+    /**
+     * @deprecated You should try to pass an existing database connection to this method to prevent opening a new one.
+     */
+    @Deprecated
+    static TableRow process(ResultSet results, String table, List<String> pColumnNames) throws SQLException{
+        return process(null,results,table,pColumnNames);
     }
 
     /**
@@ -929,14 +934,14 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static TableRow process(ResultSet results, String table, List<String> pColumnNames) throws SQLException
+    static TableRow process(Context context, ResultSet results, String table, List<String> pColumnNames) throws SQLException
     {
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
         // If we haven't been passed the column names try to generate them from the metadata / table
         List<String> columnNames = pColumnNames != null ? pColumnNames :
-                                        ((table == null) ? getColumnNames(meta) : getColumnNames(table));
+                ((table == null) ? getColumnNames(meta) : getColumnNames(context,table));
 
         TableRow row = new TableRow(canonicalize(table), columnNames);
 
@@ -1059,9 +1064,9 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static String getPrimaryKeyColumn(TableRow row) throws SQLException
+    public static String getPrimaryKeyColumn(Context context,TableRow row) throws SQLException
     {
-        return getPrimaryKeyColumn(row.getTable());
+        return getPrimaryKeyColumn(context,row.getTable());
     }
 
     /**
@@ -1076,10 +1081,10 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    protected static String getPrimaryKeyColumn(String table)
+    protected static String getPrimaryKeyColumn(Context context, String table)
             throws SQLException
     {
-        ColumnInfo info = getPrimaryKeyColumnInfo(table);
+        ColumnInfo info = getPrimaryKeyColumnInfo(context, table);
 
         return (info == null) ? null : info.getName();
     }
@@ -1095,9 +1100,9 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static ColumnInfo getPrimaryKeyColumnInfo(String table) throws SQLException
+    static ColumnInfo getPrimaryKeyColumnInfo(Context context, String table) throws SQLException
     {
-        Collection<ColumnInfo> cinfo = getColumnInfo(canonicalize(table));
+        Collection<ColumnInfo> cinfo = getColumnInfo(context, canonicalize(table));
 
         for (ColumnInfo info : cinfo)
         {
@@ -1199,7 +1204,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static Map<String, ColumnInfo> getColumnInfoInternal(String table) throws SQLException
+    private static Map<String, ColumnInfo> getColumnInfoInternal(Context context, String table) throws SQLException
     {
         String ctable = canonicalize(table);
         Map<String, ColumnInfo> results = info.get(ctable);
@@ -1209,7 +1214,7 @@ public class DatabaseManager
             return results;
         }
 
-        results = retrieveColumnInfo(ctable);
+        results = retrieveColumnInfo(context, ctable);
         info.put(ctable, results);
 
         return results;
@@ -1226,7 +1231,7 @@ public class DatabaseManager
      *                If there is a problem retrieving information from the
      *                RDBMS.
      */
-    private static Map<String, ColumnInfo> retrieveColumnInfo(String table) throws SQLException
+    private static Map<String, ColumnInfo> retrieveColumnInfo(Context context, String table) throws SQLException
     {
         Connection connection = null;
         ResultSet pkcolumns = null;
@@ -1245,7 +1250,11 @@ public class DatabaseManager
                 log.warn("table: " + table);
             }
 
-            connection = getConnection();
+            if (context != null && !context.getDBConnection().isClosed()) {
+                connection = context.getDBConnection();
+            } else {
+                connection = getConnection();
+            }
 
             // Get current database schema name
             String schema = DatabaseUtils.getSchemaName(connection);
@@ -1297,7 +1306,7 @@ public class DatabaseManager
                 try { columns.close(); } catch (SQLException sqle) { }
             }
 
-            if (connection != null)
+            if (connection != null && context == null) // Only close if connection is newly created in this method
             {
                 try { connection.close(); } catch (SQLException sqle) { }
             }
@@ -1670,10 +1679,10 @@ public class DatabaseManager
     {
         String table = row.getTable();
 
-        Collection<ColumnInfo> info = getColumnInfo(table);
+        Collection<ColumnInfo> info = getColumnInfo(context, table);
         Collection<ColumnInfo> params = new ArrayList<ColumnInfo>();
 
-        String primaryKey = getPrimaryKeyColumn(table);
+        String primaryKey = getPrimaryKeyColumn(context, table);
         String sql = insertSQL.get(table);
 
         boolean firstColumn = true;
@@ -1709,7 +1718,7 @@ public class DatabaseManager
                 }
             }
 
-            sql = insertBuilder.append(valuesBuilder.toString()).append(") RETURNING ").append(getPrimaryKeyColumn(table)).toString();
+            sql = insertBuilder.append(valuesBuilder.toString()).append(") RETURNING ").append(getPrimaryKeyColumn(context, table)).toString();
             insertSQL.put(table, sql);
         }
         else
@@ -1824,8 +1833,8 @@ public class DatabaseManager
         }
 
         // Set the ID in the table row object
-        row.setColumn(getPrimaryKeyColumn(table), newID);
-        Collection<ColumnInfo> info = getColumnInfo(table);
+        row.setColumn(getPrimaryKeyColumn(context, table), newID);
+        Collection<ColumnInfo> info = getColumnInfo(context, table);
 
         String sql = insertSQL.get(table);
         if (sql == null)
