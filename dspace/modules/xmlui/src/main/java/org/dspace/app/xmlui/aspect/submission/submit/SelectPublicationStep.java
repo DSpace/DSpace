@@ -283,7 +283,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private void addfieldsStatusAccepted(Item newItem, Request request, Manuscript manuscript) throws WingException {
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
-        Text journalField = addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
+        Text journalField = addJournalAuthorityControlled("prism.publicationName", optionsList, "prism_publicationName");
 	    journalField.setHelp(T_asterisk_explanation);
 
         if (manuscript!=null && manuscript.isAccepted()) {
