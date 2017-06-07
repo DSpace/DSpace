@@ -119,7 +119,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 updateItemDOIMetadata((Item) dso, doi);
             }
         } catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while attempting to register doi", "Item id: " + dso.getID()));
+            log.error(LogManager.getHeader(context, "Error while attempting to register doi", "Item id: " + dso.getID()), e);
             throw new IdentifierException("Error while registering doi identifier", e);
         }
         return null;
@@ -134,8 +134,8 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 updateItemDOIMetadata(item, doi);
             }
         } catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while attempting to mint doi", "Item id: " + dso.getID()));
-            throw new IdentifierException("Error while retrieving doi identifier", e);
+            log.error(LogManager.getHeader(context, "Error while attempting to mint doi", "Item id: " + dso.getID()), e);
+            throw new IdentifierException("Error while minting doi", e);
         }
         return null;
     }
@@ -151,7 +151,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             mintDOIAtVersion(context, doiString, item, 1);
 
         }catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while attempting to addNewDOItoItem doi", "Item id: " + dso.getID()));
+            log.error(LogManager.getHeader(context, "Error while attempting to addNewDOItoItem doi", "Item id: " + dso.getID()), e);
             throw new IdentifierException("Error while moving doi identifier", e);
         }
     }
@@ -188,13 +188,13 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                 }
             }
         } catch (Exception e) {
-            log.error(LogManager.getHeader(context, "Error while deleting doi identifier", "Item id: " + dso.getID()));
+            log.error(LogManager.getHeader(context, "Error while deleting doi identifier", "Item id: " + dso.getID()), e);
             throw new IdentifierException("Error while deleting doi identifier", e);
         }
     }
 
 
-    private String mintAndRegister(Context context, Item item, boolean register) throws Exception {
+    private String mintAndRegister(Context context, Item item, boolean register) throws IdentifierException {
         String doi = getDoiValue(item);
         String collection = getCollection(context, item);
         VersionHistory history = retrieveVersionHistory(context, item);
@@ -212,7 +212,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
                         item.clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
                         item.update();
-                        if (doi == null || doi.equals("")) throw new Exception();
+                        if (doi == null || doi.equals("")) throw new IdentifierException("DOI is empty");
                     }
                 }
             }
