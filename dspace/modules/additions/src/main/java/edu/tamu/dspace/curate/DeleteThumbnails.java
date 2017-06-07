@@ -2,14 +2,18 @@ package edu.tamu.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Community;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Constants;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
@@ -29,6 +33,8 @@ public class DeleteThumbnails extends AbstractCurationTask {
     private String topHandle;
 
     private String topCurationType;
+    
+    private BundleService bundleService;
 
     @Override
     public void init(Curator curator, String taskId) throws IOException {
@@ -36,6 +42,9 @@ public class DeleteThumbnails extends AbstractCurationTask {
         result = Curator.CURATE_SUCCESS;
         sb = new StringBuilder();
         numberOfItemsToCurate = currentItemCount = currentImageCount = 0;
+        
+        bundleService = ContentServiceFactory.getInstance().getBundleService();
+
     }
 
     @Override
@@ -54,7 +63,7 @@ public class DeleteThumbnails extends AbstractCurationTask {
                 topHandle = community.getHandle();
                 try {
                     // count items of community to know when all have been curated to set results
-                    numberOfItemsToCurate = community.countItems();
+                    numberOfItemsToCurate = itemService.countItems(Curator.curationContext(),community);
                 } catch (SQLException e) {
                     sb.append("Failed to count items on community: " + topHandle + "\nAborting...");
                     result = Curator.CURATE_ERROR;
@@ -70,7 +79,7 @@ public class DeleteThumbnails extends AbstractCurationTask {
                 topHandle = collection.getHandle();
                 try {
                     // count items of collection to know when all have been curated to set results
-                    numberOfItemsToCurate = collection.countItems();
+                    numberOfItemsToCurate = itemService.countItems(Curator.curationContext(),collection);
                 } catch (SQLException e) {
                     sb.append("Failed to count items on collection: " + topHandle + "\nAborting...");
                     result = Curator.CURATE_ERROR;
@@ -88,14 +97,24 @@ public class DeleteThumbnails extends AbstractCurationTask {
             try {
                 int count = 0;
                 // remove bitstrams from all bundles and count them
-                for (Bundle bundle : item.getBundles("THUMBNAIL")) {
-                    for (Bitstream bitstream : bundle.getBitstreams()) {
-                        bundle.removeBitstream(bitstream);
-                        count++;
-                    }
-                    item.removeBundle(bundle);
+                
+                List<Bitstream> removableBitstreams = new ArrayList<Bitstream>();
+                Bundle removableBundle = null;
+                for (Bundle bundle : item.getBundles()) {
+                	if (bundle.getName().equals("THUMBNAIL")) {
+	                    for (Bitstream bitstream : bundle.getBitstreams()) {
+                        	removableBitstreams.add(bitstream);
+	                        count++;
+	                    }
+	                    removableBundle = bundle;
+	                    break;
+                	}
                 }
-                item.update();
+                for (Bitstream bitstream: removableBitstreams) {
+                	bundleService.removeBitstream(Curator.curationContext(), removableBundle, bitstream);
+                }
+                itemService.removeBundle(Curator.curationContext(), item, removableBundle);
+                itemService.update(Curator.curationContext(),item);
                 // accumulate images removed count
                 currentImageCount += count;
                 sb.append("Item: " + item.getHandle() + ": " + count + " images deleted.\n");
