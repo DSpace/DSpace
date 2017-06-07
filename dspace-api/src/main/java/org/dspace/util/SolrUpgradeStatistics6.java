@@ -78,7 +78,7 @@ public class SolrUpgradeStatistics6
 	private HttpSolrServer server;
 	private int numRec = NUMREC_DEFAULT;
 	private int numProcessed = 0;
-	private enum FIELD{owningColl,owningComm,id,owningItem;}
+	private enum FIELD{owningColl,owningComm,id,owningItem,scopeId;}
         private Context context;
         private Integer type;
         
@@ -165,39 +165,58 @@ public class SolrUpgradeStatistics6
 	        runReport();
 	        if (type != null) {
 	                run(type);
-	                System.out.println("\n\t\t *** Num Processed: "+numProcessed+"\n");
+	        } else {
+	                //process items first minimize the number of objects that will be loaded from hibernate at one time
+	                run(Constants.ITEM);
+                        //process any bitstrem objects that did not have a match on onwingItem
+                        run(Constants.BITSTREAM);
+                        //process collections
+                        run(Constants.COLLECTION);
+                        //process collections
+                        run(Constants.COMMUNITY);
+	        }
+	        if (numProcessed > 0) {
+                        System.out.println("\n\t\t *** Num Processed: "+numProcessed+"\n");
 	                runReport();
 	        }
-                System.out.println("Done!");
         }
 
-	private void runReport() throws SolrServerException {
-                String query = "NOT(id:*-*)";
+        private void runReport() throws SolrServerException {
+                System.out.println("=================================================================");
+                System.out.println("\t*** Statistics Records with Legacy Id ***");
+                runReport(false);
+                runReport(true);
+                System.out.println("=================================================================");
+        }
+	private void runReport(boolean search) throws SolrServerException {
+	        String field = search ? "scopeId" : "id";
+                String query = String.format("NOT(%s:*-*)", field); 
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
                 sQ.setFacet(true);
-                sQ.addFacetField("type");
+                sQ.addFacetField(search? "scopeType" : "type");
                 QueryResponse sr = server.query(sQ);
                 
-                System.out.println("=================================================================");
-                System.out.println("\t*** Statistics Records with Legacy Id ***");
                 for(FacetField ff: sr.getFacetFields()) {
                         for(FacetField.Count count: ff.getValues()) {
                                 String name = count.getName();
                                 int id = Integer.parseInt(name);
+                                String s = search ? "Search" : "View";
                                 if (id == Constants.COMMUNITY) {
-                                        name = "Community";
+                                        name = "Community " + s;
                                 } else if (id == Constants.COLLECTION) {
-                                        name = "Collection";
+                                        name = "Collection " + s;
                                 } else if (id == Constants.ITEM) {
-                                        name = "Item";
+                                        name = "Item " + s;
                                 } else if (id == Constants.BITSTREAM) {
-                                        name = "Bistream";
+                                        name = "Bistream " + s;
+                                } else if (id == Constants.SITE) {
+                                        //I have inconsistent values for this field
+                                        name = "Site "+ s + "(TBD)";
                                 } 
                                 System.out.println(String.format("\t%s: %d", name, count.getCount()));
                         }
                 }
-                System.out.println("=================================================================");
 	}
 	
 	
@@ -214,13 +233,13 @@ public class SolrUpgradeStatistics6
                         for(FacetField.Count count: ff.getValues()) {
                                 String id = count.getName();
                                 if (ptype == Constants.COMMUNITY) {
-                                        updateRecords(String.format("id:%s OR owningComm:%s", id, id));
+                                        updateRecords(String.format("id:%s OR owningComm:%s OR scopeId:%s", id, id, id));
                                 } else if (ptype == Constants.COLLECTION) {
-                                        updateRecords(String.format("id:%s OR owningColl:%s", id, id));
+                                        updateRecords(String.format("id:%s OR owningColl:%s OR scopeId:%s", id, id, id));
                                 } else if (ptype == Constants.ITEM) {
-                                        updateRecords(String.format("id:%s OR owningItem:%s", id, id));
+                                        updateRecords(String.format("id:%s OR owningItem:%s OR scopeId:%s", id, id, id));
                                 } else if (ptype == Constants.BITSTREAM) {
-                                        updateRecords(String.format("id:%s", id));
+                                        updateRecords(String.format("id:%s OR scopeId:%s", id, id));
                                 }
                         }
                 }
@@ -282,6 +301,12 @@ public class SolrUpgradeStatistics6
                                         UUID uuid = null;
                                         if (col == FIELD.id) {
                                                 Object otype = input.getFieldValue("type");
+                                                if (otype != null) {
+                                                        int type = Integer.parseInt(otype.toString());
+                                                        uuid = mapType(type, legacy);
+                                                }
+                                        } else if (col == FIELD.scopeId) {
+                                                Object otype = input.getFieldValue("scopeType");
                                                 if (otype != null) {
                                                         int type = Integer.parseInt(otype.toString());
                                                         uuid = mapType(type, legacy);
