@@ -35,8 +35,6 @@ public interface PaymentSystemService
 
     public ShoppingCart getShoppingCart(Context context, Integer transactionId) throws SQLException;
 
-    public ShoppingCart[] findAllShoppingCart(Context context, Integer itemId) throws SQLException,PaymentSystemException;
-
     public ShoppingCart getShoppingCartByItemId(Context context, Integer itemId) throws SQLException,PaymentSystemException;
 
     public Double calculateShoppingCartTotal(Context context, ShoppingCart transaction) throws SQLException;

@@ -15,6 +15,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -26,7 +27,6 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.paymentsystem.*;
-import org.dspace.utils.DSpace;
 
 
 
@@ -44,53 +44,40 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
     private static final Message T_submit_cancel =
             message("xmlui.general.cancel");
 
-    private static final Message T_title =
-            message("xmlui.property.EditShoppingcartForm.title");
-
     private static final Message T_trail =
             message("xmlui.property.EditShoppingcartForm.trail");
 
     private static final Message T_head1 =
             message("xmlui.property.EditShoppingcartForm.head1");
 
-    private static final Message T_currency_null =
-            message("xmlui.property.EditShoppingcartForm.currency_null");
-
     private static final Message T_country_null =
             message("xmlui.property.EditShoppingcartForm.country_null");
 
-    private static final Message T_head2 =
-            message("xmlui.property.EditShoppingcartForm.head2");
+    private static final Message T_item_title =
+            message("xmlui.property.EditShoppingcart.title");
 
-    /** Language string used: */
+    private static final Message T_depositor =
+            message("xmlui.property.EditShoppingcart.depositor");
 
-    private static final Message T_name =
-            message("xmlui.Shoppingcart.EditProfile.name");
+    private static final Message T_sponsor =
+            message("xmlui.property.EditShoppingcart.sponsor");
+    private static final Message T_voucher =
+            message("xmlui.property.EditShoppingcart.voucher");
+    private static final Message T_token =
+            message("xmlui.property.EditShoppingcart.token");
+    private static final Message T_transaction =
+            message("xmlui.property.EditShoppingcart.transaction");
+    private static final Message T_status =
+            message("xmlui.property.EditShoppingcart.status");
+    private static final Message T_total =
+            message("xmlui.property.EditShoppingcart.total");
+    private static final Message T_country =
+            message("xmlui.property.EditShoppingcart.country");
 
-    private static final Message T_name1 =
-            message("xmlui.Shoppingcart.EditProfile.name1");
-
-    private static final Message T_name2 =
-            message("xmlui.Shoppingcart.EditProfile.name2");
-
-    private static final Message T_name3 =
-            message("xmlui.Shoppingcart.EditProfile.name3");
-    private static final Message T_name4 =
-            message("xmlui.Shoppingcart.EditProfile.name4");
-    private static final Message T_name5 =
-            message("xmlui.Shoppingcart.EditProfile.name5");
-    private static final Message T_name6 =
-            message("xmlui.Shoppingcart.EditProfile.name6");
-    private static final Message T_name7 =
-            message("xmlui.Shoppingcart.EditProfile.name7");
-    private static final Message T_name8 =
-            message("xmlui.Shoppingcart.EditProfile.name8");
-
-    private static final Message T_name9 =
-            message("xmlui.Shoppingcart.EditProfile.name9");
-    private static final Message T_name11 =
-            message("xmlui.Shoppingcart.EditProfile.name11");
-
+    private static final Message T_basic_fee =
+            message("xmlui.property.EditShoppingcart.basic_fee");
+    private static final Message T_surcharge =
+            message("xmlui.property.EditShoppingcart.surcharge");
 
 
     private static final Message T_voucher_used =
@@ -102,7 +89,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
-        pageMeta.addMetadata("title").addContent(T_title);
+        pageMeta.addMetadata("title").addContent(T_item_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrailLink(contextPath + "/admin/shoppingcart",T_trail);
         pageMeta.addTrail().addContent(T_trail);
@@ -116,9 +103,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
-        Properties countries  = PaymentSystemConfigurationManager.getAllCountryProperty();
-        Properties currencies  = PaymentSystemConfigurationManager.getAllCurrencyProperty();
-        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        Properties countries = PaymentSystemConfigurationManager.getAllCountryProperty();
 
         // Get our parameters;
         int shoppingcartID = parameters.getParameterAsInteger("shoppingcart_id",-1);
@@ -142,93 +127,13 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         }
         Integer itemId = shoppingcart.getItem();
         org.dspace.content.Item item = org.dspace.content.Item.find(context, itemId);
-        String title = null;
 
-        try{
-            DCValue[] name = item.getDC("title", null, org.dspace.content.Item.ANY);
-            if(name==null||name.length==0)
-            {
-                title ="Untitled";
-            }
-            else
-            if(item==null)
-            {
-                title= "Item not found";
-            }
-            else
-            {
-                title = name[0].value;
-            }
-
-        }catch (Exception e)
-        {
-            title = "UnKnown";
-            System.out.println(e.getMessage());
-        }
-
-        String secureToken = shoppingcart.getSecureToken()==null? shoppingcart.getSecureToken(): "";
-        String transactionId = shoppingcart.getTransactionId()==null? shoppingcart.getTransactionId(): "";
-        String country =  shoppingcart.getCountry();
-        Integer depositorId = shoppingcart.getDepositor();
-        EPerson depositor = EPerson.find(context,depositorId);
-        String currency = shoppingcart.getCurrency();
-        String status = shoppingcart.getStatus();
-        Double total = shoppingcart.getTotal();
-        Integer voucherId = shoppingcart.getVoucher();
-        String voucherCode = "";
-        Voucher voucher = null;
-        if(voucherId!=null&&voucherId>0)
-        {
-            voucher = Voucher.findById(context,voucherId);
-            voucherCode = voucher.getCode();
-        }
-
-        if (StringUtils.isNotEmpty(request.getParameter("transactionId")))
-        {
-            transactionId = request.getParameter("transactionId");
-        }
-        if (StringUtils.isNotEmpty(request.getParameter("country")))
-        {
-            country = request.getParameter("country");
-        }
-
-        if (StringUtils.isNotEmpty(request.getParameter("currency")))
-        {
-            currency =  request.getParameter("currency");
-        }
-
-        if (StringUtils.isNotEmpty(request.getParameter("status")) )
-        {
-            status = request.getParameter("status");
-        }
-        if (StringUtils.isNotEmpty(request.getParameter("voucher")))
-        {
-           voucherCode = request.getParameter("voucher");
-
-        }
-
-        String basicFee = Double.toString(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
-        Double basicFee1 = shoppingcart.getBasicFee();
-        if(!basicFee1.equals(new Double(-1)))
-        {
-            basicFee = Double.toString(basicFee1);
-        }
-
-
-        String surCharge = "";
-        Double surCharge1 = shoppingcart.getSurcharge();
-        if(!surCharge1.equals(new Double(-1)))
-        {
-            surCharge = Double.toString(surCharge1);
-        }
-
-        if (StringUtils.isNotEmpty(request.getParameter("basicFee")))
-        {
+        String basicFee = Double.toString(shoppingcart.getBasicFee());
+        if (StringUtils.isNotEmpty(request.getParameter("basicFee"))) {
             basicFee = request.getParameter("basicFee");
-
         }
-        if (StringUtils.isNotEmpty(request.getParameter("surCharge")))
-        {
+        String surCharge = Double.toString(shoppingcart.getSurcharge());
+        if (StringUtils.isNotEmpty(request.getParameter("surCharge"))) {
             surCharge = request.getParameter("surCharge");
 
         }
@@ -241,10 +146,6 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             Para problem = edit.addPara();
             problem.addHighlight("bold").addContent(T_country_null);
         }
-        if (errors.contains("currency")) {
-            Para problem = edit.addPara();
-            problem.addHighlight("bold").addContent(T_currency_null);
-        }
         if (errors.contains("voucher_null")) {
             Para problem = edit.addPara();
             problem.addHighlight("bold").addContent(T_voucher_null);
@@ -254,65 +155,106 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             problem.addHighlight("bold").addContent(T_voucher_used);
         }
 
+        List identity = edit.addList("form", List.TYPE_FORM);
+        identity.setHead("Shopping cart " + shoppingcartID + " for item " + itemId);
 
-        List identity = edit.addList("form",List.TYPE_FORM);
-        identity.setHead(T_head2.parameterize(title));
-
-
-        identity.addLabel(T_name);
-        identity.addItem().addContent(title);
-        identity.addLabel(T_name1);
-        identity.addItem().addContent(depositor.getFullName());
-        identity.addLabel(T_name3);
-        if(secureToken!=null) {
-            identity.addItem().addContent(secureToken);
-        }
-        else {
-            identity.addItem().addContent("");
-        }
-        if (admin)
-        {
-            Text voucherField = identity.addItem().addText("voucher");
-            voucherField.setLabel(T_name2);
-            voucherField.setValue(voucherCode);
-
-            Text transactionIdField = identity.addItem().addText("transactionId");
-            transactionIdField.setLabel(T_name4);
-            transactionIdField.setValue(transactionId);
-
-            Select statusField = identity.addItem().addSelect("status");
-            statusField.setRequired();
-            statusField.setLabel(T_name5);
-            statusField.addOption(ShoppingCart.STATUS_COMPLETED,ShoppingCart.STATUS_COMPLETED);
-            statusField.addOption(ShoppingCart.STATUS_DENIlED,ShoppingCart.STATUS_DENIlED);
-            statusField.addOption(ShoppingCart.STATUS_OPEN,ShoppingCart.STATUS_OPEN);
-            statusField.addOption(ShoppingCart.STATUS_VERIFIED,ShoppingCart.STATUS_VERIFIED);
-            statusField.setOptionSelected(status);
-
-            Select currencyField = identity.addItem().addSelect("currency");
-            currencyField.setRequired();
-            currencyField.setLabel(T_name6);
-            for(String currencyTemp: currencies.stringPropertyNames())
-            {
-                if(currency.equals(currencyTemp))
-                {
-                    currencyField.addOption(true, currencyTemp, currencyTemp);
-                }
-                else
-                {
-                    currencyField.addOption(false, currencyTemp, currencyTemp);
+        String title = "";
+        try {
+            if (item == null) {
+                title = "Item not found";
+            } else {
+                DCValue[] name = item.getDC("title", null, org.dspace.content.Item.ANY);
+                if (name == null || name.length == 0) {
+                    title = "Untitled";
+                } else {
+                    title = name[0].value;
                 }
             }
-            currencyField.setOptionSelected(currency);
+        } catch (Exception e) {
+            title = "Unknown";
+            System.out.println(e.getMessage());
+        }
+        identity.addLabel(T_item_title);
+        identity.addItem().addContent(title);
+
+        String status = shoppingcart.getStatus();
+        if (StringUtils.isNotEmpty(request.getParameter("status"))) {
+            status = request.getParameter("status");
+        }
+
+        if (admin) {
+            Select statusField = identity.addItem().addSelect("status");
+            statusField.setRequired();
+            statusField.setLabel(T_status);
+            statusField.addOption(ShoppingCart.STATUS_COMPLETED, ShoppingCart.STATUS_COMPLETED);
+            statusField.addOption(ShoppingCart.STATUS_DENIED, ShoppingCart.STATUS_DENIED);
+            statusField.addOption(ShoppingCart.STATUS_OPEN, ShoppingCart.STATUS_OPEN);
+            statusField.addOption(ShoppingCart.STATUS_VERIFIED, ShoppingCart.STATUS_VERIFIED);
+            statusField.setOptionSelected(status);
+        } else {
+            identity.addLabel(T_status);
+            identity.addItem().addContent(status);
+        }
+        identity.addLabel("Order date");
+        if (shoppingcart.getOrderDate() != null)
+            identity.addItem().addContent(shoppingcart.getOrderDate().toString());
+        identity.addLabel("Payment date");
+        if (shoppingcart.getPaymentDate() != null)
+            identity.addItem().addContent(shoppingcart.getPaymentDate().toString());
+
+        // Options that cause user to not pay DPC:
+//        List summary = edit.addList("waiver", List.TYPE_FORM);
+        identity.setHead("Payment Waiver Information");
+
+        // Sponsor
+        DryadOrganizationConcept sponsorConcept = shoppingcart.getSponsoringOrganization(context);
+        String sponsorName = "";
+        String subscription = "none";
+        String sponsorConceptID = "";
+        String sponsorCustomerID = "";
+        if (sponsorConcept != null) {
+            sponsorName = sponsorConcept.getFullName();
+            subscription = sponsorConcept.getPaymentPlan();
+            if ("".equals(subscription)) {
+                subscription = "none";
+            }
+            sponsorConceptID = String.valueOf(sponsorConcept.getConceptID());
+            sponsorCustomerID = sponsorConcept.getCustomerID();
+        }
+
+        // Voucher
+        Integer voucherId = shoppingcart.getVoucher();
+        String voucherCode = "";
+        Voucher voucher = null;
+        if (voucherId != null && voucherId > 0) {
+            voucher = Voucher.findById(context, voucherId);
+            voucherCode = voucher.getCode();
+        }
+        if (StringUtils.isNotEmpty(request.getParameter("voucher"))) {
+            voucherCode = request.getParameter("voucher");
+        }
+
+        // Fee-waiver country
+        String country = shoppingcart.getCountry();
+        if (StringUtils.isNotEmpty(request.getParameter("country"))) {
+            country = request.getParameter("country");
+        }
+
+        if (admin) {
+            Text sponsorField = identity.addItem().addText("sponsor");
+            sponsorField.setLabel(T_sponsor);
+            sponsorField.setValue(voucherCode);
+
+            Text voucherField = identity.addItem().addText("voucher");
+            voucherField.setLabel(T_voucher);
+            voucherField.setValue(voucherCode);
 
             Select countryField = identity.addItem().addSelect("country");
             countryField.setRequired();
-            countryField.setLabel(T_name8);
-            countryField.addOption("","Select your country");
-            for(String countryTemp: countries.stringPropertyNames())
-            {
-                if(country!=null&&country.length()>0&&country.equals(countryTemp))
-                {
+            countryField.setLabel(T_country);
+            countryField.addOption("", "Select fee-waiver country");
+            for (String countryTemp : countries.stringPropertyNames()) {
+                if (country != null && country.length() > 0 && country.equals(countryTemp)) {
                     countryField.addOption(true, countryTemp, countryTemp);
                 }
                 else
@@ -321,45 +263,67 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
                 }
             }
             countryField.setOptionSelected(country);
-
-            identity.addLabel(T_name9);
-            identity.addItem().addText("basicFee").setValue(basicFee);
-            identity.addLabel(T_name11);
-            identity.addItem().addText("surCharge").setValue(surCharge);
-
-        }
-        else
-        {
-            identity.addLabel(T_name2);
-            identity.addItem().addContent(voucher.getCode());
-            identity.addLabel(T_name4);
-            identity.addItem().addContent(transactionId);
-            identity.addLabel(T_name5);
-            identity.addItem().addContent(status);
-            identity.addLabel(T_name6);
-            identity.addItem().addContent(currency);
-            identity.addLabel(T_name8);
+        } else {
+            identity.addLabel(T_voucher);
+            identity.addItem().addContent(voucherCode);
+            identity.addLabel(T_voucher);
+            identity.addItem().addContent(voucherCode);
+            identity.addLabel(T_country);
             identity.addItem().addContent(country);
+        }
 
-            identity.addLabel(T_name9);
+        // Options for if the depositor is paying the DPC:
+//        List summary = edit.addList("userPays", List.TYPE_FORM);
+        identity.setHead("Depositor Payment Information");
+        Integer depositorId = shoppingcart.getDepositor();
+        EPerson depositor = EPerson.find(context, depositorId);
+
+        Double total = shoppingcart.getTotal();
+
+        String secureToken = shoppingcart.getSecureToken() == null ? shoppingcart.getSecureToken() : "";
+        String transactionId = shoppingcart.getTransactionId() == null ? shoppingcart.getTransactionId() : "";
+        if (StringUtils.isNotEmpty(request.getParameter("transactionId"))) {
+            transactionId = request.getParameter("transactionId");
+        }
+
+        if (admin) {
+            identity.addLabel(T_depositor);
+            identity.addItem().addContent(depositor.getFullName());
+
+            Text transactionIdField = identity.addItem().addText("transactionId");
+            transactionIdField.setLabel(T_transaction);
+            transactionIdField.setValue(transactionId);
+
+            if (secureToken != null) {
+                identity.addLabel(T_token);
+                identity.addItem().addContent(secureToken);
+            }
+
+            identity.addLabel(T_basic_fee);
+            identity.addItem().addText("basicFee").setValue(basicFee);
+            identity.addLabel(T_surcharge);
+            identity.addItem().addText("surCharge").setValue(surCharge);
+        } else {
+            identity.addLabel(T_transaction);
+            identity.addItem().addContent(transactionId);
+            identity.addLabel(T_basic_fee);
             identity.addItem().addContent(basicFee);
-            identity.addLabel(T_name11);
+            identity.addLabel(T_surcharge);
             identity.addItem().addContent(surCharge);
         }
-        identity.addLabel("Order date");
-        if(shoppingcart.getOrderDate()!=null)
-            identity.addItem().addContent(shoppingcart.getOrderDate().toString());
-        identity.addLabel("Payment date");
-        if(shoppingcart.getPaymentDate()!=null)
-            identity.addItem().addContent(shoppingcart.getPaymentDate().toString());
-        identity.addLabel("Notes");
-        if(shoppingcart.getNote()!=null)
-            identity.addItem("note","note").addTextArea("note").setValue(shoppingcart.getNote());
-        else
-            identity.addItem("note","note").addTextArea("note");
-
-        identity.addLabel(T_name7);
+        identity.addLabel(T_total);
         identity.addItem().addContent(Double.toString(total));
+
+        // Final notes about the cart:
+//        List summary = edit.addList("cart", List.TYPE_FORM);
+        identity.setHead("Additional Information");
+
+        identity.addLabel("Notes");
+        if (shoppingcart.getNote() != null)
+            identity.addItem("note", "note").addTextArea("note").setValue(shoppingcart.getNote());
+        else
+            identity.addItem("note", "note").addTextArea("note");
+
         Item buttons = identity.addItem();
         buttons.addButton("submit_cancel").setValue(T_submit_cancel);
         if(admin)

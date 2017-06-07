@@ -41,13 +41,19 @@ public class OrganizationConceptResource {
 
             ResultSet resultSet = journalStorage.getResults(new StoragePath(), journalConceptList, status, resultParam, cursorParam);
 
-            URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.nextCursor).build();
-            URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.previousCursor).build();
-            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.firstCursor).build();
-            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.lastCursor).build();
+            URI firstLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getFirstCursor()).build();
+            URI lastLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor",resultSet.getLastCursor()).build();
             int total = resultSet.itemList.size();
-            Response response = Response.ok(journalConceptList).link(nextLink, "next").link(prevLink, "prev").link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total).build();
-            return response;
+            Response.ResponseBuilder responseBuilder = Response.ok(journalConceptList).link(firstLink, "first").link(lastLink, "last").header("X-Total-Count", total);
+            if (resultSet.getNextCursor() > 0) {
+                URI nextLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor", resultSet.getNextCursor()).build();
+                responseBuilder.link(nextLink, "next");
+            }
+            if (resultSet.getPreviousCursor() > 0) {
+                URI prevLink = uriInfo.getRequestUriBuilder().replaceQueryParam("cursor", resultSet.getPreviousCursor()).build();
+                responseBuilder.link(prevLink, "prev");
+            }
+            return responseBuilder.build();
         } catch (StorageException ex) {
             ErrorsResponse error = ResponseFactory.makeError(ex.getMessage(), "Unable to list journals", uriInfo, Status.INTERNAL_SERVER_ERROR.getStatusCode());
             return error.toResponse().build();

@@ -723,7 +723,7 @@ public class Manuscript {
         if (journalConcept.isAccepted()) {
             journalConfidence = Choices.CF_ACCEPTED;
         }
-        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL, journalConcept.getFullName(), journalConcept.getIdentifier(), journalConfidence);
+        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL, journalConcept.getFullName(), journalConcept.getIdentifier().toString(), journalConfidence);
         addSingleMetadataValueFromJournal(context, item, Manuscript.ISSN, journalConcept.getISSN());
 
         addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_VOLUME, this.getJournalVolume());
