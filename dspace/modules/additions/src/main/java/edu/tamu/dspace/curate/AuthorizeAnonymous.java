@@ -64,7 +64,7 @@ public class AuthorizeAnonymous extends AbstractCurationTask {
             removeReadPolicies(context, workingItem);
 
             // Generally, we want items themselves to be available for everyone to access, only restricting their actual content.
-            authorizeService.addPolicy(Curator.curationContext(), workingItem, Constants.READ, groupService.findByName(context, "Anonymous"));
+            authorizeService.addPolicy(context, workingItem, Constants.READ, groupService.findByName(context, "Anonymous"));
            
             for (Bundle bundle : workingItem.getBundles()) {
                 for (Bitstream bs : bundle.getBitstreams()) {
@@ -73,7 +73,7 @@ public class AuthorizeAnonymous extends AbstractCurationTask {
                 authorizeService.addPolicy(context, bundle, Constants.READ, groupService.findByName(context, "Anonymous"));
             }
 
-            itemService.update(Curator.curationContext(), workingItem);
+            itemService.update(context, workingItem);
             context.commit();
 
             sb.append(workingItem.getHandle() + " authorized for group \"Anonymous\"\n");
@@ -114,7 +114,7 @@ public class AuthorizeAnonymous extends AbstractCurationTask {
         // Delete only those policies that fall into our special groups
         for (ResourcePolicy readPolicy : allReadPolicies) {
             if (affectedGroups.contains(readPolicy.getGroup())) {
-				resourcePolicyService.delete(Curator.curationContext(), readPolicy);
+				resourcePolicyService.delete(c, readPolicy);
             }
         }
     }
