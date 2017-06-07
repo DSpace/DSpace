@@ -68,7 +68,7 @@
              DS-1382. Please, review them to see whether they apply
              to you before enabling versioning.
         -->
-        <!--<aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />-->
+        <aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />
         
         <!-- =====================
              Base Features/Aspects
