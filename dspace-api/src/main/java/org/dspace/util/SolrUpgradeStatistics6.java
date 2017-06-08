@@ -184,10 +184,10 @@ public class SolrUpgradeStatistics6
                 Options options = new Options();
                 options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
                 options.addOption(INDEX_NAME_OPTION, "index-name", true,
-                                                 "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
-                options.addOption(NUMREC_OPTION, "num-rec", true, "Total number of records to update (100,000).");
-                options.addOption(BATCH_OPTION, "batch-size", true, "Number of records to batch update to SOLR at one time (10,000).");
-                options.addOption(TYPE_OPTION, "type", true, "(4) Communities, (3) Collections, (2) Items (0) Bitstreams");
+                                                 "The names of the indexes to process. At least one is required (default=statistics)");
+                options.addOption(NUMREC_OPTION, "num-rec", true, "Total number of records to update (defaut=100,000).");
+                options.addOption(BATCH_OPTION, "batch-size", true, "Number of records to batch update to SOLR at one time (default=10,000).");
+                options.addOption(TYPE_OPTION, "type", true, "(4) Communities, (3) Collections, (2) Items (0) Bitstreams (default=all)");
                 return options;
         }
 
