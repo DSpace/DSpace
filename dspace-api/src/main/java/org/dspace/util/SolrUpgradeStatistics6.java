@@ -124,10 +124,15 @@ public class SolrUpgradeStatistics6
          * Refresh the DSpace Context object in order to periodically release objects from memory
          */
         public void refreshContext() {
+                if (context != null) {
+                        try {
+                                totalCache += numUncache + context.getCacheSize();
+                        } catch (SQLException e) {
+                        }
+                }
                 this.context = new Context(Context.Mode.READ_ONLY);
                 lastItem = null;
                 lastBitstream = null;
-                totalCache += numUncache;
                 numUncache = 0;
         }
         
@@ -174,7 +179,7 @@ public class SolrUpgradeStatistics6
          */
         public void printTime(String header, boolean fromStart) {
                 long dur = logTime(fromStart);
-                System.out.println(String.format("%s (%,d sec; DB cache: %,d)", header, dur / 1000, getCacheCounts(fromStart)));
+                System.out.println(String.format("%s (%,6d sec; DB cache: %,9d)", header, dur / 1000, getCacheCounts(fromStart)));
         }
 
         /*
@@ -299,7 +304,7 @@ public class SolrUpgradeStatistics6
                         run(Constants.COMMUNITY);
                 }
                 if (numProcessed > 0) {
-                        printTime("\n\t* Total Processed: "+numProcessed, true);
+                        printTime(String.format("\n\t* Total Processed: %,12d", numProcessed), true);
                         runReport();
                 }
         }
