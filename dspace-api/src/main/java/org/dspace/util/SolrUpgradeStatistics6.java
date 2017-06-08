@@ -72,6 +72,7 @@ public class SolrUpgradeStatistics6
         private int numRec = NUMREC_DEFAULT;
         private int batchSize = BATCH_DEFAULT;
         private int numProcessed = 0;
+        private long totalCache = 0;
         private long numUncache = 0;
         
         //Enum to identify the named SOLR statistics fields to update
@@ -126,13 +127,14 @@ public class SolrUpgradeStatistics6
                 this.context = new Context(Context.Mode.READ_ONLY);
                 lastItem = null;
                 lastBitstream = null;
+                totalCache += numUncache;
                 numUncache = 0;
         }
         
         /*
          * Compute the number of items that were cached by hibernate since the context was cleared.
          */
-        private long getCacheCounts() {
+        private long getCacheCounts(boolean fromStart) {
                 long count = 0;
                 try {
                         count = context.getCacheSize();
@@ -140,6 +142,9 @@ public class SolrUpgradeStatistics6
                         //no action
                 }
                 count += this.numUncache;
+                if (fromStart) {
+                        count += totalCache;
+                }
                 return count;
         }
         
@@ -169,7 +174,7 @@ public class SolrUpgradeStatistics6
          */
         public void printTime(String header, boolean fromStart) {
                 long dur = logTime(fromStart);
-                System.out.println(String.format("%s (%,d sec; DB cache: %,d)", header, dur / 1000, getCacheCounts()));
+                System.out.println(String.format("%s (%,d sec; DB cache: %,d)", header, dur / 1000, getCacheCounts(fromStart)));
         }
 
         /*
@@ -294,7 +299,7 @@ public class SolrUpgradeStatistics6
                         run(Constants.COMMUNITY);
                 }
                 if (numProcessed > 0) {
-                        printTime("\n\t\t *** Num Processed: "+numProcessed, true);
+                        printTime("\n\t* Total Processed: "+numProcessed, true);
                         runReport();
                 }
         }
@@ -303,6 +308,7 @@ public class SolrUpgradeStatistics6
          * Report on the existence of legacy id records within a shard
          */
         private void runReport() throws SolrServerException {
+                System.out.println();
                 System.out.println("=================================================================");
                 System.out.println("\t*** Statistics Records with Legacy Id ***\n");
                 int total = runReport(false);
@@ -310,6 +316,7 @@ public class SolrUpgradeStatistics6
                 System.out.println("\t--------------------------------------");
                 System.out.println(String.format("\t%,12d\t%s", total, "TOTAL"));
                 System.out.println("=================================================================");
+                System.out.println();
         }
         /*
          * Report on the existence of specific legacy id records within a shard
