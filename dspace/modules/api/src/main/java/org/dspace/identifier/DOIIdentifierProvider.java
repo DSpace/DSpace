@@ -195,51 +195,56 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
 
     private String mintAndRegister(Context context, Item item, boolean register) throws IdentifierException {
-        String doi = getDoiValue(item);
-        String collection = getCollection(context, item);
-        VersionHistory history = retrieveVersionHistory(context, item);
+        String doi = null;
+        
+        try {
+            doi = getDoiValue(item);
+            String collection = getCollection(context, item);
+            VersionHistory history = retrieveVersionHistory(context, item);
 
-        // CASE A: it is a versioned datafile and the user is modifying its content (adding or removing bitstream): upgrade version number.
-        if(item.isArchived()){
-            if(!collection.equals(myDataPkgColl)){
-                if(lookup(doi)!=null){
-                    log.debug("case A -- updating DOI info for versioned data file");
-                    DOI doi_= upgradeDOIDataFile(context, doi, item, history);
-                    if(doi_!=null){
-                        remove(doi);
-                        // Not checking for blackout here because item is already archived
-                        mint(doi_, register, createListMetadata(item));
-
-                        item.clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
-                        item.update();
-                        if (doi == null || doi.equals("")) throw new IdentifierException("DOI is empty");
+            // CASE A: it is a versioned datafile and the user is modifying its content (adding or removing bitstream): upgrade version number.
+            if(item.isArchived()){
+                if(!collection.equals(myDataPkgColl)){
+                    if(lookup(doi)!=null){
+                        log.debug("case A -- updating DOI info for versioned data file");
+                        DOI doi_= upgradeDOIDataFile(context, doi, item, history);
+                        if(doi_!=null){
+                            remove(doi);
+                            // Not checking for blackout here because item is already archived
+                            mint(doi_, register, createListMetadata(item));
+                            
+                            item.clearMetadata(identifierMetadata.schema, identifierMetadata.element, identifierMetadata.qualifier, null);
+                            item.update();
+                            if (doi == null || doi.equals("")) throw new IdentifierException("DOI is empty");
+                        }
                     }
                 }
             }
-        }
 
-        // CASE B: New Item or New version
-        // FIRST time a VERSION is created 2 identifiers will be minted  and the canonical will be updated to point to the newer URL:
-        //  - id.1-->old URL
-        //  - id.2-->new URL
-        //  - id(canonical)-- new URL
-        // Next times 1 identifier will be minted  and the canonical will be updated to point to the newer URL
-        //  - id.x-->new URL
-        //  - id(canonical)-- new URL
-        // If it is a new ITEM just 1 identifier will be minted
-
-        else{
-            DOI doi_ = calculateDOI(context, doi, item, history);
-
-            log.info("DOI just minted: " + doi_);
-
-            doi = doi_.toString();
-            if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
-                mint(doi_, myBlackoutURL, register, createListMetadata(item));
-            } else {
-                mint(doi_, register, createListMetadata(item));
+            // CASE B: New Item or New version
+            // FIRST time a VERSION is created 2 identifiers will be minted  and the canonical will be updated to point to the newer URL:
+            //  - id.1-->old URL
+            //  - id.2-->new URL
+            //  - id(canonical)-- new URL
+            // Next times 1 identifier will be minted  and the canonical will be updated to point to the newer URL
+            //  - id.x-->new URL
+            //  - id(canonical)-- new URL
+            // If it is a new ITEM just 1 identifier will be minted
+            
+            else {
+                DOI doi_ = calculateDOI(context, doi, item, history);
+                
+                log.info("DOI just minted: " + doi_);
+                
+                doi = doi_.toString();
+                if(DryadDOIRegistrationHelper.isDataPackageInPublicationBlackout(item)) {
+                    mint(doi_, myBlackoutURL, register, createListMetadata(item));
+                } else {
+                    mint(doi_, register, createListMetadata(item));
+                }
             }
-
+        } catch(Exception e) {
+            log.error("unable to mint and register DOI", e);
         }
         return doi;
     }
