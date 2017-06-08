@@ -63,7 +63,7 @@ public class SolrUpgradeStatistics6
         private static final String BATCH_OPTION = "b";
         private static final String TYPE_OPTION = "t";
         private static final String HELP_OPTION = "h";
-        private static final int    NUMREC_DEFAULT = 10000;
+        private static final int    NUMREC_DEFAULT = 100000;
         private static final int    BATCH_DEFAULT = 10000;
         private static final String INDEX_DEFAULT = "statistics";
         private Integer type;
@@ -185,8 +185,8 @@ public class SolrUpgradeStatistics6
                 options.addOption(HELP_OPTION, "help", false, "Get help on options for this command.");
                 options.addOption(INDEX_NAME_OPTION, "index-name", true,
                                                  "The names of the indexes to process. At least one is required. Available indexes are: authority, statistics.");
-                options.addOption(NUMREC_OPTION, "num-rec", true, "Number of records to update.");
-                options.addOption(BATCH_OPTION, "batch-size", true, "Number of records to update to SOLR at one time.");
+                options.addOption(NUMREC_OPTION, "num-rec", true, "Total number of records to update (100,000).");
+                options.addOption(BATCH_OPTION, "batch-size", true, "Number of records to batch update to SOLR at one time (10,000).");
                 options.addOption(TYPE_OPTION, "type", true, "(4) Communities, (3) Collections, (2) Items (0) Bitstreams");
                 return options;
         }
