@@ -424,6 +424,9 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     {
 
         MetadataField metadataField = metadataValue.getMetadataField();
+        if (metadataField == null) {
+        	return false;
+        }
         MetadataSchema metadataSchema = metadataField.getMetadataSchema();
         // We will attempt to disprove a match - if we can't we have a match
         if (!element.equals(Item.ANY) && !element.equals(metadataField.getElement()))
