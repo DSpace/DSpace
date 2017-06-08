@@ -320,6 +320,10 @@ public class CollectionsResource extends Resource
                                 headers, request, context);
                     }
                 }
+                else
+                {
+                    org.dspace.content.Item dspaceItemx = dspaceItems.next();
+                }
             }
 
             context.complete();
