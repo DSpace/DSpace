@@ -139,15 +139,15 @@ public class SupervisedItem extends WorkspaceItem
      */
     // FIXME: We should arrange this code to use the above getSupervisorGroups 
     // method by building the relevant info before passing the request.
-    public Group[] getSupervisorGroups()
+    public Group[] getSupervisorGroups(Context c)
         throws SQLException
     {
-        Context ourContext = null;
+    
         TableRowIterator tri = null;
         List<Group> groupList = new ArrayList<Group>();
         
         try {
-	        ourContext = new Context();
+	
 	        String query = "SELECT epersongroup.* " +
 	                       "FROM epersongroup, epersongroup2workspaceitem " +
 	                       "WHERE epersongroup2workspaceitem.workspace_item_id" +
@@ -155,14 +155,14 @@ public class SupervisedItem extends WorkspaceItem
 	                       " AND epersongroup2workspaceitem.eperson_group_id =" +
 	                       " epersongroup.eperson_group_id ";
 	        
-	        tri = DatabaseManager.queryTable(ourContext,
+	        tri = DatabaseManager.queryTable(c,
 	                                    "epersongroup",
 	                                    query, this.getID());
 
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
-                Group group = Group.find(ourContext,
+                Group group = Group.find(c,
                                     row.getIntColumn("eperson_group_id"));
 
                 groupList.add(group);
@@ -175,9 +175,7 @@ public class SupervisedItem extends WorkspaceItem
             {
                 tri.close();
             }
-            if (ourContext != null && ourContext.isValid()) {
-            	ourContext.abort();
-            }
+           
         }
         
         return groupList.toArray(new Group[groupList.size()]);

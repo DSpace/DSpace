@@ -14,6 +14,7 @@
    -    supervised  - An array of supervised items
    --%>
 
+<%@page import="org.dspace.app.webui.util.UIUtil"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
@@ -77,7 +78,7 @@
         Metadatum[] titleArray = supervisedItems[i].getItem().getDC("title", null, Item.ANY);
 //        String title = (titleArray.length > 0 ? titleArray[0].value : "Untitled");
         EPerson submitter = supervisedItems[i].getItem().getSubmitter();
-        Group[] supervisors = supervisedItems[i].getSupervisorGroups();
+        Group[] supervisors = supervisedItems[i].getSupervisorGroups(UIUtil.obtainContext(request));
 
         for (int j = 0; j < supervisors.length; j++)
         {
