@@ -124,10 +124,10 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
                             "(p.id = :eperson_id OR " +
                             "EXISTS ( " +
                                 "SELECT 1 FROM Group2GroupCache gc " +
-                                "JOIN gc.parent p " +
-                                "JOIN gc.child c " +
-                                "JOIN c.epeople cp " +
-                                "WHERE p.id = g.id AND cp.id = :eperson_id " +
+                                "JOIN gc.parent parent " +
+                                "JOIN gc.child child " +
+                                "JOIN child.epeople cp " +
+                                "WHERE parent.id = g.id AND cp.id = :eperson_id " +
                                 ") " +
                             ")");
 

@@ -8,6 +8,7 @@
 package org.dspace.eperson;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -165,48 +166,51 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public boolean isMember(Context context, EPerson ePerson, Group group)
             throws SQLException
     {
-        if (group == null)
-        {
+        if(group == null) {
             return false;
-        }
 
-        // special, everyone is member of the anonymous group
-        if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
+            // special, everyone is member of group 0 (anonymous)
+        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
             return true;
-        }
 
-        Boolean cachedGroupMembership = context.getCachedGroupMembership(group, ePerson);
-        if(cachedGroupMembership != null)
-        {
-            return cachedGroupMembership.booleanValue();
-        }
+        } else if(ePerson != null) {
 
-        // if we have special groups they may be set by IP authentication
-        // check special groups for anonymous users and if the user is currently
-        // logged in
-        if (CollectionUtils.isNotEmpty(context.getSpecialGroups())
-                && (ePerson == null || ePerson.equals(context.getCurrentUser())))
-        {
-            for (Group specialGroup : context.getSpecialGroups())
-            {
-                if (specialGroup.equals(group) || group2GroupCacheDAO.find(context, group, specialGroup) != null)
-                {
-                    context.cacheGroupMembership(group, ePerson, true);
-                    return true;
+            Boolean cachedGroupMembership = context.getCachedGroupMembership(group, ePerson);
+            if(cachedGroupMembership != null) {
+                return cachedGroupMembership.booleanValue();
+
+                //If there are special groups we need to fetch all relevant groups.
+                //Note that special groups are only available if the current user == the ePerson.
+            } else if(CollectionUtils.isNotEmpty(context.getSpecialGroups()) && isAuthenticatedUser(context, ePerson)) {
+                Set<Group> allMemberGroups = allMemberGroupsSet(context, ePerson);
+                boolean result = allMemberGroups.contains(group);
+
+                context.cacheGroupMembership(group, ePerson, result);
+                return result;
+            } else {
+                //lookup eperson in normal groups and subgroups
+                boolean result = epersonInGroup(context, group.getName(), ePerson);
+                context.cacheGroupMembership(group, ePerson, result);
+                return result;
+            }
+        } else if(isAuthenticatedUser(context, ePerson)) {
+            // Note that special groups are only available if the current user == the ePerson.
+            // Check also for anonymous users if IP authentication used
+            List<Group> specialGroups = context.getSpecialGroups();
+            if(CollectionUtils.isNotEmpty(specialGroups)) {
+                for(Group specialGroup : specialGroups){
+                    if (StringUtils.equals(specialGroup.getName(), group.getName())) {
+                        return true;
+                    }
                 }
             }
         }
 
-        // we checked all possible memberships for anonymous users
-        if (ePerson == null)
-        {
-            return false;
-        }
+        return false;
+    }
 
-        //lookup eperson in normal groups and subgroups
-        boolean result = epersonInGroup(context, group.getName(), ePerson);
-        context.cacheGroupMembership(group, ePerson, result);
-        return result;
+    private boolean isAuthenticatedUser(final Context context, final EPerson ePerson) {
+        return ObjectUtils.equals(context.getCurrentUser(), ePerson);
     }
 
     @Override
