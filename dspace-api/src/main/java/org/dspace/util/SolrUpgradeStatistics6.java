@@ -406,20 +406,25 @@ public class SolrUpgradeStatistics6
                 QueryResponse sr = server.query(sQ);
                 SolrDocumentList sdl = sr.getResults();
                 
+                List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
                 for(int i=0; i<sdl.size() && (numProcessed < numRec); i++) {
                         SolrDocument sd = sdl.get(i);
                         SolrInputDocument input = ClientUtils.toSolrInputDocument(sd);
                         for(FIELD col: FIELD.values()) {
                                 mapField(input, col);
                         }
-                        server.add(input);
+                        
+                        docs.add(input);
                         ++numProcessed;
                         if (numProcessed % batchSize == 0) {
+                                server.add(docs);
                                 server.commit();
+                                docs.clear();
                                 printTime(String.format("\t%,12d Processed...", numProcessed), false);
                                 refreshContext();
                         }
                 }
+                server.add(docs);
                 server.commit();
         }
         
