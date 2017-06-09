@@ -2368,6 +2368,8 @@
   <message key="xmlui.ChoiceLookupTransformer.lookup">Lookup</message>
 
   <!-- Choice Lookup - sample config for dc.publisher field -->
+  <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.help">Look up a Coverage.Spatial term from the Getty TGN Vocabulary</message>
+  <message key="xmlui.ChoiceLookupTransformer.field.dc_coverage_spatial.title">Project Coverage.Spatial</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.help">Name of Publisher</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_publisher.title">Look up Publisher</message>
   <!-- Params are: search-value -->
