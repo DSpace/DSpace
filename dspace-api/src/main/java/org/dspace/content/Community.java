@@ -15,6 +15,8 @@ import org.dspace.content.service.CommunityService;
 import org.dspace.core.*;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
@@ -48,13 +50,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "parent_comm_id") },
             inverseJoinColumns = {@JoinColumn(name = "child_comm_id") }
     )
-    private final List<Community> subCommunities = new ArrayList<>();
+    private Set<Community> subCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subCommunities")
-    private List<Community> parentCommunities = new ArrayList<>();
+    private Set<Community> parentCommunities = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "communities", cascade = {CascadeType.PERSIST})
-    private final List<Collection> collections = new ArrayList<>();
+    private Set<Collection> collections = new HashSet<>();
 
     @OneToOne
     @JoinColumn(name = "admin")
@@ -89,13 +91,13 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 
     void addSubCommunity(Community subCommunity)
     {
-        getSubcommunities().add(subCommunity);
+        subCommunities.add(subCommunity);
         setModified();
     }
 
     void removeSubCommunity(Community subCommunity)
     {
-        getSubcommunities().remove(subCommunity);
+        subCommunities.remove(subCommunity);
         setModified();
     }
 
@@ -144,18 +146,21 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Collection> getCollections()
     {
-        Collections.sort(collections, new NameAscendingComparator());
-        return collections;
+        // We return a copy because we do not want people to add elements to this collection directly.
+        // We return a list to maintain backwards compatibility
+        Collection[] output = collections.toArray(new Collection[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     void addCollection(Collection collection)
     {
-        getCollections().add(collection);
+        collections.add(collection);
     }
 
     void removeCollection(Collection collection)
     {
-        getCollections().remove(collection);
+        collections.remove(collection);
     }
 
     /**
@@ -167,8 +172,11 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Community> getSubcommunities()
     {
-        Collections.sort(subCommunities, new NameAscendingComparator());
-        return subCommunities;
+        // We return a copy because we do not want people to add elements to this collection directly.
+        // We return a list to maintain backwards compatibility
+        Community[] output = subCommunities.toArray(new Community[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     /**
@@ -179,17 +187,25 @@ public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Community> getParentCommunities()
     {
-        Collections.sort(parentCommunities, new NameAscendingComparator());
-        return parentCommunities;
+        // We return a copy because we do not want people to add elements to this collection directly.
+        // We return a list to maintain backwards compatibility
+        Community[] output = parentCommunities.toArray(new Community[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     void addParentCommunity(Community parentCommunity) {
-        getParentCommunities().add(parentCommunity);
+        parentCommunities.add(parentCommunity);
     }
 
     void clearParentCommunities(){
-        this.parentCommunities.clear();
-        this.parentCommunities = null;
+        parentCommunities.clear();
+    }
+
+    public void removeParentCommunity(Community parentCommunity)
+    {
+        parentCommunities.remove(parentCommunity);
+        setModified();
     }
 
     /**

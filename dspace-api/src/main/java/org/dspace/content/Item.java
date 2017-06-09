@@ -13,13 +13,12 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Class representing an item in DSpace.
@@ -80,7 +79,7 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
             joinColumns = {@JoinColumn(name = "item_id") },
             inverseJoinColumns = {@JoinColumn(name = "collection_id") }
     )
-    private final List<Collection> collections = new ArrayList<>();
+    private final Set<Collection> collections = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "items")
     private final List<Bundle> bundles = new ArrayList<>();
@@ -232,18 +231,25 @@ public class Item extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public List<Collection> getCollections()
     {
-        Collections.sort(collections, new NameAscendingComparator());
-        return collections;
+        // We return a copy because we do not want people to add elements to this collection directly.
+        // We return a list to maintain backwards compatibility
+        Collection[] output = collections.toArray(new Collection[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     void addCollection(Collection collection)
     {
-        getCollections().add(collection);
+        collections.add(collection);
     }
 
     void removeCollection(Collection collection)
     {
-        getCollections().remove(collection);
+        collections.remove(collection);
+    }
+
+    public void clearCollections(){
+        collections.clear();
     }
 
     public Collection getTemplateItemOf() {
