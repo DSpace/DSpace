@@ -112,7 +112,7 @@ public class AuthorizeServiceTest  extends AbstractUnitTest
             eperson1 = ePersonService.create(context);
             group1 = groupService.create(context);
             // A group has to have a name, otherwise there are queries that break
-            groupService.setName(group1, "My test group");
+            groupService.setName(group1, "My test group 2");
 
             // Use a top level community as DSpaceObject to test permissions
             dso = communityService.create(null, context);
