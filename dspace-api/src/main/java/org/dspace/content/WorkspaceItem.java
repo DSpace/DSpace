@@ -612,6 +612,9 @@ public class WorkspaceItem implements InProgressSubmission
         // Remove from cache
         ourContext.removeCached(this, getID());
 
+        // Need to delete the epersongroup2workspaceitem row first since it refers
+        // to workspaceitem ID        
+        deleteEpersonGroup2WorkspaceItem();
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         DatabaseManager.delete(ourContext, wiRow);
