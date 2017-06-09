@@ -329,10 +329,14 @@ public class GroupTest extends AbstractUnitTest {
     @Test
     public void isMemberGroup() throws SQLException
     {
-        assertTrue("isMemberGroup 1", groupService.isMember(topGroup, level1Group));
-        assertTrue("isMemberGroup 2", groupService.isMember(level1Group, level2Group));
-        assertFalse("isMemberGroup 3", groupService.isMember(level1Group, topGroup));
-        assertFalse("isMemberGroup 4", groupService.isMember(level2Group, level1Group));
+        assertTrue("isMemberGroup 1", groupService.isMember(context, topGroup, level1Group));
+        assertTrue("isMemberGroup 2", groupService.isMember(context, level1Group, level2Group));
+        assertFalse("isMemberGroup 3", groupService.isMember(context, level1Group, topGroup));
+        assertFalse("isMemberGroup 4", groupService.isMember(context, level2Group, level1Group));
+
+        //Also check ancestor relations
+        assertTrue("isMemberGroup 5", groupService.isMember(context, topGroup, level2Group));
+        assertFalse("isMemberGroup 6", groupService.isMember(context, level2Group, topGroup));
     }
 
     @Test
@@ -359,9 +363,9 @@ public class GroupTest extends AbstractUnitTest {
             ePerson = createEPersonAndAddToGroup("isMemberContext@dspace.org", level2Group);
 
             context.setCurrentUser(ePerson);
-            assertTrue(groupService.isMember(context, topGroup));
-            assertTrue(groupService.isMember(context, level1Group));
-            assertTrue(groupService.isMember(context, level2Group));
+            assertTrue(groupService.isMember(context, ePerson, topGroup));
+            assertTrue(groupService.isMember(context, ePerson, level1Group));
+            assertTrue(groupService.isMember(context, ePerson, level2Group));
         } finally {
             if(ePerson != null)
             {
@@ -377,15 +381,47 @@ public class GroupTest extends AbstractUnitTest {
         try {
             ePerson = createEPersonAndAddToGroup("isMemberContextGroupId@dspace.org", level2Group);
 
-            context.setCurrentUser(ePerson);
-            assertTrue(groupService.isMember(context, topGroup));
-            assertTrue(groupService.isMember(context, level1Group));
-            assertTrue(groupService.isMember(context, level2Group));
+            assertTrue(groupService.isMember(context, ePerson, topGroup.getName()));
+            assertTrue(groupService.isMember(context, ePerson, level1Group.getName()));
+            assertTrue(groupService.isMember(context, ePerson, level2Group.getName()));
         } finally {
             if(ePerson != null)
             {
                 context.turnOffAuthorisationSystem();
                 ePersonService.delete(context, ePerson);
+            }
+        }
+    }
+
+    @Test
+    public void isMemberContextSpecialGroup() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+        EPerson ePerson = null;
+        Group specialGroup = null;
+        try {
+            specialGroup = createGroup("specialGroup");
+            groupService.addMember(context, level1Group, specialGroup);
+            groupService.update(context, level1Group);
+
+            ePerson = createEPerson("isMemberContextGroupSpecial@dspace.org");
+
+            context.setCurrentUser(ePerson);
+            context.setSpecialGroup(specialGroup.getID());
+
+            assertTrue(groupService.isMember(context, topGroup));
+            assertTrue(groupService.isMember(context, level1Group));
+            assertFalse(groupService.isMember(context, level2Group));
+            assertTrue(groupService.isMember(context, specialGroup));
+
+        } finally {
+            if(ePerson != null)
+            {
+                context.turnOffAuthorisationSystem();
+                ePersonService.delete(context, ePerson);
+            }
+            if(specialGroup != null)
+            {
+                context.turnOffAuthorisationSystem();
+                groupService.delete(context, specialGroup);
             }
         }
     }
@@ -447,10 +483,11 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
-    public void removeMemberGroup() throws SQLException {
-        assertTrue(groupService.isMember(topGroup, level1Group));
+    public void removeMemberGroup() throws SQLException, AuthorizeException {
+        assertTrue(groupService.isMember(context, topGroup, level1Group));
         groupService.removeMember(context, topGroup, level1Group);
-        assertFalse(groupService.isMember(topGroup, level1Group));
+        groupService.update(context, topGroup);
+        assertFalse(groupService.isMember(context, topGroup, level1Group));
     }
 
     @Test
