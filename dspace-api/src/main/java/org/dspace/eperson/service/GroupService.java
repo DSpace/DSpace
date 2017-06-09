@@ -134,7 +134,8 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
     /**
      * fast check to see if an eperson is a member called with eperson id, does
      * database lookup without instantiating all of the epeople objects and is
-     * thus a static method
+     * thus a static method. This method uses context.getCurrentUser() as
+     * eperson whos membership should be checked.
      *
      * @param context
      *            context
@@ -144,6 +145,34 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @throws SQLException if database error
      */
     public boolean isMember(Context context, String groupName) throws SQLException;
+
+    /**
+     * fast check to see if an eperson is a member called with eperson id, does
+     * database lookup without instantiating all of the epeople objects and is
+     * thus a static method. The eperson whos membership should be checked must
+     * be defined as method attribute.
+     *
+     * @param context
+     *            context
+     * @param groupName
+     *            the name of the group to check
+     * @return true or false
+     * @throws SQLException if database error
+     */
+    public boolean isMember(Context context, EPerson epersonToCheck, String groupName) throws SQLException;
+    
+    /**
+     * fast check to see if an eperson is a member called with eperson id, does
+     * database lookup without instantiating all of the epeople objects and is
+     * thus a static method
+     *
+     * @param context DSpace context object.
+     * @param eperson EPerson whos membership should be checked.
+     * @param group The group to check against.
+     * @return true or false
+     * @throws SQLException if database error
+     */
+    public boolean isMember(Context context, EPerson eperson, Group group) throws SQLException;
 
     /**
      * Get all of the groups that an eperson is a member of.
