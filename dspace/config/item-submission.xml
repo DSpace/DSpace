@@ -281,6 +281,7 @@
     </step> 
 
       <!--Step 7 will be to Sign off on the License-->
+      <!--
       <step>
         <heading>submit.progressbar.license</heading>
         <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
@@ -288,7 +289,7 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
 		<workflow-editable>false</workflow-editable>
       </step>
-
+      -->
 
      
    </submission-process>
