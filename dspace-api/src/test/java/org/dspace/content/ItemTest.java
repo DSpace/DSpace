@@ -615,8 +615,18 @@ public class ItemTest extends AbstractDSpaceObjectTest
     @Test
     public void testGetCollections() throws Exception
     {
+        context.turnOffAuthorisationSystem();
+        Collection collection = collectionService.create(context, owningCommunity);
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection B");
+        it.addCollection(collection);
+        collection = collectionService.create(context, owningCommunity);
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection A");
+        it.addCollection(collection);
+        context.restoreAuthSystemState();
         assertThat("testGetCollections 0", it.getCollections(), notNullValue());
-        assertTrue("testGetCollections 1", it.getCollections().size() == 1);
+        assertTrue("testGetCollections 1", it.getCollections().size() == 3);
+        assertTrue("testGetCollections 2", it.getCollections().get(1).getName().equals("collection A"));
+        assertTrue("testGetCollections 3", it.getCollections().get(2).getName().equals("collection B"));
     }
 
     /**
