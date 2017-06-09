@@ -10,7 +10,7 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Error {0} DOI {3}
+Subject: VSim - Error {0} DOI {3}
 
 Date:    {1}
 
