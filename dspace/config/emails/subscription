@@ -4,9 +4,13 @@
 # Parameters: {0} is the details of the new collections and items
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace Subscription
+Subject: VSim - Subscription
 New items are available in the collections you have subscribed to:
 
 {0}
 
-DSpace
+The VSim Repository and Archive preserves academically generated 3D models for use in both formal and informal educational settings.
+For more information, visit https://vsim.library.ucla.edu/xmlui/
+Explore. Interact. Understand.
+
+VSim
