@@ -1054,9 +1054,7 @@ img.ds-authority-confidence.cf-blank {
 #or_divider
 {
     font-weight:bold;
-    border-top: 2px dotted #ccc;
-    border-bottom: 2px dotted #ccc;
-    padding: 3px 0 1px;
+    padding: 3px 5px 1px;
     text-align: center;
 }
 

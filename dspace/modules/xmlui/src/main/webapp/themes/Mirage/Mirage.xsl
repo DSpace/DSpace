@@ -849,8 +849,7 @@ data  <a xmlns:i18n="http://apache.org/cocoon/i18n/2.1" xmlns="http://di.tamu.ed
 
                         </td></tr>
                         <xsl:if test="@n='article_doi'">
-                            <tr><td id="or_divider"><xsl:text>OR</xsl:text>
-                            </td></tr>
+                            <tr><td id="or_divider"><i18n:text>xmlui.submit.publication.unknown_doi</i18n:text></td></tr>
                         </xsl:if>
 
                     </xsl:for-each>
