@@ -70,7 +70,7 @@
           <xsl:text>', '</xsl:text>
           <!-- Confidence Indicator's ID so lookup can frob it -->
           <xsl:value-of select="$confIndicator"/>
-          <xsl:text>', </xsl:text>
+          <xsl:text>', '</xsl:text>
           <!-- Collection ID for context -->
           <xsl:choose>
             <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']">
@@ -80,7 +80,7 @@
               <xsl:text>-1</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
-          <xsl:text>, </xsl:text>
+          <xsl:text>', </xsl:text>
           <!-- isName -->
           <xsl:value-of select="$isName"/>
           <xsl:text>, </xsl:text>
@@ -322,9 +322,9 @@
                     <xsl:value-of select="$confidenceIndicatorID"/>
                     <xsl:text>', confidenceName: '</xsl:text>
                     <xsl:value-of select="$confidenceName"/>
-                    <xsl:text>', collection: </xsl:text>
+                    <xsl:text>', collection: '</xsl:text>
                     <xsl:value-of select="$collectionID"/>
-                    <xsl:text>, contextPath: '</xsl:text>
+                    <xsl:text>', contextPath: '</xsl:text>
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>'});</xsl:text>
             <xsl:text>});</xsl:text>
