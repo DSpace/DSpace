@@ -81,7 +81,19 @@ public class SolrUpgradeStatistics6
 
         
         //Enum to identify the named SOLR statistics fields to update
-        private enum FIELD{owningColl,owningComm,id,owningItem,scopeId,epersonid;}
+        private enum FIELD{
+                id(true), 
+                scopeId(true), 
+                owningComm(true), 
+                owningColl(true), 
+                owningItem(true), 
+                epersonid(false);
+                
+                boolean search;
+                FIELD(boolean search) {
+                        this.search = search;
+                }
+        }
         
         //Logger
         private static final Logger log = Logger.getLogger(SolrUpgradeStatistics6.class);
@@ -210,6 +222,31 @@ public class SolrUpgradeStatistics6
         }
 
         /**
+         * A utility method to print out all available command-line options and exit given the specified code.
+         *
+         * @param options the supported options.
+         * @param exitCode the exit code to use. The method will call System#exit(int) with the given code.
+         */
+        private static void printHelpAndExit(Options options, int exitCode)
+        {
+                HelpFormatter myhelp = new HelpFormatter();
+                myhelp.printHelp(SolrUpgradeStatistics6.class.getSimpleName() + "\n", options);
+                System.out.println("\n\nCommand Defaults");
+                System.out.println("\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process] [-b num_rec_to_update_at_once]");
+                System.out.println("");
+                System.out.println("\tAfter upgrading to DSpace 6, this process should be run iteratively over every statistics shard ");
+                System.out.println("\t\tuntil there are no remaining records with legacy ids present.");
+                System.out.println("\t\tThis process can be run while the system is in use.");
+                System.out.println("");
+                System.out.println("\tIt will take 30-60 min to process 1,000,000 legacy records. ");
+                System.out.println("");
+                System.out.println("\tUse the -n option to manage the workload on your server. ");
+                System.out.println("\t\tTo process all records, set -n to 10000000 or to 100000000 (10M or 100M)");
+                System.out.println("\tIf possible, please allocate 2GB of memory to this process (e.g. -Xmx2000m)");
+                System.exit(exitCode);
+        }
+
+        /**
          * Entry point for command-line invocation
          * @param args command-line arguments; see help for description
          * @throws ParseException if the command-line arguments cannot be parsed
@@ -222,7 +259,6 @@ public class SolrUpgradeStatistics6
                 System.out.println(" * This process should be run iteratively over every statistics shard ");
                 System.out.println(" * until there are no remaining records with legacy ids present.");
                 System.out.println(" * This process can be run while the system is in use.");
-                System.out.println(" * It possible, run this tool with -Xmx2000m .");
                 System.out.println(" * It is likely to take 1 hour/1,000,000 legacy records to be udpated.");
                 System.out.println(" * -------------------------------------------------------------------");
 
@@ -282,6 +318,7 @@ public class SolrUpgradeStatistics6
                 }
         }
 
+        
         /*
          * Process records with a legacy id.
          * From the command line, the user may specify records of a specific type to update
@@ -302,19 +339,28 @@ public class SolrUpgradeStatistics6
                 runReport();
                 logTime(false);
                 if (type != null) {
-                        while(run(type) > 0){};
+                        for(FIELD field: FIELD.values()){                                
+                                while(run(field, type) > 0){};                                
+                        }
                 } else {
                         //process items first minimize the number of objects that will be loaded from hibernate at one time
-                        while(run(Constants.ITEM) > 0){};
+                        while(run(FIELD.id, Constants.ITEM) > 0){};
+                        while(run(FIELD.scopeId, Constants.ITEM) > 0){};
+                        while(run(FIELD.owningItem, Constants.ITEM) > 0){};
                         
                         //process any bitstrem objects that did not have a match on onwingItem
-                        while(run(Constants.BITSTREAM) > 0){};
-
-                        //process collections
-                        while(run(Constants.COLLECTION) > 0){};
+                        while(run(FIELD.id, Constants.BITSTREAM) > 0){};
+                        while(run(FIELD.scopeId, Constants.BITSTREAM) > 0){};
                         
-                        //process collections
-                        while(run(Constants.COMMUNITY) > 0){};
+                        //collections
+                        while(run(FIELD.id, Constants.COLLECTION) > 0){};
+                        while(run(FIELD.scopeId, Constants.COLLECTION) > 0){};
+                        while(run(FIELD.owningColl, Constants.COLLECTION) > 0){};
+                        
+                        //communities
+                        while(run(FIELD.id, Constants.COMMUNITY) > 0){};
+                        while(run(FIELD.scopeId, Constants.COMMUNITY) > 0){};
+                        while(run(FIELD.owningComm, Constants.COMMUNITY) > 0){};                        
                 }
 
                 refreshContext();
@@ -332,8 +378,7 @@ public class SolrUpgradeStatistics6
                 System.out.println();
                 System.out.println("=================================================================");
                 System.out.println("\t*** Statistics Records with Legacy Id ***\n");
-                int total = runReport(false);
-                total += runReport(true);
+                int total = runReportQuery();
                 System.out.println("\t--------------------------------------");
                 System.out.println(String.format("\t%,12d\t%s", total, "TOTAL"));
                 System.out.println("=================================================================");
@@ -341,23 +386,30 @@ public class SolrUpgradeStatistics6
         }
         /*
          * Report on the existence of specific legacy id records within a shard
-         * @param search If true, report on search scope records.  Otherwise report on view (browse) records
          */
-        private int runReport(boolean search) throws SolrServerException {
-                String field = search ? "scopeId" : "id";
-                String query = String.format("NOT(%s:*-*)", field); 
+        private int runReportQuery() throws SolrServerException {
+                StringBuilder sb = new StringBuilder();
+                for(FIELD field: FIELD.values()) {
+                        if (field.search) {
+                                if (sb.length() > 0) {
+                                        sb.append(" OR ");
+                                }
+                                sb.append(String.format("(%s:* AND NOT(%s:*-*))", field.name(), field.name()));
+                        }
+                }
                 SolrQuery sQ = new SolrQuery();
-                sQ.setQuery(query);
+                sQ.setQuery(sb.toString());
                 sQ.setFacet(true);
-                sQ.addFacetField(search? "scopeType" : "type");
+                sQ.addFacetField("type");
+                sQ.addFacetField("scopeType");
                 QueryResponse sr = server.query(sQ);
                 
                 int total = 0;
                 for(FacetField ff: sr.getFacetFields()) {
+                        String s = ff.getName().equals("type") ? "View" : "Search";
                         for(FacetField.Count count: ff.getValues()) {
                                 String name = count.getName();
                                 int id = Integer.parseInt(name);
-                                String s = search ? "Search" : "View";
                                 if (id == Constants.COMMUNITY) {
                                         name = "Community " + s;
                                 } else if (id == Constants.COLLECTION) {
@@ -379,29 +431,39 @@ public class SolrUpgradeStatistics6
         
         /*
          * Run queries for records of a specific type faceting by id to retrieve the most viewed records first.
+         * @param field Field to use for grouping records
          * @param ptype The type of object to query:Community, Collection, Item, Bitstream
          */
-        private int run(int ptype) throws SolrServerException, SQLException, IOException {
+        private int run(FIELD field, int ptype) throws SolrServerException, SQLException, IOException {
+                if (numProcessed >= numRec && field.search) {
+                        return 0;
+                }
                 int initNumProcessed = numProcessed;
-                String query = String.format("NOT(id:*-*) AND type:%d", ptype);
+                String query = String.format("%s:* AND NOT(%s:*-*) AND (type:%d OR scopeType:%d)", field.name(), field.name(), ptype, ptype);
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
                 sQ.setFacet(true);
-                sQ.addFacetField("id");
+                sQ.addFacetField(field.name());
                 sQ.setFacetMinCount(1);
                 QueryResponse sr = server.query(sQ);
                 
                 for(FacetField ff: sr.getFacetFields()) {
                         for(FacetField.Count count: ff.getValues()) {
                                 String id = count.getName();
-                                if (ptype == Constants.COMMUNITY) {
-                                        updateRecords(String.format("id:%s OR owningComm:%s OR scopeId:%s", id, id, id));
-                                } else if (ptype == Constants.COLLECTION) {
-                                        updateRecords(String.format("id:%s OR owningColl:%s OR scopeId:%s", id, id, id));
-                                } else if (ptype == Constants.ITEM) {
-                                        updateRecords(String.format("id:%s OR owningItem:%s OR scopeId:%s", id, id, id));
-                                } else if (ptype == Constants.BITSTREAM) {
-                                        updateRecords(String.format("id:%s OR scopeId:%s", id, id));
+                                
+                                //When querying on id or scopeId, find as many objects as possible that will re-use objects in cache
+                                if (field == FIELD.id || field == FIELD.scopeId) {
+                                        if (ptype == Constants.COMMUNITY) {
+                                                updateRecords(field, String.format("id:%s OR owningComm:%s OR scopeId:%s", id, id, id));
+                                        } else if (ptype == Constants.COLLECTION) {
+                                                updateRecords(field, String.format("id:%s OR owningColl:%s OR scopeId:%s", id, id, id));
+                                        } else if (ptype == Constants.ITEM) {
+                                                updateRecords(field, String.format("id:%s OR owningItem:%s OR scopeId:%s", id, id, id));
+                                        } else if (ptype == Constants.BITSTREAM) {
+                                                updateRecords(field, String.format("id:%s OR scopeId:%s", id, id));
+                                        }
+                                } else {
+                                        updateRecords(field, String.format("%s:%s", field.name(), id));
                                 }
                         }
                 }
@@ -411,17 +473,18 @@ public class SolrUpgradeStatistics6
         /*
          * Update records associated with a particular object id
          * @param query Query to retrieve all of the statistics records associated with a particular object
+         * @param field Field to use for grouping records
          * @return number of items processed.  0 indicates that no more work is available (or the max processed has been reached).
          */
-        private int updateRecords(String query) throws SolrServerException, SQLException, IOException {
+        private int updateRecords(FIELD field, String query) throws SolrServerException, SQLException, IOException {
                 int initNumProcessed = numProcessed;
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
-                sQ.setRows(numRec - numProcessed);
+                sQ.setRows(Math.min(numRec - numProcessed, batchSize));
                 
                 //Ensure that items are grouped by id
                 //Sort by id fails due to presense of id and string fields. The ord function seems to help
-                sQ.setSort("ord(id)", SolrQuery.ORDER.asc); 
+                sQ.setSort(String.format("ord(%s)", field.name()), SolrQuery.ORDER.asc); 
                 
                 QueryResponse sr = server.query(sQ);
                 SolrDocumentList sdl = sr.getResults();
@@ -444,22 +507,6 @@ public class SolrUpgradeStatistics6
                 return numProcessed - initNumProcessed;
         }
         
-
-
-        /**
-         * A utility method to print out all available command-line options and exit given the specified code.
-         *
-         * @param options the supported options.
-         * @param exitCode the exit code to use. The method will call System#exit(int) with the given code.
-         */
-        private static void printHelpAndExit(Options options, int exitCode)
-        {
-                HelpFormatter myhelp = new HelpFormatter();
-                myhelp.printHelp(SolrUpgradeStatistics6.class.getSimpleName() + "\n", options);
-                System.out.println("\n\nCommand Defaults");
-                System.out.println("\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process] [-b num_rec_to_update_at_once]");
-                System.exit(exitCode);
-        }
         
         /*
          * Map solr fields from legacy ids to UUIDs.
@@ -468,7 +515,6 @@ public class SolrUpgradeStatistics6
          * The scopeId field is interpreted by scopeType field.
          * 
          * In order to prevent the re-processing of items with an id that cannot be resolved, the suffix "-legacy" will be appended to any id fields that cannot be resolved.  
-         * A similar treatment could be added for the scopeId field, but it is not used in the query process to find legacy ids.
          * 
          * @param input The SOLR statistics document to be updated
          * @param col The SOLR field to update (if present)
@@ -510,7 +556,7 @@ public class SolrUpgradeStatistics6
                                         input.addField(col.name(), uuid.toString());
                                 }
                                 
-                        } else if (col == FIELD.id) {
+                        } else {
                                 input.removeField(col.name());
                                 //Prevent re-processing of a legacy id value if a database match cannot be found.
                                 String newVal = ifield.getValue().toString() + "-legacy";
