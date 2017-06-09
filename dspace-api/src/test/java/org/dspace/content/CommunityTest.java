@@ -8,22 +8,25 @@
 
 package org.dspace.content;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-
+import mockit.NonStrictExpectations;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
-import org.junit.*;
-import static org.junit.Assert.* ;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.*;
-import mockit.NonStrictExpectations;
+import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class Community
@@ -681,10 +684,20 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         assertThat("testGetCollections 0",c.getCollections(), notNullValue());
         assertTrue("testGetCollections 1", c.getCollections().size() == 0);
 
-        Collection result = collectionService.create(context, c);
-        assertThat("testGetCollections 2",c.getCollections(), notNullValue());
-        assertTrue("testGetCollections 3", c.getCollections().size() == 1);
-        assertThat("testGetCollections 4",c.getCollections().get(0), equalTo(result));
+        context.turnOffAuthorisationSystem();
+        Collection collection = collectionService.create(context, c);
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection B");
+        collection = collectionService.create(context, c);
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection C");
+        collection = collectionService.create(context, c);
+        collectionService.setMetadataSingleValue(context, collection, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "collection A");
+        //we need to commit the changes so we don't block the table for testing
+        context.restoreAuthSystemState();
+
+        //sorted
+        assertTrue("testGetCollections 2",c.getCollections().get(0).getName().equals("collection A"));
+        assertTrue("testGetCollections 3",c.getCollections().get(1).getName().equals("collection B"));
+        assertTrue("testGetCollections 4",c.getCollections().get(2).getName().equals("collection C"));
     }
 
     /**
@@ -707,11 +720,20 @@ public class CommunityTest extends AbstractDSpaceObjectTest
         assertThat("testGetSubcommunities 0",c.getSubcommunities(), notNullValue());
         assertTrue("testGetSubcommunities 1", c.getSubcommunities().size() == 0);
 
-        //community with parent
-        Community son = communityService.create(c, context);
-        assertThat("testGetSubcommunities 2",c.getSubcommunities(), notNullValue());
-        assertTrue("testGetSubcommunities 3", c.getSubcommunities().size() == 1);
-        assertThat("testGetSubcommunities 4", c.getSubcommunities().get(0), equalTo(son));
+        context.turnOffAuthorisationSystem();
+        Community community = communityService.create(c, context);
+        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "subcommunity B");
+        community = communityService.create(c, context);
+        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "subcommunity A");
+        community = communityService.create(c, context);
+        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "subcommunity C");
+        //we need to commit the changes so we don't block the table for testing
+        context.restoreAuthSystemState();
+
+        //get Subcommunities sorted
+        assertTrue("testGetCollections 2",c.getSubcommunities().get(0).getName().equals("subcommunity A"));
+        assertTrue("testGetCollections 3",c.getSubcommunities().get(1).getName().equals("subcommunity B"));
+        assertTrue("testGetCollections 4",c.getSubcommunities().get(2).getName().equals("subcommunity C"));
     }
 
     /**
