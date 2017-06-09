@@ -71,9 +71,14 @@ public class SolrUpgradeStatistics6
         //Counters to determine the number of items to process
         private int numRec = NUMREC_DEFAULT;
         private int batchSize = BATCH_DEFAULT;
+        
+        //Cache management
         private int numProcessed = 0;
         private long totalCache = 0;
         private long numUncache = 0;
+        private List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
+        private Context context;
+
         
         //Enum to identify the named SOLR statistics fields to update
         private enum FIELD{owningColl,owningComm,id,owningItem,scopeId,epersonid;}
@@ -88,7 +93,6 @@ public class SolrUpgradeStatistics6
         protected ItemService        itemService          = ContentServiceFactory.getInstance().getItemService();
         protected BitstreamService   bitstreamService     = ContentServiceFactory.getInstance().getBitstreamService();
         protected EPersonService     epersonService       = EPersonServiceFactory.getInstance().getEPersonService();
-        private Context context;
 
         // This code will operate on one shard at a time, therefore the SOLR web service will be accessed directly rather
         // than make use of the DSpace Solr Logger which only writes to the current shard
@@ -108,8 +112,10 @@ public class SolrUpgradeStatistics6
          * @param indexName name of the statistics shard to update
          * @param numRec    maximum number of records to process
          * @param type      object type to process (community, collection, item, bitstream)
+         * @throws IOException 
+         * @throws SolrServerException 
          */
-        public SolrUpgradeStatistics6(String indexName, int numRec, int batchSize, Integer type) {
+        public SolrUpgradeStatistics6(String indexName, int numRec, int batchSize, Integer type) throws SolrServerException, IOException {
                 String serverPath = configurationService.getProperty("solr-statistics.server");
                 serverPath = serverPath.replaceAll("statistics$", indexName);
                 System.out.println("Connecting to " + serverPath);
@@ -122,8 +128,15 @@ public class SolrUpgradeStatistics6
 
         /**
          * Refresh the DSpace Context object in order to periodically release objects from memory
+         * @throws IOException 
+         * @throws SolrServerException 
          */
-        public void refreshContext() {
+        public void refreshContext() throws SolrServerException, IOException {
+                if (docs.size() > 0) {
+                        server.add(docs);
+                        server.commit();
+                        docs.clear();
+                }
                 if (context != null) {
                         try {
                                 totalCache += numUncache + context.getCacheSize();
@@ -257,8 +270,8 @@ public class SolrUpgradeStatistics6
                         printHelpAndExit(options, 1);
                 }
                 
-                SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec, batchSize, type);
                 try {
+                        SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec, batchSize, type);
                         upgradeStats.run();
                 } catch (SolrServerException e) {
                         log.error("Error querying stats", e);
@@ -289,20 +302,23 @@ public class SolrUpgradeStatistics6
                 runReport();
                 logTime(false);
                 if (type != null) {
-                        run(type);
+                        while(run(type) > 0){};
                 } else {
                         //process items first minimize the number of objects that will be loaded from hibernate at one time
-                        run(Constants.ITEM);
+                        while(run(Constants.ITEM) > 0){};
                         
                         //process any bitstrem objects that did not have a match on onwingItem
-                        run(Constants.BITSTREAM);
+                        while(run(Constants.BITSTREAM) > 0){};
 
                         //process collections
-                        run(Constants.COLLECTION);
+                        while(run(Constants.COLLECTION) > 0){};
                         
                         //process collections
-                        run(Constants.COMMUNITY);
+                        while(run(Constants.COMMUNITY) > 0){};
                 }
+
+                refreshContext();
+                
                 if (numProcessed > 0) {
                         printTime(String.format("\n\t* Total Processed: %,12d", numProcessed), true);
                         runReport();
@@ -365,7 +381,8 @@ public class SolrUpgradeStatistics6
          * Run queries for records of a specific type faceting by id to retrieve the most viewed records first.
          * @param ptype The type of object to query:Community, Collection, Item, Bitstream
          */
-        private void run(int ptype) throws SolrServerException, SQLException, IOException {
+        private int run(int ptype) throws SolrServerException, SQLException, IOException {
+                int initNumProcessed = numProcessed;
                 String query = String.format("NOT(id:*-*) AND type:%d", ptype);
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
@@ -388,13 +405,16 @@ public class SolrUpgradeStatistics6
                                 }
                         }
                 }
+                return numProcessed - initNumProcessed;
         }
         
         /*
          * Update records associated with a particular object id
          * @param query Query to retrieve all of the statistics records associated with a particular object
+         * @return number of items processed.  0 indicates that no more work is available (or the max processed has been reached).
          */
-        private void updateRecords(String query) throws SolrServerException, SQLException, IOException {
+        private int updateRecords(String query) throws SolrServerException, SQLException, IOException {
+                int initNumProcessed = numProcessed;
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
                 sQ.setRows(numRec - numProcessed);
@@ -406,10 +426,10 @@ public class SolrUpgradeStatistics6
                 QueryResponse sr = server.query(sQ);
                 SolrDocumentList sdl = sr.getResults();
                 
-                List<SolrInputDocument> docs = new ArrayList<SolrInputDocument>();
                 for(int i=0; i<sdl.size() && (numProcessed < numRec); i++) {
                         SolrDocument sd = sdl.get(i);
                         SolrInputDocument input = ClientUtils.toSolrInputDocument(sd);
+                        input.remove("_version_");
                         for(FIELD col: FIELD.values()) {
                                 mapField(input, col);
                         }
@@ -417,15 +437,11 @@ public class SolrUpgradeStatistics6
                         docs.add(input);
                         ++numProcessed;
                         if (numProcessed % batchSize == 0) {
-                                server.add(docs);
-                                server.commit();
-                                docs.clear();
                                 printTime(String.format("\t%,12d Processed...", numProcessed), false);
                                 refreshContext();
                         }
                 }
-                server.add(docs);
-                server.commit();
+                return numProcessed - initNumProcessed;
         }
         
 
@@ -441,7 +457,7 @@ public class SolrUpgradeStatistics6
                 HelpFormatter myhelp = new HelpFormatter();
                 myhelp.printHelp(SolrUpgradeStatistics6.class.getSimpleName() + "\n", options);
                 System.out.println("\n\nCommand Defaults");
-                System.out.println("\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process]");
+                System.out.println("\tsolr-upgradeD6-statistics [-i statistics] [-n num_recs_to_process] [-b num_rec_to_update_at_once]");
                 System.exit(exitCode);
         }
         
