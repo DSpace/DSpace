@@ -544,7 +544,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	if (memberGroupIDs.contains(group.getID()))
         	{
         		// Check if they really members or just pending members
-				if (parent != null && groupService.isMember(parent, group))
+				if (parent != null && groupService.isMember(context, parent, group))
                 {
                     row.addCellContent(T_member);
                 }
@@ -652,7 +652,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         {
 			Group group = groupService.find(context,groupID);
         	boolean highlight = (group.getID().toString().equals(highlightGroupID));
-        	boolean pendingAddition = !groupService.isMember(parent, group);
+        	boolean pendingAddition = !groupService.isMember(context, parent, group);
         	boolean pendingRemoval = !memberGroupIDs.contains(groupID);
         	addMemberRow(table, group, highlight,pendingAddition,pendingRemoval);   
         	

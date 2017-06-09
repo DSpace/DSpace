@@ -28,6 +28,8 @@ public interface Group2GroupCacheDAO extends GenericDAO<Group2GroupCache> {
 
     public List<Group2GroupCache> findByChildren(Context context, Iterable<Group> groups) throws SQLException;
 
+    public Group2GroupCache findByParentAndChild(Context context, Group parent, Group child) throws SQLException;
+
     public Group2GroupCache find(Context context, Group parent, Group child) throws SQLException;
 
     public void deleteAll(Context context) throws SQLException;

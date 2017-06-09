@@ -115,7 +115,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @param childGroup child group
      * @return true or false
      */
-    public boolean isMember(Group owningGroup, Group childGroup);
+    public boolean isMember(Context context, Group owningGroup, Group childGroup) throws SQLException;
 
     /**
      * fast check to see if an eperson is a member called with eperson id, does

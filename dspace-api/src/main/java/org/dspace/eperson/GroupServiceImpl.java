@@ -7,6 +7,9 @@
  */
 package org.dspace.eperson;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -153,8 +157,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public boolean isMember(Group owningGroup, Group childGroup) {
-        return owningGroup.contains(childGroup);
+    public boolean isMember(Context context, Group owningGroup, Group childGroup) throws SQLException {
+        return group2GroupCacheDAO.findByParentAndChild(context, owningGroup, childGroup) != null;
     }
 
     @Override
@@ -173,40 +177,40 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
             return true;
 
-        } else if(ePerson != null) {
-
+        } else {
             Boolean cachedGroupMembership = context.getCachedGroupMembership(group, ePerson);
+
             if(cachedGroupMembership != null) {
                 return cachedGroupMembership.booleanValue();
 
-                //If there are special groups we need to fetch all relevant groups.
-                //Note that special groups are only available if the current user == the ePerson.
+                //If there are special groups we need to check direct membership or check if the
+                //special group is a subgroup of the provided group.
+                //Note that special groups should only be checked if the current user == the ePerson.
+                //This also works for anonymous users (ePerson == null) if IP authentication used
             } else if(CollectionUtils.isNotEmpty(context.getSpecialGroups()) && isAuthenticatedUser(context, ePerson)) {
-                Set<Group> allMemberGroups = allMemberGroupsSet(context, ePerson);
-                boolean result = allMemberGroups.contains(group);
+                boolean isMember = false;
+                Iterator<Group> it = context.getSpecialGroups().iterator();
 
-                context.cacheGroupMembership(group, ePerson, result);
-                return result;
-            } else {
-                //lookup eperson in normal groups and subgroups
-                boolean result = epersonInGroup(context, group.getName(), ePerson);
-                context.cacheGroupMembership(group, ePerson, result);
-                return result;
-            }
-        } else if(isAuthenticatedUser(context, ePerson)) {
-            // Note that special groups are only available if the current user == the ePerson.
-            // Check also for anonymous users if IP authentication used
-            List<Group> specialGroups = context.getSpecialGroups();
-            if(CollectionUtils.isNotEmpty(specialGroups)) {
-                for(Group specialGroup : specialGroups){
-                    if (StringUtils.equals(specialGroup.getName(), group.getName())) {
-                        return true;
+                while (it.hasNext() && !isMember) {
+                    Group specialGroup =  it.next();
+                    if (specialGroup.equals(group) || isMember(context, group, specialGroup)) {
+                        isMember = true;
                     }
                 }
-            }
-        }
 
-        return false;
+                context.cacheGroupMembership(group, ePerson, isMember);
+                return isMember;
+
+            } else if(ePerson != null){
+                //lookup eperson in normal groups and subgroups with 1 query
+                boolean result = epersonInGroup(context, group.getName(), ePerson);
+
+                context.cacheGroupMembership(group, ePerson, result);
+                return result;
+            }
+
+            return false;
+        }
     }
 
     private boolean isAuthenticatedUser(final Context context, final EPerson ePerson) {
