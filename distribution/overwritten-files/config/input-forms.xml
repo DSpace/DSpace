@@ -52,7 +52,7 @@
 					<label>Tipo de documento (*)</label>
 					<input-type value-pairs-name="common_types">dropdown</input-type>
 					<hint>Seleccione el Tipo de Documento que desea cargar</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 				</field>
 
 				<!-- 
@@ -211,8 +211,9 @@
 					<label>Autor (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+                                        <!-- TODO Buscar solución a esto, ya que no se permite multiples required-on-group -->
 					<required-on-group>!SeDiCIAdmin</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 				<field> <!-- Ok -->	<!-- Duplicado para Red de Museos -->
@@ -244,7 +245,7 @@
 					<label>Título (*)</label>
 					<input-type>textarea</input-type>
 					<hint>El título principal de la obra </hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 					<i18n>true</i18n>
 				</field>
 
@@ -428,7 +429,7 @@
 					<label>Entidad de origen (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Institución donde el documento fue creado</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 				</field>
 			<!-- Abstract -->
 				<field>
@@ -452,7 +453,7 @@
 					<input-type>textarea</input-type>
 					<hint>Resumen de la obra</hint>
 					<i18n>true</i18n>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 					<type-bind>Tesis</type-bind>
 				</field>
 
@@ -632,7 +633,7 @@
 					<label>ISBN</label>
 					<input-type>onebox</input-type>
 					<hint>El código ISBN correspondiente al libro</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 					<type-bind>Libro</type-bind>
 				</field>
 
@@ -750,7 +751,7 @@
 					<input-type>textarea</input-type>
 					<hint>Nombre del congreso o conferencia en el que este objeto fue presentado</hint>
 					<type-bind>Objeto de conferencia</type-bind>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 				</field>
 
 				<!-- Nombre del evento (Opcional para articulos y Publicacion Seriada) -->
@@ -821,7 +822,7 @@
 					<label>Grado alcanzado (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Grado al que el tesista accede</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 					<type-bind>Tesis</type-bind>
 				</field>
 
@@ -833,7 +834,7 @@
 					<label>Institución garante (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Institución que otorga el título</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 					<type-bind>Tesis</type-bind>
 				</field>
 
@@ -1054,8 +1055,8 @@
 					<label>Autor (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
 					<required-on-group>!SeDiCIAdmin</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 				</field>
 				
 				<!-- Director de tesis -->
@@ -1087,7 +1088,7 @@
 					<label>Fecha de presentación (*)</label>
 					<input-type>date</input-type>
 					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 				</field>
 				
 				<!-- Nro de Acta - TESIS (opcional) -->
@@ -1097,7 +1098,7 @@
 					<label>Nro de acta (*)</label>
 					<input-type>onebox</input-type>
 					<hint>Número de acta de aprobación de la Tesis</hint>
-					<required-on-group>Bibliotecarios</required-on-group>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 				</field>			
 				
 			</page>
