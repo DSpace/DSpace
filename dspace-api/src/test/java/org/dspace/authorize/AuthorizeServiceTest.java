@@ -20,12 +20,9 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 /**
@@ -60,6 +57,8 @@ public class AuthorizeServiceTest  extends AbstractUnitTest
             eperson2 = ePersonService.create(context);
             // create a group as the bug described in DS-3572 contains a wrong group membership check
             group = groupService.create(context);
+            // A group has to have a name, otherwise there are queries that break
+            groupService.setName(group, "My test group");
             // add eperson1 to the group.
             groupService.addMember(context, group, eperson1);
             groupService.update(context, group);
@@ -112,6 +111,8 @@ public class AuthorizeServiceTest  extends AbstractUnitTest
             // create an eperson and a group
             eperson1 = ePersonService.create(context);
             group1 = groupService.create(context);
+            // A group has to have a name, otherwise there are queries that break
+            groupService.setName(group1, "My test group");
 
             // Use a top level community as DSpaceObject to test permissions
             dso = communityService.create(null, context);
