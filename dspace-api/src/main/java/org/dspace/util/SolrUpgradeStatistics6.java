@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -146,7 +147,7 @@ public class SolrUpgradeStatistics6
         public void refreshContext() throws SolrServerException, IOException {
                 if (docs.size() > 0) {
                         server.add(docs);
-                        server.commit();
+                        server.commit(true, true, true);
                         docs.clear();
                 }
                 if (context != null) {
@@ -204,7 +205,7 @@ public class SolrUpgradeStatistics6
          */
         public void printTime(String header, boolean fromStart) {
                 long dur = logTime(fromStart);
-                System.out.println(String.format("%s (%,6d sec; DB cache: %,9d)", header, dur / 1000, getCacheCounts(fromStart)));
+                System.out.println(String.format("%s (%,6d sec; DB cache: %,6d; Docs: %,6d)", header, dur / 1000, getCacheCounts(fromStart), docs.size()));
         }
 
         /*
@@ -363,10 +364,10 @@ public class SolrUpgradeStatistics6
                         while(run(FIELD.owningComm, Constants.COMMUNITY) > 0){};                        
                 }
 
+                printTime(String.format("\t%,12d Processed...", numProcessed), false);
                 refreshContext();
                 
                 if (numProcessed > 0) {
-                        printTime(String.format("\n\t* Total Processed: %,12d", numProcessed), true);
                         runReport();
                 }
         }
@@ -467,6 +468,8 @@ public class SolrUpgradeStatistics6
                                 }
                         }
                 }
+                printTime(String.format("\t%,12d Processed...", numProcessed), false);
+                refreshContext();
                 return numProcessed - initNumProcessed;
         }
         
@@ -523,7 +526,7 @@ public class SolrUpgradeStatistics6
                 SolrInputField ifield = input.get(col.name());
                 if (ifield != null) {
                         Collection<Object> vals = ifield.getValues();
-                        ArrayList<UUID> newvals = new ArrayList<>();
+                        ArrayList<String> newvals = new ArrayList<>();
                         for(Object oval: vals) {
                                 try {
                                         int legacy = Integer.parseInt(oval.toString());
@@ -544,7 +547,13 @@ public class SolrUpgradeStatistics6
                                                 uuid = mapId(col, legacy);
                                         }
                                         if (uuid != null) {
-                                                newvals.add(uuid);
+                                                newvals.add(uuid.toString());
+                                        } else if (col.search) {
+                                                //Prevent re-processing of a legacy id value if a database match cannot be found.
+                                                newvals.add(String.format("%d-legacy", legacy));
+                                        } else {
+                                                //reformatting of the epersonid seemed to trigger silent update failures (with log warnings)
+                                                newvals.add(String.format("%d", -legacy));
                                         }
                                 } catch (NumberFormatException e) {
                                         log.warn("Non numeric legacy id "+ col.name() +":" + oval.toString());
@@ -552,15 +561,10 @@ public class SolrUpgradeStatistics6
                         }
                         if (newvals.size() > 0) {
                                 input.removeField(col.name());
-                                for(UUID uuid: newvals) {
-                                        input.addField(col.name(), uuid.toString());
+                                for(String nv: newvals) {
+                                        input.addField(col.name(), nv);
                                 }
                                 
-                        } else {
-                                input.removeField(col.name());
-                                //Prevent re-processing of a legacy id value if a database match cannot be found.
-                                String newVal = ifield.getValue().toString() + "-legacy";
-                                input.addField(col.name(), newVal);
                         }
                 }
         }
