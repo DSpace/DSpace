@@ -133,6 +133,8 @@ public class SolrUpgradeStatistics6
                 serverPath = serverPath.replaceAll("statistics$", indexName);
                 System.out.println("Connecting to " + serverPath);
                 server = new HttpSolrServer(serverPath);
+                //ensure that all queries wait for commits to complete
+                server.setMaxTotalConnections(1);
                 this.numRec = numRec;
                 this.batchSize = batchSize;
                 this.type = type;
@@ -363,9 +365,11 @@ public class SolrUpgradeStatistics6
                         while(run(FIELD.scopeId, Constants.COMMUNITY) > 0){};
                         while(run(FIELD.owningComm, Constants.COMMUNITY) > 0){};                        
                 }
-
-                printTime(String.format("\t%,12d Processed...", numProcessed), false);
-                refreshContext();
+                
+                if (numProcessed > 0) {
+                        printTime(String.format("\t%,12d Processed...", numProcessed), false);
+                        refreshContext();
+                }
                 
                 if (numProcessed > 0) {
                         runReport();
@@ -446,6 +450,7 @@ public class SolrUpgradeStatistics6
                 sQ.setFacet(true);
                 sQ.addFacetField(field.name());
                 sQ.setFacetMinCount(1);
+                sQ.setFacetLimit(Math.min(1000,batchSize));
                 QueryResponse sr = server.query(sQ);
                 
                 for(FacetField ff: sr.getFacetFields()) {
@@ -466,10 +471,18 @@ public class SolrUpgradeStatistics6
                                 } else {
                                         updateRecords(field, String.format("%s:%s", field.name(), id));
                                 }
+                                if (numProcessed >= numRec) {
+                                        break;
+                                }
+                        }
+                        if (numProcessed >= numRec) {
+                                break;
                         }
                 }
-                printTime(String.format("\t%,12d Processed...", numProcessed), false);
-                refreshContext();
+                if (numProcessed > 0){
+                        printTime(String.format("\t%,12d Processed...", numProcessed), false);
+                        refreshContext();
+                }
                 return numProcessed - initNumProcessed;
         }
         
