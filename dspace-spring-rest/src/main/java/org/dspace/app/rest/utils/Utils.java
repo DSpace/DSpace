@@ -59,11 +59,11 @@ public class Utils {
 	}
 
 	public Link linkToSingleResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getCategory(), data.getType()).slash(data).withRel(rel);
+		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).withRel(rel);
 	}
 
 	public Link linkToSubResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getCategory(), data.getType()).slash(data).slash(rel).withRel(rel);
+		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).slash(rel).withRel(rel);
 	}
 
 	public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {

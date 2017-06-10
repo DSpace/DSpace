@@ -8,12 +8,14 @@
 package org.dspace.app.rest;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
@@ -54,12 +56,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestResourceController implements InitializingBean {
 	@Autowired
 	DiscoverableEndpointsService discoverableEndpointsService;
-	
+
 	@Autowired
 	Utils utils;
 
 	@Override
-	public void afterPropertiesSet()  {
+	public void afterPropertiesSet() {
 		List<Link> links = new ArrayList<Link>();
 		for (String r : utils.getRepositories()) {
 			// this doesn't work as we don't have an active http request
@@ -76,17 +78,28 @@ public class RestResourceController implements InitializingBean {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}")
 	@SuppressWarnings("unchecked")
-	DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model, @PathVariable Integer id, @RequestParam(required=false) String projection) {
+	public DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+			@PathVariable Integer id, @RequestParam(required = false) String projection) {
 		return findOneInternal(apiCategory, model, id, projection);
 	}
-	
+
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}")
+	@SuppressWarnings("unchecked")
+	public DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+			@PathVariable String id, @RequestParam(required = false) String projection) {
+		return findOneInternal(apiCategory, model, id, projection);
+	}
+
 	@RequestMapping(method = RequestMethod.GET, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}")
 	@SuppressWarnings("unchecked")
-	DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model, @PathVariable UUID uuid, @RequestParam(required=false) String projection) {
+	public DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+			@PathVariable UUID uuid, @RequestParam(required = false) String projection) {
 		return findOneInternal(apiCategory, model, uuid, projection);
 	}
-	
-	private <ID extends Serializable> DSpaceResource<RestModel> findOneInternal(String apiCategory, String model, ID id, String projection) {
+
+	private <ID extends Serializable> DSpaceResource<RestModel> findOneInternal(String apiCategory, String model, ID id,
+			String projection) {
+		checkModelPluralForm(apiCategory, model);
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 		RestModel modelObject = null;
 		try {
@@ -113,6 +126,7 @@ public class RestResourceController implements InitializingBean {
 	private <ID extends Serializable> ResourceSupport findRelInternal(String apiCategory, String model, ID uuid, String rel, String projection) {
 		// FIXME this is a very bad implementation as it leads most of times to
 		// more round-trip on the database and retrieval of unneeded infromation
+		checkModelPluralForm(apiCategory, model);
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 		RestModel modelObject = repository.findOne(uuid);
 		DSpaceResource result = repository.wrapResource(modelObject, rel);
@@ -127,21 +141,30 @@ public class RestResourceController implements InitializingBean {
 
 	@RequestMapping(method = RequestMethod.GET)
 	@SuppressWarnings("unchecked")
-	<T extends RestModel> PagedResources<DSpaceResource<T>> findAll(@PathVariable String apiCategory, @PathVariable String model, Pageable page, PagedResourcesAssembler assembler, @RequestParam(required=false) String projection) {
+	public <T extends RestModel> PagedResources<DSpaceResource<T>> findAll(@PathVariable String apiCategory,
+			@PathVariable String model, Pageable page, PagedResourcesAssembler assembler,
+			@RequestParam(required = false) String projection) {
 		DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
-//		Link link = entityLinks.linkFor(getResourceClass(model), model, page).withSelfRel();
-		Link link = linkTo(this.getClass(), apiCategory, model).withSelfRel();
-		
+		Link link = linkTo(methodOn(this.getClass(), apiCategory, English.plural(model)).findAll(apiCategory, model, page, assembler, projection)).withSelfRel();
+
 		Page<DSpaceResource<T>> resources;
 		try {
 			resources = repository.findAll(page).map(repository::wrapResource);
-//				Link linkToSingleResource = Utils.linkToSingleResource(r, Link.REL_SELF);
-//				r.add(linkToSingleResource);
-//			});
 		} catch (PaginationException pe) {
 			resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
 		}
 		PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
 		return result;
+	}
+
+	/**
+	 * Check that the model is specified in its plural form, otherwise throw a RepositoryNotFound exception
+	 *  
+	 * @param model
+	 */
+	private void checkModelPluralForm(String apiCategory, String model) {
+		if (StringUtils.equals(utils.makeSingular(model), model)) {
+			throw new RepositoryNotFoundException(apiCategory, model);
+		}
 	}
 }
