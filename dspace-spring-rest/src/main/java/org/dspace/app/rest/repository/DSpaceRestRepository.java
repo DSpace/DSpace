@@ -32,11 +32,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  *
  */
 public abstract class DSpaceRestRepository<T extends RestModel, ID extends Serializable>
+extends AbstractDSpaceRestRepository
 		implements PagingAndSortingRepository<T, ID> {
-	@Autowired
-	protected Utils utils;
-
-	protected RequestService requestService = new DSpace().getRequestService();
 
 	@Override
 	public <S extends T> S save(S entity) {
@@ -116,17 +113,6 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 	}
 
 	public abstract Page<T> findAll(Context context, Pageable pageable);
-
-	private Context obtainContext() {
-		Request currentRequest = requestService.getCurrentRequest();
-		Context context = (Context) currentRequest.getAttribute(ContextUtil.DSPACE_CONTEXT);
-		if (context != null && context.isValid()) {
-			return context;
-		}
-		context = new Context();
-		currentRequest.setAttribute(ContextUtil.DSPACE_CONTEXT, context);
-		return context;
-	}
 
 	public abstract Class<T> getDomainClass();
 
