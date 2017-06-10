@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
@@ -314,6 +315,26 @@ public class SortOption
         }
 
         return SortOption.sortOptionsSet;
+    }
+    
+    /**
+     * Get the defined sort option by name
+     * @param name
+     *     the name of the sort option as given in the config file
+     * @return the configured sort option with given name
+     * @throws SortException if sort error
+     */
+    public static SortOption getSortOption(String name) throws SortException
+    {
+        for (SortOption so : SortOption.getSortOptions())
+        {
+            if (StringUtils.equals(name, so.getName()))
+            {
+                return so;
+            }
+        }
+        
+        return null;
     }
     
     /**
