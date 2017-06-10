@@ -183,33 +183,36 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             if(cachedGroupMembership != null) {
                 return cachedGroupMembership.booleanValue();
 
+            } else {
+                boolean isMember = false;
+
+                //If we have an ePerson, check we can find membership in the database
+                if(ePerson != null) {
+                    //lookup eperson in normal groups and subgroups with 1 query
+                    isMember = epersonInGroup(context, group.getName(), ePerson);
+                }
+
+                //If we did not find the group membership in the database, check the special groups.
                 //If there are special groups we need to check direct membership or check if the
                 //special group is a subgroup of the provided group.
                 //Note that special groups should only be checked if the current user == the ePerson.
                 //This also works for anonymous users (ePerson == null) if IP authentication used
-            } else if(CollectionUtils.isNotEmpty(context.getSpecialGroups()) && isAuthenticatedUser(context, ePerson)) {
-                boolean isMember = false;
-                Iterator<Group> it = context.getSpecialGroups().iterator();
+                if(!isMember && CollectionUtils.isNotEmpty(context.getSpecialGroups()) && isAuthenticatedUser(context, ePerson)) {
+                    Iterator<Group> it = context.getSpecialGroups().iterator();
 
-                while (it.hasNext() && !isMember) {
-                    Group specialGroup =  it.next();
-                    if (specialGroup.equals(group) || isMember(context, group, specialGroup)) {
-                        isMember = true;
+                    while (it.hasNext() && !isMember) {
+                        Group specialGroup = it.next();
+                        //Check if the special group matches the given group or if it is a subgroup (with 1 query)
+                        if (specialGroup.equals(group) || isMember(context, group, specialGroup)) {
+                            isMember = true;
+                        }
                     }
                 }
 
                 context.cacheGroupMembership(group, ePerson, isMember);
                 return isMember;
 
-            } else if(ePerson != null){
-                //lookup eperson in normal groups and subgroups with 1 query
-                boolean result = epersonInGroup(context, group.getName(), ePerson);
-
-                context.cacheGroupMembership(group, ePerson, result);
-                return result;
             }
-
-            return false;
         }
     }
 

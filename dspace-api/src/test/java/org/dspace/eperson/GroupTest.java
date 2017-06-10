@@ -427,6 +427,84 @@ public class GroupTest extends AbstractUnitTest {
     }
 
     @Test
+    public void isMemberContextSpecialGroupOtherUser() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+        EPerson ePerson1 = null;
+        EPerson ePerson2 = null;
+        Group specialGroup = null;
+        try {
+            specialGroup = createGroup("specialGroup");
+            groupService.addMember(context, level2Group, specialGroup);
+            groupService.update(context, level2Group);
+
+            //The authenticated user has a special group
+            ePerson1 = createEPerson("isMemberContextGroupSpecial@dspace.org");
+            context.setCurrentUser(ePerson1);
+            context.setSpecialGroup(specialGroup.getID());
+
+            //Or second user is member of the level 1 group
+            ePerson2 = createEPersonAndAddToGroup("isMemberContextSpecialGroupOtherUser@dspace.org", level1Group);
+
+            assertTrue(groupService.isMember(context, ePerson2, topGroup));
+            assertTrue(groupService.isMember(context, ePerson2, level1Group));
+            assertFalse(groupService.isMember(context, ePerson2, level2Group));
+            assertFalse(groupService.isMember(context, ePerson2, specialGroup));
+
+            assertTrue(groupService.isMember(context, ePerson1, level2Group));
+            assertTrue(groupService.isMember(context, ePerson1, specialGroup));
+
+        } finally {
+            if(ePerson1 != null)
+            {
+                context.turnOffAuthorisationSystem();
+                ePersonService.delete(context, ePerson1);
+            }
+            if(ePerson2 != null)
+            {
+                context.turnOffAuthorisationSystem();
+                ePersonService.delete(context, ePerson2);
+            }
+            if(specialGroup != null)
+            {
+                context.turnOffAuthorisationSystem();
+                groupService.delete(context, specialGroup);
+            }
+        }
+    }
+
+    @Test
+    public void isMemberContextSpecialGroupDbMembership() throws SQLException, AuthorizeException, EPersonDeletionException, IOException {
+        EPerson ePerson = null;
+        Group specialGroup = null;
+        try {
+            specialGroup = createGroup("specialGroup");
+            groupService.addMember(context, level1Group, specialGroup);
+            groupService.update(context, level1Group);
+
+            ePerson = createEPersonAndAddToGroup("isMemberContextGroupSpecialDbMembership@dspace.org", level2Group);
+
+            context.setCurrentUser(ePerson);
+            context.setSpecialGroup(specialGroup.getID());
+
+            assertTrue(groupService.isMember(context, topGroup));
+            assertTrue(groupService.isMember(context, level1Group));
+            assertTrue(groupService.isMember(context, level2Group));
+            assertTrue(groupService.isMember(context, specialGroup));
+
+        } finally {
+            if(ePerson != null)
+            {
+                context.turnOffAuthorisationSystem();
+                ePersonService.delete(context, ePerson);
+            }
+            if(specialGroup != null)
+            {
+                context.turnOffAuthorisationSystem();
+                groupService.delete(context, specialGroup);
+            }
+        }
+    }
+
+    @Test
     public void isPermanent()
             throws SQLException
     {
