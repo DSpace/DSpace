@@ -184,58 +184,9 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
         h.setValue(contextPath);
 
         // NOTE: the "spinner" indicator image gets added in the XSLT.
-
         // the text input(s)
-        Item ti = fl.addItem("textFields", "choices-lookup");
-        Composite textItem = ti.addComposite("textFieldsComp", "choices-lookup");
-        Text t1 = textItem.addText("text1", "choices-lookup");
-        if (isName)
-        {
-            Text t2 = textItem.addText("text2", "choices-lookup");
-            DCPersonName dp = new DCPersonName(value);
-            t1.setValue(dp.getLastName());
-            t2.setValue(dp.getFirstNames());
-            if (isFieldMessage(field, "help.last"))
-            {
-                Message m = getFieldMessage(field, "help.last");
-                t1.setLabel(m);
-                t1.setHelp(m);
-            }
-            else
-            {
-                String m = getFieldLabel(field, "help.last");
-                t1.setLabel(m);
-                t1.setHelp(m);
-            }
-            if (isFieldMessage(field, "help.first"))
-            {
-                Message m = getFieldMessage(field, "help.first");
-                t2.setLabel(m);
-                t2.setHelp(m);
-            }
-            else
-            {
-                String m = getFieldLabel(field, "help.first");
-                t2.setLabel(m);
-                t2.setHelp(m);
-            }
-        }
-        else
-        {
-            t1.setValue(value);
-            if (isFieldMessage(field, "help"))
-            {
-                Message m = getFieldMessage(field, "help");
-                t1.setLabel(m);
-                t1.setHelp(m);
-            }
-            else
-            {
-                String m = getFieldLabel(field, "help");
-                t1.setLabel(m);
-                t1.setHelp(m);
-            }
-        }
+        Hidden t1 = selectItem.addHidden("text1", "choices-lookup");
+        t1.setValue(value);
 
         // confirmation buttons
         Item buttItem = fl.addItem("confirmation", "choices-lookup");
