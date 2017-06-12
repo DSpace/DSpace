@@ -89,7 +89,6 @@ function initFirstSubmissionForm() {
         else if (jQuery('input[name|="article_status"]:checked').val()=='1') {
             jQuery("#publication_options").show();
             jQuery("#article_doi").hide();
-            // jQuery("#unknown_doi").hide();
             jQuery("#prism_publicationName").show();
             jQuery("#manu").show();
             jQuery("#journalIDStatusInReview").hide();
@@ -207,19 +206,16 @@ function initFirstSubmissionForm() {
 }
 
 function enableJournalPublished(){
-    //console.log(jQuery('#unknown-doi-panel span.field-help'));
     if(jQuery('input[name|="article_doi"]').val()!="")
     {
         jQuery('input[name|="prism_publicationName"]').attr("disabled", "disabled");
         jQuery('input[name|="prism_publicationName"]').css("background-color","#E3E3E3");
-        jQuery('#unknown-doi-panel span.field-help').attr("style","color:grey");
         jQuery('label.ds-form-label-select-publication').css("color","");
     }
     else
     {
         jQuery('input[name|="prism_publicationName"]').removeAttr("disabled");
         jQuery('input[name|="prism_publicationName"]').css("background-color","");
-        jQuery('#unknown-doi-panel span.field-help').attr("style","color:black");
         jQuery('label.ds-form-label-select-publication').css("color","grey");
     }
     if(jQuery('input[name|="prism_publicationName"]').val()!="")
@@ -227,14 +223,12 @@ function enableJournalPublished(){
         jQuery('input[name|="article_doi"]').attr("disabled", "disabled");
         jQuery('input[name|="article_doi"]').css("background-color","#E3E3E3");
         jQuery('label.ds-form-label-select-publication').css("color","grey");
-        jQuery('#unknown-doi-panel span.field-help').attr("style","color:black");
     }
     else
     {
         jQuery('input[name|="article_doi"]').removeAttr("disabled");
         jQuery('input[name|="article_doi"]').css("background-color","");
         jQuery('label.ds-form-label-select-publication').css("color","");
-        jQuery('#unknown-doi-panel span.field-help').attr("style","color:grey");
     }
 }
 function enableNextButton() {

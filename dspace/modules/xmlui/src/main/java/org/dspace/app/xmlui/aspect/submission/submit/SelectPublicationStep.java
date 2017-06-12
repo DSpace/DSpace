@@ -102,7 +102,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_article_status_not_yet_submitted = message("xmlui_submit_publication_article_status_not_yet_submitted");
 
     private static final Message T_enter_article_doi = message("xmlui.submit.publication.enter_article_doi");
-    private static final Message T_unknown_doi = message("xmlui.submit.publication.unknown_doi");
 
     private static final Message T_asterisk_explanation = message("xmlui.submit.publication.journal.manu.acc.asterisk_explanation");
 
