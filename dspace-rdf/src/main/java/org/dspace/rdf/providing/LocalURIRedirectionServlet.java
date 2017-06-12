@@ -69,7 +69,7 @@ public class LocalURIRedirectionServlet extends HttpServlet
         DSpaceObject dso = null;
         try
         {
-            context = new Context(Context.READ_ONLY);
+            context = new Context(Context.Mode.READ_ONLY);
             dso = handleService.resolveToObject(context, handle);
         }
         catch (SQLException ex)

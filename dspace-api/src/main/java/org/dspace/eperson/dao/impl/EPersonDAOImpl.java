@@ -43,6 +43,8 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
         // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup
         Criteria criteria = createCriteria(context, EPerson.class);
         criteria.add(Restrictions.eq("email", email.toLowerCase()));
+
+        criteria.setCacheable(true);
         return uniqueResult(criteria);
     }
 
@@ -52,6 +54,8 @@ public class EPersonDAOImpl extends AbstractHibernateDSODAO<EPerson> implements 
     {
         Criteria criteria = createCriteria(context, EPerson.class);
         criteria.add(Restrictions.eq("netid", netid));
+
+        criteria.setCacheable(true);
         return uniqueResult(criteria);
     }
 

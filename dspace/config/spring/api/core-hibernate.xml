@@ -21,6 +21,17 @@
         </property>
     </bean>
 
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="java.lang.System" />
+        <property name="targetMethod" value="setProperty" />
+        <property name="arguments">
+            <list>
+                <value>net.sf.ehcache.configurationResourceName</value>
+                <value>file:${dspace.dir}/config/hibernate-ehcache-config.xml</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id='dataSource'
           class='org.springframework.jndi.JndiObjectFactoryBean'>
         <description>

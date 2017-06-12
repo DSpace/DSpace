@@ -218,14 +218,15 @@ public class OAIHarvester {
      *     Exception indicating the current user of the context does not have permission
      *     to perform a particular action.
      */
-    public void runHarvest() throws SQLException, IOException, AuthorizeException
-    {
-        boolean originalMode = ourContext.isBatchModeEnabled();
-        ourContext.enableBatchMode(true);
+     public void runHarvest() throws SQLException, IOException, AuthorizeException
+     {
+        Context.Mode originalMode = ourContext.getCurrentMode();
+        ourContext.setMode(Context.Mode.BATCH_EDIT);
 
         // figure out the relevant parameters
         String oaiSource = harvestRow.getOaiSource();
         String oaiSetId = harvestRow.getOaiSetId();
+
         //If we have all selected then make sure that we do not include a set filter
         if ("all".equals(oaiSetId))
         {
@@ -437,7 +438,7 @@ public class OAIHarvester {
         log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested " + currentRecord + " items.");
         harvestedCollection.update(ourContext, harvestRow);
 
-        ourContext.enableBatchMode(originalMode);
+        ourContext.setMode(originalMode);
     }
 
     private void intermediateCommit() throws SQLException {

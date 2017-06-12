@@ -158,38 +158,38 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
     @Override
     public boolean isMember(Context context, Group group) throws SQLException {
-        return isMember(context, group.getName());
-    }
+        EPerson currentUser = context.getCurrentUser();
 
-    @Override
-    public boolean isMember(final Context context, final String groupName) throws SQLException {
-        // special, everyone is member of group 0 (anonymous)
-        if (StringUtils.equals(groupName, Group.ANONYMOUS))
-        {
+        if(group == null) {
+            return false;
+
+            // special, everyone is member of group 0 (anonymous)
+        } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
             return true;
-        } else if (context.getCurrentUser() != null) {
-            EPerson currentUser = context.getCurrentUser();
+        } else if(currentUser != null) {
 
-            //First check the special groups
-            List<Group> specialGroups = context.getSpecialGroups();
-            if (CollectionUtils.isNotEmpty(specialGroups)) {
-                for (Group specialGroup : specialGroups)
-                {
-                    //Check if the current special group is the one we are looking for OR retrieve all groups & make a check here.
-                    if (StringUtils.equals(specialGroup.getName(), groupName) || allMemberGroups(context, currentUser).contains(findByName(context, groupName)))
-                    {
-                        return true;
-                    }
-                }
+            Boolean cachedGroupMembership = context.getCachedGroupMembership(group, currentUser);
+            if(cachedGroupMembership != null) {
+                return cachedGroupMembership.booleanValue();
+
+            } else if(CollectionUtils.isNotEmpty(context.getSpecialGroups())) {
+                Set<Group> allMemberGroups = allMemberGroupsSet(context, currentUser);
+                boolean result = allMemberGroups.contains(group);
+
+                context.cacheGroupMembership(group, currentUser, result);
+                return result;
+            } else {
+                //lookup eperson in normal groups and subgroups
+                boolean result = epersonInGroup(context, group.getName(), currentUser);
+                context.cacheGroupMembership(group, currentUser, result);
+                return result;
             }
-            //lookup eperson in normal groups and subgroups
-            return epersonInGroup(context, groupName, currentUser);
         } else {
             // Check also for anonymous users if IP authentication used
             List<Group> specialGroups = context.getSpecialGroups();
             if(CollectionUtils.isNotEmpty(specialGroups)) {
                 for(Group specialGroup : specialGroups){
-                    if (StringUtils.equals(specialGroup.getName(), groupName)) {
+                    if (StringUtils.equals(specialGroup.getName(), group.getName())) {
                         return true;
                     }
                 }
@@ -199,7 +199,22 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
+    public boolean isMember(final Context context, final String groupName) throws SQLException {
+        return isMember(context, findByName(context, groupName));
+    }
+
+    @Override
     public List<Group> allMemberGroups(Context context, EPerson ePerson) throws SQLException {
+        return new ArrayList<>(allMemberGroupsSet(context, ePerson));
+    }
+
+    @Override
+    public Set<Group> allMemberGroupsSet(Context context, EPerson ePerson) throws SQLException {
+        Set<Group> cachedGroupMembership = context.getCachedAllMemberGroupsSet(ePerson);
+        if(cachedGroupMembership != null) {
+            return cachedGroupMembership;
+        }
+
         Set<Group> groups = new HashSet<>();
 
         if (ePerson != null)
@@ -225,7 +240,6 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         // all the users are members of the anonymous group
         groups.add(findByName(context, Group.ANONYMOUS));
 
-
         List<Group2GroupCache> groupCache = group2GroupCacheDAO.findByChildren(context, groups);
         // now we have all owning groups, also grab all parents of owning groups
         // yes, I know this could have been done as one big query and a union,
@@ -234,7 +248,8 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
             groups.add(group2GroupCache.getParent());
         }
 
-        return new ArrayList<>(groups);
+        context.cacheAllMemberGroupsSet(ePerson, groups);
+        return groups;
     }
 
     @Override

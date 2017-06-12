@@ -84,7 +84,7 @@ public class RDFizer {
         this.dryrun = false;
         this.lang = "TURTLE";
         this.processed = new CopyOnWriteArraySet<UUID>();
-        this.context = new Context(Context.READ_ONLY);
+        this.context = new Context(Context.Mode.READ_ONLY);
         
         this.configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.contentServiceFactory = ContentServiceFactory.getInstance();
@@ -818,7 +818,7 @@ public class RDFizer {
         // data into a triple store that provides a public sparql endpoint.
         // all exported rdf data can be read by anonymous users.
         // We won't change the database => read_only context will assure this.
-        Context context = new Context(Context.READ_ONLY);
+        Context context = new Context(Context.Mode.READ_ONLY);
 
         RDFizer myself = null;
         myself = new RDFizer();        

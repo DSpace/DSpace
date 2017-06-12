@@ -34,6 +34,8 @@ import java.util.*;
  */
 @Entity
 @Table(name="community")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Community extends DSpaceObject implements DSpaceObjectLegacySupport
 {
     /** log4j category */
