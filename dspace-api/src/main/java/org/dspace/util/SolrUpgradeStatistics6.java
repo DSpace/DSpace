@@ -496,6 +496,8 @@ public class SolrUpgradeStatistics6
                         }
                 }
                 if (numProcessed > 0){
+                        printTime(String.format("\t%,12d Processed...", numProcessed), false);
+                        batchUpdateStats();
                         refreshContext();
                 }
                 return numProcessed - initNumProcessed;
