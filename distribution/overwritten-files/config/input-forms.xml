@@ -212,8 +212,9 @@
 					<input-type>onebox</input-type>
 					<hint>Autores de la obra</hint>
                                         <!-- TODO Buscar solución a esto, ya que no se permite multiples required-on-group -->
-					<required-on-group>!SeDiCIAdmin</required-on-group>
+					<!-- NOTE me esta tomando el !SeDiCIAdmin por el problema puesto arriba -->
 					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
+					<required-on-group>!SeDiCIAdmin</required-on-group>
 					<type-bind>!Objeto Fisico</type-bind>
 				</field>
 				<field> <!-- Ok -->	<!-- Duplicado para Red de Museos -->
