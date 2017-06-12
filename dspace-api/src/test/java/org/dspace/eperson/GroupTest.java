@@ -329,14 +329,22 @@ public class GroupTest extends AbstractUnitTest {
     @Test
     public void isMemberGroup() throws SQLException
     {
-        assertTrue("isMemberGroup 1", groupService.isMember(context, topGroup, level1Group));
-        assertTrue("isMemberGroup 2", groupService.isMember(context, level1Group, level2Group));
-        assertFalse("isMemberGroup 3", groupService.isMember(context, level1Group, topGroup));
-        assertFalse("isMemberGroup 4", groupService.isMember(context, level2Group, level1Group));
+        assertTrue("isMemberGroup 1", groupService.isMember(topGroup, level1Group));
+        assertTrue("isMemberGroup 2", groupService.isMember(level1Group, level2Group));
+        assertFalse("isMemberGroup 3", groupService.isMember(level1Group, topGroup));
+        assertFalse("isMemberGroup 4", groupService.isMember(level2Group, level1Group));
+    }
+
+    @Test
+    public void isSubgroupOf() throws SQLException {
+        assertTrue("isMemberGroup 1", groupService.isParentOf(context, topGroup, level1Group));
+        assertTrue("isMemberGroup 2", groupService.isParentOf(context, level1Group, level2Group));
+        assertFalse("isMemberGroup 3", groupService.isParentOf(context, level1Group, topGroup));
+        assertFalse("isMemberGroup 4", groupService.isParentOf(context, level2Group, level1Group));
 
         //Also check ancestor relations
-        assertTrue("isMemberGroup 5", groupService.isMember(context, topGroup, level2Group));
-        assertFalse("isMemberGroup 6", groupService.isMember(context, level2Group, topGroup));
+        assertTrue("isMemberGroup 5", groupService.isParentOf(context, topGroup, level2Group));
+        assertFalse("isMemberGroup 6", groupService.isParentOf(context, level2Group, topGroup));
     }
 
     @Test
@@ -562,10 +570,14 @@ public class GroupTest extends AbstractUnitTest {
 
     @Test
     public void removeMemberGroup() throws SQLException, AuthorizeException {
-        assertTrue(groupService.isMember(context, topGroup, level1Group));
+        assertTrue(groupService.isMember(topGroup, level1Group));
+        assertTrue(groupService.isParentOf(context, topGroup, level1Group));
+
         groupService.removeMember(context, topGroup, level1Group);
         groupService.update(context, topGroup);
-        assertFalse(groupService.isMember(context, topGroup, level1Group));
+
+        assertFalse(groupService.isMember(topGroup, level1Group));
+        assertFalse(groupService.isParentOf(context, topGroup, level1Group));
     }
 
     @Test
