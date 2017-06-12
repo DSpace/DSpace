@@ -7,10 +7,6 @@
  */
 package org.dspace.eperson.service;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.MetadataField;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
@@ -18,6 +14,10 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Service interface class for the Group object.
@@ -115,7 +115,16 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @param childGroup child group
      * @return true or false
      */
-    public boolean isMember(Context context, Group owningGroup, Group childGroup) throws SQLException;
+    public boolean isMember(Group owningGroup, Group childGroup);
+
+    /**
+     * Check to see if parentGroup is a direct or in-direct parent of a childGroup.
+     *
+     * @param parentGroup parent group
+     * @param childGroup child group
+     * @return true or false
+     */
+    public boolean isParentOf(Context context, Group parentGroup, Group childGroup) throws SQLException;
 
     /**
      * fast check to see if an eperson is a member called with eperson id, does
