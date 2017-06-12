@@ -66,6 +66,14 @@ public class SolrUpgradeStatistics6
         private static final String HELP_OPTION = "h";
         private static final int    NUMREC_DEFAULT = 100000;
         private static final int    BATCH_DEFAULT = 10000;
+        
+        //After processing each batch of updates to SOLR, evaulate if the hibernate cache needs to be cleared
+        private static final int    CACHE_LIMIT = 20000;
+        
+        //Maximum number of solr ids to pull in a facet query... when processing infrequently accessed ids, the
+        //facet size may grow.
+        private static final int    FACET_LIMIT = 1000;
+        
         private static final String INDEX_DEFAULT = "statistics";
         private Integer type;
 
@@ -141,17 +149,24 @@ public class SolrUpgradeStatistics6
                 refreshContext();
         }
 
+        /*
+         * Process a batch of updates to SOLR
+         */
+        private void batchUpdateStats() throws SolrServerException, IOException {
+                if (docs.size() > 0) {
+                        server.add(docs);
+                        server.commit(true, true, true);
+                        docs.clear();
+                }
+                
+        }
+        
         /**
          * Refresh the DSpace Context object in order to periodically release objects from memory
          * @throws IOException 
          * @throws SolrServerException 
          */
         public void refreshContext() throws SolrServerException, IOException {
-                if (docs.size() > 0) {
-                        server.add(docs);
-                        server.commit(true, true, true);
-                        docs.clear();
-                }
                 if (context != null) {
                         try {
                                 totalCache += numUncache + context.getCacheSize();
@@ -368,7 +383,8 @@ public class SolrUpgradeStatistics6
                 
                 if (numProcessed > 0) {
                         printTime(String.format("\t%,12d Processed...", numProcessed), false);
-                        refreshContext();
+                        printTime(String.format("\t%,12d Processed...", numProcessed), true);
+                        batchUpdateStats();
                 }
                 
                 if (numProcessed > 0) {
@@ -450,7 +466,7 @@ public class SolrUpgradeStatistics6
                 sQ.setFacet(true);
                 sQ.addFacetField(field.name());
                 sQ.setFacetMinCount(1);
-                sQ.setFacetLimit(Math.min(1000,batchSize));
+                sQ.setFacetLimit(Math.min(FACET_LIMIT,batchSize));
                 QueryResponse sr = server.query(sQ);
                 
                 for(FacetField ff: sr.getFacetFields()) {
@@ -480,7 +496,6 @@ public class SolrUpgradeStatistics6
                         }
                 }
                 if (numProcessed > 0){
-                        printTime(String.format("\t%,12d Processed...", numProcessed), false);
                         refreshContext();
                 }
                 return numProcessed - initNumProcessed;
@@ -517,7 +532,10 @@ public class SolrUpgradeStatistics6
                         ++numProcessed;
                         if (numProcessed % batchSize == 0) {
                                 printTime(String.format("\t%,12d Processed...", numProcessed), false);
-                                refreshContext();
+                                batchUpdateStats();
+                                if (context.getCacheSize() > CACHE_LIMIT) {
+                                        refreshContext();
+                                }
                         }
                 }
                 return numProcessed - initNumProcessed;
