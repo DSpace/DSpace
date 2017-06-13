@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.lang.*;
 import java.lang.Exception;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -132,6 +134,16 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         }
         if (result == null) {
             result = "";
+        }
+        return result;
+    }
+
+    @JsonIgnore
+    protected List<String> getConceptMetadataValues(String mdString) {
+        AuthorityMetadataValue[] authorityValues = getUnderlyingConcept().getMetadata(mdString);
+        ArrayList<String> result = new ArrayList<String>();
+        for (AuthorityMetadataValue authorityValue : authorityValues) {
+            result.add(authorityValue.getValue());
         }
         return result;
     }
