@@ -209,6 +209,19 @@ public class SolrUpgradeStatistics6
                 return ret;
         }
 
+        /* 
+         * Format ms count as h:mm:ss
+         * @param dur Duration in ms
+         * @return duration formatted as h:mm:ss
+         */
+        private String duration(long dur) {
+                long sec = dur / 1000;
+                long hh = sec / 3600;
+                long mm = (sec % 3600) / 60;
+                long ss = (sec % 60);
+                return String.format("%d:%02d:%02d", hh,mm,ss);
+        }
+        
         /**
          * Print a status message appended with the processing time for the operation
          * @param header Message to display
@@ -216,7 +229,9 @@ public class SolrUpgradeStatistics6
          */
         public void printTime(String header, boolean fromStart) {
                 long dur = logTime(fromStart);
-                System.out.println(String.format("%s (%,6d sec; DB cache: %,6d; Docs: %,6d)", header, dur / 1000, getCacheCounts(fromStart), docs.size()));
+                long totalDur = logTime(true);
+                String stotalDur = duration(totalDur);
+                System.out.println(String.format("%s (%,6d sec; %s; DB cache: %,6d; Docs: %,6d)", header, dur/1000, stotalDur, getCacheCounts(fromStart), docs.size()));
         }
 
         /*
@@ -250,11 +265,15 @@ public class SolrUpgradeStatistics6
                 System.out.println("\t\tuntil there are no remaining records with legacy ids present.");
                 System.out.println("\t\tThis process can be run while the system is in use.");
                 System.out.println("");
-                System.out.println("\tIt will take 30-60 min to process 1,000,000 legacy records. ");
+                System.out.println("\tIt will take 20-30 min to process 1,000,000 legacy records. ");
                 System.out.println("");
                 System.out.println("\tUse the -n option to manage the workload on your server. ");
                 System.out.println("\t\tTo process all records, set -n to 10000000 or to 100000000 (10M or 100M)");
                 System.out.println("\tIf possible, please allocate 2GB of memory to this process (e.g. -Xmx2000m)");
+                System.out.println("");
+                System.out.println("\tThis process will rewrite most solr statistics records and may temporarily double ");
+                System.out.println("\t\tthe size of your statistics repositories.  Consider optimizing your solr repos when complete.");
+
                 System.exit(exitCode);
         }
 
@@ -272,6 +291,9 @@ public class SolrUpgradeStatistics6
                 System.out.println(" * until there are no remaining records with legacy ids present.");
                 System.out.println(" * This process can be run while the system is in use.");
                 System.out.println(" * It is likely to take 1 hour/1,000,000 legacy records to be udpated.");
+                System.out.println(" *");
+                System.out.println(" * This process will rewrite most solr statistics records and may temporarily double ");
+                System.out.println(" *\tthe size of your statistics repositories.  Consider optimizing your solr repos when complete.");
                 System.out.println(" * -------------------------------------------------------------------");
 
                 String indexName = INDEX_DEFAULT;
