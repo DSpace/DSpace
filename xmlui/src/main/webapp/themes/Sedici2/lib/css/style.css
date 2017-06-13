@@ -2397,7 +2397,7 @@ right:10px;
 
 .detail-view {
 padding:0px 0 0 0 ;
-/*background-image:url(../../images/sombra_abajo.png);*/
+background-image:url(../../images/sombra_abajo.png) !important;
 /*background-color:#dedede;*/
 background-position:center -40px;
 /*margin-left:120px;*/
@@ -2473,6 +2473,7 @@ width:620px;
 	padding:3px 0px;
 	border-top:1px dashed #dedede;
 	color:#3886AA;
+        width: 75%;
 }
 
 #aspect_artifactbrowser_CommunityViewer_div_community-search-browse *,
@@ -3952,6 +3953,10 @@ table.dropdown-table.ui-accordion tr:hover td{
   display: flex;
   vertical-align:top;
   font-size: 10px;
+}
+
+.external-services-bar {
+   display: inline-block;
 }
 
 .external-services-bar div {
