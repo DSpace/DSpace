@@ -15,7 +15,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -91,17 +90,12 @@ public class SolrUpgradeStatistics6
         
         //Enum to identify the named SOLR statistics fields to update
         private enum FIELD{
-                id(true), 
-                scopeId(true), 
-                owningComm(true), 
-                owningColl(true), 
-                owningItem(true), 
-                epersonid(false);
-                
-                boolean search;
-                FIELD(boolean search) {
-                        this.search = search;
-                }
+                id, 
+                scopeId, 
+                owningComm, 
+                owningColl, 
+                owningItem, 
+                epersonid;
         }
         
         //Logger
@@ -379,11 +373,16 @@ public class SolrUpgradeStatistics6
                         while(run(FIELD.id, Constants.COMMUNITY) > 0){};
                         while(run(FIELD.scopeId, Constants.COMMUNITY) > 0){};
                         while(run(FIELD.owningComm, Constants.COMMUNITY) > 0){};                        
+
+                        //Handle irregular type/scopetype values
+                        while(run(FIELD.id, -1) > 0){};                        
+                        while(run(FIELD.scopeId, -1) > 0){};                        
+                        while(run(FIELD.epersonid, -1) > 0){};                        
                 }
                 
                 if (numProcessed > 0) {
                         printTime(String.format("\t%,12d Processed...", numProcessed), false);
-                        printTime(String.format("\t%,12d Processed...", numProcessed), true);
+                        printTime(String.format("\t%,12d TOTAL...    ", numProcessed), true);
                         batchUpdateStats();
                 }
                 
@@ -399,7 +398,7 @@ public class SolrUpgradeStatistics6
                 System.out.println();
                 System.out.println("=================================================================");
                 System.out.println("\t*** Statistics Records with Legacy Id ***\n");
-                int total = runReportQuery();
+                long total = runReportQuery();
                 System.out.println("\t--------------------------------------");
                 System.out.println(String.format("\t%,12d\t%s", total, "TOTAL"));
                 System.out.println("=================================================================");
@@ -408,13 +407,15 @@ public class SolrUpgradeStatistics6
         /*
          * Report on the existence of specific legacy id records within a shard
          */
-        private int runReportQuery() throws SolrServerException {
+        private long runReportQuery() throws SolrServerException {
                 StringBuilder sb = new StringBuilder();
                 for(FIELD field: FIELD.values()) {
-                        if (field.search) {
-                                if (sb.length() > 0) {
-                                        sb.append(" OR ");
-                                }
+                        if (sb.length() > 0) {
+                                sb.append(" OR ");
+                        }
+                        if (field == FIELD.epersonid) {
+                                sb.append(String.format("(%s:* AND NOT(%s:*-*) AND NOT(epersonid:0))", field.name(), field.name()));
+                        } else {
                                 sb.append(String.format("(%s:* AND NOT(%s:*-*))", field.name(), field.name()));
                         }
                 }
@@ -425,7 +426,8 @@ public class SolrUpgradeStatistics6
                 sQ.addFacetField("scopeType");
                 QueryResponse sr = server.query(sQ);
                 
-                int total = 0;
+                long total = 0;
+                long unexpected = 0;
                 for(FacetField ff: sr.getFacetFields()) {
                         String s = ff.getName().equals("type") ? "View" : "Search";
                         for(FacetField.Count count: ff.getValues()) {
@@ -439,13 +441,22 @@ public class SolrUpgradeStatistics6
                                         name = "Item " + s;
                                 } else if (id == Constants.BITSTREAM) {
                                         name = "Bistream " + s;
-                                } else if (id == Constants.SITE) {
-                                        //I have inconsistent values for this field
-                                        name = "Site "+ s + "(TBD)";
-                                } 
+                                } else {
+                                        /*
+                                         * In testing, I discovered some unexpected values in the scopeType field.  
+                                         * It looks like they may have been a result of a CSV import/export error.
+                                         * This will group any unexpected values into one report line.
+                                         */
+                                        unexpected += count.getCount();
+                                        continue;
+                                }
                                 System.out.println(String.format("\t%,12d\t%s", count.getCount(), name));
                                 total += count.getCount();
                         }
+                }
+                if (unexpected > 0) {
+                        System.out.println(String.format("\t%,12d\t%s", unexpected, "Unexpected Type & Full Site"));
+                        total += unexpected;
                 }
                 return total;
         }
@@ -453,14 +464,23 @@ public class SolrUpgradeStatistics6
         /*
          * Run queries for records of a specific type faceting by id to retrieve the most viewed records first.
          * @param field Field to use for grouping records
-         * @param ptype The type of object to query:Community, Collection, Item, Bitstream
+         * @param ptype The type of object to query:Community, Collection, Item, Bitstream; -1 is used for irregular type values
          */
         private int run(FIELD field, int ptype) throws SolrServerException, SQLException, IOException {
-                if (numProcessed >= numRec && field.search) {
+                if (numProcessed >= numRec) {
                         return 0;
                 }
                 int initNumProcessed = numProcessed;
-                String query = String.format("%s:* AND NOT(%s:*-*) AND (type:%d OR scopeType:%d)", field.name(), field.name(), ptype, ptype);
+                String query = "";
+                
+                if (ptype == -1){
+                        query = String.format("%s:* AND NOT(%s:*-*)", field.name(), field.name());
+                        if (field == FIELD.epersonid) {
+                                query += " AND NOT(epersonid:0)";
+                        }
+                } else {
+                        query = String.format("%s:* AND NOT(%s:*-*) AND (type:%d OR scopeType:%d)", field.name(), field.name(), ptype, ptype);
+                }
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
                 sQ.setFacet(true);
@@ -481,7 +501,7 @@ public class SolrUpgradeStatistics6
                                                 updateRecords(field, String.format("id:%s OR owningColl:%s OR scopeId:%s", id, id, id));
                                         } else if (ptype == Constants.ITEM) {
                                                 updateRecords(field, String.format("id:%s OR owningItem:%s OR scopeId:%s", id, id, id));
-                                        } else if (ptype == Constants.BITSTREAM) {
+                                        } else  {
                                                 updateRecords(field, String.format("id:%s OR scopeId:%s", id, id));
                                         }
                                 } else {
@@ -495,7 +515,7 @@ public class SolrUpgradeStatistics6
                                 break;
                         }
                 }
-                if (numProcessed > 0){
+                if ((numProcessed - initNumProcessed) > 0){
                         printTime(String.format("\t%,12d Processed...", numProcessed), false);
                         batchUpdateStats();
                         refreshContext();
@@ -581,7 +601,7 @@ public class SolrUpgradeStatistics6
                                         }
                                         if (uuid != null) {
                                                 newvals.add(uuid.toString());
-                                        } else if (col.search) {
+                                        } else if (col == FIELD.epersonid) {
                                                 //Prevent re-processing of a legacy id value if a database match cannot be found.
                                                 newvals.add(String.format("%d-legacy", legacy));
                                         } else {
