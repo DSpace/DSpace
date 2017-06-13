@@ -30,8 +30,9 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
         for (DryadJournalConcept concept : dryadJournalConcepts) {
             System.out.println("concept is " + concept.getFullName());
             if (concept.isAccepted()) {
-                AuthorityValue doc = createHashMap(concept);
-                authorities.add(doc);
+                for (AuthorityValue doc : createAuthorityValues(concept)) {
+                    authorities.add(doc);
+                }
             }
         }
     }
@@ -64,19 +65,26 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private AuthorityValue createHashMap(DryadJournalConcept concept){
-        AuthorityValue authorityValue = new AuthorityValue();
-
-        authorityValue.setId(String.valueOf(concept.getConceptID()));
-        authorityValue.setSource(SOURCE);
-        authorityValue.setField(FIELD_NAME);
-        authorityValue.setValue(concept.getFullName());
-        // full-text field is for searching, so index it with no spaces.
-        authorityValue.setFullText(concept.getFullName().replaceAll("\\s", ""));
-        authorityValue.setCreationDate(new Date());
-        authorityValue.setLastModified(new Date());
-
-        return authorityValue;
+    private List<AuthorityValue> createAuthorityValues(DryadJournalConcept concept) {
+        ArrayList<AuthorityValue> authorityValues = new ArrayList<AuthorityValue>();
+        ArrayList<String> names = new ArrayList<String>();
+        names.add(concept.getFullName());
+        for (String name : concept.getAlternateNames()) {
+            names.add(name);
+        }
+        for (String name : names) {
+            AuthorityValue authorityValue = new AuthorityValue();
+            authorityValue.setId(String.valueOf(concept.getConceptID()));
+            authorityValue.setSource(SOURCE);
+            authorityValue.setField(FIELD_NAME);
+            authorityValue.setValue(concept.getFullName());
+            // full-text field is for searching, so index it with no spaces.
+            authorityValue.setFullText(name.replaceAll("\\s", ""));
+            authorityValue.setCreationDate(new Date());
+            authorityValue.setLastModified(new Date());
+            authorityValues.add(authorityValue);
+        }
+        return authorityValues;
     }
 
     public String indexerName() {
