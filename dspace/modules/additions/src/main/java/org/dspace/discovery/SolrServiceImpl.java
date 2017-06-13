@@ -41,6 +41,7 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -120,6 +121,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected HandleService handleService;
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
+    @Autowired(required = true)
+    protected BundleService bundleService;
 
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
@@ -1426,24 +1429,45 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 {
                     // a-ha! grab the text out of the bitstreams
                     List<Bitstream> bitstreams = myBundle.getBitstreams();
+                    
+                    // TAMU Customization - Only index text bitstreams that are not restricted
+                    List<ResourcePolicy> bundlePolicies = bundleService.getBitstreamPolicies(context, myBundle); 
+                    boolean isIndexable = false;
 
                     for (Bitstream myBitstream : bitstreams)
                     {
-                        try {
 
-                            streams.add(new BitstreamContentStream(context, myBitstream));
-
-                            log.debug("  Added BitStream: "
-                                    + myBitstream.getStoreNumber() + "	"
-                                    + myBitstream.getSequenceID() + "   "
-                                    + myBitstream.getName());
-
-                        } catch (Exception e)
-                        {
-                            // this will never happen, but compiler is now
-                            // happy.
-                            log.trace(e.getMessage(), e);
-                        }
+                        // TAMU Customization - Only index text bitstreams that are not restricted
+                    	isIndexable = false;
+                    	for (ResourcePolicy rp:bundlePolicies) {
+                    		
+                    		if (rp.getdSpaceObject().getID() == myBitstream.getID()) {
+                    			if (rp.getGroup().getName().equals("ANONYMOUS")) {
+                    				isIndexable = true;
+                    			}
+                    			break;
+                    		}
+                    	}
+                        // TAMU Customization - Only index text bitstreams that are not restricted
+                    	if (isIndexable) {
+	                        try {
+	
+	                            streams.add(new BitstreamContentStream(context, myBitstream));
+	
+	                            log.debug("  Added BitStream: "
+	                                    + myBitstream.getStoreNumber() + "	"
+	                                    + myBitstream.getSequenceID() + "   "
+	                                    + myBitstream.getName());
+	
+	                        } catch (Exception e)
+	                        {
+	                            // this will never happen, but compiler is now
+	                            // happy.
+	                            log.trace(e.getMessage(), e);
+	                        }
+                    	} else {
+        	         		log.info("**********BITSTREAM ID WAS RESTRICTED********* "+myBitstream.getID());
+                    	}
                     }
                 }
             }
