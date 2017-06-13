@@ -1,0 +1,213 @@
+#coreRecommenderOutput ul.tabs {
+    border-bottom: 1px solid #dddddd;
+    list-style: outside none none;
+    margin-bottom: 0;
+    padding-left: 0;
+}
+#coreRecommenderOutput .tabs > li {
+    float: left;
+    margin-bottom: -1px;
+}
+#coreRecommenderOutput .tabs > li.active > a, #coreRecommenderOutput .tabs > li.active > a:hover, #coreRecommenderOutput .tabs > li.active > a:focus {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: white;
+    border-color: #dddddd #dddddd transparent;
+    border-image: none;
+    border-style: solid;
+    border-width: 1px;
+    color: #999999;
+    cursor: default;
+    z-index: 2;
+}
+#coreRecommenderOutput .tabs > li > a:focus, #coreRecommenderOutput .tabs > li > a:hover {
+    background-color: #eee;
+    color: #9f410c;
+    outline: 0 none;
+    text-decoration: none;
+}
+#coreRecommenderOutput .tabs > li > a {
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+    color: #e65e11;
+    display: inline-block;
+    line-height: 1.42857;
+    margin-right: 2px;
+    padding: 10px 15px;
+    position: relative;
+    text-decoration: none;
+}
+#coreRecommenderOutput .clearfix::before, #coreRecommenderOutput .clearfix::after {
+    content: "";
+    display: block;
+}
+#coreRecommenderOutput .clearfix::after {
+    clear: both;
+}
+#coreRecommenderOutput .clearfix {
+}
+#coreRecommenderOutput {
+    background: #fff none repeat scroll 0 0;
+    font-family: "Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;
+    line-height: normal;
+}
+#coreRecommenderOutput ul {
+    list-style-type: none;
+    padding: 0;
+}
+#coreRecommenderOutput .ep_summary_box_body {
+    background-color: #fff;
+    border: medium none;
+}
+#coreRecommenderOutput .ep_summary_box_title {
+    display: none;
+}
+.coreRecommender .documentTpl .thumb {
+    float: left;
+    height: 75px;
+    margin-right: 4px;
+    overflow: hidden;
+    padding: 1px;
+    width: 60px;
+}
+.coreRecommender .documentTpl .thumb img {
+    box-shadow: 2px 2px 5px #888;
+    max-height: 75px;
+    max-width: 60px;
+}
+.coreRecommender .documentTpl {
+    display: inline-block;
+    margin-bottom: 10px;
+    overflow: hidden;
+    padding-left: 5px;
+}
+.coreRecommender .title {
+    -moz-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+}
+.coreRecommender #authors {
+    -moz-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+    padding-right: 20px;
+}
+.coreRecommender .label {
+    display: inline;
+    overflow: hidden;
+    padding: 0;
+}
+.coreRecommender .addinfo {
+    display: none;
+    float: left;
+    margin-top: 5px;
+    text-align: justify;
+}
+.coreRecommender .detail-info {
+    -moz-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+}
+.coreRecommender .information {
+    margin-right: 10px;
+    overflow: hidden;
+    position: relative;
+}
+.coreRecommender .information > div {
+    margin-bottom: 10px;
+}
+.coreRecommender li {
+    border-bottom: 1px solid #dddddd;
+    border-right: 3px solid white;
+    overflow: hidden;
+    padding-top: 10px;
+    position: relative;
+}
+.coreRecommender li:hover {
+    background-color: #eee;
+    cursor: pointer;
+    padding-right: 0;
+}
+.coreRecommender a {
+    text-decoration: none;
+}
+.coreRecommender .remove-article {
+    bottom: 0;
+    float: right;
+    margin-bottom: 5px;
+    max-height: 11px;
+    max-width: 11px;
+    position: absolute;
+    right: 0;
+}
+.coreRecommender .dropdown {
+    bottom: 0;
+    display: inline-block;
+    position: absolute;
+    right: 3px;
+}
+.coreRecommender .dropdown-content {
+    background-color: white;
+    border: 1px solid #dddddd;
+    display: none;
+    margin-right: 20px;
+    min-width: 160px;
+    position: relative;
+}
+.coreRecommender .dropdown-content a {
+    display: block;
+    font-weight: inherit;
+    padding: 8px 12px;
+    text-decoration: none;
+}
+.coreRecommender .dropdown-content a:hover {
+    background-color: #eee;
+}
+.coreRecommender .dropdown:hover .dropdown-content {
+    display: block;
+}
+.coreRecommender .dropdown:hover .dropbtn {
+    background-color: #eee;
+}
+#coreRecommenderOutput .error, #coreRecommenderOutput .loading {
+    border-bottom: 1px solid #dddddd;
+    color: #999999;
+    padding: 15px;
+    text-align: center;
+}
+#coreRecommenderOutput .error-image, #coreRecommenderOutput .loading-gif {
+    margin-top: 5px;
+}
+.coreRecommender .footer img {
+    border: 0 none;
+    display: block;
+    float: right;
+    height: 24px;
+    padding-left: 4px;
+}
+.coreRecommender .footer a {
+    color: #808080;
+    float: right;
+    font-size: 0.7em;
+    font-weight: bold;
+    line-height: 30px;
+    margin-top: 5px;
+    text-decoration: none;
+}
+.coreRecommender .title {
+    font-size: 10px;
+    font-weight: bold;
+}
+.coreRecommender .label {
+    color: #e65e11;
+    font-family: "Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;
+    font-weight: 600;
+}
+.coreRecommender li:hover {
+    border-right: 3px solid #e65e11;
+}
+.coreRecommender .dropdown-content a {
+    color: #e65e11;
+}

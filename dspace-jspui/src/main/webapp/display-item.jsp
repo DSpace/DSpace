@@ -46,6 +46,8 @@
 <%@page import="org.dspace.core.Constants"%>
 <%@page import="org.dspace.eperson.EPerson"%>
 <%@page import="org.dspace.versioning.VersionHistory"%>
+<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
+
 <%
     // Attributes
     Boolean displayAllBoolean = (Boolean) request.getAttribute("display.all");
@@ -116,9 +118,9 @@
 	boolean exportBiblioEnabled =  ConfigurationManager.getBooleanProperty("exportcitation.item.enabled", false);
 	boolean exportBiblioAll =  ConfigurationManager.getBooleanProperty("exportcitation.show.all", false);
 	String cfg = ConfigurationManager.getProperty("exportcitation.options");
+	boolean coreRecommender = ConfigurationManager.getBooleanProperty("core-aggregator","core-aggregator.enabled");
+	String coreCredentials = ConfigurationManager.getProperty("core-aggregator", "core-aggregator.credentials");
 %>
-
-<%@page import="org.dspace.app.webui.servlet.MyDSpaceServlet"%>
 
 <% if(pmcEnabled || scopusEnabled || wosEnabled || scholarEnabled || altMetricEnabled) { %>
 <c:set var="dspace.layout.head.last" scope="request">
@@ -167,6 +169,31 @@ j(document).ready(function() {
 	<% } %>
 });
 --></script>
+	<% if(coreRecommender) { %>
+	<link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/recommender/core.css" type="text/css" />	
+	<script>
+		(function(d, s, idScript, idRec, userInput) {
+			var coreAddress = 'https://core.ac.uk/';
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(idScript))
+				return;
+			js = d.createElement(s);
+			js.id = idScript;
+			js.src = coreAddress + 'recommender/embed.js';
+			fjs.parentNode.insertBefore(js, fjs);
+	
+			localStorage.setItem('idRecommender', idRec);
+			localStorage.setItem('userInput', JSON.stringify(userInput));
+	
+/* 			var link = d.createElement('link');
+			link.setAttribute('rel', 'stylesheet');
+			link.setAttribute('type', 'text/css');
+			link.setAttribute('href', coreAddress
+					+ 'recommender/embed-default-style.css');
+			d.getElementsByTagName('head')[0].appendChild(link); */
+		}(document, 'script', 'recommender-embed', '<%= coreCredentials %>', {}));
+	</script>
+	<% } %>
 </c:set>
 <% } %>
 
@@ -374,7 +401,17 @@ j(document).ready(function() {
 <%
         }
 %>
-
+	<% if(coreRecommender) { %>	
+	<br/>
+	<br/>
+	<div id="recommender" class="panel panel-default">
+	<div class="panel-heading"><fmt:message key="jsp.display-item.recommender" /></div>
+	
+	<div class="panel-body">
+	<div id="coreRecommenderOutput"></div>
+	</div>
+	</div>
+	<% } %>
 </div>
 <div class="col-lg-3">
 <div class="row">
