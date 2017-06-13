@@ -34,6 +34,7 @@
     </bean>
 
     <bean name="org.dspace.core.DBConnection" class="org.dspace.core.HibernateDBConnection" lazy-init="true"/>
+    <bean name="org.dspace.core.DatabaseSchemaValidator" class="org.dspace.core.HibernateDatabaseSchemaValidator" lazy-init="true"/>
 
     <!-- Register all our Flyway callback classes (which run before/after database migrations) -->
     <bean class="org.dspace.storage.rdbms.DatabaseRegistryUpdater"/>
