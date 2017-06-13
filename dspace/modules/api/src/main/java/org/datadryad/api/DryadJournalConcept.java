@@ -265,17 +265,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public ArrayList<String> getEmailsToNotifyOnArchive() {
-        ArrayList<String> emailArrayList = new ArrayList<String>();
-        String emailString = getConceptMetadataValue(metadataProperties.getProperty(NOTIFY_ON_ARCHIVE));
-        if (emailString != null && !(emailString.equals(""))) {
-            String[] emails = emailString.split("\\s*,\\s*");
-            for (int i = 0; i < emails.length; i++) {
-                if (emails[i].matches(".+@.+\\..+")) {
-                    emailArrayList.add(emails[i]);
-                }
-            }
-        }
-        return emailArrayList;
+        return getEmails(metadataProperties.getProperty(NOTIFY_ON_ARCHIVE));
     }
 
     public void setEmailsToNotifyOnArchive(ArrayList<String> emails) {
@@ -293,17 +283,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public ArrayList<String> getEmailsToNotifyOnReview() {
-        ArrayList<String> emailArrayList = new ArrayList<String>();
-        String emailString = getConceptMetadataValue(metadataProperties.getProperty(NOTIFY_ON_REVIEW));
-        if (emailString != null && !(emailString.equals(""))) {
-            String[] emails = emailString.split("\\s*,\\s*");
-            for (int i = 0; i < emails.length; i++) {
-                if (emails[i].matches(".+@.+\\..+")) {
-                    emailArrayList.add(emails[i]);
-                }
-            }
-        }
-        return emailArrayList;
+        return getEmails(metadataProperties.getProperty(NOTIFY_ON_REVIEW));
     }
 
     public void setEmailsToNotifyOnReview(ArrayList<String> emails) {
@@ -321,17 +301,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public ArrayList<String> getEmailsToNotifyWeekly() {
-        ArrayList<String> emailArrayList = new ArrayList<String>();
-        String emailString = getConceptMetadataValue(metadataProperties.getProperty(NOTIFY_WEEKLY));
-        if (emailString != null && !(emailString.equals(""))) {
-            String[] emails = emailString.split("\\s*,\\s*");
-            for (int i = 0; i < emails.length; i++) {
-                if (emails[i].matches(".+@.+\\..+")) {
-                    emailArrayList.add(emails[i]);
-                }
-            }
-        }
-        return emailArrayList;
+        return getEmails(metadataProperties.getProperty(NOTIFY_WEEKLY));
     }
 
     public void setEmailsToNotifyWeekly(ArrayList<String> emails) {
@@ -346,6 +316,19 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         if (emailString != null) {
             setConceptMetadataValue(metadataProperties.getProperty(NOTIFY_WEEKLY), emailString);
         }
+    }
+
+    private ArrayList<String> getEmails(String emailString) {
+        ArrayList<String> emailArrayList = new ArrayList<String>();
+        if (emailString != null && !(emailString.equals(""))) {
+            String[] emails = emailString.split("\\s*,\\s*");
+            for (int i = 0; i < emails.length; i++) {
+                if (emails[i].matches(".+@.+\\..+")) {
+                    emailArrayList.add(emails[i]);
+                }
+            }
+        }
+        return emailArrayList;
     }
 
     public Boolean getAllowReviewWorkflow() {
