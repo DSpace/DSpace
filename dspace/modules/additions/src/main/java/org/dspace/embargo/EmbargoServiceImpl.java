@@ -154,7 +154,8 @@ public class EmbargoServiceImpl implements EmbargoService
         throws SQLException, AuthorizeException, IOException
     {
         // new version of Embargo policies remain in place.
-        //lifter.liftEmbargo(context, item);
+    	// TAMU Customization: actually, maybe they won't because we need this line to be run (it was commented out)
+        lifter.liftEmbargo(context, item);
         itemService.clearMetadata(context, item, lift_schema, lift_element, lift_qualifier, Item.ANY);
 
         // set the dc.date.available value to right now
