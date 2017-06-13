@@ -18,6 +18,11 @@
 
     <dc-type>
         <schema>organization</schema>
+        <element>alternateName</element>
+    </dc-type>
+
+    <dc-type>
+        <schema>organization</schema>
         <element>paymentPlanType</element>
     </dc-type>
 
