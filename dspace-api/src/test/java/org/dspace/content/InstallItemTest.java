@@ -15,6 +15,7 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -147,6 +148,7 @@ public class InstallItemTest extends AbstractUnitTest
                     Constants.ADD); result = false;
             // Allow full Admin perms
                 authorizeService.isAdmin((Context) any); result = true;
+                authorizeService.isAdmin((Context) any, (EPerson) any); result = true;
         }};
 
         String handle = "123456789/56789";

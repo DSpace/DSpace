@@ -14,7 +14,6 @@ import org.dspace.eperson.Group2GroupCache;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Database Access Object interface class for the Group2GroupCache object.
@@ -27,7 +26,9 @@ public interface Group2GroupCacheDAO extends GenericDAO<Group2GroupCache> {
 
     public List<Group2GroupCache> findByParent(Context context, Group group) throws SQLException;
 
-    public List<Group2GroupCache> findByChildren(Context context, Set<Group> groups) throws SQLException;
+    public List<Group2GroupCache> findByChildren(Context context, Iterable<Group> groups) throws SQLException;
+
+    public Group2GroupCache findByParentAndChild(Context context, Group parent, Group child) throws SQLException;
 
     public Group2GroupCache find(Context context, Group parent, Group child) throws SQLException;
 

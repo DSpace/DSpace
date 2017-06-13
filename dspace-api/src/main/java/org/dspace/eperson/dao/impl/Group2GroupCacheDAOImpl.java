@@ -13,6 +13,7 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.Group2GroupCache;
 import org.dspace.eperson.dao.Group2GroupCacheDAO;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
@@ -44,7 +45,7 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
     }
 
     @Override
-    public List<Group2GroupCache> findByChildren(Context context, Set<Group> groups) throws SQLException {
+    public List<Group2GroupCache> findByChildren(Context context, Iterable<Group> groups) throws SQLException {
         Criteria criteria = createCriteria(context, Group2GroupCache.class);
 
         Disjunction orDisjunction = Restrictions.or();
@@ -57,6 +58,19 @@ public class Group2GroupCacheDAOImpl extends AbstractHibernateDAO<Group2GroupCac
         criteria.setCacheable(true);
 
         return list(criteria);
+    }
+
+    @Override
+    public Group2GroupCache findByParentAndChild(Context context, Group parent, Group child) throws SQLException {
+        Query query = createQuery(context,
+                "FROM Group2GroupCache g WHERE g.parent = :parentGroup AND g.child = :childGroup");
+
+        query.setParameter("parentGroup", parent);
+        query.setParameter("childGroup", child);
+
+        query.setCacheable(true);
+
+        return singleResult(query);
     }
 
     @Override
