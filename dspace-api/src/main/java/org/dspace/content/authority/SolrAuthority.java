@@ -49,7 +49,7 @@ public class SolrAuthority implements ChoiceAuthority {
 
     public Choices getMatches(String field, String text, int collection, int start, int limit, String locale, boolean bestMatch) {
         if(limit == 0)
-            limit = 10;
+            limit = 25;
         SolrQuery queryArgs = new SolrQuery();
         if (text == null || text.trim().equals("")) {
             queryArgs.setQuery("*:*");
