@@ -57,6 +57,8 @@
     <script src="scripts/item-submission.js">&#160;</script>
     <!-- TAMU metadata tree browser -->
     <script src="scripts/metadata-browser.js">&#160;</script>
+    <!-- TAMU bitstream tooltip -->
+    <script src="scripts/item-view-tooltip.js">&#160;</script>
     
 
     <!-- endbuild -->
