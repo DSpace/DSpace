@@ -132,6 +132,13 @@
         </step>
     </command>
     <command>
+        <name>index-deduplication</name>
+        <description>Update Deduplication Solr Search Index</description>
+        <step>
+            <class>org.dspace.app.cris.batch.DedupClient</class>
+        </step>
+    </command>    
+    <command>
         <name>index-discovery</name>
         <description>Update Discovery Solr Search Index</description>
         <step>
