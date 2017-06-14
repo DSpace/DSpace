@@ -31,8 +31,10 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -45,7 +47,8 @@ import java.util.*;
  * 
  * This command will need to be run iteratively over each statistics shard until all legacy id values have been replaced.
  * 
- * If a legacy id cannot be resolved from the database, the suffix "-legacy" will be added to the id field to prevent the attempt to re-process that record.
+ * If a legacy id cannot be resolved from the database, the id will remain unchanged.
+ *   "field:* AND NOT(field:*-*)" can be used to locate legacy ids
  * 
  * See DS-3602 for the origin of this issue.  This code is targeted for inclusion in the DSpace 6.1 release.
  * 
@@ -95,7 +98,10 @@ public class SolrUpgradeStatistics6
                 owningComm, 
                 owningColl, 
                 owningItem, 
-                epersonid;
+                epersonid,
+                owner,
+                submitter,
+                actor;
         }
         
         //Logger
@@ -108,6 +114,7 @@ public class SolrUpgradeStatistics6
         protected ItemService        itemService          = ContentServiceFactory.getInstance().getItemService();
         protected BitstreamService   bitstreamService     = ContentServiceFactory.getInstance().getBitstreamService();
         protected EPersonService     epersonService       = EPersonServiceFactory.getInstance().getEPersonService();
+        protected GroupService       groupService         = EPersonServiceFactory.getInstance().getGroupService();
 
         // This code will operate on one shard at a time, therefore the SOLR web service will be accessed directly rather
         // than make use of the DSpace Solr Logger which only writes to the current shard
@@ -379,27 +386,22 @@ public class SolrUpgradeStatistics6
                 } else {
                         //process items first minimize the number of objects that will be loaded from hibernate at one time
                         while(run(FIELD.id, Constants.ITEM) > 0){};
-                        while(run(FIELD.scopeId, Constants.ITEM) > 0){};
-                        while(run(FIELD.owningItem, Constants.ITEM) > 0){};
                         
                         //process any bitstrem objects that did not have a match on onwingItem
                         while(run(FIELD.id, Constants.BITSTREAM) > 0){};
-                        while(run(FIELD.scopeId, Constants.BITSTREAM) > 0){};
                         
                         //collections
                         while(run(FIELD.id, Constants.COLLECTION) > 0){};
                         while(run(FIELD.scopeId, Constants.COLLECTION) > 0){};
-                        while(run(FIELD.owningColl, Constants.COLLECTION) > 0){};
                         
                         //communities
                         while(run(FIELD.id, Constants.COMMUNITY) > 0){};
                         while(run(FIELD.scopeId, Constants.COMMUNITY) > 0){};
-                        while(run(FIELD.owningComm, Constants.COMMUNITY) > 0){};                        
 
                         //Handle irregular type/scopetype values
-                        while(run(FIELD.id, -1) > 0){};                        
-                        while(run(FIELD.scopeId, -1) > 0){};                        
-                        while(run(FIELD.epersonid, -1) > 0){};                        
+                        for(FIELD field: FIELD.values()){                                
+                                while(run(field, -1) > 0){};                                
+                        }
                 }
                 
                 if (numProcessed > 0) {
@@ -430,17 +432,7 @@ public class SolrUpgradeStatistics6
          * Report on the existence of specific legacy id records within a shard
          */
         private long runReportQuery() throws SolrServerException {
-                StringBuilder sb = new StringBuilder();
-                for(FIELD field: FIELD.values()) {
-                        if (sb.length() > 0) {
-                                sb.append(" OR ");
-                        }
-                        if (field == FIELD.epersonid) {
-                                sb.append(String.format("(%s:* AND NOT(%s:*-*) AND NOT(epersonid:0))", field.name(), field.name()));
-                        } else {
-                                sb.append(String.format("(%s:* AND NOT(%s:*-*))", field.name(), field.name()));
-                        }
-                }
+                StringBuilder sb = new StringBuilder("NOT(dspaceMig:*)");
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(sb.toString());
                 sQ.setFacet(true);
@@ -496,12 +488,9 @@ public class SolrUpgradeStatistics6
                 String query = "";
                 
                 if (ptype == -1){
-                        query = String.format("%s:* AND NOT(%s:*-*)", field.name(), field.name());
-                        if (field == FIELD.epersonid) {
-                                query += " AND NOT(epersonid:0)";
-                        }
+                        query = "NOT(dspaceMig:*) AND NOT(type:* OR scopeType:*)";
                 } else {
-                        query = String.format("%s:* AND NOT(%s:*-*) AND (type:%d OR scopeType:%d)", field.name(), field.name(), ptype, ptype);
+                        query = String.format("NOT(dspaceMig:*) AND (type:%d OR scopeType:%d)", ptype, ptype);
                 }
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
@@ -516,17 +505,15 @@ public class SolrUpgradeStatistics6
                                 String id = count.getName();
                                 
                                 //When querying on id or scopeId, find as many objects as possible that will re-use objects in cache
-                                if (field == FIELD.id || field == FIELD.scopeId) {
-                                        if (ptype == Constants.COMMUNITY) {
-                                                updateRecords(field, String.format("id:%s OR owningComm:%s OR scopeId:%s", id, id, id));
-                                        } else if (ptype == Constants.COLLECTION) {
-                                                updateRecords(field, String.format("id:%s OR owningColl:%s OR scopeId:%s", id, id, id));
-                                        } else if (ptype == Constants.ITEM) {
-                                                updateRecords(field, String.format("id:%s OR owningItem:%s OR scopeId:%s", id, id, id));
-                                        } else  {
-                                                updateRecords(field, String.format("id:%s OR scopeId:%s", id, id));
-                                        }
-                                } else {
+                                if (ptype == Constants.COMMUNITY) {
+                                        updateRecords(field, String.format("id:%s OR owningComm:%s OR scopeId:%s", id, id, id));
+                                } else if (ptype == Constants.COLLECTION) {
+                                        updateRecords(field, String.format("id:%s OR owningColl:%s OR scopeId:%s", id, id, id));
+                                } else if (ptype == Constants.ITEM) {
+                                        updateRecords(field, String.format("id:%s OR owningItem:%s", id, id, id));
+                                } else if (ptype == Constants.BITSTREAM) {
+                                        updateRecords(field, String.format("id:%s", id, id, id));
+                                } else  {
                                         updateRecords(field, String.format("%s:%s", field.name(), id));
                                 }
                                 if (numProcessed >= numRec) {
@@ -571,6 +558,7 @@ public class SolrUpgradeStatistics6
                         for(FIELD col: FIELD.values()) {
                                 mapField(input, col);
                         }
+                        input.addField("dspaceMig", "6.1");
                         
                         docs.add(input);
                         ++numProcessed;
@@ -592,7 +580,7 @@ public class SolrUpgradeStatistics6
          * The id field is interpreted by the type field.
          * The scopeId field is interpreted by scopeType field.
          * 
-         * In order to prevent the re-processing of items with an id that cannot be resolved, the suffix "-legacy" will be appended to any id fields that cannot be resolved.  
+         * Legacy ids will be unchanged if they cannot be mapped  
          * 
          * @param input The SOLR statistics document to be updated
          * @param col The SOLR field to update (if present)
@@ -604,31 +592,33 @@ public class SolrUpgradeStatistics6
                         ArrayList<String> newvals = new ArrayList<>();
                         for(Object oval: vals) {
                                 try {
-                                        int legacy = Integer.parseInt(oval.toString());
                                         UUID uuid = null;
-                                        if (col == FIELD.id) {
-                                                Object otype = input.getFieldValue("type");
-                                                if (otype != null) {
-                                                        int type = Integer.parseInt(otype.toString());
-                                                        uuid = mapType(type, legacy);
-                                                }
-                                        } else if (col == FIELD.scopeId) {
-                                                Object otype = input.getFieldValue("scopeType");
-                                                if (otype != null) {
-                                                        int type = Integer.parseInt(otype.toString());
-                                                        uuid = mapType(type, legacy);
+                                        if (col == FIELD.owner) {
+                                                if (oval.toString().length() > 1) {
+                                                        String owntype = oval.toString().substring(0, 1);
+                                                        int legacy = Integer.parseInt(oval.toString().substring(1));
+                                                        uuid = mapOwner(owntype, legacy);
                                                 }
                                         } else {
-                                                uuid = mapId(col, legacy);
+                                                int legacy = Integer.parseInt(oval.toString());
+                                                if (col == FIELD.id) {
+                                                        Object otype = input.getFieldValue("type");
+                                                        if (otype != null) {
+                                                                int type = Integer.parseInt(otype.toString());
+                                                                uuid = mapType(type, legacy);
+                                                        }
+                                                } else if (col == FIELD.scopeId) {
+                                                        Object otype = input.getFieldValue("scopeType");
+                                                        if (otype != null) {
+                                                                int type = Integer.parseInt(otype.toString());
+                                                                uuid = mapType(type, legacy);
+                                                        }
+                                                } else {
+                                                        uuid = mapId(col, legacy);
+                                                }
                                         }
                                         if (uuid != null) {
                                                 newvals.add(uuid.toString());
-                                        } else if (col == FIELD.epersonid) {
-                                                //Prevent re-processing of a legacy id value if a database match cannot be found.
-                                                newvals.add(String.format("%d-legacy", legacy));
-                                        } else {
-                                                //reformatting of the epersonid seemed to trigger silent update failures (with log warnings)
-                                                newvals.add(String.format("%d", -legacy));
                                         }
                                 } catch (NumberFormatException e) {
                                         log.warn("Non numeric legacy id "+ col.name() +":" + oval.toString());
@@ -696,7 +686,7 @@ public class SolrUpgradeStatistics6
                         checkLastItem(item);
                         return item == null ? null : item.getID();
                 }
-                if (col == FIELD.epersonid) {
+                if (col == FIELD.epersonid || col == FIELD.actor || col == FIELD.submitter) {
                         EPerson per = epersonService.findByLegacyId(context, val);
                         return per == null ? null : per.getID();
                 }
@@ -728,6 +718,23 @@ public class SolrUpgradeStatistics6
                         //A bitstream is unlikely to be processed more than once, to clear immediately
                         checkLastBitstream(bit);
                         return uuid;
+                }
+                return null;
+        }
+
+        /*
+         * Retrieve the UUID corresponding to a legacy owner found in a SOLR statistics record
+         * Legacy owner fields are prefixed in solr with "e" or "g"
+         * @param owntype Identifying type field (e - eperson, g - group)
+         * @param val Value to lookup as a legacy id
+         */
+        private UUID mapOwner(String owntype, int val) throws SQLException {
+                if (owntype.equals("e")) {
+                        EPerson per = epersonService.findByLegacyId(context, val);
+                        return per == null ? null : per.getID();
+                } else if (owntype.equals("g")) {
+                        Group perg = groupService.findByLegacyId(context, val);
+                        return perg == null ? null : perg.getID();
                 }
                 return null;
         }
