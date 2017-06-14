@@ -1,0 +1,86 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace.modules</groupId>
+   <artifactId>solr</artifactId>
+   <version>1.8.2</version>
+   <packaging>war</packaging>
+   <name>DSpace SOLR :: Web Application</name>
+   <description>
+      DSpace SOLR Service Provider Web Application
+   </description>
+
+   <!--
+      Solr uses DSpace POM to avoid limitations forced
+      in dependencies found in dspace-parent pom. Solr is
+      a standalone webapplication.
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-pom</artifactId>
+      <version>12</version>
+   </parent>
+   
+   <!--
+      The Subversion repository location is used by Continuum to update
+      against when changes have occured, this spawns a new build cycle
+      and releases snapshots into the snapshot repository below.
+   -->
+   <scm>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.8.2</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.8.2</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.8.2</url>
+   </scm>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
+   <dependencies>
+       <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-solr</artifactId>
+           <version>3.3.0.0</version>
+           <classifier>skinny</classifier>
+           <type>war</type>
+       </dependency>
+
+       <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-solr</artifactId>
+           <version>3.3.0.0</version>
+           <classifier>classes</classifier>
+           <type>jar</type>
+       </dependency>
+
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-api</artifactId>
+         <version>1.5.6</version>
+      </dependency>
+       
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-jdk14</artifactId>
+         <version>1.5.6</version>
+      </dependency>
+
+
+    <!-- support odd cases where JAXP cannot be found in JVM -->
+    <dependency>
+        <groupId>xalan</groupId>
+        <artifactId>xalan</artifactId>
+        <version>2.7.0</version>
+    </dependency>
+
+   </dependencies>
+
+</project>

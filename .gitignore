@@ -1,6 +1,7 @@
 
 #Ignoro lo adquirido desde el svn de dspace
-distribution/dspace-tag-files/
+#silencio esta regla porque el svn de DSpace esta muerto y necesito tener el dspace-tag-files
+#distribution/dspace-tag-files/
 
 ## Ignore the MVN compiled output directories from version tracking
 target/

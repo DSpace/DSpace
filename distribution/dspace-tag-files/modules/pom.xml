@@ -1,0 +1,99 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace</groupId>
+	<artifactId>modules</artifactId>
+	<packaging>pom</packaging>
+	<name>DSpace Addon Modules</name>
+	<url>http://www.dspace.org</url>
+	<description>DSpace Addon Modules</description>
+
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-parent</artifactId>
+		<version>1.8.2</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+    <scm>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
+    </scm>
+    
+    <!-- 
+         List of enabled DSpace Modules to build/install.
+         To disable building of modules, you can use the Maven '-P' commandline 
+         option along with the profile's id.  For example, the following tells
+         Maven to *disable* building of 'dspace-oai' and 'dspace-lni' modules:
+         'mvn package -P !dspace-oai,!dspace-lni'
+         
+         Also note that the profile IDs below match the profile IDs of the source
+         modules in /dspace/pom.xml, so the above command will also disable the
+         compiling of the corresponding source module.
+    -->
+    <profiles>
+        <profile>
+            <id>dspace-xmlui</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>xmlui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-lni</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>lni</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-oai</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>oai</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-jspui</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>jspui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-sword</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>sword</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-swordv2</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>swordv2</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-solr</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>solr</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>

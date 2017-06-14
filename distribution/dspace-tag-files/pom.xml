@@ -1,0 +1,259 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace</artifactId>
+    <name>DSpace Assembly and Configuration</name>
+    <packaging>pom</packaging>
+    <description>
+        The DSpace Project provides all the functionality required to
+        build, install and upgrade and dspace instance.
+    </description>
+    <url>http://projects.dspace.org/dspace</url>
+    <!--
+       A Parent POM that Maven inherits DSpace Default
+       POM atrributes from.
+    -->
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>1.8.2</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <!--
+         The Subversion repository location is used by Continuum to update against
+         when changes have occured, this spawns a new build cycle and releases snapshots
+         into the snapshot repository below.
+    -->
+    <scm>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
+        <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
+    </scm>
+
+    <properties>
+        <default.dspace.dir>/dspace</default.dspace.dir>
+        <default.mail.server>smtp.example.com</default.mail.server>
+        <default.solr.server>http://localhost:8080/solr</default.solr.server>
+    </properties>
+
+    <profiles>
+
+        <!--
+           This profile is used by all children such that
+           when activated a dspace.config configuration
+           file location passed on the commandline
+           (-Ddspace.config=...) can be passed through
+           to be used as a filter source by projects for
+           tasks such as updating the ${dspace.dir} in
+           web.xml etc.
+
+           When activated, the child project will inherit
+           the configuration.
+        -->
+        <profile>
+            <id>dspace-config</id>
+            <activation>
+                <property>
+                    <name>dspace.config</name>
+                </property>
+            </activation>
+            <build>
+                <filters>
+                    <filter>${dspace.config}</filter>
+                </filters>
+            </build>
+        </profile>
+
+        <!--
+           These profiles setup properties and build configuration
+           appropriate to the database that DSpace will be installed
+           against.
+
+           They are activated by using the profile id - ie. -Ppostgres,
+           or defining db.name - ie. -Ddb.name=oracle
+        -->
+        <!--
+           Default profile for Postgres database configuration
+           Use -Ppostgres to activate.
+        -->
+
+        <profile>
+            <id>postgres</id>
+            <activation>
+                <property>
+                    <name>!db.name</name>
+                </property>
+            </activation>
+            <properties>
+                <default.db.name>postgres</default.db.name>
+                <default.db.driver>org.postgresql.Driver</default.db.driver>
+                <default.db.url>
+                    jdbc:postgresql://localhost:5432/dspace
+                </default.db.url>
+                <default.db.username>dspace</default.db.username>
+                <default.db.password>dspace</default.db.password>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>postgres-support</id>
+            <activation>
+                <property>
+                    <name>!db.name</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+
+        <!--
+           Default profile for Oracle database configuration
+           Use -Poracle or -Ddb.name=oracle to activate.
+        -->
+        <profile>
+            <id>oracle</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <properties>
+                <default.db.name>oracle</default.db.name>
+                <default.db.driver>
+                    oracle.jdbc.OracleDriver
+                </default.db.driver>
+                <default.db.url>
+                    jdbc:oracle:thin:@//localhost:1521/xe
+                </default.db.url>
+                <default.db.username>dspace</default.db.username>
+                <default.db.password>dspace</default.db.password>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>oracle-support</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!--
+           Using xpdf filters requires the inclusion
+           Of Sun dependencies these are not redistributable
+           and you will need to install them locally in your
+           maven repository prior to building your dspace instance
+        -->
+        <profile>
+            <id>xpdf-mediafilter-support</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.media</groupId>
+                    <artifactId>jai_imageio</artifactId>
+                    <version>1.0_01</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.media</groupId>
+                    <artifactId>jai_core</artifactId>
+                    <version>1.1.2_01</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+    </profiles>
+
+    <!--
+       Builds Overlay Modules for DSpace
+    -->
+    <modules>
+        <module>modules</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <!--  overall project assembly -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.1</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assemble/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>directory-single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-utils</artifactId>
+        </dependency>
+        <dependency>
+             <groupId>org.dspace</groupId>
+             <artifactId>dspace-stats</artifactId>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-discovery-provider</artifactId>
+         </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-discovery-solr</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b3</version>
+            <exclusions>
+              <exclusion>
+                <groupId>ant</groupId>
+                <artifactId>ant</artifactId>
+              </exclusion>
+            </exclusions> 
+        </dependency>
+    </dependencies>
+
+</project>
