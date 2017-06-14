@@ -338,8 +338,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 }
                 else{
                     // TAMU Customization - commented out conditional which allowed for unauthorized access when configuration is empty
-                	// if(StringUtils.isBlank(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type")) ||
-                	//		                			DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type").equalsIgnoreCase("logged")){
+                    // if(StringUtils.isBlank(DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type")) ||
+                    //                                  DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("request.item.type").equalsIgnoreCase("logged")){
                         // The user does not have read access to this bitstream. Interrupt this current request
                         // and then forward them to the login page so that they can be authenticated. Once that is
                         // successful, their request will be resumed.
@@ -352,7 +352,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                         httpResponse.sendRedirect(redictURL);
                         return;
-                	//}
+                    //}
                 }
             }
 
