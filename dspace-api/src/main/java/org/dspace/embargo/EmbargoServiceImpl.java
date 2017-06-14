@@ -138,13 +138,10 @@ public class EmbargoServiceImpl implements EmbargoService
                             + result.toString());
         }
 
-        // sanity check: do not allow an embargo lift date in the past.
-        if (liftDate.before(new Date()))
-        {
-            throw new IllegalArgumentException(
-                    "Embargo lift date must be in the future, but this is in the past: "
-                            + result.toString());
-        }
+        /*
+         * NOTE: We do not check here for past dates as it can result in errors during AIP restoration. 
+         * Therefore, UIs should perform any such date validation on input. See DS-3348
+         */
         return result;
     }
 

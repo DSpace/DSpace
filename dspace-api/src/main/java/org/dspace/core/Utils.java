@@ -16,16 +16,13 @@ import java.math.BigInteger;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import com.coverity.security.Escape;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -412,5 +409,9 @@ public final class Utils
         }
         int rl = result.length();
         return result.substring(0, rl-2) + ":" + result.substring(rl-2);
+    }
+
+    public static <E> Collection<E> emptyIfNull(Collection<E> collection) {
+        return collection == null ? Collections.<E>emptyList() : collection;
     }
 }

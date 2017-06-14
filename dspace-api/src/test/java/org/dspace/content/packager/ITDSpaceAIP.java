@@ -167,6 +167,11 @@ public class ITDSpaceAIP extends AbstractUnitTest
             ePersonService.update(context, submitter);
             context.setCurrentUser(submitter);
 
+            //Make our test ePerson an admin so he can perform deletes and restores
+            GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
+            Group adminGroup = groupService.findByName(context, Group.ADMIN);
+            groupService.addMember(context, adminGroup, submitter);
+
             // Create our primary Test Item
             WorkspaceItem wsItem = workspaceItemService.create(context, grandchildCol, false);
             Item item = installItemService.installItem(context, wsItem);

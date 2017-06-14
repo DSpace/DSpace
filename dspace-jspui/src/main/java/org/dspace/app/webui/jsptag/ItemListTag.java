@@ -29,6 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.CrossLinks;
@@ -116,6 +118,9 @@ public class ItemListTag extends TagSupport
     
     private final transient ConfigurationService configurationService
              = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+    private final transient AuthorizeService authorizeService
+            = AuthorizeServiceFactory.getInstance().getAuthorizeService();
 
     static
     {
@@ -817,7 +822,7 @@ public class ItemListTag extends TagSupport
             Context c = UIUtil.obtainContext(hrq);
             Thumbnail thumbnail = itemService.getThumbnail(c, item, linkToBitstream);
 
-            if (thumbnail == null)
+            if (thumbnail == null || !authorizeService.authorizeActionBoolean(c, thumbnail.getThumb(), Constants.READ))
             {
                 return "";
             }

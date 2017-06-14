@@ -215,8 +215,8 @@ public class OAIHarvester {
      */
 	public void runHarvest() throws SQLException, IOException, AuthorizeException
 	{
-		boolean originalMode = ourContext.isBatchModeEnabled();
-		ourContext.enableBatchMode(true);
+		Context.Mode originalMode = ourContext.getCurrentMode();
+		ourContext.setMode(Context.Mode.BATCH_EDIT);
 
 		// figure out the relevant parameters
 		String oaiSource = harvestRow.getOaiSource();
@@ -432,7 +432,7 @@ public class OAIHarvester {
 		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested " + currentRecord + " items.");
 		harvestedCollection.update(ourContext, harvestRow);
 
-		ourContext.enableBatchMode(originalMode);
+		ourContext.setMode(originalMode);
 	}
 
 	private void intermediateCommit() throws SQLException {

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.util.HashUtil;
@@ -118,7 +119,7 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	            validity.add(context, eperson);
 	            
 	            // Include any groups they are a member of
-	            List<Group> groups = groupService.allMemberGroups(context, eperson);
+	            Set<Group> groups = groupService.allMemberGroupsSet(context, eperson);
 	            for (Group group : groups)
 	            {
 	            	validity.add(context, group);

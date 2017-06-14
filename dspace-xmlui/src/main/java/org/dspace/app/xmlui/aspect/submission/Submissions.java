@@ -26,6 +26,7 @@ import org.dspace.content.service.ItemService;
 import org.dspace.content.service.SupervisedItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.xml.sax.SAXException;
 
@@ -110,11 +111,12 @@ public class Submissions extends AbstractDSpaceTransformer
     protected SupervisedItemService supervisedItemService = ContentServiceFactory.getInstance().getSupervisedItemService();
 
     @Override
-    public void addPageMeta(PageMeta pageMeta) throws SAXException,
-	WingException, UIException, SQLException, IOException,
-	AuthorizeException
-	{
-            pageMeta.addMetadata("title").addContent(T_title);
+    public void addPageMeta(PageMeta pageMeta)
+        throws SAXException, WingException, UIException, SQLException,
+        IOException, AuthorizeException
+    {
+        pageMeta.addMetadata("title").addContent(T_title);
+        pageMeta.addMetadata("javascript", "static").addContent("static/js/workflow-multiSelect.js");
 
             pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
             pageMeta.addTrailLink(null,T_trail);
@@ -124,6 +126,9 @@ public class Submissions extends AbstractDSpaceTransformer
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+
         Request request = ObjectModelHelper.getRequest(objectModel);
         boolean displayAll = false;
         //This param decides whether we display all of the user's previous
@@ -140,6 +145,8 @@ public class Submissions extends AbstractDSpaceTransformer
         this.addUnfinishedSubmissions(div);
 //        this.addSubmissionsInWorkflowDiv(div);
         this.addPreviousSubmissions(div, displayAll);
+
+        context.setMode(originalMode);
     }
 
     /**

@@ -7,16 +7,19 @@
  */
 package org.dspace.content;
 
+import org.dspace.content.comparator.NameAscendingComparator;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.*;
 import org.dspace.eperson.Group;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Sort;
+import org.hibernate.annotations.SortType;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Class representing a collection.
@@ -34,6 +37,8 @@ import java.util.List;
  */
 @Entity
 @Table(name="collection")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, include = "non-lazy")
 public class Collection extends DSpaceObject implements DSpaceObjectLegacySupport
 {
 
@@ -83,7 +88,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
             joinColumns = {@JoinColumn(name = "collection_id") },
             inverseJoinColumns = {@JoinColumn(name = "community_id") }
     )
-    private final List<Community> communities = new ArrayList<>();
+    private Set<Community> communities = new HashSet<>();
 
     @Transient
     private transient CollectionService collectionService;
@@ -263,7 +268,11 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
      */
     public List<Community> getCommunities() throws SQLException
     {
-        return communities;
+        // We return a copy because we do not want people to add elements to this collection directly.
+        // We return a list to maintain backwards compatibility
+        Community[] output = communities.toArray(new Community[]{});
+        Arrays.sort(output, new NameAscendingComparator());
+        return Arrays.asList(output);
     }
 
     void addCommunity(Community community) {
@@ -271,7 +280,7 @@ public class Collection extends DSpaceObject implements DSpaceObjectLegacySuppor
         setModified();
     }
 
-    void removeCommunity(Community community){
+    void removeCommunity(Community community) {
         this.communities.remove(community);
         setModified();
     }

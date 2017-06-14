@@ -8,6 +8,7 @@
 package org.dspace.core;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataField;
@@ -92,7 +93,10 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
         }
     }
 
-    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields, List<String> columnSortFields)
+    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields, List<String> columnSortFields) {
+        addMetadataSortQuery(query, metadataSortFields, columnSortFields, ListUtils.EMPTY_LIST);
+    }
+    protected void addMetadataSortQuery(StringBuilder query, List<MetadataField> metadataSortFields, List<String> columnSortFields, List<String> direction)
     {
 
         if(CollectionUtils.isNotEmpty(metadataSortFields)){
@@ -100,6 +104,8 @@ public abstract class AbstractHibernateDSODAO<T extends DSpaceObject> extends Ab
             for (int i = 0; i < metadataSortFields.size(); i++) {
                 MetadataField metadataField = metadataSortFields.get(i);
                 query.append("STR(").append(metadataField.toString()).append(".value)");
+                String dir = direction.size() > i ? " " + direction.get(i) : "";
+                query.append(dir);
                 if(i != metadataSortFields.size() -1)
                 {
                     query.append(",");

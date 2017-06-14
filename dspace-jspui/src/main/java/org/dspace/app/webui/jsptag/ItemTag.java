@@ -1027,8 +1027,7 @@ public class ItemTag extends TagSupport
                                                 context,
                                                 b,
                                                 groupService.findByName(context, Group.ANONYMOUS),
-                                                Constants.READ,
-                                                -1);
+                                                Constants.READ);
                                 ResourcePolicy rp = null;
                                 for (ResourcePolicy policy : policies)
                                 {

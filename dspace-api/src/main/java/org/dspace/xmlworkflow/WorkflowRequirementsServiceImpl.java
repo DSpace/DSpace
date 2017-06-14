@@ -72,12 +72,17 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         ipu.setUser(user);
         ipu.setFinished(false);
         inProgressUserService.update(context, ipu);
+
+        //Make sure the user has the necessary rights to update the item after the tasks is removed from the pool
+        xmlWorkflowService.grantUserAllItemPolicies(context, wfi.getItem(), user);
+
         int totalUsers = inProgressUserService.getNumberOfInProgressUsers(context, wfi) + inProgressUserService.getNumberOfFinishedUsers(context, wfi);
 
         if(totalUsers == step.getRequiredUsers()){
             //If enough users have claimed/finished this step then remove the tasks
             xmlWorkflowService.deleteAllPooledTasks(context, wfi);
         }
+
         xmlWorkflowItemService.update(context, wfi);
     }
 
@@ -89,6 +94,8 @@ public class WorkflowRequirementsServiceImpl implements WorkflowRequirementsServ
         //Then remove the current user from the inProgressUsers
         inProgressUserService.delete(context, inProgressUserService.findByWorkflowItemAndEPerson(context, wfi, user));
 
+        //Make sure the removed user has his custom rights removed
+        xmlWorkflowService.removeUserItemPolicies(context, wfi.getItem(), user);
 
         Workflow workflow = workflowFactory.getWorkflow(wfi.getCollection());
         Step step = workflow.getStep(stepID);

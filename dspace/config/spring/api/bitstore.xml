@@ -14,7 +14,7 @@
     </bean>
 
     <bean name="localStore" class="org.dspace.storage.bitstore.DSBitStoreService" scope="singleton">
-        <property name="baseDir" value="${dspace.dir}/assetstore"/>
+        <property name="baseDir" value="${assetstore.dir}"/>
     </bean>
 
     <bean name="s3Store" class="org.dspace.storage.bitstore.S3BitStoreService" scope="singleton">

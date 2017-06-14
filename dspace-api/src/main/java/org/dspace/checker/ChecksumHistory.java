@@ -55,7 +55,7 @@ public class ChecksumHistory implements ReloadableEntity<Long>
     private String checksumCalculated;
 
     @ManyToOne
-    @JoinColumn(name = "result")
+    @JoinColumn(name = "result", referencedColumnName = "result_code")
     private ChecksumResult checksumResult;
 
 

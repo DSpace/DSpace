@@ -185,12 +185,24 @@
             <a class="image-link" href="{$href}">
                 <xsl:choose>
                     <xsl:when test="mets:fileGrp[@USE='THUMBNAIL']">
-                        <img class="img-responsive img-thumbnail" alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
-                            <xsl:attribute name="src">
-                                <xsl:value-of
-                                        select="mets:fileGrp[@USE='THUMBNAIL']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-                            </xsl:attribute>
-                        </img>
+                        <!-- Checking if Thumbnail is restricted and if so, show a restricted image --> 
+                        <xsl:variable name="src">
+                            <xsl:value-of select="mets:fileGrp[@USE='THUMBNAIL']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                        </xsl:variable>
+                        <xsl:choose>
+                            <xsl:when test="contains($src,'isAllowed=n')">
+                                <div style="width: 100%; text-align: center">
+                                    <i aria-hidden="true" class="glyphicon  glyphicon-lock"></i>
+                                </div>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <img class="img-responsive img-thumbnail" alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
+                                    <xsl:attribute name="src">
+                                        <xsl:value-of select="$src"/>
+                                    </xsl:attribute>
+                                </img>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:when>
                     <xsl:otherwise>
                         <img class="img-thumbnail" alt="xmlui.mirage2.item-list.thumbnail" i18n:attr="alt">
