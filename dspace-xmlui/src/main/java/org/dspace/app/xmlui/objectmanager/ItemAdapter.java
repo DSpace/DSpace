@@ -55,13 +55,13 @@ import java.util.*;
  *
  * <p>There are four parts to an item's METS document: descriptive metadata,
  * file section, structural map, and extra sections.
- * 
+ *
  * <p>Request item-support
  * <p>Original Concept, JSPUI version:    Universidade do Minho   at www.uminho.pt
  * <p>Sponsorship of XMLUI version:    Instituto Oceanográfico de España at www.ieo.es
  *
  * @author Scott Phillips
- * @author Adán Román Ruiz at arvo.es (for request item support) 
+ * @author Adán Román Ruiz at arvo.es (for request item support)
  */
 
 public class ItemAdapter extends AbstractAdapter
@@ -80,7 +80,7 @@ public class ItemAdapter extends AbstractAdapter
 
     /** A space-separated list of administrative metadata sections (for item)*/
     private StringBuffer amdSecIDS;
-    
+
     /** A hashmap of all Files and their corresponding space separated list of
         administrative metadata sections */
     private final Map<String,StringBuffer> fileAmdSecIDs = new HashMap<>();
@@ -117,9 +117,9 @@ public class ItemAdapter extends AbstractAdapter
     {
         return this.item;
     }
-    
-    
-    
+
+
+
     /**
      *
      *
@@ -186,7 +186,7 @@ public class ItemAdapter extends AbstractAdapter
     {
         return "DSpace Item";
     }
-    
+
     /**
      * @param bitstream a Bitstream.
      * @return a unique id for a bitstream.
@@ -262,26 +262,26 @@ public class ItemAdapter extends AbstractAdapter
                 String dmdID = getGenericID("dmd_");
                 // Keep track of all descriptive sections
                 dmdSecIDS.append(dmdID);
-                
+
                         ////////////////////////////////
                         // Start a metadata wrapper
                         attributes = new AttributeMap();
                         attributes.put("ID", dmdID);
                         attributes.put("GROUPID", groupID);
                         startElement(METS, "dmdSec", attributes);
-        
+
                          ////////////////////////////////
                         // Start a metadata wrapper
                         attributes = new AttributeMap();
                         attributes.put("MDTYPE","OTHER");
                         attributes.put("OTHERMDTYPE", "DIM");
                         startElement(METS,"mdWrap",attributes);
-                        
+
                         // ////////////////////////////////
                         // Start the xml data
                         startElement(METS,"xmlData");
-        
-                        
+
+
                         // ///////////////////////////////
                         // Start the DIM element
                         attributes = new AttributeMap();
@@ -291,7 +291,7 @@ public class ItemAdapter extends AbstractAdapter
                 attributes.put("withdrawn", "y");
             }
             startElement(DIM,"dim",attributes);
-                        
+
                 List<MetadataValue> dcvs = itemService.getMetadata(item, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
                 for (MetadataValue dcv : dcvs)
                 {
@@ -317,11 +317,11 @@ public class ItemAdapter extends AbstractAdapter
                         endElement(DIM,"field");
                 }
                 }
-                        
+
                 // ///////////////////////////////
                         // End the DIM element
                         endElement(DIM,"dim");
-                        
+
                 // ////////////////////////////////
                 // End elements
                 endElement(METS,"xmlData");
@@ -329,8 +329,8 @@ public class ItemAdapter extends AbstractAdapter
                 endElement(METS,"dmdSec");
 
         }
-                
-        
+
+
         // Add any extra crosswalks that may configured.
         for (String dmdType : dmdTypes)
         {
@@ -340,18 +340,18 @@ public class ItemAdapter extends AbstractAdapter
                 {
                     continue;
                 }
-                
+
                 DisseminationCrosswalk crosswalk = getDisseminationCrosswalk(dmdType);
-                
+
                 if (crosswalk == null)
                 {
                     continue;
                 }
-                
+
                 String dmdID = getGenericID("dmd_");
                 // Add our id to the list.
                 dmdSecIDS.append(" ").append(dmdID);
-                
+
                 ////////////////////////////////
                 // Start a metadata wrapper
                 attributes = new AttributeMap();
@@ -372,21 +372,21 @@ public class ItemAdapter extends AbstractAdapter
                         attributes.put("OTHERMDTYPE", dmdType);
                 }
                 startElement(METS,"mdWrap",attributes);
-                
+
                 // ////////////////////////////////
                 // Start the xml data
                 startElement(METS,"xmlData");
 
-                
+
                 // ///////////////////////////////
                 // Send the actual XML content
                 try {
                         Element dissemination = crosswalk.disseminateElement(context, item);
-        
+
                         SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
                         // Allow the basics for XML
                         filter.allowElements().allowIgnorableWhitespace().allowCharacters().allowCDATA().allowPrefixMappings();
-                        
+
                     SAXOutputter outputter = new SAXOutputter();
                     outputter.setContentHandler(filter);
                     outputter.setLexicalHandler(filter);
@@ -401,8 +401,8 @@ public class ItemAdapter extends AbstractAdapter
                                 // just ignore the authorize exception and continue on
                                 // without parsing the xml document.
                         }
-                
-            
+
+
             // ////////////////////////////////
             // End elements
             endElement(METS,"xmlData");
@@ -422,46 +422,46 @@ public class ItemAdapter extends AbstractAdapter
         {
                 // Generate a second group id for any extra metadata added.
                 String groupID2 = getGenericID("group_dmd_");
-                
+
                 List<Bundle> bundles = itemService.getBundles(item, "METADATA");
                 for (Bundle bundle : bundles)
                 {
                         Bitstream bitstream = bundleService.getBitstreamByName(bundle, "MODS.xml");
-        
+
                         if (bitstream == null)
                         {
                             continue;
                         }
-                        
-                        
+
+
                         String dmdID = getGenericID("dmd_");
-                        
-                        
+
+
                         ////////////////////////////////
                         // Start a metadata wrapper
                         attributes = new AttributeMap();
                         attributes.put("ID", dmdID);
                         attributes.put("GROUPID", groupID2);
                         startElement(METS, "dmdSec", attributes);
-        
+
                          ////////////////////////////////
                         // Start a metadata wrapper
                         attributes = new AttributeMap();
                         attributes.put("MDTYPE", "MODS");
                         startElement(METS,"mdWrap",attributes);
-                        
+
                         // ////////////////////////////////
                         // Start the xml data
                         startElement(METS,"xmlData");
-                        
-                        
+
+
                         // ///////////////////////////////
                         // Send the actual XML content
-                        
+
                         SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler, namespaces);
                         // Allow the basics for XML
                         filter.allowElements().allowIgnorableWhitespace().allowCharacters().allowCDATA().allowPrefixMappings();
-                        
+
                         XMLReader reader = XMLReaderFactory.createXMLReader();
                         reader.setContentHandler(filter);
                         reader.setProperty("http://xml.org/sax/properties/lexical-handler", filter);
@@ -474,7 +474,7 @@ public class ItemAdapter extends AbstractAdapter
                                 // just ignore the authorize exception and continue on
                                 // without parsing the xml document.
                         }
-                        
+
                         // ////////////////////////////////
                     // End elements
                     endElement(METS,"xmlData");
@@ -482,9 +482,9 @@ public class ItemAdapter extends AbstractAdapter
                     endElement(METS, "dmdSec");
                 }
         }
-    
+
     }
-    
+
     /**
      * Render the METS administrative section.
      *
@@ -574,7 +574,7 @@ public class ItemAdapter extends AbstractAdapter
             } // end for each bundle
           } // end for each crosswalk
         } // end for each amdSec
-        
+
         if(amdTypes.size() > 0)
         {
           //////////////////////////////////
@@ -725,18 +725,18 @@ public class ItemAdapter extends AbstractAdapter
     protected void renderFileSection(Context context) throws SQLException, SAXException
     {
         AttributeMap attributes;
-        
+
         // //////////////////////
         // Start a new file section
         startElement(METS,"fileSec");
-        
+
         // Check if the user is requested a specific bundle or
         // the all bundles.
         List<Bundle> bundles = findEnabledBundles();
 
         // Suppress license?
         Boolean showLicense = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("webui.licence_bundle.show");
-        
+
         // Loop over all requested bundles
         for (Bundle bundle : bundles)
         {
@@ -766,13 +766,13 @@ public class ItemAdapter extends AbstractAdapter
             attributes = new AttributeMap();
             attributes.put("USE", use);
             startElement(METS,"fileGrp",attributes);
-            
+
             for (Bitstream bitstream : bundle.getBitstreams())
             {
                 // //////////////////////////////
                 // Determine the file's IDs
                 String fileID = getFileID(bitstream);
-                
+
                 Bitstream originalBitstream = null;
                 if (isDerivedBundle)
                 {
@@ -786,7 +786,7 @@ public class ItemAdapter extends AbstractAdapter
                 {
                     admIDs = fileAmdSecIDs.get(fileID).toString();
                 }
-  
+
                 // Render the actual file & flocate elements.
                 renderFileWithAllowed(item, bitstream, fileID, groupID, admIDs);
 
@@ -801,18 +801,18 @@ public class ItemAdapter extends AbstractAdapter
                     }
                 }
             }
-            
+
             // ///////////////////
             // End the bundle's file group
             endElement(METS,"fileGrp");
         }
-        
+
         // //////////////////////
         // End the file section
         endElement(METS,"fileSec");
     }
 
-    
+
     /**
      * Render the item's structural map. This includes a list of
      * content bitstreams, those are bitstreams that are typically
@@ -835,7 +835,7 @@ public class ItemAdapter extends AbstractAdapter
     protected void renderStructureMap() throws SQLException, SAXException
     {
         AttributeMap attributes;
-        
+
         // ///////////////////////
         // Start a new structure map
         attributes = new AttributeMap();
@@ -858,7 +858,7 @@ public class ItemAdapter extends AbstractAdapter
             attributes.put("AMDID", amdSecIDS.toString());
         }
         startElement(METS,"div",attributes);
-        
+
         // add a fptr pointer to the primary bitstream.
         if (primaryBitstream != null)
         {
@@ -867,7 +867,7 @@ public class ItemAdapter extends AbstractAdapter
                 attributes = new AttributeMap();
                 String fileID = getFileID(primaryBitstream);
                 attributes.put("FILEID", fileID);
-                
+
                 startElement(METS,"fptr",attributes);
                 endElement(METS,"fptr");
         }
@@ -886,10 +886,10 @@ public class ItemAdapter extends AbstractAdapter
                 attributes = new AttributeMap();
                 String fileID = getFileID(bitstream);
                 attributes.put("FILEID", fileID);
-                
+
                 startElement(METS,"fptr",attributes);
                 endElement(METS,"fptr");
-                
+
                 // ///////////////////////////////
                 // End the div
                 endElement(METS,"div");
@@ -898,12 +898,12 @@ public class ItemAdapter extends AbstractAdapter
         // ////////////////////////////////
         // End the special first division
         endElement(METS,"div");
-        
+
         // ///////////////////////
         // End the structure map
         endElement(METS,"structMap");
     }
-    
+
 
 
     /**
@@ -922,8 +922,8 @@ public class ItemAdapter extends AbstractAdapter
         {
             return;
         }
-                
-                
+
+
         List<Bundle> bundles = itemService.getBundles(item, "METADATA");
 
         for (Bundle bundle : bundles)
@@ -945,8 +945,8 @@ public class ItemAdapter extends AbstractAdapter
                         // will trim out the METS declaration and only leave the actual METS parts to be
                         // included.
                         filter.allowElements(1);
-                        
-                        
+
+
                         XMLReader reader = XMLReaderFactory.createXMLReader();
                         reader.setContentHandler(filter);
                         reader.setProperty("http://xml.org/sax/properties/lexical-handler", filter);
@@ -960,7 +960,7 @@ public class ItemAdapter extends AbstractAdapter
         }
     }
 
-    
+
     /**
      * Checks which Bundles of current item a user has requested.
      * If none specifically requested, then all Bundles are returned.
@@ -988,10 +988,10 @@ public class ItemAdapter extends AbstractAdapter
                         }
                 }
         }
-    
+
         return bundles;
     }
-    
+
 
     /**
      * For a bitstream that's a thumbnail or extracted text, find the
@@ -1020,7 +1020,8 @@ public class ItemAdapter extends AbstractAdapter
 
         // Filename of original will be filename of the derived bitstream
         // minus the extension (ie everything from and including the last "." character)
-        String originalFilename = derived.getName().substring(0, derived.getName().lastIndexOf("."));
+       int endIndex = derived.getName().lastIndexOf(".");
+       String originalFilename = derived.getName().substring(0, endIndex>0?endIndex:(derived.getName().length()-1));
 
         // First find "original" bundle
         for (Bundle bundle : bundles)
@@ -1047,7 +1048,7 @@ public class ItemAdapter extends AbstractAdapter
 
     /**
      * Generate a METS file element for a given bitstream.
-     * 
+     *
      * @param item
      *            If the bitstream is associated with an item provide the item
      *            otherwise leave null.
@@ -1064,13 +1065,13 @@ public class ItemAdapter extends AbstractAdapter
      * @throws org.xml.sax.SAXException passed through.
      * @throws java.sql.SQLException passed through.
      */
-    
+
     // FIXME: this method is a copy of the one inherited. However the
     // original method is final so we must rename it.
 	protected void renderFileWithAllowed(Item item, Bitstream bitstream, String fileID, String groupID, String admID) throws SAXException, SQLException
     {
 		AttributeMap attributes;
-		
+
 		// //////////////////////////////
     	// Determine the file attributes
         BitstreamFormat format = bitstream.getFormat(context);
@@ -1082,7 +1083,7 @@ public class ItemAdapter extends AbstractAdapter
         String checksumType = bitstream.getChecksumAlgorithm();
         String checksum = bitstream.getChecksum();
         long size = bitstream.getSize();
-    	
+
         // ////////////////////////////////
         // Start the actual file
         attributes = new AttributeMap();
@@ -1103,14 +1104,14 @@ public class ItemAdapter extends AbstractAdapter
         }
         attributes.put("SIZE", String.valueOf(size));
         startElement(METS,"file",attributes);
-        
-        
+
+
         // ////////////////////////////////////
         // Determine the file location attributes
         String name = bitstream.getName();
         String description = bitstream.getDescription();
 
-        
+
         // If possible reference this bitstream via a handle, however this may
         // be null if a handle has not yet been assigned. In this case reference the
         // item its internal id. In the last case where the bitstream is not associated
@@ -1128,10 +1129,10 @@ public class ItemAdapter extends AbstractAdapter
         {
             identifier = "id/" + bitstream.getID();
         }
-        
-        
+
+
         String url = contextPath + "/bitstream/"+identifier+"/";
-        
+
         // If we can put the pretty name of the bitstream on the end of the URL
         try
         {
@@ -1143,11 +1144,11 @@ public class ItemAdapter extends AbstractAdapter
         catch (UnsupportedEncodingException uee)
         {
             // just ignore it, we don't have to have a pretty
-            // name on the end of the URL because the sequence id will 
+            // name on the end of the URL because the sequence id will
         	// locate it. However it means that links in this file might
         	// not work....
         }
-        
+
         url += "?sequence="+bitstream.getSequenceID();
 
 	// Test if we are allowed to see this item
@@ -1157,7 +1158,7 @@ public class ItemAdapter extends AbstractAdapter
 		isAllowed = "y";
 	    }
 	} catch (SQLException e) {/* Do nothing */}
-	
+
 	url += "&isAllowed=" + isAllowed;
 
         // //////////////////////
@@ -1174,12 +1175,12 @@ public class ItemAdapter extends AbstractAdapter
         }
         attributesXLINK.put("href", url);
         startElement(METS,"FLocat",attributes,attributesXLINK);
-        
+
 
         // ///////////////////////
         // End file location
         endElement(METS,"FLocate");
-        
+
         // ////////////////////////////////
         // End the file
         endElement(METS,"file");

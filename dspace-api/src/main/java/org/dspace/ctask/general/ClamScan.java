@@ -19,8 +19,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -28,6 +26,8 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
 import org.dspace.curate.Suspendable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**  ClamScan.java
  *
@@ -55,7 +55,7 @@ public class ClamScan extends AbstractCurationTask
     protected final String SCAN_FAIL_MESSAGE = "Error encountered using virus service - check setup";
     protected final String NEW_ITEM_HANDLE = "in workflow";
 
-    private static Logger log = Logger.getLogger(ClamScan.class);
+    private static final Logger log = LoggerFactory.getLogger(ClamScan.class);
     
     protected String host = null;
     protected int  port = 0;
@@ -231,18 +231,18 @@ public class ClamScan extends AbstractCurationTask
         }
     }
 
-    /** scan
-     *
+    /** A buffer to hold chunks of an input stream to be scanned for viruses. */
+    final byte[] buffer = new byte[DEFAULT_CHUNK_SIZE];
+
+    /**
      * Issue the INSTREAM command and return the response to
-     * and from the clamav daemon
+     * and from the clamav daemon.
      *
-     * @param the bitstream for reporting results
-     * @param the InputStream to read
-     * @param the item handle for reporting results
+     * @param bitstream the bitstream for reporting results
+     * @param inputstream the InputStream to read
+     * @param itemHandle the item handle for reporting results
      * @return a ScanResult representing the server response
-     * @throws IOException if IO error
      */
-    final byte[] buffer = new byte[DEFAULT_CHUNK_SIZE];;
     protected int scan(Bitstream bitstream, InputStream inputstream, String itemHandle)
     {
         try
@@ -251,7 +251,7 @@ public class ClamScan extends AbstractCurationTask
         }
         catch (IOException e)
         {
-            log.error("Error writing INSTREAM command . . .");
+            log.error("Error writing INSTREAM command", e);
             return Curator.CURATE_ERROR;
         }
         int read = DEFAULT_CHUNK_SIZE;
@@ -263,7 +263,7 @@ public class ClamScan extends AbstractCurationTask
             }
             catch (IOException e)
             {
-                log.error("Failed attempting to read the InputStream . . . ");
+                log.error("Failed attempting to read the InputStream", e);
                 return Curator.CURATE_ERROR;
             }
             if (read == -1)
@@ -277,7 +277,7 @@ public class ClamScan extends AbstractCurationTask
             }
             catch (IOException e)
             {
-                log.error("Could not write to the socket . . . ");
+                log.error("Could not write to the socket", e);
                 return Curator.CURATE_ERROR;
             }
         }
@@ -288,7 +288,7 @@ public class ClamScan extends AbstractCurationTask
         }
         catch (IOException e)
         {
-            log.error("Error writing zero-length chunk to socket") ;
+            log.error("Error writing zero-length chunk to socket", e) ;
             return Curator.CURATE_ERROR;
         }
         try
@@ -298,7 +298,7 @@ public class ClamScan extends AbstractCurationTask
         }
         catch (IOException e)
         {
-            log.error( "Error reading result from socket");
+            log.error( "Error reading result from socket", e);
             return Curator.CURATE_ERROR;
         }
         
@@ -306,7 +306,7 @@ public class ClamScan extends AbstractCurationTask
         {
             String response = new String(buffer, 0, read);
             logDebugMessage("Response: " + response);
-            if (response.indexOf("FOUND") != -1)
+            if (response.contains("FOUND"))
             {
                 String itemMsg = "item - " + itemHandle + ": ";
                 String bsMsg = "bitstream - " + bitstream.getName() +

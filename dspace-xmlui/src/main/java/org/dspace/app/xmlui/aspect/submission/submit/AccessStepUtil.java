@@ -201,7 +201,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 
     private void populateEmbargoDetail(final DSpaceObject dso, final Text text) throws SQLException, WingException {
         for (final ResourcePolicy readPolicy : authorizeService.getPoliciesActionFilter(context, dso, Constants.READ)) {
-            if (Group.ANONYMOUS.equals(readPolicy.getGroup().getName()) && readPolicy.getStartDate() != null) {
+            if (readPolicy.getGroup() != null && Group.ANONYMOUS.equals(readPolicy.getGroup().getName()) && readPolicy.getStartDate() != null) {
                 final String dateString = DateFormatUtils.format(readPolicy.getStartDate(), "yyyy-MM-dd");
                 text.setValue(dateString);
                 globalReason = readPolicy.getRpDescription();

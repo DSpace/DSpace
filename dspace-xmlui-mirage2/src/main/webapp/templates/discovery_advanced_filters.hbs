@@ -15,7 +15,7 @@
             <select id="aspect_discovery_SimpleSearch_field_filtertype_{{index}}" class="ds-select-field form-control"
                     name="filtertype_{{index}}">
                 {{#set_selected type}}
-                {{#each ../../i18n.filtertype}}
+                {{#each ../i18n.filtertype}}
                 <option value="{{@key}}">{{this}}</option>
                 {{/each}}
                 {{/set_selected}}
@@ -27,7 +27,7 @@
             <select id="aspect_discovery_SimpleSearch_field_filter_relational_operator_{{index}}"
                     class="ds-select-field form-control" name="filter_relational_operator_{{index}}">
                 {{#set_selected relational_operator}}
-                {{#each ../../i18n.filter_relational_operator}}
+                {{#each ../i18n.filter_relational_operator}}
                 <option value="{{@key}}">{{this}}</option>
                 {{/each}}
                 {{/set_selected}}

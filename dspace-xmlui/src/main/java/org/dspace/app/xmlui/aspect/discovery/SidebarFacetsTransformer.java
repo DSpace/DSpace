@@ -115,6 +115,9 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         if (this.validity == null) {
 
             try {
+                Context.Mode originalMode = context.getCurrentMode();
+                context.setMode(Context.Mode.READ_ONLY);
+
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 DSpaceValidity val = new DSpaceValidity();
 
@@ -143,6 +146,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                 }
 
                 this.validity = val.complete();
+                context.setMode(originalMode);
             }
             catch (Exception e) {
                 log.error(e.getMessage(),e);
@@ -172,6 +176,9 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
     @Override
     public void addOptions(Options options) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
+
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
@@ -263,6 +270,8 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                 }
             }
         }
+
+        context.setMode(originalMode);
     }
 
     /**
@@ -322,7 +331,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
         java.util.List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
 
-        log.info("facets for scope, " + scope + ": " + (facets != null ? facets.size() : null));
+        log.debug("facets for scope, " + scope + ": " + (facets != null ? facets.size() : null));
 
 
 

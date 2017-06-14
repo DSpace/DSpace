@@ -34,7 +34,7 @@ import org.dspace.core.ConfigurationManager;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  */
-public abstract class ImageMagickThumbnailFilter extends MediaFilter implements SelfRegisterInputFormats
+public abstract class ImageMagickThumbnailFilter extends MediaFilter
 {
 	protected static int width = 180;
     protected static int height = 120;
@@ -188,21 +188,4 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
         return true; //assume that the thumbnail is a custom one
     }
 
-     @Override
-     public String[] getInputMIMETypes()
-    {
-        return ImageIO.getReaderMIMETypes();
-    }
-
-    @Override
-    public String[] getInputDescriptions()
-    {
-        return null;
-    }
-
-    @Override
-    public String[] getInputExtensions()
-    {
-        return ImageIO.getReaderFileSuffixes();
-    }
 }

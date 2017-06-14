@@ -218,9 +218,9 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     }
 
     /**
-     * gets ID for Group referred to by this policy
+     * gets the Group referred to by this policy
      *
-     * @return groupID, or null if no group set
+     * @return group, or null if no group set
      */
     public Group getGroup()
     {
@@ -228,7 +228,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     }
 
     /**
-     * sets ID for Group referred to by this policy
+     * sets the Group referred to by this policy
      * @param epersonGroup Group
      */
     public void setGroup(Group epersonGroup)

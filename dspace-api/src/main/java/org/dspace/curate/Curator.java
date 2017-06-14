@@ -52,12 +52,12 @@ public class Curator
     // transaction scopes
     public static enum TxScope { OBJECT, CURATION, OPEN };
 
-    private static Logger log = Logger.getLogger(Curator.class);
+    private static final Logger log = Logger.getLogger(Curator.class);
     
-    protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<Context>();
+    protected static final ThreadLocal<Context> curationCtx = new ThreadLocal<>();
     
-    protected Map<String, TaskRunner> trMap = new HashMap<String, TaskRunner>();
-    protected List<String> perfList = new ArrayList<String>();
+    protected Map<String, TaskRunner> trMap = new HashMap<>();
+    protected List<String> perfList = new ArrayList<>();
     protected TaskQueue taskQ = null;
     protected String reporter = null;
     protected Invoked iMode = null;
@@ -177,8 +177,12 @@ public class Curator
      * Performs all configured tasks upon object identified by id. If
      * the object can be resolved as a handle, the DSO will be the
      * target object.
-     * 
-     * @param c a Dpace context
+     *
+     * <p>
+     * Note:  this method has the side-effect of setting this instance's Context
+     * reference.  The setting is retained on return.
+     *
+     * @param c a DSpace context
      * @param id an object identifier
      * @throws IOException if IO error
      */
@@ -230,9 +234,10 @@ public class Curator
      * <P>
      * Note: Site-wide tasks will default to running as
      * an Anonymous User unless you call the Site-wide task
-     * via the 'curate(Context,String)' method with an 
+     * via the {@link curate(Context,String)} or
+     * {@link #curate(Context, DSpaceObject)} method with an
      * authenticated Context object.
-     * 
+     *
      * @param dso the DSpace object
      * @throws IOException if IO error
      */
@@ -265,7 +270,26 @@ public class Curator
             }
         }
     }
-    
+
+    /**
+     * Performs all configured tasks upon DSpace object
+     * (Community, Collection or Item).
+     *
+     * <p>
+     * Note:  this method has the side-effect of setting this instance's Context
+     * reference.  The setting is retained on return.
+     *
+     * @param c session context in which curation takes place.
+     * @param dso the single object to be curated.
+     * @throws java.io.IOException passed through.
+     */
+    public void curate(Context c, DSpaceObject dso)
+            throws IOException
+    {
+        curationCtx.set(c);
+        curate(dso);
+    }
+
     /**
      * Places a curation request for the object identified by id on a
      * managed queue named by the queueId.

@@ -11,19 +11,6 @@ import com.lyncode.xoai.dataprovider.exceptions.ConfigurationException;
 import com.lyncode.xoai.dataprovider.exceptions.MetadataBindException;
 import com.lyncode.xoai.dataprovider.exceptions.WritingXmlException;
 import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
@@ -36,34 +23,37 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
-import org.dspace.content.MetadataField;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
+import org.dspace.handle.Handle;
 import org.dspace.xoai.exceptions.CompilingException;
+import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.cache.XOAICacheService;
 import org.dspace.xoai.services.api.cache.XOAIItemCacheService;
 import org.dspace.xoai.services.api.cache.XOAILastCompilationCacheService;
 import org.dspace.xoai.services.api.config.ConfigurationService;
-import org.dspace.xoai.services.api.CollectionsService;
 import org.dspace.xoai.services.api.solr.SolrServerResolver;
 import org.dspace.xoai.solr.DSpaceSolrSearch;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrException;
 import org.dspace.xoai.solr.exceptions.DSpaceSolrIndexerException;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.*;
 
 import static com.lyncode.xoai.dataprovider.core.Granularity.Second;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
@@ -206,7 +196,12 @@ public class XOAI {
             SolrServer server = solrServerResolver.getServer();
             while (iterator.hasNext()) {
                 try {
-                    server.add(this.index(iterator.next()));
+                    Item item = iterator.next();
+                    server.add(this.index(item));
+
+                    //Uncache the item to keep memory consumption low
+                    context.uncacheEntity(item);
+
                 } catch (SQLException | MetadataBindException | ParseException
                         | XMLStreamException | WritingXmlException ex) {
                     log.error(ex.getMessage(), ex);
@@ -272,7 +267,6 @@ public class XOAI {
         if (verbose) {
             println("Item with handle " + handle + " indexed");
         }
-
 
         return doc;
     }
@@ -382,7 +376,7 @@ public class XOAI {
                 String command = line.getArgs()[0];
 
                 if (COMMAND_IMPORT.equals(command)) {
-                    ctx = new Context();
+                    ctx = new Context(Context.Mode.READ_ONLY);
                     XOAI indexer = new XOAI(ctx,
                             line.hasOption('o'),
                             line.hasOption('c'),
