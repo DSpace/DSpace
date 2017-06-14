@@ -75,6 +75,8 @@ public class SolrUpgradeStatistics6
         //Maximum number of solr ids to pull in a facet query... when processing infrequently accessed ids, the
         //facet size may grow.
         private static final int    FACET_LIMIT = 1000;
+        //Once the number of records returned from a facet is smaller than this number, process all items for a query
+        private static final int    FACET_CUTOFF = 10;
         
         private static final String INDEX_DEFAULT = "statistics";
         private static final String MIGQUERY = "NOT(dspaceMig:*)";
@@ -402,9 +404,7 @@ public class SolrUpgradeStatistics6
                         while(run(FIELD.scopeId, Constants.COMMUNITY) > 0){};
 
                         //Handle irregular type/scopetype values
-                        for(FIELD field: FIELD.values()){                                
-                                while(run(field, -1) > 0){};                                
-                        }
+                        while(run(FIELD.epersonid, -1) > 0){};
                 }
                 
                 if (numProcessed > 0) {
@@ -475,6 +475,11 @@ public class SolrUpgradeStatistics6
                         System.out.println(String.format("\t%,12d\t%s", unexpected, "Unexpected Type & Full Site"));
                         total += unexpected;
                 }
+                long rem = sr.getResults().getNumFound() - total;
+                if (rem > 0) {
+                        System.out.println(String.format("\t%,12d\t%s", rem, "Other Records"));
+                        total += rem;
+                }
                 return total;
         }
         
@@ -499,7 +504,7 @@ public class SolrUpgradeStatistics6
                 sQ.setQuery(query);
                 sQ.setFacet(true);
                 sQ.addFacetField(field.name());
-                sQ.setFacetMinCount(1);
+                sQ.setFacetMinCount(FACET_CUTOFF);
                 sQ.setFacetLimit(Math.min(FACET_LIMIT,batchSize));
                 QueryResponse sr = server.query(sQ);
                 
@@ -507,7 +512,6 @@ public class SolrUpgradeStatistics6
                         for(FacetField.Count count: ff.getValues()) {
                                 String id = count.getName();
                                 
-                                //When querying on id or scopeId, find as many objects as possible that will re-use objects in cache
                                 if (ptype == Constants.COMMUNITY) {
                                         updateRecords(field, String.format("%s AND (id:%s OR owningComm:%s OR scopeId:%s)", MIGQUERY, id, id, id));
                                 } else if (ptype == Constants.COLLECTION) {
@@ -517,7 +521,7 @@ public class SolrUpgradeStatistics6
                                 } else if (ptype == Constants.BITSTREAM) {
                                         updateRecords(field, String.format("%s AND (id:%s)", MIGQUERY, id, id, id));
                                 } else  {
-                                        updateRecords(field, String.format("%s AND (%s:%s)", MIGQUERY, field.name(), id));
+                                        updateRecords(field, String.format("%s", MIGQUERY, field.name(), id));
                                 }
                                 if (numProcessed >= numRec) {
                                         break;
@@ -526,6 +530,10 @@ public class SolrUpgradeStatistics6
                         if (numProcessed >= numRec) {
                                 break;
                         }
+                }
+                if ((numProcessed - initNumProcessed) == 0){
+                        //run the query without the facet
+                        updateRecords(field, query);
                 }
                 if ((numProcessed - initNumProcessed) > 0){
                         printTime(String.format("\t%,12d Processed...", numProcessed), false);
