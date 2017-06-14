@@ -10,7 +10,6 @@ package org.dspace.content;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
@@ -25,13 +24,14 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.junit.*;
+
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
+
 import mockit.*;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 
 /**
@@ -97,6 +97,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     @Override
     public void destroy()
     {
+        context.turnOffAuthorisationSystem();
         it = null;
         super.destroy();
     }
@@ -104,6 +105,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
 
     /**
      * Test of find method, of class Item.
+     * @throws java.lang.Exception passed through.
      */
     @Test
     public void testItemFind() throws Exception

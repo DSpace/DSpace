@@ -81,6 +81,7 @@ public class WorkspaceItem implements InProgressSubmission
      *            ID of the workspace item
      * 
      * @return the workspace item, or null if the ID is invalid.
+     * @throws java.sql.SQLException passed through.
      */
     public static WorkspaceItem find(Context context, int id)
             throws SQLException
@@ -131,6 +132,9 @@ public class WorkspaceItem implements InProgressSubmission
      *            of the collection's template item
      * 
      * @return the newly created workspace item
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
      */
     public static WorkspaceItem create(Context c, Collection coll,
             boolean template) throws AuthorizeException, SQLException,
@@ -140,98 +144,49 @@ public class WorkspaceItem implements InProgressSubmission
         AuthorizeManager.authorizeAction(c, coll, Constants.ADD);
 
         // Create an item
-        Item i = Item.create(c);
-        i.setSubmitter(c.getCurrentUser());
+        Item item = Item.create(c);
+        item.setSubmitter(c.getCurrentUser());
 
-        // Now create the policies for the submitter and workflow
-        // users to modify item and contents
+        // Now create the policies for the submitter to modify item and contents.
         // contents = bitstreams, bundles
         // FIXME: icky hardcoded workflow steps
         Group step1group = coll.getWorkflowGroup(1);
         Group step2group = coll.getWorkflowGroup(2);
         Group step3group = coll.getWorkflowGroup(3);
 
-        EPerson e = c.getCurrentUser();
+        EPerson submitter = c.getCurrentUser();
 
-        // read permission
-        AuthorizeManager.addPolicy(c, i, Constants.READ, e, ResourcePolicy.TYPE_SUBMISSION);
+        // Add policies for the submitter
+        AuthorizeManager.addPolicy(c, item, Constants.READ, submitter, ResourcePolicy.TYPE_SUBMISSION);
+        AuthorizeManager.addPolicy(c, item, Constants.WRITE, submitter, ResourcePolicy.TYPE_SUBMISSION);
+        AuthorizeManager.addPolicy(c, item, Constants.ADD, submitter, ResourcePolicy.TYPE_SUBMISSION);
+        AuthorizeManager.addPolicy(c, item, Constants.REMOVE, submitter, ResourcePolicy.TYPE_SUBMISSION);
 
-
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow"))
+        {
+            // Add policies for the workflow step administrative groups
             if (step1group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.READ, step1group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.READ, step1group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.WRITE, step1group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.ADD, step1group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.REMOVE, step1group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step2group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.READ, step2group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.READ, step2group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.WRITE, step2group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.ADD, step2group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.REMOVE, step2group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step3group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.READ, step3group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-        }
-
-
-        // write permission
-        AuthorizeManager.addPolicy(c, i, Constants.WRITE, e, ResourcePolicy.TYPE_SUBMISSION);
-
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
-            if (step1group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-
-            if (step2group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step2group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-
-            if (step3group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step3group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-        }
-
-        // add permission
-        AuthorizeManager.addPolicy(c, i, Constants.ADD, e, ResourcePolicy.TYPE_SUBMISSION);
-
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
-            if (step1group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-
-            if (step2group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.ADD, step2group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-
-            if (step3group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.ADD, step3group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-        }
-
-        // remove contents permission
-        AuthorizeManager.addPolicy(c, i, Constants.REMOVE, e, ResourcePolicy.TYPE_SUBMISSION);
-
-        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
-            if (step1group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-
-            if (step2group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step2group, ResourcePolicy.TYPE_WORKFLOW);
-            }
-
-            if (step3group != null)
-            {
-                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step3group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.READ, step3group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.WRITE, step3group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.ADD, step3group, ResourcePolicy.TYPE_WORKFLOW);
+                AuthorizeManager.addPolicy(c, item, Constants.REMOVE, step3group, ResourcePolicy.TYPE_WORKFLOW);
             }
         }
 
@@ -244,22 +199,22 @@ public class WorkspaceItem implements InProgressSubmission
 
             for (int n = 0; n < md.length; n++)
             {
-                i.addMetadata(md[n].schema, md[n].element, md[n].qualifier, md[n].language,
+                item.addMetadata(md[n].schema, md[n].element, md[n].qualifier, md[n].language,
                         md[n].value);
             }
         }
 
-        i.update();
+        item.update();
 
         // Create the workspace item row
         TableRow row = DatabaseManager.row("workspaceitem");
 
-        row.setColumn("item_id", i.getID());
+        row.setColumn("item_id", item.getID());
         row.setColumn("collection_id", coll.getID());
 
         log.info(LogManager.getHeader(c, "create_workspace_item",
                 "workspace_item_id=" + row.getIntColumn("workspace_item_id")
-                        + "item_id=" + i.getID() + "collection_id="
+                        + "item_id=" + item.getID() + "collection_id="
                         + coll.getID()));
 
         DatabaseManager.insert(c, row);
@@ -280,6 +235,7 @@ public class WorkspaceItem implements InProgressSubmission
      *            the eperson
      * 
      * @return the corresponding workspace items
+     * @throws java.sql.SQLException passed through.
      */
     public static WorkspaceItem[] findByEPerson(Context context, EPerson ep)
             throws SQLException
@@ -332,6 +288,7 @@ public class WorkspaceItem implements InProgressSubmission
      *            the collection
      * 
      * @return the corresponding workspace items
+     * @throws java.sql.SQLException passed through.
      */
     public static WorkspaceItem[] findByCollection(Context context, Collection c)
             throws SQLException
@@ -384,6 +341,7 @@ public class WorkspaceItem implements InProgressSubmission
      *            the item
      *
      * @return workflow item corresponding to the item, or null
+     * @throws java.sql.SQLException passed through.
      */
     public static WorkspaceItem findByItem(Context context, Item i)
             throws SQLException
@@ -408,6 +366,7 @@ public class WorkspaceItem implements InProgressSubmission
      * @param   context     the context object
      *
      * @return      all workspace items
+     * @throws java.sql.SQLException passed through.
      */
     public static WorkspaceItem[] findAll(Context context)
         throws SQLException
@@ -505,6 +464,8 @@ public class WorkspaceItem implements InProgressSubmission
 
     /**
      * Update the workspace item, including the unarchived item.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     public void update() throws SQLException, AuthorizeException
     {
@@ -554,6 +515,10 @@ public class WorkspaceItem implements InProgressSubmission
      * Delete the workspace item. The entry in workspaceitem, the unarchived
      * item and its contents are all removed (multiple inclusion
      * notwithstanding.)
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException
+     *          if not original submitter or an administrator.
+     * @throws java.io.IOException passed through.
      */
     public void deleteAll() throws SQLException, AuthorizeException,
             IOException

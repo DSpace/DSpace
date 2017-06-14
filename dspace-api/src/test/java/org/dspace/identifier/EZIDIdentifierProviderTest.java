@@ -10,17 +10,14 @@ package org.dspace.identifier;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.UUID;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
-import org.dspace.core.Context;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -66,14 +63,14 @@ public class EZIDIdentifierProviderTest
      * @throws AuthorizeException
      * @throws IOException
      */
-    private Item newItem(Context ctx)
+    private Item newItem()
             throws SQLException, AuthorizeException, IOException
     {
-        ctx.turnOffAuthorisationSystem();
-        ctx.setCurrentUser(eperson);
+        context.turnOffAuthorisationSystem();
+        context.setCurrentUser(eperson);
 
         // Create an Item to play with
-        WorkspaceItem wsItem = WorkspaceItem.create(ctx, collection, false);
+        WorkspaceItem wsItem = WorkspaceItem.create(context, collection, false);
 
         // Get it from the workspace and set some metadata
         Item item = wsItem.getItem();
@@ -85,14 +82,14 @@ public class EZIDIdentifierProviderTest
         item.update();
 
         // I think we have to do this?
-        WorkflowItem wfItem = WorkflowManager.startWithoutNotify(ctx, wsItem);
-        WorkflowManager.advance(ctx, wfItem, ctx.getCurrentUser());
+        WorkflowItem wfItem = WorkflowManager.startWithoutNotify(context, wsItem);
+        WorkflowManager.advance(context, wfItem, context.getCurrentUser());
         wfItem.update();
         wfItem.deleteWrapper();
 
         // Commit work, clean up
-        ctx.commit();
-        ctx.restoreAuthSystemState();
+        context.commit();
+        context.restoreAuthSystemState();
 
         return item;
     }

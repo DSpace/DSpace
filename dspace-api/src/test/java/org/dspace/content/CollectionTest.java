@@ -479,6 +479,29 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     }
 
     /**
+     * Test of setWorkflowGroup method, of class Collection.
+     * The setWorkflowGroup adjusts the policies for the basic Workflow. This test
+     * shall assure that no exception (e.g. ConcurrentModificationException) is
+     * thrown during these adjustments.
+     * @throws java.sql.SQLException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     */
+    @Test
+    public void testChangeWorkflowGroup()
+            throws SQLException, AuthorizeException
+    {
+        context.turnOffAuthorisationSystem(); //must be an Admin to create a Group
+        int step = 1;
+        Group g1 = Group.create(context);
+        Group g2 = Group.create(context);
+        context.restoreAuthSystemState();
+        c.setWorkflowGroup(step, g1);
+        c.setWorkflowGroup(step, g2);
+        assertThat("testSetWorkflowGroup 0", c.getWorkflowGroup(step), notNullValue());
+        assertThat("testSetWorkflowGroup 1", c.getWorkflowGroup(step), equalTo(g2));
+    }
+
+    /**
      * Test of getWorkflowGroup method, of class Collection.
      */
     @Test
@@ -1733,6 +1756,7 @@ public class CollectionTest extends AbstractDSpaceObjectTest
 
      /**
      * Test of delete method, of class Collection.
+     * @throws java.lang.Exception
      */
     @Test(expected=AuthorizeException.class)
     public void testDeleteNoAuth2() throws Exception
