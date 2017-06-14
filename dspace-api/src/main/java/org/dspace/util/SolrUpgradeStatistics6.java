@@ -145,7 +145,7 @@ public class SolrUpgradeStatistics6
                 System.out.println("Connecting to " + serverPath);
                 server = new HttpSolrServer(serverPath);
                 //ensure that all queries wait for commits to complete
-                server.setMaxTotalConnections(1);
+                //server.setMaxTotalConnections(1);
                 this.numRec = numRec;
                 this.batchSize = batchSize;
                 refreshContext();
@@ -157,7 +157,7 @@ public class SolrUpgradeStatistics6
         private void batchUpdateStats() throws SolrServerException, IOException {
                 if (docs.size() > 0) {
                         server.add(docs);
-                        server.commit(true, true, true);
+                        //server.commit(true, true, true);
                         docs.clear();
                 }
                 
@@ -382,14 +382,17 @@ public class SolrUpgradeStatistics6
         private void run() throws SolrServerException, SQLException, IOException {
                 runReport();
                 logTime(false);
-                while(updateRecords(MIGQUERY) > 0){
-                        //no action
+                for(int start=0; start<numRec; start += batchSize){
+                        int processed = updateRecords(MIGQUERY, start);
+                        if (processed > 0) {
+                                printTime(numProcessed, false);
+                                batchUpdateStats();
+                        } else {
+                                break;
+                        }
                 }                
-                if (numProcessed > 0) {
-                        printTime(numProcessed, false);
-                        printTime(numProcessed, true);
-                        batchUpdateStats();
-                }
+                this.server.commit(true, true);
+                printTime(numProcessed, true);
                 
                 if (numProcessed > 0) {
                         runReport();
@@ -468,11 +471,12 @@ public class SolrUpgradeStatistics6
          * @param field Field to use for grouping records
          * @return number of items processed.  0 indicates that no more work is available (or the max processed has been reached).
          */
-        private int updateRecords(String query) throws SolrServerException, SQLException, IOException {
+        private int updateRecords(String query, int start) throws SolrServerException, SQLException, IOException {
                 int initNumProcessed = numProcessed;
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
-                sQ.setRows(Math.min(numRec - numProcessed, batchSize));
+                sQ.setStart(start);
+                sQ.setRows(batchSize);
                 
                 //Ensure that items are grouped by id
                 //Sort by id fails due to presense of id and string fields. The ord function seems to help
