@@ -8,8 +8,6 @@ import java.util.Map;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
@@ -85,7 +83,7 @@ public class AlumniRequestItemView extends AbstractDSpaceTransformer implements 
 	            dso = HandleUtil.obtainHandle(objectModel);
 
 	            DSpaceValidity validity = new DSpaceValidity();
-	            validity.add(dso);
+	            validity.add(context,dso);
 	            this.validity =  validity.complete();
 	        }
 	        catch (Exception e)
@@ -105,7 +103,6 @@ public class AlumniRequestItemView extends AbstractDSpaceTransformer implements 
             UIException, SQLException, IOException, AuthorizeException
     {
     	
-        Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
     	    	
         if (!AlumniRequest.isRequestable(context, dso))

@@ -27,16 +27,20 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -45,10 +49,19 @@ import org.xml.sax.SAXException;
  * @author Alexey Maslov
  * @author Scott Phillips
  * @author James Creel (http://www.jamescreel.net)
+ * @author Jason Savell <jsavell@library.tamu.edu>
  */
 
 public class AlumniRequest extends AbstractDSpaceTransformer 
 {
+	protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+	protected static final AuthorizeService authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
+	protected static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+
+	/*
+	protected static final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+	protected static final BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+*/
     private static Logger log = Logger.getLogger(AlumniRequest.class);
     
 
@@ -67,7 +80,7 @@ public class AlumniRequest extends AbstractDSpaceTransformer
     	
         // Add the trail back to the repository root.
         pageMeta.addTrailLink(contextPath + "/", message("xmlui.general.dspace_home"));
-        HandleUtil.buildHandleTrail(HandleUtil.obtainHandle(objectModel), pageMeta,contextPath);
+        HandleUtil.buildHandleTrail(context, HandleUtil.obtainHandle(objectModel), pageMeta,contextPath);
         
         pageMeta.addTrailLink(null, "Alumni Open Access Request");
     }
@@ -197,7 +210,7 @@ public class AlumniRequest extends AbstractDSpaceTransformer
         }
         
         // If the item is not in a blessed collection
-        String collectionsString = ConfigurationManager.getProperty("xmlui.alumni.request.collections");
+        String collectionsString = configurationService.getProperty("xmlui.alumni.request.collections");
         
         if (collectionsString == null || collectionsString.length() == 0)
             return false;
@@ -210,32 +223,32 @@ public class AlumniRequest extends AbstractDSpaceTransformer
             
         // If the item has no restricted bitstreams
         Item item = (Item)dso;
-	Bundle[] bundles = item.getBundles("ORIGINAL");
-	boolean restrictions = false;
+        java.util.List<Bundle> bundles = itemService.getBundles(item,"ORIGINAL");
+        boolean restrictions = false;
 	
-	for (Bundle bundle : bundles) 
-	{
-	    Bitstream[] bitstreams = bundle.getBitstreams();
-	    for (Bitstream bitstream : bitstreams)
-	    {
-		if (!AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ))
-		    restrictions = true;	
-	    }
-	}
+        for (Bundle bundle : bundles) 
+        {
+        	java.util.List<Bitstream> bitstreams = bundle.getBitstreams();
+        	for (Bitstream bitstream : bitstreams)
+        	{
+        		if (!authorizeService.authorizeActionBoolean(context, bitstream, Constants.READ))
+        			restrictions = true;	
+        	}
+		}
 	
-	if (!restrictions)
-	    return false;
+		if (!restrictions)
+			return false;
 	
-	return true;
+		return true;
     }
     
     
     private void sendRequest(DSpaceObject dso, Request request) throws IOException 
     {
         Email email = Email.getEmail(I18nUtil.getEmailFilename(I18nUtil.getDefaultLocale(), "alumni_request"));
-        email.addRecipient(ConfigurationManager.getProperty("feedback.recipient"));
+        email.addRecipient(configurationService.getProperty("feedback.recipient"));
         
-        String itemURL = ConfigurationManager.getProperty("dspace.url") + "/handle/" + ((Item)dso).getHandle();
+        String itemURL = configurationService.getProperty("dspace.url") + "/handle/" + ((Item)dso).getHandle();
         String message = "" + request.getParameter("comments");
         
         /*
