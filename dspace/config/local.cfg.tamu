@@ -329,3 +329,5 @@ xmlui.mdbrowser.1969.1/97043.reverse = true
 
 # Versioning Configurations: admin or submitter
 item.level.versioning = submitter
+
+xmlui.alumni.request.collections=1969.1/129207,1969.1/147588
