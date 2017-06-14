@@ -41,7 +41,6 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
@@ -121,8 +120,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected HandleService handleService;
     @Autowired(required = true)
     protected MetadataAuthorityService metadataAuthorityService;
-    @Autowired(required = true)
-    protected BundleService bundleService;
 
     /**
      * Non-Static CommonsHttpSolrServer for processing indexing events.
@@ -764,23 +761,22 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Write the document to the index under the appropriate handle.
      *
-     * @param doc the solr document to be written to the server
+     * @param doc
+     *     the solr document to be written to the server
      * @param streams
-     * @throws IOException IO exception
+     *     list of bitstream content streams
+     * @throws IOException
+     *     A general class of exceptions produced by failed or interrupted I/O operations.
      */
-    protected void writeDocument(SolrInputDocument doc, List<BitstreamContentStream> streams) throws IOException {
+    protected void writeDocument(SolrInputDocument doc, FullTextContentStreams streams) throws IOException {
 
         try {
             if(getSolr() != null)
             {
-                if(CollectionUtils.isNotEmpty(streams))
+                if (streams != null && !streams.isEmpty())
                 {
                     ContentStreamUpdateRequest req = new ContentStreamUpdateRequest("/update/extract");
-
-                    for(BitstreamContentStream bce : streams)
-                    {
-                        req.addContentStream(bce);
-                    }
+                    req.addContentStream(streams);
 
                     ModifiableSolrParams params = new ModifiableSolrParams();
 
@@ -1413,69 +1409,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         log.debug("  Added Grouping");
 
-
-
-        List<BitstreamContentStream> streams = new ArrayList<BitstreamContentStream>();
-
-        try {
-            // now get full text of any bitstreams in the TEXT bundle
-            // trundle through the bundles
-            List<Bundle> myBundles = item.getBundles();
-
-            for (Bundle myBundle : myBundles)
-            {
-                if ((myBundle.getName() != null)
-                        && myBundle.getName().equals("TEXT"))
-                {
-                    // a-ha! grab the text out of the bitstreams
-                    List<Bitstream> bitstreams = myBundle.getBitstreams();
-                    
-                    // TAMU Customization - Only index text bitstreams that are not restricted
-                    List<ResourcePolicy> bundlePolicies = bundleService.getBitstreamPolicies(context, myBundle); 
-                    boolean isIndexable = false;
-
-                    for (Bitstream myBitstream : bitstreams)
-                    {
-
-                        // TAMU Customization - Only index text bitstreams that are not restricted
-                    	isIndexable = false;
-                    	for (ResourcePolicy rp:bundlePolicies) {
-                    		
-                    		if (rp.getdSpaceObject().getID() == myBitstream.getID()) {
-                    			if (rp.getGroup().getName().equals("ANONYMOUS")) {
-                    				isIndexable = true;
-                    			}
-                    			break;
-                    		}
-                    	}
-                        // TAMU Customization - Only index text bitstreams that are not restricted
-                    	if (isIndexable) {
-	                        try {
-	
-	                            streams.add(new BitstreamContentStream(context, myBitstream));
-	
-	                            log.debug("  Added BitStream: "
-	                                    + myBitstream.getStoreNumber() + "	"
-	                                    + myBitstream.getSequenceID() + "   "
-	                                    + myBitstream.getName());
-	
-	                        } catch (Exception e)
-	                        {
-	                            // this will never happen, but compiler is now
-	                            // happy.
-	                            log.trace(e.getMessage(), e);
-	                        }
-                    	} else {
-        	         		log.info("**********BITSTREAM ID WAS RESTRICTED********* "+myBitstream.getID());
-                    	}
-                    }
-                }
-            }
-        } catch (RuntimeException e)
-        {
-            log.error(e.getMessage(), e);
-        }
-
         //Do any additional indexing, depends on the plugins
         List<SolrServiceIndexPlugin> solrServiceIndexPlugins = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(SolrServiceIndexPlugin.class);
         for (SolrServiceIndexPlugin solrServiceIndexPlugin : solrServiceIndexPlugins)
@@ -1485,7 +1418,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         // write the index and close the inputstreamreaders
         try {
-            writeDocument(doc, streams);
+            writeDocument(doc, new FullTextContentStreams(context, item));
             log.info("Wrote Item: " + handle + " to Index");
         } catch (RuntimeException e)
         {
