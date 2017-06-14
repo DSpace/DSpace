@@ -459,7 +459,10 @@
                 <xsl:attribute name="href">
                     <xsl:value-of select="$href"/>
                 </xsl:attribute>
+                <!--  TAMU Customization -->
                 <xsl:call-template name="getFileIcon">
+                    <xsl:with-param name="href" select="$href"/>
+                    <xsl:with-param name="title" select="$title"/>
                     <xsl:with-param name="mimetype">
                         <xsl:value-of select="substring-before($mimetype,'/')"/>
                         <xsl:text>/</xsl:text>
@@ -762,22 +765,20 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-
+    
+    <!--  TAMU Customization -->
     <xsl:template name="getFileIcon">
+        <xsl:param name="href"/>
+        <xsl:param name="title"/>
         <xsl:param name="mimetype"/>
-            <i aria-hidden="true">
-                <xsl:attribute name="class">
-                <xsl:text>glyphicon </xsl:text>
-                <xsl:choose>
-                    <xsl:when test="contains(mets:FLocat[@LOCTYPE='URL']/@xlink:href,'isAllowed=n')">
-                        <xsl:text> glyphicon-lock</xsl:text>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:text> glyphicon-file</xsl:text>
-                    </xsl:otherwise>
-                </xsl:choose>
-                </xsl:attribute>
-            </i>
+            <xsl:choose>
+                <xsl:when test="contains($href,'isAllowed=n')">
+                    <i aria-hidden="true" class="glyphicon glyphicon-lock" data-toggle="popover" data-placement="right" data-trigger="hover" title="{$title}" data-content="xmlui.dri2xhtml.METS-1.0.item-files-authorization-required" i18n:attr="data-content"></i>
+                </xsl:when>
+                <xsl:otherwise>
+                    <i aria-hidden="true" class="glyphicon glyphicon-file" data-toggle="popover" data-placement="right" data-trigger="hover" title="{$title}" data-content="xmlui.dri2xhtml.METS-1.0.item-files-authorized" i18n:attr="data-content"></i>
+                </xsl:otherwise>
+            </xsl:choose>
         <xsl:text> </xsl:text>
     </xsl:template>
 
