@@ -77,6 +77,9 @@ public class SolrUpgradeStatistics6
         private static final int    FACET_LIMIT = 1000;
         
         private static final String INDEX_DEFAULT = "statistics";
+        private static final String MIGQUERY = "NOT(dspaceMig:*)";
+
+
         private Integer type;
 
         //Counters to determine the number of items to process
@@ -167,7 +170,7 @@ public class SolrUpgradeStatistics6
          * @throws IOException 
          * @throws SolrServerException 
          */
-        public void refreshContext() throws SolrServerException, IOException {
+        private void refreshContext() throws SolrServerException, IOException {
                 if (context != null) {
                         try {
                                 totalCache += numUncache + context.getCacheSize();
@@ -202,7 +205,7 @@ public class SolrUpgradeStatistics6
          * @param fromStart if true, report on processing time since the start of the program
          * @return the time in ms since the start time
          */
-        public long logTime(boolean fromStart) {
+        private long logTime(boolean fromStart) {
                 long ret = 0;
                 long cur = new Date().getTime();
                 if (lastTime == -1) {
@@ -234,7 +237,7 @@ public class SolrUpgradeStatistics6
          * @param header Message to display
          * @param fromStart if true, report on processing time since the start of the program
          */
-        public void printTime(String header, boolean fromStart) {
+        private void printTime(String header, boolean fromStart) {
                 long dur = logTime(fromStart);
                 long totalDur = logTime(true);
                 String stotalDur = duration(totalDur);
@@ -432,7 +435,7 @@ public class SolrUpgradeStatistics6
          * Report on the existence of specific legacy id records within a shard
          */
         private long runReportQuery() throws SolrServerException {
-                StringBuilder sb = new StringBuilder("NOT(dspaceMig:*)");
+                StringBuilder sb = new StringBuilder(MIGQUERY);
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(sb.toString());
                 sQ.setFacet(true);
@@ -488,9 +491,9 @@ public class SolrUpgradeStatistics6
                 String query = "";
                 
                 if (ptype == -1){
-                        query = "NOT(dspaceMig:*) AND NOT(type:* OR scopeType:*)";
+                        query = String.format("%s AND NOT(type:* OR scopeType:*)", MIGQUERY);
                 } else {
-                        query = String.format("NOT(dspaceMig:*) AND (type:%d OR scopeType:%d)", ptype, ptype);
+                        query = String.format("%s AND (type:%d OR scopeType:%d)", MIGQUERY, ptype, ptype);
                 }
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
@@ -506,15 +509,15 @@ public class SolrUpgradeStatistics6
                                 
                                 //When querying on id or scopeId, find as many objects as possible that will re-use objects in cache
                                 if (ptype == Constants.COMMUNITY) {
-                                        updateRecords(field, String.format("id:%s OR owningComm:%s OR scopeId:%s", id, id, id));
+                                        updateRecords(field, String.format("%s AND (id:%s OR owningComm:%s OR scopeId:%s)", MIGQUERY, id, id, id));
                                 } else if (ptype == Constants.COLLECTION) {
-                                        updateRecords(field, String.format("id:%s OR owningColl:%s OR scopeId:%s", id, id, id));
+                                        updateRecords(field, String.format("%s AND (id:%s OR owningColl:%s OR scopeId:%s)", MIGQUERY, id, id, id));
                                 } else if (ptype == Constants.ITEM) {
-                                        updateRecords(field, String.format("id:%s OR owningItem:%s", id, id, id));
+                                        updateRecords(field, String.format("%s AND (id:%s OR owningItem:%s)", MIGQUERY, id, id, id));
                                 } else if (ptype == Constants.BITSTREAM) {
-                                        updateRecords(field, String.format("id:%s", id, id, id));
+                                        updateRecords(field, String.format("%s AND (id:%s)", MIGQUERY, id, id, id));
                                 } else  {
-                                        updateRecords(field, String.format("%s:%s", field.name(), id));
+                                        updateRecords(field, String.format("%s AND (%s:%s)", MIGQUERY, field.name(), id));
                                 }
                                 if (numProcessed >= numRec) {
                                         break;
@@ -638,7 +641,7 @@ public class SolrUpgradeStatistics6
          * Determine if the last processed item should be cleared from the hibernate cache
          * @param item Current item being processed
          */
-        public void checkLastItem(Item item) throws SQLException {
+        private void checkLastItem(Item item) throws SQLException {
                 if (item != null) {
                         if (lastItem == null) {
                                 lastItem = item;
@@ -654,7 +657,7 @@ public class SolrUpgradeStatistics6
          * Determine if the last processed bitstream should be cleared from the hibernate cache
          * @param bitstream Current bitstream being processed
          */
-        public void checkLastBitstream(Bitstream bitstream) throws SQLException {
+        private void checkLastBitstream(Bitstream bitstream) throws SQLException {
                 if (bitstream != null) {
                         if (lastBitstream == null) {
                                 lastBitstream = bitstream;
