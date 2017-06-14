@@ -44,15 +44,16 @@
     <script src="scripts/license-step.js">&#160;</script>
     <!-- TAMU Customization -->
     <script src="scripts/metadata-browser.js">&#160;</script>
+    <!-- TAMU Custom item submission -->
+    <script src="scripts/item-submission.js">&#160;</script>
+    <!-- TAMU bitstream tooltip -->
+    <script src="scripts/item-view-tooltip.js">&#160;</script>
 
     <script src="scripts/templates.js">&#160;</script>
 
     <!-- authorLookup and its dependencies -->
     <script src="vendor/datatables/media/js/jquery.dataTables.js">&#160;</script>
     <script src="scripts/person-lookup.js">&#160;</script>
-
-    <!-- TAMU Customization - proxy license step -->
-    <script src="scripts/license-step.js">&#160;</script>
 
     <!-- endbuild -->
 
