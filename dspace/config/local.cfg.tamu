@@ -318,9 +318,14 @@ embargo.field.terms = local.embargo.terms
 # DC metadata field to hold computed "lift date" of embargo
 embargo.field.lift = local.embargo.lift
 
-#### Metadata Tree Browser ####
 xmlui.community-list.render.full = true
 xmlui.community-list.render.browse = true
+
+#######################
+# TAMU CUSTOMIZATIONS #
+#######################
+
+#### Metadata Tree Browser ####
 
 # Metadata Tree Browser - Cushing Historic Images
 xmlui.mdbrowser.1969.1/97043.field = dc.relation.ispartof
@@ -331,3 +336,6 @@ xmlui.mdbrowser.1969.1/97043.reverse = true
 item.level.versioning = submitter
 
 xmlui.alumni.request.collections=1969.1/129207,1969.1/147588
+
+djatoka.url=http://djatoka.library.tamu.edu/
+dspace.oai.url=http://oaktrust.library.tamu.edu/dspace-oai
