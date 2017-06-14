@@ -15,12 +15,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 
 import javax.annotation.Nullable;
@@ -46,13 +48,16 @@ public class FullTextContentStreams extends ContentStreamBase
     protected final Context context;
     protected List<FullTextBitstream> fullTextStreams;
     protected BitstreamService bitstreamService;
+    
+    //TAMU Customization - We need a BundleService to check for bitstream restrictions before indexing them
+    protected final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
         init(parentItem);
     }
 
-    protected void init(Item parentItem) {
+    protected void init(Item parentItem) throws SQLException {
         fullTextStreams = new LinkedList<>();
 
         if(parentItem != null) {
@@ -65,7 +70,7 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
-    private void buildFullTextList(Item parentItem) {
+    private void buildFullTextList(Item parentItem) throws SQLException {
         // now get full text of any bitstreams in the TEXT bundle
         // trundle through the bundles
         List<Bundle> myBundles = parentItem.getBundles();
@@ -74,14 +79,37 @@ public class FullTextContentStreams extends ContentStreamBase
             if (StringUtils.equals(FULLTEXT_BUNDLE, myBundle.getName())) {
                 // a-ha! grab the text out of the bitstreams
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
+                
+                // TAMU Customization - Only index text bitstreams that are not restricted
+                List<ResourcePolicy> bundlePolicies = bundleService.getBitstreamPolicies(context, myBundle); 
+                boolean isIndexable = false;
 
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
-                    fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
-
-                    log.debug("Added BitStream: "
-                            + fulltextBitstream.getStoreNumber() + " "
-                            + fulltextBitstream.getSequenceID() + " "
-                            + fulltextBitstream.getName());
+                    // TAMU Customization - Only index text bitstreams that are not restricted
+                	isIndexable = false;
+                	for (ResourcePolicy rp:bundlePolicies) {
+                		
+                		if (rp.getdSpaceObject().getID() == fulltextBitstream.getID()) {
+                			if (rp.getGroup().getName().equals("ANONYMOUS")) {
+                				isIndexable = true;
+                			}
+                			break;
+                		}
+                	}
+                    // TAMU Customization - Only index text bitstreams that are not restricted
+                	if (isIndexable) {
+	                    fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
+	
+	                    log.debug("Added BitStream: "
+	                            + fulltextBitstream.getStoreNumber() + " "
+	                            + fulltextBitstream.getSequenceID() + " "
+	                            + fulltextBitstream.getName());
+                	} else {
+                		log.debug("Bitstream was restricted: "
+	                            + fulltextBitstream.getStoreNumber() + " "
+	                            + fulltextBitstream.getSequenceID() + " "
+	                            + fulltextBitstream.getName());
+                	}
                 }
             }
         }
