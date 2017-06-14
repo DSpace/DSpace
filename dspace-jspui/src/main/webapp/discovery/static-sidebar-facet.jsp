@@ -28,6 +28,8 @@
 <%
 	boolean brefine = false;
 	
+	Map<String, List<FacetResult>> mapFacetes = (Map<String, List<FacetResult>>) request.getAttribute("discovery.fresults");
+	List<DiscoverySearchFilterFacet> facetsConf = (List<DiscoverySearchFilterFacet>) request.getAttribute("facetsConfig");
 	String searchScope = (String) request.getAttribute("discovery.searchScope");
 
 	if (searchScope == null)

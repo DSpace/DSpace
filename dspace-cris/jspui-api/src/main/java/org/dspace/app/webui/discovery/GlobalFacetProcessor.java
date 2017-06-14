@@ -84,7 +84,7 @@ public class GlobalFacetProcessor implements SiteHomeProcessor
         {
             qResults = SearchUtils.getSearchService().search(context, scope,
                     queryArgs);
-            request.setAttribute("discovery.fresults",
+            request.setAttribute("discovery.global.fresults",
                     qResults.getFacetResults());
             DiscoveryConfiguration globalConfiguration = SearchUtils
                     .getGlobalConfiguration();
@@ -103,7 +103,7 @@ public class GlobalFacetProcessor implements SiteHomeProcessor
             request.setAttribute("facetGlobalName", globalConfiguration.getCollapsingConfiguration().getGroupIndexFieldName());
             request.setAttribute("facetGlobalFirstLevel", mapsFirstLevel);
             request.setAttribute("facetGlobalSecondLevel", mapsSecondLevel);
-            request.setAttribute("facetsConfig",
+            request.setAttribute("facetsGlobalConfig",
                     availableFacet != null ? availableFacet
                             : new ArrayList<DiscoverySearchFilterFacet>());
             if (scope !=null)
