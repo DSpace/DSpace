@@ -16,6 +16,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -206,6 +207,23 @@ public class AuthorizeServiceImpl implements AuthorizeService
         }
 
         return isAuthorized;
+    }
+    
+    // TAMU Customization 
+    @Override
+    public boolean authorizeVersioning(Context context, DSpaceObject dso) throws SQLException {
+        boolean authorized = false;
+        if(dso != null && dso.getType() == Constants.ITEM) {
+            if(isAdmin(context, dso)) {
+                authorized = true;
+            }
+            else {
+                Item item = (Item) dso;
+                authorized = StringUtils.equalsIgnoreCase("submitter", ConfigurationManager.getProperty("item.level.versioning")) ? 
+                                item.getSubmitter().equals(context.getCurrentUser()) : false;
+            }
+        }
+        return authorized;
     }
     
     /**

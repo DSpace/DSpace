@@ -426,13 +426,13 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
     }
     
-    // CUSTOM
+    // TAMU Customization
     @Override
     public void update(Context context, Item item) throws SQLException, AuthorizeException {
         update(context, item, false);
     }
 
-    // CUSTOM
+    // TAMU Customization
     public void update(Context context, Item item, boolean versioning) throws SQLException, AuthorizeException {
         
         if(versioning) {
@@ -667,7 +667,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         //Only clear collections after we have removed everything else from the item
-        item.getCollections().clear();
+        item.clearCollections();
         item.setOwningCollection(null);
 
         // Finally remove item row

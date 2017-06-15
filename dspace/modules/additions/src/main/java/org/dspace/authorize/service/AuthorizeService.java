@@ -147,6 +147,9 @@ public interface AuthorizeService {
      * @throws SQLException if database error
      */
     public boolean authorizeActionBoolean(Context c, EPerson e, DSpaceObject o, int a, boolean useInheritance) throws SQLException;
+    
+    // TAMU Customization
+    public boolean authorizeVersioning(Context context, DSpaceObject dso) throws SQLException;
 
     ///////////////////////////////////////////////
     // admin check methods
