@@ -82,8 +82,6 @@ public class SolrUpgradeStatistics6
         private static final String MIGQUERY = "NOT(dspaceMig:*)";
 
 
-        private Integer type;
-
         //Counters to determine the number of items to process
         private int numRec = NUMREC_DEFAULT;
         private int batchSize = BATCH_DEFAULT;
@@ -138,20 +136,17 @@ public class SolrUpgradeStatistics6
          * Construct the utility class from the command line options
          * @param indexName name of the statistics shard to update
          * @param numRec    maximum number of records to process
-         * @param type      object type to process (community, collection, item, bitstream)
          * @throws IOException 
          * @throws SolrServerException 
          */
-        public SolrUpgradeStatistics6(String indexName, int numRec, int batchSize, Integer type) throws SolrServerException, IOException {
+        public SolrUpgradeStatistics6(String indexName, int numRec, int batchSize) throws SolrServerException, IOException {
                 String serverPath = configurationService.getProperty("solr-statistics.server");
                 serverPath = serverPath.replaceAll("statistics$", indexName);
                 System.out.println("Connecting to " + serverPath);
                 server = new HttpSolrServer(serverPath);
-                //ensure that all queries wait for commits to complete
                 server.setMaxTotalConnections(1);
                 this.numRec = numRec;
                 this.batchSize = batchSize;
-                this.type = type;
                 refreshContext();
         }
 
@@ -161,7 +156,7 @@ public class SolrUpgradeStatistics6
         private void batchUpdateStats() throws SolrServerException, IOException {
                 if (docs.size() > 0) {
                         server.add(docs);
-                        server.commit(true, true, true);
+                        server.commit(true, true);
                         docs.clear();
                 }
                 
@@ -239,11 +234,23 @@ public class SolrUpgradeStatistics6
          * @param header Message to display
          * @param fromStart if true, report on processing time since the start of the program
          */
-        private void printTime(String header, boolean fromStart) {
+        private void printTime(int numProcessed, boolean fromStart) {
                 long dur = logTime(fromStart);
                 long totalDur = logTime(true);
                 String stotalDur = duration(totalDur);
-                System.out.println(String.format("%s (%,6d sec; %s; DB cache: %,6d; Docs: %,6d)", header, dur/1000, stotalDur, getCacheCounts(fromStart), docs.size()));
+                long cacheSize = 0;
+                try {
+                        cacheSize = context.getCacheSize();
+                } catch (SQLException e) {
+                        log.error("Cannot get cache size", e);
+                }
+                String label = fromStart ? "TOTAL" : "Processed";
+                System.out.println(String.format("%s (%s; %s; %s)", 
+                        String.format("\t%,12d %10s...", numProcessed, label),
+                        String.format("%,6d sec; %s", dur/1000, stotalDur),
+                        String.format("DB cache: %,6d/%,8d", cacheSize, getCacheCounts(fromStart)),
+                        String.format("Docs: %,6d", docs.size())
+                ));
         }
 
         /*
@@ -311,7 +318,6 @@ public class SolrUpgradeStatistics6
                 String indexName = INDEX_DEFAULT;
                 int numrec = NUMREC_DEFAULT;
                 int batchSize = BATCH_DEFAULT;
-                Integer type = null;
                 try
                 {
                         CommandLine line = parser.parse(options, args);
@@ -335,15 +341,6 @@ public class SolrUpgradeStatistics6
                         if (line.hasOption(BATCH_OPTION)) {
                                 batchSize = Integer.parseInt(line.getOptionValue(BATCH_OPTION,""+BATCH_DEFAULT));
                         }
-                        if (line.hasOption(TYPE_OPTION)) {
-                                String s = null;
-                                try {
-                                        s = line.getOptionValue(TYPE_OPTION);
-                                        type = Integer.parseInt(s);
-                                } catch (NumberFormatException e) {
-                                        log.warn("Non integer type parameter "+s);
-                                }
-                        }
 
                 }
                 catch (ParseException e)
@@ -353,7 +350,7 @@ public class SolrUpgradeStatistics6
                 }
                 
                 try {
-                        SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec, batchSize, type);
+                        SolrUpgradeStatistics6 upgradeStats = new SolrUpgradeStatistics6(indexName, numrec, batchSize);
                         upgradeStats.run();
                 } catch (SolrServerException e) {
                         log.error("Error querying stats", e);
@@ -365,59 +362,6 @@ public class SolrUpgradeStatistics6
         }
 
         
-        /*
-         * Process records with a legacy id.
-         * From the command line, the user may specify records of a specific type to update
-         * Otherwise, the following sequence will be applied in order to optimize hibernate caching.
-         * 
-         * Communities and Collections - retain in the cache since each is likely to be re-used
-         * Items - retain in the cache until a new item is processed
-         * Bitstreams - retain in the cache until a new bitstream is processed
-         * 
-         * 1. Find the most viewed item records
-         * 2. Find bitstreams owned by item records
-         * 3. Find all remaining bitstream records
-         * 4. Find all remaining collection records
-         * 5. Find all remaining community records
-         * 
-         */
-        private void run() throws SolrServerException, SQLException, IOException {
-                runReport();
-                logTime(false);
-                if (type != null) {
-                        for(FIELD field: FIELD.values()){                                
-                                while(run(field, type) > 0){};                                
-                        }
-                } else {
-                        //process items first minimize the number of objects that will be loaded from hibernate at one time
-                        while(run(FIELD.id, Constants.ITEM) > 0){};
-                        
-                        //process any bitstrem objects that did not have a match on onwingItem
-                        while(run(FIELD.id, Constants.BITSTREAM) > 0){};
-                        
-                        //collections
-                        while(run(FIELD.id, Constants.COLLECTION) > 0){};
-                        while(run(FIELD.scopeId, Constants.COLLECTION) > 0){};
-                        
-                        //communities
-                        while(run(FIELD.id, Constants.COMMUNITY) > 0){};
-                        while(run(FIELD.scopeId, Constants.COMMUNITY) > 0){};
-
-                        //Handle irregular type/scopetype values
-                        while(run(FIELD.epersonid, -1) > 0){};
-                }
-                
-                if (numProcessed > 0) {
-                        printTime(String.format("\t%,12d Processed...", numProcessed), false);
-                        printTime(String.format("\t%,12d TOTAL...    ", numProcessed), true);
-                        batchUpdateStats();
-                }
-                
-                if (numProcessed > 0) {
-                        runReport();
-                }
-        }
-
         /*
          * Report on the existence of legacy id records within a shard
          */
@@ -482,66 +426,34 @@ public class SolrUpgradeStatistics6
                 }
                 return total;
         }
-        
+
         /*
-         * Run queries for records of a specific type faceting by id to retrieve the most viewed records first.
-         * @param field Field to use for grouping records
-         * @param ptype The type of object to query:Community, Collection, Item, Bitstream; -1 is used for irregular type values
+         * Process records with a legacy id.
+         * From the command line, the user may specify records of a specific type to update
+         * Otherwise, the following sequence will be applied in order to optimize hibernate caching.
+         * 
+         * Communities and Collections - retain in the cache since each is likely to be re-used
+         * Items - retain in the cache until a new item is processed
+         * Bitstreams - retain in the cache until a new bitstream is processed
          */
-        private int run(FIELD field, int ptype) throws SolrServerException, SQLException, IOException {
-                if (numProcessed >= numRec) {
-                        return 0;
-                }
-                int initNumProcessed = numProcessed;
-                String query = "";
-                
-                if (ptype == -1){
-                        query = String.format("%s AND NOT(type:* OR scopeType:*)", MIGQUERY);
-                } else {
-                        query = String.format("%s AND (type:%d OR scopeType:%d)", MIGQUERY, ptype, ptype);
-                }
-                SolrQuery sQ = new SolrQuery();
-                sQ.setQuery(query);
-                sQ.setFacet(true);
-                sQ.addFacetField(field.name());
-                sQ.setFacetMinCount(FACET_CUTOFF);
-                sQ.setFacetLimit(Math.min(FACET_LIMIT,batchSize));
-                QueryResponse sr = server.query(sQ);
-                
-                for(FacetField ff: sr.getFacetFields()) {
-                        for(FacetField.Count count: ff.getValues()) {
-                                String id = count.getName();
-                                
-                                if (ptype == Constants.COMMUNITY) {
-                                        updateRecords(field, String.format("%s AND (id:%s OR owningComm:%s OR scopeId:%s)", MIGQUERY, id, id, id));
-                                } else if (ptype == Constants.COLLECTION) {
-                                        updateRecords(field, String.format("%s AND (id:%s OR owningColl:%s OR scopeId:%s)", MIGQUERY, id, id, id));
-                                } else if (ptype == Constants.ITEM) {
-                                        updateRecords(field, String.format("%s AND (id:%s OR owningItem:%s)", MIGQUERY, id, id, id));
-                                } else if (ptype == Constants.BITSTREAM) {
-                                        updateRecords(field, String.format("%s AND (id:%s)", MIGQUERY, id, id, id));
-                                } else  {
-                                        updateRecords(field, String.format("%s", MIGQUERY, field.name(), id));
-                                }
-                                if (numProcessed >= numRec) {
-                                        break;
-                                }
-                        }
-                        if (numProcessed >= numRec) {
-                                break;
-                        }
-                }
-                if ((numProcessed - initNumProcessed) == 0){
-                        //run the query without the facet
-                        updateRecords(field, query);
-                }
-                if ((numProcessed - initNumProcessed) > 0){
-                        printTime(String.format("\t%,12d Processed...", numProcessed), false);
+        private void run() throws SolrServerException, SQLException, IOException {
+                runReport();
+                logTime(false);
+                for(int processed = updateRecords(MIGQUERY); (processed != 0) && (numProcessed < numRec);  processed = updateRecords(MIGQUERY)){
+                        printTime(numProcessed, false);
                         batchUpdateStats();
-                        refreshContext();
+                        if (context.getCacheSize() > CACHE_LIMIT) {
+                                refreshContext();
+                        }
+                }                
+                printTime(numProcessed, true);
+                
+                if (numProcessed > 0) {
+                        runReport();
                 }
-                return numProcessed - initNumProcessed;
         }
+
+        
         
         /*
          * Update records associated with a particular object id
@@ -549,15 +461,19 @@ public class SolrUpgradeStatistics6
          * @param field Field to use for grouping records
          * @return number of items processed.  0 indicates that no more work is available (or the max processed has been reached).
          */
-        private int updateRecords(FIELD field, String query) throws SolrServerException, SQLException, IOException {
+        private int updateRecords(String query) throws SolrServerException, SQLException, IOException {
                 int initNumProcessed = numProcessed;
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
-                sQ.setRows(Math.min(numRec - numProcessed, batchSize));
+                sQ.setRows(batchSize);
                 
                 //Ensure that items are grouped by id
                 //Sort by id fails due to presense of id and string fields. The ord function seems to help
-                sQ.setSort(String.format("ord(%s)", field.name()), SolrQuery.ORDER.asc); 
+                sQ.addSort("type", SolrQuery.ORDER.desc);
+                sQ.addSort("scopeType", SolrQuery.ORDER.desc);
+                sQ.addSort("ord(owningItem)", SolrQuery.ORDER.desc);
+                sQ.addSort("id", SolrQuery.ORDER.asc);
+                sQ.addSort("scopeId", SolrQuery.ORDER.asc);
                 
                 QueryResponse sr = server.query(sQ);
                 SolrDocumentList sdl = sr.getResults();
@@ -573,13 +489,6 @@ public class SolrUpgradeStatistics6
                         
                         docs.add(input);
                         ++numProcessed;
-                        if (numProcessed % batchSize == 0) {
-                                printTime(String.format("\t%,12d Processed...", numProcessed), false);
-                                batchUpdateStats();
-                                if (context.getCacheSize() > CACHE_LIMIT) {
-                                        refreshContext();
-                                }
-                        }
                 }
                 return numProcessed - initNumProcessed;
         }
