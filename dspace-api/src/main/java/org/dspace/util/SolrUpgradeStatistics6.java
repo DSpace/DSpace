@@ -144,8 +144,7 @@ public class SolrUpgradeStatistics6
                 serverPath = serverPath.replaceAll("statistics$", indexName);
                 System.out.println("Connecting to " + serverPath);
                 server = new HttpSolrServer(serverPath);
-                //ensure that all queries wait for commits to complete
-                //server.setMaxTotalConnections(1);
+                server.setMaxTotalConnections(1);
                 this.numRec = numRec;
                 this.batchSize = batchSize;
                 refreshContext();
@@ -157,7 +156,7 @@ public class SolrUpgradeStatistics6
         private void batchUpdateStats() throws SolrServerException, IOException {
                 if (docs.size() > 0) {
                         server.add(docs);
-                        //server.commit(true, true, true);
+                        server.commit(true, true);
                         docs.clear();
                 }
                 
@@ -249,7 +248,7 @@ public class SolrUpgradeStatistics6
                 System.out.println(String.format("%s (%s; %s; %s)", 
                         String.format("\t%,12d %10s...", numProcessed, label),
                         String.format("%,6d sec; %s", dur/1000, stotalDur),
-                        String.format("DB cache: %,6d/%,6d", cacheSize, getCacheCounts(fromStart)),
+                        String.format("DB cache: %,6d/%,8d", cacheSize, getCacheCounts(fromStart)),
                         String.format("Docs: %,6d", docs.size())
                 ));
         }
@@ -364,42 +363,6 @@ public class SolrUpgradeStatistics6
 
         
         /*
-         * Process records with a legacy id.
-         * From the command line, the user may specify records of a specific type to update
-         * Otherwise, the following sequence will be applied in order to optimize hibernate caching.
-         * 
-         * Communities and Collections - retain in the cache since each is likely to be re-used
-         * Items - retain in the cache until a new item is processed
-         * Bitstreams - retain in the cache until a new bitstream is processed
-         * 
-         * 1. Find the most viewed item records
-         * 2. Find bitstreams owned by item records
-         * 3. Find all remaining bitstream records
-         * 4. Find all remaining collection records
-         * 5. Find all remaining community records
-         * 
-         */
-        private void run() throws SolrServerException, SQLException, IOException {
-                runReport();
-                logTime(false);
-                for(int start=0; start<numRec; start += batchSize){
-                        int processed = updateRecords(MIGQUERY, start);
-                        if (processed > 0) {
-                                printTime(numProcessed, false);
-                                batchUpdateStats();
-                        } else {
-                                break;
-                        }
-                }                
-                this.server.commit(true, true);
-                printTime(numProcessed, true);
-                
-                if (numProcessed > 0) {
-                        runReport();
-                }
-        }
-
-        /*
          * Report on the existence of legacy id records within a shard
          */
         private void runReport() throws SolrServerException {
@@ -463,6 +426,33 @@ public class SolrUpgradeStatistics6
                 }
                 return total;
         }
+
+        /*
+         * Process records with a legacy id.
+         * From the command line, the user may specify records of a specific type to update
+         * Otherwise, the following sequence will be applied in order to optimize hibernate caching.
+         * 
+         * Communities and Collections - retain in the cache since each is likely to be re-used
+         * Items - retain in the cache until a new item is processed
+         * Bitstreams - retain in the cache until a new bitstream is processed
+         */
+        private void run() throws SolrServerException, SQLException, IOException {
+                runReport();
+                logTime(false);
+                for(int processed = updateRecords(MIGQUERY); (processed != 0) && (numProcessed < numRec);  processed = updateRecords(MIGQUERY)){
+                        printTime(numProcessed, false);
+                        batchUpdateStats();
+                        if (context.getCacheSize() > CACHE_LIMIT) {
+                                refreshContext();
+                        }
+                }                
+                printTime(numProcessed, true);
+                
+                if (numProcessed > 0) {
+                        runReport();
+                }
+        }
+
         
         
         /*
@@ -471,18 +461,19 @@ public class SolrUpgradeStatistics6
          * @param field Field to use for grouping records
          * @return number of items processed.  0 indicates that no more work is available (or the max processed has been reached).
          */
-        private int updateRecords(String query, int start) throws SolrServerException, SQLException, IOException {
+        private int updateRecords(String query) throws SolrServerException, SQLException, IOException {
                 int initNumProcessed = numProcessed;
                 SolrQuery sQ = new SolrQuery();
                 sQ.setQuery(query);
-                sQ.setStart(start);
                 sQ.setRows(batchSize);
                 
                 //Ensure that items are grouped by id
                 //Sort by id fails due to presense of id and string fields. The ord function seems to help
                 sQ.addSort("type", SolrQuery.ORDER.desc);
+                sQ.addSort("scopeType", SolrQuery.ORDER.desc);
                 sQ.addSort("ord(owningItem)", SolrQuery.ORDER.desc);
                 sQ.addSort("id", SolrQuery.ORDER.asc);
+                sQ.addSort("scopeId", SolrQuery.ORDER.asc);
                 
                 QueryResponse sr = server.query(sQ);
                 SolrDocumentList sdl = sr.getResults();
@@ -498,13 +489,6 @@ public class SolrUpgradeStatistics6
                         
                         docs.add(input);
                         ++numProcessed;
-                        if (numProcessed % batchSize == 0) {
-                                printTime(numProcessed, false);
-                                batchUpdateStats();
-                                if (context.getCacheSize() > CACHE_LIMIT) {
-                                        refreshContext();
-                                }
-                        }
                 }
                 return numProcessed - initNumProcessed;
         }
