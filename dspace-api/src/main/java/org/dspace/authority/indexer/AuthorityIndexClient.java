@@ -54,7 +54,7 @@ public class AuthorityIndexClient {
             while (indexerInterface.hasMore()) {
                 AuthorityValue authorityValue = indexerInterface.nextValue();
                 if(authorityValue != null){
-                    toIndexValues.put(authorityValue.getId(), authorityValue);
+                    toIndexValues.put(authorityValue.getIndexID(), authorityValue);
                 }
             }
             //Close up

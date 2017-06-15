@@ -318,6 +318,7 @@ via copyField further on in this schema  -->
         <field name="last_modified_date" type="date" indexed="true" stored="true" required="true" />
         <field name="creation_date" type="date" indexed="true" stored="true" required="true" />
         <field name="authority_type" type="string" multiValued="false" indexed="true" stored="true" required="false"/>
+        <field name="index-id" type="string" multiValued="false" indexed="true" stored="true" required="true"/>
 
         <!-- Authority Metadata ( meta_{schema}_{element}_{qualifier} -->
         <!--dynamicField name="meta_*" type="text" multiValued="true" indexed="true" stored="true" required="false"/-->
@@ -328,7 +329,7 @@ via copyField further on in this schema  -->
     <!-- Field to use to determine and enforce document uniqueness.
        Unless this field is marked with required="false", it will be a required field
     -->
-    <uniqueKey>id</uniqueKey>
+    <uniqueKey>index-id</uniqueKey>
 
     <!-- field for the QueryParser to use when an explicit fieldname is absent -->
     <defaultSearchField>full-text</defaultSearchField>

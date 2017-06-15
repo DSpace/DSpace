@@ -1,6 +1,7 @@
 package org.datadryad.authority;
 
 import org.datadryad.api.DryadJournalConcept;
+import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.indexer.AuthorityIndexerInterface;
 import org.dspace.content.*;
@@ -17,18 +18,17 @@ import org.dspace.JournalUtils;
  */
 public class JournalConceptIndexer implements AuthorityIndexerInterface {
 
-    private String SOURCE="JOURNALCONCEPTS";
-    private AuthorityValue nextValue;
+    protected String SOURCE="JOURNALCONCEPTS";
+    protected AuthorityValue nextValue;
 
-    LinkedList<AuthorityValue> authorities = new LinkedList();
+    protected LinkedList<AuthorityValue> authorities = new LinkedList();
 
 
-    public static final String FIELD_NAME = "prism_publicationName";
+    public String FIELD_NAME = "prism_publicationName";
 
     public void init() {
         DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
         for (DryadJournalConcept concept : dryadJournalConcepts) {
-            System.out.println("concept is " + concept.getFullName());
             if (concept.isAccepted()) {
                 for (AuthorityValue doc : createAuthorityValues(concept)) {
                     authorities.add(doc);
@@ -65,7 +65,7 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private List<AuthorityValue> createAuthorityValues(DryadJournalConcept concept) {
+    protected List<AuthorityValue> createAuthorityValues(DryadOrganizationConcept concept) {
         ArrayList<AuthorityValue> authorityValues = new ArrayList<AuthorityValue>();
         ArrayList<String> names = new ArrayList<String>();
         names.add(concept.getFullName());
