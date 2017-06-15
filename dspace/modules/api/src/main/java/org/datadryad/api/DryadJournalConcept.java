@@ -114,12 +114,16 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         }
     }
 
+    protected static String getSchemeName() {
+        return ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
+    }
+
     @Override
     public void create(Context context) {
         try {
             context.turnOffAuthorisationSystem();
-            Scheme journalScheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
-            Concept newConcept = journalScheme.createConcept(context);
+            Scheme scheme = Scheme.findByIdentifier(context, getSchemeName());
+            Concept newConcept = scheme.createConcept(context);
             this.setUnderlyingConcept(context, newConcept);
             JournalUtils.addDryadJournalConcept(context, this);
             context.commit();

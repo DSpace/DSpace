@@ -45,7 +45,9 @@ public class DryadFunderConcept extends DryadOrganizationConcept {
         defaultMetadataValues.setProperty(metadataProperties.getProperty(COUNTRY), "");
     }
 
-    // these are mandatory elements
+    protected static String getSchemeName() {
+        return ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_fundingEntity");
+    }
 
     public DryadFunderConcept() {
         Context context = null;
@@ -77,20 +79,6 @@ public class DryadFunderConcept extends DryadOrganizationConcept {
             context.commit();
         } catch (Exception e) {
             log.error("exception " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void create(Context context) {
-        try {
-            context.turnOffAuthorisationSystem();
-            Scheme funderScheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_fundingEntity"));
-            Concept newConcept = funderScheme.createConcept(context);
-            this.setUnderlyingConcept(context, newConcept);
-            context.commit();
-            context.restoreAuthSystemState();
-        } catch (Exception e) {
-            log.error("Couldn't make new concept: " + e.getMessage());
         }
     }
 

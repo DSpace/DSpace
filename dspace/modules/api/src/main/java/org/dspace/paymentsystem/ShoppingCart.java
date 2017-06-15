@@ -10,7 +10,6 @@ package org.dspace.paymentsystem;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadOrganizationConcept;
 import org.datadryad.rest.models.ResultSet;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -438,6 +437,10 @@ public class ShoppingCart {
         return getCartForTableRow(context, rows.next());
     }
 
+    public static ShoppingCart findByItemId(Context context, int itemId) throws SQLException {
+        return findAllByItem(context, itemId).get(0);
+    }
+
     /**
      * Find the shoppingCarts by its id.
      *
@@ -585,7 +588,7 @@ public class ShoppingCart {
         return myRow.getDoubleColumn("surcharge");
     }
 
-    public void setSponsoringOrganization(DryadOrganizationConcept organizationConcept) {
+    public void setSponsoringOrganization(Context context, DryadOrganizationConcept organizationConcept) {
         if (organizationConcept != null) {
             setJournal(organizationConcept.getFullName());
             setJournalSub(organizationConcept.getSubscriptionPaid());

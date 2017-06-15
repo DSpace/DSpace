@@ -82,11 +82,15 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         }
     }
 
-    public void create(Context context) {
+    protected static String getSchemeName() {
+        return ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_organization");
+    }
+
+    protected void create(Context context) {
         try {
             context.turnOffAuthorisationSystem();
-            Scheme funderScheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_organization"));
-            Concept newConcept = funderScheme.createConcept(context);
+            Scheme scheme = Scheme.findByIdentifier(context, getSchemeName());
+            Concept newConcept = scheme.createConcept(context);
             this.setUnderlyingConcept(context, newConcept);
             context.commit();
             context.restoreAuthSystemState();
@@ -97,6 +101,19 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     public void delete(Context context) throws SQLException, AuthorizeException {
         this.getUnderlyingConcept(context).delete(context);
+    }
+
+    @JsonIgnore
+    public static Boolean isValid(Concept concept) {
+        log.error("scheme is " + getSchemeName());
+        try {
+            if (concept.getScheme().getName().equals(getSchemeName())) {
+                return true;
+            }
+        } catch (SQLException e) {
+            log.error("Couldn't get scheme for concept " + concept.getID());
+        }
+        return false;
     }
 
     @JsonIgnore

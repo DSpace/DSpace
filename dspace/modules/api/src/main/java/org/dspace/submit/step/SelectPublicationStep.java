@@ -85,7 +85,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         try {
             shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
             if (shoppingCart != null) {
-                shoppingCart.setSponsoringOrganization(null);
+                shoppingCart.setSponsoringOrganization(context, null);
             }
         } catch (Exception e) {
             log.error("couldn't find cart for item " + item.getID());

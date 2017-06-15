@@ -116,7 +116,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         newShoppingcart.setStatus(status);
         newShoppingcart.setVoucher(null);
         newShoppingcart.setTransactionId(null);
-        newShoppingcart.setSponsoringOrganization(null);
+        newShoppingcart.setSponsoringOrganization(context, null);
         newShoppingcart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
         newShoppingcart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
         Double totalPrice = calculateShoppingCartTotal(context, newShoppingcart);
@@ -319,7 +319,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 if (journal != null && journal.length() > 0) {
                     DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
                     if (journalConcept != null) {
-                        shoppingcart.setSponsoringOrganization(journalConcept);
+                        shoppingcart.setSponsoringOrganization(context, journalConcept);
                     }
                 }
 
@@ -330,7 +330,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                         DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, funder);
                         if (funderConcept != null && funderConcept.getSubscriptionPaid()) {
                             log.info("funder is a sponsor");
-                            shoppingcart.setSponsoringOrganization(funderConcept);
+                            shoppingcart.setSponsoringOrganization(context, funderConcept);
                         }
                     }
                 }
