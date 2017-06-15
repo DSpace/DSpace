@@ -45,6 +45,10 @@ public class NewsServiceImpl implements NewsService
     }
 
     protected List<String> addLocalesToAcceptableFilenames(List<String> acceptableFilenames){
+<<<<<<< 8af4cd0b6891e72d2c4d9d122aa9c5afead44c19
+=======
+        ConfigurationService configurationService =  DSpaceServicesFactory.getInstance().getConfigurationService();
+>>>>>>> Adding the changes suggested by Pascal-Nicolas Becker and Claudia Jurgen.
         String [] locales = configurationService.getArrayProperty("webui.supported.locales");
         List<String> newAcceptableFilenames = new ArrayList<>();
         newAcceptableFilenames.addAll(acceptableFilenames);
