@@ -19,8 +19,23 @@
 		<default.db.username>dspace_user</default.db.username>
 		<default.db.password>dspace_password</default.db.password>
 		<default.dspace.dir>/dspace</default.dspace.dir>
-		<default.mail.server>smtp.example.com</default.mail.server>
 		<default.solr.server>http://localhost:8080/solr</default.solr.server>
+		<default.sedici2003.database.url>jdbc\:mysql\://localhost\:3306/s2003_sedici?zeroDateTimeBehavior=convertToNull</default.sedici2003.database.url>
+		<default.sedici2003.database.username>root</default.sedici2003.database.username>
+		<default.sedici2003.database.password>root</default.sedici2003.database.password>
+		<default.dspace.hostname>localhost</default.dspace.hostname>
+		<default.dspace.baseUrl>http://localhost:8080</default.dspace.baseUrl>
+		<default.xmlui.google.analytics.key>UA-XXXXXX-X</default.xmlui.google.analytics.key>
+		<default.xmlui.debug>true</default.xmlui.debug>
+		<default.mail.server>smtp.example.com</default.mail.server>
+		<default.mail.server.username>myusername</default.mail.server.username>
+		<default.mail.server.password>mypassword</default.mail.server.password>
+		<default.mail.server.port>25</default.mail.server.port>
+		<default.mail.server.disabled>true</default.mail.server.disabled>
+		<default.mail.allowed.referrers>localhost, 127.0.0.1,163.10.34.,192.168.1.</default.mail.allowed.referrers>
+		<default.mail.extraproperties>mail.smtp.socketFactory.port=465, \
+									mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory, \
+									mail.smtp.socketFactory.fallback=false</default.mail.extraproperties>
 	</properties>
 
 	<profiles>
