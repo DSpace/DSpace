@@ -69,6 +69,7 @@
 <%@page import="org.dspace.content.DSpaceObject"%>
 <%@page import="java.util.List"%>
 <%
+	String hdlPrefix = ConfigurationManager.getProperty("handle.prefix");
     // Get the attributes
     DSpaceObject scope = (DSpaceObject) request.getAttribute("scope" );
     String searchScope = (String) request.getParameter("location" );
@@ -269,7 +270,7 @@
 </c:set>
 
 <c:set var="searchinKey">
-jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope)?"."+searchScope:""  %>
+jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope) && !StringUtils.startsWith(searchScope, hdlPrefix)?"."+searchScope:""  %>
 </c:set>
 <dspace:layout titlekey="${searchinKey}">
 
