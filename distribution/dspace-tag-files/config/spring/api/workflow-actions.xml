@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <bean id="claimactionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.ClaimAction" scope="prototype"/>
+    <bean id="reviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.ReviewAction" scope="prototype"/>
+    <bean id="editactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.AcceptEditRejectAction" scope="prototype"/>
+    <bean id="finaleditactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.FinalEditAction" scope="prototype"/>
+    <bean id="singleuserreviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SingleUserReviewAction" scope="prototype"/>
+
+    <bean id="selectrevieweractionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction" scope="prototype">
+        <property name="roleId" value="reviewer"/>
+    </bean>
+    <bean id="scorereviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.ScoreReviewAction" scope="prototype"/>
+    <bean id="evaluationactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.ScoreEvaluationAction" scope="prototype">
+        <property name="minimumAcceptanceScore" value="50" />
+    </bean>
+
+
+    <bean id="autoassignactionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.AutoAssignAction" scope="prototype"/>
+    <bean id="noUserSelectionActionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.NoUserSelectionAction" scope="prototype"/>
+    <bean id="assignoriginalsubmitteractionAPI" class="org.dspace.xmlworkflow.state.actions.userassignment.AssignOriginalSubmitterAction" scope="prototype"/>
+
+    <bean id="reviewaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="reviewaction"/>
+        <property name="processingAction" ref="reviewactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="editaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="editaction"/>
+        <property name="processingAction" ref="editactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="finaleditaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="finaleditaction"/>
+        <property name="processingAction" ref="finaleditactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+
+    <!--Action for the select single reviewer workflow -->
+    <bean id="selectrevieweraction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="selectrevieweraction"/>
+        <property name="processingAction" ref="selectrevieweractionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="singleuserreviewaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="singleuserreviewaction"/>
+        <property name="processingAction" ref="singleuserreviewactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="scorereviewaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="scorereviewaction"/>
+        <property name="processingAction" ref="scorereviewactionAPI" />
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <!--Autmatic step that evaluates scores (workflow.score) and checks if they match the configured minimum for archiving -->
+    <bean id="evaluationaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="evaluationaction"/>
+        <property name="processingAction" ref="evaluationactionAPI" />
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+
+<!--User selection actions-->
+    <bean id="claimaction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="claimaction"/>
+        <property name="processingAction" ref="claimactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="autoassignAction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="autoassignAction"/>
+        <property name="processingAction" ref="autoassignactionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+    <bean id="noUserSelectionAction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="noUserSelectionAction"/>
+        <property name="processingAction" ref="noUserSelectionActionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+    <bean id="originalSubmitterAssignAction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value=""/>
+        <property name="processingAction"  ref="assignoriginalsubmitteractionAPI"/>
+        <property name="requiresUI" value="false"/>
+    </bean>
+
+</beans>

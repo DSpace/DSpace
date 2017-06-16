@@ -1,0 +1,198 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace.modules</groupId>
+   <artifactId>xmlui</artifactId>
+   <packaging>war</packaging>
+   <name>DSpace XML-UI (Manakin) :: Web Application</name>
+   <url>http://projects.dspace.org/dspace-xmlui</url>
+   <description>
+      DSpace/Manakin XML-UI Based Webapplication using the Cocoon and
+      Wing frameworks
+   </description>
+
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>modules</artifactId>
+      <version>1.8.2</version>
+      <relativePath>..</relativePath>
+   </parent>
+
+   <scm>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
+   </scm>
+
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+               <archiveClasses>false</archiveClasses>
+               <webResources>
+                  <resource>
+                     <filtering>true</filtering>
+                     <directory>${basedir}/src/main/webapp</directory>
+                     <includes>
+                        <include>WEB-INF/web.xml</include>
+                     </includes>
+                  </resource>
+               </webResources>
+               <overlays>
+                  <!--  
+                     the priority of overlays is determined here
+                     1.) default: anything in the current project has highest
+                     2.) anything defined here has precedence in the order defined
+                     3.) any war found transitively in the dependencies will be applied
+                     next. the order is unpredictable.
+                  -->
+                  <overlay>
+                     <groupId>org.dspace</groupId>
+                     <artifactId>dspace-xmlui-lang</artifactId>
+                     <excludes>
+                        <!--  
+                           keep lang web.xml from overiding xmlui
+                        -->
+                        <exclude>WEB-INF/web.xml</exclude>
+                     </excludes>
+                  </overlay>
+                  <overlay>
+                     <groupId>org.dspace</groupId>
+                     <artifactId>dspace-xmlui-webapp</artifactId>
+                  </overlay>
+               </overlays>
+            </configuration>
+            <executions>
+               <execution>
+                  <phase>prepare-package</phase>
+               </execution>
+            </executions>
+         </plugin>
+
+      </plugins>
+   </build>
+
+   <profiles>
+      <!-- 
+         when activated a dspace.config configuration
+         file location passed on the commandline 
+         (-Ddspace.config=...) can be passed through 
+         to be used as a filter source by projects for 
+         tasks such as updating the ${dspace.dir} in
+         web.xml etc.
+      -->
+      <profile>
+         <id>dspace-config</id>
+         <activation>
+            <property>
+               <name>dspace.config</name>
+            </property>
+         </activation>
+         <build>
+            <filters>
+               <filter>${dspace.config}</filter>
+            </filters>
+         </build>
+      </profile>
+      <profile>
+         <id>postgres-support</id>
+         <activation>
+            <property>
+               <name>!db.name</name>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>postgresql</groupId>
+               <artifactId>postgresql</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+      <profile>
+         <id>oracle-support</id>
+         <activation>
+            <property>
+               <name>db.name</name>
+               <value>oracle</value>
+            </property>
+         </activation>
+         <dependencies>
+            <dependency>
+               <groupId>com.oracle</groupId>
+               <artifactId>ojdbc6</artifactId>
+            </dependency>
+         </dependencies>
+      </profile>
+   </profiles>
+
+   <dependencies>
+
+      <!-- DSpace XMLUI Languages -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-xmlui-lang</artifactId>
+         <type>war</type>
+      </dependency>
+
+      <!-- DSpace XMLUI Webapp -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-xmlui-webapp</artifactId>
+         <type>war</type>
+      </dependency>
+
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-discovery-solr</artifactId>
+         <version>1.8.2</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-discovery-xmlui-api</artifactId>
+         <version>1.8.2</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-discovery-xmlui-webapp</artifactId>
+         <version>1.8.2</version>
+         <type>war</type>
+      </dependency>
+
+        <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-sword-client-xmlui-api</artifactId>
+         <version>1.8.2</version>
+      </dependency>
+
+       <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
+         <version>1.8.2</version>
+         <type>war</type>
+      </dependency>
+
+      <!-- DSpace XMLUI API -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-xmlui-api</artifactId>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+         <version>2.3</version>
+         <scope>provided</scope>
+      </dependency>
+
+       <!--  A bit untidy but needed for XMLUI Sword client -->
+       <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-sword-api</artifactId>
+       </dependency>
+
+   </dependencies>
+
+</project>

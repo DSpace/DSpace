@@ -1,0 +1,19 @@
+# Email sent to DSpace users when they successfully export an item or collection.
+#
+# Parameters: {0} the export error
+#             {1} the URL to the feedback page
+#             
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: DSpace - The item export you requested was not completed.
+The item export you requested was not completed, due to the following reason:
+ {0}
+
+For more information you may contact your system administrator:
+ {1}
+
+
+
+The DSpace Team
+

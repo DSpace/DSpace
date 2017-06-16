@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workflow-curation>
+
+ <!-- workflow-curation enables curation tasks to be assigned to DSpace      -->
+ <!-- workflow steps.  The taskset-map element maps collection handles to    -->
+ <!-- tasksets enumerated in the 'tasksets' element. The special literal     -->
+ <!-- key 'default' is applied when a collection is not otherwise mapped.    -->
+ <!-- The special literal value 'none' indicates no taskset to perform.      -->
+
+ <taskset-map>
+   <mapping collection-handle="default" taskset="none" />
+ </taskset-map>
+
+ <!-- Tasksets specify tasks to be automatically performed at specific       -->
+ <!-- stages of workflow. The taskset 'name' attribute should match the      -->
+ <!-- 'taskset' attribute in the task-set mapping above. Sets are organized  -->
+ <!-- into elements called 'flowsteps' which correspond to DSpace workflow   -->
+ <!-- steps. Thus, to cause a task to be performed in the first step of      -->
+ <!-- workflow, place a 'task' element in the 'step1' flowstep. You may      -->
+ <!-- define from one to four flowstep elements in a taskset, since DSpace   -->
+ <!-- provides three workflow steps, and the flowstep action occurs before   -->
+ <!-- each step: use 'step1' for tasks prior to step1, 'step2' for tasks     -->
+ <!-- before step2, 'step3' before step3 and 'archive' before the item is    -->
+ <!-- installed in archive. Each flowstep also allows an optional 'queue'    -->
+ <!-- attribute, which controls whether and where the tasks are placed       -->
+ <!-- on a queue for deferred performance. If the attribute is not present,  -->
+ <!-- the tasks are all performed immediately. Otherwise, the                -->
+ <!-- tasks are placed on a queue named by the attribute value.              -->
+ <!-- You may add any number of tasks to a flowstep.  Each task              -->
+ <!-- element has a mandatory name attribute and 2 optional, repeateable     -->
+ <!-- properties. The task name attribute must match the plugin              -->
+ <!-- manager name given the task in dspace.cfg. The 'workflow' element      -->
+ <!-- describes what workflow actions can be taken upon completion of the    -->
+ <!-- task. In the example below, the vscan (virus scan) task has been given -->
+ <!-- the power to 'reject': meaning that if the task fails - viz. a virus   -->
+ <!-- is detected - the item will be rejected like a reviewer would reject   -->
+ <!-- it. The other 'workflow' value is 'approve', which skips any further   -->
+ <!-- tasks and advances the item. The 'notify' element allows you use       -->
+ <!-- the workflow system of notifications (email) whenever a task is        -->
+ <!-- performed and returns the designated status code (in the 'on'          -->
+ <!-- attribute): 'fail', 'success' or 'error'. The values these elements    -->
+ <!-- can have must be one of the following types:                           -->
+ <!-- an eperson name, an eperson group, or one of the special literals:     -->
+ <!-- '$flowgroup' = the workflow group of the step (if any).                -->
+ <!-- '$colladmin' = the collection administrator's group (if any)           -->
+ <!-- '$siteadmin' = the site administrator                                  -->
+ <!-- Thus, a recap of the sample taskset below would be: run a virus scan   -->
+ <!-- on every submitted item, reject infected submissions, notify the       -->
+ <!-- reviewer's group and collection administrators of same, or the site    -->
+ <!-- administrator if the task encounters an error in processing            -->
+
+ <tasksets>
+     
+   <taskset name="cautious">
+     <flowstep name="step1">
+       <task name="vscan">
+         <workflow>reject</workflow>
+         <notify on="fail">$flowgroup</notify>
+         <notify on="fail">$colladmin</notify>
+         <notify on="error">$siteadmin</notify>
+       </task>
+     </flowstep>
+   </taskset>
+   
+ </tasksets>
+ 
+</workflow-curation>

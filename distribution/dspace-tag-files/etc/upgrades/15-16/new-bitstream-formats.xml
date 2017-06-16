@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<!--
+  - new-bitstream-formats.xml
+  -
+  - New bitstream formats added in DSpace 1.6
+  -
+  - To load these, run: [dspace]/bin/registry-loader -bitstream new-bitstream-formats.xml
+  -->
+
+<dspace-bitstream-types>
+
+  <bitstream-type>
+    <mimetype>text/html; charset=utf-8</mimetype>
+    <short_description>CC License</short_description>
+    <description>Item-specific Creative Commons license agreed upon to submission</description>
+    <support_level>1</support_level>
+    <internal>true</internal>
+  </bitstream-type>
+
+  <bitstream-type>
+    <mimetype>application/rdf+xml; charset=utf-8</mimetype>
+    <short_description>RDF XML</short_description>
+    <description>RDF serialized in XML</description>
+    <support_level>1</support_level>
+    <internal>false</internal>
+    <extension>rdf</extension>
+  </bitstream-type>
+
+</dspace-bitstream-types>

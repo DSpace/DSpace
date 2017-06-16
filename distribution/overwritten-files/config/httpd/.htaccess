@@ -1,5 +1,7 @@
 RewriteEngine on
 
+#RewriteRule ^/+themes/.*:.*$ /error [R=permanent,L]
+
 #External redirect para accessos a la colección de la radiouniversidad. No quitar
 RewriteRule ^radio(.*)$ /handle/10915/25224$1 [R=permanent,L]
 
