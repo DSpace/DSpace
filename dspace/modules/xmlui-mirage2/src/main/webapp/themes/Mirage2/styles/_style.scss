@@ -15,6 +15,8 @@ body {
     min-width: 250px;
 }
 
+@import url('https://fonts.googleapis.com/css?family=Lato');
+
 //example mixin to set the text-selection style
 @mixin selection {
     ::-moz-selection { @content; }
@@ -224,65 +226,63 @@ ul#edu_tamu_metadatatreebrowser_BrowseOverview_list_overview-list li ul.sub-list
 /* TAMU Customization */
 /*********** header **********/
 
-.tamu-header-nav-bar {
-    background-color: #3c0000 !important;
-}
 
-.tamu-header-title-bar {
-    background-color: #500000 !important;
-    border-top: 1px solid #8d8d8d !important;
-    border-radius: 0;
-    height: 80px;
-}
-
-.tamu-header-title {
-    margin-left: 2px !important;
-    margin-top: 13px;
-    font: -webkit-control;
-    font-size: 38px;
-    font-style: normal;
-    font-variant: normal;
-    color: white;
-}
-
-.tamu-header-title a {
-    color: white;
-    text-decoration: none;
-}
-
-.tamu-header-title a:hover {
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.tamu-header-brand {
-    margin-top: 0px;
-}
-
-.tamu-header-brand-text {
-    margin-left: 10px;
-    font: -webkit-control;
-    font-size: 20px;
-    font-style: normal;
-    font-variant: normal;
-    color: white;
-}
-
-@media only screen and (max-width: 520px) {
-    .tamu-header-display {
-        display: none;
+header {
+    div.tamu-header-nav-bar {
+        background-color: #3c0000;
     }
-    .tamu-header-display-meadia {
-        display: inline;
+    div.tamu-header-title-bar {
+        background-color: #500000;
+        border-top: 1px solid #8d8d8d;
+        border-radius: 0;
+        padding: 20px 0;
     }
-}
-
-@media only screen and (min-width: 520px) {
-    .tamu-header-display {
-        display: inline;
+    .tamu-header-title {
+        font-family: 'Lato', sans-serif;
+        font-size: 30px;
+        font-style: normal;
+        font-variant: normal;
+        color: white;
     }
-    .tamu-header-display-meadia {
-        display: none;
+    .tamu-header-title a {
+        color: white;
+        text-decoration: none;
+    }
+    .tamu-header-title a:hover {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .tamu-header-brand {
+        margin-top: 0px;
+    }
+    .tamu-header-brand-text {
+        margin-left: 10px;
+        font-family: 'Lato', sans-serif;
+        font-size: 18px;
+        font-style: normal;
+        font-variant: normal;
+        color: white;
+    }
+    @media only screen and (max-width: 520px) {
+        .tamu-header-display {
+            display: none;
+        }
+        .tamu-header-display-mobile {
+            display: inline;
+        }
+    }
+    @media only screen and (max-width: 767px) {
+        .tamu-header-title {
+            padding-left: 15px;
+        }
+    }
+    @media only screen and (min-width: 520px) {
+        .tamu-header-display {
+            display: inline;
+        }
+        .tamu-header-display-mobile {
+            display: none;
+        }
     }
 }
