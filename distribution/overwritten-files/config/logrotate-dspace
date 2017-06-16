@@ -2,6 +2,7 @@
 /var/log/dspace/cocoon.log
 /var/log/dspace/solr.log
 {
+  su dspace dspace
   missingok
   notifempty
   weekly
@@ -13,6 +14,7 @@
 }
 
 /var/log/dspace/dspace.log {
+  su dspace dspace
   copytruncate
   daily
   size 100M
@@ -22,7 +24,7 @@
   dateformat .%Y-%m-%d
   dateyesterday
   compress
-  olddir old
+  olddir old-logs
 
   #postrotate
         #comprime los logs de antes de ayer
