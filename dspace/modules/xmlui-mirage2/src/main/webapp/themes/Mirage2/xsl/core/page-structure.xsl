@@ -370,7 +370,7 @@
     <xsl:template name="buildHeader">
 
         <header>
-            <div class="navbar navbar-default navbar-static-top" role="navigation">
+            <div class="navbar navbar-default navbar-static-top tamu-header-nav-bar" role="navigation">
                 <div class="container">
                     <div class="navbar-header">
 
