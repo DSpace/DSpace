@@ -369,7 +369,6 @@
         placeholders for header images -->
     <xsl:template name="buildHeader">
 
-
         <header>
             <div class="navbar navbar-default navbar-static-top" role="navigation">
                 <div class="container">
@@ -384,10 +383,21 @@
                             <span class="icon-bar"></span>
                         </button>
 
-                        <a href="{$context-path}/" class="navbar-brand">
-                            <!-- TAMU Customization -->
-                            <img src="{$theme-path}/images/library-logo.png" />
-                        </a>
+                        <!-- TAMU Customization -->
+                        <span class="navbar-brand tamu-header-brand tamu-header-display">                            
+                            <a href="http://library.tamu.edu">
+                                <img alt="Texas A&amp;M University Libraries" src="{$theme-path}images/tamu-logo-with-bar.png" />
+                            </a>
+                            <a href="http://library.tamu.edu">
+                                <span class="tamu-header-brand-text">Texas A&amp;M University Libraries</span>
+                            </a>                      
+                        </span>
+
+                        <span class="navbar-brand tamu-header-brand tamu-header-display-meadia">                            
+                            <a href="http://library.tamu.edu">
+                                <img alt="Texas A&amp;M University Libraries" src="{$theme-path}images/tamu-logo.png" />
+                            </a>               
+                        </span>
 
 
                         <div class="navbar-header pull-right visible-xs hidden-sm hidden-md hidden-lg">
@@ -448,6 +458,12 @@
                                     </li>
                                 </xsl:when>
                                 <xsl:otherwise>
+                                    <!-- TAMU Customization -->
+                                    <li>
+                                        <a href="http://askus.library.tamu.edu">
+                                            <span class="visible-xs glyphicon glyphicon-question-sign"></span>
+                                        </a>
+                                    </li>
                                     <li>
                                         <form style="display: inline" action="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='loginURL']}" method="get">
@@ -465,6 +481,18 @@
                     <div class="navbar-header pull-right hidden-xs">
                         <ul class="nav navbar-nav pull-left">
                               <xsl:call-template name="languageSelection"/>
+                        </ul>
+                        <!-- TAMU Customization -->
+                        <ul class="nav navbar-nav pull-left">
+                            <xsl:choose>
+                                <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'no'">
+                                    <li>
+                                        <a href="http://askus.library.tamu.edu">
+                                            <span class="hidden-xs">Help</span>
+                                        </a>
+                                    </li>
+                                </xsl:when>
+                            </xsl:choose>
                         </ul>
                         <ul class="nav navbar-nav pull-left">
                             <xsl:choose>
@@ -518,6 +546,15 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAMU Customization -->
+            <div class="navbar navbar-default tamu-header-title-bar" role="title">
+                <div class="container">
+                    <div class="navbar-header tamu-header-title">
+                        <a href="{$context-path}/">OAKTrust</a>    
                     </div>
                 </div>
             </div>

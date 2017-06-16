@@ -10,6 +10,10 @@
  * You can put your own style in this file.
  * It will be included in all color schemes
  */
+ 
+body {
+    min-width: 250px;
+}
 
 //example mixin to set the text-selection style
 @mixin selection {
@@ -215,4 +219,70 @@ ul#edu_tamu_metadatatreebrowser_BrowseOverview_list_overview-list li ul.sub-list
 
 #aspect_submission_StepTransformer_list_submit-initial-questions label.control-label {
     display: block;
+}
+
+/* TAMU Customization */
+/*********** header **********/
+
+.tamu-header-nav-bar {
+    background-color: #3c0000 !important;
+}
+
+.tamu-header-title-bar {
+    background-color: #500000 !important;
+    border-top: 1px solid #8d8d8d !important;
+    border-radius: 0;
+    height: 80px;
+}
+
+.tamu-header-title {
+    margin-left: 2px !important;
+    margin-top: 13px;
+    font: -webkit-control;
+    font-size: 38px;
+    font-style: normal;
+    font-variant: normal;
+    color: white;
+}
+
+.tamu-header-title a {
+    color: white;
+    text-decoration: none;
+}
+
+.tamu-header-title a:hover {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.tamu-header-brand {
+    margin-top: 0px;
+}
+
+.tamu-header-brand-text {
+    margin-left: 10px;
+    font: -webkit-control;
+    font-size: 20px;
+    font-style: normal;
+    font-variant: normal;
+    color: white;
+}
+
+@media only screen and (max-width: 520px) {
+    .tamu-header-display {
+        display: none;
+    }
+    .tamu-header-display-meadia {
+        display: inline;
+    }
+}
+
+@media only screen and (min-width: 520px) {
+    .tamu-header-display {
+        display: inline;
+    }
+    .tamu-header-display-meadia {
+        display: none;
+    }
 }
