@@ -8,6 +8,7 @@
 package org.dspace.eperson;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -157,9 +158,19 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     }
 
     @Override
-    public boolean isMember(Context context, Group group) throws SQLException {
-        EPerson currentUser = context.getCurrentUser();
+    public boolean isParentOf(Context context, Group parentGroup, Group childGroup) throws SQLException {
+        return group2GroupCacheDAO.findByParentAndChild(context, parentGroup, childGroup) != null;
+    }
 
+    @Override
+    public boolean isMember(Context context, Group group) throws SQLException {
+        return isMember(context, context.getCurrentUser(), group);
+    }
+
+    @Override
+    public boolean isMember(Context context, EPerson ePerson, Group group)
+            throws SQLException
+    {
         if(group == null) {
             return false;
 
@@ -167,32 +178,57 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
         } else if (StringUtils.equals(group.getName(), Group.ANONYMOUS)) {
             return true;
 
-        } else if(currentUser != null) {
+        } else {
+            Boolean cachedGroupMembership = context.getCachedGroupMembership(group, ePerson);
 
-            Boolean cachedGroupMembership = context.getCachedGroupMembership(group, currentUser);
             if(cachedGroupMembership != null) {
                 return cachedGroupMembership.booleanValue();
 
-            } else if(CollectionUtils.isNotEmpty(context.getSpecialGroups())) {
-                Set<Group> allMemberGroups = allMemberGroupsSet(context, currentUser);
-                boolean result = allMemberGroups.contains(group);
-
-                context.cacheGroupMembership(group, currentUser, result);
-                return result;
             } else {
-                //lookup eperson in normal groups and subgroups
-                boolean result = epersonInGroup(context, group.getName(), currentUser);
-                context.cacheGroupMembership(group, currentUser, result);
-                return result;
+                boolean isMember = false;
+
+                //If we have an ePerson, check we can find membership in the database
+                if(ePerson != null) {
+                    //lookup eperson in normal groups and subgroups with 1 query
+                    isMember = isEPersonInGroup(context, group.getName(), ePerson);
+                }
+
+                //If we did not find the group membership in the database, check the special groups.
+                //If there are special groups we need to check direct membership or check if the
+                //special group is a subgroup of the provided group.
+                //Note that special groups should only be checked if the current user == the ePerson.
+                //This also works for anonymous users (ePerson == null) if IP authentication used
+                if(!isMember && CollectionUtils.isNotEmpty(context.getSpecialGroups()) && isAuthenticatedUser(context, ePerson)) {
+                    Iterator<Group> it = context.getSpecialGroups().iterator();
+
+                    while (it.hasNext() && !isMember) {
+                        Group specialGroup = it.next();
+                        //Check if the special group matches the given group or if it is a subgroup (with 1 query)
+                        if (specialGroup.equals(group) || isParentOf(context, group, specialGroup)) {
+                            isMember = true;
+                        }
+                    }
+                }
+
+                context.cacheGroupMembership(group, ePerson, isMember);
+                return isMember;
+
             }
-        } else {
-            return false;
         }
+    }
+
+    private boolean isAuthenticatedUser(final Context context, final EPerson ePerson) {
+        return ObjectUtils.equals(context.getCurrentUser(), ePerson);
     }
 
     @Override
     public boolean isMember(final Context context, final String groupName) throws SQLException {
         return isMember(context, findByName(context, groupName));
+    }
+
+    @Override
+    public boolean isMember(final Context context, EPerson eperson, final String groupName) throws SQLException {
+        return isMember(context, eperson, findByName(context, groupName));
     }
 
     @Override
@@ -478,7 +514,7 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
 
 
 
-    protected boolean epersonInGroup(Context context, String groupName, EPerson ePerson)
+    protected boolean isEPersonInGroup(Context context, String groupName, EPerson ePerson)
             throws SQLException
     {
         return groupDAO.findByNameAndMembership(context, groupName, ePerson) != null;

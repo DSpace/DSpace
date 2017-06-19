@@ -189,7 +189,7 @@ public class ItemImportCLITool {
             String zipfilename = "";
             if (line.hasOption('z')) {
                 zip = true;
-                zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
+                zipfilename = line.getOptionValue('z');
             }
 
             //By default assume collections will be given on the command line

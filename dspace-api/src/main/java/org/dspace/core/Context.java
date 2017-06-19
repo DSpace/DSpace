@@ -9,8 +9,7 @@ package org.dspace.core;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.*;
-import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -692,8 +691,14 @@ public class Context
             log.warn("Unable to set database connection mode", ex);
         }
 
+        //Always clear the cache, except when going from READ_ONLY to READ_ONLY
+        if(mode != Mode.READ_ONLY || newMode != Mode.READ_ONLY) {
+            //clear our read-only cache to prevent any inconsistencies
+            readOnlyCache.clear();
+        }
+
         //save the new mode
-        this.mode = newMode;
+        mode = newMode;
     }
 
     /**

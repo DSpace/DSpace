@@ -46,11 +46,4 @@ public class ImageMagickPdfThumbnailFilter extends ImageMagickThumbnailFilter {
 	    }
     }
 
-   public static final String[] PDF = {"Adobe PDF"};
-   @Override
-   public String[] getInputMIMETypes()
-  {
-      return PDF;
-  }
-
 }

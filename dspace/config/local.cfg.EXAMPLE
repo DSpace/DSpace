@@ -104,8 +104,8 @@ db.schema = public
 #db.maxwait = 5000
 
 # Maximum number of idle connections in pool (-1 = unlimited)
-# (default = -1, unlimited)
-#db.maxidle = -1
+# (default = 10)
+#db.maxidle = 10
 
 
 #######################

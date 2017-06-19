@@ -160,6 +160,15 @@ public class DSpaceServlet extends HttpServlet
             }
             abortContext(context);
         }
+        catch (IOException ioe)
+        {
+            /*
+             * If a an IOException occurs (e.g. if the client interrupted a download),
+             * just log a simple warning without stacktrace.
+             */
+            log.warn(LogManager.getHeader(context, "io_error", ioe.toString()));
+            abortContext(context);
+        }
         catch (Exception e)
         {
             log.warn(LogManager.getHeader(context, "general_jspui_error", e

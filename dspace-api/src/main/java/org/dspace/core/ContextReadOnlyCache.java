@@ -79,6 +79,12 @@ public class ContextReadOnlyCache {
         return allMemberGroupsCache.get(buildAllMembersGroupKey(ePerson));
     }
 
+    public void clear() {
+        authorizedActionsCache.clear();
+        groupMembershipCache.clear();
+        allMemberGroupsCache.clear();
+    }
+
     private String buildAllMembersGroupKey(EPerson ePerson) {
         return ePerson == null ? "" : ePerson.getID().toString();
     }
@@ -93,4 +99,5 @@ public class ContextReadOnlyCache {
         return new ImmutablePair<>(group == null ? "" : group.getName(),
                 eperson == null ? "" : eperson.getID().toString());
     }
+
 }

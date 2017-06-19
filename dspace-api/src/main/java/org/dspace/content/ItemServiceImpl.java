@@ -651,7 +651,7 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
         }
 
         //Only clear collections after we have removed everything else from the item
-        item.getCollections().clear();
+        item.clearCollections();
         item.setOwningCollection(null);
 
         // Finally remove item row

@@ -7,6 +7,20 @@
  */
 package org.dspace.content;
 
+import mockit.NonStrictExpectations;
+import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.factory.CoreServiceFactory;
+import org.dspace.core.service.LicenseService;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,20 +29,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-
-import org.dspace.authorize.AuthorizeException;
-import org.apache.log4j.Logger;
-import org.dspace.core.Context;
-import org.dspace.core.factory.CoreServiceFactory;
-import org.dspace.core.service.LicenseService;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
-import org.junit.*;
-import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
-import mockit.NonStrictExpectations;
-import org.dspace.app.util.AuthorizeUtil;
-import org.dspace.core.Constants;
+import static org.junit.Assert.*;
 
 /**
  * Unit Tests for class Collection
@@ -1823,8 +1825,22 @@ public class CollectionTest extends AbstractDSpaceObjectTest
     @Test
     public void testGetCommunities() throws Exception
     {
-        assertThat("testGetCommunities 0",collection.getCommunities(), notNullValue());
-        assertTrue("testGetCommunities 1",collection.getCommunities().size() == 1);
+        context.turnOffAuthorisationSystem();
+        Community community = communityService.create(null, context);
+        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "community 3");
+        this.collection.addCommunity(community);
+        community = communityService.create(null, context);
+        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "community 1");
+        this.collection.addCommunity(community);
+        community = communityService.create(null, context);
+        communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, "community 2");
+        this.collection.addCommunity(community);
+        context.restoreAuthSystemState();
+        assertTrue("testGetCommunities 0",collection.getCommunities().size() == 4);
+        //Communities should be sorted by name
+        assertTrue("testGetCommunities 1",collection.getCommunities().get(1).getName().equals("community 1"));
+        assertTrue("testGetCommunities 1",collection.getCommunities().get(2).getName().equals("community 2"));
+        assertTrue("testGetCommunities 1",collection.getCommunities().get(3).getName().equals("community 3"));
     }
 
     /**
