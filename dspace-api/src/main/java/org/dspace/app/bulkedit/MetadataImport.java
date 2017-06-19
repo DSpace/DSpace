@@ -403,9 +403,12 @@ public class MetadataImport
                     changes.add(whatHasChanged);
                 }
 
-                c.uncacheEntity(wsItem);
-                c.uncacheEntity(wfItem);
-                c.uncacheEntity(item);
+                if (change) {
+                    //only clear cache if changes have been made.
+                    c.uncacheEntity(wsItem);
+                    c.uncacheEntity(wfItem);
+                    c.uncacheEntity(item);
+                }
             }
 
             c.setMode(originalMode);
