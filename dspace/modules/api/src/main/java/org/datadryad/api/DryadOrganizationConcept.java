@@ -139,6 +139,9 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     @Override
     public int compareTo(DryadOrganizationConcept organizationConcept) {
+        if (organizationConcept == null) {
+            return -1;
+        }
         return this.getFullName().toUpperCase().compareTo(organizationConcept.getFullName().toUpperCase());
     }
 
