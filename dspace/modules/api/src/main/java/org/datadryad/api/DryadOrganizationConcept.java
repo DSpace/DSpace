@@ -69,6 +69,10 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     protected Concept underlyingConcept;
     protected Integer conceptIdentifier;
     protected String fullName;
+    protected String schemeName;
+    {
+        schemeName = ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_organization");
+    }
 
     public DryadOrganizationConcept() {
     } // JAXB needs this
@@ -82,8 +86,9 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         }
     }
 
-    protected static String getSchemeName() {
-        return ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_organization");
+    @JsonIgnore
+    public String getSchemeName() {
+        return schemeName;
     }
 
     protected void create(Context context) {
@@ -101,19 +106,6 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     public void delete(Context context) throws SQLException, AuthorizeException {
         this.getUnderlyingConcept(context).delete(context);
-    }
-
-    @JsonIgnore
-    public static Boolean isValid(Concept concept) {
-        log.error("scheme is " + getSchemeName());
-        try {
-            if (concept.getScheme().getName().equals(getSchemeName())) {
-                return true;
-            }
-        } catch (SQLException e) {
-            log.error("Couldn't get scheme for concept " + concept.getID());
-        }
-        return false;
     }
 
     @JsonIgnore
@@ -337,7 +329,13 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     @JsonIgnore
     public Boolean isValid() {
-        return (getFullName() != null);
+        String conceptSchemeName = null;
+        try {
+            conceptSchemeName = underlyingConcept.getScheme().getIdentifier();
+        } catch (SQLException e) {
+            log.error("couldn't get scheme for concept");
+        }
+        return (getFullName() != null) && (getSchemeName().equals(conceptSchemeName));
     }
 
     @Override

@@ -45,8 +45,8 @@ public class DryadFunderConcept extends DryadOrganizationConcept {
         defaultMetadataValues.setProperty(metadataProperties.getProperty(COUNTRY), "");
     }
 
-    protected static String getSchemeName() {
-        return ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_fundingEntity");
+    {
+        schemeName = ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_fundingEntity");
     }
 
     public DryadFunderConcept() {

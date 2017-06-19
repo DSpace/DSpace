@@ -82,6 +82,10 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         defaultMetadataValues.setProperty(metadataProperties.getProperty(HASJOURNALPAGE), "");
     }
 
+    {
+        schemeName = ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
+    }
+
     // these are mandatory elements
 
     public DryadJournalConcept() {
@@ -112,10 +116,6 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
         } catch (Exception e) {
             log.error("exception " + e.getMessage());
         }
-    }
-
-    protected static String getSchemeName() {
-        return ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName");
     }
 
     @Override
