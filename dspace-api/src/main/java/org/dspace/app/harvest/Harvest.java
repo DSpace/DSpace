@@ -87,7 +87,7 @@ public class Harvest
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("Harvest\n", options);
             System.out
-    				.println("\nPING OAI server: Harvest -g -s oai_source -i oai_set_id");
+    				.println("\nPING OAI server: Harvest -g -a oai_source -i oai_set_id");
             System.out
 					.println("RUNONCE harvest with arbitrary options: Harvest -o -e eperson -c collection -t harvest_type -a oai_source -i oai_set_id -m metadata_format");
             System.out

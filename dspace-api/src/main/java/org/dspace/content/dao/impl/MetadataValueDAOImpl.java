@@ -50,7 +50,7 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
 
     @Override
     public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
-        String queryString = "SELECT m FROM MetadataValue m JOIN FETCH m.metadataField f " +
+        String queryString = "SELECT m FROM MetadataValue m JOIN m.metadataField f " +
                 "WHERE m.value like concat('%', concat(:searchString,'%')) ORDER BY m.id ASC";
 
         Query query = createQuery(context, queryString);
