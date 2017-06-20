@@ -162,30 +162,16 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         return doc.getRootElement();
     }
 
-    private void addEmailsAndEmbargoSettings(DryadJournalConcept journalConcept, Item item) throws AuthorizeException, SQLException {
-        ArrayList<String> reviewEmailList = journalConcept.getEmailsToNotifyOnReview();
-        String[] reviewEmails = reviewEmailList.toArray(new String[reviewEmailList.size()]);
-        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", Item.ANY);
-        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", Item.ANY);
+    private void addEmbargoSettings(DryadJournalConcept journalConcept, Item item) throws AuthorizeException, SQLException {
         item.clearMetadata("internal", "submit", "showEmbargo", Item.ANY);
         item.update();
-
-        if(reviewEmails != null) {
-            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails);
-        }
-
-        ArrayList<String> archiveEmailList = journalConcept.getEmailsToNotifyOnArchive();
-        String[] archiveEmails = archiveEmailList.toArray(new String[archiveEmailList.size()]);
-
-        if (archiveEmails != null) {
-            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails);
-        }
 
         Boolean embargoAllowed = journalConcept.getAllowEmbargo();
         if(embargoAllowed != null && !embargoAllowed){
             //We don't need to show the embargo option to any of our data files
             item.addMetadata("internal", "submit", "showEmbargo", null, String.valueOf(embargoAllowed));
         }
+        item.update();
     }
 
     private boolean processJournal(Item item, Context context, HttpServletRequest request) throws AuthorizeException, SQLException {
@@ -290,7 +276,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
         item.update();
         if (journalConcept.getIntegrated()) {
-            addEmailsAndEmbargoSettings(journalConcept, item);
+            addEmbargoSettings(journalConcept, item);
             if (manuscriptNumber != null && manuscriptNumber.equals("")) {
                 // set the status of the manuscript to whatever the user specified:
                 log.error("manuscript number is empty or nonexistent");
