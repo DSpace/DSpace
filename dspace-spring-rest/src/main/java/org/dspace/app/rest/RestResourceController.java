@@ -27,6 +27,7 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
+import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
@@ -175,9 +176,26 @@ public class RestResourceController implements InitializingBean {
 			//TODO create a custom exception
 			throw new ResourceNotFoundException(rel + "undefined for "+ model);
 		}
-		
-		ResourceSupport resu = (ResourceSupport) result.getEmbedded().get(rel);
-		return resu;
+		else if (result.getEmbedded().get(rel) instanceof EmbeddedPage){
+			// this is a very inefficient scenario. We have an embedded list
+			// already fully retrieved that we need to limit with pagination
+			// parameter. BTW change the default sorting is not implemented at
+			// the current stage and could be overcompex to implement
+			// if we really want to implement pagination we should implement a
+			// link repository so to fall in the previous block code
+			EmbeddedPage ep = (EmbeddedPage) result.getEmbedded().get(rel);
+			List<? extends RestModel> fullList = ep.getFullList();
+			if (fullList == null || fullList.size() == 0) return null;
+			int start = page.getOffset();
+			int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
+			DSpaceRestRepository<RestModel, ?> resourceRepository = utils.getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
+			PageImpl<RestModel> pageResult = new PageImpl(fullList.subList(start, end), page, fullList.size());
+			return assembler.toResource(pageResult	.map(resourceRepository::wrapResource));
+		}
+		else {
+			ResourceSupport resu = (ResourceSupport) result.getEmbedded().get(rel);
+			return resu;
+		}
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

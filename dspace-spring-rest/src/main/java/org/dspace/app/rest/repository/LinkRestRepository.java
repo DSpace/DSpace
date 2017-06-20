@@ -19,4 +19,8 @@ import org.springframework.hateoas.ResourceSupport;
  */
 public interface LinkRestRepository<L extends Serializable> {
 	public abstract ResourceSupport wrapResource(L model, String... rels);
+
+	public default boolean isEmbbeddableRelation(Object data, String name) {
+		return true;
+	}
 }
