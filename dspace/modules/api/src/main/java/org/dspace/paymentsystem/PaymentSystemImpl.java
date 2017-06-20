@@ -8,22 +8,17 @@
 package org.dspace.paymentsystem;
 
 import org.apache.log4j.Logger;
-import org.datadryad.api.DryadFunderConcept;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
-import org.dspace.content.authority.Choices;
 import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.JournalUtils;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.DryadWorkflowUtils;
-import org.datadryad.api.DryadJournalConcept;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -96,36 +91,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
     protected PaymentSystemImpl() {
     }
 
-
-    public ShoppingCart createNewShoppingCart(Context context, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException,
-            PaymentSystemException {
-        ShoppingCart newShoppingcart = ShoppingCart.create(context);
-        newShoppingcart.setCountry(country);
-        newShoppingcart.setCurrency(currency);
-        newShoppingcart.setDepositor(epersonId);
-        newShoppingcart.setExpiration(null);
-        if (itemId != null) {
-            //make sure we only create the shoppingcart for data package
-            Item item = Item.find(context, itemId);
-            org.dspace.content.Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
-            if (dataPackage != null) {
-                itemId = dataPackage.getID();
-            }
-            newShoppingcart.setItem(itemId);
-        }
-        newShoppingcart.setStatus(status);
-        newShoppingcart.setVoucher(null);
-        newShoppingcart.setTransactionId(null);
-        newShoppingcart.setSponsoringOrganization(context, null);
-        newShoppingcart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
-        newShoppingcart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
-        Double totalPrice = calculateShoppingCartTotal(context, newShoppingcart);
-        newShoppingcart.setTotal(totalPrice);
-        newShoppingcart.update();
-        return newShoppingcart;
-    }
-
-
     public void modifyShoppingCart(Context context, ShoppingCart shoppingcart, DSpaceObject dso) throws AuthorizeException, SQLException, PaymentSystemException {
 
         if (shoppingcart.getModified()) {
@@ -175,7 +140,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 // We should create a completed placeholder cart for the original item, but make sure it is marked
                 // that it was created for versioning and should not be re-charged.
                 log.debug("creating a completed shopping cart for new version of item " + itemId);
-                ShoppingCart versionCart = createNewShoppingCart(context, itemId, context.getCurrentUser().getID(), "", ShoppingCart.CURRENCY_US, ShoppingCart.STATUS_COMPLETED);
+                ShoppingCart versionCart = new ShoppingCart(context, itemId, context.getCurrentUser().getID(), "", ShoppingCart.CURRENCY_US, ShoppingCart.STATUS_COMPLETED);
                 versionCart.setNote("cart created for versioning; do not charge");
                 versionCart.update();
                 return versionCart;
@@ -188,7 +153,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
             return shoppingcartList.get(0);
         else {
             //if no shopping cart , create a new one
-            return createNewShoppingCart(context, itemId, context.getCurrentUser().getID(), "", ShoppingCart.CURRENCY_US, ShoppingCart.STATUS_OPEN);
+            return new ShoppingCart(context, itemId, context.getCurrentUser().getID(), "", ShoppingCart.CURRENCY_US, ShoppingCart.STATUS_OPEN);
         }
 
     }
@@ -210,15 +175,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
             // no sponsor, voucher, or country discount
             price = basicFee + fileSizeSurcharge;
         }
-        return price;
-    }
-
-    public Double calculateShoppingCartTotal(Context context, ShoppingCart shoppingcart) throws SQLException {
-        log.debug("recalculating shopping cart total");
-        boolean discount = dpcIsCovered(context, shoppingcart);
-        double fileSizeSurcharge = getSurchargeLargeFileFee(context, shoppingcart);
-        double basicFee = shoppingcart.getBasicFee();
-        double price = calculateTotal(discount, fileSizeSurcharge, basicFee);
         return price;
     }
 
@@ -260,7 +216,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
      * @return
      * @throws SQLException
      */
-    public long getTotalDataFileSize(Context context, Item dataPackage) throws SQLException {
+    public static long getTotalDataFileSize(Context context, Item dataPackage) throws SQLException {
         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage);
         long size = 0;
         for (Item dataFile : dataFiles) {
@@ -275,212 +231,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
         return size;
     }
 
-    public double getSurchargeLargeFileFee(Context context, ShoppingCart shoppingcart) throws SQLException {
-        // Extract values from database objects and configuration to pass to calculator
-        String currency = shoppingcart.getCurrency();
-
-        long allowedSize = PaymentSystemConfigurationManager.getMaxFileSize().longValue();
-        double fileSizeFeeAfter = PaymentSystemConfigurationManager.getAllSizeFileFeeAfterProperty(currency);
-        Long unitSize = PaymentSystemConfigurationManager.getUnitSize();  //1 GB
-
-        Item item = Item.find(context, shoppingcart.getItem());
-        long totalSizeDataFile = getTotalDataFileSize(context, item);
-        double totalSurcharge = calculateFileSizeSurcharge(allowedSize, totalSizeDataFile, fileSizeFeeAfter, shoppingcart.getSurcharge(), unitSize);
-        return totalSurcharge;
-    }
-
-    public boolean isSponsored(Context context, ShoppingCart shoppingcart) throws SQLException {
-        if (shoppingcart.getSponsoringOrganization(context) == null) {
-            // if this is an older cart that hasn't set a SponsoringOrganization yet, set one based on its journal.
-            if (!shoppingcart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
-                String journal = "";
-                String funder = "";
-                Item item = Item.find(context, shoppingcart.getItem());
-                if (item != null) {
-                    try {
-                        // Look for the journal
-                        DCValue[] values = item.getMetadata("prism.publicationName");
-                        if (values != null && values.length > 0) {
-                            journal = values[0].value;
-                        }
-                        // Look for any valid funding entities
-                        // (for now, there should only be one; there could be more later
-                        DCValue[] fundingEntities = item.getMetadata("dryad.fundingEntity");
-                        if (fundingEntities != null && fundingEntities.length > 0) {
-                            if (fundingEntities[0].confidence == Choices.CF_ACCEPTED) {
-                                funder = fundingEntities[0].authority;
-                            }
-                        }
-
-                    } catch (Exception e) {
-                        log.error("Exception getting journal from item " + item.getID() + ":", e);
-                    }
-                }
-                if (journal != null && journal.length() > 0) {
-                    DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
-                    if (journalConcept != null) {
-                        shoppingcart.setSponsoringOrganization(context, journalConcept);
-                    }
-                }
-
-                // funder of last resort:
-                if (!shoppingcart.hasSubscription()) {
-                    if (!"".equals(funder)) {
-                        log.info("checking to see if " + funder + " is a sponsor");
-                        DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, funder);
-                        if (funderConcept != null && funderConcept.getSubscriptionPaid()) {
-                            log.info("funder is a sponsor");
-                            shoppingcart.setSponsoringOrganization(context, funderConcept);
-                        }
-                    }
-                }
-            }
-        }
-        shoppingcart.update();
-        return shoppingcart.hasSubscription();
-    }
-
-
-    private boolean voucherValidate(Context context, ShoppingCart shoppingcart) {
-        VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
-        return voucherValidationService.validate(context, shoppingcart.getVoucher(), shoppingcart);
-    }
-
-    public boolean dpcIsCovered(Context context, ShoppingCart shoppingcart) throws SQLException {
-        int waiver = getWaiver(context, shoppingcart);
-        if (waiver == ShoppingCart.NO_WAIVER) {
-            return false;
-        }
-        return true;
-    }
-
-    public int getWaiver(Context context, ShoppingCart shoppingcart) throws SQLException {
-        // check for payment by sponsor, waiver, voucher
-        Boolean isSponsored = isSponsored(context, shoppingcart);
-        Boolean countryDiscount = getCountryWaiver(context, shoppingcart);
-        Boolean voucherDiscount = voucherValidate(context, shoppingcart);
-
-        if (countryDiscount) {
-            return ShoppingCart.COUNTRY_WAIVER;
-        } else if (isSponsored) {
-            return ShoppingCart.JOUR_WAIVER;
-        } else if (voucherDiscount) {
-            return ShoppingCart.VOUCHER_WAIVER;
-        }
-        return ShoppingCart.NO_WAIVER;
-    }
-
-    public String getWaiverMessage(Context context, ShoppingCart shoppingCart) {
-        String result = "";
-        try {
-            switch (getWaiver(context, shoppingCart)) {
-                case ShoppingCart.COUNTRY_WAIVER:
-                    result = "Data Publishing Charge has been waived due to submitter's association with " + shoppingCart.getCountry() + ".";
-                    break;
-                case ShoppingCart.JOUR_WAIVER:
-                    result = shoppingCart.getJournal() + " will cover the Data Publishing Charge for this associated submission.";
-                    break;
-                case ShoppingCart.VOUCHER_WAIVER:
-                    result = "Voucher code applied to Data Publishing Charge.";
-                    break;
-            }
-        } catch (SQLException e) {
-            log.error("Exception getting waiver for cart " + shoppingCart.getID());
-        }
-        return result;
-    }
-
-    public boolean getCountryWaiver(Context context, ShoppingCart shoppingCart) throws SQLException {
-        PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
-        Properties countryArray = manager.getAllCountryProperty();
-
-        if (shoppingCart.getCountry() != null && shoppingCart.getCountry().length() > 0) {
-            return countryArray.get(shoppingCart.getCountry()).equals(ShoppingCart.COUNTRYFREE);
-        } else {
-            return false;
-        }
-    }
-
-
-    public void updateTotal(Context context, ShoppingCart shoppingCart) throws SQLException {
-        if (!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
-            Double newPrice = calculateShoppingCartTotal(context, shoppingCart);
-            //TODO:only setup the price when the old total price is higher than the price right now
-            shoppingCart.setTotal(newPrice);
-            shoppingCart.update();
-            shoppingCart.setModified(false);
-        }
-    }
-
-    public String getPayer(Context context, ShoppingCart shoppingcart) throws SQLException {
-        String payerName = "";
-        EPerson e = EPerson.find(context, shoppingcart.getDepositor());
-        switch (getWaiver(context, shoppingcart)) {
-            case ShoppingCart.COUNTRY_WAIVER:
-                payerName = "Country";
-                break;
-            case ShoppingCart.JOUR_WAIVER:
-                payerName = "Sponsor";
-                break;
-            case ShoppingCart.VOUCHER_WAIVER:
-                payerName = "Voucher";
-                break;
-            case ShoppingCart.NO_WAIVER:
-                payerName = e.getFullName();
-                break;
-        }
-        return payerName;
-    }
-
-    private String format(String label, String value) {
-        return label + ": " + value + "\n";
-    }
-
-    public String printShoppingCart(Context c, ShoppingCart shoppingCart) {
-
-        String result = "";
-
-        try {
-
-            result += format("Payer", getPayer(c, shoppingCart));
-
-            String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
-
-            if (dpcIsCovered(c, shoppingCart)) {
-                result += format("Price", symbol + "0.0");
-            } else {
-                result += format("Price", symbol + Double.toString(shoppingCart.getBasicFee()));
-            }
-
-            //add the large file surcharge section
-            format("Excess data storage", symbol + Double.toString(getSurchargeLargeFileFee(c, shoppingCart)));
-
-            try {
-                Voucher v = Voucher.findById(c, shoppingCart.getVoucher());
-                if (v != null) {
-                    result += format("Voucher applied", v.getCode());
-                }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-
-            //add the final total price
-            result += format("Total", symbol + Double.toString(shoppingCart.getTotal()));
-
-            // add waiver information
-            result += format("Waiver Details", getWaiverMessage(c, shoppingCart));
-
-            if (shoppingCart.getTransactionId() != null && "".equals(shoppingCart.getTransactionId().trim())) {
-                format("Transaction ID", shoppingCart.getTransactionId());
-            }
-
-        } catch (Exception e) {
-            result += format("Error", e.getMessage());
-            log.error(e.getMessage(), e);
-        }
-
-        return result;
-    }
 
 
     public void generateShoppingCart(Context context, org.dspace.app.xmlui.wing.element.List info, ShoppingCart shoppingCart, PaymentSystemConfigurationManager manager, String baseUrl, Map<String, String> messages) throws WingException, SQLException {
@@ -598,7 +348,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         //add the large file surcharge section
         String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
         info.addLabel(T_Surcharge);
-        info.addItem("surcharge", "surcharge").addContent(String.format("%s%.0f", symbol, this.getSurchargeLargeFileFee(context, shoppingCart)));
+        info.addItem("surcharge", "surcharge").addContent(String.format("%s%.0f", symbol, shoppingCart.getSurchargeLargeFileFee(context)));
 
     }
 
@@ -652,10 +402,10 @@ public class PaymentSystemImpl implements PaymentSystemService {
     }
 
     private void generatePrice(Context context, org.dspace.app.xmlui.wing.element.List info, PaymentSystemConfigurationManager manager, ShoppingCart shoppingCart) throws WingException, SQLException {
-        String waiverMessage = getWaiverMessage(context, shoppingCart);
+        String waiverMessage = shoppingCart.getWaiverMessage(context);
         String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(shoppingCart.getCurrency());
         info.addLabel(T_Price);
-        if (this.dpcIsCovered(context, shoppingCart)) {
+        if (shoppingCart.getWaiver(context) != ShoppingCart.NO_WAIVER) {
             info.addItem("price", "price").addContent(symbol + "0");
         } else {
             info.addItem("price", "price").addContent(String.format("%s%.0f", symbol, shoppingCart.getBasicFee()));
@@ -672,7 +422,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     private void generatePayer(Context context, org.dspace.app.xmlui.wing.element.List info, ShoppingCart shoppingCart, Item item) throws WingException, SQLException {
         info.addLabel(T_Payer);
-        String payerName = this.getPayer(context, shoppingCart);
+        String payerName = shoppingCart.getPayer(context);
         DCValue[] values = item.getMetadata("prism.publicationName");
         if (values != null && values.length > 0) {
             //on the first page don't generate the payer name, wait until user choose country or sponsor
@@ -684,7 +434,6 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
     }
 
-
     public void sendPaymentApprovedEmail(Context c, WorkflowItem wfi, ShoppingCart shoppingCart) {
         try {
             Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "payment_approved"));
@@ -695,7 +444,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
             if (shoppingCart != null) {
                 /** add details of shopping cart */
-                email.addArgument(printShoppingCart(c, shoppingCart));
+                email.addArgument(shoppingCart.print(c));
             }
 
             email.send();
@@ -716,7 +465,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
             if (shoppingCart != null) {
                 /** add details of shopping cart */
-                email.addArgument(printShoppingCart(c, shoppingCart));
+                email.addArgument(shoppingCart.print(c));
             }
 
             email.send();
@@ -737,7 +486,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
             email.addArgument(wfi.getSubmitter().getFullName() + " (" + wfi.getSubmitter().getEmail() + ")");
             if (shoppingCart != null) {
                 /** add details of shopping cart */
-                email.addArgument(printShoppingCart(c, shoppingCart));
+                email.addArgument(shoppingCart.print(c));
             }
             email.send();
         } catch (Exception e) {
@@ -758,7 +507,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
 
             if (shoppingCart != null) {
                 /** add details of shopping cart */
-                email.addArgument(printShoppingCart(c, shoppingCart));
+                email.addArgument(shoppingCart.print(c));
             }
             email.send();
         } catch (Exception e) {

@@ -10,24 +10,18 @@ package org.dspace.paymentsystem;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
-import org.datadryad.api.DryadFunderConcept;
-import org.datadryad.api.DryadOrganizationConcept;
-import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
-import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -442,7 +436,7 @@ public class PaymentServiceImpl implements PaymentService {
                     // put the voucher ID in the shopping cart so we can access it next time, if it's good.
                     shoppingCart.setVoucher(voucher.getID());
                 }
-                paymentSystemService.updateTotal(context, shoppingCart);
+                shoppingCart.updateTotal(context);
             }
 
             if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
