@@ -12,10 +12,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
+import java.util.*;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
@@ -24,6 +21,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -31,6 +29,7 @@ import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.handle.HandleManager;
+import org.dspace.paymentsystem.ShoppingCart;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -214,7 +213,12 @@ public class FlowItemUtils
                         item.addMetadata(parts[0], parts[1], parts[2], lang,
                                              value, authority, iconf);
 		}
-		
+
+		ShoppingCart cart = ShoppingCart.findByItemId(context, itemID);
+		if (cart != null) {
+			cart.updateCartInternals(context);
+		}
+
 		item.update();
 		context.commit();
 		

@@ -120,11 +120,10 @@ public class ShoppingCart {
         setStatus(status);
         setVoucher(null);
         setTransactionId(null);
-        setSponsoringOrganization(context, null);
+        setSponsoringOrganization(null);
         setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
         setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
-        Double totalPrice = calculateShoppingCartTotal(context);
-        setTotal(totalPrice);
+        calculateShoppingCartTotal(context);
         update();
     }
 
@@ -500,73 +499,76 @@ public class ShoppingCart {
     public double getTotal(){
         return myRow.getDoubleColumn("total");
     }
-    public void setTotal(double total){
+
+    private void setTotal(double total){
         myRow.setColumn("total",total);
         modified = true;
     }
 
-    public Double calculateShoppingCartTotal(Context context) throws SQLException {
+    void calculateShoppingCartTotal(Context context) throws SQLException {
         log.debug("recalculating shopping cart total");
         boolean discount = (getWaiver(context) != 0);
         double fileSizeSurcharge = getSurchargeLargeFileFee(context);
         double basicFee = getBasicFee();
-        return PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee);
+        setTotal(PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee));
     }
 
-    public boolean isSponsored(Context context) throws SQLException {
-        if (getSponsoringOrganization(context) == null) {
-            // if this is an older cart that hasn't set a SponsoringOrganization yet, set one based on its journal.
-            if (!getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
-                String journal = "";
-                String funder = "";
-                Item item = Item.find(context, getItem());
-                if (item != null) {
-                    try {
-                        // Look for the journal
-                        DCValue[] values = item.getMetadata("prism.publicationName");
-                        if (values != null && values.length > 0) {
-                            journal = values[0].value;
-                        }
-                        // Look for any valid funding entities
-                        // (for now, there should only be one; there could be more later
-                        DCValue[] fundingEntities = item.getMetadata("dryad.fundingEntity");
-                        if (fundingEntities != null && fundingEntities.length > 0) {
-                            if (fundingEntities[0].confidence == Choices.CF_ACCEPTED) {
-                                funder = fundingEntities[0].authority;
-                            }
-                        }
-
-                    } catch (Exception e) {
-                        log.error("Exception getting journal from item " + item.getID() + ":", e);
+    public void updateCartInternals(Context context) throws SQLException {
+        // only bother calculating internals if the cart is still open
+        if (!getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+            String journal = "";
+            String funder = "";
+            Item item = Item.find(context, getItem());
+            if (item != null) {
+                try {
+                    // Look for the journal
+                    DCValue[] values = item.getMetadata("prism.publicationName");
+                    if (values != null && values.length > 0) {
+                        journal = values[0].value;
                     }
-                }
-                if (journal != null && journal.length() > 0) {
-                    DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
-                    if (journalConcept != null) {
-                        setSponsoringOrganization(context, journalConcept);
-                    }
-                }
-
-                // funder of last resort:
-                if (!hasSubscription()) {
-                    if (!"".equals(funder)) {
-                        log.info("checking to see if " + funder + " is a sponsor");
-                        DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, funder);
-                        if (funderConcept != null && funderConcept.getSubscriptionPaid()) {
-                            log.info("funder is a sponsor");
-                            setSponsoringOrganization(context, funderConcept);
+                    // Look for any valid funding entities
+                    // (for now, there should only be one; there could be more later
+                    DCValue[] fundingEntities = item.getMetadata("dryad.fundingEntity");
+                    if (fundingEntities != null && fundingEntities.length > 0) {
+                        if (fundingEntities[0].confidence == Choices.CF_ACCEPTED) {
+                            funder = fundingEntities[0].authority;
                         }
+                    }
+
+                } catch (Exception e) {
+                    log.error("Exception getting journal from item " + item.getID() + ":", e);
+                }
+            }
+            if (journal != null && journal.length() > 0) {
+                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+                if (journalConcept != null) {
+                    setSponsoringOrganization(journalConcept);
+                }
+            }
+
+            // funder of last resort:
+            if (!hasSubscription()) {
+                if (!"".equals(funder)) {
+                    log.info("checking to see if " + funder + " is a sponsor");
+                    DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, funder);
+                    if (funderConcept != null && funderConcept.getSubscriptionPaid()) {
+                        log.info("funder is a sponsor");
+                        setSponsoringOrganization(funderConcept);
                     }
                 }
             }
+            log.info("sponsor of cart " + getID() + " is " + getSponsorName());
+
+            // calculate the new total
+            calculateShoppingCartTotal(context);
+            update();
+            setModified(false);
         }
-        update();
-        return hasSubscription();
     }
 
-    public int getWaiver(Context context) throws SQLException {
+    int getWaiver(Context context) throws SQLException {
         // check for payment by sponsor, waiver, voucher
-        Boolean isSponsored = isSponsored(context);
+        Boolean isSponsored = hasSubscription();
         Boolean countryDiscount = getCountryWaiver();
         Boolean voucherDiscount = voucherValidate(context);
 
@@ -584,9 +586,9 @@ public class ShoppingCart {
         // Extract values from database objects and configuration to pass to calculator
         String currency = getCurrency();
 
-        long allowedSize = PaymentSystemConfigurationManager.getMaxFileSize().longValue();
+        long allowedSize = PaymentSystemConfigurationManager.getMaxFileSize();
         double fileSizeFeeAfter = PaymentSystemConfigurationManager.getAllSizeFileFeeAfterProperty(currency);
-        Long unitSize = PaymentSystemConfigurationManager.getUnitSize();  //1 GB
+        long unitSize = PaymentSystemConfigurationManager.getUnitSize();  //1 GB
 
         Item item = Item.find(context, getItem());
         long totalSizeDataFile = PaymentSystemImpl.getTotalDataFileSize(context, item);
@@ -595,12 +597,7 @@ public class ShoppingCart {
 
     private boolean getCountryWaiver() throws SQLException {
         Properties countryArray = PaymentSystemConfigurationManager.getAllCountryProperty();
-
-        if (getCountry() != null && getCountry().length() > 0) {
-            return countryArray.get(getCountry()).equals(ShoppingCart.COUNTRYFREE);
-        } else {
-            return false;
-        }
+        return getCountry() != null && ShoppingCart.COUNTRYFREE.equals(countryArray.get(getCountry()));
     }
 
     private boolean voucherValidate(Context context) {
@@ -724,15 +721,15 @@ public class ShoppingCart {
         return myRow.getDoubleColumn("surcharge");
     }
 
-    public void setSponsoringOrganization(Context context, DryadOrganizationConcept organizationConcept) {
+    private void setSponsoringOrganization(DryadOrganizationConcept organizationConcept) {
         if (organizationConcept != null) {
-            setJournal(organizationConcept.getFullName());
-            setJournalSub(organizationConcept.getSubscriptionPaid());
+            setSponsorName(organizationConcept.getFullName());
+            setSponsorSub(organizationConcept.getSubscriptionPaid());
             setSponsorID(organizationConcept.getConceptID());
             sponsorConcept = organizationConcept;
         } else {
-            setJournal(null);
-            setJournalSub(false);
+            setSponsorName(null);
+            setSponsorSub(false);
             setSponsorID(-1);
         }
     }
@@ -761,7 +758,7 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    private void setJournal(String journal)
+    private void setSponsorName(String journal)
     {
         if(journal==null)
         {
@@ -778,7 +775,7 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public String getJournal()
+    public String getSponsorName()
     {
         return myRow.getStringColumn("journal");
     }
@@ -788,7 +785,7 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    private void setJournalSub(boolean journal_sub)
+    private void setSponsorSub(boolean journal_sub)
     {
         myRow.setColumn("journal_sub",journal_sub);
         modified = true;
@@ -800,13 +797,13 @@ public class ShoppingCart {
      * @return text_lang code (or null if the column is an SQL NULL)
      */
 
-    private Boolean getJournalSub() {
+    private Boolean getSponsorSub() {
         return myRow.getBooleanColumn("journal_sub");
     }
 
     public Boolean hasSubscription()
     {
-        return getJournalSub();
+        return getSponsorSub();
     }
 
 
@@ -956,7 +953,7 @@ public class ShoppingCart {
                     result = "Data Publishing Charge has been waived due to submitter's association with " + getCountry() + ".";
                     break;
                 case ShoppingCart.JOUR_WAIVER:
-                    result = getJournal() + " will cover the Data Publishing Charge for this associated submission.";
+                    result = getSponsorName() + " will cover the Data Publishing Charge for this associated submission.";
                     break;
                 case ShoppingCart.VOUCHER_WAIVER:
                     result = "Voucher code applied to Data Publishing Charge.";
@@ -967,18 +964,6 @@ public class ShoppingCart {
         }
         return result;
     }
-
-
-    public void updateTotal(Context context) throws SQLException {
-        if (!getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
-            Double newPrice = calculateShoppingCartTotal(context);
-            //TODO:only setup the price when the old total price is higher than the price right now
-            setTotal(newPrice);
-            update();
-            setModified(false);
-        }
-    }
-
 
     private String format(String label, String value) {
         return label + ": " + value + "\n";

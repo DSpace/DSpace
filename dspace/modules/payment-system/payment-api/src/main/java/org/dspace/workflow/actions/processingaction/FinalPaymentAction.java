@@ -108,7 +108,7 @@ public class FinalPaymentAction extends ProcessingAction {
                         log.error("unable to tally credit for " + organizationConcept.getFullName() + " due to missing customerID");
                     }
                 } else {
-                    log.error("unable to tally credit due to missing concept " + shoppingCart.getJournal());
+                    log.error("unable to tally credit due to missing concept " + shoppingCart.getSponsorName());
                 }
             }
 

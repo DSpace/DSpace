@@ -97,11 +97,11 @@ public class ReAuthorizationCreditActionXMLUI extends AbstractXMLUIAction {
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
             // if journal-based subscription is in place, transaction is paid
             if(!shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)&&shoppingCart.hasSubscription()) {
-                log.info("processed journal subscription for Item " + item.getHandle() + ", journal = " + shoppingCart.getJournal());
-                log.debug("tally credit for journal = "+shoppingCart.getJournal());
+                log.info("processed journal subscription for Item " + item.getHandle() + ", journal = " + shoppingCart.getSponsorName());
+                log.debug("tally credit for journal = "+shoppingCart.getSponsorName());
 
                 Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
-                Concept[] concepts = Concept.findByPreferredLabel(context,shoppingCart.getJournal(),scheme.getID());
+                Concept[] concepts = Concept.findByPreferredLabel(context,shoppingCart.getSponsorName(),scheme.getID());
                 if(concepts!=null&&concepts.length!=0){
                     AuthorityMetadataValue[] metadataValues = concepts[0].getMetadata("internal", "journal", "customerID", Item.ANY);
                     if(metadataValues!=null&&metadataValues.length>0){

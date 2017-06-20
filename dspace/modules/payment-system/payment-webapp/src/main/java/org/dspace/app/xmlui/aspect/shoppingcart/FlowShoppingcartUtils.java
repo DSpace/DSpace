@@ -143,8 +143,7 @@ public class FlowShoppingcartUtils {
                             shoppingCart.setTransactionId(transactionId);
                         }
                     }
-                
-                shoppingCart.updateTotal(context);
+                shoppingCart.updateCartInternals(context);
                 context.commit();
                 
                 result.setContinue(true);

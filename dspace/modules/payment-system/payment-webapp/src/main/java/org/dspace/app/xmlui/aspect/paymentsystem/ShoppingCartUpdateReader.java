@@ -184,7 +184,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         {
             transaction.setVoucher(null);
         }
-        transaction.updateTotal(context);
+        transaction.updateCartInternals(context);
         return errorMessage;
 
     }

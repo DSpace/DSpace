@@ -436,8 +436,8 @@ public class PaymentServiceImpl implements PaymentService {
                     // put the voucher ID in the shopping cart so we can access it next time, if it's good.
                     shoppingCart.setVoucher(voucher.getID());
                 }
-                shoppingCart.updateTotal(context);
             }
+            shoppingCart.updateCartInternals(context);
 
             if (shoppingCart.getTotal() == 0 || shoppingCart.getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
                 generateNoCostForm(mainDiv, shoppingCart, item, manager, paymentSystemService);

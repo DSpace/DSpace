@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,18 +78,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return ERROR_SELECT_JOURNAL;
         }
 
-        // clear the sponsor from the shoppingcart:
-        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-        ShoppingCart shoppingCart = null;
-        try {
-            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
-            if (shoppingCart != null) {
-                shoppingCart.setSponsoringOrganization(context, null);
-            }
-        } catch (Exception e) {
-            log.error("couldn't find cart for item " + item.getID());
-        }
-
         item.clearMetadata("dryad.fundingEntity");
         item.update();
         String fundingStatus = request.getParameter("funding-status");
@@ -109,6 +96,19 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             item.addMetadata(DryadFunderConcept.createFundingEntityMetadata(nsfConcept, grantInfo, confidence));
             item.update();
         }
+
+        // clear the sponsor from the shoppingcart:
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        ShoppingCart shoppingCart = null;
+        try {
+            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+            if (shoppingCart != null) {
+                shoppingCart.updateCartInternals(context);
+            }
+        } catch (Exception e) {
+            log.error("couldn't find cart for item " + item.getID());
+        }
+
         EventLogger.log(context, "submission-select-publication", "status=complete");
         return STATUS_COMPLETE;
     }
