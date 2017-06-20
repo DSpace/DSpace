@@ -72,26 +72,42 @@ public class ShoppingCart {
     private DryadOrganizationConcept sponsorConcept;
 
 
-    ShoppingCart(Context context, TableRow row)
-    {
+    private ShoppingCart(Context context, TableRow row) {
         myContext = context;
         myRow = row;
-        setSponsorID(row.getIntColumn("sponsor_id"));
-        sponsorConcept = getSponsoringOrganization(myContext);
-
-
-        // Cache ourselves
-        context.cache(this, row.getIntColumn("cart_id"));
-        modified = false;
+        init();
     }
 
-    ShoppingCart(Context context, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException,
+    private ShoppingCart(Context context) {
+        myContext = context;
+        try {
+            if (myRow == null) {
+                // Create a table row
+                myRow = DatabaseManager.create(context, "shoppingcart");
+            }
+        } catch (SQLException e) {
+            log.error("couldn't create a row in table shoppingcart");
+        }
+        init();
+    }
+
+    private void init() {
+        setSponsorID(myRow.getIntColumn("sponsor_id"));
+        sponsorConcept = getSponsoringOrganization(myContext);
+
+        // Cache ourselves
+        myContext.cache(this, myRow.getIntColumn("cart_id"));
+        modified = false;
+        log.info(LogManager.getHeader(myContext, "create_shoppingcart", "cart_id=" + getID()));
+    }
+
+    public ShoppingCart(Context context, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException,
             PaymentSystemException {
-        ShoppingCart newShoppingcart = ShoppingCart.create(context);
-        newShoppingcart.setCountry(country);
-        newShoppingcart.setCurrency(currency);
-        newShoppingcart.setDepositor(epersonId);
-        newShoppingcart.setExpiration(null);
+        this(context);
+        setCountry(country);
+        setCurrency(currency);
+        setDepositor(epersonId);
+        setExpiration(null);
         if (itemId != null) {
             //make sure we only create the shoppingcart for data package
             Item item = Item.find(context, itemId);
@@ -99,17 +115,17 @@ public class ShoppingCart {
             if (dataPackage != null) {
                 itemId = dataPackage.getID();
             }
-            newShoppingcart.setItem(itemId);
+            setItem(itemId);
         }
-        newShoppingcart.setStatus(status);
-        newShoppingcart.setVoucher(null);
-        newShoppingcart.setTransactionId(null);
-        newShoppingcart.setSponsoringOrganization(context, null);
-        newShoppingcart.setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
-        newShoppingcart.setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
+        setStatus(status);
+        setVoucher(null);
+        setTransactionId(null);
+        setSponsoringOrganization(context, null);
+        setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
+        setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
         Double totalPrice = calculateShoppingCartTotal(context);
-        newShoppingcart.setTotal(totalPrice);
-        newShoppingcart.update();
+        setTotal(totalPrice);
+        update();
     }
 
     public String getHandle(){
@@ -374,27 +390,6 @@ public class ShoppingCart {
 
         this.modified=i;
 
-    }
-
-    /**
-     * Create a new shoppingcart
-     *
-     * @param context
-     *            DSpace context object
-     */
-    public static ShoppingCart create(Context context) throws SQLException
-    {
-
-        // Create a table row
-        TableRow row = DatabaseManager.create(context, "shoppingcart");
-
-        ShoppingCart e = new ShoppingCart(context, row);
-
-        log.info(LogManager.getHeader(context, "create_shoppingcart", "cart_id="
-                + e.getID()));
-
-
-        return e;
     }
 
     /**
