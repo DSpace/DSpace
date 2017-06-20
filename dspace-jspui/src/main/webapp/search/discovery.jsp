@@ -272,7 +272,7 @@
 </c:set>
 
 <c:set var="searchinKey">
-jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope) && !StringUtils.startsWith(searchScope, hdlPrefix)?"."+searchScope:""  %>
+jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope) && !StringUtils.contains(searchScope, hdlPrefix)?"."+searchScope:""  %>
 </c:set>
 <%
 String dsoName = "";
