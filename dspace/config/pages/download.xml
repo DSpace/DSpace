@@ -3,27 +3,134 @@
 
     <body>
         <div id="file.about.div.download" n="about" rend="primary">
-            <head>Download VSim</head>
+            <head>VSim Downloads</head>
 
-            <p>This will eventually contain information on how to download VSim.</p>
+            <hi rend="bold">The NEH-funded VSim Prototype Version 1</hi>
 
-            <hi rend="bold">We can have bold type in this document!</hi>
+            <p>The VSim prototype was released in 2013 and three versions of the
+              software are currently available. The most recent is VSim 1.2.1
+              for Windows. This version can also be used on a dual-boot Mac or
+              through Windows emulating software (e.g., Parallels).  There are
+              two versions of the original prototype, one for Windows and one
+              for Macs. Use these versions of the software if you want to create
+              content that can be used interchangeably on Windows and Macs.
+              Directions for installing on Windows systems, a sample model of
+              the Pantheon, sample narratives, and user guides are provided
+              below.</p>
 
-            <p>And paragraphs!</p>
+            <p>The VSim team is actively seeking feedback on the software
+              prototype. For details about participating in this research,
+              please read the VSim_StudyInformationSheet. If you choose to
+              provide comments about the software, please use the
+              VSim_FeedbackForm or e-mail your thoughts to Lisa M. Snyder
+              (lms AT idre DOT ucla DOT edu).</p>
 
-                <list><item>and lists</item>
-                    <item>of important things</item>
-                    <item>very important things</item></list>
+            <list>
+            <item><xref target="https://idre.ucla.edu/?wpdmdl=5349">The most recent (v 1.2.1) Windows-compatible release of VSim</xref> (20MB).
+            (Please note that content created with this version will not work
+            with the Mac-compatible prototype release; opens .dae, .flt. and
+            .vsim model files)</item>
 
-                <p> And we can also have hyperlinks, because they are
-                    <xref target="http://www.library.ucla.edu/">the best thing ever</xref>.</p>
+            <item><xref target="https://idre.ucla.edu/?wpdmdl=5114">Windows-compatible release</xref> of the original VSim prototype (v 1) with
+            a few post-grant additions (20MB). (Opens .dae, .flt, and .vsim
+            model files)</item>
+
+            <item><xref target="https://idre.ucla.edu/?wpdmdl=5112">Mac-compatible release</xref> of the original VSim prototype (15MB). (Only
+            opens .vsim model files)</item>
+            </list>
+
+            <hi rend="bold">The Digital Karnak Publication Prototype</hi>
+
+            <p><xref target="/xmlui/discover?scope=%2F&amp;query=digital+karnak">SEARCH the VSim Repository and Archive for Digital Karnak files</xref></p>
+
+            <p><hi rend="bold">IMPORTANT NOTICE: The posted version of the Digital Karnak
+            Publication Prototype has expired! We are working on a new version
+            of the file and will post it as soon as possible. Please check back
+            to download the new version. If you need a new file immediately for
+            a scheduled lecture or presentation, please e-mail Lisa M. Snyder
+            (lms AT idre DOT ucla DOT edu).</hi></p>
+
+            <p>VSim was designed so that it could be used as a platform to peer
+            review, publish, and broadly disseminate academically generated 3D
+            content. A prototype publication focused on the interactive Digital
+            Karnak model has been developed and is available below. This package
+            features the real-time Digital Karnak model and contains a series of
+            narratives that describe the physical changes at Karnak across the
+            reigns of eight rulers as well as a suite of embedded resources that
+            provide supplementary information for users about the reconstruction
+            and the history of the complex. The zip file includes VSim 1.2.1 for
+            Windows, a cheat sheet, and a users’ guide.  This file will also
+            work on Mac with Windows-emulating software (e.g., Parallels). It
+            expired on August 31, 2016.</p>
+
+            <p><hi rend="bold">Video presentation</hi>: <xref target="https://www.youtube.com/watch?v=IlOnKNhRB5c">Digital Karnak</xref> (a presentation by Elaine A.
+            Sullivan and Lisa M. Snyder captured through WebEx; the initial ~42
+            minutes is a basic presentation, followed by ~30 minutes of
+            discussion).</p>
+
+            <p>If you’ve downloaded the publication prototype and are willing to
+            share your thoughts, we’d love to hear from you. The Karnak and VSim
+            teams are actively seeking feedback on either the Digital Karnak
+            package or the VSim prototype. For details about participating in
+            this research, please read the VSim_StudyInformationSheet. If you
+            choose to provide comments about the software and/or the model,
+            please use the VSim_FeedbackForm (also included in the Digital
+            Karnak Package download) or e-mail your thoughts to Lisa M. Snyder
+            (lms AT idre DOT ucla DOT edu).</p>
+
+            <p><hi rend="bold">Sample files (models and narratives)</hi></p>
+
+
+            <list>
+              <item><xref target="https://idre.ucla.edu/files/Pantheon_v082.vsim">Sample model of the Pantheon</xref> (a .vsim file) created at UCLA (64MB).</item>
+              <item><xref target="https://idre.ucla.edu/files/Pantheon_VSimBasics_March25.nar">A narrative for Windows that works with the Pantheon model and explains the basic features of VSim</xref> (2.4MB)</item>
+              <item><xref target="https://idre.ucla.edu/files/Pantheon_Navigation.nar">A narrative for Windows that works with the Pantheon model that explains VSim navigation</xref> (13.5MB)</item>
+              <item><xref target="https://idre.ucla.edu/files/Pantheon_CameraMoves4.nar">A narrative for Windows that works with the Pantheon model that describes how to create ‘camera moves’</xref> (1.5MB)</item>
+            </list>
+
+            <hi rend="bold">User guides, tutorials, and presentations</hi>
+
+            <list>
+              <item><xref target="https://idre.ucla.edu/wp-content/uploads/2015/09/vsim-v1-userguide-june2013.pdf?x83242">Users’ guide</xref> (last updated June 13, 2013).</item>
+              <item><xref target="https://idre.ucla.edu/sites/default/files/vsim-v1-graphicguide-july2013.pdf?x83242">Short graphic guide</xref> (last updated July 9, 2013).</item>
+              <item><xref target="http://mith.umd.edu/podcasts/a-conversation-about-compulsion/">Digital Dialogues presentation featuring VSim</xref> (MITH: Maryland
+                    Institute for Technology in the Humanities, University of Maryland)</item>
+              <item><xref target="http://www.youtube.com/watch?v=TUz086WMGNU">VSim Tutorial on YouTube</xref> captured at the Humanities Heritage NEH
+              Summer Institute (NEH Advanced Topics in the Digital Humanites
+                    Summer Institute, The Center for Digital Initiatives, Arkansas
+                    State University)</item>
+              <item><xref target="http://cdi.astateweb.org/neh/lecturespresentations/">Humanities Heritage 3D Visualization presentation featuring VSim</xref>
+                    (NEH Advanced Topics in the Digital Humanites Summer Institute, The
+                    Center for Digital Initiatives, Arkansas State University)</item>
+            </list>
+
+            <hi rend="bold">Directions for installing the VSim prototype on Windows systems</hi>
+
+            <list rend="numeric" type="ordered">
+            <item>Create a VSim folder on your hard drive</item>
+            <item>Right click on the links and ‘save link as ...’ the software, sample model, and other files as desired</item>
+            <item>Unzip the VSim .zip file (typically a right click, choose WinZip from the menu, and ‘extract to here’)</item>
+            <item>Navigate into the release folder and double click the VSim.exe file to launch the software</item>
+            <item>If you downloaded the sample files, click File -> Open Model and browse for the Pantheon_v082.vsim file</item>
+            <item>Click on File > Import Narrative and browse for the Pantheon_VSimBasics_March25.nar file</item>
+            <item>Click on the VSim Basics narrative in the bar across the top of the VSim window and press ‘>’</item>
+            <item>When you’re done with that, select and play “The Pantheon” narrative</item>
+            <item>Once that tour has completed (at the view of the occulus), press the spacebar to explore the model in WASD mode</item>
+            <item>Read the user guide for help loading models and creating narratives of your own! (VSim loads 3D content in .flt, .dae, .vsim, and .ive formats.)</item>
+          </list>
+            <p>Remember that this software is a prototype. It is a
+              proof-of-concept to allow us to assess the educational
+              possibilities of three-dimensional content and the functionality
+              built into VSim. Please report any reproducible problems to
+              Lisa M. Snyder (lms AT idre DOT ucla DOT edu).</p>
+
                </div>
     </body>
 
 
     <meta>
         <pageMeta>
-            <metadata element="title">Download VSim</metadata>
+            <metadata element="title">VSim Downloads</metadata>
             <trail target="../">VSim Home</trail>
         </pageMeta>
     </meta>
