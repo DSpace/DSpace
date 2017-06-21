@@ -227,7 +227,7 @@ public class DisplayItemMetadataUtils {
 					} else if (displayStrategyName.equalsIgnoreCase("resolver")) {
 						strategy = new ResolverDisplayStrategy();
 					} else {
-						strategy = new DefaultDisplayStrategy();
+						strategy = new DefaultDisplayStrategy(displayStrategyName);						
 					}
 				}
 

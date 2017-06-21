@@ -13,13 +13,12 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.Utils;
 
@@ -27,12 +26,25 @@ public class DefaultDisplayStrategy extends ASimpleDisplayStrategy
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(DefaultDisplayStrategy.class);
-
+    
+    private String displayStrategyName;
+    
+    public DefaultDisplayStrategy()
+    {
+    
+    }
+    
+    public DefaultDisplayStrategy(String displayStrategyName)
+    {
+        this.displayStrategyName = displayStrategyName;
+    }
+    
     @Override
     public String getMetadataDisplay(HttpServletRequest hrq, int limit,
             boolean viewFull, String browseType, int colIdx, int itemid, String field,
             Metadatum[] metadataArray, boolean disableCrossLinks, boolean emph) throws JspException
     {
+        boolean isNoBreakLine = "nobreakline".equals(getDisplayStrategyName());
         String metadata;
         // limit the number of records if this is the author field (if
         // -1, then the limit is the full list)
@@ -112,9 +124,25 @@ public class DefaultDisplayStrategy extends ASimpleDisplayStrategy
             sb.append(endLink);
             if (j < (loopLimit - 1))
             {
-                if (colIdx != -1) // we are showing metadata in a table row (browse or item list)
+                if (colIdx != -1 || isNoBreakLine) // we are showing metadata in an item tag with nobreakline strategy or in a table row (browse or item list)
                 {
-                    sb.append("; ");
+                    if (isNoBreakLine)
+                    {
+                        String separator = ConfigurationManager
+                                .getProperty("webui.itemdisplay.nobreakline."+ field +".separator");
+                        if (separator == null)
+                        {
+                            separator = ConfigurationManager
+                                    .getProperty("webui.itemdisplay.nobreakline.separator");
+                            if(separator == null) {
+                                separator = ";&nbsp;";
+                            }
+                        }
+                        sb.append(separator);
+                    }
+                    else {
+                        sb.append(";&nbsp;");
+                    }
                 }
                 else
                 {
@@ -143,5 +171,15 @@ public class DefaultDisplayStrategy extends ASimpleDisplayStrategy
         }
         
         return metadata;
+    }
+
+    public String getDisplayStrategyName()
+    {
+        return displayStrategyName;
+    }
+
+    public void setDisplayStrategyName(String displayStrategyName)
+    {
+        this.displayStrategyName = displayStrategyName;
     }
 }
