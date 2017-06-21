@@ -812,6 +812,7 @@ else
 	if (brefine) {
 %>
 
+<h3 class="facets"><fmt:message key="jsp.search.facet.refine.local" /></h3>
 <div id="facets" class="facetsBox">
 
 <%
