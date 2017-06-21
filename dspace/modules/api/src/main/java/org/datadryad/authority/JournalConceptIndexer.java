@@ -28,7 +28,6 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
     public void init() {
         DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
         for (DryadJournalConcept concept : dryadJournalConcepts) {
-            System.out.println("concept is " + concept.getFullName());
             if (concept.isAccepted()) {
                 AuthorityValue doc = createHashMap(concept);
                 authorities.add(doc);
