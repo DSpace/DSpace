@@ -58,7 +58,7 @@ public class DryadReviewAction extends ProcessingAction {
                 EPerson[] reviewers = Group.allMembers(c, reviewersGroup);
                 for (EPerson reviewer : reviewers) {
                     if(!mailsSent.contains(reviewer.getEmail())){
-                        sendReviewerEmail(c, reviewer.getEmail(), wf, uuid.toString());
+                        WorkflowEmailManager.sendReviewerEmail(c, reviewer.getEmail(), wf, uuid.toString());
                         mailsSent.add(reviewer.getEmail());
                     }
                 }
@@ -67,7 +67,7 @@ public class DryadReviewAction extends ProcessingAction {
             sendEmailToJournalNotifyOnReview(c, wf, mailsSent, uuid);
 
             if(!mailsSent.contains(wf.getItem().getSubmitter().getEmail())){
-                sendReviewerEmail(c, wf.getItem().getSubmitter().getEmail(), wf, uuid.toString());
+                WorkflowEmailManager.sendReviewerEmail(c, wf.getItem().getSubmitter().getEmail(), wf, uuid.toString());
             }
 
         } catch (WorkflowConfigurationException e) {
@@ -87,7 +87,7 @@ public class DryadReviewAction extends ProcessingAction {
                     ArrayList<String> emails = journalConcept.getEmailsToNotifyOnReview();
                     for (String email : emails) {
                         if(!mailsSent.contains(email)) {
-                            sendReviewerEmail(c, email, wf, uuid.toString());
+                            WorkflowEmailManager.sendReviewerEmail(c, email, wf, uuid.toString());
                             mailsSent.add(email);
                         }
                     }
@@ -104,7 +104,7 @@ public class DryadReviewAction extends ProcessingAction {
                 boolean approved = Boolean.valueOf(approvedVals[0].value);
 
                 if(approved){
-                    sendReviewApprovedEmail(c, wfi.getSubmitter().getEmail(), wfi);
+                    WorkflowEmailManager.sendReviewApprovedEmail(c, wfi.getSubmitter().getEmail(), wfi);
 
 
                     return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
@@ -124,113 +124,4 @@ public class DryadReviewAction extends ProcessingAction {
         }else
             return new ActionResult(ActionResult.TYPE.TYPE_ERROR);
     }
-
-    private void sendReviewApprovedEmail(Context c, String emailAddress, WorkflowItem wfi) throws IOException, SQLException {
-        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "submit_datapackage_confirm"));
-
-        email.addRecipient(emailAddress);
-
-        email.addArgument(wfi.getItem().getName());
-
-        //Add the doi of our data package
-        String doi = DOIIdentifierProvider.getDoiValue(wfi.getItem());
-        email.addArgument(doi == null ? "" : doi);
-
-        //Get all the data files
-        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
-        String dataFileNames = "";
-        String dataFileDois = "";
-        for (Item dataFile : dataFiles){
-            dataFileNames += dataFile.getName() + "\n";
-            doi = DOIIdentifierProvider.getDoiValue(dataFile);
-            dataFileDois += (doi == null ? "" : doi) + "\n";
-        }
-
-        email.addArgument(dataFileNames);
-        email.addArgument(dataFileDois);
-
-        try {
-	    // Send the email -- Unless the journal is Evolution
-	    // TODO: make this configurable for each journal
-	    DCValue journals[] = wfi.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
-	    String journalName =  (journals.length >= 1) ? journals[0].value : null;
-	    if(journalName !=null && !journalName.equals("Evolution") && !journalName.equals("Evolution*")) {
-		log.debug("sending submit_datapackage_confirm");
-		email.send();
-	    } else {
-		log.debug("skipping submit_datapackage_confirm; journal is " + journalName);
-	    }
-	} catch (MessagingException e) {
-            log.error(LogManager.getHeader(c, "Error while email submitter about approved submission", "WorkflowItemId: " + wfi.getID()), e);
-        }
-    }
-
-    private void sendReviewerEmail(Context c, String emailAddress, WorkflowItem wf, String key) throws IOException, SQLException {
-	log.debug("sending review email for workflow item " + wf.getID() + " to " + emailAddress);
-        try {
-        String template;
-        boolean isDataPackage = DryadWorkflowUtils.isDataPackage(wf);
-        if(isDataPackage)
-            template = "submit_datapackage_review";
-        else
-            template = "submit_datafile_review";
-
-        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), template));
-
-        email.addRecipient(emailAddress);
-        //Add the title
-        email.addArgument(wf.getItem().getName());
-        String doi = DOIIdentifierProvider.getDoiValue(wf.getItem());
-        email.addArgument(doi == null ? "" : doi);
-
-        //Add the parent data
-        if(isDataPackage){
-            //Get all the data files
-            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wf.getItem());
-            String dataFileNames = "";
-            for (Item dataFile : dataFiles)
-                dataFileNames += dataFile.getName() + "\n";
-
-            email.addArgument(dataFileNames);
-        }else{
-            //Get the data package
-            Item dataPackage = DryadWorkflowUtils.getDataPackage(c, wf.getItem());
-            if(dataPackage!=null){
-                email.addArgument(dataPackage.getName());
-            }
-            //TODO: DECENT URL !
-            email.addArgument(HandleManager.resolveToURL(c, dataPackage.getHandle()));
-        }
-
-        //add the submitter
-        email.addArgument(wf.getSubmitter().getFullName() + " ("  + wf.getSubmitter().getEmail() + ")");
-
-	// add the review URL (using provisional DOI as key)
-        email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?doi=" + doi);
-
-	// add journal's manuscript number
-	String manuScriptIdentifier = "none available";
-	DCValue[] manuScripIdentifiers = wf.getItem().getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
-	if(0 < manuScripIdentifiers.length){
-	    manuScriptIdentifier = manuScripIdentifiers[0].value;
-	}
-	
-	email.addArgument(manuScriptIdentifier);
-
-	// Add journal name
-	String journalName = "not available";
-	DCValue[] journalNames = wf.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
-	if(0 < journalNames.length){
-	    journalName = journalNames[0].value;
-	}
-        
-        email.addArgument(journalName);
-
-            email.addArgument(DOIIdentifierProvider.getFullDOIURL(wf.getItem()));
-            email.send();
-        } catch (Exception e) {
-            log.error(LogManager.getHeader(c, "Error while email reviewer", "WorkflowItemId: " + wf.getID()), e);
-        }
-    }
-
 }

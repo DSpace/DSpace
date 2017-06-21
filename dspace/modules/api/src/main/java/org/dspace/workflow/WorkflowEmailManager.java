@@ -25,6 +25,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.JournalUtils;
 import org.datadryad.api.DryadJournalConcept;
@@ -287,6 +288,136 @@ public class WorkflowEmailManager {
         {
             log.warn(LogManager.getHeader(c, "notifyOfReAuthorizationPayment", "cannot email users" +
                                           " of workflow_item_id" + wi.getID()));
+        }
+    }
+
+    public static void sendReviewApprovedEmail(Context c, String emailAddress, WorkflowItem wfi) throws IOException, SQLException {
+        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "submit_datapackage_confirm"));
+
+        email.addRecipient(emailAddress);
+
+        email.addArgument(wfi.getItem().getName()); // {0}
+
+        //Add the doi of our data package
+        String doi = DOIIdentifierProvider.getDoiValue(wfi.getItem());
+        email.addArgument(doi == null ? "" : doi); // {1}
+
+        //Get all the data files
+        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
+        String dataFileNames = "";
+        for (Item dataFile : dataFiles) {
+            dataFileNames += dataFile.getName() + "\n";
+        }
+
+        email.addArgument(dataFileNames);  // {2}
+
+        try {
+            // Send the email -- Unless the journal is Evolution
+            // TODO: make this configurable for each journal
+            DCValue journals[] = wfi.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
+            String journalName = (journals.length >= 1) ? journals[0].value : null;
+
+
+            if (journalName != null && !journalName.equals("Evolution") && !journalName.equals("Evolution*")) {
+                log.debug("sending submit_datapackage_confirm");
+                email.send();
+            } else {
+                log.debug("skipping submit_datapackage_confirm; journal is " + journalName);
+            }
+        } catch (MessagingException e) {
+            log.error(LogManager.getHeader(c, "Error while email submitter about approved submission", "WorkflowItemId: " + wfi.getID()), e);
+        }
+    }
+
+    public static void sendReviewerEmail(Context c, String emailAddress, WorkflowItem wf, String key) throws IOException, SQLException {
+        log.debug("sending review email for workflow item " + wf.getID() + " to " + emailAddress);
+        try {
+            String template;
+            boolean isDataPackage = DryadWorkflowUtils.isDataPackage(wf);
+            if(isDataPackage)
+                template = "submit_datapackage_review";
+            else
+                template = "submit_datafile_review";
+
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), template));
+
+            email.addRecipient(emailAddress);
+            //Add the title
+            email.addArgument(wf.getItem().getName());
+            String doi = DOIIdentifierProvider.getDoiValue(wf.getItem());
+            email.addArgument(doi == null ? "" : doi);
+
+            //Add the parent data
+            if(isDataPackage){
+                //Get all the data files
+                Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wf.getItem());
+                String dataFileNames = "";
+                for (Item dataFile : dataFiles)
+                    dataFileNames += dataFile.getName() + "\n";
+
+                email.addArgument(dataFileNames);
+            }else{
+                //Get the data package
+                Item dataPackage = DryadWorkflowUtils.getDataPackage(c, wf.getItem());
+                if(dataPackage!=null){
+                    email.addArgument(dataPackage.getName());
+                }
+                //TODO: DECENT URL !
+                email.addArgument(HandleManager.resolveToURL(c, dataPackage.getHandle()));
+            }
+
+            //add the submitter
+            email.addArgument(wf.getSubmitter().getFullName() + " ("  + wf.getSubmitter().getEmail() + ")");
+
+            // add the review URL (using provisional DOI as key)
+            email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?doi=" + doi);
+
+            // add journal's manuscript number
+            String manuScriptIdentifier = "none available";
+            DCValue[] manuScripIdentifiers = wf.getItem().getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
+            if(0 < manuScripIdentifiers.length){
+                manuScriptIdentifier = manuScripIdentifiers[0].value;
+            }
+
+            email.addArgument(manuScriptIdentifier);
+
+            // Add journal name
+            String journalName = "not available";
+            DCValue[] journalNames = wf.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
+            if(0 < journalNames.length){
+                journalName = journalNames[0].value;
+            }
+
+            email.addArgument(journalName);
+
+            email.addArgument(DOIIdentifierProvider.getFullDOIURL(wf.getItem()));
+            email.send();
+        } catch (Exception e) {
+            log.error(LogManager.getHeader(c, "Error while email reviewer", "WorkflowItemId: " + wf.getID()), e);
+        }
+    }
+
+    public static void emailUsersOnActivation(Context c, WorkflowItem wfi, String recipient, String step) throws IOException, SQLException {
+        Email mail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "submit_datapackage_task"));
+        mail.addArgument(wfi.getItem().getName());
+        //Add the titles of the data files
+        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
+        String titles = "";
+        for (Item dataFile : dataFiles) {
+            titles += dataFile.getName() + "\n";
+        }
+        mail.addArgument(titles);
+
+        mail.addArgument(wfi.getSubmitter().getFullName());
+        //TODO: message
+        mail.addArgument("New task available.");
+        mail.addArgument(WorkflowManager.getMyDSpaceLink());
+
+        try {
+            mail.addRecipient(recipient);
+            mail.send();
+        } catch (MessagingException e) {
+            log.info(LogManager.getHeader(c, "error emailing about task", "step: " + step + " workflowitem: " + wfi.getID()));
         }
     }
 
