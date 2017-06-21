@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
-	targetNamespace="http://www.cilea.it/publications/listmetadata/schemas">
+	targetNamespace="http://4science.github.io/dspace-cris/publications/listmetadata/schemas">
 
 	<xs:simpleType name="metadata">
 		<xs:restriction base="xs:string">

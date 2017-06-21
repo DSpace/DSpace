@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:reqgrant="http://www.cilea.it/grant/listmetadata/schemas"
-	xmlns:reqitem="http://www.cilea.it/publications/listmetadata/schemas"
-	xmlns:reqrp="http://www.cilea.it/researcherpage/listmetadata/schemas"
-	xmlns:reqou="http://www.cilea.it/orgunit/listmetadata/schemas"
-	xmlns:grant="http://www.cilea.it/grant/schemas" 
-	xmlns:rp="http://www.cilea.it/researcherpage/schemas"
-	xmlns:orgunit="http://www.cilea.it/orgunit/schemas"
-	xmlns:item="http://www.cilea.it/publications/schemas"
-	xmlns:cris="http://www.cilea.it/cris/schemas" elementFormDefault="qualified"
-	targetNamespace="http://www.cilea.it/cris/schemas">
+	xmlns:reqgrant="http://4science.github.io/dspace-cris/grant/listmetadata/schemas"
+	xmlns:reqitem="http://4science.github.io/dspace-cris/publications/listmetadata/schemas"
+	xmlns:reqrp="http://4science.github.io/dspace-cris/researcherpage/listmetadata/schemas"
+	xmlns:reqou="http://4science.github.io/dspace-cris/orgunit/listmetadata/schemas"
+	xmlns:grant="http://4science.github.io/dspace-cris/grant/schemas" 
+	xmlns:rp="http://4science.github.io/dspace-cris/researcherpage/schemas"
+	xmlns:orgunit="http://4science.github.io/dspace-cris/orgunit/schemas"
+	xmlns:item="http://4science.github.io/dspace-cris/publications/schemas"
+	xmlns:cris="http://4science.github.io/dspace-cris/schemas" elementFormDefault="qualified"
+	targetNamespace="http://4science.github.io/dspace-cris/schemas">
 
-	<xs:import namespace="http://www.cilea.it/grant/listmetadata/schemas"
+	<xs:import namespace="http://4science.github.io/dspace-cris/grant/listmetadata/schemas"
 		schemaLocation="xsd/requestresearchergrants.xsd">
 	</xs:import>
-	<xs:import namespace="http://www.cilea.it/publications/listmetadata/schemas"
+	<xs:import namespace="http://4science.github.io/dspace-cris/publications/listmetadata/schemas"
 		schemaLocation="xsd/staticrequestpublications.xsd">
 	</xs:import>
-	<xs:import namespace="http://www.cilea.it/orgunit/listmetadata/schemas"
+	<xs:import namespace="http://4science.github.io/dspace-cris/orgunit/listmetadata/schemas"
 		schemaLocation="xsd/requestorgunits.xsd">
 	</xs:import>
-	<xs:import namespace="http://www.cilea.it/researcherpage/listmetadata/schemas"
+	<xs:import namespace="http://4science.github.io/dspace-cris/researcherpage/listmetadata/schemas"
 		schemaLocation="xsd/requestresearcherpage.xsd">
 	</xs:import>
-	<xs:import namespace="http://www.cilea.it/grant/schemas"
+	<xs:import namespace="http://4science.github.io/dspace-cris/grant/schemas"
 		schemaLocation="xsd/responseresearchergrants.xsd">
 	</xs:import>
-	<xs:import namespace="http://www.cilea.it/researcherpage/schemas"
+	<xs:import namespace="http://4science.github.io/dspace-cris/researcherpage/schemas"
 		schemaLocation="xsd/responseresearcherpage.xsd">
 	</xs:import>
-	<xs:import namespace="http://www.cilea.it/orgunit/schemas"
+	<xs:import namespace="http://4science.github.io/dspace-cris/orgunit/schemas"
 		schemaLocation="xsd/responseorgunits.xsd">
 	</xs:import>
 	
-	<xs:import namespace="http://www.cilea.it/publications/schemas"
+	<xs:import namespace="http://4science.github.io/dspace-cris/publications/schemas"
 		schemaLocation="xsd/staticresponsepublication.xsd">
 	</xs:import>
 

@@ -19,7 +19,7 @@
 <%@page import="org.dspace.app.cris.model.ws.User"%>
 
 
-<c:set var="dspace.layout.head" scope="request">
+<c:set var="dspace.layout.head.last" scope="request">
 	
 <style type="text/css">
 .error {
@@ -33,9 +33,8 @@
 #enabledDiv {
 	padding-top: 1em;
 }
-</style>
+</style>	
 	
-	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.8.2.min.js"></script>
 	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.validate.min.js"></script>
 	<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.showPassword.min.js"></script>
 	<script type="text/javascript" src="<%=request.getContextPath()%>/js/additional-methods.min.js"></script>
@@ -156,7 +155,7 @@
 		</c:forEach>		
 		</div>	
 			
-		<input type="submit" value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
+		<input type="submit" class="btn btn-primary" value="<fmt:message key="jsp.layout.hku.researcher.button.save" />" />
 		
 	</form:form>				 
 </dspace:layout>
