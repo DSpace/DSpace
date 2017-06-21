@@ -68,6 +68,8 @@
 <%@page import="org.dspace.discovery.DiscoverResult"%>
 <%@page import="org.dspace.content.DSpaceObject"%>
 <%@page import="java.util.List"%>
+<%@page import="org.dspace.handle.HandleManager"%>
+
 <%
 	String hdlPrefix = ConfigurationManager.getProperty("handle.prefix");
     // Get the attributes
@@ -270,14 +272,22 @@
 </c:set>
 
 <c:set var="searchinKey">
-jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope) && !StringUtils.startsWith(searchScope, hdlPrefix)?"."+searchScope:""  %>
+jsp.search.results.searchin<%= StringUtils.isNotBlank(searchScope) && !StringUtils.contains(searchScope, hdlPrefix)?"."+searchScope:""  %>
 </c:set>
+<%
+String dsoName = "";
+if(StringUtils.contains(searchScope, hdlPrefix) ){
+	String hdl = StringUtils.substring(searchScope, 8);
+	DSpaceObject dso = HandleManager.resolveToObject(UIUtil.obtainContext(request),hdl );
+	dsoName = (dso != null) ? dso.getName() :"";
+}
+%>
 <dspace:layout titlekey="${searchinKey}">
 
     <%-- <h1>Search Results</h1> --%>
 
 
-<h2><fmt:message key="${searchinKey}"/></h2>
+<h2><fmt:message key="${searchinKey}"/> <%= dsoName %></h2>
 
 <div class="discovery-search-form">
     <%-- Controls for a repeat search --%>
