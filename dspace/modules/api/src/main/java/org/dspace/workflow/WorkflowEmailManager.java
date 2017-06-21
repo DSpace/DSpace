@@ -432,4 +432,13 @@ public class WorkflowEmailManager {
             }
         return wasBlackedOut;
     }
+
+    private static String getJournalNameForItem(Context c, Item item) {
+        DCValue pubNames[] =  item.getMetadata("prism", "publicationName", null, null);
+        String journalName = "";
+        if (pubNames != null && pubNames.length > 0) {
+            journalName = pubNames[0].value;
+        }
+        return journalName;
+    }
 }
