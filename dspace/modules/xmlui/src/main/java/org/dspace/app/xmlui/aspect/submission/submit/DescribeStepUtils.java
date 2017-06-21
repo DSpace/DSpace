@@ -388,7 +388,7 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
                 select.setOptionSelected(dcValue.value);
             }
         } else {
-            select.setOptionSelected("untilArticleAppears");
+            select.setOptionSelected("none");
         }
     }
 
