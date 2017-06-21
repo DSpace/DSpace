@@ -7,20 +7,9 @@
  */
 package org.dspace.app.xmlui.aspect.general;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-
 import org.apache.cocoon.ResourceNotFoundException;
-import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
-import org.apache.cocoon.util.HashUtil;
 import org.apache.commons.lang.reflect.FieldUtils;
-import org.apache.excalibur.source.SourceValidity;
-import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -33,6 +22,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
  * This special component checks to see if the body element is empty (has no sub elements) and if
  * it is then displays some page not found text.
@@ -40,7 +33,7 @@ import org.xml.sax.SAXException;
  * @author Scott Phillips
  * @author Kim Shepherd
  */
-public class PageNotFoundTransformer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class PageNotFoundTransformer extends AbstractDSpaceTransformer
 {
     /* Language Strings */
     private static final Message T_title =
@@ -63,30 +56,6 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     
     /** Have we determined that the body is empty, and hence a we should generate a page not found. */
     private boolean bodyEmpty;
-    
-    /**
-     * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
-     * @return the key.
-     */
-    @Override
-    public Serializable getKey() 
-    {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        
-        return HashUtil.hash(request.getSitemapURI());
-    }
-
-    /**
-     * Generate the cache validity object.
-     * 
-     * The cache is always valid.
-     * @return the validity.
-     */
-    @Override
-    public SourceValidity getValidity() {
-        return NOPValidity.SHARED_INSTANCE;
-    }
     
     
     /**
@@ -182,9 +151,8 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
 
             notFound.addPara().addXref(contextPath + "/",T_go_home);
 
-            throw new ResourceNotFoundException("Page cannot be found");
-
-
+            HttpServletResponse response = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
