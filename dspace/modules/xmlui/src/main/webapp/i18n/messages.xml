@@ -3068,10 +3068,10 @@
             </ul>
         </div>
     </message>
-    <message key="xmlui.Submission.submit.Checkout.help"><div><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Please enter your payment information below.<br/><br/><strong>You will not be charged until your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button when you are finished.</span></div>
+    <message key="xmlui.Submission.submit.Checkout.help"><div><span style="font-family: Helvetica, sans-serif; font-size: 15px;">Please enter your payment information below.<br/><br/><strong>You will not be charged until/unless your publication is accepted and your data is approved for archiving by Dryad curators.</strong><br/><br/>You must click the <strong>Finalize submission</strong> button when you are finished.</span></div>
     </message>
 	<message key="xmlui.Submission.submit.Checkout.voucher.error">The voucher code is not valid or the voucher code has been used</message>
-	<message key="xmlui.Submission.submit.Checkout.note"><br/>NOTE: Proceed only if your submission is finalized. After submitting, a Dryad curator will review your submission. After this review, your data will be archived in Dryad, and your payment will be processed.</message>
+	<message key="xmlui.Submission.submit.Checkout.note"><br/>NOTE: Proceed only if your data submission is finalized. If/when your associated publication is accepted, a Dryad curator will review your submission. After this review, your data will be archived in Dryad, and your payment will be processed.</message>
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>
 	<message key="xmlui.Submission.submit.OverviewStep.help.add-datafile">Click the button to add a new data file, please be aware that if the data file isn't fully submitted when the dataset is approved/rejected that it will be deleted.</message>
