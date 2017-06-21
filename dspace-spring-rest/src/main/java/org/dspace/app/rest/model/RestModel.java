@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serializable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -15,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public interface RestModel {
+public interface RestModel extends Serializable {
 	public static final String CORE = "core";
 	public static final String EPERSON = "eperson";
 	public static final String DISCOVER = "discover";

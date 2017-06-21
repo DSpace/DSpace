@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
+import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -59,11 +60,11 @@ public class Utils {
 	}
 
 	public Link linkToSingleResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getCategory(), data.getType()).slash(data).withRel(rel);
+		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).withRel(rel);
 	}
 
 	public Link linkToSubResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getCategory(), data.getType()).slash(data).slash(rel).withRel(rel);
+		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).slash(rel).withRel(rel);
 	}
 
 	public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {
@@ -85,5 +86,26 @@ public class Utils {
 			return CommunityRest.NAME;
 		}
 		return modelPlural.replaceAll("s$", "");
+	}
+
+	/**
+	 * Retrieve the LinkRestRepository associated with a specific link from the
+	 * apiCategory and model specified in the parameters.
+	 * 
+	 * @param apiCategory
+	 *            the apiCategory
+	 * @param modelPlural
+	 *            the model name in its plural form
+	 * @param rel
+	 *            the name of the relation
+	 * @return
+	 */
+	public LinkRestRepository getLinkResourceRepository(String apiCategory, String modelPlural, String rel) {
+		String model = makeSingular(modelPlural);
+		try {
+			return applicationContext.getBean(apiCategory + "." + model + "." + rel, LinkRestRepository.class);
+		} catch (NoSuchBeanDefinitionException e) {
+			throw new RepositoryNotFoundException(apiCategory, model);
+		}
 	}
 }
