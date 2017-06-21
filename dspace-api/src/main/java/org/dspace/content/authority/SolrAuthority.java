@@ -49,8 +49,7 @@ public class SolrAuthority implements ChoiceAuthority {
 
     public Choices getMatches(String field, String text, int collection, int start, int limit, String locale, boolean bestMatch) {
         if(limit == 0)
-            limit = 10;
-        String fieldKey = ConfigurationManager.getProperty("solrauthority.searchscheme." + field);
+            limit = 25;
         SolrQuery queryArgs = new SolrQuery();
         if (text == null || text.trim().equals("")) {
             queryArgs.setQuery("*:*");
@@ -84,9 +83,8 @@ public class SolrAuthority implements ChoiceAuthority {
             }
             queryArgs.setQuery(query);
         }
-        //TODO: check if this is right ! could always be this.field
-        if(fieldKey!=null&&fieldKey.length()>=0){
-            queryArgs.addFilterQuery("field:" + fieldKey);
+        if (field != null) {
+            queryArgs.addFilterQuery("field:" + field);
         }
         queryArgs.set(CommonParams.START, start);
         //We add one to our facet limit so that we know if there are more matches
@@ -212,7 +210,7 @@ public class SolrAuthority implements ChoiceAuthority {
     }
 
     private String toQuery(String searchField, String text) {
-        return searchField + ":" + text.toLowerCase().replaceAll(":", "\\:") + "* or " + searchField + ":" + text.toLowerCase().replaceAll(":", "\\:");
+        return searchField + ":*" + text.toLowerCase().replaceAll(":", "\\:").replaceAll("\\s", "") + "*";
     }
 
     @Override

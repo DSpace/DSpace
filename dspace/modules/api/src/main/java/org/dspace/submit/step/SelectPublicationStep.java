@@ -1,5 +1,6 @@
 package org.dspace.submit.step;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadFunderConcept;
 import org.datadryad.api.DryadJournalConcept;
@@ -235,40 +236,31 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             }
         }
 
-        DCValue[] dcValues = item.getMetadata("prism.publicationName");
+        DCValue[] journalMDV = item.getMetadata("prism.publicationName");
         item.clearMetadata("prism.publicationName");
         item.update();
 
         String journal = null;
         if (journalConcept == null) {
-            // look in the item's metadata, in case the journal name was loaded by a crosswalk.
-            if (dcValues.length > 0) {
-                journal = dcValues[0].value;
-                item.clearMetadata("prism.publicationName");
-            }
-
-            // then look in the request parameter for publication name.
-            if (journal == null || "".equals(journal)) {
+            // did the user enter a journal?
+            if (Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED || Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED) {
                 journal = request.getParameter("prism_publicationName");
             }
 
-            // then look in the unknown_doi parameter.
-            if (journal == null || "".equals(journal)) {
-                journal = request.getParameter("unknown_doi");
+            // if not, look in the item's metadata, in case the journal name was loaded by a crosswalk.
+            if (StringUtils.isBlank(journal) && journalMDV.length > 0) {
+                journal = journalMDV[0].value;
             }
 
             // clean the name
-            if (journal != null) {
+            if (!StringUtils.isBlank(journal)) {
                 journal = journal.replace("*", "");
                 journal = journal.trim();
-            }
-
-            if (journal != null && journal.length() > 0) {
                 journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
             }
         }
 
-        if (journalConcept == null && journal != null) {
+        if (journalConcept == null && !StringUtils.isBlank(journal)) {
             // if article is PUBLISHED or ACCEPTED, can be any journal, so we should make a temp journal.
             if ((Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) || (Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED)) {
                 try {

@@ -473,7 +473,7 @@ div.bioText {
 .submission fieldset.ds-form-list {
     border: none;
 }
-#status_other_than_published,
+#publication_options,
 #aspect_submission_StepTransformer_list_doi > table {
     border: 1px solid #ccc;
     float: left;
@@ -1049,6 +1049,13 @@ img.ds-authority-confidence.cf-blank {
 #recently-published-data .odd
 {
     background-color: #EEEEEE;
+}
+
+#or_divider
+{
+    font-weight:bold;
+    padding: 3px 5px 1px;
+    text-align: center;
 }
 
 .italics {
@@ -1648,7 +1655,7 @@ blockquote {
 
 }
 #aspect_submission_StepTransformer_field_manu,#aspect_submission_StepTransformer_field_prism_publicationName {
-    width:450px;
+    width:440px;
 }
 #aspect_submission_StepTransformer_field_article_doi {
     width:440px;

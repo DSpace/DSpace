@@ -324,9 +324,9 @@ public class PaymentSystemImpl implements PaymentSystemService {
                 }
 
                 // funder of last resort:
-                log.info("checking to see if " + funder + " is a sponsor");
                 if (!shoppingcart.hasSubscription()) {
                     if (!"".equals(funder)) {
+                        log.info("checking to see if " + funder + " is a sponsor");
                         DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, funder);
                         if (funderConcept != null && funderConcept.getSubscriptionPaid()) {
                             log.info("funder is a sponsor");

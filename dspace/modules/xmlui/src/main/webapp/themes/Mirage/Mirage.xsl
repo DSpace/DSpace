@@ -124,10 +124,13 @@
         #aspect_statistics_StatisticsTransformer_div_stats tr.odd td {
 	        background-color: #eee;
 	    }
-        #aspect_statistics_StatisticsTransformer_div_stats th,
+        #aspect_statistics_StatisticsTransformer_div_stats th {
+            padding: 0 8px;
+            text-align: center;
+        }
         #aspect_statistics_StatisticsTransformer_div_stats td {
             padding: 0 8px;
-            text-align: right
+            text-align: right;
         }
         #aspect_statistics_StatisticsTransformer_div_stats td:first-child {
             text-align: left;
@@ -693,57 +696,10 @@
         </div>
     </xsl:template>
 
-
-
-    <!-- First submission form: STATUS: PUBLISHED - journalID Select + Manuscript Number Edit Box -->
-    <xsl:template match="dri:list[@n='doi']">
-        <li id="aspect_submission_StepTransformer_list_doi">
-            <table>
-                <tr>
-                    <td>
-                    <xsl:for-each select="dri:item/dri:field">
-                        <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
-                        <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
-                        <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
-
-                        <xsl:if test="$currentName!='unknown_doi'">
-                            <div style='padding: 0 8px 8px;'>
-                                <label class="ds-form-label-select-publication">
-                                    <xsl:attribute name="for">
-                                        <xsl:value-of select="translate($currentId,'.','_')"/>
-                                    </xsl:attribute>
-                                    <i18n:text>
-                                        <xsl:value-of select="dri:label"/>
-                                    </i18n:text>
-                                    <xsl:text>: </xsl:text>
-                                </label>
-
-                                <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-                                <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-                            </div>
-                        </xsl:if>
-
-                        <xsl:if test="$currentName='unknown_doi'">
-                            <div style="font-weight:bold; border-top: 2px dotted #ccc; border-bottom: 2px dotted #ccc; padding: 3px 0 1px; text-align: center;">
-                                OR
-                            </div>
-                            <div style="padding: 8px;" id="unknown-doi-panel">
-                                <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-                                <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-                            </div>
-                        </xsl:if>
-
-                    </xsl:for-each>
-                    </td>
-                </tr>
-            </table>
-        </li>
-    </xsl:template>
-
     <!-- First submission form: STATUS: ACCEPTED/IN REVIEW/NOT_YET_SUBMITTED -->
     <xsl:template match="dri:list/dri:item[@n='select_publication_new' or @n='select_publication_exist']">
         <li>
-            <table id="status_other_than_published">
+            <table id="publication_options">
                     <!--xsl:call-template name="standardAttributes">
                     <xsl:with-param name="class">
                         <xsl:text>ds-form-item </xsl:text>
@@ -772,7 +728,6 @@
                             <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
                             <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
 
-
                             <label class="ds-form-label-select-publication">
                                 <xsl:attribute name="for"><xsl:value-of select="translate($currentId,'.','_')"/></xsl:attribute>
                                 <i18n:text><xsl:value-of select="dri:label"/></i18n:text>
@@ -786,6 +741,10 @@
 
 
                         </td></tr>
+                        <xsl:if test="@n='article_doi'">
+                            <tr><td id="or_divider"><i18n:text>xmlui.submit.publication.unknown_doi</i18n:text></td></tr>
+                        </xsl:if>
+
                     </xsl:for-each>
 
                     <xsl:for-each select="dri:field[@type!='composite']">
@@ -828,9 +787,6 @@
                                 </td>
                             </tr>
                         </xsl:if>
-
-
-
                     </xsl:for-each>
             </table>
         </li>

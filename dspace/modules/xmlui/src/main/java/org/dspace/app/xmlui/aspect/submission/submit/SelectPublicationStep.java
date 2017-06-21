@@ -16,6 +16,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
+import org.dspace.content.MetadataField;
 import org.dspace.content.authority.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -101,7 +102,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_article_status_not_yet_submitted = message("xmlui_submit_publication_article_status_not_yet_submitted");
 
     private static final Message T_enter_article_doi = message("xmlui.submit.publication.enter_article_doi");
-    private static final Message T_unknown_doi = message("xmlui.submit.publication.unknown_doi");
 
     private static final Message T_asterisk_explanation = message("xmlui.submit.publication.journal.manu.acc.asterisk_explanation");
 
@@ -170,9 +170,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         // add radios: Accepted, In Review, Published, Not Yet Submitted
         addArticleStatusRadios(request, form, manuscript);
 
-        // case A: (radio selected ==> published)
-        addFieldsStatusPublished(request, form);
-
         //Get all the data required
         boolean pubIdError = this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_INVALID_PUBLICATION_ID;
         Collection pubColl = (Collection) HandleManager.resolveToObject(context, ConfigurationManager.getProperty("submit.publications.collection"));
@@ -181,11 +178,14 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Item newItem = form.addItem("select_publication_new", submitExisting ? "" : "odd");
         addRadioIfSubmitExisting(submitExisting, pubIdError, pubColl, newItem);
 
+        // case A: (radio selected ==> published)
+        addFieldsStatusPublished(request, newItem);
+
         // case B: (radio selected ==> accepted)
         addfieldsStatusAccepted(newItem, request, manuscript);
 
         // case D: (radio selected ==>  In Review)
-        addJournalSelectStatusInReview(selectedJournalName, newItem, manuscript, request);
+        addJournalSelectStatusInReview(newItem, manuscript, request);
 
         // hidden select fields that populate integrated journals
         addJournalSelectStatusIntegrated(selectedJournalName, newItem);
@@ -207,33 +207,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
 
-
-    private void addFieldsStatusPublished(Request request, List form) throws WingException {
-        List doi = form.addList("doi");
-        Text textArticleDOI = doi.addItem().addText("article_doi");
-        textArticleDOI.setLabel(T_enter_article_doi);
-        if(request.getParameter("article_doi") != null)
-            textArticleDOI.setValue(request.getParameter("article_doi"));
-
-
-        doi.addItem().addContent("OR");
-        Text cb = doi.addItem().addText("unknown_doi");
-        String pubName = request.getParameter("unknown_doi");
-        if (pubName != null) {
-            cb.setValue(pubName);
-        }
-        cb.setHelp(T_unknown_doi);
-
-
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_DOI){
-            textArticleDOI.addError("Invalid Identifier.");
-        }
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_NAME){
-            textArticleDOI.addError("No journal name.");
-        }
-
-
-    }
 
     private void addArticleStatusRadios(Request request, List form, Manuscript manuscript) throws WingException {
         // add "article status" radios
@@ -279,12 +252,29 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
     }
 
+    private void addFieldsStatusPublished(Request request, Item newItem) throws WingException {
+        Composite doi = newItem.addComposite("doi");
+        Text textArticleDOI = doi.addText("article_doi");
+        textArticleDOI.setLabel(T_enter_article_doi);
+        if(request.getParameter("article_doi") != null)
+            textArticleDOI.setValue(request.getParameter("article_doi"));
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_DOI){
+            textArticleDOI.addError("Invalid Identifier.");
+        }
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_NAME){
+            textArticleDOI.addError("No journal name.");
+        }
+
+
+    }
 
     private void addfieldsStatusAccepted(Item newItem, Request request, Manuscript manuscript) throws WingException {
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
-        Text journalField = addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
+        Text journalField = addJournalAuthorityControlled(optionsList, "prism_publicationName");
 	    journalField.setHelp(T_asterisk_explanation);
+        journalField.setLabel(T_SELECT_LABEL_NEW);
+
 
         if (manuscript!=null && manuscript.isAccepted()) {
             journalField.setValue(manuscript.getJournalName());
@@ -293,7 +283,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
     }
 
-    private void addJournalSelectStatusInReview(String selectedJournalName, Item newItem, Manuscript manuscript, Request request) throws WingException,SQLException {
+    private void addJournalSelectStatusInReview(Item newItem, Manuscript manuscript, Request request) throws WingException,SQLException {
         Composite optionsList = newItem.addComposite("journalID_status_in_review");
         Select journalID = optionsList.addSelect("journalIDStatusInReview");
         journalID.addOption("", "Please select a valid journal");
@@ -343,14 +333,13 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private Text addJournalAuthorityControlled(String fieldkey, Composite comp, String fieldName) throws WingException {
-        fieldkey = config2fkey(fieldkey);
+    private Text addJournalAuthorityControlled(Composite comp, String fieldName) throws WingException {
+        String fieldkey = MetadataField.formKey("prism", "publicationName", null);
         Text journal = comp.addText(fieldName);
         journal.setAuthorityControlled();
         journal.setChoices(fieldkey);
         journal.setChoicesPresentation(ConfigurationManager.getProperty("choices.presentation.prism.publicationName"));
         journal.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldkey));
-        journal.setLabel(T_SELECT_LABEL_NEW);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
             journal.addError(T_SELECT_ERROR);
 
@@ -358,25 +347,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     }
 
-
-    private static String config2fkey(String field) {
-        // field is expected to be "schema.element.qualifier"
-        int dot = field.indexOf('.');
-        if (dot < 0) {
-            return null;
-        }
-        String schema = field.substring(0, dot);
-        String element = field.substring(dot + 1);
-        String qualifier = null;
-        dot = element.indexOf('.');
-        if (dot >= 0) {
-            qualifier = element.substring(dot + 1);
-            element = element.substring(0, dot);
-        }
-        return MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
-    }
-
-
+    // NOTE: this method is always turned off in our current layout.
+    // If it is enabled again, CHECK THE FORMATTING in utils.js and Mirage.xsl.
     private void addPublicationNumberIfSubmitExisting(List form, boolean submitExisting, boolean pubIdError, Collection pubColl) throws WingException, SQLException {
            if(submitExisting){
                Item existItem = form.addItem("select_publication_exist", "");
@@ -401,25 +373,25 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
            }
        }
 
-       private void addRadioIfSubmitExisting(boolean submitExisting, boolean pubIdError, Collection pubColl, Item newItem) throws WingException, SQLException {
-           if(submitExisting){
-               //We need to add a radio
-               Radio radio = newItem.addRadio("publication_select");
-               if (AuthorizeManager.authorizeActionBoolean(context, pubColl, Constants.ADD))
-               {
-                   radio.addOption(!pubIdError, "create").addContent(T_PUB_SELECT_NEW);
-               }else{
-                   //We cannot create one so just disable it
-                   Option createOption = radio.addOption(false, "create");
-                   createOption.addContent(T_PUB_SELECT_NEW);
-                   radio.setDisabled(true);
-                   radio.addOption(true, "select").addContent(T_PUB_SELECT_EXISTING);
-               }
+    private void addRadioIfSubmitExisting(boolean submitExisting, boolean pubIdError, Collection pubColl, Item newItem) throws WingException, SQLException {
+       if(submitExisting){
+           //We need to add a radio
+           Radio radio = newItem.addRadio("publication_select");
+           if (AuthorizeManager.authorizeActionBoolean(context, pubColl, Constants.ADD))
+           {
+               radio.addOption(!pubIdError, "create").addContent(T_PUB_SELECT_NEW);
            }else{
-               //We cannot add a new data set so just add a hidden field to indicate that we want to create a new one
-               newItem.addHidden("publication_select").setValue("create");
+               //We cannot create one so just disable it
+               Option createOption = radio.addOption(false, "create");
+               createOption.addContent(T_PUB_SELECT_NEW);
+               radio.setDisabled(true);
+               radio.addOption(true, "select").addContent(T_PUB_SELECT_EXISTING);
            }
+       }else{
+           //We cannot add a new data set so just add a hidden field to indicate that we want to create a new one
+           newItem.addHidden("publication_select").setValue("create");
        }
+    }
 
 
     private void addLicense(List form) throws WingException {
@@ -432,9 +404,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
     private void generateCountryList(org.dspace.app.xmlui.wing.element.List info,Request request) throws WingException{
-
-        PaymentSystemConfigurationManager manager = new PaymentSystemConfigurationManager();
-        java.util.List<String> countryArray = manager.getSortedCountry();
+        java.util.List<String> countryArray = PaymentSystemConfigurationManager.getSortedCountry();
         try{
 	org.dspace.app.xmlui.wing.element.Item countryItem = info.addItem("country-help","country-help");
 	countryItem.addContent(T_Country_head);

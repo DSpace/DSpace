@@ -3330,7 +3330,7 @@
     <message key="xmlui_submit_publication_article_status_accepted">&#160; Accepted</message>
     <message key="xmlui_submit_publication_article_status_in_review">&#160; In preparation or in review</message>
     <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
-    <message key="xmlui.submit.publication.unknown_doi">I do not know the DOI or PubMedID for my publication. It was published in the journal:</message>
+    <message key="xmlui.submit.publication.unknown_doi">OR, if you do not know your publication's DOI/PMID, please enter journal information below:</message>
     <message key="xmlui.submit.publication.article_status"><span class="ds-form-label">Select the status of your publication*</span><br/></message>
     <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.<br />
     <br /><strong>Did you receive an email from your journal with a link to Dryad? Using this link to initiate your submission will save you time and effort by automatically entering the article metadata and the correct payment type for your journal.</strong></message>
@@ -3346,7 +3346,7 @@
      <message key="xmlui.submit.publication.journal.manu.help">example: 12345678MEC-11-1234.R1</message>
      <message key="xmlui.submit.publication.enter_article_doi">Enter publication's DOI or PubMed ID</message>
 
-     <message key="xmlui.submit.select.pub.form.manu_error">Please, provide a manuscript number</message>
+     <message key="xmlui.submit.select.pub.form.manu_error">Please provide a manuscript number</message>
      <message key="xmlui.submit.publication.journal.select.label.new">Enter your journal title</message>
      <message key="xmlui.submit.publication.journal.manu.label.new">Enter your manuscript number</message>
      <message key="xmlui.submit.publication.journal.manu.label.review">Enter your manuscript number (if available)</message>

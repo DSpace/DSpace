@@ -116,10 +116,6 @@ public class LocalIndexer implements AuthorityIndexerInterface {
     private void populateAuthorities(Item item) throws SQLException {
         if (item != null && item.isArchived()) {
             for (String fieldName : authorityControlledFields) {
-                DCValue[] dcVaslues = item.getMetadata("dc.identifier");
-                String doi=null;
-                if(dcVaslues.length > 0) doi=dcVaslues[0].value;
-
                 DCValue[] values = item.getMetadata(fieldName);
 
                 for (DCValue value : values) {

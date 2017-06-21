@@ -70,54 +70,53 @@ jQuery.fn.inputHints = function() {
 
 
 function initFirstSubmissionForm() {
-
-    enableJournalPublished();
     // if I am in the first page
     if (jQuery("#aspect_submission_StepTransformer_div_submit-select-publication").length > 0) {
-        // Status (onLoad of the page): STATUS_ACCEPTED
-        if (jQuery('input[name|="article_status"]:checked').val()=='1') {
-
-            jQuery("#status_other_than_published").show();
-            jQuery("#aspect_submission_StepTransformer_list_doi").hide();
+        enableJournalPublished();
+        // Status (onLoad of the page): STATUS_PUBLISHED
+        if (jQuery('input[name|="article_status"]:checked').val()=='0') {
+            jQuery("#publication_options").show();
+            jQuery("#article_doi").show();
+            jQuery("#or_divider").show();
+            jQuery("#prism_publicationName").hide();
             jQuery("#manu").hide();
-            jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#journalIDStatusInReview").hide();
-            jQuery("#prism_publicationName").show();
-            jQuery("#manu").show();
+            jQuery("#journalIDStatusIntegrated").hide();
             enableNextButton();
         }
 
-        // Status (onLoad of the page): STATUS_PUBLISHED
-        else if (jQuery('input[name|="article_status"]:checked').val()=='0') {
-            jQuery("#prism_publicationName").hide();
-            jQuery("#manu").hide();
-            jQuery("#journalIDStatusNotYetSubmitted").hide();
+        // Status (onLoad of the page): STATUS_ACCEPTED
+        else if (jQuery('input[name|="article_status"]:checked').val()=='1') {
+            jQuery("#publication_options").show();
+            jQuery("#article_doi").hide();
+            jQuery("#prism_publicationName").show();
+            jQuery("#manu").show();
             jQuery("#journalIDStatusInReview").hide();
-            jQuery("#aspect_submission_StepTransformer_list_doi").show();
-            jQuery("#status_other_than_published").hide();
+            jQuery("#journalIDStatusIntegrated").hide();
             enableNextButton();
-
         }
 
         // Status (onLoad of the page): STATUS_IN_REVIEW
         else if (jQuery('input[name|="article_status"]:checked').val()=='2') {
-            jQuery("#aspect_submission_StepTransformer_list_doi").hide();
+            jQuery("#publication_options").show();
+            jQuery("#article_doi").hide();
+            jQuery("#or_divider").hide();
             jQuery("#prism_publicationName").hide();
-            jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#manu").show();
             jQuery("#journalIDStatusInReview").show();
-            jQuery("#status_other_than_published").show();
+            jQuery("#journalIDStatusIntegrated").show();
             enableNextButton();
         }
 
         // Status (onLoad of the page): STATUS_NULL
         else {
-            jQuery("#aspect_submission_StepTransformer_list_doi").hide();
+            jQuery("#publication_options").hide();
+            jQuery("#article_doi").hide();
+            jQuery("#or_divider").hide();
             jQuery("#prism_publicationName").hide();
             jQuery("#manu").hide();
-            jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#journalIDStatusInReview").hide();
-            jQuery("#status_other_than_published").hide();
+            jQuery("#journalIDStatusIntegrated").hide();
             enableNextButton();
         }
 
@@ -144,36 +143,37 @@ function initFirstSubmissionForm() {
 
         // Click: status_published
         jQuery('#xmlui_submit_publication_article_status_published').click(function () {
-            jQuery("#prism_publicationName").hide();
+            jQuery("#publication_options").show();
+            jQuery("#article_doi").show();
+            jQuery("#or_divider").show();
+            jQuery("#prism_publicationName").show();
             jQuery("#manu").hide();
-            jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#journalIDStatusInReview").hide();
-            jQuery("#status_other_than_published").hide();
-            jQuery("#aspect_submission_StepTransformer_list_doi").show();
-            enableNextButton();
-        });
-
-        // Click: status_in_review
-        jQuery('#xmlui_submit_publication_article_status_in_review').click(function () {
-            jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#prism_publicationName").hide();
-            jQuery("#aspect_submission_StepTransformer_item_new-manu-comp-acc").hide();
-            jQuery("#aspect_submission_StepTransformer_item_new-manu-acc").hide();
-            jQuery("#journalIDStatusNotYetSubmitted").hide();
-            jQuery("#status_other_than_published").show();
-            jQuery("#manu").show();
-            jQuery("#journalIDStatusInReview").show();
+            jQuery("#journalIDStatusIntegrated").hide();
             enableNextButton();
         });
 
         // Click: status_accepted
         jQuery('#xmlui_submit_publication_article_status_accepted').click(function () {
-            jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#manu").show();
-            jQuery("#journalIDStatusNotYetSubmitted").hide();
-            jQuery("#journalIDStatusInReview").hide();
-            jQuery("#status_other_than_published").show();
+            jQuery("#publication_options").show();
+            jQuery("#article_doi").hide();
+            jQuery("#or_divider").hide();
             jQuery("#prism_publicationName").show();
+            jQuery("#manu").show();
+            jQuery("#journalIDStatusInReview").hide();
+            jQuery("#journalIDStatusIntegrated").hide();
+            enableNextButton();
+        });
+
+        // Click: status_in_review
+        jQuery('#xmlui_submit_publication_article_status_in_review').click(function () {
+            jQuery("#publication_options").show();
+            jQuery("#article_doi").hide();
+            jQuery("#or_divider").hide();
+            jQuery("#prism_publicationName").hide();
+            jQuery("#manu").show();
+            jQuery("#journalIDStatusInReview").show();
+            jQuery("#journalIDStatusIntegrated").show();
             enableNextButton();
         });
 
@@ -195,7 +195,7 @@ function initFirstSubmissionForm() {
         jQuery('input[name|="manu_accepted-cb"]').change(function() {
             enableNextButton();
         });
-        jQuery('input[name|="unknown_doi"]').keyup(function() {
+        jQuery('input[name|="prism_publicationName"]').keyup(function() {
             enableJournalPublished();
         });
         jQuery('input[name|="article_doi"]').keyup(function() {
@@ -206,34 +206,29 @@ function initFirstSubmissionForm() {
 }
 
 function enableJournalPublished(){
-    //console.log(jQuery('#unknown-doi-panel span.field-help'));
     if(jQuery('input[name|="article_doi"]').val()!="")
     {
-        jQuery('input[name|="unknown_doi"]').attr("disabled", "disabled");
-        jQuery('input[name|="unknown_doi"]').css("background-color","#E3E3E3");
-        jQuery('#unknown-doi-panel span.field-help').attr("style","color:grey");
+        jQuery('input[name|="prism_publicationName"]').attr("disabled", "disabled");
+        jQuery('input[name|="prism_publicationName"]').css("background-color","#E3E3E3");
         jQuery('label.ds-form-label-select-publication').css("color","");
     }
     else
     {
-        jQuery('input[name|="unknown_doi"]').removeAttr("disabled");
-        jQuery('input[name|="unknown_doi"]').css("background-color","");
-        jQuery('#unknown-doi-panel span.field-help').attr("style","color:black");
+        jQuery('input[name|="prism_publicationName"]').removeAttr("disabled");
+        jQuery('input[name|="prism_publicationName"]').css("background-color","");
         jQuery('label.ds-form-label-select-publication').css("color","grey");
     }
-    if(jQuery('input[name|="unknown_doi"]').val()!="")
+    if(jQuery('input[name|="prism_publicationName"]').val()!="")
     {
         jQuery('input[name|="article_doi"]').attr("disabled", "disabled");
         jQuery('input[name|="article_doi"]').css("background-color","#E3E3E3");
         jQuery('label.ds-form-label-select-publication').css("color","grey");
-        jQuery('#unknown-doi-panel span.field-help').attr("style","color:black");
     }
     else
     {
         jQuery('input[name|="article_doi"]').removeAttr("disabled");
         jQuery('input[name|="article_doi"]').css("background-color","");
         jQuery('label.ds-form-label-select-publication').css("color","");
-        jQuery('#unknown-doi-panel span.field-help').attr("style","color:grey");
     }
 }
 function enableNextButton() {
