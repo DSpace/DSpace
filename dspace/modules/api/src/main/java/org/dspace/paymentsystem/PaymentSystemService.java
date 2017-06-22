@@ -26,9 +26,6 @@ import java.util.Map;
  */
 public interface PaymentSystemService
 {
-
-    public ShoppingCart createNewShoppingCart(Context context, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException, PaymentSystemException;
-
     public void modifyShoppingCart(Context context, ShoppingCart transaction, DSpaceObject dso) throws AuthorizeException, SQLException, PaymentSystemException;
 
     public void deleteShoppingCart(Context context, Integer transactionId) throws AuthorizeException, SQLException, PaymentSystemException;
@@ -36,27 +33,6 @@ public interface PaymentSystemService
     public ShoppingCart getShoppingCart(Context context, Integer transactionId) throws SQLException;
 
     public ShoppingCart getShoppingCartByItemId(Context context, Integer itemId) throws SQLException,PaymentSystemException;
-
-    public Double calculateShoppingCartTotal(Context context, ShoppingCart transaction) throws SQLException;
-
-    public double getSurchargeLargeFileFee(Context context, ShoppingCart transaction) throws SQLException;
-
-    public boolean isSponsored(Context context, ShoppingCart transaction) throws SQLException;
-
-    public boolean dpcIsCovered(Context context, ShoppingCart transaction) throws SQLException;
-
-    public void updateTotal(Context context, ShoppingCart transaction) throws SQLException;
-
-    public void setCurrency(ShoppingCart shoppingCart,String currency)throws SQLException;
-
-    public String getWaiverMessage(Context context, ShoppingCart shoppingCart);
-
-    public int getWaiver(Context context, ShoppingCart shoppingcart)throws SQLException;
-    public boolean getCountryWaiver(Context context, ShoppingCart transaction) throws SQLException;
-
-    public String getPayer(Context context, ShoppingCart shoppingcart)throws SQLException;
-
-    public String printShoppingCart(Context c, ShoppingCart shoppingCart);
 
     public void generateShoppingCart(Context context,org.dspace.app.xmlui.wing.element.List info,ShoppingCart transaction,PaymentSystemConfigurationManager manager,String baseUrl,Map<String,String> messages) throws WingException,SQLException;
     public void generateNoEditableShoppingCart(Context context,org.dspace.app.xmlui.wing.element.List info,ShoppingCart transaction,PaymentSystemConfigurationManager manager,String baseUrl,Map<String,String> messages) throws WingException,SQLException;

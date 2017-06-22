@@ -1,6 +1,7 @@
 package org.datadryad.authority;
 
 import org.datadryad.api.DryadJournalConcept;
+import org.datadryad.api.DryadOrganizationConcept;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.indexer.AuthorityIndexerInterface;
 import org.dspace.content.*;
@@ -17,20 +18,21 @@ import org.dspace.JournalUtils;
  */
 public class JournalConceptIndexer implements AuthorityIndexerInterface {
 
-    private String SOURCE="JOURNALCONCEPTS";
-    private AuthorityValue nextValue;
+    protected String SOURCE="JOURNALCONCEPTS";
+    protected AuthorityValue nextValue;
 
-    LinkedList<AuthorityValue> authorities = new LinkedList();
+    protected LinkedList<AuthorityValue> authorities = new LinkedList();
 
 
-    public static final String FIELD_NAME = "prism_publicationName";
+    public String FIELD_NAME = "prism_publicationName";
 
     public void init() {
         DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
         for (DryadJournalConcept concept : dryadJournalConcepts) {
             if (concept.isAccepted()) {
-                AuthorityValue doc = createHashMap(concept);
-                authorities.add(doc);
+                for (AuthorityValue doc : createAuthorityValues(concept)) {
+                    authorities.add(doc);
+                }
             }
         }
     }
@@ -63,19 +65,26 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private AuthorityValue createHashMap(DryadJournalConcept concept){
-        AuthorityValue authorityValue = new AuthorityValue();
-
-        authorityValue.setId(String.valueOf(concept.getConceptID()));
-        authorityValue.setSource(SOURCE);
-        authorityValue.setField(FIELD_NAME);
-        authorityValue.setValue(concept.getFullName());
-        // full-text field is for searching, so index it with no spaces.
-        authorityValue.setFullText(concept.getFullName().replaceAll("\\s", ""));
-        authorityValue.setCreationDate(new Date());
-        authorityValue.setLastModified(new Date());
-
-        return authorityValue;
+    protected List<AuthorityValue> createAuthorityValues(DryadOrganizationConcept concept) {
+        ArrayList<AuthorityValue> authorityValues = new ArrayList<AuthorityValue>();
+        ArrayList<String> names = new ArrayList<String>();
+        names.add(concept.getFullName());
+        for (String name : concept.getAlternateNames()) {
+            names.add(name);
+        }
+        for (String name : names) {
+            AuthorityValue authorityValue = new AuthorityValue();
+            authorityValue.setId(String.valueOf(concept.getConceptID()));
+            authorityValue.setSource(SOURCE);
+            authorityValue.setField(FIELD_NAME);
+            authorityValue.setValue(concept.getFullName());
+            // full-text field is for searching, so index it with no spaces.
+            authorityValue.setFullText(name.replaceAll("\\s", ""));
+            authorityValue.setCreationDate(new Date());
+            authorityValue.setLastModified(new Date());
+            authorityValues.add(authorityValue);
+        }
+        return authorityValues;
     }
 
     public String indexerName() {

@@ -59,42 +59,16 @@ public class ShoppingCartConsumer implements Consumer {
             // Bundle.getItem.....
             Item[] item = bundle.getItems();
             if(item!=null&&item.length>0){
-            Item publication =  DryadWorkflowUtils.getDataPackage(ctx, item[0]);
+                Item publication =  DryadWorkflowUtils.getDataPackage(ctx, item[0]);
 
-            if(publication==null) publication=item[0];
+                if(publication==null) publication=item[0];
 
-            DCValue[] journal = publication.getMetadata("prism.publicationName");
-            ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(ctx,publication.getID());
-            if(shoppingCart!=null)
-            {
-               Double oldPrice = shoppingCart.getTotal();
-               //recaculate based on the current rate
-               Double newPrice = paymentSystemService.calculateShoppingCartTotal(ctx,shoppingCart);
-
-               Double oversized = paymentSystemService.getSurchargeLargeFileFee(ctx,shoppingCart);
-
-               if(!oldPrice.equals(newPrice))
-               {
-                   if(oldPrice>newPrice)
-                   {  //update the new price
-                       shoppingCart.setTotal(newPrice);
-                   }
-                   else
-                   {
-                       //oldprice < newprice ,adding new files and oversized
-                       if(oversized>0)
-                       {
-                           //file is oversized
-                           shoppingCart.setTotal(newPrice);
-                       }
-                   }
-               }
-                else
-               {
-                   //do nothing
-               }
-                shoppingCart.update();
-            }
+                ShoppingCart shoppingCart = paymentSystemService.getShoppingCartByItemId(ctx,publication.getID());
+                if(shoppingCart!=null) {
+                   //recaculate based on the current rate
+                   shoppingCart.calculateShoppingCartTotal(ctx);
+                   shoppingCart.update();
+                }
             }
         }
 

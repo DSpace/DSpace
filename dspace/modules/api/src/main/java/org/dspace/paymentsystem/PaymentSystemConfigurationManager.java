@@ -165,7 +165,7 @@ public class PaymentSystemConfigurationManager {
     {
         if(StringUtils.equals(maxFileSize,null))
         {
-            return null;
+            return 0L;
         }
         else
         {
@@ -189,7 +189,8 @@ public class PaymentSystemConfigurationManager {
     {
         if(StringUtils.equals(UnitSize,null))
         {
-            return null;
+            // default is 1GB
+            return 10737418240L;
         }
         else
         {

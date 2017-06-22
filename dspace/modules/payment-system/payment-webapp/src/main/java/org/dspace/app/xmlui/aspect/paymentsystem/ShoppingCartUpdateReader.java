@@ -89,7 +89,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         String symbol = PaymentSystemConfigurationManager.getCurrencySymbolISO(shoppingCart.getCurrency())+";";
         //{ "firstName":"John" , "lastName":"Doe" }
         Double basicFee =shoppingCart.getBasicFee();
-        Double surcharge = paymentSystemService.getSurchargeLargeFileFee(context,shoppingCart);
+        Double surcharge = shoppingCart.getSurchargeLargeFileFee(context);
         Integer voucherId= shoppingCart.getVoucher();
         Voucher voucher = Voucher.findById(context,voucherId);
         String voucherCode = "";
@@ -98,8 +98,8 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
             voucherCode = voucher.getCode();
         }
         String waiverMessage = "";
-        String payername = paymentSystemService.getPayer(context,shoppingCart);
-        waiverMessage = paymentSystemService.getWaiverMessage(context, shoppingCart);
+        String payername = shoppingCart.getPayer(context);
+        waiverMessage = shoppingCart.getWaiverMessage(context);
 
         String result = "{\"total\":\""+symbol+String.valueOf(Double.toString(total))+"\",\"country\":\""+StringEscapeUtils.escapeJava(shoppingCart.getCountry())+"\",\"price\":\""+symbol+basicFee+"\",\"surcharge\":\""+symbol+surcharge+"\",\"voucher\":\""+voucherCode+"\""+",\"errorMessage\":\""+errorMessage+"\",\"waiverMessage\":\""+waiverMessage+"\",\"payer\":\""+payername+"\"}";
         ByteArrayInputStream inputStream = new ByteArrayInputStream(result.getBytes("UTF-8"));
@@ -152,7 +152,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         if(request.getParameter("currency")!=null)
         {
             String currency=request.getParameter("currency");
-            payementSystemService.setCurrency(transaction,currency);
+            transaction.setCurrency(currency);
 
         }
         if(request.getParameter("country")!=null)
@@ -184,7 +184,7 @@ public class ShoppingCartUpdateReader extends AbstractReader implements Recyclab
         {
             transaction.setVoucher(null);
         }
-        payementSystemService.updateTotal(context,transaction);
+        transaction.updateCartInternals(context);
         return errorMessage;
 
     }

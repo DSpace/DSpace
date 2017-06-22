@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,18 +78,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return ERROR_SELECT_JOURNAL;
         }
 
-        // clear the sponsor from the shoppingcart:
-        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
-        ShoppingCart shoppingCart = null;
-        try {
-            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
-            if (shoppingCart != null) {
-                shoppingCart.setSponsoringOrganization(null);
-            }
-        } catch (Exception e) {
-            log.error("couldn't find cart for item " + item.getID());
-        }
-
         item.clearMetadata("dryad.fundingEntity");
         item.update();
         String fundingStatus = request.getParameter("funding-status");
@@ -109,6 +96,19 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             item.addMetadata(DryadFunderConcept.createFundingEntityMetadata(nsfConcept, grantInfo, confidence));
             item.update();
         }
+
+        // clear the sponsor from the shoppingcart:
+        PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
+        ShoppingCart shoppingCart = null;
+        try {
+            shoppingCart = paymentSystemService.getShoppingCartByItemId(context,item.getID());
+            if (shoppingCart != null) {
+                shoppingCart.updateCartInternals(context);
+            }
+        } catch (Exception e) {
+            log.error("couldn't find cart for item " + item.getID());
+        }
+
         EventLogger.log(context, "submission-select-publication", "status=complete");
         return STATUS_COMPLETE;
     }
@@ -162,30 +162,16 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         return doc.getRootElement();
     }
 
-    private void addEmailsAndEmbargoSettings(DryadJournalConcept journalConcept, Item item) throws AuthorizeException, SQLException {
-        ArrayList<String> reviewEmailList = journalConcept.getEmailsToNotifyOnReview();
-        String[] reviewEmails = reviewEmailList.toArray(new String[reviewEmailList.size()]);
-        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", Item.ANY);
-        item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", Item.ANY);
+    private void addEmbargoSettings(DryadJournalConcept journalConcept, Item item) throws AuthorizeException, SQLException {
         item.clearMetadata("internal", "submit", "showEmbargo", Item.ANY);
         item.update();
-
-        if(reviewEmails != null) {
-            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails);
-        }
-
-        ArrayList<String> archiveEmailList = journalConcept.getEmailsToNotifyOnArchive();
-        String[] archiveEmails = archiveEmailList.toArray(new String[archiveEmailList.size()]);
-
-        if (archiveEmails != null) {
-            item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails);
-        }
 
         Boolean embargoAllowed = journalConcept.getAllowEmbargo();
         if(embargoAllowed != null && !embargoAllowed){
             //We don't need to show the embargo option to any of our data files
             item.addMetadata("internal", "submit", "showEmbargo", null, String.valueOf(embargoAllowed));
         }
+        item.update();
     }
 
     private boolean processJournal(Item item, Context context, HttpServletRequest request) throws AuthorizeException, SQLException {
@@ -290,7 +276,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "submit", "skipReviewStage", Item.ANY);
         item.update();
         if (journalConcept.getIntegrated()) {
-            addEmailsAndEmbargoSettings(journalConcept, item);
+            addEmbargoSettings(journalConcept, item);
             if (manuscriptNumber != null && manuscriptNumber.equals("")) {
                 // set the status of the manuscript to whatever the user specified:
                 log.error("manuscript number is empty or nonexistent");

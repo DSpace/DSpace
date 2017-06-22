@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.lang.*;
 import java.lang.Exception;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -28,11 +30,12 @@ import org.dspace.authorize.AuthorizeException;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DryadOrganizationConcept implements Comparable<DryadOrganizationConcept> {
     // Organization Concepts can have the following metadata properties:
-    public static final String FULLNAME = "fullname";
+    public static final String FULLNAME = "fullName";
     public static final String CUSTOMER_ID = "customerID";
     public static final String DESCRIPTION = "description";
     public static final String WEBSITE = "website";
     public static final String PAYMENT_PLAN = "paymentPlanType";
+    public static final String ALTNAME = "alternateName";
 
     public static final String SUBSCRIPTION_PLAN = "SUBSCRIPTION";
     public static final String PREPAID_PLAN = "PREPAID";
@@ -47,6 +50,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     static {
         metadataProperties = new Properties();
         metadataProperties.setProperty(FULLNAME, "organization.fullName");
+        metadataProperties.setProperty(ALTNAME, "organization.alternateName");
         metadataProperties.setProperty(PAYMENT_PLAN, "organization.paymentPlanType");
         metadataProperties.setProperty(DESCRIPTION, "organization.description");
         metadataProperties.setProperty(WEBSITE, "organization.website");
@@ -54,6 +58,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
         defaultMetadataValues = new Properties();
         defaultMetadataValues.setProperty(metadataProperties.getProperty(FULLNAME), "");
+        defaultMetadataValues.setProperty(metadataProperties.getProperty(ALTNAME), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(PAYMENT_PLAN), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(DESCRIPTION), "");
         defaultMetadataValues.setProperty(metadataProperties.getProperty(WEBSITE), "");
@@ -64,6 +69,10 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
     protected Concept underlyingConcept;
     protected Integer conceptIdentifier;
     protected String fullName;
+    protected String schemeName;
+    {
+        schemeName = ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_organization");
+    }
 
     public DryadOrganizationConcept() {
     } // JAXB needs this
@@ -77,11 +86,16 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         }
     }
 
-    public void create(Context context) {
+    @JsonIgnore
+    public String getSchemeName() {
+        return schemeName;
+    }
+
+    protected void create(Context context) {
         try {
             context.turnOffAuthorisationSystem();
-            Scheme funderScheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.dryad_organization"));
-            Concept newConcept = funderScheme.createConcept(context);
+            Scheme scheme = Scheme.findByIdentifier(context, getSchemeName());
+            Concept newConcept = scheme.createConcept(context);
             this.setUnderlyingConcept(context, newConcept);
             context.commit();
             context.restoreAuthSystemState();
@@ -117,6 +131,9 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     @Override
     public int compareTo(DryadOrganizationConcept organizationConcept) {
+        if (organizationConcept == null) {
+            return -1;
+        }
         return this.getFullName().toUpperCase().compareTo(organizationConcept.getFullName().toUpperCase());
     }
 
@@ -132,6 +149,16 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
         }
         if (result == null) {
             result = "";
+        }
+        return result;
+    }
+
+    @JsonIgnore
+    protected List<String> getConceptMetadataValues(String mdString) {
+        AuthorityMetadataValue[] authorityValues = getUnderlyingConcept().getMetadata(mdString);
+        ArrayList<String> result = new ArrayList<String>();
+        for (AuthorityMetadataValue authorityValue : authorityValues) {
+            result.add(authorityValue.getValue());
         }
         return result;
     }
@@ -201,7 +228,7 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
                 context.turnOffAuthorisationSystem();
 
                 // add the new Term
-                Term newTerm = getUnderlyingConcept(context).createTerm(context, value, Term.prefer_term);
+                getUnderlyingConcept(context).createTerm(context, value, Term.prefer_term);
                 context.restoreAuthSystemState();
                 context.complete();
             } catch (Exception e) {
@@ -211,6 +238,29 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
                 throw new StorageException("Couldn't set fullname for " + fullName + ", " + e.getMessage());
             }
             fullName = value;
+        }
+    }
+
+    public List<String> getAlternateNames() {
+        return getConceptMetadataValues(metadataProperties.getProperty(ALTNAME));
+    }
+
+    public void addAlternateName(String value) throws StorageException{
+        Context context = null;
+        addConceptMetadataValue(metadataProperties.getProperty(ALTNAME), value);
+        try {
+            context = new Context();
+            context.turnOffAuthorisationSystem();
+
+            // add the new Term
+            getUnderlyingConcept(context).createTerm(context, value, Term.alternate_term);
+            context.restoreAuthSystemState();
+            context.complete();
+        } catch (Exception e) {
+            if (context != null) {
+                context.abort();
+            }
+            throw new StorageException("Couldn't set alternateName for " + value + ", " + e.getMessage());
         }
     }
 
@@ -279,7 +329,13 @@ public class DryadOrganizationConcept implements Comparable<DryadOrganizationCon
 
     @JsonIgnore
     public Boolean isValid() {
-        return (getFullName() != null);
+        String conceptSchemeName = null;
+        try {
+            conceptSchemeName = underlyingConcept.getScheme().getIdentifier();
+        } catch (SQLException e) {
+            log.error("couldn't get scheme for concept");
+        }
+        return (getFullName() != null) && (getSchemeName().equals(conceptSchemeName));
     }
 
     @Override

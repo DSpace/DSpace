@@ -48,7 +48,7 @@
       <xsl:param name="confIndicator" select="''"/>
       <input type="button" name="{concat('lookup_',@n)}" class="ds-button-field ds-add-button" >
         <xsl:attribute name="value">
-          <xsl:text>Lookup</xsl:text>
+          <xsl:text>Find authority-controlled value</xsl:text>
           <xsl:if test="contains(dri:params/@operations,'add')">
             <xsl:text> &amp; Add</xsl:text>
           </xsl:if>

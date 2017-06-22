@@ -24,5 +24,6 @@
 
     <bean id="com.atmire.authority.indexer.JournalConceptIndexer" class="org.datadryad.authority.JournalConceptIndexer"/>
 
+    <bean id="com.atmire.authority.indexer.SponsorIndexer" class="org.datadryad.authority.SponsorIndexer"/>
 
 </beans>

@@ -113,7 +113,7 @@ public class FlowShoppingcartUtils {
                     }
                 
                 if (currency != null && !currency.equals(currencyOriginal)) {
-                    paymentSystemService.setCurrency(shoppingCart,currency);
+                    shoppingCart.setCurrency(currency);
                 }
                 else{
                     //only when the currency doesn't change then change the individual rate
@@ -143,8 +143,7 @@ public class FlowShoppingcartUtils {
                             shoppingCart.setTransactionId(transactionId);
                         }
                     }
-                
-                paymentSystemService.updateTotal(context,shoppingCart);
+                shoppingCart.updateCartInternals(context);
                 context.commit();
                 
                 result.setContinue(true);

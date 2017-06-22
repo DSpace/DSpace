@@ -8,18 +8,28 @@
 package org.dspace.paymentsystem;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadFunderConcept;
+import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.api.DryadOrganizationConcept;
 import org.datadryad.rest.models.ResultSet;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.JournalUtils;
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.utils.DSpace;
+import org.dspace.workflow.DryadWorkflowUtils;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * This is the core Shopping Cart Domain Class
@@ -62,17 +72,59 @@ public class ShoppingCart {
     private DryadOrganizationConcept sponsorConcept;
 
 
-    ShoppingCart(Context context, TableRow row)
-    {
+    private ShoppingCart(Context context, TableRow row) {
         myContext = context;
         myRow = row;
-        setSponsorID(row.getIntColumn("sponsor_id"));
+        init();
+    }
+
+    private ShoppingCart(Context context) {
+        myContext = context;
+        try {
+            if (myRow == null) {
+                // Create a table row
+                myRow = DatabaseManager.create(context, "shoppingcart");
+            }
+        } catch (SQLException e) {
+            log.error("couldn't create a row in table shoppingcart");
+        }
+        init();
+    }
+
+    private void init() {
+        setSponsorID(myRow.getIntColumn("sponsor_id"));
         sponsorConcept = getSponsoringOrganization(myContext);
 
-
         // Cache ourselves
-        context.cache(this, row.getIntColumn("cart_id"));
+        myContext.cache(this, myRow.getIntColumn("cart_id"));
         modified = false;
+        log.info(LogManager.getHeader(myContext, "create_shoppingcart", "cart_id=" + getID()));
+    }
+
+    public ShoppingCart(Context context, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException,
+            PaymentSystemException {
+        this(context);
+        setCountry(country);
+        setCurrency(currency);
+        setDepositor(epersonId);
+        setExpiration(null);
+        if (itemId != null) {
+            //make sure we only create the shoppingcart for data package
+            Item item = Item.find(context, itemId);
+            org.dspace.content.Item dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
+            if (dataPackage != null) {
+                itemId = dataPackage.getID();
+            }
+            setItem(itemId);
+        }
+        setStatus(status);
+        setVoucher(null);
+        setTransactionId(null);
+        setSponsoringOrganization(null);
+        setBasicFee(PaymentSystemConfigurationManager.getCurrencyProperty(currency));
+        setSurcharge(PaymentSystemConfigurationManager.getSizeFileFeeProperty(currency));
+        calculateShoppingCartTotal(context);
+        update();
     }
 
     public String getHandle(){
@@ -340,27 +392,6 @@ public class ShoppingCart {
     }
 
     /**
-     * Create a new shoppingcart
-     *
-     * @param context
-     *            DSpace context object
-     */
-    public static ShoppingCart create(Context context) throws SQLException
-    {
-
-        // Create a table row
-        TableRow row = DatabaseManager.create(context, "shoppingcart");
-
-        ShoppingCart e = new ShoppingCart(context, row);
-
-        log.info(LogManager.getHeader(context, "create_shoppingcart", "cart_id="
-                + e.getID()));
-
-
-        return e;
-    }
-
-    /**
      * Delete an shoppingcart
      *
      */
@@ -438,6 +469,10 @@ public class ShoppingCart {
         return getCartForTableRow(context, rows.next());
     }
 
+    public static ShoppingCart findByItemId(Context context, int itemId) throws SQLException {
+        return findAllByItem(context, itemId).get(0);
+    }
+
     /**
      * Find the shoppingCarts by its id.
      *
@@ -464,9 +499,110 @@ public class ShoppingCart {
     public double getTotal(){
         return myRow.getDoubleColumn("total");
     }
-    public void setTotal(double total){
+
+    private void setTotal(double total){
         myRow.setColumn("total",total);
         modified = true;
+    }
+
+    void calculateShoppingCartTotal(Context context) throws SQLException {
+        log.debug("recalculating shopping cart total");
+        boolean discount = (getWaiver(context) != 0);
+        double fileSizeSurcharge = getSurchargeLargeFileFee(context);
+        double basicFee = getBasicFee();
+        setTotal(PaymentSystemImpl.calculateTotal(discount, fileSizeSurcharge, basicFee));
+    }
+
+    public void updateCartInternals(Context context) throws SQLException {
+        // only bother calculating internals if the cart is still open
+        if (!getStatus().equals(ShoppingCart.STATUS_COMPLETED)) {
+            String journal = "";
+            String funder = "";
+            Item item = Item.find(context, getItem());
+            if (item != null) {
+                try {
+                    // Look for the journal
+                    DCValue[] values = item.getMetadata("prism.publicationName");
+                    if (values != null && values.length > 0) {
+                        journal = values[0].value;
+                    }
+                    // Look for any valid funding entities
+                    // (for now, there should only be one; there could be more later
+                    DCValue[] fundingEntities = item.getMetadata("dryad.fundingEntity");
+                    if (fundingEntities != null && fundingEntities.length > 0) {
+                        if (fundingEntities[0].confidence == Choices.CF_ACCEPTED) {
+                            funder = fundingEntities[0].authority;
+                        }
+                    }
+
+                } catch (Exception e) {
+                    log.error("Exception getting journal from item " + item.getID() + ":", e);
+                }
+            }
+            if (journal != null && journal.length() > 0) {
+                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(journal);
+                if (journalConcept != null) {
+                    setSponsoringOrganization(journalConcept);
+                }
+            }
+
+            // funder of last resort:
+            if (!hasSubscription()) {
+                if (!"".equals(funder)) {
+                    log.info("checking to see if " + funder + " is a sponsor");
+                    DryadFunderConcept funderConcept = DryadFunderConcept.getFunderConceptMatchingFunderID(context, funder);
+                    if (funderConcept != null && funderConcept.getSubscriptionPaid()) {
+                        log.info("funder is a sponsor");
+                        setSponsoringOrganization(funderConcept);
+                    }
+                }
+            }
+            log.info("sponsor of cart " + getID() + " is " + getSponsorName());
+
+            // calculate the new total
+            calculateShoppingCartTotal(context);
+            update();
+            setModified(false);
+        }
+    }
+
+    int getWaiver(Context context) throws SQLException {
+        // check for payment by sponsor, waiver, voucher
+        Boolean isSponsored = hasSubscription();
+        Boolean countryDiscount = getCountryWaiver();
+        Boolean voucherDiscount = voucherValidate(context);
+
+        if (countryDiscount) {
+            return ShoppingCart.COUNTRY_WAIVER;
+        } else if (isSponsored) {
+            return ShoppingCart.JOUR_WAIVER;
+        } else if (voucherDiscount) {
+            return ShoppingCart.VOUCHER_WAIVER;
+        }
+        return ShoppingCart.NO_WAIVER;
+    }
+
+    public double getSurchargeLargeFileFee(Context context) throws SQLException {
+        // Extract values from database objects and configuration to pass to calculator
+        String currency = getCurrency();
+
+        long allowedSize = PaymentSystemConfigurationManager.getMaxFileSize();
+        double fileSizeFeeAfter = PaymentSystemConfigurationManager.getAllSizeFileFeeAfterProperty(currency);
+        long unitSize = PaymentSystemConfigurationManager.getUnitSize();  //1 GB
+
+        Item item = Item.find(context, getItem());
+        long totalSizeDataFile = PaymentSystemImpl.getTotalDataFileSize(context, item);
+        return PaymentSystemImpl.calculateFileSizeSurcharge(allowedSize, totalSizeDataFile, fileSizeFeeAfter, getSurcharge(), unitSize);
+    }
+
+    private boolean getCountryWaiver() throws SQLException {
+        Properties countryArray = PaymentSystemConfigurationManager.getAllCountryProperty();
+        return getCountry() != null && ShoppingCart.COUNTRYFREE.equals(countryArray.get(getCountry()));
+    }
+
+    private boolean voucherValidate(Context context) {
+        VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
+        return voucherValidationService.validate(context, getVoucher(), this);
     }
 
 
@@ -585,15 +721,15 @@ public class ShoppingCart {
         return myRow.getDoubleColumn("surcharge");
     }
 
-    public void setSponsoringOrganization(DryadOrganizationConcept organizationConcept) {
+    private void setSponsoringOrganization(DryadOrganizationConcept organizationConcept) {
         if (organizationConcept != null) {
-            setJournal(organizationConcept.getFullName());
-            setJournalSub(organizationConcept.getSubscriptionPaid());
+            setSponsorName(organizationConcept.getFullName());
+            setSponsorSub(organizationConcept.getSubscriptionPaid());
             setSponsorID(organizationConcept.getConceptID());
             sponsorConcept = organizationConcept;
         } else {
-            setJournal(null);
-            setJournalSub(false);
+            setSponsorName(null);
+            setSponsorSub(false);
             setSponsorID(-1);
         }
     }
@@ -622,7 +758,7 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    private void setJournal(String journal)
+    private void setSponsorName(String journal)
     {
         if(journal==null)
         {
@@ -639,7 +775,7 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    public String getJournal()
+    public String getSponsorName()
     {
         return myRow.getStringColumn("journal");
     }
@@ -649,7 +785,7 @@ public class ShoppingCart {
      *
      * @return text_lang code (or null if the column is an SQL NULL)
      */
-    private void setJournalSub(boolean journal_sub)
+    private void setSponsorSub(boolean journal_sub)
     {
         myRow.setColumn("journal_sub",journal_sub);
         modified = true;
@@ -661,13 +797,13 @@ public class ShoppingCart {
      * @return text_lang code (or null if the column is an SQL NULL)
      */
 
-    private Boolean getJournalSub() {
+    private Boolean getSponsorSub() {
         return myRow.getBooleanColumn("journal_sub");
     }
 
     public Boolean hasSubscription()
     {
-        return getJournalSub();
+        return getSponsorSub();
     }
 
 
@@ -741,5 +877,95 @@ public class ShoppingCart {
     {
         return myRow.getDateColumn("payment_date");
 
+    }
+
+    public String print(Context c) {
+
+        String result = "";
+
+        try {
+
+            result += format("Payer", getPayer(c));
+
+            String symbol = PaymentSystemConfigurationManager.getCurrencySymbol(getCurrency());
+
+            if (getWaiver(c) != ShoppingCart.NO_WAIVER) {
+                result += format("Price", symbol + "0.0");
+            } else {
+                result += format("Price", symbol + Double.toString(getBasicFee()));
+            }
+
+            //add the large file surcharge section
+            format("Excess data storage", symbol + Double.toString(getSurchargeLargeFileFee(c)));
+
+            try {
+                Voucher v = Voucher.findById(c, getVoucher());
+                if (v != null) {
+                    result += format("Voucher applied", v.getCode());
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+
+            //add the final total price
+            result += format("Total", symbol + Double.toString(getTotal()));
+
+            // add waiver information
+            result += format("Waiver Details", getWaiverMessage(c));
+
+            if (getTransactionId() != null && "".equals(getTransactionId().trim())) {
+                format("Transaction ID", getTransactionId());
+            }
+
+        } catch (Exception e) {
+            result += format("Error", e.getMessage());
+            log.error(e.getMessage(), e);
+        }
+
+        return result;
+    }
+
+    public String getPayer(Context context) throws SQLException {
+        String payerName = "";
+        EPerson e = EPerson.find(context, getDepositor());
+        switch (getWaiver(context)) {
+            case ShoppingCart.COUNTRY_WAIVER:
+                payerName = "Country";
+                break;
+            case ShoppingCart.JOUR_WAIVER:
+                payerName = "Sponsor";
+                break;
+            case ShoppingCart.VOUCHER_WAIVER:
+                payerName = "Voucher";
+                break;
+            case ShoppingCart.NO_WAIVER:
+                payerName = e.getFullName();
+                break;
+        }
+        return payerName;
+    }
+
+    public String getWaiverMessage(Context context) {
+        String result = "";
+        try {
+            switch (getWaiver(context)) {
+                case ShoppingCart.COUNTRY_WAIVER:
+                    result = "Data Publishing Charge has been waived due to submitter's association with " + getCountry() + ".";
+                    break;
+                case ShoppingCart.JOUR_WAIVER:
+                    result = getSponsorName() + " will cover the Data Publishing Charge for this associated submission.";
+                    break;
+                case ShoppingCart.VOUCHER_WAIVER:
+                    result = "Voucher code applied to Data Publishing Charge.";
+                    break;
+            }
+        } catch (SQLException e) {
+            log.error("Exception getting waiver for cart " + getID());
+        }
+        return result;
+    }
+
+    private String format(String label, String value) {
+        return label + ": " + value + "\n";
     }
 }

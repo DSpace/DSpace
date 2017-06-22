@@ -93,6 +93,10 @@ public class AuthorityValue {
         return id;
     }
 
+    public String getIndexID() {
+        return getSource() + getId();
+    }
+
     public String getField() {
         return field;
     }
@@ -217,6 +221,7 @@ public class AuthorityValue {
         doc.addField("creation_date", dateToString(getCreationDate()));
         doc.addField("last_modified_date", dateToString(getLastModified()));
         doc.addField("authority_type", getAuthorityType());
+        doc.addField("index-id", getIndexID());
         for(String name:nameVariants)
         {
             doc.addField(ALTERNATE_LABEL,name);

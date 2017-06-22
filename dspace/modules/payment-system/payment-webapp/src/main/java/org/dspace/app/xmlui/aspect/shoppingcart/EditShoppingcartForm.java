@@ -203,8 +203,8 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             identity.addItem().addContent(shoppingcart.getPaymentDate().toString());
 
         // Options that cause user to not pay DPC:
-//        List summary = edit.addList("waiver", List.TYPE_FORM);
-        identity.setHead("Payment Waiver Information");
+        List paymentWaiver = edit.addList("payment_waiver", List.TYPE_FORM);
+        paymentWaiver.setHead("Payment Waiver Information");
 
         // Sponsor
         DryadOrganizationConcept sponsorConcept = shoppingcart.getSponsoringOrganization(context);
@@ -241,15 +241,15 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         }
 
         if (admin) {
-            Text sponsorField = identity.addItem().addText("sponsor");
+            Text sponsorField = paymentWaiver.addItem().addText("sponsor");
             sponsorField.setLabel(T_sponsor);
-            sponsorField.setValue(voucherCode);
+            sponsorField.setValue(sponsorName);
 
-            Text voucherField = identity.addItem().addText("voucher");
+            Text voucherField = paymentWaiver.addItem().addText("voucher");
             voucherField.setLabel(T_voucher);
             voucherField.setValue(voucherCode);
 
-            Select countryField = identity.addItem().addSelect("country");
+            Select countryField = paymentWaiver.addItem().addSelect("country");
             countryField.setRequired();
             countryField.setLabel(T_country);
             countryField.addOption("", "Select fee-waiver country");
@@ -264,17 +264,17 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             }
             countryField.setOptionSelected(country);
         } else {
-            identity.addLabel(T_voucher);
-            identity.addItem().addContent(voucherCode);
-            identity.addLabel(T_voucher);
-            identity.addItem().addContent(voucherCode);
-            identity.addLabel(T_country);
-            identity.addItem().addContent(country);
+            paymentWaiver.addLabel(T_sponsor);
+            paymentWaiver.addItem().addContent(sponsorName);
+            paymentWaiver.addLabel(T_voucher);
+            paymentWaiver.addItem().addContent(voucherCode);
+            paymentWaiver.addLabel(T_country);
+            paymentWaiver.addItem().addContent(country);
         }
 
         // Options for if the depositor is paying the DPC:
-//        List summary = edit.addList("userPays", List.TYPE_FORM);
-        identity.setHead("Depositor Payment Information");
+        List depositorInfo = edit.addList("depositor_info", List.TYPE_FORM);
+        depositorInfo.setHead("Depositor Payment Information");
         Integer depositorId = shoppingcart.getDepositor();
         EPerson depositor = EPerson.find(context, depositorId);
 
@@ -287,44 +287,44 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         }
 
         if (admin) {
-            identity.addLabel(T_depositor);
-            identity.addItem().addContent(depositor.getFullName());
+            depositorInfo.addLabel(T_depositor);
+            depositorInfo.addItem().addContent(depositor.getFullName());
 
-            Text transactionIdField = identity.addItem().addText("transactionId");
+            Text transactionIdField = depositorInfo.addItem().addText("transactionId");
             transactionIdField.setLabel(T_transaction);
             transactionIdField.setValue(transactionId);
 
             if (secureToken != null) {
-                identity.addLabel(T_token);
-                identity.addItem().addContent(secureToken);
+                depositorInfo.addLabel(T_token);
+                depositorInfo.addItem().addContent(secureToken);
             }
 
-            identity.addLabel(T_basic_fee);
-            identity.addItem().addText("basicFee").setValue(basicFee);
-            identity.addLabel(T_surcharge);
-            identity.addItem().addText("surCharge").setValue(surCharge);
+            depositorInfo.addLabel(T_basic_fee);
+            depositorInfo.addItem().addText("basicFee").setValue(basicFee);
+            depositorInfo.addLabel(T_surcharge);
+            depositorInfo.addItem().addText("surCharge").setValue(surCharge);
         } else {
-            identity.addLabel(T_transaction);
-            identity.addItem().addContent(transactionId);
-            identity.addLabel(T_basic_fee);
-            identity.addItem().addContent(basicFee);
-            identity.addLabel(T_surcharge);
-            identity.addItem().addContent(surCharge);
+            depositorInfo.addLabel(T_depositor);
+            depositorInfo.addItem().addContent(depositor.getFullName());
+            depositorInfo.addLabel(T_basic_fee);
+            depositorInfo.addItem().addContent(basicFee);
+            depositorInfo.addLabel(T_surcharge);
+            depositorInfo.addItem().addContent(surCharge);
         }
-        identity.addLabel(T_total);
-        identity.addItem().addContent(Double.toString(total));
+        depositorInfo.addLabel(T_total);
+        depositorInfo.addItem().addContent(Double.toString(total));
 
         // Final notes about the cart:
-//        List summary = edit.addList("cart", List.TYPE_FORM);
-        identity.setHead("Additional Information");
+        List additionalInfo = edit.addList("additional_info", List.TYPE_FORM);
+        additionalInfo.setHead("Additional Information");
 
-        identity.addLabel("Notes");
+        additionalInfo.addLabel("Notes");
         if (shoppingcart.getNote() != null)
-            identity.addItem("note", "note").addTextArea("note").setValue(shoppingcart.getNote());
+            additionalInfo.addItem("note", "note").addTextArea("note").setValue(shoppingcart.getNote());
         else
-            identity.addItem("note", "note").addTextArea("note");
+            additionalInfo.addItem("note", "note").addTextArea("note");
 
-        Item buttons = identity.addItem();
+        Item buttons = additionalInfo.addItem();
         buttons.addButton("submit_cancel").setValue(T_submit_cancel);
         if(admin)
         {
