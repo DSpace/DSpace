@@ -733,5 +733,13 @@
       <extension>rdf</extension>
     </bitstream-type>
 
+    <bitstream-type>
+      <mimetype>application/epub+zip</mimetype>
+      <short_description>EPUB</short_description>
+      <description>Electronic publishing</description>
+      <support_level>1</support_level>
+      <internal>false</internal>
+      <extension>epub</extension>
+    </bitstream-type>
 
 </dspace-bitstream-types>
