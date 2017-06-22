@@ -30,7 +30,7 @@ pg_connection_user=""
 
 #Setea los parametros por default
 
-	if [ ! "$INSTALL_DIR"]; then
+	if [ ! "$INSTALL_DIR" ]; then
 		INSTALL_DIR=$BASE_DIR/install
 		echo "[DEFAULT] Se toma como directorio de instalacion a $INSTALL_DIR"
 	fi	
