@@ -10,29 +10,22 @@ package org.dspace.app.util;
 import org.apache.commons.io.Charsets;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
-import org.dspace.app.util.GoogleMetadata;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
-import org.dspace.content.service.CollectionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import sun.net.www.content.text.PlainTextInputStream;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class GoogleMetadataTest extends AbstractUnitTest {
 
@@ -50,6 +43,8 @@ public class GoogleMetadataTest extends AbstractUnitTest {
 
     private BitstreamService bitstreamService;
 
+    private Community community;
+
     /**
      * This method will be run before every test as per @Before. It will
      * initialize resources required for the tests.
@@ -64,7 +59,7 @@ public class GoogleMetadataTest extends AbstractUnitTest {
         try
         {
             context.turnOffAuthorisationSystem();
-            Community community = ContentServiceFactory.getInstance().getCommunityService().create(null, context);
+            community = ContentServiceFactory.getInstance().getCommunityService().create(null, context);
             Collection collection = ContentServiceFactory.getInstance().getCollectionService().create(context, community);
             WorkspaceItem wi = ContentServiceFactory.getInstance().getWorkspaceItemService().create(context, collection, true);
             Item item = wi.getItem();
@@ -300,6 +295,20 @@ public class GoogleMetadataTest extends AbstractUnitTest {
     @Override
     public void destroy()
     {
+        try {
+            context.turnOffAuthorisationSystem();
+
+            //Context might have been committed in the test method, so best to reload to entity so we're sure that it is attached.
+            community = context.reloadEntity(community);
+            ContentServiceFactory.getInstance().getCommunityService().delete(context, community);
+            community = null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (AuthorizeException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         it = null;
         super.destroy();
     }

@@ -430,16 +430,15 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 bundle.getName(), getIdentifiers(context, bundle)));
 
         // Remove bitstreams
-        Iterator<Bitstream> bitstreams = bundle.getBitstreams().iterator();
-        while (bitstreams.hasNext()) {
-            Bitstream bitstream = bitstreams.next();
-            bitstreams.remove();
+        List<Bitstream> bitstreams = new LinkedList<>(bundle.getBitstreams());
+        bundle.getBitstreams().clear();
+        for (Bitstream bitstream : bitstreams) {
             removeBitstream(context, bundle, bitstream);
         }
 
-        Iterator<Item> items = bundle.getItems().iterator();
-        while (items.hasNext()) {
-            Item item = items.next();
+        List<Item> items = new LinkedList<>(bundle.getItems());
+        bundle.getItems().clear();
+        for (Item item : items) {
             item.removeBundle(bundle);
         }
 
