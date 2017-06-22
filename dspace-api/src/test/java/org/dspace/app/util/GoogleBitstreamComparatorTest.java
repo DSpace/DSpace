@@ -15,14 +15,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 
@@ -59,11 +60,13 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
      * @throws Exception
      */
     @Before
-    public void setUp() throws Exception {
+    @Override
+    public void init() {
+        super.init();
         when(bitstream1.getName()).thenReturn("bitstream1");
         when(bitstream2.getName()).thenReturn("bitstream2");
         when(bitstream3.getName()).thenReturn("bitstream3");
-        settings.put("citation.prioritized_types", "Adobe PDF, Microsoft Word, RTF, Photoshop");
+        settings.put("citation.prioritized_types", "Adobe PDF, Microsoft Word, RTF, Postscript");
         when(bundle.getBitstreams()).thenReturn(new Bitstream[] {bitstream1, bitstream2, bitstream3});
         when(bitstream1.getFormat()).thenReturn(bitstreamFormat1);
         when(bitstream2.getFormat()).thenReturn(bitstreamFormat2);
@@ -98,7 +101,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
     public void testDifferentMimeTypes() throws Exception {
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
-        when(bitstreamFormat3.getMIMEType()).thenReturn("application/x-photoshop");
+        when(bitstreamFormat3.getMIMEType()).thenReturn("application/postscript");
 
         List<Bitstream> toSort = Arrays.asList(bundle.getBitstreams());
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
@@ -116,7 +119,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
     public void testMimeTypesDifferentSizes() throws Exception {
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("text/richtext");
-        when(bitstreamFormat3.getMIMEType()).thenReturn("application/x-photoshop");
+        when(bitstreamFormat3.getMIMEType()).thenReturn("application/postscript");
         when(bitstream1.getSize()).thenReturn(new Long(100));
         when(bitstream2.getSize()).thenReturn(new Long(200));
         when(bitstream3.getSize()).thenReturn(new Long(300));
@@ -193,10 +196,10 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
      */
     @Test
     public void testChangePriority() throws Exception{
-        settings.put("citation.prioritized_types", "Photoshop, RTF, Microsoft Word, Adobe PDF");
+        settings.put("citation.prioritized_types", "Postscript, RTF, Microsoft Word, Adobe PDF");
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
-        when(bitstreamFormat3.getMIMEType()).thenReturn("application/x-photoshop");
+        when(bitstreamFormat3.getMIMEType()).thenReturn("application/postscript");
 
         List<Bitstream> toSort = Arrays.asList(bundle.getBitstreams());
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
@@ -258,7 +261,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
         settings.put("citation.prioritized_types", "");
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
-        when(bitstreamFormat3.getMIMEType()).thenReturn("application/x-photoshop");
+        when(bitstreamFormat3.getMIMEType()).thenReturn("application/postscript");
         when(bitstream1.getSize()).thenReturn(new Long(100));
         when(bitstream2.getSize()).thenReturn(new Long(200));
         when(bitstream3.getSize()).thenReturn(new Long(300));
@@ -278,7 +281,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
         settings.remove("citation.prioritized_types");
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
-        when(bitstreamFormat3.getMIMEType()).thenReturn("application/x-photoshop");
+        when(bitstreamFormat3.getMIMEType()).thenReturn("application/postscript");
         when(bitstream1.getSize()).thenReturn(new Long(100));
         when(bitstream2.getSize()).thenReturn(new Long(200));
         when(bitstream3.getSize()).thenReturn(new Long(300));
@@ -295,10 +298,10 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
      */
     @Test
     public void testUndefinedShortDescription() {
-        settings.put("citation.prioritized_types", "Photoshop, RTF, Undefined Type, Microsoft Word, Adobe PDF");
+        settings.put("citation.prioritized_types", "Postscript, RTF, Undefined Type, Microsoft Word, Adobe PDF");
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
-        when(bitstreamFormat3.getMIMEType()).thenReturn("application/x-photoshop");
+        when(bitstreamFormat3.getMIMEType()).thenReturn("application/postscript");
         when(bitstream1.getSize()).thenReturn(new Long(100));
         when(bitstream2.getSize()).thenReturn(new Long(200));
         when(bitstream3.getSize()).thenReturn(new Long(300));
@@ -315,7 +318,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
      */
     @Test
     public void testAddingNewFormat() {
-        settings.put("citation.prioritized_types", "WAV, Adobe PDF, Microsoft Word, RTF, Photoshop");
+        settings.put("citation.prioritized_types", "WAV, Adobe PDF, Microsoft Word, RTF, Postscript");
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
         when(bitstreamFormat3.getMIMEType()).thenReturn("audio/x-wav");
@@ -335,6 +338,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
     public void destroy()
     {
       settings = null;
+        super.destroy();
     }
 
 
