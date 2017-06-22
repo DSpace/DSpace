@@ -15,12 +15,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.util.ContentStreamBase;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
 
 import javax.annotation.Nullable;
@@ -46,13 +50,15 @@ public class FullTextContentStreams extends ContentStreamBase
     protected final Context context;
     protected List<FullTextBitstream> fullTextStreams;
     protected BitstreamService bitstreamService;
+    protected final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
+    protected final ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
 
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
         init(parentItem);
     }
 
-    protected void init(Item parentItem) {
+    protected void init(Item parentItem) throws SQLException {
         fullTextStreams = new LinkedList<>();
 
         if(parentItem != null) {
@@ -65,26 +71,40 @@ public class FullTextContentStreams extends ContentStreamBase
         }
     }
 
-    private void buildFullTextList(Item parentItem) {
+    private void buildFullTextList(Item parentItem) throws SQLException {
         // now get full text of any bitstreams in the TEXT bundle
         // trundle through the bundles
         List<Bundle> myBundles = parentItem.getBundles();
 
+        String logPrefix;
         for (Bundle myBundle : emptyIfNull(myBundles)) {
             if (StringUtils.equals(FULLTEXT_BUNDLE, myBundle.getName())) {
                 // a-ha! grab the text out of the bitstreams
                 List<Bitstream> bitstreams = myBundle.getBitstreams();
-
                 for (Bitstream fulltextBitstream : emptyIfNull(bitstreams)) {
-                    fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
-
-                    log.debug("Added BitStream: "
+                    if (isIndexable(fulltextBitstream,myBundle)) {
+                        fullTextStreams.add(new FullTextBitstream(sourceInfo, fulltextBitstream));
+                        logPrefix = "Added BitStream";
+                    } else {
+                        logPrefix = "Skipped Restricted BitStream";
+                    }
+                    log.debug(logPrefix+": "
                             + fulltextBitstream.getStoreNumber() + " "
                             + fulltextBitstream.getSequenceID() + " "
                             + fulltextBitstream.getName());
                 }
             }
         }
+    }
+    
+    private boolean isIndexable(Bitstream fulltextBitstream,Bundle myBundle) throws SQLException {
+        for (ResourcePolicy rp:bundleService.getBitstreamPolicies(context, myBundle)) {
+            if (rp.getdSpaceObject().getID() == fulltextBitstream.getID() && rp.getGroup().getName().toLowerCase().equals("anonymous") 
+                    && resourcePolicyService.isDateValid(rp)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
