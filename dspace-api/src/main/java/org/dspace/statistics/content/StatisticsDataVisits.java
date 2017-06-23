@@ -806,7 +806,7 @@ public class StatisticsDataVisits extends StatisticsData
                 {
                     query += (query.equals("") ? "" : " AND ");
                     if(dso instanceof DSpaceObjectLegacySupport){
-                        query += " (id:" + dso.getID() + " OR " + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
+                        query += " (id:" + dso.getID() + " OR id:" + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
                     }else{
                         query += "id:" + dso.getID();
                     }
