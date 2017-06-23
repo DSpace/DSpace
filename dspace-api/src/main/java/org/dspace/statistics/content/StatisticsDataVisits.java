@@ -805,8 +805,11 @@ public class StatisticsDataVisits extends StatisticsData
                 if(dso != null)
                 {
                     query += (query.equals("") ? "" : " AND ");
+
+                    //DS-3602: For clarity, adding "id:" to the right hand side of the search
+                    //In the solr schema, "id" has been declared as the defaultSearchField so the field name is optional
                     if(dso instanceof DSpaceObjectLegacySupport){
-                        query += " (id:" + dso.getID() + " OR " + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
+                        query += " (id:" + dso.getID() + " OR id:" + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
                     }else{
                         query += "id:" + dso.getID();
                     }
