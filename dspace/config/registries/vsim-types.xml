@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!--
+  - vsim-types.xml
+  -
+  - A registry for VSim-specific metadata. Any non-standard, VSim-related
+  - metadata fields should be added here to avoid 'polluting' the standard
+  - namespaces.
+  -
+  -->
+<dspace-dc-types>
+
+  <dspace-header>
+    <title>Registry of VSim-specific metadata fields</title>
+    <contributor.author>Lisa Snyder</contributor.author>
+    <contributor.editor>$Author$</contributor.editor>
+    <date.created>$Date$</date.created>
+    <description>$Log$</description>
+    <description.version>$Revision$</description.version>
+  </dspace-header>
+
+  <dc-schema>
+    <name>vsim</name>
+    <namespace>http://vsim.library.ucla.edu/namespace/vsim/</namespace>
+  </dc-schema>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>acknowledgements</element>
+    <qualifier></qualifier>
+    <scope_note>Acknowledgements for this VSim project, a place to give credit where credit is due.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>bibliography</element>
+    <qualifier></qualifier>
+    <scope_note>Bibliography for this VSim project.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>contributor</element>
+    <qualifier>details</qualifier>
+    <scope_note>Contributor details for this VSim project.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>keywords</element>
+    <qualifier></qualifier>
+    <scope_note>text field for keyword tagging, supplemental to dc.subject</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>news</element>
+    <qualifier></qualifier>
+    <scope_note>News for this VSim project.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>peerreview</element>
+    <qualifier></qualifier>
+    <scope_note>Peer Review details for this VSim project.</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>relation</element>
+    <qualifier>archives</qualifier>
+    <scope_note>handle for the archives DSpace collection for this VSim project</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>relation</element>
+    <qualifier>community</qualifier>
+    <scope_note>handle for the top level DSpace community for this VSim project</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>relation</element>
+    <qualifier>models</qualifier>
+    <scope_note>handle for the models DSpace collection for this VSim project</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>relation</element>
+    <qualifier>submissions</qualifier>
+    <scope_note>handle for the submissions DSpace collection for this VSim project</scope_note>
+  </dc-type>
+
+  <dc-type>
+    <schema>vsim</schema>
+    <element>research</element>
+    <qualifier>objective</qualifier>
+    <scope_note>Research Objective for this VSim project.</scope_note>
+  </dc-type>
+
+</dspace-dc-types>
