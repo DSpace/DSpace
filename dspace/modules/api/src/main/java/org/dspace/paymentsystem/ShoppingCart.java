@@ -470,7 +470,11 @@ public class ShoppingCart {
     }
 
     public static ShoppingCart findByItemId(Context context, int itemId) throws SQLException {
-        return findAllByItem(context, itemId).get(0);
+        List<ShoppingCart> carts = findAllByItem(context, itemId);
+        if (carts.size() > 0) {
+            return carts.get(0);
+        }
+        return null;
     }
 
     /**
