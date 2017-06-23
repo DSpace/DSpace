@@ -37,13 +37,12 @@ public class IndicatorMetricSubtractionBuilder<ACO extends DSpaceObject>
                 if(count!=null && count>0) {
                     if(i == 0) {
                         valueComputed += count;
-                        i++;
                     }
                     else {
                         valueComputed -= count;
                     }
                 }
-                
+                i++;                
             }
 
             mapValueComputed.put(this.getName(), valueComputed);
