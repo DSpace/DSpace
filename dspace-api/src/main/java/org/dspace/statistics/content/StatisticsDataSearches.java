@@ -204,7 +204,7 @@ public class StatisticsDataSearches extends StatisticsData {
         if(currentDso != null){
             query = "scopeType: " + currentDso.getType() + " AND ";
             if(currentDso instanceof DSpaceObjectLegacySupport){
-                query += " (scopeId:" + currentDso.getID() + " OR " + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
+                query += " (scopeId:" + currentDso.getID() + " OR scopeId:" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
             }else{
                 query += "scopeId:" + currentDso.getID();
             }

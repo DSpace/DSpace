@@ -829,7 +829,8 @@ public class StatisticsDataVisits extends StatisticsData
                             break;
                     }
                     if(currentDso instanceof DSpaceObjectLegacySupport){
-                        owningStr = "(" + owningStr + ":" + currentDso.getID() + " OR " + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
+                        owningStr = "(" + owningStr + ":" + currentDso.getID() + " OR " 
+                            + owningStr + ":" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
                     }else{
                         owningStr += ":" + currentDso.getID();
                     }
