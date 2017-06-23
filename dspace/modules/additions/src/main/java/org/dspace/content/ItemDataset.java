@@ -195,7 +195,7 @@ public class ItemDataset {
                             context, item.getID(), getFullPath(), cksum);
                 }
                 else{
-                    System.out.println("Zip creation for " + item.getHandle() + " not allowed.");
+                    ItemDataset.LOG.warn("Zip creation for " + item.getHandle() + " not allowed.");
                 }
             }
             catch(SQLException ex){

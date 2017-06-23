@@ -43,6 +43,21 @@ public class IRUSUKLog {
 	    this.send(context, url);
 	}
 	
+	public IRUSUKLog(Context context, IDownloadStat stat){
+	    this.data = new StringBuffer();
+        this.addField("url_ver", this.getTrackerURlVersion(), true);
+        this.addField("req_id", stat.getIPAddress());
+        this.addField("req_dat", stat.getUserAgent()); 
+        this.addField("rft.artnum", stat.getOAIIdentifer()); 
+        this.addField("rfr_dat", stat.getReferrer());
+        this.addField("rfr_id", this.getSource());
+        this.addField("url_tim", new DCDate(stat.getDate()).toString());
+        this.addField("svc_dat", stat.getUrl().toString());
+        
+        String url = ConfigurationManager.getProperty("stats", "tracker.baseurl") + "?" + this.data.toString();
+        this.send(context, url);
+	}
+	
 	/**
 	 * Add a field to log.
 	 * @param field Log field name.
