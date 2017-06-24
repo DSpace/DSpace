@@ -239,11 +239,7 @@ public class StatsGenericIndicatorsPlugin<ACO extends ACrisObject>
                 }
                 if (mapElementsValueComputed.containsKey(indicator.getName()))
                 {
-                    List<Double> elementsValueComputed = mapElementsValueComputed
-                            .containsKey(this.getName())
-                                    ? mapElementsValueComputed
-                                            .get(this.getName())
-                                    : new ArrayList<Double>();
+                    List<Double> elementsValueComputed = mapElementsValueComputed.get(indicator.getName());
 
                     Double max = Collections.max(elementsValueComputed);
                     Double min = Collections.min(elementsValueComputed);

@@ -28,15 +28,21 @@ public class IndicatorMetricSubtractionBuilder<ACO extends DSpaceObject>
 
         if (doc != null)
         {
+            int i = 0;
             for (String field : getFields())
             {
                 
                 Double count = (Double) doc
                         .getFirstValue(field);
                 if(count!=null && count>0) {
-                    valueComputed -= count;
+                    if(i == 0) {
+                        valueComputed += count;
+                    }
+                    else {
+                        valueComputed -= count;
+                    }
                 }
-                
+                i++;                
             }
 
             mapValueComputed.put(this.getName(), valueComputed);
