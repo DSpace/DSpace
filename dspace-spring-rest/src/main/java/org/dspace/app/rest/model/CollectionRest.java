@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * The Collection REST Resource
  * 
@@ -17,6 +19,17 @@ public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";
 	public static final String CATEGORY = RestModel.CORE;
 
+	@JsonIgnore
+	private BitstreamRest logo;
+	
+	public BitstreamRest getLogo() {
+		return logo;
+	}
+	
+	public void setLogo(BitstreamRest logo) {
+		this.logo = logo;
+	}
+	
 	@Override
 	public String getCategory() {
 		return CATEGORY;
