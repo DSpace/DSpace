@@ -1608,7 +1608,11 @@ public class DatabaseManager
         int idx = 1;
         for (Object parameter : parameters)
 	    {
-	    	if (parameter instanceof String)
+        	if (parameter instanceof Boolean)
+        	{
+        		statement.setBoolean(idx, (Boolean) parameter);
+        	}
+        	else if (parameter instanceof String)
 	    	{
 	    		statement.setString(idx,(String) parameter);
 	    	}

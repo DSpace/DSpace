@@ -143,14 +143,24 @@ public abstract class ImpRecordDAO
                 primarybitstream = true;
             }
 
-            DatabaseManager.updateQuery(context,
-                    "INSERT INTO imp_bitstream(imp_bitstream_id, imp_id, filepath, description, bundle, bitstream_order, primary_bitstream, assetstore, name, imp_blob, embargo_policy, embargo_start_date)"
-                            + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?, ?)",
-                    o.getPkey(), impRecord.getImp_id(), o.getFilepath(),
-                    o.getDescription(), o.getBundle(), o.getBitstream_order(),
-                    primarybitstream, o.getAssetstore(), o.getName(),
-                    o.getEmbargoPolicy(), o.getEmbargoStartDate());
-
+            if (o.getEmbargoStartDate() == null) {
+            	DatabaseManager.updateQuery(context,
+	                    "INSERT INTO imp_bitstream(imp_bitstream_id, imp_id, filepath, description, bundle, bitstream_order, primary_bitstream, assetstore, name, imp_blob, embargo_policy)"
+	                            + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?)",
+	                    o.getPkey(), impRecord.getImp_id(), o.getFilepath(),
+	                    o.getDescription(), o.getBundle(), o.getBitstream_order(),
+	                    primarybitstream, o.getAssetstore(), o.getName(),
+	                    o.getEmbargoPolicy());
+            }
+            else {
+	            DatabaseManager.updateQuery(context,
+	                    "INSERT INTO imp_bitstream(imp_bitstream_id, imp_id, filepath, description, bundle, bitstream_order, primary_bitstream, assetstore, name, imp_blob, embargo_policy, embargo_start_date)"
+	                            + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, null, ?, ?)",
+	                    o.getPkey(), impRecord.getImp_id(), o.getFilepath(),
+	                    o.getDescription(), o.getBundle(), o.getBitstream_order(),
+	                    primarybitstream, o.getAssetstore(), o.getName(),
+	                    o.getEmbargoPolicy(), o.getEmbargoStartDate());
+            }
         }
     }
 
