@@ -50,9 +50,9 @@ public class FullTextContentStreams extends ContentStreamBase
     protected final Context context;
     protected List<FullTextBitstream> fullTextStreams;
     protected BitstreamService bitstreamService;
-    protected final BundleService bundleService = ContentServiceFactory.getInstance().getBundleService();
-    protected final ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
-
+    protected BundleService bundleService; 
+    protected ResourcePolicyService resourcePolicyService;
+    
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
         init(parentItem);
@@ -98,9 +98,9 @@ public class FullTextContentStreams extends ContentStreamBase
     }
     
     private boolean isIndexable(Bitstream fulltextBitstream,Bundle myBundle) throws SQLException {
-        for (ResourcePolicy rp:bundleService.getBitstreamPolicies(context, myBundle)) {
+        for (ResourcePolicy rp:getBundleService().getBitstreamPolicies(context, myBundle)) {
             if (rp.getdSpaceObject().getID() == fulltextBitstream.getID() && rp.getGroup().getName().toLowerCase().equals("anonymous") 
-                    && resourcePolicyService.isDateValid(rp)) {
+                    && getResourcePolicyService().isDateValid(rp)) {
                 return true;
             }
         }
@@ -163,6 +163,20 @@ public class FullTextContentStreams extends ContentStreamBase
             bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
         }
         return bitstreamService;
+    }
+    
+    private BundleService getBundleService() {
+        if(bundleService == null) {
+            bundleService = ContentServiceFactory.getInstance().getBundleService();
+        }
+        return bundleService;
+    }
+    
+    private ResourcePolicyService getResourcePolicyService() {
+        if(resourcePolicyService == null) {
+            resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+        }
+        return resourcePolicyService;
     }
 
     private class FullTextBitstream {
