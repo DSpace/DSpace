@@ -209,17 +209,8 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         // Sponsor
         DryadOrganizationConcept sponsorConcept = shoppingcart.getSponsoringOrganization(context);
         String sponsorName = "";
-        String subscription = "none";
-        String sponsorConceptID = "";
-        String sponsorCustomerID = "";
         if (sponsorConcept != null) {
             sponsorName = sponsorConcept.getFullName();
-            subscription = sponsorConcept.getPaymentPlan();
-            if ("".equals(subscription)) {
-                subscription = "none";
-            }
-            sponsorConceptID = String.valueOf(sponsorConcept.getConceptID());
-            sponsorCustomerID = sponsorConcept.getCustomerID();
         }
 
         // Voucher
