@@ -4,12 +4,23 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: Dryad Account Registration
+Subject: Welcome to Dryad!
 
-Thank you for registering for an account at datadryad.org.  To complete registration for your account, please click the link below:
+Thank you for registering for an account at datadryad.org. Dryad is a open-access, non-profit, curated repository for research data underlying publications. 
+
+To complete your registration, please click the link below:
 
  {0}
 
-If you need assistance with your account, please email help@datadryad.org.  For more information about using or submitting data, please see http://datadryad.org/pages/faq.
+DID YOU KNOW? 
+- We partner with journals to make data archiving easy. Many journals cover the Dryad data publishing fee: http://datadryad.org/pages/journalLookup
+- More about the Dryad organization and mission: https://datadryad.org/pages/organization
+- Stay informed of the latest news:
+http://blog.datadryad.org/
+http://twitter.com/datadryad
+
+If you need assistance, please email help@datadryad.org. For more information about using or submitting data, please see http://datadryad.org/pages/faq.
+
+Best regards,
 
 The Dryad Team
