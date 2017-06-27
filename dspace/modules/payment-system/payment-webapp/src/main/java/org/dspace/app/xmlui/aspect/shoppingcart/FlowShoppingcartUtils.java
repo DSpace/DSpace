@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.shoppingcart;
@@ -28,7 +28,7 @@ import org.dspace.utils.DSpace;
  */
 public class FlowShoppingcartUtils {
     private static final Logger log = Logger.getLogger(FlowShoppingcartUtils.class);
-    
+
     private static final Message T_edit_shoppingcart_success_notice =
             new Message("default", "xmlui.administrative.FlowShoppingcartUtils.add_shoppingcart_success_notice");
 
@@ -41,114 +41,82 @@ public class FlowShoppingcartUtils {
             // Get all our request parameters
             String voucherCode = request.getParameter("voucher");
             String country = request.getParameter("country");
-            String currency = request.getParameter("currency");
             String basicFee = request.getParameter("basicFee");
             String surCharge = request.getParameter("surCharge");
             String transactionId = request.getParameter("transactionId");
+            String note = request.getParameter("note");
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
             Voucher voucher = null;
             if (!StringUtils.isEmpty(voucherCode)) {
-                voucher = Voucher.findByCode(context,voucherCode);
+                voucher = Voucher.findByCode(context, voucherCode);
             }
-            
-            
-            ShoppingCart shoppingCart = paymentSystemService.getShoppingCart(context, shoppingcartID);
-            
-            String countryOriginal = shoppingCart.getCountry();
-            String currencyOriginal = shoppingCart.getCurrency();
-            String transactionIdOriginal = shoppingCart.getTransactionId();
-            
-            // If we have errors, the form needs to be resubmitted to fix those problems
-            // currency should not be null
-            if (StringUtils.isEmpty(currency)) {
-                result.addError("currency");
-            }
-            if (!StringUtils.isEmpty(voucherCode)) {
-                if(voucher==null)
-                    {
-                        result.addError("voucher_null");
-                    }
-                else
-                    {
-                        if(!voucherValidationService.validate(context,voucher.getID(),shoppingCart))
-                            {
-                                result.addError("voucher_used");
-                            }
-                    }
-            }
-            
-            String note = request.getParameter("note");
-            if (!StringUtils.isEmpty(note)){
-                shoppingCart.setNote(note);
-            }
-            else
-                {
-                    shoppingCart.setNote(null);
-                }
-            
-            if (result.getErrors() == null) {
-                if (!StringUtils.isEmpty(voucherCode)) {
-                    
-                    if(!voucherValidationService.voucherUsed(context,voucherCode))
-                        {
-                            shoppingCart.setVoucher(voucher.getID());
-                        }
-                }
-                else
-                    {
-                        //delete the voucher
-                        shoppingCart.setVoucher(null);
-                    }
-                
-                if (country != null &&!country.equals(countryOriginal)) {
-                    shoppingCart.setCountry(country);
-                }
-                else
-                    {
-                        if(country!=null&&country.length()==0)
-                            {
-                                shoppingCart.setCountry(null);
-                            }
-                    }
-                
-                if (currency != null && !currency.equals(currencyOriginal)) {
-                    shoppingCart.setCurrency(currency);
-                }
-                else{
-                    //only when the currency doesn't change then change the individual rate
-                    if (surCharge != null && surCharge.length()>0 && Double.parseDouble(surCharge)>0) {
-                        shoppingCart.setSurcharge(Double.parseDouble(surCharge));
-                    }
-                    else
-                        {
-                            shoppingCart.setSurcharge(new Double(0.0));
-                        }
 
-                    if (basicFee != null && basicFee.length()>0 && Double.parseDouble(basicFee)>0) {
-                        shoppingCart.setBasicFee(Double.parseDouble(basicFee));
+            ShoppingCart shoppingCart = paymentSystemService.getShoppingCart(context, shoppingcartID);
+
+            String countryOriginal = shoppingCart.getCountry();
+            String transactionIdOriginal = shoppingCart.getTransactionId();
+
+            if (!StringUtils.isEmpty(voucherCode)) {
+                if (voucher == null) {
+                    result.addError("voucher_null");
+                } else {
+                    if (!voucherValidationService.validate(context, voucher.getID(), shoppingCart)) {
+                        result.addError("voucher_used");
                     }
-                    else
-                        {
-                            shoppingCart.setBasicFee(new Double(0.0));
-                        }
                 }
-                
-                if (StringUtils.isEmpty(transactionId)){
+            }
+
+            if (!StringUtils.isEmpty(note)) {
+                shoppingCart.setNote(note);
+            } else {
+                shoppingCart.setNote(null);
+            }
+
+            if (result.getErrors() == null) {
+                }
+                if (!StringUtils.isEmpty(voucherCode)) {
+                    if (!voucherValidationService.voucherUsed(context, voucherCode)) {
+                        shoppingCart.setVoucher(voucher.getID());
+                    }
+                } else {
+                    //delete the voucher
+                    shoppingCart.setVoucher(null);
+                }
+
+                if (country != null && !country.equals(countryOriginal)) {
+                    shoppingCart.setCountry(country);
+                } else {
+                    if (country != null && country.length() == 0) {
+                        shoppingCart.setCountry(null);
+                    }
+                }
+
+                if (surCharge != null && surCharge.length() > 0 && Double.parseDouble(surCharge) > 0) {
+                    shoppingCart.setSurcharge(Double.parseDouble(surCharge));
+                } else {
+                    shoppingCart.setSurcharge(0.0);
+                }
+
+                if (basicFee != null && basicFee.length() > 0 && Double.parseDouble(basicFee) > 0) {
+                    shoppingCart.setBasicFee(Double.parseDouble(basicFee));
+                } else {
+                    shoppingCart.setBasicFee(0.0);
+                }
+
+                if (StringUtils.isEmpty(transactionId)) {
                     shoppingCart.setTransactionId(null);
-                }
-                else
-                    {
-                        if(!transactionId.equals(transactionIdOriginal)) {
-                            shoppingCart.setTransactionId(transactionId);
-                        }
+                } else {
+                    if (!transactionId.equals(transactionIdOriginal)) {
+                        shoppingCart.setTransactionId(transactionId);
                     }
+                }
                 shoppingCart.updateCartInternals(context);
                 context.commit();
-                
+
                 result.setContinue(true);
                 result.setOutcome(true);
-                
+
                 result.setMessage(T_edit_shoppingcart_success_notice);
             }
         } catch (Exception e) {
