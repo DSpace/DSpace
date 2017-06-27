@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.Date;
 
-import org.apache.cocoon.environment.Request;
-import org.dspace.app.util.Util;
+import org.apache.log4j.Logger;
 import org.dspace.content.DCDate;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
@@ -19,30 +16,14 @@ import com.atmire.statistics.export.ExportUsageEventListener;
  * Logs a datashare zip download with IRUS UK.
  */
 public class IRUSUKLog {
-    //private Logger LOG = Logger.getLogger(IRISUKLog.class);
+    private static final Logger LOG = Logger.getLogger(IRUSUKLog.class);
     private StringBuffer data;
-    
+
     /**
-     * @param context DSpace context.
-     * @param request Cocoon request.
-     * @param item DSpace item.
-     * @param fileName Zip file name.
+     * Log a download with IRUS UK.
+     * @param context
+     * @param stat
      */
-	public IRUSUKLog(Context context, Request request, DSpaceObject item, String fileName){ 
-	    this.data = new StringBuffer();
-	    this.addField("url_ver", this.getTrackerURlVersion(), true);
-	    this.addField("req_id", this.getIpAddress(request));
-	    this.addField("req_dat", this.getUserAgent(request)); 
-	    this.addField("rft.artnum", this.getOAIIdentifer(item)); 
-	    this.addField("rfr_dat", this.getReferrer(request));
-	    this.addField("rfr_id", this.getSource());
-	    this.addField("url_tim", this.getDate());
-	    this.addField("svc_dat", this.getUrl(item, fileName));
-	    
-	    String url = ConfigurationManager.getProperty("stats", "tracker.baseurl") + "?" + this.data.toString();
-	    this.send(context, url);
-	}
-	
 	public IRUSUKLog(Context context, IDownloadStat stat){
 	    this.data = new StringBuffer();
         this.addField("url_ver", this.getTrackerURlVersion(), true);
@@ -94,42 +75,6 @@ public class IRUSUKLog {
     }
     
     /**
-     * @return Current date.
-     */
-    private String getDate(){
-        return new DCDate(new Date()).toString();
-    }
-      
-    /**
-     * @param request Cocoon request.
-     * @return User's ip address.
-     */
-    private String getIpAddress(Request request){
-        return Util.getIPAddress(request);
-    }
-    
-    /**
-     * @param item DSpace item.
-     * @return OAI identifier/URI.
-     */
-    private String getOAIIdentifer(DSpaceObject item){
-        return "oai:" + ConfigurationManager.getProperty("dspace.hostname") + ":" + item.getHandle();
-    }
-    
-    /**
-     * @param request Coccon request.
-     * @return Page referer.
-     */
-    private String getReferrer(Request request){
-        String referer = request.getHeader("referer");
-        if(referer == null){
-            referer = "";
-        }
-        
-        return referer;
-    }
-    
-    /**
      * @return The source of the log.
      */
     private String getSource(){
@@ -143,20 +88,6 @@ public class IRUSUKLog {
         return ConfigurationManager.getProperty("stats", "tracker.urlversion");
     }
     
-    /**
-     * @return The url of the downloaded item.
-     */
-    private String getUrl(DSpaceObject item, String fileName){
-        return ConfigurationManager.getProperty("dspace.url") + "/download/" + item.getHandle() + "/" + fileName;
-    }
-
-    /**
-     * @return The user agent.
-     */
-	private String getUserAgent(Request request){
-	    return request.getHeader("USER-AGENT");
-	}
-	
     /**
      * @return Send log in new thread.
      */
@@ -180,7 +111,13 @@ public class IRUSUKLog {
 
         public void run() {
             try{
-            	ExportUsageEventListener.processUrl(this.context, this.urlString);
+                if(ConfigurationManager.getProperty("dspace.hostname") == "datashare.is.ed.ac.uk"){
+                    LOG.info("send: " + this.urlString);
+                    ExportUsageEventListener.processUrl(this.context, this.urlString);
+                }
+                else{
+                    LOG.info("not sent: " + this.urlString);
+                }
             }
             catch(IOException ex){
                 throw new RuntimeException(ex);

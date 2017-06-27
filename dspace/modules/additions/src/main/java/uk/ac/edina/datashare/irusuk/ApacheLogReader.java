@@ -20,6 +20,9 @@ import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
+/**
+ * Read apache log and log dataset downloads with irusuk
+ */
 public class ApacheLogReader {
     private Context context = null;
     private String handlePrefix = null;
@@ -71,17 +74,16 @@ public class ApacheLogReader {
     private void processLog(){
         // get yesterdays log
         final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String logName = "/var/log/apache2/access_log." + dateFormat.format(cal.getTime());
-        
+        System.out.println(logName);
         try (BufferedReader br = new BufferedReader(new FileReader(logName))) {
             String line;
             while ((line = br.readLine()) != null) {
-                
                 IDownloadStat stat = this.parseLine(line);
                 if(stat != null){
-                    System.out.println(stat.toString());    
-                    //new IRUSUKLog(this.context, stat);                    
+                    new IRUSUKLog(this.context, stat);                    
                 }
             }
         }

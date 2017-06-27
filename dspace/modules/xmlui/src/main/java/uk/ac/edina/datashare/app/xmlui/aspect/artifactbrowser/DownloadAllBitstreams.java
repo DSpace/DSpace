@@ -35,8 +35,6 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
-import uk.ac.edina.datashare.irusuk.IRUSUKLog;
-
 public class DownloadAllBitstreams extends AbstractReader implements Recyclable
 { 
 	private Logger LOG = Logger.getLogger(DownloadAllBitstreams.class);
@@ -97,9 +95,9 @@ public class DownloadAllBitstreams extends AbstractReader implements Recyclable
                     }
                     
                     // log download request 
-                    Request request = ObjectModelHelper.getRequest(objectModel);
+                    // Request request = ObjectModelHelper.getRequest(objectModel);
                     LOG.info(this.fileName);
-                    new IRUSUKLog(context, request, item, this.fileName);
+                    //new IRUSUKLog(context, request, item, this.fileName);
                 }
                 else
                 {
