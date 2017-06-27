@@ -26,6 +26,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -98,6 +100,10 @@ public class FullTextContentStreams extends ContentStreamBase
     }
     
     private boolean isIndexable(Bitstream fulltextBitstream,Bundle myBundle) throws SQLException {
+        Boolean embargoFullText = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("discovery.fulltext.embargo");
+        if (embargoFullText == null || embargoFullText == false) {
+            return true;
+        }
         for (ResourcePolicy rp:getBundleService().getBitstreamPolicies(context, myBundle)) {
             if (rp.getdSpaceObject().getID() == fulltextBitstream.getID() && rp.getGroup().getName().toLowerCase().equals("anonymous") 
                     && getResourcePolicyService().isDateValid(rp)) {
