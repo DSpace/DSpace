@@ -1,6 +1,7 @@
 package uk.ac.edina.datashare.irusuk;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -15,7 +16,6 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -27,10 +27,11 @@ public class ApacheLogReader {
     private Context context = null;
     private String handlePrefix = null;
     private String hostName = null;
+    private String apacheLogDir = null;
     private static final Logger LOG = Logger.getLogger(ApacheLogReader.class);
     private static final String LOG_ENTRY_PATTERN =
             // 1:IP  2:logname 3:user 4:date time                 5:method 6:req 7:proto 8:respcode 9:size 10:cip 11:time 12:ref 13:user-agent
-            "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+) (\\S+) (\\S+)\" (\\d{3}) (\\d+) (\\S+) (\\d+) \"(\\S+)\" \"(.*)\"";
+            "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+) (\\S+) (\\S+)\" (\\d{3}) (\\S+) (\\S+) (\\d+) \"(\\S+)\" \"(.*)\"";
     private static final Pattern PATTERN = Pattern.compile(LOG_ENTRY_PATTERN);
     
     public ApacheLogReader(){
@@ -38,6 +39,7 @@ public class ApacheLogReader {
             this.context = new Context();
             this.handlePrefix = ConfigurationManager.getProperty("handle.prefix");
             this.hostName = ConfigurationManager.getProperty("dspace.hostname");
+            this.apacheLogDir = ConfigurationManager.getProperty("apache.log.dir");
         }
         catch(SQLException ex){
             throw new RuntimeException(ex);
@@ -48,23 +50,25 @@ public class ApacheLogReader {
         ApacheDownloadStat stat = null;
         Matcher m = PATTERN.matcher(line);
         if (!m.find()) {
-            LOG.log(Level.ALL, "Cannot parse logline" + line);
-            throw new RuntimeException("Error parsing logline");
+            System.out.println("Cannot parse logline: " + line);
+            LOG.warn("Cannot parse logline" + line);
         }
-        String req = m.group(6);
-        if(req.startsWith("/download")){
-            DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
-            try{
-                stat = new ApacheDownloadStat(
-                        m.group(1),
-                        dateFormat.parse(m.group(4)),
-                        m.group(7).split("/")[0].toLowerCase(),
-                        m.group(12),
-                        m.group(13),
-                        req);
-            }
-            catch(ParseException ex){
-                throw new RuntimeException(ex);
+        else{
+            String req = m.group(6);
+            if(req.startsWith("/download")){
+                DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss Z");
+                try{
+                    stat = new ApacheDownloadStat(
+                            m.group(1),
+                            dateFormat.parse(m.group(4)),
+                            m.group(7).split("/")[0].toLowerCase(),
+                            m.group(12),
+                            m.group(13),
+                            req);
+                }
+                catch(ParseException ex){
+                    throw new RuntimeException(ex);
+                }
             }
         }
         
@@ -76,8 +80,8 @@ public class ApacheLogReader {
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String logName = "/var/log/apache2/access_log." + dateFormat.format(cal.getTime());
-        System.out.println(logName);
+        String logName = this.apacheLogDir + File.separator +
+                "access_log." + dateFormat.format(cal.getTime());
         try (BufferedReader br = new BufferedReader(new FileReader(logName))) {
             String line;
             while ((line = br.readLine()) != null) {
