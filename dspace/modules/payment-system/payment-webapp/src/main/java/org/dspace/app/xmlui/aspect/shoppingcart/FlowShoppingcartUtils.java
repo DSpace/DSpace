@@ -7,6 +7,7 @@
  */
 package org.dspace.app.xmlui.aspect.shoppingcart;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
@@ -44,6 +45,7 @@ public class FlowShoppingcartUtils {
             String basicFee = request.getParameter("basicFee");
             String surCharge = request.getParameter("surCharge");
             String transactionId = request.getParameter("transactionId");
+            String status = request.getParameter("status");
             String note = request.getParameter("note");
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
@@ -74,6 +76,10 @@ public class FlowShoppingcartUtils {
             }
 
             if (result.getErrors() == null) {
+                if (!shoppingCart.getStatus().equals(status)) {
+                    // update status, update payment date to current date
+                    shoppingCart.setStatus(status);
+                    shoppingCart.setPaymentDate(new Date());
                 }
                 if (!StringUtils.isEmpty(voucherCode)) {
                     if (!voucherValidationService.voucherUsed(context, voucherCode)) {
