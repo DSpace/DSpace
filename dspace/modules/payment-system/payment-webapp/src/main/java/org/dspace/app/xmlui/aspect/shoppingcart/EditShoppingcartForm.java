@@ -230,12 +230,10 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         if (StringUtils.isNotEmpty(request.getParameter("country"))) {
             country = request.getParameter("country");
         }
+        paymentWaiver.addLabel(T_sponsor);
+        paymentWaiver.addItem().addContent(sponsorName);
 
         if (admin) {
-            Text sponsorField = paymentWaiver.addItem().addText("sponsor");
-            sponsorField.setLabel(T_sponsor);
-            sponsorField.setValue(sponsorName);
-
             Text voucherField = paymentWaiver.addItem().addText("voucher");
             voucherField.setLabel(T_voucher);
             voucherField.setValue(voucherCode);
@@ -255,8 +253,6 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             }
             countryField.setOptionSelected(country);
         } else {
-            paymentWaiver.addLabel(T_sponsor);
-            paymentWaiver.addItem().addContent(sponsorName);
             paymentWaiver.addLabel(T_voucher);
             paymentWaiver.addItem().addContent(voucherCode);
             paymentWaiver.addLabel(T_country);
