@@ -103,6 +103,13 @@
         <artifactId>jcosign</artifactId>
         <version>3.0.1</version>
       </dependency>
+        <!-- Atmire Statistics Exporter Dependency -->
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-statistics-exporter-api</artifactId>
+            <version>1.0.0</version>
+            <type>jar</type>
+        </dependency>
       <!-- DATASHARE end  -->
 
    </dependencies>
