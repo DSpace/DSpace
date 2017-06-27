@@ -269,7 +269,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             //print the display value
             AuthorityValue authorityValue = authorityValueService.findByUID(context, value);
             if (authorityValue != null) {
-                row.addCell("", Cell.ROLE_DATA, "discovery-filter-display-value-cell").addText("filter_" + index, "discovery-filter-display-value").setValue(authorityValue.getValue());
+                row.addCell("", Cell.ROLE_DATA, "discovery-filter-display-value-cell hidden").addText("filter_display_value_" + index, "discovery-filter-display-value").setValue(authorityValue.getValue());
             }
         }
         //Add a box so we can search for our value
