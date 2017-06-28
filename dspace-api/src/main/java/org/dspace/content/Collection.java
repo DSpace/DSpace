@@ -13,8 +13,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.*;
 import org.dspace.eperson.Group;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Sort;
-import org.hibernate.annotations.SortType;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import javax.persistence.*;

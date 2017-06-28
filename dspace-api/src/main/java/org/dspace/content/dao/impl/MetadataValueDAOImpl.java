@@ -18,6 +18,7 @@ import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -48,14 +49,14 @@ public class MetadataValueDAOImpl extends AbstractHibernateDAO<MetadataValue> im
     }
 
     @Override
-    public List<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
-        Criteria criteria = createCriteria(context, MetadataValue.class);
-        criteria.add(
-                Restrictions.like("value", "%" + value + "%")
-        );
-        criteria.setFetchMode("metadataField", FetchMode.JOIN);
+    public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException {
+        String queryString = "SELECT m FROM MetadataValue m JOIN m.metadataField f " +
+                "WHERE m.value like concat('%', concat(:searchString,'%')) ORDER BY m.id ASC";
 
-        return list(criteria);
+        Query query = createQuery(context, queryString);
+        query.setString("searchString", value);
+
+        return iterate(query);
     }
 
     @Override

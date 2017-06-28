@@ -372,8 +372,13 @@ public class Context
         try
         {
             // As long as we have a valid, writeable database connection,
-            // commit any changes made as part of the transaction
-            commit();
+            // rollback any changes if we are in read-only mode,
+            // otherwise, commit any changes made as part of the transaction
+            if(isReadOnly()) {
+                abort();
+            } else {
+                commit();
+            }
         }
         finally
         {
