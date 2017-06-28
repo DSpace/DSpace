@@ -7,21 +7,7 @@
  */
 package org.dspace.app.itemupdate;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
@@ -30,6 +16,9 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+
+import java.io.*;
+import java.util.*;
 
 /**
  *   
@@ -62,7 +51,7 @@ import org.dspace.eperson.service.EPersonService;
  *
  */
 public class ItemUpdate {
-    
+
     public static final String SUPPRESS_UNDO_FILENAME = "suppress_undo";
 
     public static final String CONTENTS_FILE = "contents";
@@ -70,7 +59,7 @@ public class ItemUpdate {
 
     public static String HANDLE_PREFIX = null;
     public static final Map<String, String> filterAliases = new HashMap<String, String>();
-    
+
     public static boolean verbose = false;
 
     protected static final EPersonService epersonService = EPersonServiceFactory.getInstance().getEPersonService();
@@ -80,10 +69,10 @@ public class ItemUpdate {
     {
         filterAliases.put("ORIGINAL", "org.dspace.app.itemupdate.OriginalBitstreamFilter");
         filterAliases.put("ORIGINAL_AND_DERIVATIVES", "org.dspace.app.itemupdate.OriginalWithDerivativesBitstreamFilter");
-        filterAliases.put("TEXT", "org.dspace.app.itemupdate.DerivativeTextBitstreamFilter");        
-        filterAliases.put("THUMBNAIL", "org.dspace.app.itemupdate.ThumbnailBitstreamFilter");        
+        filterAliases.put("TEXT", "org.dspace.app.itemupdate.DerivativeTextBitstreamFilter");
+        filterAliases.put("THUMBNAIL", "org.dspace.app.itemupdate.ThumbnailBitstreamFilter");
     }
-                                  
+
     // File listing filter to check for folders
     static FilenameFilter directoryFilter = new FilenameFilter()
     {
@@ -122,11 +111,11 @@ public class ItemUpdate {
 
         Options options = new Options();
 
-        //processing basis for determining items    
+        //processing basis for determining items
         //item-specific changes with metadata in source directory with dublin_core.xml files  
         options.addOption("s", "source", true, "root directory of source dspace archive ");
       
-        //actions  on items     
+        //actions  on items
         options.addOption("a", "addmetadata", true, "add metadata specified for each item; multiples separated by semicolon ';'");
         options.addOption("d", "deletemetadata", true, "delete metadata specified for each item");
         
@@ -138,13 +127,13 @@ public class ItemUpdate {
         delBitstreamOption.setArgName("BitstreamFilter");
         options.addOption(delBitstreamOption);
                                
-        //other params        
+        //other params
         options.addOption("e", "eperson", true, "email of eperson doing the update");
         options.addOption("i", "itemfield", true, "optional metadata field that containing item identifier; default is dc.identifier.uri");
         options.addOption("F", "filter-properties", true, "filter class name; only for deleting bitstream");  
         options.addOption("v", "verbose", false, "verbose logging");
       
-        //special run states        
+        //special run states
         options.addOption("t", "test", false, "test run - do not actually import items");
         options.addOption("P", "provenance", false, "suppress altering provenance field for bitstream changes");
         options.addOption("h", "help", false, "help");
@@ -156,12 +145,12 @@ public class ItemUpdate {
         String metadataIndexName = null;
         
         Context context = null;
-        ItemUpdate iu = new ItemUpdate();    
+        ItemUpdate iu = new ItemUpdate();
 
         try
         {       
             CommandLine line = parser.parse(options, argv);
-    
+
             if (line.hasOption('h'))
             {
                 HelpFormatter myhelp = new HelpFormatter();
@@ -173,10 +162,10 @@ public class ItemUpdate {
                 pr("  adding bitstreams:   ItemUpdate -e jsmith@mit.edu -s sourcedir -A -i dc.identifier");
                 pr("  deleting bitstreams: ItemUpdate -e jsmith@mit.edu -s sourcedir -D ORIGINAL ");
                 pr("");
-    
+
                 System.exit(0);
             }
-            
+
             if (line.hasOption('v'))
             {
                 verbose = true;
@@ -190,85 +179,85 @@ public class ItemUpdate {
             }
 
             iu.eperson = line.getOptionValue('e'); // db ID or email
-            
+
             if (!line.hasOption('s')) // item specific changes from archive dir
             {
                 pr("Missing source archive option");
                 System.exit(1);
             }
             String sourcedir = line.getOptionValue('s');
-            
+
             if (line.hasOption('t'))  //test
             {
                 isTest = true;
                 pr("**Test Run** - not actually updating items.");
-                          
+
             }
-            
+
             if (line.hasOption('i'))
             {
-                itemField = line.getOptionValue('i');              
+                itemField = line.getOptionValue('i');
             }
 
             if (line.hasOption('d'))
             {
-                String[] targetFields = line.getOptionValues('d'); 
-                
+                String[] targetFields = line.getOptionValues('d');
+
                 DeleteMetadataAction delMetadataAction = (DeleteMetadataAction) iu.actionMgr.getUpdateAction(DeleteMetadataAction.class);
                 delMetadataAction.addTargetFields(targetFields);
-                
-                //undo is an add 
+
+                //undo is an add
                 for (String field : targetFields)
                 {
                     iu.undoActionList.add(" -a " + field + " ");
                 }
-                
+
                 pr("Delete metadata for fields: ");
                 for (String s : targetFields)
                 {
                     pr("    " + s);
                 }
             }
-            
+
             if (line.hasOption('a'))
             {
-                String[] targetFields = line.getOptionValues('a'); 
-            
-                AddMetadataAction addMetadataAction = (AddMetadataAction) iu.actionMgr.getUpdateAction(AddMetadataAction.class); 
+                String[] targetFields = line.getOptionValues('a');
+
+                AddMetadataAction addMetadataAction = (AddMetadataAction) iu.actionMgr.getUpdateAction(AddMetadataAction.class);
                 addMetadataAction.addTargetFields(targetFields);
-                
+
                 //undo is a delete followed by an add of a replace record for target fields
                 for (String field : targetFields)
                 {
                     iu.undoActionList.add(" -d " + field + " ");
                 }
-                
+
                 for (String field : targetFields)
                 {
                     iu.undoActionList.add(" -a " + field + " ");
                 }
-                
+
                 pr("Add metadata for fields: ");
                 for (String s : targetFields)
                 {
                     pr("    " + s);
                 }
             }
-            
-            if (line.hasOption('D'))  // undo not supported 
+
+            if (line.hasOption('D'))  // undo not supported
             {
                 pr("Delete bitstreams ");
-                
+
                 String[] filterNames = line.getOptionValues('D');
                 if ((filterNames != null) && (filterNames.length > 1))
                 {
                     pr("Error: Only one filter can be a used at a time.");
                     System.exit(1);
                 }
-                
+
                 String filterName = line.getOptionValue('D');
                 pr("Filter argument: " + filterName);
-                
+
                 if (filterName == null)  // indicates using delete_contents files
                 {
                     DeleteBitstreamsAction delAction = (DeleteBitstreamsAction) iu.actionMgr.getUpdateAction(DeleteBitstreamsAction.class);
@@ -278,19 +267,19 @@ public class ItemUpdate {
                 {
                     // check if param is on ALIAS list
                     String filterClassname = filterAliases.get(filterName);
-                    
+
                     if (filterClassname == null)
                     {
                         filterClassname = filterName;
                     }
-                                        
-                    BitstreamFilter filter = null; 
+
+                    BitstreamFilter filter = null;
 
                     try
                     {
                         Class<?> cfilter = Class.forName(filterClassname);
                         pr("BitstreamFilter class to instantiate: " + cfilter.toString());
-                        
+
                         filter =  (BitstreamFilter) cfilter.newInstance();  //unfortunate cast, an erasure consequence
                     }
                     catch(Exception e)
@@ -298,7 +287,7 @@ public class ItemUpdate {
                         pr("Error:  Failure instantiating bitstream filter class: " + filterClassname);
                         System.exit(1);
                     }
-                    
+
                     String filterPropertiesName = line.getOptionValue('F');
                     if (filterPropertiesName != null)  //not always required
                     {
@@ -309,7 +298,7 @@ public class ItemUpdate {
                             {
                                 filterPropertiesName = sourcedir + File.separator + filterPropertiesName;
                             }
-                            
+
                             filter.initProperties(filterPropertiesName);
                         }
                         catch(Exception e)
@@ -318,52 +307,52 @@ public class ItemUpdate {
                             System.exit(1);
                         }
                     }
-                    
-                    DeleteBitstreamsByFilterAction delAction = 
+
+                    DeleteBitstreamsByFilterAction delAction =
                         (DeleteBitstreamsByFilterAction) iu.actionMgr.getUpdateAction(DeleteBitstreamsByFilterAction.class);
                     delAction.setAlterProvenance(alterProvenance);
                     delAction.setBitstreamFilter(filter);
                     //undo not supported
-                }            
+                }
             }
 
             if (line.hasOption('A'))
             {
-                pr("Add bitstreams ");                    
+                pr("Add bitstreams ");
                 AddBitstreamsAction addAction = (AddBitstreamsAction) iu.actionMgr.getUpdateAction(AddBitstreamsAction.class);
                 addAction.setAlterProvenance(alterProvenance);
-                
-                iu.undoActionList.add(" -D ");  // delete_contents file will be written, no arg required                
-            }                
-                        
+
+                iu.undoActionList.add(" -D ");  // delete_contents file will be written, no arg required
+            }
+
             if (!iu.actionMgr.hasActions())
             {
                 pr("Error - an action must be specified");
                 System.exit(1);
             }
-            else  
+            else
             {
                 pr("Actions to be performed: ");
-                
+
                 for (UpdateAction ua : iu.actionMgr)
                 {
                     pr("    " + ua.getClass().getName());
                 }
             }
-            
+
             pr("ItemUpdate - initializing run on " + (new Date()).toString());
-                       
-            context = new Context();  
-            iu.setEPerson(context, iu.eperson);    
+
+            context = new Context(Context.Mode.BATCH_EDIT);
+            iu.setEPerson(context, iu.eperson);
             context.turnOffAuthorisationSystem();
-            
+
             HANDLE_PREFIX = ConfigurationManager.getProperty("handle.canonical.prefix");
             if (HANDLE_PREFIX == null || HANDLE_PREFIX.length() == 0)
             {
                 HANDLE_PREFIX = "http://hdl.handle.net/";
             }
-                        
-            iu.processArchive(context, sourcedir, itemField, metadataIndexName, alterProvenance, isTest);                                
+
+            iu.processArchive(context, sourcedir, itemField, metadataIndexName, alterProvenance, isTest);
 
             context.complete();  // complete all transactions
         }
@@ -388,7 +377,7 @@ public class ItemUpdate {
         else
         {
             pr("End.");
-            
+
         }
         System.exit(status);
     }
@@ -430,24 +419,24 @@ public class ItemUpdate {
 
         File undoDir = null;  //sibling directory of source archive
         
-        if (!suppressUndo && !isTest) 
+        if (!suppressUndo && !isTest)
         {
-            undoDir = initUndoArchive(sourceDir);    
+            undoDir = initUndoArchive(sourceDir);
         }
         
         int itemCount = 0;
         int successItemCount = 0;
-        
+
         for (String dirname : dircontents)
         {
             itemCount++;
             pr("");
             pr("processing item " + dirname);
-            
+
             try
             {
                 ItemArchive itarch = ItemArchive.create(context, new File(sourceDir, dirname), itemField);
-                
+
                 for (UpdateAction action : actionMgr)
                 {
                     pr("action: " + action.getClass().getName());
@@ -461,28 +450,28 @@ public class ItemUpdate {
                 {
                     Item item = itarch.getItem();
                     itemService.update(context, item);  //need to update before commit
-                }
-                ItemUpdate.pr("Item " + dirname + " completed");
-                successItemCount++;
-            }
-            catch(Exception e)
-            {
-                pr("Exception processing item " + dirname + ": " + e.toString());
+	    		context.uncacheEntity(item);}
+    			ItemUpdate.pr("Item " + dirname + " completed");
+    			successItemCount++;
+    		}
+    		catch(Exception e)
+    		{
+    			pr("Exception processing item " + dirname + ": " + e.toString());
                 e.printStackTrace();
             }
         }  
         
         if (!suppressUndo && !isTest)
-        {                     
+        {
             StringBuilder sb = new StringBuilder("dsrun org.dspace.app.itemupdate.ItemUpdate ");
             sb.append(" -e ").append(this.eperson);
             sb.append(" -s ").append(undoDir);
-            
+
             if (itemField != null)
             {
                 sb.append(" -i ").append(itemField);
             }
-            
+
              if (!alterProvenance)
             {
                 sb.append(" -P ");
@@ -491,12 +480,12 @@ public class ItemUpdate {
             {
                 sb.append(" -t ");
             }
-            
+
             for (String actionOption : undoActionList)
             {
                 sb.append(actionOption);
-            }   
-            
+            }
+
             PrintWriter pw = null;
             try
             {
@@ -527,29 +516,29 @@ public class ItemUpdate {
      */
     protected File initUndoArchive(File sourceDir)
     throws FileNotFoundException, IOException
-    {                
+    {
         File parentDir = sourceDir.getCanonicalFile().getParentFile();
         if (parentDir == null)
         {
-            throw new FileNotFoundException("Parent directory of archive directory not found; unable to write UndoArchive; no processing performed");                
+            throw new FileNotFoundException("Parent directory of archive directory not found; unable to write UndoArchive; no processing performed");
         }
-        
+
         String sourceDirName = sourceDir.getName();
         int seqNo = 1;
-        
+
         File undoDir = new File(parentDir, "undo_" + sourceDirName + "_" + seqNo);
         while (undoDir.exists())
         {
             undoDir = new File(parentDir, "undo_" + sourceDirName+ "_" + ++seqNo); //increment
         }
-        
+
         // create root directory
         if (!undoDir.mkdir())
         {
             pr("ERROR creating  Undo Archive directory " + undoDir.getCanonicalPath());
             throw new IOException("ERROR creating  Undo Archive directory " + undoDir.getCanonicalPath());
         }
-        
+
         //Undo is suppressed to prevent undo of undo
         File fSuppressUndo = new File(undoDir, ItemUpdate.SUPPRESS_UNDO_FILENAME);
         try
@@ -561,9 +550,9 @@ public class ItemUpdate {
             pr("ERROR creating Suppress Undo File " + e.toString());
             throw e;
         }
-        return undoDir;        
+        return undoDir;
     }
-    
+
     //private void write
 
     /**
@@ -606,7 +595,7 @@ public class ItemUpdate {
      * poor man's logging
      * As with ItemImport, API logging goes through log4j to the DSpace.log files
      * whereas the batch logging goes to the console to be captured there.
-     * 
+     *
      * @param s String
      */
     static void pr(String s)
@@ -620,7 +609,7 @@ public class ItemUpdate {
      */
     static void prv(String s)
     {
-        if (verbose) 
+        if (verbose)
         {
             System.out.println(s);
         }
