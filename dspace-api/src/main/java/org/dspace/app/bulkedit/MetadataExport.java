@@ -296,6 +296,6 @@ public class MetadataExport
 
         // Finish off and tidy up
         c.restoreAuthSystemState();
-        c.abort();
+        c.complete();
     }
 }

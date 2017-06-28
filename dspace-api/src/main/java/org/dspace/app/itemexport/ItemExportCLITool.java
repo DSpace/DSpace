@@ -263,6 +263,6 @@ public class ItemExportCLITool {
             }
         }
 
-        c.abort();
+        c.complete();
     }
 }
