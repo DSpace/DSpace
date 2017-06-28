@@ -77,7 +77,6 @@ public class ManuscriptDatabaseStorageImplTest extends ContextUnitTest {
         try {
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_1);
             DatabaseManager.deleteByValue(context, ManuscriptDatabaseStorageImpl.MANUSCRIPT_TABLE, ManuscriptDatabaseStorageImpl.COLUMN_MSID, TEST_MANUSCRIPT_ID_2);
-            DatabaseManager.deleteByValue(context, JournalConceptDatabaseStorageImpl.JOURNAL_TABLE, JournalConceptDatabaseStorageImpl.COLUMN_CODE, TEST_JOURNAL_CODE);
         } catch (SQLException ex) {
             fail("Exception clearing test journal and manuscript: " + ex);
         }
