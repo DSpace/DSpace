@@ -198,7 +198,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             // We don't need to remove the link between bundle & bitstream, this will be handled in the delete() method.
             bitstreamService.delete(context, bitstream);
         }else{
-            bundle.getBitstreams().remove(bitstream);
+            bundle.removeBitstream(bitstream);
             bitstream.getBundles().remove(bundle);
         }
     }
@@ -269,7 +269,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     public void setOrder(Context context, Bundle bundle, UUID[] bitstreamIds) throws AuthorizeException, SQLException {
         authorizeService.authorizeAction(context, bundle, Constants.WRITE);
 
-        bundle.getBitstreams().clear();
+        bundle.clearBitstreams();
         for (int i = 0; i < bitstreamIds.length; i++) {
             UUID bitstreamId = bitstreamIds[i];
             Bitstream bitstream = bitstreamService.find(context, bitstreamId);
@@ -279,7 +279,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 continue;
             }
             bitstream.getBundles().remove(bundle);
-            bundle.getBitstreams().add(bitstream);
+            bundle.addBitstream(bitstream);
             bitstream.getBundles().add(bundle);
 
             bitstreamService.update(context, bitstream);
@@ -399,8 +399,8 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 bundle.getName(), getIdentifiers(context, bundle)));
 
         // Remove bitstreams
-        List<Bitstream> bitstreams = new LinkedList<>(bundle.getBitstreams());
-        bundle.getBitstreams().clear();
+        List<Bitstream> bitstreams = bundle.getBitstreams();
+        bundle.clearBitstreams();
         for (Bitstream bitstream : bitstreams) {
             removeBitstream(context, bundle, bitstream);
         }

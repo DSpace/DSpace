@@ -255,7 +255,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         //Remove our bitstream from all our bundles
         final List<Bundle> bundles = bitstream.getBundles();
         for (Bundle bundle : bundles) {
-            bundle.getBitstreams().remove(bitstream);
+            bundle.removeBitstream(bitstream);
         }
 
         //Remove all bundles from the bitstream object, clearing the connection in 2 ways
