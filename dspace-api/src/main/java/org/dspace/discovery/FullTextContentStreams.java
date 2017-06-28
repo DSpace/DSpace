@@ -54,6 +54,7 @@ public class FullTextContentStreams extends ContentStreamBase
     protected BitstreamService bitstreamService;
     protected BundleService bundleService; 
     protected ResourcePolicyService resourcePolicyService;
+    protected ConfigurationService configurationService;
     
     public FullTextContentStreams(Context context, Item parentItem) throws SQLException {
         this.context = context;
@@ -100,7 +101,7 @@ public class FullTextContentStreams extends ContentStreamBase
     }
     
     private boolean isIndexable(Bitstream fulltextBitstream,Bundle myBundle) throws SQLException {
-        Boolean embargoFullText = DSpaceServicesFactory.getInstance().getConfigurationService().getBooleanProperty("discovery.fulltext.embargo");
+        Boolean embargoFullText = getConfigurationService().getBooleanProperty("discovery.fulltext.embargo");
         if (embargoFullText == null || embargoFullText == false) {
             return true;
         }
@@ -183,6 +184,13 @@ public class FullTextContentStreams extends ContentStreamBase
             resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         }
         return resourcePolicyService;
+    }
+    
+    private ConfigurationService getConfigurationService() {
+        if (configurationService == null) {
+            configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+        }
+        return configurationService;
     }
 
     private class FullTextBitstream {

@@ -18,6 +18,7 @@ import org.dspace.content.Item;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.eperson.Group;
+import org.dspace.services.ConfigurationService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,6 +55,9 @@ public class FullTextContentStreamsTest {
     @Mock
     private ResourcePolicyService resourcePolicyService;
 
+    @Mock
+    private ConfigurationService configurationService;
+    
     @Mock
     private Item item;
 
@@ -114,10 +118,13 @@ public class FullTextContentStreamsTest {
         
         when(resourcePolicy.getdSpaceObject()).thenReturn(dspaceObject);
         when(resourcePolicy.getdSpaceObject().getID()).thenReturn(objectId);
+
+        when(configurationService.getBooleanProperty("discovery.fulltext.embargo")).thenReturn(false);
         
         streams.bitstreamService = bitstreamService;
         streams.bundleService = bundleService;
         streams.resourcePolicyService = resourcePolicyService;
+        streams.configurationService = configurationService;
     }
 
     @Test
@@ -234,5 +241,5 @@ public class FullTextContentStreamsTest {
         assertTrue("The data should contain data on the exception that occurred",
                 content.contains("NOTFOUND"));
     }
-
+    
 }
