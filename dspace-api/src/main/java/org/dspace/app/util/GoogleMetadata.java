@@ -7,33 +7,29 @@
  */
 package org.dspace.app.util;
 
-import java.sql.SQLException;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-
-import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.Collection;
-import java.util.Map.Entry;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.jdom.Element;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Collection;
+import java.util.Map.Entry;
 
 /**
  * Configuration and mapping for Google Scholar output metadata
@@ -1057,11 +1053,12 @@ public class GoogleMetadata
      */
     protected Bitstream findLinkableFulltext(Item item) throws SQLException {
         Bitstream bestSoFar = null;
-        int bitstreamCount = 0;
+
         List<Bundle> contentBundles = itemService.getBundles(item, "ORIGINAL");
         for (Bundle bundle : contentBundles) {
             List<Bitstream> bitstreams = bundle.getBitstreams();
             Collections.sort(bitstreams, googleBitstreamComparator);
+
             for (Bitstream candidate : bitstreams) {
                 if (candidate.equals(bundle.getPrimaryBitstream())) { // is primary -> use this one
                     if (isPublic(candidate)) {
