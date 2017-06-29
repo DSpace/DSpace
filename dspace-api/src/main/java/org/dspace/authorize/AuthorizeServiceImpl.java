@@ -460,7 +460,6 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return groupService.isMember(c, Group.ADMIN);
         }
     }
-
     @Override
     public boolean isAdmin(Context c, EPerson e) throws SQLException
     {
@@ -478,7 +477,6 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return groupService.isMember(c, e, Group.ADMIN);
         }
     }
-    
     public boolean isCommunityAdmin(Context c) throws SQLException 
     {
         EPerson e = c.getCurrentUser();

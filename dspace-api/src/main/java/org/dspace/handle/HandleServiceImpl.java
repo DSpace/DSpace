@@ -231,6 +231,10 @@ public class HandleServiceImpl implements HandleService
                 // can verify during a restore whether the same *type* of resource
                 // is reusing this handle!
                 handle.setDSpaceObject(null);
+
+                //Also remove the handle from the DSO list to keep a consistent model
+                dso.getHandles().remove(handle);
+                
                 handleDAO.save(context, handle);
 
                 if(log.isDebugEnabled())
@@ -241,7 +245,7 @@ public class HandleServiceImpl implements HandleService
         }
         else
         {
-            log.warn("Cannot find Handle entry to unbind for object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
+            log.trace("Cannot find Handle entry to unbind for object " + Constants.typeText[dso.getType()] + " id=" + dso.getID() + ". Handle could have been unbinded before.");
         }
     }
 

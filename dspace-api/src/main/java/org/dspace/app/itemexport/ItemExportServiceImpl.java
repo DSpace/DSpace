@@ -7,43 +7,27 @@
  */
 package org.dspace.app.itemexport;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.mail.MessagingException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 import org.dspace.app.itemexport.service.ItemExportService;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.core.Utils;
-import org.dspace.core.Email;
+import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.mail.MessagingException;
+import java.io.*;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Item exporter to create simple AIPs for DSpace content. Currently exports
@@ -129,7 +113,9 @@ public class ItemExportServiceImpl implements ItemExportService
             }
 
             System.out.println("Exporting item to " + mySequenceNumber);
-            exportItem(c, i.next(), fullPath, mySequenceNumber, migrate, excludeBitstreams);
+            Item item = i.next();
+            exportItem(c, item, fullPath, mySequenceNumber, migrate, excludeBitstreams);
+            c.uncacheEntity(item);
             mySequenceNumber++;
         }
     }

@@ -352,7 +352,7 @@ public class FlowContainerUtils
 			//System.out.println("Deleting: " + item.getHandle());
 			//ib.itemRemoved(item);
 			collectionService.removeItem(context, collection, item);
-
+			context.uncacheEntity(item);
 		}
 
 		hc.setLastHarvested(null);
