@@ -438,6 +438,13 @@
     <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.head">Your response has been sent.</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestResponseSent.para1">Your response has been sent.</message>
 
+    <!-- DATASHARE start -->
+    <!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseError.java -->
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseError.title">File too large.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseError.trail">File too large.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseError.head">File too large.</message>
+    <message key="xmlui.ArtifactBrowser.ItemRequestResponseError.para1">The attached file was too large for the email server to send to the person who sent you the request. Please find an alternative route to send the file. For example the University's DataSync system (<a href="http://www.ed.ac.uk/information-services/computing/desktop-personal/datasync">http://www.ed.ac.uk/information-services/computing/desktop-personal/datasync</a>) makes it easy for you to share files with people outside of the university. If you would like assistance with this please email the Research Data Service on <a href="datalib@ed.ac.uk">datalib@ed.ac.uk</a>. Another possible solution would be to lift the embargo on the deposit entirely; if you'd like to make the data public in that way, please email the Research Data Service on datalib@ed.ac.uk or call us on ext 515277.</message>
+    <!-- DATASHARE end -->
 
 
 	<!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
