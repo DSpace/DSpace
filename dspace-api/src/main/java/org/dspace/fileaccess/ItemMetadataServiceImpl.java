@@ -11,9 +11,11 @@ import org.dspace.content.*;
 import org.dspace.fileaccess.service.*;
 
 /**
- * Created by Philip Vissenaekens (philip at atmire dot com)
- * Date: 12/11/15
- * Time: 13:51
+ * This stub can be used to replace the Elsevier specific ElsevierItemMetadataServiceImpl.
+ * comment out the ElsevierItemMetadataServiceImpl bean in config/spring/api/core-services.xml to disable it
+ * uncomment the ItemMetadataServiceImpl bean in the same spring file to enable it.
+ *
+ * @author Created by Philip Vissenaekens (philip at atmire dot com)
  */
 public class ItemMetadataServiceImpl implements ItemMetadataService {
     @Override

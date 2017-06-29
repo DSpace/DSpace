@@ -16,9 +16,11 @@ import org.dspace.fileaccess.service.*;
 import org.dspace.importer.external.elsevier.entitlement.*;
 
 /**
- * Created by Philip Vissenaekens (philip at atmire dot com)
- * Date: 12/11/15
- * Time: 13:49
+ * This stub can be used to replace the Elsevier specific ElsevierFileAccessFromMetadataService.
+ * comment out the ElsevierFileAccessFromMetadataService bean in config/spring/api/core-services.xml to disable it
+ * uncomment the FileAccessFromMetadataServiceImpl bean in the same spring file to enable it.
+ *
+ * @author Created by Philip Vissenaekens (philip at atmire dot com)
  */
 public class FileAccessFromMetadataServiceImpl implements FileAccessFromMetadataService {
     @Override

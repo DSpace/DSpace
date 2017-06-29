@@ -8,8 +8,8 @@
 package org.dspace.importer.external.elsevier;
 
 import java.sql.*;
-import java.util.Collection;
 import java.util.*;
+import java.util.Collection;
 import org.apache.commons.cli.*;
 import org.apache.commons.collections.*;
 import org.apache.commons.lang.*;
@@ -40,14 +40,13 @@ public class UpdateElsevierItems {
     private static boolean test = false;
     private static boolean force = false;
 
-    private static ImportService importService;
-    private static String url;
-
     protected static ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected static BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected static HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
     protected static FileAccessFromMetadataService fileAccessFromMetadataService = FileAccessServiceFactory.getInstance().getFileAccessFromMetadataService();
     protected static ItemMetadataService itemMetadataService = FileAccessServiceFactory.getInstance().getItemMetadataService();
+    private static final List<String> ElsevierImportSources = Arrays.asList(new String[] {"science", "scopus"});
+    private static Map<String, AbstractImportMetadataSourceService> sources = new DSpace().getServiceManager().getServiceByName("ImportServices", HashMap.class);
 
     private static Logger log = Logger.getLogger(UpdateElsevierItems.class);
 
@@ -71,7 +70,7 @@ public class UpdateElsevierItems {
             context = new Context();
             context.turnOffAuthorisationSystem();
 
-            Iterator<Item> itemIterator = null;
+            Iterator<Item> itemIterator = IteratorUtils.emptyIterator();
 
             if (line.hasOption("i")) {
                 DSpaceObject dSpaceObject = handleService.resolveToObject(context, line.getOptionValue("i"));
@@ -80,7 +79,10 @@ public class UpdateElsevierItems {
                     itemIterator = IteratorUtils.getIterator(dSpaceObject);
                 }
             } else {
-                itemIterator = itemService.findAll(context);
+                for (String elsevierImportSource : ElsevierImportSources) {
+                    Iterator<Item> sourceItemIterator = itemService.findByMetadataField(context, "workflow", "import", "source", elsevierImportSource);
+                    itemIterator = IteratorUtils.chainedIterator(itemIterator, sourceItemIterator);
+                }
             }
 
             if (itemIterator != null && itemIterator.hasNext()) {
@@ -184,8 +186,10 @@ public class UpdateElsevierItems {
             qualifier = split[2];
         }
 
+        String source = itemService.getMetadataFirstValue(item, "workflow", "import", "source", Item.ANY);
+
         if(force){
-            ImportRecord record = getRecord("doi",doi);
+            ImportRecord record = getRecord(source,"doi",doi);
 
             if(record!=null) {
                 Collection<MetadatumDTO> values = record.getValue(schema,element,qualifier);
@@ -216,7 +220,7 @@ public class UpdateElsevierItems {
             }
         }
         else if(StringUtils.isNotBlank(doi) && StringUtils.isBlank(pii)){
-            ImportRecord record = getRecord("doi",doi);
+            ImportRecord record = getRecord(source, "doi",doi);
 
             if (record!=null) {
                 Collection<MetadatumDTO> values = record.getValue(schema,element,qualifier);
@@ -240,11 +244,13 @@ public class UpdateElsevierItems {
 
         if(force){
             ImportRecord record = null;
+            String source = itemService.getMetadataFirstValue(item, "workflow", "import", "source", Item.ANY);
+
             if(StringUtils.isNotBlank(pii)){
-                record = getRecord("pii",pii);
+                record = getRecord(source, "pii",pii);
             }
             else if (StringUtils.isNotBlank(doi)){
-                record = getRecord("doi",doi);
+                record = getRecord(source, "doi",doi);
             }
 
             if(record!=null){
@@ -253,7 +259,7 @@ public class UpdateElsevierItems {
 
                     boolean addMetadata = true;
                     for (MetadataValue itemMetadata : metadata) {
-                        if(itemMetadata.getValue().equals(recordMetadatum.getValue())){
+                        if(itemMetadata.getValue().equals(StringUtils.trim(recordMetadatum.getValue()))){
                             addMetadata = false;
                         }
                     }
@@ -272,19 +278,15 @@ public class UpdateElsevierItems {
         }
     }
 
-    private static ImportRecord getRecord(String field, String value) throws MetadataSourceException {
-        if(importService==null){
-            importService = new DSpace().getServiceManager().getServiceByName("importService", ImportService.class);
-        }
+    private static ImportRecord getRecord(String source, String field, String value) throws MetadataSourceException {
+        AbstractImportMetadataSourceService importMetadataSourceService = sources.get(source);
 
-        if(StringUtils.isBlank(url)) {
-            url = ConfigurationManager.getProperty("external-sources.scidir.url");
-        }
+        if(importMetadataSourceService != null) {
+            Collection<ImportRecord> records = importMetadataSourceService.getRecords(field + "(\"" + value + "\")", 0, 1);
 
-        Collection<ImportRecord> records = importService.getRecords(url,  field + "(\"" + value + "\")", 0, 1);
-
-        if(records.size()>0) {
-            return records.iterator().next();
+            if (records.size() > 0) {
+                return records.iterator().next();
+            }
         }
 
         return null;

@@ -55,7 +55,7 @@ public class FileAccessConsumer implements Consumer {
                 }
                 break;
             default:
-                log.warn("consume() got unrecognized event: " + event.toString());
+                log.debug("consume() got unrecognized event: " + event.toString());
         }
 
     }
