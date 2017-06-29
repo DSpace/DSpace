@@ -30,6 +30,7 @@ import org.dspace.curate.Curator;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.paymentsystem.ShoppingCart;
+import org.dspace.workflow.WorkflowManager;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -56,8 +57,9 @@ public class FlowItemUtils
     private static final Message T_embargo_set = new Message("default","New embargo was set.");
     private static final Message T_embargo_removed = new Message("default","Embargo was disabled.");
     private static final Message T_embargo_not_set = new Message("default","The embargo could not be configured. Please make sure you have a valid future date.");
-	    
-	
+	private final static String PROVENANCE = "dc.description.provenance";
+	private final static String PUBLICATION_NAME = "prism.publicationName";
+
 	/**
 	 * Resolve the given identifier to an item. The identifier may be either an
 	 * internal ID or a handle. If an item is found then the result the internal
@@ -138,7 +140,13 @@ public class FlowItemUtils
 		result.setContinue(false);
 
 		Item item = Item.find(context, itemID);
-		
+
+		// check for old pub name in case that changed
+		StringBuilder provenance = new StringBuilder();
+		DCValue[] pubnames = item.getMetadata(PUBLICATION_NAME);
+		if (pubnames != null && pubnames.length > 0) {
+			provenance.append(WorkflowManager.getEPersonName(context.getCurrentUser())).append(" updated ").append(PUBLICATION_NAME).append(": changed from ").append(pubnames[0].value);
+		}
 		
 		// STEP 1:
 		// Clear all metadata within the scope
@@ -212,6 +220,13 @@ public class FlowItemUtils
                         }
                         item.addMetadata(parts[0], parts[1], parts[2], lang,
                                              value, authority, iconf);
+
+			// if the thing that was changed was the pub name, add provenance:
+			if (PUBLICATION_NAME.replaceAll("\\.", "_").equals(name)) {
+				provenance.append(" to ").append(value).append(" on ").append(DCDate.getCurrent().toString()).append(" (GMT)");
+				item.addMetadata(PROVENANCE, "en", provenance.toString(), null, -1);
+			}
+
 		}
 
 		ShoppingCart cart = ShoppingCart.findByItemId(context, itemID);

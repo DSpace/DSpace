@@ -724,7 +724,6 @@ public class Manuscript {
             journalConfidence = Choices.CF_ACCEPTED;
         }
         addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL, journalConcept.getFullName(), journalConcept.getIdentifier().toString(), journalConfidence);
-        addSingleMetadataValueFromJournal(context, item, Manuscript.ISSN, journalConcept.getISSN());
 
         addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_VOLUME, this.getJournalVolume());
         addSingleMetadataValueFromJournal(context, item, Manuscript.ABSTRACT, manuscript_abstract);
@@ -733,7 +732,6 @@ public class Manuscript {
         if (publicationDate != null) {
             addSingleMetadataValueFromJournal(context, item, Manuscript.PUBLICATION_DATE, sdf.format(publicationDate));
         }
-        addSingleMetadataValueFromJournal(context, item, Manuscript.JOURNAL_PUBLISHER, this.getPublisher());
         addSingleMetadataValueFromJournal(context, item, Manuscript.MANUSCRIPT, this.getManuscriptId());
         addSingleMetadataValueFromJournal(context, item, Manuscript.SKIP_REVIEW, String.valueOf(this.isSkipReviewStep()));
         ArrayList<String> authors = new ArrayList<String>();
