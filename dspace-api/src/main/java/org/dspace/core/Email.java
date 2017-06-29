@@ -363,7 +363,12 @@ public class Email
             message.setReplyTo(replyToAddr);
         }
 
+        log.debug("sending email with subject \'" + fullSubject + "\' to recipients " + recipients.toString() + " with content \'" + fullMessage + "\'");
         Transport.send(message);
+    }
+
+    public String toString() {
+        return "recipients: " + recipients.toString() + ", message: " + content;
     }
 
     /**
