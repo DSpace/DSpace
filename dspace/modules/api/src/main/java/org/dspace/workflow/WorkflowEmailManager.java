@@ -124,6 +124,7 @@ public class WorkflowEmailManager {
             email.addArgument(submitter);             // {4}  The submitter's full name
             email.addArgument(manuscriptIdentifier);  // {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
             email.addArgument(doi_url);               // {6}  The formatted dx.doi.org URL
+            email.addArgument(getJournalNameForItem(c, i)); // {7}  Journal
             email.send();
         }
         catch (MessagingException e) {
@@ -177,6 +178,7 @@ public class WorkflowEmailManager {
             email.addArgument(dataFileTitles);                                                  // {2}  Name(s) of the data file(s)
             email.addArgument(reason);                                                          // {3}  Reason for the rejection
             email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/mydspace");    // {4}  Link to 'My DSpace' page
+            email.addArgument(getJournalNameForItem(c, wi.getItem()));                          // {5}  Journal name
 
             email.send();
         }
@@ -226,6 +228,7 @@ public class WorkflowEmailManager {
                 email.addArgument(taskName);
                 email.addArgument(message);
                 email.addArgument(action);
+                email.addArgument(getJournalNameForItem(c, wi.getItem()));
                 email.addRecipient(epa[i].getEmail());
                 email.send();
             }
@@ -280,7 +283,9 @@ public class WorkflowEmailManager {
                 email.addArgument(title);      // {0}  Title of submission
                 email.addArgument(doi);        // {1}  package DOI
                 email.addArgument(submitter);  // {2}  Submitter's name
+                email.addArgument(getJournalNameForItem(c, wi.getItem()));
                 email.addRecipient(recipient.getEmail());
+
                 email.send();
             }
         }
@@ -312,11 +317,9 @@ public class WorkflowEmailManager {
         email.addArgument(dataFileNames);  // {2}
 
         try {
-            // Send the email -- Unless the journal is Evolution
-            // TODO: make this configurable for each journal
-            DCValue journals[] = wfi.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
-            String journalName = (journals.length >= 1) ? journals[0].value : null;
+            String journalName = getJournalNameForItem(c, wfi.getItem());
 
+            email.addArgument(journalName); // {3}
 
             if (journalName != null && !journalName.equals("Evolution") && !journalName.equals("Evolution*")) {
                 log.debug("sending submit_datapackage_confirm");
@@ -346,7 +349,7 @@ public class WorkflowEmailManager {
             email.addArgument(wf.getItem().getName());
             String doi = DOIIdentifierProvider.getDoiValue(wf.getItem());
             email.addArgument(doi == null ? "" : doi);
-
+            Item dataPackage = wf.getItem();
             //Add the parent data
             if(isDataPackage){
                 //Get all the data files
@@ -358,7 +361,7 @@ public class WorkflowEmailManager {
                 email.addArgument(dataFileNames);
             }else{
                 //Get the data package
-                Item dataPackage = DryadWorkflowUtils.getDataPackage(c, wf.getItem());
+                dataPackage = DryadWorkflowUtils.getDataPackage(c, wf.getItem());
                 if(dataPackage!=null){
                     email.addArgument(dataPackage.getName());
                 }
@@ -382,11 +385,8 @@ public class WorkflowEmailManager {
             email.addArgument(manuScriptIdentifier);
 
             // Add journal name
-            String journalName = "not available";
-            DCValue[] journalNames = wf.getItem().getMetadata("prism", "publicationName", null, Item.ANY);
-            if(0 < journalNames.length){
-                journalName = journalNames[0].value;
-            }
+            String journalName = getJournalNameForItem(c, dataPackage);
+            if ("".equals(journalName)) journalName = "not available";
 
             email.addArgument(journalName);
 
@@ -434,11 +434,12 @@ public class WorkflowEmailManager {
     }
 
     private static String getJournalNameForItem(Context c, Item item) {
-        DCValue pubNames[] =  item.getMetadata("prism", "publicationName", null, null);
+        DCValue pubNames[] =  item.getMetadata("prism", "publicationName", Item.ANY, Item.ANY);
         String journalName = "";
         if (pubNames != null && pubNames.length > 0) {
             journalName = pubNames[0].value;
         }
+        log.error("looking for journal for item " + item.getID() + ": " + journalName);
         return journalName;
     }
 }

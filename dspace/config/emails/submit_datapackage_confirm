@@ -8,6 +8,7 @@
 # {0}  Title of data package
 # {1}  The doi identifier of the data package
 # {2}  The title(s) of the data file(s)
+# {3}  Journal
 #
 Subject: Dryad submission now in curation
 
@@ -18,6 +19,7 @@ YOUR DRYAD DOI
 Your data package has been assigned a unique identifier, called a DOI. This DOI is provisional for now, but may be included in the article manuscript. It will be fully registered with the DOI system when your submission has been approved by Dryad curation staff.
 
 Data package title: {0}
+Journal: {3}
 Provisional DOI: {1}
 Data files: {2}
 
