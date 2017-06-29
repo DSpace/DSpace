@@ -7,26 +7,14 @@
  */
 package org.dspace.app.packager;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
-import org.dspace.content.packager.PackageParameters;
 import org.dspace.content.packager.PackageIngester;
+import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -35,6 +23,10 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.workflow.WorkflowException;
+
+import java.io.*;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Command-line interface to the Packager plugin.
@@ -331,6 +323,7 @@ public class Packager
         //If we are in REPLACE mode
         if(pkgParams.replaceModeEnabled())
         {
+            context.setMode(Context.Mode.BATCH_EDIT);
             PackageIngester sip = (PackageIngester) pluginService
                     .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null)
@@ -394,6 +387,8 @@ public class Packager
         //else if normal SUBMIT mode (or basic RESTORE mode -- which is a special type of submission)
         else if (myPackager.submit || pkgParams.restoreModeEnabled())
         {
+            context.setMode(Context.Mode.BATCH_EDIT);
+
             PackageIngester sip = (PackageIngester) pluginService
                     .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null)
@@ -445,6 +440,8 @@ public class Packager
         }// else, if DISSEMINATE mode
         else
         {
+            context.setMode(Context.Mode.READ_ONLY);
+
             //retrieve specified package disseminator
             PackageDisseminator dip = (PackageDisseminator) pluginService
                 .getNamedPlugin(PackageDisseminator.class, myPackager.packageType);

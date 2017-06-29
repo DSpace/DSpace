@@ -215,8 +215,8 @@ public class OAIHarvester {
      */
 	public void runHarvest() throws SQLException, IOException, AuthorizeException
 	{
-		boolean originalMode = ourContext.isBatchModeEnabled();
-		ourContext.enableBatchMode(true);
+		Context.Mode originalMode = ourContext.getCurrentMode();
+		ourContext.setMode(Context.Mode.BATCH_EDIT);
 
 		// figure out the relevant parameters
 		String oaiSource = harvestRow.getOaiSource();
@@ -432,7 +432,7 @@ public class OAIHarvester {
 		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds. Harvested " + currentRecord + " items.");
 		harvestedCollection.update(ourContext, harvestRow);
 
-		ourContext.enableBatchMode(originalMode);
+		ourContext.setMode(originalMode);
 	}
 
 	private void intermediateCommit() throws SQLException {
@@ -624,6 +624,11 @@ public class OAIHarvester {
 		long timeTaken = new Date().getTime() - timeStart.getTime();
 		log.info(String.format("Item %s (%s) has been ingested (item %d of %d). The whole process took: %d ms.",
 				item.getHandle(), item.getID(), currentRecord, totalListSize, timeTaken));
+
+		//Clear the context cache
+		ourContext.uncacheEntity(wi);
+		ourContext.uncacheEntity(hi);
+		ourContext.uncacheEntity(item);
 
     	// Stop ignoring authorization
     	ourContext.restoreAuthSystemState();

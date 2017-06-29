@@ -353,31 +353,31 @@ public class Submissions extends AbstractDSpaceTransformer
         {
             String title = workflowItem.getItem().getName();
             String collectionName = workflowItem.getCollection().getName();
-        	Message state = getWorkflowStateMessage(workflowItem);
+            Message state = getWorkflowStateMessage(workflowItem);
 
 
-        	Row row = table.addRow();
+            Row row = table.addRow();
 
-        	// Add the title column
-        	if (title.length() > 0)
-        	{
-        		String displayTitle = title;
-    			if (displayTitle.length() > 50)
+            // Add the title column
+            if (StringUtils.isNotBlank(title))
+            {
+                String displayTitle = title;
+    	        if (displayTitle.length() > 50)
                 {
                     displayTitle = displayTitle.substring(0, 50) + " ...";
                 }
-        		row.addCellContent(displayTitle);
-        	}
-        	else
+                row.addCellContent(displayTitle);
+            }
+            else
             {
                 row.addCellContent(T_untitled);
             }
 
-        	// Collection name column
-        	row.addCellContent(collectionName);
+            // Collection name column
+            row.addCellContent(collectionName);
 
-        	// Status column
-        	row.addCellContent(state);
+            // Status column
+            row.addCellContent(state);
         }
     }
 

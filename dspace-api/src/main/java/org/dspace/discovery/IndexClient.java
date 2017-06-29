@@ -47,7 +47,7 @@ public class IndexClient {
      */
     public static void main(String[] args) throws SQLException, IOException, SearchServiceException {
 
-        Context context = new Context();
+        Context context = new Context(Context.Mode.READ_ONLY);
         context.turnOffAuthorisationSystem();
 
         String usage = "org.dspace.discovery.IndexClient [-cbhf] | [-r <handle>] | [-i <handle>] or nothing to update/clean an existing index.";
@@ -142,8 +142,6 @@ public class IndexClient {
                 throw new IllegalArgumentException("Cannot resolve " + handle + " to a DSpace object");
             }
             log.info("Forcibly Indexing " + handle);
-            // Enable batch mode; we may be indexing a large number of items
-            context.enableBatchMode(true);
             final long startTimeMillis = System.currentTimeMillis();
             final long count = indexAll(indexer,  ContentServiceFactory.getInstance().getItemService(), context, dso);
             final long seconds = (System.currentTimeMillis() - startTimeMillis ) / 1000;

@@ -75,7 +75,7 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
-    public List<ResourcePolicy> findByTypeIdGroupAction(Context context, DSpaceObject dso, Group group, int action, int notPolicyID) throws SQLException {
+    public List<ResourcePolicy> findByTypeGroupAction(Context context, DSpaceObject dso, Group group, int action) throws SQLException {
         Criteria criteria = createCriteria(context, ResourcePolicy.class);
         criteria.add(Restrictions.and(
                 Restrictions.eq("dSpaceObject", dso),
@@ -83,15 +83,21 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
                 Restrictions.eq("actionId", action)
         ));
         criteria.setMaxResults(1);
-
-        List<ResourcePolicy> results;
-        if (notPolicyID != -1)
-        {
-            criteria.add(Restrictions.and(Restrictions.not(Restrictions.eq("id", notPolicyID))));
-        }
-
         return list(criteria);
     }
+    
+    @Override
+    public List<ResourcePolicy> findByTypeGroupActionExceptId(Context context, DSpaceObject dso, Group group, int action, int notPolicyID) throws SQLException {
+        Criteria criteria = createCriteria(context, ResourcePolicy.class);
+        criteria.add(Restrictions.and(
+                Restrictions.eq("dSpaceObject", dso),
+                Restrictions.eq("epersonGroup", group),
+                Restrictions.eq("actionId", action)
+        ));
+        criteria.add(Restrictions.and(Restrictions.not(Restrictions.eq("id", notPolicyID))));
+        return list(criteria);
+    }
+    
      public List<ResourcePolicy> findByEPersonGroupTypeIdAction(Context context, EPerson e, List<Group> groups, int action, int type_id) throws SQLException
      {
          Criteria criteria = createCriteria(context, ResourcePolicy.class);

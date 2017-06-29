@@ -34,6 +34,8 @@ public class MetadataExport
 
     protected ItemService itemService;
 
+    protected Context context;
+
     /** Whether to export all metadata, or just normally edited metadata */
     protected boolean exportAll;
 
@@ -55,6 +57,7 @@ public class MetadataExport
         // Store the export settings
         this.toExport = toExport;
         this.exportAll = exportAll;
+        this.context = c;
     }
 
     /**
@@ -73,6 +76,7 @@ public class MetadataExport
             // Try to export the community
             this.toExport = buildFromCommunity(c, toExport, 0);
             this.exportAll = exportAll;
+            this.context = c;
         }
         catch (SQLException sqle)
         {
@@ -144,13 +148,19 @@ public class MetadataExport
     {
         try
         {
+            Context.Mode originalMode = context.getCurrentMode();
+            context.setMode(Context.Mode.READ_ONLY);
+
             // Process each item
             DSpaceCSV csv = new DSpaceCSV(exportAll);
             while (toExport.hasNext())
             {
-                csv.addItem(toExport.next());
+                Item item = toExport.next();
+                csv.addItem(item);
+                context.uncacheEntity(item);
             }
 
+            context.setMode(originalMode);
             // Return the results
             return csv;
         }
@@ -224,7 +234,7 @@ public class MetadataExport
         String filename = line.getOptionValue('f');
 
         // Create a context
-        Context c = new Context();
+        Context c = new Context(Context.Mode.READ_ONLY);
         c.turnOffAuthorisationSystem();
 
         // The things we'll export

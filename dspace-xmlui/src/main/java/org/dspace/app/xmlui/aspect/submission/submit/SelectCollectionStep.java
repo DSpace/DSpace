@@ -27,6 +27,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.handle.HandleServiceImpl;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -78,7 +79,10 @@ public class SelectCollectionStep extends AbstractSubmissionStep
   
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
-    {     
+    {
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+
         java.util.List<Collection> collections; // List of possible collections.
         String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
         DSpaceObject dso = handleService.resolveToObject(context, handle);
@@ -113,6 +117,8 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         
         Button submit = list.addItem().addButton("submit");
         submit.setValue(T_submit_next);
+
+        context.setMode(originalMode);
     }
     
     /** 

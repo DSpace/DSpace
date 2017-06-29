@@ -8,6 +8,9 @@
 package org.dspace.core;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.exception.DatabaseSchemaValidationException;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -44,9 +47,6 @@ public class Context
 {
     private static final Logger log = Logger.getLogger(Context.class);
 
-    /** option flags */
-    public static final short READ_ONLY = 0x01;
-
     /** Current user - null means anonymous access */
     private EPerson currentUser;
 
@@ -77,12 +77,21 @@ public class Context
     /** Event dispatcher name */
     private String dispName = null;
 
-    /** options */
-    private short options = 0;
+    /** Context mode */
+    private Mode mode = Mode.READ_WRITE;
+
+    /** Cache that is only used the context is in READ_ONLY mode */
+    private ContextReadOnlyCache readOnlyCache = new ContextReadOnlyCache();
 
     protected EventService eventService;
 
     private DBConnection dbConnection;
+
+    public enum Mode {
+        READ_ONLY,
+        READ_WRITE,
+        BATCH_EDIT
+    }
 
     static
     {
@@ -100,6 +109,7 @@ public class Context
     }
 
     protected Context(EventService eventService, DBConnection dbConnection)  {
+        this.mode = Mode.READ_WRITE;
         this.eventService = eventService;
         this.dbConnection = dbConnection;
         init();
@@ -112,18 +122,19 @@ public class Context
      */
     public Context()
     {
+        this.mode = Mode.READ_WRITE;
         init();
     }
 
     /**
-     * Construct a new context object with passed options. A database connection is opened.
+     * Construct a new context object with the given mode enabled. A database connection is opened.
      * No user is authenticated.
      * 
-     * @param options   context operation flags
+     * @param mode   The mode to use when opening the context.
      */
-    public Context(short options)
+    public Context(Mode mode)
     {
-        this.options = options;
+        this.mode = mode;
         init();
     }
 
@@ -145,8 +156,18 @@ public class Context
             dbConnection = new DSpace().getSingletonService(DBConnection.class);
             if(dbConnection == null)
             {
+                //It appears there is a problem with the database, run the Schema validator
+                DatabaseSchemaValidator schemaValidator = new DSpace().getSingletonService(DatabaseSchemaValidator.class);
+
+                String validationError = schemaValidator == null ? "null" : schemaValidator.getDatabaseSchemaValidationError();
+                String message = "The schema validator returned: " +
+                        validationError;
+
                 log.fatal("Cannot obtain the bean which provides a database connection. " +
-                        "Check previous entries in the dspace.log to find why the db failed to initialize.");
+                        "Check previous entries in the dspace.log to find why the db failed to initialize. " + message);
+
+                //Fail fast
+                throw new DatabaseSchemaValidationException(message);
             }
         }
 
@@ -159,6 +180,7 @@ public class Context
 
         authStateChangeHistory = new Stack<Boolean>();
         authStateClassCallHistory = new Stack<String>();
+        setMode(this.mode);
     }
 
     /**
@@ -350,8 +372,13 @@ public class Context
         try
         {
             // As long as we have a valid, writeable database connection,
-            // commit any changes made as part of the transaction
-            commit();
+            // rollback any changes if we are in read-only mode,
+            // otherwise, commit any changes made as part of the transaction
+            if(isReadOnly()) {
+                abort();
+            } else {
+                commit();
+            }
         }
         finally
         {
@@ -381,12 +408,16 @@ public class Context
             log.info("commit() was called on a closed Context object. No changes to commit.");
         }
 
+        if(isReadOnly()) {
+            throw new UnsupportedOperationException("You cannot commit a read-only context");
+        }
+
         // Our DB Connection (Hibernate) will decide if an actual commit is required or not
         try
         {
             // As long as we have a valid, writeable database connection,
             // commit any changes made as part of the transaction
-            if (isValid() && !isReadOnly())
+            if (isValid())
             {
                 dispatchEvents();
             }
@@ -516,7 +547,7 @@ public class Context
         try
         {
             // Rollback if we have a database connection, and it is NOT Read Only
-            if (isValid() && !isReadOnly())
+            if (isValid())
             {
                 dbConnection.rollback();
             }
@@ -564,7 +595,7 @@ public class Context
      */
     public boolean isReadOnly()
     {
-        return (options & READ_ONLY) > 0;
+        return mode != null && mode == Mode.READ_ONLY;
     }
 
     public void setSpecialGroup(UUID groupID)
@@ -632,12 +663,65 @@ public class Context
     /**
      * Returns the size of the cache of all object that have been read from the database so far. A larger number
      * means that more memory is consumed by the cache. This also has a negative impact on the query performance. In
-     * that case you should consider clearing the cache (see {@link Context#clearCache() clearCache}).
+     * that case you should consider uncaching entities when they are no longer needed (see {@link Context#uncacheEntity(ReloadableEntity)} () uncacheEntity}).
      *
      * @throws SQLException When connecting to the active cache fails.
      */
     public long getCacheSize() throws SQLException {
         return this.getDBConnection().getCacheSize();
+    }
+
+    /**
+     * Change the mode of this current context.
+     *
+     * BATCH_EDIT: Enabling batch edit mode means that the database connection is configured so that it is optimized to
+     * process a large number of records.
+     *
+     * READ_ONLY: READ ONLY mode will tell the database we are nog going to do any updates. This means it can disable
+     * optimalisations for delaying or grouping updates.
+     *
+     * READ_WRITE: This is the default mode and enables the normal database behaviour. This behaviour is optimal for querying and updating a
+     * small number of records.
+     *
+     * @param newMode The mode to put this context in
+     */
+    public void setMode(Mode newMode) {
+        try {
+            //update the database settings
+            switch (newMode) {
+                case BATCH_EDIT:
+                    dbConnection.setConnectionMode(true, false);
+                    break;
+                case READ_ONLY:
+                    dbConnection.setConnectionMode(false, true);
+                    break;
+                case READ_WRITE:
+                    dbConnection.setConnectionMode(false, false);
+                    break;
+                default:
+                    log.warn("New context mode detected that has nog been configured.");
+                    break;
+            }
+        } catch(SQLException ex) {
+            log.warn("Unable to set database connection mode", ex);
+        }
+
+        //Always clear the cache, except when going from READ_ONLY to READ_ONLY
+        if(mode != Mode.READ_ONLY || newMode != Mode.READ_ONLY) {
+            //clear our read-only cache to prevent any inconsistencies
+            readOnlyCache.clear();
+        }
+
+        //save the new mode
+        mode = newMode;
+    }
+
+    /**
+     * The current database mode of this context.
+     * @return The current mode
+     */
+    public Mode getCurrentMode() {
+        return mode;
     }
 
     /**
@@ -652,16 +736,22 @@ public class Context
      * @param batchModeEnabled When true, batch processing mode will be enabled. If false, it will be disabled.
      * @throws SQLException When configuring the database connection fails.
      */
+    @Deprecated
     public void enableBatchMode(boolean batchModeEnabled) throws SQLException {
-        dbConnection.setOptimizedForBatchProcessing(batchModeEnabled);
+        if(batchModeEnabled) {
+            setMode(Mode.BATCH_EDIT);
+        } else {
+            setMode(Mode.READ_WRITE);
+        }
     }
 
     /**
      * Check if "batch processing mode" is enabled for this context.
      * @return True if batch processing mode is enabled, false otherwise.
      */
+    @Deprecated
     public boolean isBatchModeEnabled() {
-        return dbConnection.isOptimizedForBatchProcessing();
+        return mode != null && mode == Mode.BATCH_EDIT;
     }
 
     /**
@@ -690,7 +780,53 @@ public class Context
         dbConnection.uncacheEntity(entity);
     }
 
-    
+    public Boolean getCachedAuthorizationResult(DSpaceObject dspaceObject, int action, EPerson eperson) {
+        if(isReadOnly()) {
+            return readOnlyCache.getCachedAuthorizationResult(dspaceObject, action, eperson);
+        } else {
+            return null;
+        }
+    }
+
+    public void cacheAuthorizedAction(DSpaceObject dspaceObject, int action, EPerson eperson, Boolean result, ResourcePolicy rp) {
+        if(isReadOnly()) {
+            readOnlyCache.cacheAuthorizedAction(dspaceObject, action, eperson, result);
+            try {
+                uncacheEntity(rp);
+            } catch (SQLException e) {
+                log.warn("Unable to uncache a resource policy when in read-only mode", e);
+            }
+        }
+    }
+
+    public Boolean getCachedGroupMembership(Group group, EPerson eperson) {
+        if(isReadOnly()) {
+            return readOnlyCache.getCachedGroupMembership(group, eperson);
+        } else {
+            return null;
+        }
+    }
+
+    public void cacheGroupMembership(Group group, EPerson eperson, Boolean isMember) {
+        if(isReadOnly()) {
+            readOnlyCache.cacheGroupMembership(group, eperson, isMember);
+        }
+    }
+
+    public void cacheAllMemberGroupsSet(EPerson ePerson, Set<Group> groups) {
+        if(isReadOnly()) {
+            readOnlyCache.cacheAllMemberGroupsSet(ePerson, groups);
+        }
+    }
+
+    public Set<Group> getCachedAllMemberGroupsSet(EPerson ePerson) {
+        if(isReadOnly()) {
+            return readOnlyCache.getCachedAllMemberGroupsSet(ePerson);
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Reload all entities related to this context.
      * @throws SQLException When reloading one of the entities fails.

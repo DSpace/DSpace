@@ -7,16 +7,7 @@
  */
 package org.dspace.curate;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.Iterator;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-
+import org.apache.commons.cli.*;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.factory.CoreServiceFactory;
@@ -24,6 +15,10 @@ import org.dspace.curate.factory.CurateServiceFactory;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.Iterator;
 
 /**
  * CurationCli provides command-line access to Curation tools and processes.
@@ -142,7 +137,7 @@ public class CurationCli
     	}
         EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
 
-        Context c = new Context();
+        Context c = new Context(Context.Mode.BATCH_EDIT);
         if (ePersonName != null)
         {
             EPerson ePerson = ePersonService.findByEmail(c, ePersonName);

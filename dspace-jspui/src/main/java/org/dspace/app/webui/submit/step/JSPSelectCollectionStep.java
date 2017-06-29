@@ -7,15 +7,6 @@
  */
 package org.dspace.app.webui.submit.step;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
@@ -31,6 +22,14 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.submit.step.SelectCollectionStep;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Step which controls selecting a Collection for the Item Submission process
@@ -101,6 +100,9 @@ public class JSPSelectCollectionStep extends JSPStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        Context.Mode originalMode = context.getCurrentMode();
+        context.setMode(Context.Mode.READ_ONLY);
+
         /*
          * Possible parameters from JSP:
          * 
@@ -161,6 +163,8 @@ public class JSPSelectCollectionStep extends JSPStep
             // we need to load the select collection JSP
             JSPStepManager.showJSP(request, response, subInfo, SELECT_COLLECTION_JSP);
         }
+
+        context.setMode(originalMode);
     }
 
     /**

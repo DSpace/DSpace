@@ -7,9 +7,6 @@
  */
 package org.dspace.app.mediafilter;
 
-import java.io.InputStream;
-import java.util.*;
-
 import org.dspace.app.mediafilter.service.MediaFilterService;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
@@ -23,6 +20,9 @@ import org.dspace.eperson.service.GroupService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.InputStream;
+import java.util.*;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
@@ -161,6 +161,7 @@ public class MediaFilterServiceImpl implements MediaFilterService, InitializingB
               ++processed;
           }
           // clear item objects from context cache and internal cache
+          c.uncacheEntity(currentItem);
           currentItem = null;
         }  
     }

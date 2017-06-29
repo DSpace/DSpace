@@ -18,12 +18,14 @@
         <!--Debug property that can be used to display the sql-->
         <property name="show_sql">false</property>
 
-
         <!--Second level cache configuration-->
-        <property name="hibernate.cache.use_second_level_cache">true</property>
         <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="hibernate.cache.use_second_level_cache">true</property>
         <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+        <property name="hibernate.cache.use_structured_entries">true</property>
         <property name="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</property>
+        <!-- Set in config/spring/api/core-hibernate.xml -->
+        <!--<property name="net.sf.ehcache.configurationResourceName">file:${dspace.dir}/config/hibernate-ehcache-config.xml</property>-->
 
 
         <!-- Entities to be loaded by hibernate -->
