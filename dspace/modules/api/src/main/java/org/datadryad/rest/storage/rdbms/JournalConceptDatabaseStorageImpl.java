@@ -17,6 +17,7 @@ import org.datadryad.rest.models.ResultSet;
 import org.datadryad.rest.storage.AbstractOrganizationConceptStorage;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
+import org.dspace.content.MetadataField;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -30,18 +31,26 @@ import org.dspace.JournalUtils;
 public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConceptStorage {
     private static Logger log = Logger.getLogger(JournalConceptDatabaseStorageImpl.class);
 
-    static final String JOURNAL_TABLE = "journal";
+    static final String CONCEPT_TABLE = "conceptmetadatavalue";
+    static final String COLUMN_ID = "parent_id";
 
-    static final String COLUMN_ID = "concept_id";
-    static final String COLUMN_CODE = "code";
-    static final String COLUMN_NAME = "name";
-    static final String COLUMN_ISSN = "issn";
-    static final List<String> JOURNAL_COLUMNS = Arrays.asList(
-            COLUMN_ID,
-            COLUMN_CODE,
-            COLUMN_NAME,
-            COLUMN_ISSN
-    );
+    static int ISSN_FIELD;
+    static int JOURNALCODE_FIELD;
+    static int FULLNAME_FIELD;
+
+    static {
+        Context context = getContext();
+        try {
+            ISSN_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.ISSN)).getFieldID();
+            JOURNALCODE_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.JOURNAL_ID)).getFieldID();
+            FULLNAME_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.FULLNAME)).getFieldID();
+            context.complete();
+            log.error("found fields " + ISSN_FIELD + ", " + JOURNALCODE_FIELD + ", " + FULLNAME_FIELD);
+        } catch (SQLException e) {
+            log.error("couldn't find metadata fields");
+            context.abort();
+        }
+    }
 
     public JournalConceptDatabaseStorageImpl(String configFileName) {
         setConfigFile(configFileName);
@@ -65,11 +74,11 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
         boolean isISSN = Pattern.compile("\\d{4}-\\p{Alnum}{4}").matcher(codeOrISSN).matches();
         String query;
         if (isISSN) {
-            query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE " + COLUMN_ISSN + " = UPPER(?)";
+            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + ISSN_FIELD;
         } else {
-            query = "SELECT * FROM " + JOURNAL_TABLE + " WHERE UPPER(" + COLUMN_CODE + ") = UPPER(?)";
+            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + JOURNALCODE_FIELD;
         }
-        TableRow row = DatabaseManager.querySingleTable(context, JOURNAL_TABLE, query, codeOrISSN);
+        TableRow row = DatabaseManager.querySingleTable(context, CONCEPT_TABLE, query, codeOrISSN);
         if (row != null) {
             return DryadJournalConcept.getJournalConceptMatchingConceptID(context, row.getIntColumn(COLUMN_ID));
         }
