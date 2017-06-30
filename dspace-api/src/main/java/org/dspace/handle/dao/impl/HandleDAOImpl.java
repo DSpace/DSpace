@@ -93,9 +93,10 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     @Override
     public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException
     {
-        String hql = "UPDATE Handle set handle = concat(:newPrefix, '/', substring(handle, locate('/', handle, 0) + 1)) WHERE handle like concat(:oldPrefix,'%')";
+        String hql = "UPDATE Handle set handle = concat(:newPrefix, '/', substring(handle, :oldPrefixLength + 2)) WHERE handle like concat(:oldPrefix,'%')";
         Query query = createQuery(context, hql);
         query.setString("newPrefix", newPrefix);
+        query.setInteger("oldPrefixLength", oldPrefix.length());
         query.setString("oldPrefix", oldPrefix);
         return query.executeUpdate();
     }
