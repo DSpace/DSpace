@@ -7,13 +7,6 @@
  */
 package org.dspace.handle.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.AbstractHibernateDAO;
 import org.dspace.core.Context;
@@ -27,6 +20,13 @@ import org.hibernate.engine.jdbc.dialect.internal.StandardDialectResolver;
 import org.hibernate.engine.jdbc.dialect.spi.DatabaseMetaDataDialectResolutionInfoAdapter;
 import org.hibernate.engine.jdbc.dialect.spi.DialectResolver;
 import org.hibernate.jdbc.ReturningWork;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Handle object.
@@ -94,7 +94,7 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     @Override
     public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException
     {
-        String hql = "UPDATE Handle set handle = concat(:newPrefix,'/',id) WHERE handle like concat(:oldPrefix,'%')";
+        String hql = "UPDATE Handle set handle = concat(:newPrefix, '/', substring(handle, locate('/', handle, 0) + 1)) WHERE handle like concat(:oldPrefix,'%')";
         Query query = createQuery(context, hql);
         query.setString("newPrefix", newPrefix);
         query.setString("oldPrefix", oldPrefix);
