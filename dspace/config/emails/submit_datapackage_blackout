@@ -9,6 +9,7 @@
 # {4}  The submitters full name
 # {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
 # {6}  The formatted dx.doi.org URL
+# {7}  Journal
 #
 Subject: Dryad submission approved pending publication {1}
 
@@ -18,6 +19,7 @@ Thank you for your submission to the Dryad repository. Your data package has bee
 
 Title: {0}
 DOI: {1}
+Journal: {7}
 Journal manuscript number: {5}
 
 You will receive another email when your data package is released. If you did not request a data embargo, your file(s) will be available for download after the article is published.

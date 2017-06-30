@@ -269,7 +269,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public ArrayList<String> getEmailsToNotifyOnArchive() {
-        return getEmails(metadataProperties.getProperty(NOTIFY_ON_ARCHIVE));
+        return getEmails(getConceptMetadataValue(metadataProperties.getProperty(NOTIFY_ON_ARCHIVE)));
     }
 
     public void setEmailsToNotifyOnArchive(ArrayList<String> emails) {
@@ -287,7 +287,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public ArrayList<String> getEmailsToNotifyOnReview() {
-        return getEmails(metadataProperties.getProperty(NOTIFY_ON_REVIEW));
+        return getEmails(getConceptMetadataValue(metadataProperties.getProperty(NOTIFY_ON_REVIEW)));
     }
 
     public void setEmailsToNotifyOnReview(ArrayList<String> emails) {
@@ -305,7 +305,7 @@ public class DryadJournalConcept extends DryadOrganizationConcept {
     }
 
     public ArrayList<String> getEmailsToNotifyWeekly() {
-        return getEmails(metadataProperties.getProperty(NOTIFY_WEEKLY));
+        return getEmails(getConceptMetadataValue(metadataProperties.getProperty(NOTIFY_WEEKLY)));
     }
 
     public void setEmailsToNotifyWeekly(ArrayList<String> emails) {

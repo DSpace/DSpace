@@ -4,7 +4,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.workflow.*;
 import org.dspace.workflow.Step;
 import org.dspace.workflow.WorkflowItem;
@@ -34,7 +33,7 @@ public class ClaimAction extends UserSelectionAction {
         // Create pooled tasks for each member of our group
         if(allMembers != null && allMembers.length > 0){
             WorkflowManager.createPoolTasks(context, wfItem, allMembers, owningStep, getParent());
-            alertUsersOnActivation(context, wfItem, recipient);
+            WorkflowEmailManager.emailUsersOnActivation(context, wfItem, recipient, getParent().getStep().getId());
         }
         else
             log.info(LogManager.getHeader(context, "warning while activating claim action", "No group was found for the following roleid: " + getParent().getStep().getRole().getId()));
@@ -51,30 +50,6 @@ public class ClaimAction extends UserSelectionAction {
             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
         }else{
             return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
-        }
-    }
-
-    public void alertUsersOnActivation(Context c, WorkflowItem wfi, String recipient) throws IOException, SQLException {
-        Email mail = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "submit_datapackage_task"));
-        mail.addArgument(wfi.getItem().getName());
-        //Add the titles of the data files
-        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(c, wfi.getItem());
-        String titles = "";
-        for (Item dataFile : dataFiles) {
-            titles += dataFile.getName() + "\n";
-        }
-        mail.addArgument(titles);
-
-        mail.addArgument(wfi.getSubmitter().getFullName());
-        //TODO: message
-        mail.addArgument("New task available.");
-        mail.addArgument(WorkflowManager.getMyDSpaceLink());
-
-        try {
-            mail.addRecipient(recipient);
-            mail.send();
-        } catch (MessagingException e) {
-            log.info(LogManager.getHeader(c, "error emailing about task", "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
         }
     }
 

@@ -8,12 +8,14 @@
 # {2}  Name(s) of the data file(s)
 # {3}  Reason for the rejection
 # {4}  Link to 'My DSpace' page
+# {5}  Journal
 #
 Subject: Your submission to Dryad: not accepted at this time
 
 You previously submitted a data package to Dryad:
 Title: {0}
 Dryad DOI: {1}
+Journal: {5}
 
 This data package contained the following data files:
 {2}

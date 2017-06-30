@@ -10,6 +10,7 @@
 # {4}  The submitters full name
 # {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
 # {6}  The formatted dx.doi.org URL
+# {7}  Journal
 #
 Subject: Dryad submission approved {1}
 
@@ -19,6 +20,7 @@ Your submission to the Dryad repository has been approved, and is available now 
 
 Title: {0}
 DOI: {1}
+Journal: {7}
 Journal manuscript number: {5}
 
 
