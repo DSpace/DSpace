@@ -275,47 +275,59 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
             }
             init(language);
         }
-        catch (DCInputsReaderException e)
+        catch (Exception e)
         {
             log.error(e.getMessage(), e);
         }
-        Set<String> result = new HashSet<String>();
-        Iterator<String> iterator = dcInputsReader.get(language).getPairsNameIterator();
-        while (iterator.hasNext())
+        if (StringUtils.isNotBlank(language))
         {
-            result.add("valuepairsname_"+iterator.next());
-        }
+            Set<String> result = new HashSet<String>();
+            Iterator<String> iterator = dcInputsReader.get(language)
+                    .getPairsNameIterator();
+            while (iterator.hasNext())
+            {
+                result.add("valuepairsname_" + iterator.next());
+            }
 
-        Set<String> pds = additionalSearchParameter(RPPropertiesDefinition.class);
-        for(String pd : pds) {
-            result.add("crisrp." + pd);
-        }
-        pds = additionalSearchParameter(ProjectPropertiesDefinition.class);
-        for(String pd : pds) {
-            result.add("crisproject." + pd);
-        }
-        pds = additionalSearchParameter(OUPropertiesDefinition.class);
-        for(String pd : pds) {
-            result.add("crisou." + pd);
-        }
-        pds = additionalSearchParameter(DynamicPropertiesDefinition.class);
-        for(String pd : pds) {
-            List<DynamicObjectType> dyn = applicationService.getList(DynamicObjectType.class);
-            for(DynamicObjectType dy : dyn) {
-                if(pd.startsWith(dy.getShortName())) {
-                    result.add("cris" + dy.getShortName() + "." + pd);
+            Set<String> pds = additionalSearchParameter(
+                    RPPropertiesDefinition.class);
+            for (String pd : pds)
+            {
+                result.add("crisrp." + pd);
+            }
+            pds = additionalSearchParameter(ProjectPropertiesDefinition.class);
+            for (String pd : pds)
+            {
+                result.add("crisproject." + pd);
+            }
+            pds = additionalSearchParameter(OUPropertiesDefinition.class);
+            for (String pd : pds)
+            {
+                result.add("crisou." + pd);
+            }
+            pds = additionalSearchParameter(DynamicPropertiesDefinition.class);
+            for (String pd : pds)
+            {
+                List<DynamicObjectType> dyn = applicationService
+                        .getList(DynamicObjectType.class);
+                for (DynamicObjectType dy : dyn)
+                {
+                    if (pd.startsWith(dy.getShortName()))
+                    {
+                        result.add("cris" + dy.getShortName() + "." + pd);
+                    }
                 }
-            }            
-        }
-//        TODO manage nested          
-//        result.addAll(additionalSearchParameter(RPNestedPropertiesDefinition.class));
-//        result.addAll(additionalSearchParameter(ProjectNestedPropertiesDefinition.class));
-//        result.addAll(additionalSearchParameter(OUNestedPropertiesDefinition.class));
-//        result.addAll(additionalSearchParameter(DynamicNestedPropertiesDefinition.class));
+            }
+            // TODO manage nested
+            // result.addAll(additionalSearchParameter(RPNestedPropertiesDefinition.class));
+            // result.addAll(additionalSearchParameter(ProjectNestedPropertiesDefinition.class));
+            // result.addAll(additionalSearchParameter(OUNestedPropertiesDefinition.class));
+            // result.addAll(additionalSearchParameter(DynamicNestedPropertiesDefinition.class));
 
-        for (String rr : result)
-        {
-            solrQuery.addField(rr);
+            for (String rr : result)
+            {
+                solrQuery.addField(rr);
+            }
         }
 
     }
