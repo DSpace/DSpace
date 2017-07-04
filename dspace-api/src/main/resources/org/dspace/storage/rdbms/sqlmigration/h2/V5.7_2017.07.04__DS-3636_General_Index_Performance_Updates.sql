@@ -21,6 +21,7 @@ DROP INDEX IF EXISTS group2groupcache_parent_id_idx;
 DROP INDEX IF EXISTS group2groupcache_child_id_idx;
 DROP INDEX IF EXISTS metadatavalue_mf_place_idx;
 DROP INDEX IF EXISTS bundle2bitstream_bitstream_order_idx;
+DROP INDEX IF EXISTS resourcepolicy_type_id_idx;
 
 CREATE INDEX resourcepolicy_rptype_idx ON resourcepolicy (rptype);
 CREATE INDEX resourcepolicy_action_idx ON resourcepolicy (action_id);
@@ -31,4 +32,4 @@ CREATE INDEX versionitem_versionhistory_id_idx ON versionitem (versionhistory_id
 CREATE INDEX group2groupcache_parent_id_idx ON group2groupcache (parent_id);
 CREATE INDEX group2groupcache_child_id_idx ON group2groupcache (child_id);
 CREATE INDEX bundle2bitstream_bitstream_order_idx ON bundle2bitstream (bitstream_order);
-CREATE INDEX metadatavalue_mf_place_idx ON metadatavalue (metadata_field_id, place);
+CREATE INDEX metadatavalue_mf_place_idx ON metadatavalue (place);

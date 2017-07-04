@@ -109,6 +109,7 @@ public class ResourcePolicy
 
     /**
      * Create a new resource policy based on this one but copy it to another DSpace object
+     * Create and fill in the new ResourcePolicy in 1 statements instead of first creating it and then updating it later on, which would take 2 statement executions
      * @param dso
      * @return
      * @throws SQLException

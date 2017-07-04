@@ -20,7 +20,7 @@ begin
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
@@ -30,17 +30,17 @@ begin
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
 begin
-
-  execute immediate 'DROP INDEX resourcepolicy_resource_type_id_idx';
+-- Note -> This index should actually be called "resourcepolicy_resource_type_id_idx", but this exceeds the identifier length of 30.
+  execute immediate 'DROP INDEX policy_resource_type_id_idx';
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
@@ -50,7 +50,7 @@ begin
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
@@ -60,17 +60,17 @@ begin
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
 begin
-
-  execute immediate 'DROP INDEX versionitem_versionhistory_id_idx';
+-- Note -> This index should actually be called "versionitem_versionhistory_id_idx" by convention, but this exceeds the identifier length of 30.
+  execute immediate 'DROP INDEX versionitem_history_id_idx';
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
@@ -80,7 +80,7 @@ begin
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
@@ -90,17 +90,17 @@ begin
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
     index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
 begin
-
-  execute immediate 'DROP INDEX bundle2bitstream_bitstream_order_idx';
+-- Note -> This index should actually be called "bundle2bitstream_bitstream_order_idx" by convention, but this exceeds the identifier length of 30.
+  execute immediate 'DROP INDEX bundle2bitstream_bit_order_idx';
   exception
   when index_not_exists then null;
 end;
-
+/
 declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
@@ -110,15 +110,31 @@ begin
   exception
   when index_not_exists then null;
 end;
+/
+declare
+  index_not_exists EXCEPTION;
+  PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
+begin
 
+  execute immediate 'DROP INDEX resourcepolicy_type_id_idx';
+  exception
+  when index_not_exists then null;
+end;
+/
 
 CREATE INDEX resourcepolicy_rptype_idx ON resourcepolicy (rptype);
 CREATE INDEX resourcepolicy_action_idx ON resourcepolicy (action_id);
-CREATE INDEX resourcepolicy_resource_type_id_idx ON resourcepolicy(resource_type_id );
 CREATE INDEX resourcepolicy_resource_id_idx ON resourcepolicy(resource_id );
 CREATE INDEX versionitem_item_id_idx ON versionitem (item_id);
-CREATE INDEX versionitem_versionhistory_id_idx ON versionitem (versionhistory_id);
 CREATE INDEX group2groupcache_parent_id_idx ON group2groupcache (parent_id);
 CREATE INDEX group2groupcache_child_id_idx ON group2groupcache (child_id);
-CREATE INDEX bundle2bitstream_bitstream_order_idx ON bundle2bitstream (bitstream_order);
-CREATE INDEX metadatavalue_mf_place_idx ON metadatavalue (metadata_field_id, place);
+CREATE INDEX metadatavalue_mf_place_idx ON metadatavalue (place);
+
+-- The following indexes do NOT adhere to previously used index naming conventions, but these would exceed the ORACLE defined identifier length of 30 characters
+
+-- Note -> This index should actually be called "versionitem_versionhistory_id_idx" by convention, but this exceeds the identifier length of 30.
+CREATE INDEX versionitem_history_id_idx ON versionitem (versionhistory_id);
+-- Note -> This index should actually be called "bundle2bitstream_bitstream_order_idx" by convention, but this exceeds the identifier length of 30.
+CREATE INDEX bundle2bitstream_bit_order_idx ON bundle2bitstream (bitstream_order);
+-- Note -> This index should actually be called "resourcepolicy_resource_type_id_idx" by convention, but this exceeds the identifier length of 30.
+CREATE INDEX policy_resource_type_id_idx ON resourcepolicy(resource_type_id );
