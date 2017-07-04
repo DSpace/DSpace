@@ -50,7 +50,7 @@ public class PubmedEuropeUtils
         Element pmc = XMLUtils.getSingleElement(pubArticle, "pmcid"); 
         String pmcID = "";
         if(pmc!= null){
-            XMLUtils.getElementValue(pubArticle,
+        	pmcID = XMLUtils.getElementValue(pubArticle,
                     "pmcid");
             record.addValue("pmcid", new StringValue(pmcID));
         }

@@ -972,7 +972,8 @@
   	</bean>
 	<bean name="pubmedOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
 		<property name="outputMap" ref="outputMap"/>
-		<property name="sourceIdMetadata" value="dc.identifier.pmid" />		
+		<property name="sourceIdMetadata" value="dc.identifier.pmid" />
+		<property name="providerName" value="pubmedEurope" />		
 	</bean>
 
 	<!-- SCOPUS FEED -->

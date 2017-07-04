@@ -17,7 +17,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace"%>
 <%@page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 
-<c:set var="dspace.layout.head" scope="request">
+<c:set var="dspace.layout.head.last" scope="request">
 	<script type="text/javascript" src="<%= request.getContextPath() %>/static/js/jquery/jquery-1.8.2.min.js"></script>
 		<script type="text/javascript">
 	var j = jQuery.noConflict();
@@ -47,7 +47,7 @@
 	</c:if>
 
 	<display:table name="${listUsers}" cellspacing="0" cellpadding="0" 
-			requestURI="" id="objectList" htmlId="objectList"  class="displaytaglikemisctable" export="false">
+			requestURI="" id="objectList" htmlId="objectList"  class="table" export="false">
 			<display:column titleKey="jsp.layout.table.hku.ws.type" sortable="true">
 					${objectList.typeDef}
 			</display:column>

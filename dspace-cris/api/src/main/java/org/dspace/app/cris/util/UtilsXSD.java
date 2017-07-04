@@ -36,23 +36,23 @@ import org.dspace.core.ConfigurationManager;
  */
 public class UtilsXSD
 {
-    public static final String NAMESPACE_TARGET = "http://cineca.github.io/dspace-cris/definitions";
-    public static final String NAMESPACE_CRIS = "http://cineca.github.io/dspace-cris/schemas";
+    public static final String NAMESPACE_TARGET = "http://4science.github.io/dspace-cris/definitions";
+    public static final String NAMESPACE_CRIS = "http://4science.github.io/dspace-cris/schemas";
     public static final String NAMESPACE_PREFIX_CRIS = "cris";
     
-    public static final String NAMESPACE_RP = "http://cineca.github.io/dspace-cris/researcherpage/schemas";
+    public static final String NAMESPACE_RP = "http://4science.github.io/dspace-cris/researcherpage/schemas";
     public static final String NAMESPACE_PREFIX_RP = "rp";
     
-    public static final String NAMESPACE_PJ = "http://cineca.github.io/dspace-cris/grant/schemas";
+    public static final String NAMESPACE_PJ = "http://4science.github.io/dspace-cris/grant/schemas";
     public static final String NAMESPACE_PREFIX_PJ = "grant";
     
-    public static final String NAMESPACE_OU = "http://cineca.github.io/dspace-cris/orgunit/schemas";
+    public static final String NAMESPACE_OU = "http://4science.github.io/dspace-cris/orgunit/schemas";
     public static final String NAMESPACE_PREFIX_OU = "orgunit";
     
-    public static final String NAMESPACE_DO = "http://cineca.github.io/dspace-cris/orgunit/schemas";
+    public static final String NAMESPACE_DO = "http://4science.github.io/dspace-cris/orgunit/schemas";
     public static final String NAMESPACE_PREFIX_DO = "researchobject";
     
-    public static final String NAMESPACE_ITEM = "http://cineca.github.io/dspace-cris/publications/schemas";
+    public static final String NAMESPACE_ITEM = "http://4science.github.io/dspace-cris/publications/schemas";
     public static final String NAMESPACE_PREFIX_ITEM = "item";
 
     public static final String[] RP_DEFAULT_ELEMENT = new String[] {
@@ -102,21 +102,21 @@ public class UtilsXSD
     }
     
     public static <PD extends PropertiesDefinition> String[] getNamespace(Class<PD> clazz) {
-    	String namespacePrefix = NAMESPACE_PREFIX_DO+":";
+    	String namespacePrefix = NAMESPACE_PREFIX_DO;
 	 	String namespace = NAMESPACE_DO;
     	if (clazz.isAssignableFrom(ProjectPropertiesDefinition.class))
         {
-            namespacePrefix = NAMESPACE_PREFIX_PJ+":";
+            namespacePrefix = NAMESPACE_PREFIX_PJ;
     	 	namespace = NAMESPACE_PJ;
         }
         else if (clazz.isAssignableFrom(RPPropertiesDefinition.class))
         {
-            namespacePrefix = NAMESPACE_PREFIX_RP+":";
+            namespacePrefix = NAMESPACE_PREFIX_RP;
             namespace = NAMESPACE_RP;
     	}
         else if (clazz.isAssignableFrom(OUPropertiesDefinition.class))
         {
-            namespacePrefix = NAMESPACE_PREFIX_OU+":";
+            namespacePrefix = NAMESPACE_PREFIX_OU;
             namespace = NAMESPACE_OU;
         }
     	return new String[]{namespacePrefix, namespace};
@@ -155,8 +155,8 @@ public class UtilsXSD
 
         if (namespaceValue == null || targetNamespace == null)
         {
-            namespaceValue = "http://www.cilea.it/researcherpage/schemas";
-            targetNamespace = "http://www.cilea.it/researcherpage/schemas";
+            namespaceValue = "http://4science.github.io/dspace-cris/researcherpage/schemas";
+            targetNamespace = "http://4science.github.io/dspace-cris/researcherpage/schemas";
         }
 
         writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");

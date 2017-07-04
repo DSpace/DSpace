@@ -109,7 +109,11 @@ public class ImpRecordOutputGenerator implements OutputGenerator {
             {
                 for (Value value : values)
                 {
-                    ImpRecordMetadata strVal= splitValue(value.getAsString());
+                    String asString = value.getAsString();
+                	if(!StringUtils.isNotBlank(asString)){
+                		continue;
+                	}
+					ImpRecordMetadata strVal= splitValue(asString);
                 	if(!StringUtils.isNotBlank(strVal.getValue())){
                 		continue;
                 	}

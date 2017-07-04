@@ -200,7 +200,7 @@ public class CustomRequestPayloadValidatingInterceptor extends
                                     metadataALL,
                                     filexsd,
                                     "reqgrant:",
-                                    "http://www.cilea.it/grant/listmetadata/schemas",
+                                    "http://4science.github.io/dspace-cris/grant/listmetadata/schemas",
                                     "GRANTmetadata");
                 }
                 else if (clazz.isAssignableFrom(RPPropertiesDefinition.class))
@@ -211,7 +211,7 @@ public class CustomRequestPayloadValidatingInterceptor extends
                                     metadataALL,
                                     filexsd,
                                     "reqrp:",
-                                    "http://www.cilea.it/researcherpage/listmetadata/schemas",
+                                    "http://4science.github.io/dspace-cris/researcherpage/listmetadata/schemas",
                                     "RPmetadata");
                 }
                 else if (clazz.isAssignableFrom(OUPropertiesDefinition.class))
@@ -222,7 +222,7 @@ public class CustomRequestPayloadValidatingInterceptor extends
                                     metadataALL,
                                     filexsd,
                                     "reqou:",
-                                    "http://www.cilea.it/orgunit/listmetadata/schemas",
+                                    "http://4science.github.io/dspace-cris/orgunit/listmetadata/schemas",
                                     "OUmetadata");
                 }
             }

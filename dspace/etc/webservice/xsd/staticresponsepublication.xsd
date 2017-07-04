@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:item="http://www.cilea.it/publications/schemas"
+<xs:schema xmlns:item="http://4science.github.io/dspace-cris/publications/schemas"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-	targetNamespace="http://www.cilea.it/publications/schemas">
+	targetNamespace="http://4science.github.io/dspace-cris/publications/schemas">
 
 	<xs:element name="crisobjects" type="item:ItemValueList"></xs:element>
 

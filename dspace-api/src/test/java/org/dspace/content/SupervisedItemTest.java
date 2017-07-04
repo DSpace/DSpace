@@ -154,7 +154,7 @@ public class SupervisedItemTest extends AbstractUnitTest
     @Test
     public void testGetSupervisorGroups_0args() throws Exception 
     {
-        Group[] found = si.getSupervisorGroups();
+        Group[] found = si.getSupervisorGroups(context);
         assertThat("testGetSupervisorGroups_0args 0", found, notNullValue());
         assertTrue("testGetSupervisorGroups_0args 1", found.length == 1);
 
