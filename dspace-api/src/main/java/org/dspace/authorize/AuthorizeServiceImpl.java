@@ -612,7 +612,10 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
         for (ResourcePolicy srp : policies)
         {
-            srp.copyToDSpaceObject(dest);
+            ResourcePolicy policy = resourcePolicyService.create(c);
+            policy = srp.copyToDSpaceObject(policy,dest);
+            resourcePolicyService.update(c,policy);
+            newPolicies.add(policy);
         }
 
         resourcePolicyService.update(c, newPolicies);

@@ -136,11 +136,11 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
 
     /**
      * Create a new resource policy based on this one but copy it to another DSpace object
+     * @param policy
      * @param dso
      * @return ResourcePolicy
      */
-    public ResourcePolicy copyToDSpaceObject(DSpaceObject dso) {
-        ResourcePolicy policy = new ResourcePolicy();
+    public ResourcePolicy copyToDSpaceObject(ResourcePolicy policy, DSpaceObject dso) {
         policy.setdSpaceObject(dso);
         policy.setAction(getAction());
         if(getEPerson()!=null){
@@ -154,6 +154,7 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
         policy.setRpName(getRpName());
         policy.setRpDescription(getRpDescription());
         policy.setRpType(getRpType());
+
         return policy;
     }
 
