@@ -7,14 +7,16 @@
  */
 package org.dspace.handle;
 
+import org.apache.log4j.Logger;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.discovery.IndexClient;
+import org.dspace.storage.rdbms.DatabaseManager;
+import org.dspace.storage.rdbms.TableRow;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
-import org.dspace.core.Context;
-import org.dspace.storage.rdbms.DatabaseManager;
-import org.dspace.storage.rdbms.TableRow;
-import org.dspace.discovery.IndexClient;
 
 /**
  * A script to update the handle values in the database. This is typically used
@@ -84,7 +86,7 @@ public class UpdateHandlePrefix
                         // Make the changes
                         System.out.print("\nUpdating handle table... ");
                         sql = "UPDATE handle " +
-                              "SET handle = '" + newH + "' || '/' || handle_id " +
+                              "SET handle = '" + newH + "' || '/' || substr(handle, " + oldH.length() + "+2) " +
                               "WHERE handle like '" + oldH + "/%'";
                         int updHdl = DatabaseManager.updateQuery(context, sql, new Object[] {});
                         System.out.println(
@@ -92,15 +94,16 @@ public class UpdateHandlePrefix
                         );
 
                         System.out.print("Updating metadatavalues table... ");
+                        String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
                         sql = "UPDATE metadatavalue " +
                               "SET text_value = " +
                                 "(" +
-                                  "SELECT 'http://hdl.handle.net/' || handle " +
+                                  "SELECT '" + handlePrefix + "' || handle " +
                                   "FROM handle " +
                                   "WHERE handle.resource_id = metadatavalue.resource_id " +
                                     "AND handle.resource_type_id = 2" +
                                 ") " +
-                              "WHERE text_value LIKE 'http://hdl.handle.net/" + oldH + "/%'" +
+                              "WHERE text_value LIKE '" + handlePrefix + oldH + "/%'" +
                                 "AND EXISTS " +
                                   "(" +
                                     "SELECT 1 " +
