@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 import org.apache.log4j.Logger;
-
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -106,6 +105,37 @@ public class ResourcePolicy
             log.error("Error while comparing ResourcePolicy objects", ex);
         }
         return false;
+    }
+
+    /**
+     * Create a new resource policy based on this one but copy it to another DSpace object
+     * @param dso
+     * @return
+     * @throws SQLException
+     */
+    public ResourcePolicy copyToDSpaceObject(DSpaceObject dso) throws SQLException {
+        TableRow row = DatabaseManager.row("ResourcePolicy");
+
+        row.setColumn("resource_type_id", dso.getType());
+        row.setColumn("resource_id", dso.getID());
+        row.setColumn("action_id", getAction());
+        if(getEPerson() != null)
+        {
+            row.setColumn("eperson_id", getEPerson().getID());
+        }
+        if(getGroup() != null)
+        {
+            row.setColumn("epersongroup_id", getGroup().getID());
+        }
+        row.setColumn("start_date", getStartDate());
+        row.setColumn("end_date", getEndDate());
+        row.setColumn("rpname", getRpName());
+        row.setColumn("rpdescription", getRpDescription());
+        row.setColumn("rptype", getRpType());
+
+        DatabaseManager.insert(myContext, row);
+        return new ResourcePolicy(myContext, row);
+
     }
 
     /**
