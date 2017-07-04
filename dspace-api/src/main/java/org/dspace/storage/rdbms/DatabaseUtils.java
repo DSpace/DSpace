@@ -579,7 +579,7 @@ public class DatabaseUtils
         
         if(tableExists(connection, "cris_rp_box2policygroup")) {
             if(tableColumnExists(connection, "imp_bitstream", "md5value", null, null)) {
-                return "5.6.2.0";
+                return "5.7.0.0";
             }
             if(tableColumnExists(connection, "cris_rp_box2policygroup", "authorizedgroup_id", null, null)) {
                 return "5.6.0.1";
