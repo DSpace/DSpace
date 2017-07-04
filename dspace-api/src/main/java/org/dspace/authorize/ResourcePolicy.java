@@ -135,6 +135,29 @@ public class ResourcePolicy implements ReloadableEntity<Integer> {
     }
 
     /**
+     * Create a new resource policy based on this one but copy it to another DSpace object
+     * @param dso
+     * @return ResourcePolicy
+     */
+    public ResourcePolicy copyToDSpaceObject(DSpaceObject dso) {
+        ResourcePolicy policy = new ResourcePolicy();
+        policy.setdSpaceObject(dso);
+        policy.setAction(getAction());
+        if(getEPerson()!=null){
+            policy.setEPerson(getEPerson());
+        }
+        if(getGroup()!=null){
+            policy.setGroup(getGroup());
+        }
+        policy.setStartDate(getStartDate());
+        policy.setEndDate(getEndDate());
+        policy.setRpName(getRpName());
+        policy.setRpDescription(getRpDescription());
+        policy.setRpType(getRpType());
+        return policy;
+    }
+
+    /**
      * Return a hash code for this object.
      *
      * @return int hash of object
