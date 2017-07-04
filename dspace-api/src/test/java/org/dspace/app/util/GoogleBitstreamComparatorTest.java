@@ -115,9 +115,9 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
-        assertEquals("WORD should be first",  "bitstream2", toSort.get(0).getName());
-        assertEquals("RTF second", "bitstream1", toSort.get(1).getName());
-        assertEquals("PS next", "bitstream3", toSort.get(2).getName());
+        assertEquals("WORD should be first as its type has the highest priority",  "bitstream2", toSort.get(0).getName());
+        assertEquals("RTF should be second as its type priority is right after Word", "bitstream1", toSort.get(1).getName());
+        assertEquals("PS should be last as it has the lowest type priority", "bitstream3", toSort.get(2).getName());
     }
 
     /**
@@ -156,9 +156,9 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
-        assertEquals("Same size and mimetype, so just pick the first one", "bitstream1", toSort.get(0).getName());
-        assertEquals("bitstream2", toSort.get(1).getName());
-        assertEquals("bitstream3", toSort.get(2).getName());
+        assertEquals("Bitstreams have same size and type, so order should remain unchanged", "bitstream1", toSort.get(0).getName());
+        assertEquals("Bitstreams have same size and type, so order should remain unchanged", "bitstream2", toSort.get(1).getName());
+        assertEquals("Bitstreams have same size and type, so order should remain unchanged", "bitstream3", toSort.get(2).getName());
     }
 
     /**
@@ -178,7 +178,7 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
         assertEquals("bitstream3", toSort.get(0).getName());
         assertEquals("bitstream2", toSort.get(1).getName());
-        assertEquals("bitstream1",toSort.get(2).getName());
+        assertEquals("Unknown mime-types should always have the lowest priority", "bitstream1",toSort.get(2).getName());
     }
 
     /**
@@ -196,9 +196,9 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
-        assertEquals("bitstream2", toSort.get(0).getName());
-        assertEquals("bitstream1", toSort.get(1).getName());
-        assertEquals("bitstream3", toSort.get(2).getName());
+        assertEquals("bitstream2 should come first as it is the largest and all types are equal", "bitstream2", toSort.get(0).getName());
+        assertEquals("bitstream1 should come second as it is the second largest and all types are equal", "bitstream1", toSort.get(1).getName());
+        assertEquals("bitstream3 should come last as it is the smallest and all types are equal", "bitstream3", toSort.get(2).getName());
     }
 
     /**
@@ -213,9 +213,9 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
-        assertEquals("PS should be first", "bitstream3", toSort.get(0).getName());
-        assertEquals("RTF second", "bitstream1", toSort.get(1).getName());
-        assertEquals("Word third", "bitstream2", toSort.get(2).getName());
+        assertEquals("According to the updated type prioritization, PS should be first", "bitstream3", toSort.get(0).getName());
+        assertEquals("According to the updated type prioritization, RTF should come second", "bitstream1", toSort.get(1).getName());
+        assertEquals("According to the updated type prioritization, Word has to be last", "bitstream2", toSort.get(2).getName());
     }
 
     /**
@@ -229,9 +229,9 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
-        assertEquals("bitstream2", toSort.get(0).getName());
-        assertEquals("bitstream1", toSort.get(1).getName());
-        assertEquals("bitstream3", toSort.get(2).getName());
+        assertEquals("bitstream2 should come first as it is the largest and there are no types", "bitstream2", toSort.get(0).getName());
+        assertEquals("bitstream1 should come second as it is the second largest and there are no types", "bitstream1", toSort.get(1).getName());
+        assertEquals("bitstream3 should come last as it is the smallest and there are no types", "bitstream3", toSort.get(2).getName());
     }
 
     /**
@@ -278,9 +278,12 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
-        assertEquals("PS should be first", "bitstream3", toSort.get(0).getName());
-        assertEquals("RTF second", "bitstream2", toSort.get(1).getName());
-        assertEquals("Word third", "bitstream1", toSort.get(2).getName());
+        assertEquals("PS should be first because it is the largest one and there is no type prioritization",
+                "bitstream3", toSort.get(0).getName());
+        assertEquals("RTF should come second because it is the second largest and there is no type prioritization",
+                "bitstream2", toSort.get(1).getName());
+        assertEquals("Word has to be last (third) as it is the smallest one and there is no type prioritization",
+                "bitstream1", toSort.get(2).getName());
     }
 
     /**
@@ -298,9 +301,9 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
-        assertEquals("bitstream3", toSort.get(0).getName());
-        assertEquals("bitstream2", toSort.get(1).getName());
-        assertEquals("bitstream1", toSort.get(2).getName());
+        assertEquals("bitstream3 should come first as it is the largest and there is no type prioritization configured", "bitstream3", toSort.get(0).getName());
+        assertEquals("bitstream2 should come second as it is the second largest and there is no type prioritization configured", "bitstream2", toSort.get(1).getName());
+        assertEquals("bitstream1 should come last as it is the smallest and there is no type prioritization configured", "bitstream1", toSort.get(2).getName());
     }
 
     /**
@@ -332,30 +335,25 @@ public class GoogleBitstreamComparatorTest extends AbstractUnitTest{
         when(bitstreamFormat1.getMIMEType()).thenReturn("text/richtext");
         when(bitstreamFormat2.getMIMEType()).thenReturn("application/msword");
         when(bitstreamFormat3.getMIMEType()).thenReturn("audio/x-wav");
-        when(bitstream1.getSize()).thenReturn(new Long(100));
+        when(bitstream1.getSize()).thenReturn(new Long(300));
         when(bitstream2.getSize()).thenReturn(new Long(200));
-        when(bitstream3.getSize()).thenReturn(new Long(300));
+        when(bitstream3.getSize()).thenReturn(new Long(100));
 
         List<Bitstream> toSort = bundle.getBitstreams();
         Collections.sort(toSort, new GoogleBitstreamComparator(context, settings));
-        assertEquals("bitstream3", toSort.get(0).getName());
-        assertEquals("bitstream2", toSort.get(1).getName());
-        assertEquals("bitstream1", toSort.get(2).getName());
+        assertEquals("bitstream3 has the type with the highest priority (thus ignoring its size) and should come first",
+                "bitstream3", toSort.get(0).getName());
+        assertEquals("bitstream2 has a type with a priority higher than bitstream1 (size is ignored) and should come second",
+                "bitstream2", toSort.get(1).getName());
+        assertEquals("bitstream1 has a type with the lowest priority in this bundle eventhough it is the largest bitstream and should come last",
+                "bitstream1", toSort.get(2).getName());
     }
-
-
+    
     @After
     public void destroy()
     {
         settings = null;
         super.destroy();
     }
-
-
-
-
-
-
-
 
 }
