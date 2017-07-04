@@ -7,15 +7,9 @@
  */
 package org.dspace.content;
 
-import org.databene.contiperf.Required;
-import org.databene.contiperf.PerfTest;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.UUID;
 import org.apache.log4j.Logger;
+import org.databene.contiperf.PerfTest;
+import org.databene.contiperf.Required;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -28,8 +22,16 @@ import org.dspace.eperson.service.GroupService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
+
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This is an integration test to ensure collections and communities interact properly.
@@ -91,8 +93,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest
     @Test
     @PerfTest(invocations = 25, threads = 1)
     @Required(percentile95 = 1200, average = 700, throughput = 1)
-    public void testCreateTree() throws SQLException, AuthorizeException
-    {
+    public void testCreateTree() throws SQLException, AuthorizeException, IOException {
         //we create the structure
         context.turnOffAuthorisationSystem();
         Community parent = communityService.create(null, context);
@@ -108,6 +109,9 @@ public class ITCommunityCollection extends AbstractIntegrationTest
         assertThat("testCreateTree 1", child1.getParentCommunities().get(0), equalTo(parent));
         assertThat("testCreateTree 2", (Community) collectionService.getParentObject(context, col1), equalTo(child1));
         assertThat("testCreateTree 3", (Community) collectionService.getParentObject(context, col2), equalTo(child1));
+
+        context.turnOffAuthorisationSystem();
+        communityService.delete(context, parent);
     }
     
     /**
@@ -116,8 +120,7 @@ public class ITCommunityCollection extends AbstractIntegrationTest
     @Test
     @PerfTest(invocations = 25, threads = 1)
     @Required(percentile95 = 1200, average = 700, throughput = 1)
-    public void testCreateItems() throws SQLException, AuthorizeException
-    {
+    public void testCreateItems() throws SQLException, AuthorizeException, IOException {
         //we create the structure
         context.turnOffAuthorisationSystem();
         Community parent = communityService.create(null, context);
@@ -134,6 +137,9 @@ public class ITCommunityCollection extends AbstractIntegrationTest
         //verify it works as expected
         assertThat("testCreateItems 0", (Collection) itemService.getParentObject(context, item1), equalTo(col1));
         assertThat("testCreateItems 1", (Collection) itemService.getParentObject(context, item2), equalTo(col2));
+
+        context.turnOffAuthorisationSystem();
+        communityService.delete(context, parent);
     }
 
      /**
@@ -179,6 +185,9 @@ public class ITCommunityCollection extends AbstractIntegrationTest
         assertThat("testCountItems 1", itemService.countItems(context, col2), equalTo(collTotalItems));
         assertThat("testCountItems 2", itemService.countItems(context, childCom), equalTo(totalitems));
         assertThat("testCountItems 3", itemService.countItems(context, parentCom), equalTo(totalitems));
+
+        context.turnOffAuthorisationSystem();
+        communityService.delete(context, parentCom);
     }
 
      /**
