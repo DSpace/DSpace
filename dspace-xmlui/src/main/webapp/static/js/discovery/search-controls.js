@@ -47,7 +47,8 @@
                     $link = $link.find('a');
                 }
                 //Retrieve the params we are to fill in in our main form
-                var params = $link.attr('href').split('&');
+                var separators = ['\\\&', '\\\?'];
+                var params = $link.attr('href').split(new RegExp(separators.join('|'), 'g'));
 
                 var mainForm = $('form#aspect_discovery_SimpleSearch_div_main-form');
                 //Split them & fill in in the main form, when done submit the main form !
