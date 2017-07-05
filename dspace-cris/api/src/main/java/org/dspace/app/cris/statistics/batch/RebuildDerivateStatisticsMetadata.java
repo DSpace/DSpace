@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -23,7 +22,10 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.dspace.app.cris.model.CrisConstants;
+import org.dspace.app.cris.model.ACrisObject;
+import org.dspace.app.cris.model.OrganizationUnit;
+import org.dspace.app.cris.model.Project;
+import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.content.DSpaceObject;
@@ -54,6 +56,7 @@ public class RebuildDerivateStatisticsMetadata
     
         options.addOption("y", "year", true, "Year");
         options.addOption("c", "crisentity", true, "Cris entity");
+        options.addOption("o", "other", true, "Other DSpace type");
         
         try {
             line = new PosixParser().parse(options, args);
@@ -77,24 +80,29 @@ public class RebuildDerivateStatisticsMetadata
         
         SolrDocumentList sdl = null;
         
-        boolean year = false;
-        if (line.hasOption("y")) {
+        int dspaceType = Constants.ITEM;
+        if (line.hasOption("o")) {
+            dspaceType = Integer.parseInt(line.getOptionValue("o"));
+        }
+        
+        boolean year = line.hasOption("y");
+        
+        if (year) {
             System.out.println("YEAR");
-            sdl = indexer.getRawData(Constants.ITEM, Integer.parseInt(line.getOptionValue("y")));
-            year = true;
+            sdl = indexer.getRawData(dspaceType, Integer.parseInt(line.getOptionValue("y")));
         } else {
             System.out.println("ALL");
-            sdl = indexer.getRawData(Constants.ITEM);
+            sdl = indexer.getRawData(dspaceType);
         }
         
         System.out.println("Found " + sdl.getNumFound()
                 + " access in the statistics core");
         HttpSolrServer solr = indexer.getSolr();
         if(year) {
-            indexer.deleteByTypeAndYear(Constants.ITEM, Integer.parseInt(line.getOptionValue("y")));
+            indexer.deleteByTypeAndYear(dspaceType, Integer.parseInt(line.getOptionValue("y")));
         }
         else {
-            indexer.deleteByType(Constants.ITEM);
+            indexer.deleteByType(dspaceType);
         }
         solr.commit();
         System.out.println("Remove old data");
@@ -135,11 +143,13 @@ public class RebuildDerivateStatisticsMetadata
         solr.optimize();
 
         if(!year && line.hasOption("c")) {
-            sdl = indexer.getRawData(CrisConstants.RP_TYPE_ID);
+            
+            Integer crisType = Integer.parseInt(line.getOptionValue("c"));
+            sdl = indexer.getRawData(crisType);
             System.out.println("Found " + sdl.getNumFound()
                     + " access in the RP statistics core");
             HttpSolrServer rpsolr = indexer.getSolr();
-            indexer.deleteByType(CrisConstants.RP_TYPE_ID);
+            indexer.deleteByType(crisType);
             rpsolr.commit();
     
             System.out.println("Remove old data");
@@ -154,8 +164,24 @@ public class RebuildDerivateStatisticsMetadata
                         + sdl.getNumFound());
                 SolrInputDocument sdi = ClientUtils.toSolrInputDocument(sd);
                 Integer id = (Integer) sd.getFieldValue("id");
-    
-                ResearcherPage rp = as.get(ResearcherPage.class, id);
+                
+                ACrisObject rp = null;
+                switch (crisType)
+                {
+                case 9:
+                    rp = as.get(ResearcherPage.class, id);
+                    break;
+                case 10:
+                    rp = as.get(Project.class, id);
+                    break;
+                case 11:
+                    rp = as.get(OrganizationUnit.class, id);
+                    break;
+                default:
+                    rp = as.get(ResearchObject.class, id);
+                    break;
+                }
+                    
                 if (rp == null)
                     continue;
     
