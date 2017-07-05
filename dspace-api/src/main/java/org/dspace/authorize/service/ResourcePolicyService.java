@@ -69,4 +69,6 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public void removeDsoAndTypeNotEqualsToPolicies(Context c, DSpaceObject o, String type) throws SQLException, AuthorizeException;
 
+    public ResourcePolicy copyToDSpaceObject(Context context, ResourcePolicy srp, DSpaceObject dso) throws SQLException;
+
 }
