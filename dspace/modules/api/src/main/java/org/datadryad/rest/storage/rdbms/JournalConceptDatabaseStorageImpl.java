@@ -34,18 +34,14 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
     static final String CONCEPT_TABLE = "conceptmetadatavalue";
     static final String COLUMN_ID = "parent_id";
 
-    static int ISSN_FIELD;
-    static int JOURNALCODE_FIELD;
-    static int FULLNAME_FIELD;
+    static int ISSN_FIELD = 141;
+    static int JOURNALCODE_FIELD = 121;
+    static int FULLNAME_FIELD = 151;
 
     static {
         Context context = getContext();
         try {
-            ISSN_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.ISSN)).getFieldID();
-            JOURNALCODE_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.JOURNAL_ID)).getFieldID();
-            FULLNAME_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.FULLNAME)).getFieldID();
             context.complete();
-            log.error("found fields " + ISSN_FIELD + ", " + JOURNALCODE_FIELD + ", " + FULLNAME_FIELD);
         } catch (SQLException e) {
             log.error("couldn't find metadata fields");
             context.abort();
