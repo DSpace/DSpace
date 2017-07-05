@@ -8,7 +8,8 @@
 package org.dspace.rest.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -49,8 +50,16 @@ public class ResourcePolicy{
 			break;
 		}
 
-		this.epersonId = dspacePolicy.getEPerson().getID().toString();
-		this.groupId = dspacePolicy.getGroup().getID().toString();
+                EPerson ePerson = dspacePolicy.getEPerson();
+                if(ePerson != null) {
+                    this.epersonId = ePerson.getID().toString();
+                }
+
+                Group group = dspacePolicy.getGroup();
+                if(group != null) {
+                    this.groupId = group.getID().toString();
+                }
+
 		this.resourceId = dspacePolicy.getdSpaceObject().getID().toString();
 		this.rpDescription = dspacePolicy.getRpDescription();
 		this.rpName = dspacePolicy.getRpName();
