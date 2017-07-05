@@ -144,8 +144,10 @@ public class FlowItemUtils
 		// check for old pub name in case that changed
 		StringBuilder provenance = new StringBuilder();
 		DCValue[] pubnames = item.getMetadata(PUBLICATION_NAME);
+		String oldPub = "";
 		if (pubnames != null && pubnames.length > 0) {
-			provenance.append(WorkflowManager.getEPersonName(context.getCurrentUser())).append(" updated ").append(PUBLICATION_NAME).append(": changed from ").append(pubnames[0].value);
+			oldPub = pubnames[0].value;
+			provenance.append(WorkflowManager.getEPersonName(context.getCurrentUser())).append(" updated ").append(PUBLICATION_NAME).append(": changed from ").append(oldPub);
 		}
 		
 		// STEP 1:
@@ -222,7 +224,7 @@ public class FlowItemUtils
                                              value, authority, iconf);
 
 			// if the thing that was changed was the pub name, add provenance:
-			if (PUBLICATION_NAME.replaceAll("\\.", "_").equals(name)) {
+			if (PUBLICATION_NAME.replaceAll("\\.", "_").equals(name) && !oldPub.equals(value)) {
 				provenance.append(" to ").append(value).append(" on ").append(DCDate.getCurrent().toString()).append(" (GMT)");
 				item.addMetadata(PROVENANCE, "en", provenance.toString(), null, -1);
 			}
