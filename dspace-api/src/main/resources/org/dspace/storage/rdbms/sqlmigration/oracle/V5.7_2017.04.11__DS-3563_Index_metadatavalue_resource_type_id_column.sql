@@ -19,5 +19,5 @@ begin
   exception
   when index_not_exists then null;
 end;
-
+/
 CREATE INDEX metadatavalue_type_id_idx ON metadatavalue (resource_type_id);
