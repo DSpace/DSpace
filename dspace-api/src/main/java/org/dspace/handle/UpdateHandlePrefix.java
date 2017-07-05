@@ -101,7 +101,7 @@ public class UpdateHandlePrefix
                                   "SELECT '" + handlePrefix + "' || handle " +
                                   "FROM handle " +
                                   "WHERE handle.resource_id = metadatavalue.resource_id " +
-                                    "AND handle.resource_type_id = 2" +
+                                    "AND handle.resource_type_id = metadatavalue.resource_type_id " +
                                 ") " +
                               "WHERE text_value LIKE '" + handlePrefix + oldH + "/%'" +
                                 "AND EXISTS " +
@@ -109,7 +109,7 @@ public class UpdateHandlePrefix
                                     "SELECT 1 " +
                                     "FROM handle " + 
                                     "WHERE handle.resource_id = metadatavalue.resource_id " +
-                                      "AND handle.resource_type_id = 2" +
+                                      "AND handle.resource_type_id = metadatavalue.resource_type_id " +
                                   ")";
                         int updMeta = DatabaseManager.updateQuery(context, sql, new Object[] {});
                         System.out.println(
