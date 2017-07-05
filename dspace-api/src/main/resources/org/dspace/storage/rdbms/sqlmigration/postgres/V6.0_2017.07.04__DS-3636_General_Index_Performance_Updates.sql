@@ -15,13 +15,11 @@ DROP INDEX IF EXISTS resourcepolicy_action_idx;
 DROP INDEX IF EXISTS resourcepolicy_resource_type_id_idx;
 DROP INDEX IF EXISTS resourcepolicy_resource_id_idx;
 DROP INDEX IF EXISTS versionitem_item_id_idx;
-DROP INDEX IF EXISTS resourcepolicy_dspace_object_idx;
 DROP INDEX IF EXISTS metadatavalue_mf_place_idx;
 DROP INDEX IF EXISTS bundle2bitstream_bitstream_order_idx;
 
 CREATE INDEX resourcepolicy_action_idx ON resourcepolicy (action_id);
 CREATE INDEX resourcepolicy_resource_type_id_idx ON resourcepolicy(resource_type_id );
-CREATE INDEX resourcepolicy_dspace_object_idx ON resourcepolicy(dspace_object );
 CREATE INDEX versionitem_item_id_idx ON versionitem (item_id);
 CREATE INDEX versionitem_versionhistory_id_idx ON versionitem (versionhistory_id);
 CREATE INDEX bundle2bitstream_bitstream_order_idx ON bundle2bitstream (bitstream_order);

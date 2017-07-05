@@ -35,17 +35,6 @@ declare
   index_not_exists EXCEPTION;
   PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
 begin
--- Note -> This index should actually be called "resourcepolicy_dspace_object_idx" by convention, but this exceeds the identifier length of 30.
-
-  execute immediate 'DROP INDEX resourcepolicy_dso_idx';
-  exception
-  when index_not_exists then null;
-end;
-/
-declare
-  index_not_exists EXCEPTION;
-  PRAGMA EXCEPTION_INIT(index_not_exists, -1418);
-begin
 
   execute immediate 'DROP INDEX versionitem_item_id_idx';
   exception
@@ -106,5 +95,3 @@ CREATE INDEX versionitem_history_id_idx ON versionitem (versionhistory_id);
 CREATE INDEX bundle2bitstream_bit_order_idx ON bundle2bitstream (bitstream_order);
 -- Note -> This index should actually be called "resourcepolicy_resource_type_id_idx" by convention, but this exceeds the identifier length of 30.
 CREATE INDEX policy_resource_type_id_idx ON resourcepolicy(resource_type_id );
--- Note -> This index should actually be called "resourcepolicy_dspace_object_idx" by convention, but this exceeds the identifier length of 30.
-CREATE INDEX resourcepolicy_dso_idx ON resourcepolicy(dspace_object );
