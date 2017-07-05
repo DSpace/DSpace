@@ -15,6 +15,7 @@ import org.dspace.core.Context;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -82,7 +83,7 @@ public interface MetadataValueService {
      */
     public void delete(Context context, MetadataValue metadataValue) throws SQLException;
 
-    public List<MetadataValue> findByValueLike(Context context, String value) throws SQLException;
+    public Iterator<MetadataValue> findByValueLike(Context context, String value) throws SQLException;
 
     public void deleteByMetadataField(Context context, MetadataField metadataField) throws SQLException;
 

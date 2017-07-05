@@ -646,8 +646,13 @@ public class OAIHarvester {
         log.info(String.format("Item %s (%s) has been ingested (item %d of %d). The whole process took: %d ms.",
                 item.getHandle(), item.getID(), currentRecord, totalListSize, timeTaken));
 
-        // Stop ignoring authorization
-        ourContext.restoreAuthSystemState();
+    	//Clear the context cache
+		ourContext.uncacheEntity(wi);
+		ourContext.uncacheEntity(hi);
+		ourContext.uncacheEntity(item);
+
+    	// Stop ignoring authorization
+    	ourContext.restoreAuthSystemState();
     }
 
 

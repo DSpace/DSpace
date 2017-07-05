@@ -115,7 +115,7 @@ public class EmbargoCLITool {
         Context context = null;
         try
         {
-            context = new Context();
+            context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
             Date now = new Date();
 
@@ -149,10 +149,12 @@ public class EmbargoCLITool {
                 Iterator<Item> ii = embargoService.findItemsByLiftMetadata(context);
                 while (ii.hasNext())
                 {
-                    if (processOneItem(context, ii.next(), line, now))
+                    Item item = ii.next();
+                    if (processOneItem(context, item, line, now))
                     {
                         status = 1;
                     }
+                    context.uncacheEntity(item);
                 }
             }
             context.complete();

@@ -8,28 +8,12 @@
 
 package org.dspace.identifier.doi;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.sql.SQLException;
-import java.util.*;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
+import org.dspace.core.*;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.DOI;
@@ -38,6 +22,11 @@ import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.factory.IdentifierServiceFactory;
 import org.dspace.identifier.service.DOIService;
 import org.dspace.utils.DSpace;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.sql.SQLException;
+import java.util.*;
 
 
 /**
@@ -203,6 +192,7 @@ public class DOIOrganiser {
 
                 for (DOI doi : dois) {
                     organiser.reserve(doi);
+                    context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -223,6 +213,7 @@ public class DOIOrganiser {
                 for (DOI doi : dois)
                 {
                     organiser.register(doi);
+                    context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -247,6 +238,7 @@ public class DOIOrganiser {
                 for (DOI doi : dois)
                 {
                     organiser.update(doi);
+                    context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());
@@ -270,6 +262,7 @@ public class DOIOrganiser {
                     DOI doi = iterator.next();
                     iterator.remove();
                     organiser.delete(doi.getDoi());
+                    context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
                 System.err.println("Error in database connection:" + ex.getMessage());

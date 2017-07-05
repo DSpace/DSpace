@@ -169,7 +169,7 @@ public interface GroupService extends DSpaceObjectService<Group>, DSpaceObjectLe
      * @throws SQLException if database error
      */
     public boolean isMember(Context context, EPerson epersonToCheck, String groupName) throws SQLException;
-    
+
     /**
      * fast check to see if an eperson is a member called with eperson id, does
      * database lookup without instantiating all of the epeople objects and is

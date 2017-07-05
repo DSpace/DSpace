@@ -7,35 +7,31 @@
  */
 package org.dspace.app.harvest;
 
+import org.apache.commons.cli.*;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.HarvestingException;
+import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.ItemService;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
-import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.harvest.HarvestedCollection;
-import org.dspace.content.Item;
-import org.dspace.harvest.HarvestingException;
-import org.dspace.harvest.OAIHarvester;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.harvest.factory.HarvestServiceFactory;
-import org.dspace.harvest.service.HarvestedCollectionService;
 
 /**
  *  Test class for harvested collections.
@@ -96,7 +92,7 @@ public class Harvest
         {
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("Harvest\n", options);
-            System.out.println("\nPING OAI server: Harvest -g -s oai_source -i oai_set_id");
+            System.out.println("\nPING OAI server: Harvest -g -a oai_source -i oai_set_id");
             System.out.println("RUNONCE harvest with arbitrary options: Harvest -o -e eperson -c collection -t harvest_type -a oai_source -i oai_set_id -m metadata_format");
             System.out.println("SETUP a collection for harvesting: Harvest -s -c collection -t harvest_type -a oai_source -i oai_set_id -m metadata_format");
             System.out.println("RUN harvest once: Harvest -r -e eperson -c collection");
@@ -160,7 +156,7 @@ public class Harvest
 
         // Instantiate our class
         Harvest harvester = new Harvest();
-        harvester.context = new Context();
+        harvester.context = new Context(Context.Mode.BATCH_EDIT);
         
         
         // Check our options
@@ -203,7 +199,7 @@ public class Harvest
                 System.out.println(" (run with -h flag for details)");
                 System.exit(1);
             }
-            
+
             List<HarvestedCollection> harvestedCollections = harvestedCollectionService.findAll(context);
             for (HarvestedCollection harvestedCollection : harvestedCollections)
             {
@@ -247,7 +243,7 @@ public class Harvest
             {
                 System.out.println("Error - a metadata key (commonly the prefix) must be specified for this collection");
                 System.out.println(" (run with -h flag for details)");
-                System.exit(1);                
+                System.exit(1);
             }
             
             harvester.configureCollection(collection, harvestType, oaiSource, oaiSetID, metadataKey);
@@ -270,10 +266,10 @@ public class Harvest
      * the collection, if not, bail out. 
      */
     private Collection resolveCollection(String collectionID) {
-        
+
         DSpaceObject dso;
         Collection targetCollection = null;
-        
+
         try {
             // is the ID a handle?
             if (collectionID != null)
@@ -311,30 +307,30 @@ public class Harvest
         catch (SQLException se) {
             se.printStackTrace();
         }
-        
+
         return targetCollection;
     }
     
     
     private void configureCollection(String collectionID, int type, String oaiSource, String oaiSetId, String mdConfigId) {
         System.out.println("Running: configure collection");
-       
+
         Collection collection = resolveCollection(collectionID);
         System.out.println(collection.getID());
-                
+
         try {
             HarvestedCollection hc = harvestedCollectionService.find(context, collection);
             if (hc == null) {
                 hc = harvestedCollectionService.create(context, collection);
             }
-            
+
             context.turnOffAuthorisationSystem();
             hc.setHarvestParams(type, oaiSource, oaiSetId, mdConfigId);
             hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
             harvestedCollectionService.update(context, hc);
             context.restoreAuthSystemState();
             context.complete();
-        } 
+        }
         catch (Exception e) {
             System.out.println("Changes could not be committed");
             e.printStackTrace();
@@ -358,8 +354,8 @@ public class Harvest
     private void purgeCollection(String collectionID, String email) {
         System.out.println("Purging collection of all items and resetting last_harvested and harvest_message: " + collectionID);
         Collection collection = resolveCollection(collectionID);
-       
-        try 
+
+        try
         {
             EPerson eperson = ePersonService.findByEmail(context, email);
             context.setCurrentUser(eperson);
@@ -373,16 +369,16 @@ public class Harvest
                 Item item = it.next();
                 System.out.println("Deleting: " + item.getHandle());
                 collectionService.removeItem(context, collection, item);
-                // Dispatch events every 50 items
-                if (i%50 == 0) {
-                    context.dispatchEvents();
-                    i=0;
-                }
-            }
-            
-            HarvestedCollection hc = harvestedCollectionService.find(context, collection);
-            if (hc != null) {
-                hc.setLastHarvested(null);
+    			context.uncacheEntity(item);// Dispatch events every 50 items
+    			if (i%50 == 0) {
+    				context.dispatchEvents();
+    				i=0;
+    			}
+    		}
+    		
+    		HarvestedCollection hc = harvestedCollectionService.find(context, collection);
+    		if (hc != null) {
+	    		hc.setLastHarvested(null);
                 hc.setHarvestMessage("");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
                 hc.setHarvestStartTime(null);
@@ -407,7 +403,7 @@ public class Harvest
      */
     private void runHarvest(String collectionID, String email) {
         System.out.println("Running: a harvest cycle on " + collectionID);
-        
+
         System.out.print("Initializing the harvester... ");
         OAIHarvester harvester = null;
         try {
@@ -425,7 +421,7 @@ public class Harvest
             System.out.println(se.getMessage());
             throw new IllegalStateException("Unable to access database", se);
         }
-                
+
         try {
             // Harvest will not work for an anonymous user
             EPerson eperson = ePersonService.findByEmail(context, email);
@@ -468,7 +464,7 @@ public class Harvest
         catch (Exception ex) {
             System.out.println("failed. ");
             ex.printStackTrace();
-        }        
+        }
     }
 
     /**

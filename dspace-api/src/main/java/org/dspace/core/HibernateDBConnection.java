@@ -7,13 +7,6 @@
  */
 package org.dspace.core;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.handle.Handle;
@@ -25,6 +18,11 @@ import org.hibernate.resource.transaction.spi.TransactionStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.hibernate5.SessionFactoryUtils;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 
 /**
  * Hibernate implementation of the DBConnection
@@ -52,7 +50,7 @@ public class HibernateDBConnection implements DBConnection<Session> {
     @Override
     public boolean isTransActionAlive() {
         Transaction transaction = getTransaction();
-        return transaction != null && transaction.getStatus().isOneOf(TransactionStatus.ACTIVE);
+        return transaction != null && transaction.isActive();
     }
 
     protected Transaction getTransaction() {
@@ -150,11 +148,11 @@ public class HibernateDBConnection implements DBConnection<Session> {
 
     private void configureDatabaseMode() throws SQLException {
         if(batchModeEnabled) {
-            getSession().setFlushMode(FlushMode.ALWAYS);
+            getSession().setHibernateFlushMode(FlushMode.ALWAYS);
         } else if(readOnlyEnabled) {
-            getSession().setFlushMode(FlushMode.MANUAL);
+            getSession().setHibernateFlushMode(FlushMode.MANUAL);
         } else {
-            getSession().setFlushMode(FlushMode.AUTO);
+            getSession().setHibernateFlushMode(FlushMode.AUTO);
         }
     }
 

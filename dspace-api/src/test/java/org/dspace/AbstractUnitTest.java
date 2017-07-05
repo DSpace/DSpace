@@ -107,7 +107,7 @@ public class AbstractUnitTest extends AbstractDSpaceTest
         try
         {
             //Start a new context
-            context = new Context();
+            context = new Context(Context.Mode.BATCH_EDIT);
             context.turnOffAuthorisationSystem();
 
             //Find our global test EPerson account. If it doesn't exist, create it.

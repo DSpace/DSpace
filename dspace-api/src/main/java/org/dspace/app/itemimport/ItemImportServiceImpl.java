@@ -14,21 +14,6 @@ import gr.ekt.bte.core.TransformationSpec;
 import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bteio.generators.DSpaceOutputGenerator;
 import gr.ekt.bteio.loaders.OAIPMHDataLoader;
-
-import java.io.*;
-import java.net.URL;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipEntry;
-
-import javax.mail.MessagingException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.io.FileDeleteStrategy;
 import org.apache.commons.io.FileUtils;
@@ -46,18 +31,14 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.service.*;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.handle.service.HandleService;
 import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +47,19 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.mail.MessagingException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.*;
+import java.net.URL;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 
 /**
@@ -314,39 +308,39 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
 
             Arrays.sort(dircontents, ComparatorUtils.naturalComparator());
 
-            for (int i = 0; i < dircontents.length; i++)
+        for (int i = 0; i < dircontents.length; i++)
+        {
+            if (skipItems.containsKey(dircontents[i]))
             {
-                if (skipItems.containsKey(dircontents[i]))
-                {
-                    System.out.println("Skipping import of " + dircontents[i]);
+                System.out.println("Skipping import of " + dircontents[i]);
+            }
+            else
+            {
+                List<Collection> clist;
+                if (directoryFileCollections) {
+                    String path = sourceDir + File.separatorChar + dircontents[i];
+                    try {
+                        List<Collection> cols = processCollectionFile(c, path, "collections");
+                        if (cols == null) {
+                            System.out.println("No collections specified for item " + dircontents[i] + ". Skipping.");
+                            continue;
+                        }
+                        clist = cols;
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        System.out.println(e.getMessage() + " Skipping." );
+                        continue;
+                    }
                 }
                 else
                 {
-                    List<Collection> clist;
-                    if (directoryFileCollections) {
-                        String path = sourceDir + File.separatorChar + dircontents[i];
-                        try {
-                            List<Collection> cols = processCollectionFile(c, path, "collections");
-                            if (cols == null) {
-                                System.out.println("No collections specified for item " + dircontents[i] + ". Skipping.");
-                                continue;
-                            }
-                            clist = cols;
-                        }
-                        catch (IllegalArgumentException e)
-                        {
-                            System.out.println(e.getMessage() + " Skipping." );
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        clist = mycollections;
-                    }
-                    addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
-                    System.out.println(i + " " + dircontents[i]);
+                    clist = mycollections;
                 }
+                Item item =addItem(c, clist, sourceDir, dircontents[i], mapOut, template);c.uncacheEntity(item);
+                System.out.println(i + " " + dircontents[i]);
             }
+        }
 
         } finally {
             if(mapOut!=null) {
@@ -416,7 +410,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             handleOut.close();
 
             deleteItem(c, oldItem);
-            addItem(c, mycollections, sourceDir, newItemName, null, template);
+            Item newItem = addItem(c, mycollections, sourceDir, newItemName, null, template);
+            c.uncacheEntity(oldItem);
+            c.uncacheEntity(newItem);
         }
     }
 
@@ -447,6 +443,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
                 Item myitem = itemService.findByIdOrLegacyId(c, itemID);
                 System.out.println("Deleting item " + itemID);
                 deleteItem(c, myitem);
+                c.uncacheEntity(myitem);
             }
         }
     }
@@ -473,6 +470,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         // create workspace item
         Item myitem = null;
         WorkspaceItem wi = null;
+        WorkflowItem wfi = null;
 
         if (!isTest)
         {
@@ -498,9 +496,9 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             {
                 // Should we send a workflow alert email or not?
                 if (useWorkflowSendEmail) {
-                    workflowService.start(c, wi);
+                    wfi = workflowService.start(c, wi);
                 } else {
-                    workflowService.startWithoutNotify(c, wi);
+                    wfi = workflowService.startWithoutNotify(c, wi);
                 }
 
                 // send ID to the mapfile
@@ -556,6 +554,10 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
             mapOut.println(mapOutputString);
         }
 
+        //Clear intermediary objects from the cache
+        c.uncacheEntity(wi);
+        c.uncacheEntity(wfi);
+
         return myitem;
     }
 
@@ -593,6 +595,7 @@ public class ItemImportServiceImpl implements ItemImportService, InitializingBea
         else
         {
             deleteItem(c, myitem);
+            c.uncacheEntity(myitem);
         }
     }
 
