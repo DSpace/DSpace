@@ -479,12 +479,12 @@
     </fieldType>
 
     <fieldType name="dspaceFilter" class="solr.StrField" sortMissingLast="true" omitNorms="true">
-        <analyzer>
-            <!--Treats the entire field as a single token, regardless of its content-->
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
-
-            <filter class="solr.LowerCaseFilterFactory" />
-        </analyzer>
+      <analyzer>
+        <!--Treats the entire field as a single token, regardless of its content-->
+        <tokenizer class="solr.KeywordTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory" />
+        <filter class="solr.ASCIIFoldingFilterFactory"/>
+      </analyzer>
     </fieldType>
  </types>
 
