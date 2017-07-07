@@ -133,8 +133,8 @@ public class CrisPictureDisplayStrategy
             thumbFrag.append("<img class=\"cris-thubmnail img-thumbnail\" src=\"").append(img).append("\" alt=\"")
                     .append(alt + "\" title=\"")
                     .append(title + "\" ")
-                    .append("/ border=\"0\">");
-
+                    .append("/ border=\"0\"/>");
+            
             return thumbFrag.toString();
     }
 

@@ -113,7 +113,15 @@ public class DiscoveryArtifactTag extends BodyTagSupport {
 								+ "\"/>");
 					}
 				} else {
-					// TODO MANANAGE OTHER THUMBNAIL
+					// TODO MANANAGE COLLECTION AND COMMUNITY
+				    if (artifact.getType() >= 9) {
+			            IDisplayMetadataValueStrategy strategy = (IDisplayMetadataValueStrategy) PluginManager
+			                        .getNamedPlugin(IDisplayMetadataValueStrategy.class, "crispicture");
+
+	                    if (strategy != null) {
+	                        out.println(strategy.getMetadataDisplay(request, -1, true, "thumbnail", -1, "thumbnail", new Metadatum[]{}, artifact, true, true)); 	                        
+	                    }
+	                }				    
 				}
 
 			}
