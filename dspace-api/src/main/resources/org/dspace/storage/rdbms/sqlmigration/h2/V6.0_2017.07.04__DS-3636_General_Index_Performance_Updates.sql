@@ -9,13 +9,13 @@
 ------------------------------------------------------
 -- DS-3636 General index and caching perfomance fixes
 ------------------------------------------------------
--- Indexes on resourcepolicy, versionitem, group2groupcache, metadata and bundle2bitstream colums to improve searching efficiency
+-- Indexes on resourcepolicy, versionitem, metadata and bundle2bitstream colums to improve searching efficiency
 
 DROP INDEX IF EXISTS resourcepolicy_action_idx;
 DROP INDEX IF EXISTS resourcepolicy_resource_type_id_idx;
-DROP INDEX IF EXISTS resourcepolicy_resource_id_idx;
-DROP INDEX IF EXISTS metadatavalue_mf_place_idx;
+DROP INDEX IF EXISTS versionitem_versionhistory_id_idx;
 DROP INDEX IF EXISTS bundle2bitstream_bitstream_order_idx;
+DROP INDEX IF EXISTS metadatavalue_mf_place_idx;
 
 CREATE INDEX resourcepolicy_action_idx ON resourcepolicy (action_id);
 CREATE INDEX resourcepolicy_resource_type_id_idx ON resourcepolicy(resource_type_id );

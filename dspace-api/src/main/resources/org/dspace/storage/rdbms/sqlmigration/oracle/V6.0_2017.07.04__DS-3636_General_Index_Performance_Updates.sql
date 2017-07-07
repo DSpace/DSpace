@@ -9,7 +9,7 @@
 ------------------------------------------------------
 -- DS-3636 General index and caching perfomance fixes
 ------------------------------------------------------
--- Indexes on resourcepolicy, versionitem, group2groupcache, metadata and bundle2bitstream colums to improve searching efficiency
+-- Indexes on resourcepolicy, versionitem, metadata and bundle2bitstream colums to improve searching efficiency
 
 declare
   index_not_exists EXCEPTION;
