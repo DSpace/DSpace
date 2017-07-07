@@ -682,7 +682,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
         List<Group> groups = new ArrayList<Group>();
         for (ResourcePolicy resourcePolicy : policies) {
-            if (resourcePolicy.getGroup() != null)
+            if (resourcePolicy.getGroup() != null && resourcePolicyService.isDateValid(resourcePolicy))
             {
                 groups.add(resourcePolicy.getGroup());
             }
