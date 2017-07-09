@@ -19,6 +19,7 @@ import org.dspace.content.authority.Choices;
  */
 public class Metadatum
 {
+
     /** The element name. */
     public String element;
 
