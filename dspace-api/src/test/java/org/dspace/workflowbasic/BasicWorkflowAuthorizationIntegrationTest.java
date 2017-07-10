@@ -184,7 +184,6 @@ extends AbstractIntegrationTest
                 {
                     log.error("deleting user", e);
                 }
-                eperson = null;
             }
         }
         finally
