@@ -166,7 +166,6 @@ extends AbstractIntegrationTest
                 } catch (SQLException | AuthorizeException | EPersonDeletionException e) {
                     log.error("deleting user", e);
                 }
-                eperson = null;
             }
         }
         finally
