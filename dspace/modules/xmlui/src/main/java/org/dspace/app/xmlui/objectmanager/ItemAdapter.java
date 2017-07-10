@@ -42,7 +42,6 @@ package org.dspace.app.xmlui.objectmanager;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.datadryad.dspace.statistics.ItemFileStats;
-import org.datadryad.dspace.statistics.StatisticsException;
 import org.dspace.app.util.MetadataExposure;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
@@ -56,7 +55,6 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.workflow.DryadWorkflowUtils;
-import org.dspace.workflow.Workflow;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowRequirementsManager;
 import org.jdom.Element;
@@ -71,7 +69,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.Collection;
 
 
 /**
@@ -283,10 +280,8 @@ public class ItemAdapter extends AbstractAdapter
             startElement(DIM,"dim",attributes);
 
                 DCValue[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-                for (DCValue dcv : dcvs)
-                {
-                        if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier))
-                        {
+                for (DCValue dcv : dcvs) {
+                    if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier)) {
                         // ///////////////////////////////
                         // Field element for each metadata field.
                         attributes = new AttributeMap();
@@ -301,10 +296,15 @@ public class ItemAdapter extends AbstractAdapter
                                 attributes.put("authority", dcv.authority);
                                 attributes.put("confidence", Choices.getConfidenceText(dcv.confidence));
                         }
+
+                        // SPECIAL CASE: if dryad.fundingEntity is REJECTED, don't add at all
+                        if (dcv.schema.equals("dryad") && dcv.element.equals("fundingEntity") && dcv.confidence == Choices.CF_REJECTED) {
+                            continue;
+                        }
                         startElement(DIM,"field",attributes);
                         sendCharacters(dcv.value);
                         endElement(DIM,"field");
-                }
+                    }
                 }
                 viewsAndDownloads();
 
