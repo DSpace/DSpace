@@ -162,7 +162,7 @@ public class PackageUtils
     {
         if (license == null)
         {
-            license = collection.getLicenseCollection();
+            license = collectionService.getLicense(collection);
         }
         InputStream lis = new ByteArrayInputStream(license.getBytes());
 
