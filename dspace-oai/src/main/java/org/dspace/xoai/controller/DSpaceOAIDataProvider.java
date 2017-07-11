@@ -94,7 +94,7 @@ public class DSpaceOAIDataProvider
             OutputStream out = response.getOutputStream();
             OAIRequestParameters parameters = new OAIRequestParameters(buildParametersMap(request));
 
-            response.setContentType("application/xml");
+            response.setContentType("text/xml");
             response.setCharacterEncoding("UTF-8");
 
             String identification = xoaiContext + parameters.requestID();
