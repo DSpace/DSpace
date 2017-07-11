@@ -186,7 +186,6 @@ extends AbstractIntegrationTest
                 } catch (Exception e) {
                     log.error("deleting user", e);
                 } 
-                eperson = null;
             }
         }
         finally
