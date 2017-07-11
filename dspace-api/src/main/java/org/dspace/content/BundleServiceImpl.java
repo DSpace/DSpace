@@ -198,7 +198,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             // We don't need to remove the link between bundle & bitstream, this will be handled in the delete() method.
             bitstreamService.delete(context, bitstream);
         }else{
-            bundle.getBitstreams().remove(bitstream);
+            bundle.removeBitstream(bitstream);
             bitstream.getBundles().remove(bundle);
         }
     }
@@ -304,13 +304,13 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         if(CollectionUtils.isNotEmpty(updatedBitstreams) && !updatedBitstreams.equals(currentBitstreams))
         {
             //First clear out the existing list of bitstreams
-            bundle.getBitstreams().clear();
+            bundle.clearBitstreams();
 
             // Now add them back in the proper order
             for (Bitstream bitstream : updatedBitstreams)
             {
                 bitstream.getBundles().remove(bundle);
-                bundle.getBitstreams().add(bitstream);
+                bundle.addBitstream(bitstream);
                 bitstream.getBundles().add(bundle);
                 bitstreamService.update(context, bitstream);
             }
@@ -430,16 +430,15 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 bundle.getName(), getIdentifiers(context, bundle)));
 
         // Remove bitstreams
-        Iterator<Bitstream> bitstreams = bundle.getBitstreams().iterator();
-        while (bitstreams.hasNext()) {
-            Bitstream bitstream = bitstreams.next();
-            bitstreams.remove();
+        List<Bitstream> bitstreams = bundle.getBitstreams();
+        bundle.clearBitstreams();
+        for (Bitstream bitstream : bitstreams) {
             removeBitstream(context, bundle, bitstream);
         }
 
-        Iterator<Item> items = bundle.getItems().iterator();
-        while (items.hasNext()) {
-            Item item = items.next();
+        List<Item> items = new LinkedList<>(bundle.getItems());
+        bundle.getItems().clear();
+        for (Item item : items) {
             item.removeBundle(bundle);
         }
 
