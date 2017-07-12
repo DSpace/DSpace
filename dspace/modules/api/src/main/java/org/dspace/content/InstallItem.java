@@ -103,13 +103,13 @@ public class InstallItem
 
         
         DCValue[] doiMetadata = item.getMetadata(MetadataSchema.DC_SCHEMA, "identifier", null, Item.ANY);
-        log.info("Archiving item " + item.getID() + " with DOI " + doiMetadata);
+        log.info("Archiving item " + item.getID() + " with DOI " + doiMetadata[0].value);
         
         // this is really just to flush out fatal embargo metadata
         // problems before we set inArchive.
 //        DCDate liftDate = EmbargoManager.getEmbargoDate(c, item);
 
-        log.debug(" -- lifting embargos");
+        log.info(" -- lifting embargos");
         DCDate liftDate = null;
         //Get our embargo date !
         String embargoType = ConfigurationManager.getProperty("embargo.field.type");
@@ -165,7 +165,7 @@ public class InstallItem
         item.clearMetadata("internal", "submit", "showEmbargo", org.dspace.content.Item.ANY);
 
 
-        log.debug(" -- setting dates");
+        log.info(" -- setting dates");
         // create accession date
         DCDate now = DCDate.getCurrent();
         item.addDC("date", "accessioned", null, now.toString());
@@ -184,7 +184,7 @@ public class InstallItem
             item.addDC("date", "issued", null, issued.toString());
         }
 
-        log.debug(" -- setting handle");
+        log.info(" -- setting handle");
         if(item.getHandle() == null)
         {
         	// if no previous handle supplied, create one
@@ -224,7 +224,7 @@ public class InstallItem
                     + d.toString();
         }
 
-        log.debug(" -- adding provenance");
+        log.info(" -- adding provenance");
         // Add provenance description
         item.addDC("description", "provenance", "en", provDescription);
 
@@ -256,7 +256,7 @@ public class InstallItem
         }
         */
 
-        log.debug(" -- registering DOI");
+        log.info(" -- registering DOI");
         IdentifierService service = new DSpace().getSingletonService(IdentifierService.class);
         try {
             service.register(c, item);
@@ -264,7 +264,7 @@ public class InstallItem
             throw new IOException(e);
         }
 
-        log.debug(" -- updating collections and archived flag");
+        log.info(" -- updating collections and archived flag");
         // create collection2item mapping
         is.getCollection().addItem(item);
 
@@ -275,22 +275,22 @@ public class InstallItem
         item.setArchived(true);
 
         // save changes ;-)
-        log.debug(" -- saving item metadata");
+        log.info(" -- saving item metadata");
         item.update();
         c.addEvent(new Event(Event.INSTALL, Constants.ITEM, item.getID(), item.getHandle()));
 
         // remove in-progress submission
-        log.debug(" -- deleting in-progress submission");
+        log.info(" -- deleting in-progress submission");
         is.deleteWrapper();
 
         // remove the item's policies and replace them with
         // the defaults from the collection
 
-        log.debug(" -- updating item permissions");
+        log.info(" -- updating item permissions");
         item.inheritCollectionDefaultPolicies(is.getCollection());
 
         // set embargo lift date and take away read access if indicated.
-        log.debug(" -- final embargo processing");
+        log.info(" -- final embargo processing");
         if (liftDate != null)
             EmbargoManager.setEmbargo(c, item, liftDate);
 
