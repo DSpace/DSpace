@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>modules</artifactId>
-        <version>6.1-SNAPSHOT</version>
+        <version>6.1</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -208,7 +208,7 @@
                 <dependency>
                     <groupId>org.dspace.modules</groupId>
                     <artifactId>xmlui-mirage2</artifactId>
-                    <version>6.1-SNAPSHOT</version>
+                    <version>6.1</version>
                     <type>war</type>
                 </dependency>
             </dependencies>
