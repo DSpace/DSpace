@@ -203,37 +203,26 @@ public class Voucher {
         TableRowIterator rows = DatabaseManager.query(context,
                 "SELECT * FROM voucher ORDER BY voucher_id DESC");
 
-        try
-        {
+        try {
             List<TableRow> voucherRows = rows.toList();
 
             ArrayList<Voucher> vouchers = new ArrayList<Voucher>();
 
-            for (int i = 0; i < voucherRows.size(); i++)
-            {
-                TableRow row = (TableRow) voucherRows.get(i);
-
+            for (TableRow row : voucherRows) {
                 // First check the cache
-                Voucher fromCache = (Voucher) context.fromCache(Voucher.class, row
-                        .getIntColumn("voucher_id"));
+                Voucher fromCache = (Voucher) context.fromCache(Voucher.class, row.getIntColumn("voucher_id"));
 
-                if (fromCache != null)
-                {
+                if (fromCache != null) {
                     vouchers.add(fromCache);
-                }
-                else
-                {
+                } else {
                     Voucher newProperty = new Voucher(context, row);
                     vouchers.add(newProperty);
                 }
             }
 
             return vouchers;
-        }
-        finally
-        {
-            if (rows != null)
-            {
+        } finally {
+            if (rows != null) {
                 rows.close();
             }
         }
@@ -257,96 +246,41 @@ public class Voucher {
     }
 
     public static Voucher findById(Context context,Integer id) throws SQLException{
-
+        if (id < 0) {
+            return null;
+        }
         TableRowIterator rows = DatabaseManager.queryTable(context, "voucher", "SELECT * FROM voucher WHERE voucher_id = "+ id+ "limit 1");
-
-        try
-        {
-            List<TableRow> voucherRows = rows.toList();
-
-            ArrayList<Voucher> vouchers = new ArrayList<Voucher>();
-
-            for (int i = 0; i < voucherRows.size(); i++)
-            {
-                TableRow row = (TableRow) voucherRows.get(i);
-
-                // First check the cache
-                Voucher fromCache = (Voucher) context.fromCache(Voucher.class, row
-                        .getIntColumn("voucher_id"));
-
-                if (fromCache != null)
-                {
-                    vouchers.add(fromCache);
-                }
-                else
-                {
-                    Voucher newProperty = new Voucher(context, row);
-                    vouchers.add(newProperty);
-                }
-            }
-            if(vouchers.size()>0){
-                return vouchers.get(0);
-            }
-            else
-            {
-                return null;
-            }
-
-        }
-        finally
-        {
-            if (rows != null)
-            {
-                rows.close();
-            }
-        }
+        return getFirstVoucherFromRows(context, rows);
     }
+
     public static Voucher findByCode(Context context,String code) throws SQLException{
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "voucher", "SELECT * FROM voucher WHERE code = '"+ code+ "' limit 1");
-
-        try
-        {
-            List<TableRow> voucherRows = rows.toList();
-
-            ArrayList<Voucher> vouchers = new ArrayList<Voucher>();
-
-            for (int i = 0; i < voucherRows.size(); i++)
-            {
-                TableRow row = (TableRow) voucherRows.get(i);
-
-                // First check the cache
-                Voucher fromCache = (Voucher) context.fromCache(Voucher.class, row
-                        .getIntColumn("voucher_id"));
-
-                if (fromCache != null)
-                {
-                    vouchers.add(fromCache);
-                }
-                else
-                {
-                    Voucher newProperty = new Voucher(context, row);
-                    vouchers.add(newProperty);
-                }
-            }
-            if(vouchers.size()>0){
-                return vouchers.get(0);
-            }
-            else
-            {
-                return null;
-            }
-
-        }
-        finally
-        {
-            if (rows != null)
-            {
-                rows.close();
-            }
-        }
+        return getFirstVoucherFromRows(context, rows);
     }
 
+    private static Voucher getFirstVoucherFromRows(Context context, TableRowIterator rows) {
+        List<TableRow> voucherRows;
+        try {
+            voucherRows = rows.toList();
+            rows.close();
+        } catch (Exception e) {
+            log.error("couldn't get voucher from rows: " + e.getMessage());
+            return null;
+        }
+        if (voucherRows.size() > 0) {
+            TableRow row = voucherRows.get(0);
+            // First check the cache
+            Voucher fromCache = (Voucher) context.fromCache(Voucher.class, row.getIntColumn("voucher_id"));
+
+            if (fromCache != null) {
+                return fromCache;
+            } else {
+                return new Voucher(context, row);
+            }
+        }
+        return null;
+    }
     public static Voucher[] search(Context context, String query)
             throws SQLException
     {
