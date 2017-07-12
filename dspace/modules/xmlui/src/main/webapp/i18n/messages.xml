@@ -1069,7 +1069,7 @@
 
 	<!-- action-generated messages. These are referenced from the sitemap rather than a transformer -->
 
-    <message key="xmlui.administrative.FlowShoppingcartUtils.add_shoppingcart_success_notice">The shopping Cart was added
+    <message key="xmlui.administrative.FlowShoppingcartUtils.edit_shoppingcart_success_notice">The shopping cart was updated
         successfully.</message>
     <message key="xmlui.administrative.FlowVoucherUtils.add_voucher_success_notice">The voucher was added
         successfully.</message>

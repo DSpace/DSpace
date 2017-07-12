@@ -32,7 +32,7 @@ public class FlowShoppingcartUtils {
     private static final Logger log = Logger.getLogger(FlowShoppingcartUtils.class);
 
     private static final Message T_edit_shoppingcart_success_notice =
-            new Message("default", "xmlui.administrative.FlowShoppingcartUtils.add_shoppingcart_success_notice");
+            new Message("default", "xmlui.administrative.FlowShoppingcartUtils.edit_shoppingcart_success_notice");
 
 
     public static FlowResult processEditShoppingcart(Context context,

@@ -88,6 +88,7 @@ public class ShoppingCart {
         } catch (SQLException e) {
             log.error("couldn't create a row in table shoppingcart");
         }
+        log.info(LogManager.getHeader(myContext, "create_shoppingcart", "cart_id=" + getID()));
         init();
     }
 
@@ -98,7 +99,6 @@ public class ShoppingCart {
         // Cache ourselves
         myContext.cache(this, myRow.getIntColumn("cart_id"));
         modified = false;
-        log.info(LogManager.getHeader(myContext, "create_shoppingcart", "cart_id=" + getID()));
     }
 
     public ShoppingCart(Context context, Integer itemId, Integer epersonId, String country, String currency, String status) throws SQLException,
