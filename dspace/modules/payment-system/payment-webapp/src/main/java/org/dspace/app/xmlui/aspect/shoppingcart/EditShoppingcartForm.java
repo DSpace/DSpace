@@ -199,13 +199,9 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         // Voucher
         Integer voucherId = shoppingcart.getVoucher();
         String voucherCode = "";
-        Voucher voucher = null;
-        if (voucherId != null && voucherId > 0) {
-            voucher = Voucher.findById(context, voucherId);
+        Voucher voucher = Voucher.findById(context, voucherId);
+        if (voucher != null) {
             voucherCode = voucher.getCode();
-        }
-        if (StringUtils.isNotEmpty(request.getParameter("voucher"))) {
-            voucherCode = request.getParameter("voucher");
         }
 
         // Fee-waiver country
