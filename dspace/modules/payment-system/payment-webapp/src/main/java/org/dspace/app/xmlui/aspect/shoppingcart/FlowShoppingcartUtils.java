@@ -8,6 +8,7 @@
 package org.dspace.app.xmlui.aspect.shoppingcart;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
@@ -49,74 +50,65 @@ public class FlowShoppingcartUtils {
             String note = request.getParameter("note");
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
             VoucherValidationService voucherValidationService = new DSpace().getSingletonService(VoucherValidationService.class);
-            Voucher voucher = null;
-            if (!StringUtils.isEmpty(voucherCode)) {
-                voucher = Voucher.findByCode(context, voucherCode);
-            }
 
             ShoppingCart shoppingCart = paymentSystemService.getShoppingCart(context, shoppingcartID);
 
             String countryOriginal = shoppingCart.getCountry();
             String transactionIdOriginal = shoppingCart.getTransactionId();
 
-            if (!StringUtils.isEmpty(voucherCode)) {
-                if (voucher == null) {
-                    result.addError("voucher_null");
-                } else {
-                    if (!voucherValidationService.validate(context, voucher.getID(), shoppingCart)) {
-                        result.addError("voucher_used");
-                    }
-                }
-            }
-
             if (!StringUtils.isEmpty(note)) {
                 shoppingCart.setNote(note);
             } else {
                 shoppingCart.setNote(null);
             }
+            if (!shoppingCart.getStatus().equals(status)) {
+                // update status, update payment date to current date
+                shoppingCart.setStatus(status);
+                shoppingCart.setPaymentDate(new Date());
+            }
 
-            if (result.getErrors() == null) {
-                if (!shoppingCart.getStatus().equals(status)) {
-                    // update status, update payment date to current date
-                    shoppingCart.setStatus(status);
-                    shoppingCart.setPaymentDate(new Date());
-                }
-                if (!StringUtils.isEmpty(voucherCode)) {
-                    if (!voucherValidationService.voucherUsed(context, voucherCode)) {
-                        shoppingCart.setVoucher(voucher.getID());
-                    }
+            if (!StringUtils.isEmpty(voucherCode)) {
+                // see if this is a valid voucher code
+                Voucher voucher = Voucher.findByCode(context, voucherCode);
+                if (voucher == null) {
+                    result.addError("voucher_null");
+                } else if (voucherValidationService.voucherUsed(context, voucherCode)) {
+                    result.addError("voucher_used");
                 } else {
-                    //delete the voucher
-                    shoppingCart.setVoucher(null);
+                    shoppingCart.setVoucher(voucher.getID());
                 }
+            }
 
-                if (country != null && !country.equals(countryOriginal)) {
-                    shoppingCart.setCountry(country);
-                } else {
-                    if (country != null && country.length() == 0) {
-                        shoppingCart.setCountry(null);
-                    }
+            if (country != null && !country.equals(countryOriginal)) {
+                shoppingCart.setCountry(country);
+            } else {
+                if (country != null && country.length() == 0) {
+                    shoppingCart.setCountry(null);
                 }
+            }
 
-                if (surCharge != null && surCharge.length() > 0 && Double.parseDouble(surCharge) > 0) {
-                    shoppingCart.setSurcharge(Double.parseDouble(surCharge));
-                } else {
-                    shoppingCart.setSurcharge(0.0);
-                }
+            if (surCharge != null && surCharge.length() > 0 && Double.parseDouble(surCharge) > 0) {
+                shoppingCart.setSurcharge(Double.parseDouble(surCharge));
+            } else {
+                shoppingCart.setSurcharge(0.0);
+            }
 
-                if (basicFee != null && basicFee.length() > 0 && Double.parseDouble(basicFee) > 0) {
-                    shoppingCart.setBasicFee(Double.parseDouble(basicFee));
-                } else {
-                    shoppingCart.setBasicFee(0.0);
-                }
+            if (basicFee != null && basicFee.length() > 0 && Double.parseDouble(basicFee) > 0) {
+                shoppingCart.setBasicFee(Double.parseDouble(basicFee));
+            } else {
+                shoppingCart.setBasicFee(0.0);
+            }
 
-                if (StringUtils.isEmpty(transactionId)) {
-                    shoppingCart.setTransactionId(null);
-                } else {
-                    if (!transactionId.equals(transactionIdOriginal)) {
-                        shoppingCart.setTransactionId(transactionId);
-                    }
+            if (StringUtils.isEmpty(transactionId)) {
+                shoppingCart.setTransactionId(null);
+            } else {
+                if (!transactionId.equals(transactionIdOriginal)) {
+                    shoppingCart.setTransactionId(transactionId);
                 }
+            }
+            shoppingCart.update();
+            List<String> errors = result.getErrors();
+            if (errors == null || errors.size() == 0) {
                 shoppingCart.updateCartInternals(context);
                 context.commit();
 
@@ -124,6 +116,8 @@ public class FlowShoppingcartUtils {
                 result.setOutcome(true);
 
                 result.setMessage(T_edit_shoppingcart_success_notice);
+            } else if (errors.size() > 0){
+                log.error("Errors in shopping cart: " + errors.toString());
             }
         } catch (Exception e) {
             // catch and log all exceptions, otherwise they will go off to the javascript layer

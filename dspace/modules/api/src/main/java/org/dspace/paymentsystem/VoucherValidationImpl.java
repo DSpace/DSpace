@@ -64,19 +64,12 @@ public class VoucherValidationImpl implements VoucherValidationService
         {
             try{
                 Voucher voucher = findByCode(context,voucherCode);
-                if(voucher!=null)
-                {
-                    Integer voucherId = voucher.getID();
-                    //if the voucher haven't been used than return true
-                    ShoppingCart newShoppingCart = ShoppingCart.findByVoucher(context,voucherId);
-                    if(newShoppingCart==null||newShoppingCart.getStatus().equals(Voucher.STATUS_USED))
-
-                    {
+                if (voucher!=null) {
+                    if (ShoppingCart.findByVoucher(context,voucher.getID()) == null) {
                         //no shopping cart is using the voucher
                         return false;
                     }
                 }
-
             }catch(Exception e){
 
             }
