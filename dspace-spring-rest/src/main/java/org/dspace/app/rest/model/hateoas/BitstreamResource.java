@@ -21,6 +21,6 @@ import org.dspace.app.rest.utils.Utils;
 public class BitstreamResource extends DSpaceResource<BitstreamRest> {
 	public BitstreamResource(BitstreamRest bs, Utils utils, String... rels) {
 		super(bs, utils, rels);
-		add(utils.linkToSubResource(bs, "retrieve"));
+		add(utils.linkToSubResource(bs, "retrieve", "content"));
 	}
 }
