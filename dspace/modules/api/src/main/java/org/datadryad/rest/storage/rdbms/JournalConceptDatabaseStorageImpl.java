@@ -34,10 +34,6 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
     static final String CONCEPT_TABLE = "conceptmetadatavalue";
     static final String COLUMN_ID = "parent_id";
 
-    static int ISSN_FIELD = 141;
-    static int JOURNALCODE_FIELD = 121;
-    static int FULLNAME_FIELD = 151;
-
     static {
         Context context = getContext();
         try {
@@ -70,9 +66,11 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
         boolean isISSN = Pattern.compile("\\d{4}-\\p{Alnum}{4}").matcher(codeOrISSN).matches();
         String query;
         if (isISSN) {
-            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + ISSN_FIELD;
+            int issnField = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.ISSN)).getFieldID();
+            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + issnField;
         } else {
-            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + JOURNALCODE_FIELD;
+            int journalcodeField = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.JOURNAL_ID)).getFieldID();
+            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + journalcodeField;
         }
         TableRow row = DatabaseManager.querySingleTable(context, CONCEPT_TABLE, query, codeOrISSN);
         if (row != null) {
