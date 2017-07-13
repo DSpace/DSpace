@@ -374,8 +374,9 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
             isBlackedOut = journalConcept.getPublicationBlackout();
         }
 
-        if(!isBlackedOut)
+        if(!isBlackedOut) {
             select.addOption("none", "Publish immediately");
+        }
 
         select.addOption("oneyear", "1 year embargo");
         select.addOption("custom", "Custom length embargo (approved by journal editor)");
@@ -387,8 +388,10 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
             for (DCValue dcValue : dcValues) {
                 select.setOptionSelected(dcValue.value);
             }
-        } else {
+        } else if (!isBlackedOut) {
             select.setOptionSelected("none");
+        } else {
+            select.setOptionSelected("untilArticleAppears");
         }
     }
 
