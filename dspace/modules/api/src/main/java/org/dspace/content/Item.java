@@ -1732,7 +1732,7 @@ public class Item extends DSpaceObject
             AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
 
-        log.info(LogManager.getHeader(ourContext, "update_item", "item_id="
+        log.debug(LogManager.getHeader(ourContext, "update_item", "item_id="
                 + internalItemId));
 
         // Set sequence IDs for bitstreams in item
