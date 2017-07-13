@@ -223,14 +223,21 @@
 				    <xsl:for-each select="dspace:field[@element='relation' and @qualifier='isreferencedby']">
 				      <xsl:variable name="id" select="."/>
 				      <xsl:if test="starts-with($id,'doi')">
-					<relatedIdentifier relatedIdentifierType="DOI" relationType="IsReferencedBy">
-					  <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
-					</relatedIdentifier>
-				      </xsl:if>
+						  <relatedIdentifier relatedIdentifierType="DOI" relationType="IsReferencedBy">
+							  <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+						  </relatedIdentifier>
+						  <relatedIdentifier relatedIdentifierType="DOI" relationType="IsSupplementTo">
+							  <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+						  </relatedIdentifier>
+
+					  </xsl:if>
 				      <xsl:if test="starts-with($id,'PMID')">
-					<relatedIdentifier relatedIdentifierType="PMID" relationType="IsReferencedBy">
-					  <xsl:value-of select="translate(substring-after($id,'PMID:'), $smallcase, $uppercase)"/>
-					</relatedIdentifier>
+						  <relatedIdentifier relatedIdentifierType="PMID" relationType="IsReferencedBy">
+							  <xsl:value-of select="translate(substring-after($id,'PMID:'), $smallcase, $uppercase)"/>
+						  </relatedIdentifier>
+						  <relatedIdentifier relatedIdentifierType="PMID" relationType="IsSupplementTo">
+							  <xsl:value-of select="translate(substring-after($id,'PMID:'), $smallcase, $uppercase)"/>
+						  </relatedIdentifier>
 				      </xsl:if>
 				    </xsl:for-each>
 					<xsl:if test="$version > 1">
