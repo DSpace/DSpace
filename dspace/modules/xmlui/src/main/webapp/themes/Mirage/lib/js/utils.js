@@ -143,6 +143,7 @@ function initFirstSubmissionForm() {
 
         // Click: status_published
         jQuery('#xmlui_submit_publication_article_status_published').click(function () {
+            enableJournalPublished();
             jQuery("#publication_options").show();
             jQuery("#article_doi").show();
             jQuery("#or_divider").show();
@@ -155,6 +156,7 @@ function initFirstSubmissionForm() {
 
         // Click: status_accepted
         jQuery('#xmlui_submit_publication_article_status_accepted').click(function () {
+            enableJournalPublished();
             jQuery("#publication_options").show();
             jQuery("#article_doi").hide();
             jQuery("#or_divider").hide();
@@ -206,29 +208,33 @@ function initFirstSubmissionForm() {
 }
 
 function enableJournalPublished(){
-    if(jQuery('input[name|="article_doi"]').val()!="")
-    {
-        jQuery('input[name|="prism_publicationName"]').attr("disabled", "disabled");
-        jQuery('input[name|="prism_publicationName"]').css("background-color","#E3E3E3");
-        jQuery('label.ds-form-label-select-publication').css("color","");
+    if (jQuery('input[name|="article_status"]:checked').val()=='0') { // only do this if article status is "published"
+        if (jQuery('input[name|="article_doi"]').val() != "") {
+            jQuery('input[name|="prism_publicationName"]').attr("disabled", "disabled");
+            jQuery('input[name|="prism_publicationName"]').css("background-color", "#E3E3E3");
+            jQuery('label.ds-form-label-select-publication').css("color", "");
+        }
+        else {
+            jQuery('input[name|="prism_publicationName"]').removeAttr("disabled");
+            jQuery('input[name|="prism_publicationName"]').css("background-color", "");
+            jQuery('label.ds-form-label-select-publication').css("color", "grey");
+        }
+        if (jQuery('input[name|="prism_publicationName"]').val() != "") {
+            jQuery('input[name|="article_doi"]').attr("disabled", "disabled");
+            jQuery('input[name|="article_doi"]').css("background-color", "#E3E3E3");
+            jQuery('label.ds-form-label-select-publication').css("color", "grey");
+        }
+        else {
+            jQuery('input[name|="article_doi"]').removeAttr("disabled");
+            jQuery('input[name|="article_doi"]').css("background-color", "");
+            jQuery('label.ds-form-label-select-publication').css("color", "");
+        }
     }
-    else
-    {
+    else {
+        jQuery('input[name|="article_doi"]').val("");
         jQuery('input[name|="prism_publicationName"]').removeAttr("disabled");
-        jQuery('input[name|="prism_publicationName"]').css("background-color","");
-        jQuery('label.ds-form-label-select-publication').css("color","grey");
-    }
-    if(jQuery('input[name|="prism_publicationName"]').val()!="")
-    {
-        jQuery('input[name|="article_doi"]').attr("disabled", "disabled");
-        jQuery('input[name|="article_doi"]').css("background-color","#E3E3E3");
-        jQuery('label.ds-form-label-select-publication').css("color","grey");
-    }
-    else
-    {
-        jQuery('input[name|="article_doi"]').removeAttr("disabled");
-        jQuery('input[name|="article_doi"]').css("background-color","");
-        jQuery('label.ds-form-label-select-publication').css("color","");
+        jQuery('input[name|="prism_publicationName"]').css("background-color", "");
+        jQuery('label.ds-form-label-select-publication').css("color", "grey");
     }
 }
 function enableNextButton() {

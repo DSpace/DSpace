@@ -55,7 +55,7 @@
             <!-- Full Title -->
             <xsl:if test="MedlineCitation/Article/ArticleTitle">
                 <dim:field mdschema="dc" element="title">
-                    Data from: <xsl:value-of select="MedlineCitation/Article/ArticleTitle"/>
+                    <xsl:value-of select="MedlineCitation/Article/ArticleTitle"/>
                 </dim:field>
             </xsl:if>
 

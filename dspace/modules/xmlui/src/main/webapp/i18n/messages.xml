@@ -3347,7 +3347,7 @@
      <message key="xmlui.submit.publication.enter_article_doi">Enter publication's DOI or PubMed ID</message>
 
      <message key="xmlui.submit.select.pub.form.manu_error">Please provide a manuscript number</message>
-     <message key="xmlui.submit.publication.journal.select.label.new">Enter your journal title</message>
+     <message key="xmlui.submit.publication.journal.select.label.new">Enter your journal</message>
      <message key="xmlui.submit.publication.journal.manu.label.new">Enter your manuscript number</message>
      <message key="xmlui.submit.publication.journal.manu.label.review">Enter your manuscript number (if available)</message>
 
