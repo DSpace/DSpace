@@ -16,7 +16,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>6.1-SNAPSHOT</version>
+      <version>6.1</version>
       <relativePath>..</relativePath>
    </parent>
 
