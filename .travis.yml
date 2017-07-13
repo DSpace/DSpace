@@ -20,10 +20,10 @@ before_install:
   # Print ruby version info (should be installed)
   - ruby -v
   # Install Sass & print version info
-  - gem install sass
+  - gem install sass -v 3.3.14
   - sass -v
   # Install Compass & print version info
-  - gem install compass
+  - gem install compass -v 1.0.1
   - compass version
 
 # Skip install stage, as we'll do it below
