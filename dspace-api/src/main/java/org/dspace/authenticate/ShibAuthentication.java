@@ -199,7 +199,54 @@ public class ShibAuthentication implements AuthenticationMethod
 					message += ""+headerName+"='"+headerValue+"'\n";
 				}
 			}
+			
+            // Check if IDP sent attribute into the request
+            String messageAttribute = "Received the following attribute:\n";
+            Enumeration<String> attributeNames = request.getAttributeNames();
+            boolean writeLogA = false;
+            if (attributeNames != null)
+            {
+                while (attributeNames.hasMoreElements())
+                {
+                    String attributeName = attributeNames.nextElement();
+                    Object attribute = request.getAttribute(attributeName);
+                    if (attribute != null)
+                    {
+                        String attributeValue = (String) attribute;
+                        messageAttribute += "" + attributeName + "='"
+                                + attributeValue + "'\n";
+                        writeLogA = true;
+                    }
+                }
+            }
+            // Check if IDP sent attribute into the session
+            String messageSession = "Received the following session:\n";
+            Enumeration<String> attributeSessionNames = request.getSession()
+                    .getAttributeNames();
+            boolean writeLogB = false;
+            if (attributeSessionNames != null)
+            {
+                while (attributeSessionNames.hasMoreElements())
+                {
+                    String attributeName = attributeNames.nextElement();
+                    Object attribute = request.getAttribute(attributeName);
+                    if (attribute != null)
+                    {
+                        String attributeValue = (String) attribute;
+                        messageSession += "" + attributeName + "='"
+                                + attributeValue + "'\n";
+                        writeLogB = true;
+                    }
+                }
+            }
 			log.debug(message);
+			if(writeLogA) {
+			    log.debug(messageAttribute);
+			}
+            if (writeLogB)
+            {
+                log.debug(messageSession);
+            }
 		}
 
 		// Should we auto register new users.
