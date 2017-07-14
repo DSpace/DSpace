@@ -65,7 +65,10 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 			Pageable pageable, String projection) throws BrowseException, SQLException {
 		// FIXME this should be bind automatically and available as method
 		// argument
-		String scope = request.getParameter("scope");
+		String scope = null;
+		if (request != null) {
+			request.getParameter("scope");
+		}
 
 		Context context = obtainContext();
 		BrowseEngine be = new BrowseEngine(context);
@@ -95,7 +98,10 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 
 		// set up a BrowseScope and start loading the values into it
 		bs.setBrowseIndex(bi);
-		Sort sort = pageable.getSort();
+		Sort sort = null;
+		if (pageable != null) {
+			sort = pageable.getSort();
+		}
 		if (sort != null) {
 			Iterator<Order> orders = sort.iterator();
 			while (orders.hasNext()) {
@@ -108,8 +114,10 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 		// bs.setJumpToValue(valueFocus);
 		// bs.setJumpToValueLang(valueFocusLang);
 		// bs.setStartsWith(startsWith);
-		bs.setOffset(pageable.getOffset());
-		bs.setResultsPerPage(pageable.getPageSize());
+		if (pageable != null) {
+			bs.setOffset(pageable.getOffset());
+			bs.setResultsPerPage(pageable.getPageSize());
+		}
 		// bs.setEtAl(etAl);
 		// bs.setAuthorityValue(authority);
 
@@ -119,7 +127,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 
 		BrowseInfo binfo = be.browse(bs);
 		Pageable pageResultInfo = new PageRequest((binfo.getStart() - 1) / binfo.getResultsPerPage(),
-				pageable.getPageSize());
+				binfo.getResultsPerPage());
 		Page<BrowseEntryRest> page = new PageImpl<String[]>(Arrays.asList(binfo.getStringResults()), pageResultInfo,
 				binfo.getTotal()).map(converter);
 		page.forEach(new Consumer<BrowseEntryRest>() {
@@ -134,5 +142,14 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 	@Override
 	public BrowseEntryResource wrapResource(BrowseEntryRest entry, String... rels) {
 		return new BrowseEntryResource(entry);
+	}
+	
+	@Override
+	public boolean isEmbbeddableRelation(Object data, String name) {
+		BrowseIndexRest bir = (BrowseIndexRest) data;
+		if (bir.isMetadataBrowse() && "entries".equals(name)) {
+			return true;
+		}
+		return false;
 	}
 }

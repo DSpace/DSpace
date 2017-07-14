@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 /**
  * The Item REST Resource
@@ -79,6 +81,9 @@ public class ItemRest extends DSpaceObjectRest {
 	public void setTemplateItemOf(CollectionRest templateItemOf){
 		this.templateItemOf = templateItemOf;
 	}
+	
+	@LinkRest(linkClass = BitstreamRest.class)
+	@JsonIgnore
 	public List<BitstreamRest> getBitstreams() {
 		return bitstreams;
 	}
