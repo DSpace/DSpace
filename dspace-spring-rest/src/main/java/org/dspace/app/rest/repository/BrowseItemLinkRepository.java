@@ -63,10 +63,15 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 	public Page<ItemRest> listBrowseItems(HttpServletRequest request, String browseName, Pageable pageable, String projection)
 			throws BrowseException, SQLException {
 		//FIXME these should be bind automatically and available as method arguments
-		String scope = request.getParameter("scope");
-		String filterValue = request.getParameter("filterValue");
-		String filterAuthority = request.getParameter("filterAuthority");
-				
+		String scope = null;
+		String filterValue = null;
+		String filterAuthority = null;
+		
+		if (request != null) {		
+			scope = request.getParameter("scope");
+			filterValue = request.getParameter("filterValue");
+			filterAuthority = request.getParameter("filterAuthority");
+		}
 		Context context = obtainContext();
 		BrowseEngine be = new BrowseEngine(context);
 		BrowserScope bs = new BrowserScope(context);
@@ -97,7 +102,10 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 
 		// set up a BrowseScope and start loading the values into it
 		bs.setBrowseIndex(bi);
-		Sort sort = pageable.getSort();
+		Sort sort = null;
+		if (pageable != null) {
+			sort = pageable.getSort();
+		}
 		if (sort != null) {
 			Iterator<Order> orders = sort.iterator();
 			while (orders.hasNext()) {
@@ -132,9 +140,11 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 		// bs.setJumpToValue(valueFocus);
 		// bs.setJumpToValueLang(valueFocusLang);
 		// bs.setStartsWith(startsWith);
-		bs.setOffset(pageable.getOffset());
-		bs.setResultsPerPage(pageable.getPageSize());
-
+		if (pageable != null) {
+			bs.setOffset(pageable.getOffset());
+			bs.setResultsPerPage(pageable.getPageSize());
+		}
+		
 		if (scopeObj != null) {
 			bs.setBrowseContainer(scopeObj);
 		}
@@ -147,7 +157,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 
 		BrowseInfo binfo = be.browse(bs);
 
-		Pageable pageResultInfo = new PageRequest((binfo.getStart() -1) / binfo.getResultsPerPage(), pageable.getPageSize());
+		Pageable pageResultInfo = new PageRequest((binfo.getStart() -1) / binfo.getResultsPerPage(), binfo.getResultsPerPage());
 		Page<ItemRest> page = new PageImpl<Item>(binfo.getBrowseItemResults(), pageResultInfo, binfo.getTotal())
 				.map(converter);
 		return page;
@@ -156,5 +166,14 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 	@Override
 	public ItemResource wrapResource(ItemRest item, String... rels) {
 		return itemRestRepository.wrapResource(item, rels);
+	}
+	
+	@Override
+	public boolean isEmbbeddableRelation(Object data, String name) {
+		BrowseIndexRest bir = (BrowseIndexRest) data;
+		if (!bir.isMetadataBrowse() && "items".equals(name)) {
+			return true;
+		}
+		return false;
 	}
 }

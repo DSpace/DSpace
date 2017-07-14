@@ -18,12 +18,12 @@ import java.lang.annotation.Target;
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface LinkRest {
-	String name();
-	String method();
+	String name() default "";
+	String method() default "";
 	Class linkClass();
 	boolean optional() default false;
 }

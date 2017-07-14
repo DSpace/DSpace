@@ -8,6 +8,8 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.content.Bitstream;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,6 +22,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CollectionConverter
 		extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest> {
+	@Autowired
+	private BitstreamConverter bitstreamConverter;
+	
 	@Override
 	public org.dspace.content.Collection toModel(org.dspace.app.rest.model.CollectionRest obj) {
 		return (org.dspace.content.Collection) super.toModel(obj);
@@ -27,7 +32,12 @@ public class CollectionConverter
 
 	@Override
 	public CollectionRest fromModel(org.dspace.content.Collection obj) {
-		return (CollectionRest) super.fromModel(obj);
+		CollectionRest col = (CollectionRest) super.fromModel(obj);
+		Bitstream logo = obj.getLogo();
+		if (logo != null) {
+			col.setLogo(bitstreamConverter.convert(logo));
+		}
+		return col;
 	}
 
 	@Override

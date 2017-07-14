@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,6 +18,7 @@ import java.util.UUID;
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
@@ -83,5 +86,26 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 	@Override	
 	public BitstreamResource wrapResource(BitstreamRest bs, String... rels) {
 		return new BitstreamResource(bs, utils, rels);
+	}
+
+	public InputStream retrieve(UUID uuid) {
+		Context context = obtainContext();
+		Bitstream bit = null;
+		try {
+			bit = bs.find(context, uuid);
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		if (bit == null) {
+			return null;
+		}
+		InputStream is;
+		try {
+			is = bs.retrieve(context, bit);
+		} catch (IOException | SQLException | AuthorizeException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		context.abort();
+		return is;
 	}
 }

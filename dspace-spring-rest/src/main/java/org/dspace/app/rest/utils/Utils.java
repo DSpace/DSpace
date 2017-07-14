@@ -64,9 +64,13 @@ public class Utils {
 	}
 
 	public Link linkToSubResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).slash(rel).withRel(rel);
+		return linkToSubResource(data, rel, rel) ;
 	}
 
+	public Link linkToSubResource(RestModel data, String rel, String path) {
+		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).slash(path).withRel(rel);
+	}
+	
 	public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {
 		String model = makeSingular(modelPlural);
 		try {

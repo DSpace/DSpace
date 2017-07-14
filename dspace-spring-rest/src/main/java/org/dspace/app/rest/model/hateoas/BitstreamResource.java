@@ -21,9 +21,7 @@ import org.dspace.app.rest.utils.Utils;
 public class BitstreamResource extends DSpaceResource<BitstreamRest> {
 	public BitstreamResource(BitstreamRest bs, Utils utils, String... rels) {
 		super(bs, utils, rels);
-//		if (bs.getFormat() != null) {
-//			BitstreamFormatResource bfr = new BitstreamFormatResource(bs.getFormat());
-//			this.add(new Link(bfr.getLink(Link.REL_SELF).getHref(), "bitstreamformat"));
-//		}
+		add(utils.linkToSubResource(bs, "retrieve", "content"));
+		add(utils.linkToSubResource(bs, "content"));
 	}
 }
