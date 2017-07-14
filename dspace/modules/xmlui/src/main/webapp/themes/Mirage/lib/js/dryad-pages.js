@@ -553,7 +553,6 @@ function shoeShoppingCartWaiver(obj){
         //initial
         if(jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html().length==0&&jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val().length==0&&jQuery(':input[name="country"]').val()==0)
         {
-            showEmptyVoucher();
             showEmptyCountry();
         }
         else
@@ -608,13 +607,13 @@ function showEmptyCountry(){
     jQuery(':input[name="country"]').show();
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_country-list div').show();
     jQuery(':input[name="country"]').val('');
-    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove country : ');
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove country: ');
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').hide();
 }
 function showEmptyVoucher(){
     //console.log("show empty voucher");
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list').show();
-    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove voucher : ');
+    jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove voucher: ');
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_voucher-list div').show();
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').hide();
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val('');
@@ -628,7 +627,7 @@ function showRemoveCountry(obj){
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').show();
     if(obj!=null)
     {
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove country : '+obj.country);
+        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-country a').html('Remove country: '+obj.country);
     }
 
 }
@@ -638,7 +637,7 @@ function showRemoveVoucher(obj){
     jQuery(':input[name="country"]').hide();
     jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').show();
     if(obj!=null){
-        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove voucher : '+obj.voucher);
+        jQuery('#aspect_paymentsystem_ShoppingCartTransformer_item_remove-voucher a').html('Remove voucher: '+obj.voucher);
         jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').html(obj.voucher);
         jQuery('#aspect_paymentsystem_ShoppingCartTransformer_field_voucher').val(obj.voucher);
     }
