@@ -7,12 +7,9 @@
  */
 package org.dspace.handle.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDAO;
+import org.dspace.core.Context;
 import org.dspace.handle.Handle;
 import org.dspace.handle.dao.HandleDAO;
 import org.hibernate.Criteria;
@@ -23,6 +20,9 @@ import org.hibernate.jdbc.ReturningWork;
 import org.hibernate.service.jdbc.dialect.internal.StandardDialectResolver;
 import org.hibernate.service.jdbc.dialect.spi.DialectResolver;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -93,9 +93,10 @@ public class HandleDAOImpl extends AbstractHibernateDAO<Handle> implements Handl
     @Override
     public int updateHandlesWithNewPrefix(Context context, String newPrefix, String oldPrefix) throws SQLException
     {
-        String hql = "UPDATE Handle set handle = concat(:newPrefix,'/',id) WHERE handle like concat(:oldPrefix,'%')";
+        String hql = "UPDATE Handle set handle = concat(:newPrefix, '/', substring(handle, :oldPrefixLength + 2)) WHERE handle like concat(:oldPrefix,'%')";
         Query query = createQuery(context, hql);
         query.setString("newPrefix", newPrefix);
+        query.setInteger("oldPrefixLength", oldPrefix.length());
         query.setString("oldPrefix", oldPrefix);
         return query.executeUpdate();
     }

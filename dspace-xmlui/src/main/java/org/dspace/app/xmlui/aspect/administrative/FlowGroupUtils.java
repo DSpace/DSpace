@@ -383,17 +383,17 @@ public class FlowGroupUtils {
 		    		}
 		    		else if (role == Role.WorkflowStep1)
 		    		{
-		    			collection.setWorkflowGroup(1, null);
+		    			collectionService.setWorkflowGroup(context, collection, 1, null);
 						collectionService.update(context, collection);
 		    		}
 		    		else if (role == Role.WorkflowStep2)
 		    		{
-		    			collection.setWorkflowGroup(2, null);
+						collectionService.setWorkflowGroup(context, collection, 2, null);
 						collectionService.update(context, collection);
 		    		}
 		    		else if (role == Role.WorkflowStep3)
 		    		{
-		    			collection.setWorkflowGroup(3, null);
+						collectionService.setWorkflowGroup(context, collection, 3, null);
 						collectionService.update(context, collection);
 		    		}
 		    		else if (role == Role.DefaultRead)

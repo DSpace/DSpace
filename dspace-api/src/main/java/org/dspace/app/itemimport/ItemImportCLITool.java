@@ -294,7 +294,7 @@ public class ItemImportCLITool {
             myloader.setQuiet(isQuiet);
 
             // create a context
-            Context c = new Context();
+            Context c = new Context(Context.Mode.BATCH_EDIT);
 
             // find the EPerson, assign to context
             EPerson myEPerson = null;

@@ -101,25 +101,25 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public Group findByNameAndMembership(Context context, String groupName, EPerson ePerson) throws SQLException {
-        if(groupName == null || ePerson == null) {
+    public Group findByIdAndMembership(Context context, UUID id, EPerson ePerson) throws SQLException {
+        if(id == null || ePerson == null) {
             return null;
         } else {
             Query query = createQuery(context,
                     "SELECT DISTINCT g FROM Group g " +
                             "LEFT JOIN g.epeople p " +
-                            "WHERE g.name = :name AND " +
+                            "WHERE g.id = :id AND " +
                             "(p.id = :eperson_id OR " +
                             "EXISTS ( " +
                                 "SELECT 1 FROM Group2GroupCache gc " +
-                                "JOIN gc.parent p " +
-                                "JOIN gc.child c " +
-                                "JOIN c.epeople cp " +
-                                "WHERE p.id = g.id AND cp.id = :eperson_id " +
+                                "JOIN gc.parent parent " +
+                                "JOIN gc.child child " +
+                                "JOIN child.epeople cp " +
+                                "WHERE parent.id = g.id AND cp.id = :eperson_id " +
                                 ") " +
                             ")");
 
-            query.setParameter("name", groupName);
+            query.setParameter("id", id);
             query.setParameter("eperson_id", ePerson.getID());
             query.setCacheable(true);
 

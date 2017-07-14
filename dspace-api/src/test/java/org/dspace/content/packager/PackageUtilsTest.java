@@ -159,7 +159,7 @@ public class PackageUtilsTest extends AbstractUnitTest
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group testGroup = groupService.create(context);
         groupService.setName(testGroup, "TESTGROUP");
-        testCollection.setWorkflowGroup(1, testGroup);
+        testCollection.setWorkflowGroup(context, 1, testGroup);
 
         String exportName = PackageUtils.translateGroupNameForExport(context,
                 testGroup.getName());
@@ -168,7 +168,7 @@ public class PackageUtilsTest extends AbstractUnitTest
         String importName = PackageUtils.translateGroupNameForImport(context, exportName);
         assertEquals("Exported Group name without underscore unchanged by translation for import", exportName, importName);
 
-        testCollection.setWorkflowGroup(1, originalFirstStepWorkflowGroup);
+        testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class PackageUtilsTest extends AbstractUnitTest
         GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
         Group testGroup = groupService.create(context);
         groupService.setName(testGroup, "TESTGROUP_ABC_TEST");
-        testCollection.setWorkflowGroup(1, testGroup);
+        testCollection.setWorkflowGroup(context, 1, testGroup);
 
         String exportName = PackageUtils.translateGroupNameForExport(context,
                 testGroup.getName());
@@ -189,7 +189,7 @@ public class PackageUtilsTest extends AbstractUnitTest
         String importName = PackageUtils.translateGroupNameForImport(context, exportName);
         assertEquals("Exported Group name with underscores but no DSO unchanged by translation for import", exportName, importName);
 
-        testCollection.setWorkflowGroup(1, originalFirstStepWorkflowGroup);
+        testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
     }
 
     @Test
@@ -208,7 +208,7 @@ public class PackageUtilsTest extends AbstractUnitTest
         String importName = PackageUtils.translateGroupNameForImport(context, exportName);
         assertEquals("Exported Group name with dso unchanged by roundtrip translation for export/import", group.getName(), importName);
 
-        testCollection.setWorkflowGroup(1, originalFirstStepWorkflowGroup);
+        testCollection.setWorkflowGroup(context, 1, originalFirstStepWorkflowGroup);
     }
 
     @After

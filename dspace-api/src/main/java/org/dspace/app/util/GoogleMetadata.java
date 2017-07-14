@@ -7,37 +7,29 @@
  */
 package org.dspace.app.util;
 
-import java.sql.SQLException;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.jdom.Element;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Collection;
+import java.util.Map.Entry;
 
 /**
  * Configuration and mapping for Google Scholar output metadata
@@ -60,7 +52,7 @@ public class GoogleMetadata
     protected String itemURL;
 
     // Configuration keys and fields
-    protected static Map<String, String> configuredFields = new HashMap<String, String>();
+    protected static Map<String, String> googleScholarSettings = new HashMap<String, String>();
 
     // Google field names (e.g. citation_fieldname) and formatted metadata
     // values
@@ -128,6 +120,8 @@ public class GoogleMetadata
 
     protected final int ALL_FIELDS_IN_OPTION = 2;
 
+    private static GoogleBitstreamComparator googleBitstreamComparator = null;
+
     // Load configured fields from google-metadata.properties
     static
     {
@@ -181,7 +175,7 @@ public class GoogleMetadata
                 if (null != name && !name.equals("") && null != field
                         && !field.equals(""))
                 {
-                    configuredFields.put(name.trim(), field.trim());
+                    googleScholarSettings.put(name.trim(), field.trim());
                 }
             }
         }
@@ -200,9 +194,9 @@ public class GoogleMetadata
     {
         log.debug("Google Metadata Configuration Mapping:");
 
-        for (String name : configuredFields.keySet())
+        for (String name : googleScholarSettings.keySet())
         {
-            log.debug("  " + name + " => " + configuredFields.get(name));
+            log.debug("  " + name + " => " + googleScholarSettings.get(name));
         }
     }
 
@@ -221,6 +215,7 @@ public class GoogleMetadata
         this.item = item;
         this.itemService = ContentServiceFactory.getInstance().getItemService();
         itemURL = HandleServiceFactory.getInstance().getHandleService().resolveToURL(context, item.getHandle());
+        googleBitstreamComparator = new GoogleBitstreamComparator(context, googleScholarSettings);
         parseItem();
     }
 
@@ -234,7 +229,7 @@ public class GoogleMetadata
     protected boolean addSingleField(String fieldName)
     {
 
-        String config = configuredFields.get(fieldName);
+        String config = googleScholarSettings.get(fieldName);
 
         if (null == config || config.equals(""))
         {
@@ -738,7 +733,7 @@ public class GoogleMetadata
             addSingleField(PATENT_NUMBER);
 
             // Use config value for patent country. Should be a literal.
-            String countryConfig = configuredFields.get(PATENT_COUNTRY);
+            String countryConfig = googleScholarSettings.get(PATENT_COUNTRY);
             if (null != countryConfig && !countryConfig.trim().equals(""))
             {
                 metadataMappings.put(PATENT_COUNTRY, countryConfig.trim());
@@ -1051,10 +1046,13 @@ public class GoogleMetadata
 	 */
 	protected Bitstream findLinkableFulltext(Item item) throws SQLException {
 		Bitstream bestSoFar = null;
-		int bitstreamCount = 0;
+
 		List<Bundle> contentBundles = itemService.getBundles(item, "ORIGINAL");
+
 		for (Bundle bundle : contentBundles) {
             List<Bitstream> bitstreams = bundle.getBitstreams();
+            Collections.sort(bitstreams, googleBitstreamComparator);
+
             for (Bitstream candidate : bitstreams) {
                 if (candidate.equals(bundle.getPrimaryBitstream())) { // is primary -> use this one
                     if (isPublic(candidate)) {
@@ -1097,7 +1095,7 @@ public class GoogleMetadata
     protected void addAggregateValues(String field, String delimiter)
     {
 
-        String authorConfig = configuredFields.get(field);
+        String authorConfig = googleScholarSettings.get(field);
         ArrayList<MetadataValue> fields = resolveMetadataFields(authorConfig);
 
         if (null != fields && !fields.isEmpty())
@@ -1125,7 +1123,7 @@ public class GoogleMetadata
      */
     protected void addMultipleValues(String FIELD)
     {
-        String fieldConfig = configuredFields.get(FIELD);
+        String fieldConfig = googleScholarSettings.get(FIELD);
         ArrayList<MetadataValue> fields = resolveMetadataFields(fieldConfig);
 
         if (null != fields && !fields.isEmpty())
@@ -1146,7 +1144,7 @@ public class GoogleMetadata
     protected boolean itemIsDissertation()
     {
 
-        String dConfig = configuredFields.get(DISSERTATION_ID);
+        String dConfig = googleScholarSettings.get(DISSERTATION_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;
@@ -1165,7 +1163,7 @@ public class GoogleMetadata
     protected boolean itemIsPatent()
     {
 
-        String dConfig = configuredFields.get(PATENT_ID);
+        String dConfig = googleScholarSettings.get(PATENT_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;
@@ -1184,7 +1182,7 @@ public class GoogleMetadata
     protected boolean itemIsTechReport()
     {
 
-        String dConfig = configuredFields.get(TECH_REPORT_ID);
+        String dConfig = googleScholarSettings.get(TECH_REPORT_ID);
         if (null == dConfig || dConfig.trim().equals(""))
         {
             return false;

@@ -7,26 +7,21 @@
  */
 package org.dspace.checker;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import javax.mail.MessagingException;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.dspace.checker.factory.CheckerServiceFactory;
 import org.dspace.checker.service.SimpleReporterService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
+
+import javax.mail.MessagingException;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * <p>
@@ -184,7 +179,7 @@ public class DailyReportEmailer
 
         try
         {
-            context = new Context();
+            context = new Context(Context.Mode.READ_ONLY);
 
             // the number of bitstreams in report
             int numBitstreams = 0;

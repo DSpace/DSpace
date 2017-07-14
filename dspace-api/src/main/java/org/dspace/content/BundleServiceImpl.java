@@ -198,7 +198,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             // We don't need to remove the link between bundle & bitstream, this will be handled in the delete() method.
             bitstreamService.delete(context, bitstream);
         }else{
-            bundle.getBitstreams().remove(bitstream);
+            bundle.removeBitstream(bitstream);
             bitstream.getBundles().remove(bundle);
         }
     }
@@ -269,29 +269,60 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
     public void setOrder(Context context, Bundle bundle, UUID[] bitstreamIds) throws AuthorizeException, SQLException {
         authorizeService.authorizeAction(context, bundle, Constants.WRITE);
 
-        bundle.getBitstreams().clear();
+        List<Bitstream> currentBitstreams = bundle.getBitstreams();
+        List<Bitstream> updatedBitstreams = new ArrayList<Bitstream>();
+
+        // Loop through and ensure these Bitstream IDs are all valid. Add them to list of updatedBitstreams.
         for (int i = 0; i < bitstreamIds.length; i++) {
             UUID bitstreamId = bitstreamIds[i];
             Bitstream bitstream = bitstreamService.find(context, bitstreamId);
-            if(bitstream == null){
+
+            // If we have an invalid Bitstream ID, just ignore it, but log a warning
+            if(bitstream == null) {
                 //This should never occur but just in case
                 log.warn(LogManager.getHeader(context, "Invalid bitstream id while changing bitstream order", "Bundle: " + bundle.getID() + ", bitstream id: " + bitstreamId));
                 continue;
             }
-            bitstream.getBundles().remove(bundle);
-            bundle.getBitstreams().add(bitstream);
-            bitstream.getBundles().add(bundle);
 
-            bitstreamService.update(context, bitstream);
+            // If we have a Bitstream not in the current list, log a warning & exit immediately
+            if(!currentBitstreams.contains(bitstream))
+            {
+                log.warn(LogManager.getHeader(context, "Encountered a bitstream not in this bundle while changing bitstream order. Bitstream order will not be changed.", "Bundle: " + bundle.getID() + ", bitstream id: " + bitstreamId));
+                return;
+            }
+            updatedBitstreams.add(bitstream);
         }
 
-        //The order of the bitstreams has changed, ensure that we update the last modified of our item
-        Item owningItem = (Item) getParentObject(context, bundle);
-        if(owningItem != null)
+        // If our lists are different sizes, exit immediately
+        if(updatedBitstreams.size()!=currentBitstreams.size())
         {
-            itemService.updateLastModified(context, owningItem);
-            itemService.update(context, owningItem);
+            log.warn(LogManager.getHeader(context, "Size of old list and new list do not match. Bitstream order will not be changed.", "Bundle: " + bundle.getID()));
+            return;
+        }
 
+        // As long as the order has changed, update it
+        if(CollectionUtils.isNotEmpty(updatedBitstreams) && !updatedBitstreams.equals(currentBitstreams))
+        {
+            //First clear out the existing list of bitstreams
+            bundle.clearBitstreams();
+
+            // Now add them back in the proper order
+            for (Bitstream bitstream : updatedBitstreams)
+            {
+                bitstream.getBundles().remove(bundle);
+                bundle.addBitstream(bitstream);
+                bitstream.getBundles().add(bundle);
+                bitstreamService.update(context, bitstream);
+            }
+
+            //The order of the bitstreams has changed, ensure that we update the last modified of our item
+            Item owningItem = (Item) getParentObject(context, bundle);
+            if(owningItem != null)
+            {
+                itemService.updateLastModified(context, owningItem);
+                itemService.update(context, owningItem);
+
+            }
         }
     }
 
@@ -399,16 +430,15 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
                 bundle.getName(), getIdentifiers(context, bundle)));
 
         // Remove bitstreams
-        Iterator<Bitstream> bitstreams = bundle.getBitstreams().iterator();
-        while (bitstreams.hasNext()) {
-            Bitstream bitstream = bitstreams.next();
-            bitstreams.remove();
+        List<Bitstream> bitstreams = bundle.getBitstreams();
+        bundle.clearBitstreams();
+        for (Bitstream bitstream : bitstreams) {
             removeBitstream(context, bundle, bitstream);
         }
 
-        Iterator<Item> items = bundle.getItems().iterator();
-        while (items.hasNext()) {
-            Item item = items.next();
+        List<Item> items = new LinkedList<>(bundle.getItems());
+        bundle.getItems().clear();
+        for (Item item : items) {
             item.removeBundle(bundle);
         }
 

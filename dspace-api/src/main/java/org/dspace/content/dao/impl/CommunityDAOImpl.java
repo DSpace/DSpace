@@ -91,6 +91,7 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
 
         Query query = createQuery(context, queryBuilder.toString());
         query.setParameter(sortField.toString(), sortField.getID());
+        query.setCacheable(true);
 
         return findMany(context, query);
     }
@@ -129,6 +130,8 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
                 Restrictions.eq("resourcePolicy.eperson", ePerson),
                 actionQuery
         ));
+        criteria.setCacheable(true);
+
         return list(criteria);
     }
 
@@ -164,6 +167,8 @@ public class CommunityDAOImpl extends AbstractHibernateDSODAO<Community> impleme
         query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in elements(epeople))");
         Query hibernateQuery = createQuery(context, query.toString());
         hibernateQuery.setParameter("eperson_id", ePerson.getID());
+        hibernateQuery.setCacheable(true);
+
         return list(hibernateQuery);
     }
 

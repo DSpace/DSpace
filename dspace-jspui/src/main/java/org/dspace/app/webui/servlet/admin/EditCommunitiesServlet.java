@@ -884,7 +884,7 @@ public class EditCommunitiesServlet extends DSpaceServlet
             int step = Integer.parseInt(button.substring(17));
 
             Group g = collectionService.getWorkflowGroup(collection, step);
-            collection.setWorkflowGroup(step, null);
+            collection.setWorkflowGroup(context, step, null);
 
             // Have to update to avoid ref. integrity error
             collectionService.update(context, collection);

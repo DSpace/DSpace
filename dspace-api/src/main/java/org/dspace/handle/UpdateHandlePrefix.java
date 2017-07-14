@@ -7,10 +7,6 @@
  */
 package org.dspace.handle;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.sql.SQLException;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -19,6 +15,13 @@ import org.dspace.core.Context;
 import org.dspace.discovery.IndexClient;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.sql.SQLException;
+import java.util.Iterator;
 
 /**
  * A script to update the handle values in the database. This is typically used
@@ -32,6 +35,7 @@ public class UpdateHandlePrefix
 {
 
     private static final Logger log = Logger.getLogger(UpdateHandlePrefix.class);
+    private static final ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 
     /**
      * When invoked as a command-line tool, updates handle prefix
@@ -94,12 +98,19 @@ public class UpdateHandlePrefix
 
                         System.out.print("Updating metadatavalues table... ");
                         MetadataValueService metadataValueService = ContentServiceFactory.getInstance().getMetadataValueService();
-                        List<MetadataValue> metadataValues = metadataValueService.findByValueLike(context, "http://hdl.handle.net/");
-                        int updMeta = metadataValues.size();
-                        for (MetadataValue metadataValue : metadataValues) {
-                        	metadataValue.setValue(metadataValue.getValue().replace("http://hdl.handle.net/" + oldH, "http://hdl.handle.net/" + newH));
+
+                        String handlePrefix = configurationService.getProperty("handle.canonical.prefix");
+                        Iterator<MetadataValue> metadataValues = metadataValueService.findByValueLike(context, handlePrefix + oldH);
+
+                        int updMeta = 0;
+                        while(metadataValues.hasNext()) {
+                            MetadataValue metadataValue = metadataValues.next();
+                            metadataValue.setValue(metadataValue.getValue().replace(handlePrefix + oldH, handlePrefix + newH));
                             metadataValueService.update(context, metadataValue, true);
+                            context.uncacheEntity(metadataValue);
+                            updMeta++;
                         }
+
                         System.out.println(
                           updMeta + " metadata value" + ((updMeta > 1) ? "s" : "") + " updated"
                         );

@@ -7,35 +7,31 @@
  */
 package org.dspace.app.harvest;
 
+import org.apache.commons.cli.*;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.HarvestingException;
+import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.factory.HarvestServiceFactory;
+import org.dspace.harvest.service.HarvestedCollectionService;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.ItemService;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
-import org.dspace.handle.factory.HandleServiceFactory;
-import org.dspace.harvest.HarvestedCollection;
-import org.dspace.content.Item;
-import org.dspace.harvest.HarvestingException;
-import org.dspace.harvest.OAIHarvester;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
-import org.dspace.harvest.factory.HarvestServiceFactory;
-import org.dspace.harvest.service.HarvestedCollectionService;
 
 /**
  *  Test class for harvested collections.
@@ -91,7 +87,7 @@ public class Harvest
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("Harvest\n", options);
             System.out
-    				.println("\nPING OAI server: Harvest -g -s oai_source -i oai_set_id");
+    				.println("\nPING OAI server: Harvest -g -a oai_source -i oai_set_id");
             System.out
 					.println("RUNONCE harvest with arbitrary options: Harvest -o -e eperson -c collection -t harvest_type -a oai_source -i oai_set_id -m metadata_format");
             System.out
@@ -162,7 +158,7 @@ public class Harvest
 
         // Instantiate our class
         Harvest harvester = new Harvest();
-        harvester.context = new Context();
+        harvester.context = new Context(Context.Mode.BATCH_EDIT);
         
         
         // Check our options
@@ -375,6 +371,8 @@ public class Harvest
     			Item item = it.next();
     			System.out.println("Deleting: " + item.getHandle());
                 collectionService.removeItem(context, collection, item);
+                context.uncacheEntity(item);
+                
     			// Dispatch events every 50 items
     			if (i%50 == 0) {
     				context.dispatchEvents();

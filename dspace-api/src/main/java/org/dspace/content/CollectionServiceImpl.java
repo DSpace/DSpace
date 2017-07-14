@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
+import org.dspace.authorize.service.ResourcePolicyService;
 
 /**
  * Service implementation for the Collection object.
@@ -50,6 +51,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
+    @Autowired(required = true)
+    protected ResourcePolicyService resourcePolicyService;
     @Autowired(required = true)
     protected BitstreamService bitstreamService;
     @Autowired(required = true)
@@ -334,30 +337,77 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
             groupService.setName(g,
                     "COLLECTION_" + collection.getID() + "_WORKFLOW_STEP_" + step);
             groupService.update(context, g);
-            setWorkflowGroup(collection, step, g);
+            setWorkflowGroup(context, collection, step, g);
 
-            authorizeService.addPolicy(context, collection, Constants.ADD, g);
         }
 
         return getWorkflowGroup(collection, step);
     }
 
     @Override
-    public void setWorkflowGroup(Collection collection, int step, Group group) {
+    public void setWorkflowGroup(Context context, Collection collection, int step, Group group)
+            throws SQLException, AuthorizeException
+    {
+        // we need to store the old group to be able to revoke permissions if granted before
+        Group oldGroup = null;
+        int action;
+        
         switch (step)
         {
             case 1:
+                oldGroup = collection.getWorkflowStep1();
+                action = Constants.WORKFLOW_STEP_1;
                 collection.setWorkflowStep1(group);
                 break;
             case 2:
+                oldGroup = collection.getWorkflowStep2();
+                action = Constants.WORKFLOW_STEP_2;
                 collection.setWorkflowStep2(group);
                 break;
             case 3:
+                oldGroup = collection.getWorkflowStep3();
+                action = Constants.WORKFLOW_STEP_3;
                 collection.setWorkflowStep3(group);
                 break;
             default:
                 throw new IllegalArgumentException("Illegal step count: " + step);
         }
+        
+        // deal with permissions.
+        try
+        {
+            context.turnOffAuthorisationSystem();
+            // remove the policies for the old group
+            if (oldGroup != null)
+            {
+                Iterator<ResourcePolicy> oldPolicies =
+                        resourcePolicyService.find(context, collection, oldGroup, action).iterator();
+                while (oldPolicies.hasNext())
+                {
+                    resourcePolicyService.delete(context, oldPolicies.next());
+                }
+                oldPolicies = resourcePolicyService.find(context, collection, oldGroup, Constants.ADD).iterator();
+                while (oldPolicies.hasNext())
+                {
+                    ResourcePolicy rp = oldPolicies.next();
+                    if (rp.getRpType() == ResourcePolicy.TYPE_WORKFLOW)
+                    {
+                        resourcePolicyService.delete(context, rp);
+                    }
+                }
+            }
+            
+            // group can be null to delete workflow step.
+            // we need to grant permissions if group is not null
+            if (group != null)
+            {
+                authorizeService.addPolicy(context, collection, action, group, ResourcePolicy.TYPE_WORKFLOW);
+                authorizeService.addPolicy(context, collection, Constants.ADD, group, ResourcePolicy.TYPE_WORKFLOW);
+            }
+        } finally {
+            context.restoreAuthSystemState();
+        }
+        collection.setModified();
     }
 
     @Override
@@ -749,8 +799,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         while (owningCommunities.hasNext())
         {
             Community owningCommunity = owningCommunities.next();
-            owningCommunities.remove();
-            owningCommunity.getCollections().remove(collection);
+            collection.removeCommunity(owningCommunity);
+            owningCommunity.removeCollection(collection);
         }
 
         collectionDAO.delete(context, collection);

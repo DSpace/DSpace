@@ -7,6 +7,8 @@
  */
 package org.dspace.checker;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.dspace.content.Bitstream;
 
 import javax.persistence.*;
@@ -57,7 +59,7 @@ public class MostRecentChecksum implements Serializable
     private boolean bitstreamFound;
 
     @OneToOne
-    @JoinColumn(name= "result")
+    @JoinColumn(name= "result", referencedColumnName = "result_code")
     private ChecksumResult checksumResult;
 
     /**
@@ -154,5 +156,45 @@ public class MostRecentChecksum implements Serializable
 
     public void setBitstreamFound(boolean bitstreamFound) {
         this.bitstreamFound = bitstreamFound;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MostRecentChecksum that = (MostRecentChecksum) o;
+
+        return new EqualsBuilder()
+                .append(toBeProcessed, that.toBeProcessed)
+                .append(matchedPrevChecksum, that.matchedPrevChecksum)
+                .append(infoFound, that.infoFound)
+                .append(bitstreamFound, that.bitstreamFound)
+                .append(bitstream, that.bitstream)
+                .append(expectedChecksum, that.expectedChecksum)
+                .append(currentChecksum, that.currentChecksum)
+                .append(processStartDate, that.processStartDate)
+                .append(processEndDate, that.processEndDate)
+                .append(checksumAlgorithm, that.checksumAlgorithm)
+                .append(checksumResult, that.checksumResult)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(bitstream)
+                .append(toBeProcessed)
+                .append(expectedChecksum)
+                .append(currentChecksum)
+                .append(processStartDate)
+                .append(processEndDate)
+                .append(checksumAlgorithm)
+                .append(matchedPrevChecksum)
+                .append(infoFound)
+                .append(bitstreamFound)
+                .append(checksumResult)
+                .toHashCode();
     }
 }

@@ -926,15 +926,19 @@ public class ItemsResource extends Resource
         {
             context = createContext();
 
-            Iterator<org.dspace.content.Item> itemIterator = itemService.findByMetadataField(context, metadataEntry.getSchema(), metadataEntry.getElement(), metadataEntry.getQualifier(), metadataEntry.getValue());
+            Iterator<org.dspace.content.Item> itemIterator = itemService.findByMetadataField(context, metadataEntry.getSchema(),
+                    metadataEntry.getElement(), metadataEntry.getQualifier(), metadataEntry.getValue());
 
             while (itemIterator.hasNext())
             {
                 org.dspace.content.Item dspaceItem = itemIterator.next();
-                Item item = new Item(dspaceItem, servletContext, expand, context);
-                writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
-                        request, context);
-                items.add(item);
+                //Only return items that are available for the current user
+                if (itemService.isItemListedForUser(context, dspaceItem)) {
+                    Item item = new Item(dspaceItem, servletContext, expand, context);
+                    writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
+                            request, context);
+                    items.add(item);
+                }
             }
 
             context.complete();

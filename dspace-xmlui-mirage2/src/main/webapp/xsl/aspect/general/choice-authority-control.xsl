@@ -74,7 +74,9 @@
           <!-- Collection ID for context -->
           <xsl:choose>
             <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']">
+              <xsl:text>'</xsl:text>
               <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']"/>
+              <xsl:text>'</xsl:text>
             </xsl:when>
             <xsl:otherwise>
               <xsl:text>-1</xsl:text>
@@ -322,9 +324,9 @@
                     <xsl:value-of select="$confidenceIndicatorID"/>
                     <xsl:text>', confidenceName: '</xsl:text>
                     <xsl:value-of select="$confidenceName"/>
-                    <xsl:text>', collection: </xsl:text>
+                    <xsl:text>', collection: '</xsl:text>
                     <xsl:value-of select="$collectionID"/>
-                    <xsl:text>, contextPath: '</xsl:text>
+                    <xsl:text>', contextPath: '</xsl:text>
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>'});</xsl:text>
             <xsl:text>});</xsl:text>

@@ -244,6 +244,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return true;
         }
 
+        // If authorization was given before and cached
+        Boolean cachedResult = c.getCachedAuthorizationResult(o, action, e);
+        if (cachedResult != null) {
+            return cachedResult.booleanValue();
+        }
+
         // is eperson set? if not, userToCheck = null (anonymous)
         EPerson userToCheck = null;
         if (e != null)
@@ -254,8 +260,9 @@ public class AuthorizeServiceImpl implements AuthorizeService
             // if user is an Admin on this object
             DSpaceObject adminObject = useInheritance ? serviceFactory.getDSpaceObjectService(o).getAdminObject(c, o, action) : null;
 
-            if (isAdmin(c, adminObject))
+            if (isAdmin(c, e, adminObject))
             {
+                c.cacheAuthorizedAction(o, action, e, true, null);
                 return true;
             }
         }
@@ -297,6 +304,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
             if (ignoreCustomPolicies
                     && ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType()))
             {
+                if(c.isReadOnly()) {
+                    //When we are in read-only mode, we will cache authorized actions in a different way
+                    //So we remove this resource policy from the cache.
+                    c.uncacheEntity(rp);
+                }
                 continue;
             }
 
@@ -305,20 +317,29 @@ public class AuthorizeServiceImpl implements AuthorizeService
             {
                 if (rp.getEPerson() != null && rp.getEPerson().equals(userToCheck))
                 {
+                    c.cacheAuthorizedAction(o, action, e, true, rp);
                     return true; // match
                 }
 
                 if ((rp.getGroup() != null)
-                        && (groupService.isMember(c, rp.getGroup())))
+                        && (groupService.isMember(c, e, rp.getGroup())))
                 {
                     // group was set, and eperson is a member
                     // of that group
+                    c.cacheAuthorizedAction(o, action, e, true, rp);
                     return true;
                 }
+            }
+
+            if(c.isReadOnly()) {
+                //When we are in read-only mode, we will cache authorized actions in a different way
+                //So we remove this resource policy from the cache.
+                c.uncacheEntity(rp);
             }
         }
 
         // default authorization is denial
+        c.cacheAuthorizedAction(o, action, e, false, null);
         return false;
     }
 
@@ -349,9 +370,14 @@ public class AuthorizeServiceImpl implements AuthorizeService
     @Override
     public boolean isAdmin(Context c, DSpaceObject o) throws SQLException
     {
+        return this.isAdmin(c, c.getCurrentUser(), o);
+    }
 
+    @Override
+    public boolean isAdmin(Context c, EPerson e, DSpaceObject o) throws SQLException
+    {
         // return true if user is an Administrator
-        if (isAdmin(c))
+        if (isAdmin(c, e))
         {
             return true;
         }
@@ -359,6 +385,11 @@ public class AuthorizeServiceImpl implements AuthorizeService
         if (o == null)
         {
             return false;
+        }
+
+        Boolean cachedResult = c.getCachedAuthorizationResult(o, Constants.ADMIN, e);
+        if (cachedResult != null) {
+            return cachedResult.booleanValue();
         }
 
         //
@@ -371,18 +402,26 @@ public class AuthorizeServiceImpl implements AuthorizeService
             // check policies for date validity
             if (resourcePolicyService.isDateValid(rp))
             {
-                if (rp.getEPerson() != null && rp.getEPerson().equals(c.getCurrentUser()))
+                if (rp.getEPerson() != null && rp.getEPerson().equals(e))
                 {
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp);
                     return true; // match
                 }
 
                 if ((rp.getGroup() != null)
-                        && (groupService.isMember(c, rp.getGroup())))
+                        && (groupService.isMember(c, e, rp.getGroup())))
                 {
                     // group was set, and eperson is a member
                     // of that group
+                    c.cacheAuthorizedAction(o, Constants.ADMIN, e, true, rp);
                     return true;
                 }
+            }
+
+            if(c.isReadOnly()) {
+                //When we are in read-only mode, we will cache authorized actions in a different way
+                //So we remove this resource policy from the cache.
+                c.uncacheEntity(rp);
             }
         }
 
@@ -393,9 +432,12 @@ public class AuthorizeServiceImpl implements AuthorizeService
         DSpaceObject parent = serviceFactory.getDSpaceObjectService(o).getParentObject(c, o);
         if (parent != null)
         {
-            return isAdmin(c, parent);
+            boolean admin = isAdmin(c, e, parent);
+            c.cacheAuthorizedAction(o, Constants.ADMIN, e, admin, null);
+            return admin;
         }
 
+        c.cacheAuthorizedAction(o, Constants.ADMIN, e, false, null);
         return false;
     }
 
@@ -418,7 +460,23 @@ public class AuthorizeServiceImpl implements AuthorizeService
             return groupService.isMember(c, Group.ADMIN);
         }
     }
-    
+    @Override
+    public boolean isAdmin(Context c, EPerson e) throws SQLException
+    {
+        // if we're ignoring authorization, user is member of admin
+        if (c.ignoreAuthorization())
+        {
+            return true;
+        }
+
+        if (e == null)
+        {
+            return false; // anonymous users can't be admins....
+        } else
+        {
+            return groupService.isMember(c, e, Group.ADMIN);
+        }
+    }
     public boolean isCommunityAdmin(Context c) throws SQLException 
     {
         EPerson e = c.getCurrentUser();
@@ -624,7 +682,7 @@ public class AuthorizeServiceImpl implements AuthorizeService
 
         List<Group> groups = new ArrayList<Group>();
         for (ResourcePolicy resourcePolicy : policies) {
-            if(resourcePolicy.getGroup() != null)
+            if(resourcePolicy.getGroup() != null && resourcePolicyService.isDateValid(resourcePolicy))
             {
                 groups.add(resourcePolicy.getGroup());
             }
