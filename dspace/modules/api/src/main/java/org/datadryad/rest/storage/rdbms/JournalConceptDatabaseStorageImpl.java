@@ -36,6 +36,8 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
 
     static {
         Context context = getContext();
+        // this seems to help ensure that the metadatafield cache is instantiated?
+        DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
         try {
             context.complete();
         } catch (SQLException e) {
