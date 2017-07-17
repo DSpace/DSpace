@@ -75,6 +75,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
@@ -1102,7 +1103,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 String value = meta.value;
 
-                if (value == null)
+                if (value == null || StringUtils.equals(value, MetadataValue.PARENT_PLACEHOLDER_VALUE))
                 {
                     continue;
                 }
