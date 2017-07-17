@@ -303,9 +303,22 @@ public class WorkflowItem implements InProgressSubmission {
                     }
                 }
 
-                if (matched == false) {
-                    StringBuilder authormatches = new StringBuilder();
-                    matched = JournalUtils.compareItemAuthorsToManuscript(item, manuscript, authormatches);
+                if (!matched) {
+                    // compare titles
+                    // check to see if this matches by msid:
+                    DCValue[] titles = item.getMetadata("dc", "title", Item.ANY, Item.ANY);
+                    if (titles != null && titles.length > 0) {
+                        DCValue title = titles[0];
+                        StringBuilder titleMatches = new StringBuilder();
+                        matched = JournalUtils.compareTitleToManuscript(title.value, manuscript, titleMatches);
+                        log.debug("comparing titles: " + titleMatches.toString());
+                        if (matched) {
+                            // compare authors
+                            StringBuilder authormatches = new StringBuilder();
+                            matched = JournalUtils.compareItemAuthorsToManuscript(item, manuscript, authormatches);
+                            log.debug("comparing authors: " + authormatches.toString());
+                        }
+                    }
                 }
 
                 if (matched) {
