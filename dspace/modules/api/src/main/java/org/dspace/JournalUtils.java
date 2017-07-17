@@ -542,17 +542,24 @@ public class JournalUtils {
 
         // sanity check:
         if (matchedManuscript != null) {
-            double matchScore = getHamrScore(queryManuscript.getTitle().toLowerCase(), matchedManuscript.getTitle().toLowerCase());
-            matchedManuscript.optionalProperties.put("crossref-score", String.valueOf(matchScore));
-            // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
-            if (matchScore < 0.5) {
-                resultString.append("BAD MATCH: \"" + queryManuscript.getTitle() + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
+            if (!compareTitleToManuscript(queryManuscript.getTitle(), matchedManuscript, resultString)) {
                 return null;
-            } else {
-                resultString.append("GOOD MATCH: \"" + queryManuscript.getTitle() + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
             }
         }
         return matchedManuscript;
+    }
+
+    public static boolean compareTitleToManuscript(String title, Manuscript matchedManuscript, StringBuilder resultString) {
+        double matchScore = getHamrScore(title.toLowerCase(), matchedManuscript.getTitle().toLowerCase());
+        matchedManuscript.optionalProperties.put("crossref-score", String.valueOf(matchScore));
+        // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
+        if (matchScore < 0.5) {
+            resultString.append("BAD MATCH: \"" + title + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
+            return false;
+        } else {
+            resultString.append("GOOD MATCH: \"" + title + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
+        }
+        return true;
     }
 
     public static boolean compareItemAuthorsToManuscript(Item item, Manuscript manuscript, StringBuilder result) {
