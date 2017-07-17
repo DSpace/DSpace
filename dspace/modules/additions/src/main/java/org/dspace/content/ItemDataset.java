@@ -12,10 +12,14 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -108,7 +112,7 @@ public class ItemDataset {
         }
 
         if(!zip.delete()){
-            LOG.info("Problem deleting " + zip);
+            LOG.warn("Problem deleting " + zip);
         }
     }
     
@@ -199,6 +203,7 @@ public class ItemDataset {
                 }
             }
             catch(SQLException ex){
+                LOG.error(ex);
                 throw new RuntimeException(ex);
             }
             finally {
@@ -275,7 +280,7 @@ public class ItemDataset {
                 
                 // rename zip with temporary file to final name 
                 if(!new File(tmpDir).renameTo(new File(getFullPath()))){
-                    LOG.error("Problem renaming " + tmpDir + " to " + tmpDir);
+                    LOG.error("Problem renaming " + tmpDir + " to " + getFullPath());
                 }
                 LOG.info(getFileName() + " complete");
             }
@@ -301,23 +306,39 @@ public class ItemDataset {
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
+            Context context = new Context();
             
-            ItemIterator iter = Item.findAll(new Context());
+            Hashtable<Integer, Boolean> datasetMap = new Hashtable<Integer, Boolean>(10000);
+            List<Integer> ids = DbQuery.fetchDatasetIds(context);
+            for (Integer id : ids) {
+                datasetMap.put(id, false);
+            }
+            
+            ItemIterator iter = Item.findAll(context);
             while(iter.hasNext()){
                 Item item = iter.next();
                 ItemDataset ds = new ItemDataset(item); 
                 if(ds.exists()){
                     System.out.println("Item already exists " + item.getHandle());
+                    datasetMap.put(item.getID(), true);
                 }
                 else{
                     System.out.println("Create dataset for " + ds.getFullPath() + " for " + item.getHandle());
                     Thread th = ds.createDataset();
                     try{
                         th.join();
+                        datasetMap.put(item.getID(), true);
                     }
                     catch(InterruptedException ex){
                         System.out.println(ex);
                     }
+                }
+            }
+            
+            Set<Integer> keys = datasetMap.keySet();
+            for (Integer itemId : keys) {
+                if(!datasetMap.get(itemId)){
+                    System.out.println("*** Item " + itemId + " has no dataset");
                 }
             }
         }

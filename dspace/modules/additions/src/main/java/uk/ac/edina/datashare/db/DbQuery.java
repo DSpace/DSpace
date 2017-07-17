@@ -1,6 +1,8 @@
 package uk.ac.edina.datashare.db;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
@@ -9,6 +11,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.storage.rdbms.TableRowIterator;
 
 import uk.ac.edina.datashare.eperson.RegistrationDetails;
 
@@ -113,6 +116,29 @@ public class DbQuery
         }
         
         return checksum;
+    }
+    
+    public static List<Integer> fetchDatasetIds(Context context)
+    {
+        ArrayList<Integer> ds = new ArrayList<Integer>(10000);
+        
+        final String QUERY =
+            "SELECT item_id FROM dataset";
+        
+        try
+        {
+            TableRowIterator iterator = DatabaseManager.query(context, QUERY);
+            while (iterator.hasNext()) {
+                ds.add(iterator.next().getIntColumn("item_id"));
+            }
+        }
+        catch(SQLException ex)
+        {
+            LOG.error("Failed to fetch file name: " + ex);
+            DatabaseManager.freeConnection(context.getDBConnection());
+        }
+        
+        return ds;
     }
     
     /**

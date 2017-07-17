@@ -501,7 +501,7 @@ public class Util {
     }
     
     /**
-     * Can all bistreams be read in an item? 
+     * Can all bitstreams be read in an item? 
      * @param context
      * @param item
      * @return
@@ -509,17 +509,15 @@ public class Util {
     public static boolean canReadAllBitstreams(Context context, Item item)
     {
         boolean canRead = true;
-        
         try
         {
             Bundle bundles[] = item.getBundles("ORIGINAL");
             for(int i = 0; i < bundles.length && canRead; i++)
             {
-                
                 Bitstream[] files = bundles[i].getBitstreams();
                 for(int j = 0; j < files.length && canRead; j++)
                 {
-                    System.out.println(j);
+                    //System.out.println(j);
                     canRead = AuthorizeManager.authorizeActionBoolean(
                             context,
                             files[j],
