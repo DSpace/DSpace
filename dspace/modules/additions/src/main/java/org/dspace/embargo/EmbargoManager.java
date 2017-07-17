@@ -19,6 +19,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
@@ -393,10 +394,16 @@ public class EmbargoManager
                         else if (!line.hasOption('c'))
                         {
                             liftEmbargo(context, item);
-                            
+
                             // DATASHARE - start
-                            // create zip file
-                            new ItemDataset(item).createDataset();
+	                        context.commit();
+                            Thread th = new ItemDataset(item).createDataset();
+                            try{
+                                th.join();
+                            }
+                            catch(InterruptedException ex){
+                                System.out.println(ex);
+                            }
                             // DATASHARE - end
                         }
                     }
