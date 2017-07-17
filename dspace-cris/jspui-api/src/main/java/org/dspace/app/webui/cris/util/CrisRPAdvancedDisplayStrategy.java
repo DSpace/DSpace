@@ -15,6 +15,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.browse.BrowseItem;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.ChoiceAuthorityManager;
@@ -177,7 +178,8 @@ public class CrisRPAdvancedDisplayStrategy extends ItemCrisRefDisplayStrategy {
             }
             
             if(otherMetadata != null && otherMetadata.length>j){
-            	startLink+=" data-toggle=\"tooltip\" data-placement=\"right\" title=\""+ otherMetadata[j].value+"\" ";
+            	String val = StringUtils.equals(otherMetadata[j].value,MetadataValue.PARENT_PLACEHOLDER_VALUE) ? "N/D": otherMetadata[j].value; 
+            	startLink+=" data-toggle=\"tooltip\" data-placement=\"right\" title=\""+ val +"\" ";
             }
             
 
