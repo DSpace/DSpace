@@ -318,7 +318,7 @@ public class DSpaceMultipartParser {
             byte[] bytes = ((ByteArrayOutputStream) out).toByteArray();
             this.parts.put(name, new PartInMemory(headers, bytes));
         } else {
-            this.parts.put(name, new PartOnDisk(headers, file));
+            this.parts.put(name, new DSpacePartOnDisk(headers, file));
         }
     }
 
