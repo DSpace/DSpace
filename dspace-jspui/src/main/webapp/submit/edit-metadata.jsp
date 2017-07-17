@@ -15,6 +15,7 @@
   -    submission.inputs - the DCInputSet
   -    submission.page   - the step in submission
   --%>
+<%@page import="org.dspace.content.MetadataValue"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ page import="java.util.ArrayList" %>
@@ -886,7 +887,7 @@
 
         if (count < defaults.length)
         {
-          val = defaults[count].value.replaceAll("\"", "&quot;");
+          val = StringUtils.replaceEachRepeatedly(defaults[count].value, {"\"",MetadataValue.PARENT_PLACEHOLDER_VALUE}, {"&quot;",""});
           auth = defaults[count].authority;
           conf = defaults[count].confidence;
         }
