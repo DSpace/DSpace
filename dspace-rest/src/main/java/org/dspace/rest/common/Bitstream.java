@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.Bundle;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,21 +38,19 @@ public class Bitstream extends DSpaceObject {
     private String retrieveLink;
     private CheckSum checkSum;
     private Integer sequenceId;
-
+    
     private ResourcePolicy[] policies = null;
-
+    
     public Bitstream() {
 
     }
 
-   
-    public Bitstream(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context) throws SQLException{
-	        super(bitstream, servletContext);
-	        setup(bitstream, servletContext, expand, context);
-     }
+    public Bitstream(org.dspace.content.Bitstream bitstream, String expand) throws SQLException{
+        super(bitstream);
+        setup(bitstream, expand);
+    }
 
-    
-	public void setup(org.dspace.content.Bitstream bitstream, ServletContext servletContext, String expand, Context context) throws SQLException{
+    public void setup(org.dspace.content.Bitstream bitstream, String expand) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -71,7 +67,7 @@ public class Bitstream extends DSpaceObject {
         format = bitstream.getFormatDescription();
         sizeBytes = bitstream.getSize();
         retrieveLink = "/bitstreams/" + bitstream.getID() + "/retrieve";
-        mimeType = bitstream.getFormat().getMIMEType();      
+        mimeType = bitstream.getFormat().getMIMEType();
         sequenceId = bitstream.getSequenceID();
         CheckSum checkSum = new CheckSum();
         checkSum.setCheckSumAlgorith(bitstream.getChecksumAlgorithm());
@@ -79,7 +75,7 @@ public class Bitstream extends DSpaceObject {
         this.setCheckSum(checkSum);
 
         if(expandFields.contains("parent") || expandFields.contains("all")) {
-            parentObject = new DSpaceObject(bitstream.getParentObject(), servletContext);
+            parentObject = new DSpaceObject(bitstream.getParentObject());
         } else {
             this.addExpand("parent");
         }
@@ -96,7 +92,7 @@ public class Bitstream extends DSpaceObject {
 					}
 				}
 			}
-
+			
 			policies = tempPolicies.toArray(new ResourcePolicy[0]);
         } else {
             this.addExpand("policies");
@@ -170,11 +166,11 @@ public class Bitstream extends DSpaceObject {
     public DSpaceObject getParentObject() {
         return parentObject;
     }
-
+    
     public CheckSum getCheckSum() {
 		return checkSum;
 	}
-
+    
     public void setCheckSum(CheckSum checkSum) {
 		this.checkSum = checkSum;
 	}
@@ -186,6 +182,6 @@ public class Bitstream extends DSpaceObject {
 	public void setPolicies(ResourcePolicy[] policies) {
 		this.policies = policies;
 	}
-
-
+    
+    
 }

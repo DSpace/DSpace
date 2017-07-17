@@ -38,8 +38,7 @@ import org.dspace.utils.DSpace;
 public class Resource
 {
 
-    @javax.ws.rs.core.Context public ServletContext servletContext;
-
+    @javax.ws.rs.core.Context public static ServletContext servletContext;
 
     private static Logger log = Logger.getLogger(Resource.class);
 
@@ -49,8 +48,7 @@ public class Resource
         writeStatistics = ConfigurationManager.getBooleanProperty("rest", "stats", false);
     }
 
-    
-     public String getServletContextPath() {
+    static public String getServletContextPath() {
 	        return servletContext.getContextPath();
     }
     /**

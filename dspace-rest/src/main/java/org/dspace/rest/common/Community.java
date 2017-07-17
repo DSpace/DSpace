@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -45,14 +44,12 @@ public class Community extends DSpaceObject{
 
     public Community(){}
 
-   
-    public Community(org.dspace.content.Community community, ServletContext servletContext, String expand, Context context) throws SQLException, WebApplicationException{
-	       super(community, servletContext);
-	        setup(community,servletContext, expand, context);
+    public Community(org.dspace.content.Community community, String expand, Context context) throws SQLException, WebApplicationException{
+        super(community);
+        setup(community, expand, context);
      }
 
-    
-	private void setup(org.dspace.content.Community community, ServletContext servletContext, String expand, Context context) throws SQLException{
+    private void setup(org.dspace.content.Community community, String expand, Context context) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -67,7 +64,7 @@ public class Community extends DSpaceObject{
         if(expandFields.contains("parentCommunity") || expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity = community.getParentCommunity();
             if(parentCommunity != null) {
-                setParentCommunity(new Community(parentCommunity,servletContext, null, context));
+                setParentCommunity(new Community(parentCommunity, null, context));
             }
         } else {
             this.addExpand("parentCommunity");
@@ -78,7 +75,7 @@ public class Community extends DSpaceObject{
             collections = new ArrayList<Collection>();
             for(org.dspace.content.Collection collection : collectionArray) {
                 if(AuthorizeManager.authorizeActionBoolean(context, collection, org.dspace.core.Constants.READ)) {
-                    collections.add(new Collection(collection,servletContext, null, context, null, null));
+                    collections.add(new Collection(collection, null, context, null, null));
                 } else {
                     log.info("Omitted restricted collection: " + collection.getID() + " _ " + collection.getName());
                 }
@@ -92,7 +89,7 @@ public class Community extends DSpaceObject{
             subcommunities = new ArrayList<Community>();
             for(org.dspace.content.Community subCommunity : communityArray) {
                 if(AuthorizeManager.authorizeActionBoolean(context, subCommunity, org.dspace.core.Constants.READ)) {
-                	subcommunities.add(new Community(subCommunity, servletContext, null, context));
+                	subcommunities.add(new Community(subCommunity, null, context));
                 } else {
                     log.info("Omitted restricted subCommunity: " + subCommunity.getID() + " _ " + subCommunity.getName());
                 }
@@ -103,7 +100,7 @@ public class Community extends DSpaceObject{
 
         if(expandFields.contains("logo") || expandFields.contains("all")) {
             if(community.getLogo() != null) {
-                logo = new Bitstream(community.getLogo(),servletContext, null, context);
+                logo = new Bitstream(community.getLogo(), null);
             }
         } else {
             this.addExpand("logo");

@@ -52,9 +52,9 @@ import org.dspace.usage.UsageEvent;
 
 /**
  * Class which provide all CRUD methods over items.
- *
+ * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
- *
+ * 
  */
 // Every DSpace class used without namespace is from package org.dspace.rest.common.*. Otherwise namespace is defined.
 @SuppressWarnings("deprecation")
@@ -67,7 +67,7 @@ public class ItemsResource extends Resource
     /**
      * Return item properties without metadata and bitstreams. You can add
      * additional properties by parameter expand.
-     *
+     * 
      * @param itemId
      *            Id of item in DSpace.
      * @param expand
@@ -108,7 +108,7 @@ public class ItemsResource extends Resource
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            item = new Item(dspaceItem, servletContext, expand, context);
+            item = new Item(dspaceItem, expand, context);
             context.complete();
             log.trace("Item(id=" + itemId + ") was successfully read.");
 
@@ -133,7 +133,7 @@ public class ItemsResource extends Resource
      * It returns an array of items in DSpace. You can define how many items in
      * list will be and from which index will start. Items in list are sorted by
      * handle, not by id.
-     *
+     * 
      * @param limit
      *            How many items in array will be. Default value is 100.
      * @param offset
@@ -182,7 +182,7 @@ public class ItemsResource extends Resource
                 {
                     if (ItemService.isItemListedForUser(context, dspaceItem))
                     {
-                        items.add(new Item(dspaceItem, servletContext, expand, context));
+                        items.add(new Item(dspaceItem, expand, context));
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
@@ -209,7 +209,7 @@ public class ItemsResource extends Resource
 
     /**
      * Returns item metadata in list.
-     *
+     * 
      * @param itemId
      *            Id of item in DSpace.
      * @param headers
@@ -244,7 +244,7 @@ public class ItemsResource extends Resource
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            metadata = new org.dspace.rest.common.Item(dspaceItem, servletContext, "metadata", context).getMetadata();
+            metadata = new org.dspace.rest.common.Item(dspaceItem, "metadata", context).getMetadata();
             context.complete();
         }
         catch (SQLException e)
@@ -266,7 +266,7 @@ public class ItemsResource extends Resource
 
     /**
      * Return array of bitstreams in item. It can be pagged.
-     *
+     * 
      * @param itemId
      *            Id of item in DSpace.
      * @param limit
@@ -303,7 +303,7 @@ public class ItemsResource extends Resource
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
 
-            List<Bitstream> itemBitstreams = new Item(dspaceItem, servletContext, "bitstreams", context).getBitstreams();
+            List<Bitstream> itemBitstreams = new Item(dspaceItem, "bitstreams", context).getBitstreams();
 
             if ((offset + limit) > (itemBitstreams.size() - offset))
             {
@@ -336,7 +336,7 @@ public class ItemsResource extends Resource
     /**
      * Adding metadata fields to item. If metadata key is in item, it will be
      * added, NOT REPLACED!
-     *
+     * 
      * @param itemId
      *            Id of item in DSpace.
      * @param metadata
@@ -411,7 +411,7 @@ public class ItemsResource extends Resource
 
     /**
      * Create bitstream in item.
-     *
+     * 
      * @param itemId
      *            Id of item in DSpace.
      * @param inputStream
@@ -551,7 +551,7 @@ public class ItemsResource extends Resource
             }
 
             dspaceBitstream = org.dspace.content.Bitstream.find(context, dspaceBitstream.getID());
-            bitstream = new Bitstream(dspaceBitstream, servletContext, "", context);
+            bitstream = new Bitstream(dspaceBitstream, "");
 
             context.complete();
 
@@ -579,13 +579,12 @@ public class ItemsResource extends Resource
         }
 
         log.info("Bitstream(id=" + bitstream.getId() + ") was successfully added into item(id=" + itemId + ").");
-        
         return bitstream;
     }
 
     /**
      * Replace all metadata in item with new passed metadata.
-     *
+     * 
      * @param itemId
      *            Id of item in DSpace.
      * @param metadata
@@ -671,7 +670,7 @@ public class ItemsResource extends Resource
 
     /**
      * Delete item from DSpace. It delete bitstreams only from item bundle.
-     *
+     * 
      * @param itemId
      *            Id of item which will be deleted.
      * @param headers
@@ -740,7 +739,7 @@ public class ItemsResource extends Resource
 
     /**
      * Delete all item metadata.
-     *
+     * 
      * @param itemId
      *            Id of item in DSpace.
      * @param headers
@@ -818,7 +817,7 @@ public class ItemsResource extends Resource
 
     /**
      * Delete bitstream from item bundle.
-     *
+     * 
      * @param itemId
      *            Id of item in DSpace.
      * @param headers
@@ -914,7 +913,7 @@ public class ItemsResource extends Resource
 
     /**
      * Find items by one metadada field.
-     *
+     * 
      * @param metadataEntry
      *            Metadata field to search by.
      * @param scheme
@@ -967,7 +966,7 @@ public class ItemsResource extends Resource
              *     log.error("Finding failed, bad metadata key.");
              *     throw new WebApplicationException(Response.Status.NOT_FOUND);
              * }
-             *
+             * 
              * if (itemIterator.hasNext()) {
              * item = new Item(itemIterator.next(), "", context);
              * }
@@ -1023,7 +1022,7 @@ public class ItemsResource extends Resource
                 TableRow row = iterator.next();
                 org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("RESOURCE_ID"),
                         org.dspace.core.Constants.READ);
-                Item item = new Item(dspaceItem, servletContext, expand, context);
+                Item item = new Item(dspaceItem, expand, context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);
@@ -1061,7 +1060,7 @@ public class ItemsResource extends Resource
      * Find item from DSpace database. It is encapsulation of method
      * org.dspace.content.Item.find with checking if item exist and if user
      * logged into context has permission to do passed action.
-     *
+     * 
      * @param context
      *            Context of actual logged user.
      * @param id

@@ -32,25 +32,25 @@ import org.dspace.rest.exceptions.ContextException;
 /**
  * Root of RESTful api. It provides login and logout. Also have method for
  * printing every method which is provides by RESTful api.
- *
+ * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
- *
+ * 
  */
 @Path("/")
 public class RestIndex {
     private static Logger log = Logger.getLogger(RestIndex.class);
 
-   // @javax.ws.rs.core.Context public static ServletContext servletContext;
+    @javax.ws.rs.core.Context public static ServletContext servletContext;
 
     /**
      * Return html page with information about REST api. It contains methods all
      * methods provide by REST api.
-     *
+     * 
      * @return HTML page which has information about all methods of REST api.
      */
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String sayHtmlHello(@Context ServletContext servletContext){
+    public String sayHtmlHello() { 
     	// TODO Better graphics, add arguments to all methods. (limit, offset, item and so on)
         return "<html><title>DSpace REST - index</title>" +
                 "<body>"
@@ -117,10 +117,10 @@ public class RestIndex {
                   	"</ul>" +
                 "</body></html> ";
     }
-
+    
     /**
      * Method only for testing whether the REST API is running.
-     *
+     * 
      * @return String "REST api is running."
      */
     @GET
@@ -132,7 +132,7 @@ public class RestIndex {
 
     /**
      * Method to login a user into REST API.
-     *
+     * 
      * @param user
      *            User which will be logged in to REST API.
      * @return Returns response code OK and a token. Otherwise returns response
@@ -157,7 +157,7 @@ public class RestIndex {
     /**
      * Method to logout a user from DSpace REST API. Removes the token and user from
      * TokenHolder.
-     *
+     * 
      * @param headers
      *            Request header which contains the header named
      *            "rest-dspace-token" containing the token as value.
@@ -192,7 +192,7 @@ public class RestIndex {
 
     /**
      * Method to check current status of the service and logged in user.
-     *
+     * 
      * okay: true | false
      * authenticated: true | false
      * epersonEMAIL: user@example.com

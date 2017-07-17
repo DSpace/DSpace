@@ -7,20 +7,19 @@
  */
 package org.dspace.rest.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
-
-//import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @XmlRootElement(name = "resourcepolicy")
 public class ResourcePolicy{
-
+	
 	public enum Action {
 		READ, WRITE, DELETE;
 	}
-
+	
 	private Integer id;
 	private Action action;
 	private Integer epersonId;
@@ -32,12 +31,12 @@ public class ResourcePolicy{
 	private String rpType;
 	private Date startDate;
 	private Date endDate;
-
+	
 	public ResourcePolicy() {}
-
+	
 	public ResourcePolicy(org.dspace.authorize.ResourcePolicy dspacePolicy) {
 		this.id = dspacePolicy.getID();
-
+		
 		switch(dspacePolicy.getAction()) {
 		case org.dspace.core.Constants.READ:
 			this.action = Action.READ;
@@ -49,7 +48,7 @@ public class ResourcePolicy{
 			this.action = Action.DELETE;
 			break;
 		}
-
+		
 		this.epersonId = dspacePolicy.getEPersonID();
 		this.groupId = dspacePolicy.getGroupID();
 		this.resourceId = dspacePolicy.getResourceID();
@@ -58,7 +57,7 @@ public class ResourcePolicy{
 		this.rpType = dspacePolicy.getRpType();
 		this.startDate = dspacePolicy.getStartDate();
 		this.endDate = dspacePolicy.getEndDate();
-
+		
 		switch(dspacePolicy.getResourceType()) {
 		case org.dspace.core.Constants.BITSTREAM:
 			this.resourceType = "bitstream";
@@ -92,7 +91,7 @@ public class ResourcePolicy{
 	public Action getAction() {
 		return action;
 	}
-
+	
 	@JsonIgnore
 	public int getActionInt(){
 		switch(action) {
@@ -181,5 +180,5 @@ public class ResourcePolicy{
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
-
+	
 }

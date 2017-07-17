@@ -7,12 +7,11 @@
  */
 package org.dspace.rest.common;
 
-//import org.codehaus.jackson.annotate.JsonProperty;
-import org.dspace.core.Context;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.dspace.eperson.EPerson;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Used to handle/determine status of REST API.

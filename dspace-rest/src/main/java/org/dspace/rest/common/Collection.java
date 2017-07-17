@@ -12,7 +12,6 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
@@ -47,15 +46,13 @@ public class Collection extends DSpaceObject {
 
     public Collection(){}
 
-    
-    public Collection(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
-	        super(collection, servletContext);
-	        setup(collection, servletContext, expand, context, limit, offset);
-     }
+    public Collection(org.dspace.content.Collection collection, String expand, Context context, Integer limit, Integer offset) throws SQLException, WebApplicationException{
+        super(collection);
+        setup(collection, expand, context, limit, offset);
+    }
 
-    
-     private void setup(org.dspace.content.Collection collection, ServletContext servletContext, String expand, Context context, Integer limit, Integer offset) throws SQLException{
-    List<String> expandFields = new ArrayList<String>();
+    private void setup(org.dspace.content.Collection collection, String expand, Context context, Integer limit, Integer offset) throws SQLException{
+        List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
         }
@@ -64,11 +61,11 @@ public class Collection extends DSpaceObject {
         this.setIntroductoryText(collection.getMetadata(org.dspace.content.Collection.INTRODUCTORY_TEXT));
         this.setShortDescription(collection.getMetadata(org.dspace.content.Collection.SHORT_DESCRIPTION));
         this.setSidebarText(collection.getMetadata(org.dspace.content.Collection.SIDEBAR_TEXT));
-
+        
         if(expandFields.contains("parentCommunityList") || expandFields.contains("all")) {
             org.dspace.content.Community[] parentCommunities = collection.getCommunities();
             for(org.dspace.content.Community parentCommunity : parentCommunities) {
-                this.addParentCommunityList(new Community(parentCommunity, servletContext, null, context));
+                this.addParentCommunityList(new Community(parentCommunity, null, context));
             }
         } else {
             this.addExpand("parentCommunityList");
@@ -76,7 +73,7 @@ public class Collection extends DSpaceObject {
 
         if(expandFields.contains("parentCommunity") | expandFields.contains("all")) {
             org.dspace.content.Community parentCommunity = (org.dspace.content.Community) collection.getParentObject();
-            this.setParentCommunity(new Community(parentCommunity, servletContext, null, context));
+            this.setParentCommunity(new Community(parentCommunity, null, context));
         } else {
             this.addExpand("parentCommunity");
         }
@@ -95,7 +92,7 @@ public class Collection extends DSpaceObject {
                 org.dspace.content.Item item = childItems.next();
 
                 if(ItemService.isItemListedForUser(context, item)) {
-                    items.add(new Item(item, servletContext, null, context));
+                    items.add(new Item(item, null, context));
                 }
             }
         } else {
@@ -110,11 +107,11 @@ public class Collection extends DSpaceObject {
 
         if(expandFields.contains("logo") || expandFields.contains("all")) {
             if(collection.getLogo() != null) {
-                this.logo = new Bitstream(collection.getLogo(), servletContext, null, context);
+                this.logo = new Bitstream(collection.getLogo(), null);
             }
         }
         else {
-        	this.addExpand("logo");
+            this.addExpand("logo");
         }
 
         if(!expandFields.contains("all")) {
@@ -145,18 +142,18 @@ public class Collection extends DSpaceObject {
     }
 
     public List<Item> getItems() {
-		return items;
-	}
+        return items;
+    }
 
-	public void setItems(List<Item> items) {
-		this.items = items;
-	}
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
 
-	public void setParentCommunityList(List<Community> parentCommunityList) {
-		this.parentCommunityList = parentCommunityList;
-	}
+    public void setParentCommunityList(List<Community> parentCommunityList) {
+        this.parentCommunityList = parentCommunityList;
+    }
 
-	public List<Community> getParentCommunityList() {
+    public List<Community> getParentCommunityList() {
         return parentCommunityList;
     }
 
@@ -172,35 +169,35 @@ public class Collection extends DSpaceObject {
         this.license = license;
     }
 
-	public String getCopyrightText() {
-		return copyrightText;
-	}
+    public String getCopyrightText() {
+        return copyrightText;
+    }
 
-	public void setCopyrightText(String copyrightText) {
-		this.copyrightText = copyrightText;
-	}
+    public void setCopyrightText(String copyrightText) {
+        this.copyrightText = copyrightText;
+    }
 
-	public String getIntroductoryText() {
-		return introductoryText;
-	}
+    public String getIntroductoryText() {
+        return introductoryText;
+    }
 
-	public void setIntroductoryText(String introductoryText) {
-		this.introductoryText = introductoryText;
-	}
+    public void setIntroductoryText(String introductoryText) {
+        this.introductoryText = introductoryText;
+    }
 
-	public String getShortDescription() {
-		return shortDescription;
-	}
+    public String getShortDescription() {
+        return shortDescription;
+    }
 
-	public void setShortDescription(String shortDescription) {
-		this.shortDescription = shortDescription;
-	}
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
 
-	public String getSidebarText() {
-		return sidebarText;
-	}
+    public String getSidebarText() {
+        return sidebarText;
+    }
 
-	public void setSidebarText(String sidebarText) {
-		this.sidebarText = sidebarText;
-	}
+    public void setSidebarText(String sidebarText) {
+        this.sidebarText = sidebarText;
+    }
 }

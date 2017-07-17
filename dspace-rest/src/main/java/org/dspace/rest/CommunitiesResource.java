@@ -38,9 +38,9 @@ import org.dspace.usage.UsageEvent;
 
 /**
  * Class which provides CRUD methods over communities.
- *
+ * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
- *
+ * 
  */
 @Path("/communities")
 public class CommunitiesResource extends Resource
@@ -50,7 +50,7 @@ public class CommunitiesResource extends Resource
     /**
      * Returns community with basic properties. If you want more, use expand
      * parameter or method for community collections or subcommunities.
-     *
+     * 
      * @param communityId
      *            Id of community in DSpace.
      * @param expand
@@ -89,8 +89,7 @@ public class CommunitiesResource extends Resource
             writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
-          
-            community = new Community(dspaceCommunity, servletContext, expand, context);
+            community = new Community(dspaceCommunity, expand, context);
             context.complete();
 
         }
@@ -115,13 +114,13 @@ public class CommunitiesResource extends Resource
 
     /**
      * Return all communities in DSpace.
-     *
+     * 
      * @param expand
      *            String in which is what you want to add to returned instance
      *            of community. Options are: "all", "parentCommunity",
      *            "collections", "subCommunities" and "logo". If you want to use
      *            multiple options, it must be separated by commas.
-     *
+     * 
      * @param limit
      *            Maximum communities in array. Default value is 100.
      * @param offset
@@ -166,8 +165,7 @@ public class CommunitiesResource extends Resource
             {
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
-                    
-                    Community community = new Community(dspaceCommunities[i], servletContext, expand, context);
+                    Community community = new Community(dspaceCommunities[i], expand, context);
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                     communities.add(community);
@@ -196,13 +194,13 @@ public class CommunitiesResource extends Resource
     /**
      * Return all top communities in DSpace. Top communities are communities on
      * the root of tree.
-     *
+     * 
      * @param expand
      *            String in which is what you want to add to returned instance
      *            of community. Options are: "all", "parentCommunity",
      *            "collections", "subCommunities" and "logo". If you want to use
      *            multiple options, it must be separated by commas.
-     *
+     * 
      * @param limit
      *            Maximum communities in array. Default value is 100.
      * @param offset
@@ -249,8 +247,7 @@ public class CommunitiesResource extends Resource
             {
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
-                    
-                    Community community = new Community(dspaceCommunities[i], servletContext, expand, context);
+                    Community community = new Community(dspaceCommunities[i], expand, context);
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                     communities.add(community);
@@ -278,7 +275,7 @@ public class CommunitiesResource extends Resource
 
     /**
      * Return all collections of community.
-     *
+     * 
      * @param communityId
      *            Id of community in DSpace.
      * @param expand
@@ -335,8 +332,7 @@ public class CommunitiesResource extends Resource
             {
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollections[i], org.dspace.core.Constants.READ))
                 {
-                    
-                    collections.add(new Collection(dspaceCollections[i], servletContext, expand, context, 20, 0));
+                    collections.add(new Collection(dspaceCollections[i], expand, context, 20, 0));
                     writeStats(dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                 }
@@ -365,7 +361,7 @@ public class CommunitiesResource extends Resource
 
     /**
      * Return all subcommunities of community.
-     *
+     * 
      * @param communityId
      *            Id of community in DSpace.
      * @param expand
@@ -422,8 +418,7 @@ public class CommunitiesResource extends Resource
             {
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
-                    
-                    communities.add(new Community(dspaceCommunities[i], servletContext, expand, context));
+                    communities.add(new Community(dspaceCommunities[i], expand, context));
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                 }
@@ -454,7 +449,7 @@ public class CommunitiesResource extends Resource
     /**
      * Create community at top level. Creating community at top level has
      * permission only admin.
-     *
+     * 
      * @param community
      *            Community which will be created at top level of communities.
      * @param headers
@@ -504,8 +499,7 @@ public class CommunitiesResource extends Resource
             dspaceCommunity.setMetadata(org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
             dspaceCommunity.update();
 
-            
-            retCommunity = new Community(dspaceCommunity, servletContext, "", context);
+            retCommunity = new Community(dspaceCommunity, "", context);
             context.complete();
 
         }
@@ -533,7 +527,7 @@ public class CommunitiesResource extends Resource
 
     /**
      * Create collection in community.
-     *
+     * 
      * @param communityId
      *            Id of community in DSpace.
      * @param collection
@@ -583,8 +577,7 @@ public class CommunitiesResource extends Resource
             dspaceCollection.update();
             dspaceCommunity.update();
 
-            
-            retCollection = new Collection(dspaceCollection, servletContext, "", context, 100, 0);
+            retCollection = new Collection(dspaceCollection, "", context, 100, 0);
             context.complete();
 
         }
@@ -617,7 +610,7 @@ public class CommunitiesResource extends Resource
 
     /**
      * Create subcommunity in community.
-     *
+     * 
      * @param communityId
      *            Id of community in DSpace, in which will be created
      *            subcommunity.
@@ -666,8 +659,7 @@ public class CommunitiesResource extends Resource
             dspaceCommunity.update();
             dspaceParentCommunity.update();
 
-            
-            retCommunity = new Community(dspaceCommunity, servletContext, "", context);
+            retCommunity = new Community(dspaceCommunity, "", context);
             context.complete();
 
         }
@@ -699,7 +691,7 @@ public class CommunitiesResource extends Resource
     /**
      * Update community. Replace all information about community except: id,
      * handle and expandle items.
-     *
+     * 
      * @param communityId
      *            Id of community in DSpace.
      * @param community
@@ -770,7 +762,7 @@ public class CommunitiesResource extends Resource
 
     /**
      * Delete community from DSpace. It delete it everything with community!
-     *
+     * 
      * @param communityId
      *            Id of community in DSpace.
      * @param headers
@@ -836,7 +828,7 @@ public class CommunitiesResource extends Resource
 
     /**
      * Delete collection in community.
-     *
+     * 
      * @param communityId
      *            Id of community in DSpace.
      * @param collectionId
@@ -942,7 +934,7 @@ public class CommunitiesResource extends Resource
 
     /**
      * Delete subcommunity in community.
-     *
+     * 
      * @param parentCommunityId
      *            Id of community in DSpace.
      * @param subcommunityId
@@ -1050,7 +1042,7 @@ public class CommunitiesResource extends Resource
      * Find community from DSpace database. It is encapsulation of method
      * org.dspace.content.Community.find with checking if item exist and if user
      * logged into context has permission to do passed action.
-     *
+     * 
      * @param context
      *            Context of actual logged user.
      * @param id
