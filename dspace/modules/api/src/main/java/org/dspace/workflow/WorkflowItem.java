@@ -2,7 +2,6 @@ package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
-import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -278,26 +277,26 @@ public class WorkflowItem implements InProgressSubmission {
 
         try {
             workflowItems = WorkflowItem.findAllByJournalCode(context, journalCode);
-            for (int i=0;i<workflowItems.length;i++) {
+            for (WorkflowItem wfi : workflowItems) {
                 Boolean matched = false;
-                WorkflowItem wfi = workflowItems[i];
                 Item item = wfi.getItem();
                 // check to see if this matches by msid:
                 DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
-                for (int j=0; j<msids.length; j++) {
+                if (msids != null && msids.length > 0) {
+                    DCValue msid = msids[0];
                     try {
-                        String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msids[j].value, journalConcept);
+                        String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msid.value, journalConcept);
                         if (manuscript.getManuscriptId().equals(canonicalMSID)) {
                             log.debug("matched " + item.getID() + " by msid");
                             matched = true;
                         }
                     } catch (Exception e) {
-                        log.error("couldn't parse msid " + msids[j].value);
+                        log.error("couldn't parse msid " + msid.value);
                     }
 
                     // TEMPORARY FIX: manuscript numbers from metadata files had the JournalCode prefixed onto the manuscript number as well.
                     String alt_msid = journalCode + "-" + manuscript.getManuscriptId();
-                    if (alt_msid.equals(msids[j].value)) {
+                    if (alt_msid.equals(msid.value)) {
                         log.debug("matched " + item.getID() + " by msid (metadata file method)");
                         matched = true;
                     }
@@ -322,6 +321,7 @@ public class WorkflowItem implements InProgressSubmission {
                 }
 
                 if (matched) {
+                    log.debug("MATCHED " + manuscript.getTitle() + " to " + wfi.getItem().getID());
                     matchingItems.add(wfi);
                 }
             }
