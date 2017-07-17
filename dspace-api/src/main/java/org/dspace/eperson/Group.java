@@ -363,9 +363,9 @@ public class Group extends DSpaceObject
     }
 
     /**
-     * fast check to see if an eperson is a member called with eperson id, does
-     * database lookup without instantiating all of the epeople objects and is
-     * thus a static method
+     * fast check to see if the current EPerson is a member of a Group.  Does
+     * database lookup without instantiating all of the EPerson objects and is
+     * thus a static method.
      * 
      * @param c
      *            context
@@ -386,7 +386,30 @@ public class Group extends DSpaceObject
     }
 
     /**
-     * Get all of the groups that an eperson is a member of
+     * Fast check to see if a given EPerson is a member of a Group.
+     * Does database lookup without instantiating all of the EPerson objects and
+     * is thus a static method.
+     *
+     * @param c current DSpace context.
+     * @param eperson candidate to test for membership.
+     * @param groupid group whose membership is to be tested.
+     * @return true if {@link eperson} is a member of Group {@link groupid}.
+     * @throws SQLException passed through
+     */
+    public static boolean isMember(Context c, EPerson eperson, int groupid)
+            throws SQLException
+    {
+        // Every EPerson is a member of Anonymous
+        if (groupid == 0)
+        {
+            return true;
+        }
+
+        return epersonInGroup(c, groupid, eperson);
+    }
+
+    /**
+     * Get all of the groups that an eperson is a member of.
      * 
      * @param c
      * @param e

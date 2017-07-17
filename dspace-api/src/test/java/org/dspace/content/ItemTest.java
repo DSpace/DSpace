@@ -96,6 +96,7 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     @Override
     public void destroy()
     {
+        context.turnOffAuthorisationSystem();
         it = null;
         super.destroy();
     }

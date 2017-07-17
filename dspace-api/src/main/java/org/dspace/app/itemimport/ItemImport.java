@@ -285,7 +285,7 @@ public class ItemImport
             if (line.hasOption('z'))
             {
                 zip = true;
-                zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
+                zipfilename = line.getOptionValue('z');
             }
 
             //By default assume collections will be given on the command line
@@ -1109,6 +1109,10 @@ public class ItemImport
         {
             value = "";
         }
+        else
+        {
+        	value = value.trim();
+        }
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");
         String qualifier = getAttributeValue(n, "qualifier"); //NodeValue();
@@ -1140,8 +1144,8 @@ public class ItemImport
         {
             qualifier = null;
         }
-
-        if (!isTest)
+        // only add metadata if it is no test and there is an real value
+        if (!isTest && !value.equals(""))
         {
             if(StringUtils.isNotEmpty(authority)) {
                 

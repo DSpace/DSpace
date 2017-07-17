@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-
+import java.util.Locale;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
@@ -66,6 +66,11 @@ public class DatabaseUtils
                             File.separator + "search" +
                             File.separator + "conf" +
                             File.separator + "reindex.flag";
+
+    // Types of databases supported by DSpace. See getDbType()
+    public static final String DBMS_POSTGRES="postgres";
+    public static final String DBMS_ORACLE="oracle";
+    public static final String DBMS_H2="h2";
 
     private static final String baseConfigurationPostgresFilePath = ConfigurationManager.getProperty("dspace.dir") +
             File.separator + "etc" +
@@ -1209,6 +1214,37 @@ public class DatabaseUtils
             // (See ReindexerThread nested class below)
             ReindexerThread go = new ReindexerThread(indexer);
             go.start();
+        }
+    }
+
+    /**
+     * Determine the type of Database, based on the DB connection.
+     *
+     * @param connection current DB Connection
+     * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
+     * @throws SQLException if database error
+     */
+    public static String getDbType(Connection connection)
+            throws SQLException
+    {
+        DatabaseMetaData meta = connection.getMetaData();
+        String prodName = meta.getDatabaseProductName();
+        String dbms_lc = prodName.toLowerCase(Locale.ROOT);
+        if (dbms_lc.contains("postgresql"))
+        {
+            return DBMS_POSTGRES;
+        }
+        else if (dbms_lc.contains("oracle"))
+        {
+            return DBMS_ORACLE;
+        }
+        else if (dbms_lc.contains("h2")) // Used for unit testing only
+        {
+            return DBMS_H2;
+        }
+        else
+        {
+            return dbms_lc;
         }
     }
 

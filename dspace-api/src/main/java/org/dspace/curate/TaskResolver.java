@@ -29,36 +29,50 @@ import org.dspace.core.PluginManager;
 /**
  * TaskResolver takes a logical name of a curation task and attempts to deliver 
  * a suitable implementation object. Supported implementation types include:
- * (1) Classpath-local Java classes configured and loaded via PluginManager.
- * (2) Local script-based tasks, viz. coded in any scripting language whose
+ * <ol>
+ *  <li> Classpath-local Java classes configured and loaded via PluginManager</li>.
+ *  <li> Local script-based tasks, viz. coded in any scripting language whose
  * runtimes are accessible via the JSR-223 scripting API. This really amounts
- * to the family of dynamic JVM languages: JRuby, Jython, Groovy, Javascript, etc
- * Note that the requisite jars and other resources for these languages must be
- * installed in the DSpace instance for them to be used here.
+ * to the family of dynamic JVM languages: JRuby, Jython, Groovy, Javascript, etc.</li>
+ * </ol>
+ * <p>
+ * Note that the requisite jars and other resources for these languages must
+ * be installed in the DSpace instance for them to be used here.
  * Further work may involve remote URL-loadable code, etc. 
  * 
+ * <p>
  * Scripted tasks are managed in a directory configured with the
- * dspace/config/modules/curate.cfg property "script.dir". A catalog of
- * scripted tasks named 'task.catalog" is kept in this directory.
+ * {@code dspace/config/modules/curate.cfg} property "script.dir".
+ * A catalog of
+ * scripted tasks named "task.catalog" is kept in this directory.
  * Each task has a 'descriptor' property with value syntax:
- * <engine>|<relFilePath>|<implClassCtor>
+ * <br/>
+ * {@code <engine>|<relFilePath>|<implClassCtor>}
+ *
+ * <p>
  * An example property:
- * 
- * linkchecker = ruby|rubytask.rb|LinkChecker.new
- * 
+ * <br/>
+ * {@code linkchecker = ruby|rubytask.rb|LinkChecker.new}
+ *
+ * <p>
  * This descriptor means that a 'ruby' script engine will be created,
- * a script file named 'rubytask.rb' in the directory <script.dir> will be
- * loaded and the resolver will expect an evaluation of 'LinkChecker.new' will 
- * provide a correct implementation object.
- * 
+ * a script file named 'rubytask.rb' in the directory {@code <script.dir>}
+ * will be
+ * loaded and the resolver will expect an evaluation of 'LinkChecker.new'
+ * will provide a correct implementation object.
+ *
+ * <p>
  * Script files may embed their descriptors to facilitate deployment.
- * To accomplish this, a script must include the descriptor string with syntax:
- * $td=<descriptor> somewhere on a comment line. for example:
- * 
- * # My descriptor $td=ruby|rubytask.rb|LinkChecker.new
- * 
- * For portability, the <relFilePath> component may be omitted in this context.
- * Thus, $td=ruby||LinkChecker.new will be expanded to a descriptor
+ * To accomplish this, a script must include the descriptor string with
+ * syntax {@code $td=<descriptor>} somewhere on a comment line. For example:
+ *
+ * <p>
+ * {@code # My descriptor $td=ruby|rubytask.rb|LinkChecker.new}
+ *
+ * <p>
+ * For portability, the {@code <relFilePath>} component may be omitted in
+ * this context.
+ * Thus, {@code $td=ruby||LinkChecker.new} will be expanded to a descriptor
  * with the name of the embedding file.
  * 
  * @author richardrodgers
