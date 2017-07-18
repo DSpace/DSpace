@@ -887,7 +887,7 @@
 
         if (count < defaults.length)
         {
-          val = StringUtils.replaceEachRepeatedly(defaults[count].value, {"\"",MetadataValue.PARENT_PLACEHOLDER_VALUE}, {"&quot;",""});
+          val = StringUtils.replaceEachRepeatedly(defaults[count].value,new String[]{"\"",MetadataValue.PARENT_PLACEHOLDER_VALUE},new String[]{"&quot;",""});
           auth = defaults[count].authority;
           conf = defaults[count].confidence;
         }
