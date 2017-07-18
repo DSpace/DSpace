@@ -35,6 +35,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
@@ -756,6 +757,24 @@ public class ShibAuthentication implements AuthenticationMethod
 		// Set the minimum attributes for the new eperson
 		if (netid != null)
 			eperson.setNetid(netid);
+		
+        // Check if we were able to determine an email address from Shibboleth
+        if (StringUtils.isEmpty(email))
+        {
+            // If no email, check if we have a "netid_email_domain". If so, append it to the netid to create email
+            if (StringUtils.isNotEmpty(ConfigurationManager.getProperty("authentication-shibboleth", "netid_email_domain")))
+            {
+                email = netid + ConfigurationManager.getProperty("authentication-shibboleth", "netid_email_domain");
+            }
+            else
+            {
+                // We don't have a valid email address. We'll default it to 'netid' but log a warning
+                log.warn(LogManager.getHeader(context, "autoregister",
+                        "Unable to locate email address for account '" + netid + "', so it has been set to '" + netid + "'. " +
+                        "Please check the Shibboleth 'email-header' OR consider configuring 'netid_email_domain'."));
+                email = netid;
+            }
+        }
 		eperson.setEmail(email.toLowerCase());
 		if ( fname != null )
 			eperson.setFirstName(fname);
