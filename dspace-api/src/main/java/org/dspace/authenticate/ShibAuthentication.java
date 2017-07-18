@@ -851,7 +851,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			// to netid based authentication. The current users do not have netids and fall back to email-based
 			// identification but once they login we update their record and lock the account to a particular netid.
 			eperson.setNetid(netid);
-		if (email != null)
+		if (StringUtils.isNotBlank(email))
 			// The email could have changed if using netid based lookup.
 			eperson.setEmail(email.toLowerCase());
 		if (fname != null)
