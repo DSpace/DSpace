@@ -297,7 +297,7 @@ public class Community extends DSpaceObject
         {
             while (tri.hasNext())
             {
-                TableRow row = tri.next();
+                TableRow row = tri.next(context);
 
                 // First check the cache
                 Community fromCache = (Community) context.fromCache(
@@ -367,7 +367,7 @@ public class Community extends DSpaceObject
         {
             while (tri.hasNext())
             {
-                TableRow row = tri.next();
+                TableRow row = tri.next(context);
 
                 // First check the cache
                 Community fromCache = (Community) context.fromCache(
@@ -783,7 +783,7 @@ public class Community extends DSpaceObject
         {
             while (tri.hasNext())
             {
-                TableRow row = tri.next();
+                TableRow row = tri.next(ourContext);
 
                 // First check the cache
                 Collection fromCache = (Collection) ourContext.fromCache(
@@ -905,7 +905,7 @@ public class Community extends DSpaceObject
         {
             while (tri.hasNext())
             {
-                TableRow row = tri.next();
+                TableRow row = tri.next(ourContext);
 
                 // First check the cache
                 Community fromCache = (Community) ourContext.fromCache(
@@ -962,7 +962,7 @@ public class Community extends DSpaceObject
         {
             if (tri.hasNext())
             {
-                TableRow row = tri.next();
+                TableRow row = tri.next(ourContext);
 
                 // First check the cache
                 Community fromCache = (Community) ourContext.fromCache(
