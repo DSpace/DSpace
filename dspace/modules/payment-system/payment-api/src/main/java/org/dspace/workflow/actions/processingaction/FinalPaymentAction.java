@@ -96,7 +96,7 @@ public class FinalPaymentAction extends ProcessingAction {
                             Date date = new Date();
                             shoppingCart.setPaymentDate(date);
                             shoppingCart.update();
-                            AssociationAnywhere.tallyCredit(c, organizationConcept.getCustomerID(), packageDOI);
+//                            AssociationAnywhere.tallyCredit(c, organizationConcept.getCustomerID(), packageDOI);
                             paymentSystemService.sendPaymentApprovedEmail(c, wfi, shoppingCart);
                             return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, ActionResult.OUTCOME_COMPLETE);
                         } catch (Exception e) {
