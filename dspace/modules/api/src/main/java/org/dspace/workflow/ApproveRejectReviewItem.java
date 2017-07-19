@@ -292,22 +292,23 @@ public class ApproveRejectReviewItem {
             // set title
             if (!"".equals(manuscript.getTitle()) && !dataPackage.getItem().hasMetadataEqualTo(ARTICLE_TITLE, manuscript.getTitle())) {
                 String oldValue = dataPackage.getTitle();
-                dataPackage.setTitle(manuscript.getTitle());
-                message.append(" " + ARTICLE_TITLE + " was updated from " + oldValue + ".");
+                dataPackage.setTitle(prefixTitle(manuscript.getTitle()));
+                message.append(" " + ARTICLE_TITLE + " was updated from \"" + oldValue + "\".");
             }
             // set abstract
             if (!"".equals(manuscript.getAbstract()) && !dataPackage.getItem().hasMetadataEqualTo(ABSTRACT, manuscript.getAbstract())) {
-                String oldValue = dataPackage.getAbstract();
                 dataPackage.setAbstract(manuscript.getAbstract());
-                message.append(" " + ABSTRACT + " was updated from " + oldValue + ".");
+                message.append(" " + ABSTRACT + " was updated.");
             }
             // set publicationDate
-            SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
-            String dateString = dateIso.format(manuscript.getPublicationDate());
-            if (!"".equals(manuscript.getPublicationDate()) && !dataPackage.getItem().hasMetadataEqualTo(PUBLICATION_DATE, dateString)) {
+            if (manuscript.getPublicationDate() != null) {
+                SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
+                String dateString = dateIso.format(manuscript.getPublicationDate());
                 String oldValue = dataPackage.getPublicationDate();
-                dataPackage.setPublicationDate(dateString);
-                message.append(" " + PUBLICATION_DATE + " was updated from " + oldValue + ".");
+                if (!oldValue.equals(dateString)) {
+                    dataPackage.setPublicationDate(dateString);
+                    message.append(" " + PUBLICATION_DATE + " was updated from " + oldValue + ".");
+                }
             }
         }
     }
