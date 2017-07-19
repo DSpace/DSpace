@@ -32,6 +32,7 @@ import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.ChoiceAuthorityManager;
@@ -117,6 +118,10 @@ public class CrisConsumer implements Consumer
                         for (Metadatum dcval : Metadatums)
                         {
                             dcval.setPlace(idx);
+                            if(StringUtils.equals(dcval.value, MetadataValue.PARENT_PLACEHOLDER_VALUE)){
+                            	idx++;
+                            	continue;
+                            }
                             String authority = dcval.authority;
                             if (StringUtils.isNotBlank(authority))
                             {
