@@ -278,50 +278,10 @@ public class WorkflowItem implements InProgressSubmission {
         try {
             workflowItems = WorkflowItem.findAllByJournalCode(context, journalCode);
             for (WorkflowItem wfi : workflowItems) {
-                Boolean matched = false;
                 Item item = wfi.getItem();
-                // check to see if this matches by msid:
-                DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
-                if (msids != null && msids.length > 0) {
-                    DCValue msid = msids[0];
-                    try {
-                        String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msid.value, journalConcept);
-                        if (manuscript.getManuscriptId().equals(canonicalMSID)) {
-                            log.debug("matched " + item.getID() + " by msid");
-                            matched = true;
-                        }
-                    } catch (Exception e) {
-                        log.error("couldn't parse msid " + msid.value);
-                    }
-
-                    // TEMPORARY FIX: manuscript numbers from metadata files had the JournalCode prefixed onto the manuscript number as well.
-                    String alt_msid = journalCode + "-" + manuscript.getManuscriptId();
-                    if (alt_msid.equals(msid.value)) {
-                        log.debug("matched " + item.getID() + " by msid (metadata file method)");
-                        matched = true;
-                    }
-                }
-
-                if (!matched) {
-                    // compare titles
-                    // check to see if this matches by msid:
-                    DCValue[] titles = item.getMetadata("dc", "title", Item.ANY, Item.ANY);
-                    if (titles != null && titles.length > 0) {
-                        DCValue title = titles[0];
-                        StringBuilder titleMatches = new StringBuilder();
-                        matched = JournalUtils.compareTitleToManuscript(title.value, manuscript, titleMatches);
-                        log.debug("comparing titles: " + titleMatches.toString());
-                        if (matched) {
-                            // compare authors
-                            StringBuilder authormatches = new StringBuilder();
-                            matched = JournalUtils.compareItemAuthorsToManuscript(item, manuscript, authormatches);
-                            log.debug("comparing authors: " + authormatches.toString());
-                        }
-                    }
-                }
-
-                if (matched) {
-                    log.debug("MATCHED " + manuscript.getTitle() + " to " + wfi.getItem().getID());
+                StringBuilder result = new StringBuilder();
+                if (JournalUtils.compareItemToManuscript(item, manuscript, result)) {
+                    log.debug("MATCHED " + manuscript.getTitle() + " to " + wfi.getItem().getID() + "\n" + result.toString());
                     matchingItems.add(wfi);
                 }
             }

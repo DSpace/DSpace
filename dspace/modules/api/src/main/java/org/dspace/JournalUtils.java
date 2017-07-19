@@ -542,18 +542,17 @@ public class JournalUtils {
 
         // sanity check:
         if (matchedManuscript != null) {
-            if (!compareTitleToManuscript(queryManuscript.getTitle(), matchedManuscript, resultString)) {
+            // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
+            if (!compareTitleToManuscript(queryManuscript.getTitle(), matchedManuscript, 0.5, resultString)) {
                 return null;
             }
         }
         return matchedManuscript;
     }
 
-    public static boolean compareTitleToManuscript(String title, Manuscript matchedManuscript, StringBuilder resultString) {
+    public static boolean compareTitleToManuscript(String title, Manuscript matchedManuscript, double threshold, StringBuilder resultString) {
         double matchScore = getHamrScore(title.toLowerCase(), matchedManuscript.getTitle().toLowerCase());
-        matchedManuscript.optionalProperties.put("crossref-score", String.valueOf(matchScore));
-        // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
-        if (matchScore < 0.5) {
+        if (matchScore < threshold) {
             resultString.append("BAD MATCH: \"" + title + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
             return false;
         } else {
@@ -583,6 +582,39 @@ public class JournalUtils {
             if (numMatched == itemAuthors.length) {
                 matched = true;
                 result.append("matched " + item.getID() + " by authors");
+            }
+        }
+        return matched;
+    }
+
+    public static boolean compareItemToManuscript(Item item, Manuscript manuscript, StringBuilder result) {
+        boolean matched = false;
+        // check to see if this matches by msid:
+        DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
+        if (msids != null && msids.length > 0) {
+            DCValue msid = msids[0];
+            try {
+                String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msid.value, manuscript.getJournalConcept());
+                if (manuscript.getManuscriptId().equals(canonicalMSID)) {
+                    log.debug("matched " + item.getID() + " by msid");
+                    matched = true;
+                }
+            } catch (Exception e) {
+                log.error("couldn't parse msid " + msid.value);
+            }
+        }
+
+        if (!matched) {
+            // compare authors
+            matched = JournalUtils.compareItemAuthorsToManuscript(item, manuscript, result);
+            if (matched) {
+                // compare titles
+                // check to see if this matches by msid:
+                DCValue[] titles = item.getMetadata("dc", "title", Item.ANY, Item.ANY);
+                if (titles != null && titles.length > 0) {
+                    DCValue title = titles[0];
+                    matched = JournalUtils.compareTitleToManuscript(title.value, manuscript, 0.3, result);
+                }
             }
         }
         return matched;
