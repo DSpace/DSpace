@@ -241,6 +241,9 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 }
             }
 
+            if(!readOnlyEnabled && getSession().isDirty()) {
+                getSession().flush();
+            }
             getSession().evict(entity);
         }
     }
