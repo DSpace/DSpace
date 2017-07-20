@@ -34,18 +34,12 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
     static final String CONCEPT_TABLE = "conceptmetadatavalue";
     static final String COLUMN_ID = "parent_id";
 
-    static int ISSN_FIELD;
-    static int JOURNALCODE_FIELD;
-    static int FULLNAME_FIELD;
-
     static {
         Context context = getContext();
+        // this seems to help ensure that the metadatafield cache is instantiated?
+        DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
         try {
-            ISSN_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.ISSN)).getFieldID();
-            JOURNALCODE_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.JOURNAL_ID)).getFieldID();
-            FULLNAME_FIELD = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.FULLNAME)).getFieldID();
             context.complete();
-            log.error("found fields " + ISSN_FIELD + ", " + JOURNALCODE_FIELD + ", " + FULLNAME_FIELD);
         } catch (SQLException e) {
             log.error("couldn't find metadata fields");
             context.abort();
@@ -74,9 +68,11 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
         boolean isISSN = Pattern.compile("\\d{4}-\\p{Alnum}{4}").matcher(codeOrISSN).matches();
         String query;
         if (isISSN) {
-            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + ISSN_FIELD;
+            int issnField = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.ISSN)).getFieldID();
+            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + issnField;
         } else {
-            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + JOURNALCODE_FIELD;
+            int journalcodeField = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.JOURNAL_ID)).getFieldID();
+            query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + journalcodeField;
         }
         TableRow row = DatabaseManager.querySingleTable(context, CONCEPT_TABLE, query, codeOrISSN);
         if (row != null) {

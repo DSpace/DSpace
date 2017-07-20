@@ -219,7 +219,6 @@ public class ManuscriptDatabaseStorageImpl extends AbstractManuscriptStorage {
 
     private static List<TableRow> getManuscriptTableRows(Context context, DryadJournalConcept journalConcept) throws SQLException, IOException {
         List<TableRow> manuscripts = new ArrayList<TableRow>();
-        log.error("journal is " + journalConcept.getFullName());
         Integer journalConceptID = journalConcept.getConceptID();
         String query = "SELECT * FROM " + MANUSCRIPT_TABLE + " where " + COLUMN_JOURNAL_ID + " = ? and " + COLUMN_ACTIVE + " = ? ORDER BY " + COLUMN_ID + " ASC";
         TableRowIterator rows = DatabaseManager.queryTable(context, MANUSCRIPT_TABLE, query, journalConceptID, ACTIVE_TRUE);
