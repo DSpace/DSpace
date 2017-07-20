@@ -551,10 +551,11 @@ public class WorkspaceItem implements InProgressSubmission
         // to workspaceitem ID
         deleteEpersonGroup2WorkspaceItem();
         
+        // Begin UMD customization
         // delete additional mapped collections
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM collection2workspaceitem WHERE workspace_item_id=" + getID());
-        
+        // End UMD customization
 
         // Need to delete the workspaceitem row first since it refers
         // to item ID
@@ -586,10 +587,12 @@ public class WorkspaceItem implements InProgressSubmission
         // Remove from cache
         ourContext.removeCached(this, getID());
 
+        // Begin UMD customization
         // delete additional mapped collections
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM collection2workspaceitem WHERE workspace_item_id=" + getID());
-        
+        // End UMD customization
+
         // Need to delete the workspaceitem row first since it refers
         // to item ID
         DatabaseManager.delete(ourContext, wiRow);
@@ -641,6 +644,7 @@ public class WorkspaceItem implements InProgressSubmission
         wiRow.setColumn("published_before", b);
     }
     
+    // Begin UMD customization
     /**
      * Get the additional collections to map the item to.
      * 
@@ -687,5 +691,6 @@ public class WorkspaceItem implements InProgressSubmission
 
         DatabaseManager.update(ourContext, row);
     }
+    // End UMD customization
   
 }

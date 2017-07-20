@@ -181,10 +181,13 @@ public class WorkflowManager
         wfi.setMultipleTitles(wsi.hasMultipleTitles());
         wfi.setPublishedBefore(wsi.isPublishedBefore());
 
+        // Begin UMD customization
         Collection collections[] = wsi.getMapCollections();
         for (int i=0; i < collections.length; i++) {
             wfi.addMapCollection(collections[i]);
         }
+        // End UMD customization
+
         // remove the WorkspaceItem
         wsi.deleteWrapper();
 
@@ -260,7 +263,7 @@ public class WorkflowManager
 
         String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem" +
         		" WHERE tasklistitem.eperson_id= ? " +
-			" AND tasklistitem.workflow_id=workflowitem.workflow_id ORDER BY workflowitem.workflow_id";
+        		" AND tasklistitem.workflow_id=workflowitem.workflow_id ORDER BY workflowitem.workflow_id";
 
         TableRowIterator tri = DatabaseManager
                 .queryTable(c, "workflowitem", myquery, e.getID());
@@ -748,7 +751,7 @@ public class WorkflowManager
     {
         // shortcut to the collection
         Collection collection = workflowItem.getCollection();
-
+        
         // From the step we can recognize the new state and the corresponding state.
         // The new state is the pool of the step.
         // The corresponding state is the state an item gets when it is claimed.
@@ -773,7 +776,7 @@ public class WorkflowManager
         default:
             throw new IllegalArgumentException("Unknown workflow step " + step);
         }
-
+        
         // Gather our old owner and state, as we need those as well to determine
         // whether we have to send notifications.
         int oldState = workflowItem.getState();
@@ -781,20 +784,20 @@ public class WorkflowManager
         // Clear owner.
         workflowItem.setOwner(null);
         // Don't revoke the reviewer policies yet.  They may be needed to advance the item.
-
+        
         // Any approvers?  If so, add them to the tasklist; if not, skip to next state.
         Group workflowStepGroup = collection.getWorkflowGroup(step);
         if ((workflowStepGroup != null) && !(workflowStepGroup.isEmpty()))
         {
             // Set new item state.
             workflowItem.setState(newState);
-
+            
             // Revoke previously granted reviewer policies and grant read permissions.
             try {
                 context.turnOffAuthorisationSystem();
                 // Revoke previously granted policies.
                 revokeReviewerPolicies(context, workflowItem.getItem());
-
+                
                 // JSPUI offers a preview to every task before a reviewer claims it.
                 // So we need to grant permissions in advance, so that all
                 // possible reviewers can read the item and all bitstreams in
@@ -821,10 +824,10 @@ public class WorkflowManager
             } finally {
                 context.restoreAuthSystemState();
             }
-
+            
             // Get a list of all epeople in group (or any subgroups)
             EPerson[] epa = Group.allMembers(context, workflowStepGroup);
-
+            
             // There were reviewers.  Change the state and then add them to the list.
             createTasks(context, workflowItem, epa);
             ConfigurationService configurationService = new DSpace().getConfigurationService();
@@ -930,6 +933,7 @@ public class WorkflowManager
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
    
+            // Customization for LIBDRUM-60
             // Get the email
             String emailName = "submit_archive";
             
@@ -938,8 +942,9 @@ public class WorkflowManager
                 emailName = "libraryaward_submit_archive";
             }
             
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailName));
-            
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailName));
+            // End customization for LIBDRUM-60
+
             // Get the item handle to email to user
             String handle = HandleManager.findHandle(c, i);
 
@@ -1007,10 +1012,12 @@ public class WorkflowManager
         wi.setMultipleTitles(wfi.hasMultipleTitles());
         wi.setPublishedBefore(wfi.isPublishedBefore());
         
+        // Begin UMD customization
         Collection collections[] = wfi.getMapCollections();
         for (int i=0; i < collections.length; i++) {
             wi.addMapCollection(collections[i]);
         }
+        // End UMD customization
         
         wi.update();
 
@@ -1128,6 +1135,8 @@ public class WorkflowManager
                 Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale,
                                                                                   "flowtask_notify"));
                 email.addArgument(title);
+                email.addArgument(coll.getMetadata("name"));
+                email.addArgument(submitter);
                 email.addArgument(taskName);
                 email.addArgument(message);
                 email.addArgument(action);
@@ -1176,6 +1185,8 @@ public class WorkflowManager
                     Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
                     Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
                     email.addArgument(title);
+                    email.addArgument(coll.getMetadata("name"));
+                    email.addArgument(submitter);
 
                     ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
                     switch (wi.getState())
@@ -1196,6 +1207,7 @@ public class WorkflowManager
                             break;
                     }
 
+                    // Begin UMD customization
                     StringBuffer sb = new StringBuffer();
                     sb.append(coll.getMetadata("name"));
                     Collection collections[] = wi.getMapCollections();
@@ -1210,7 +1222,8 @@ public class WorkflowManager
                       sb.append(")");
                     }
                     email.addArgument(sb.toString());
-                            
+                    // End UMD customization
+                    
                     email.addArgument(submitter);
                     email.addArgument(message);
                     email.addArgument(getMyDSpaceLink());
@@ -1250,13 +1263,15 @@ public class WorkflowManager
             String rejector = getEPersonName(e);
             Locale supportedLocale = I18nUtil.getEPersonLocale(e);
 
+            // Customization for LIBDRUM-60
             String emailName = "submit_reject";
             
             if (coll.getHandle().equals("1903/11324")) {
                 emailName = "libraryaward_submit_reject";
             }
 
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,emailName));
+            Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailName));
+            // End customization for LIBDRUM-60
 
             email.addRecipient(getSubmitterEPerson(wi).getEmail());
             email.addArgument(title);

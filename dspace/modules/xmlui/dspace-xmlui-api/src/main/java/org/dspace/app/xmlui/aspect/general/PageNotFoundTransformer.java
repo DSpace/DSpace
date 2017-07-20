@@ -7,19 +7,9 @@
  */
 package org.dspace.app.xmlui.aspect.general;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.cocoon.caching.CacheableProcessingComponent;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.http.HttpEnvironment;
-import org.apache.cocoon.util.HashUtil;
-import org.apache.excalibur.source.SourceValidity;
-import org.apache.excalibur.source.impl.validity.NOPValidity;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -32,13 +22,18 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+
 /**
- * This special comonent checks to see if the body element is empty (has no sub elements) and if
+ * This special component checks to see if the body element is empty (has no sub elements) and if
  * it is then displays some page not found text.
  * 
  * @author Scott Phillips
+ * @author Kim Shepherd
  */
-public class PageNotFoundTransformer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class PageNotFoundTransformer extends AbstractDSpaceTransformer
 {
     /** Language Strings */
     private static final Message T_title =
@@ -64,29 +59,9 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     private boolean bodyEmpty;
     
     /**
-     * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
-     */
-    public Serializable getKey() 
-    {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        
-        return HashUtil.hash(request.getSitemapURI());
-    }
-
-    /**
-     * Generate the cache validity object.
-     * 
-     * The cache is always valid.
-     */
-    public SourceValidity getValidity() {
-        return NOPValidity.SHARED_INSTANCE;
-    }
-    
-    
-    /**
      * Receive notification of the beginning of a document.
      */
+    @Override
     public void startDocument() throws SAXException
     {
         // Reset our parameters before starting a new document.
@@ -99,13 +74,14 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
      * Process the SAX event.
      * @see org.xml.sax.ContentHandler#startElement
      */
+    @Override
     public void startElement(String namespaceURI, String localName,
             String qName, Attributes attributes) throws SAXException
     {          
         if (this.bodyEvent != null)
         {
             // If we have recorded the startElement for body and we are
-            // recieving another start event, then there must be something 
+            // receiving another start event, then there must be something 
             // inside the body element, so we send the held body and carry
             // on as normal.
             sendEvent(this.bodyEvent);
@@ -126,12 +102,13 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
      * Process the SAX event.
      * @see org.xml.sax.ContentHandler#endElement
      */
+    @Override
     public void endElement(String namespaceURI, String localName, String qName)
             throws SAXException
     {
         if (this.bodyEvent != null && WingConstants.DRI.URI.equals(namespaceURI) && Body.E_BODY.equals(localName))
         {
-            // If we are recieving an endElement event for body while we
+            // If we are receiving an endElement event for body while we
             // still have a startElement body event recorded then
             // the body element must have been empty. In this case, record
             // that the body is empty, and send both the start and end body events.
@@ -148,26 +125,41 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
   
     
     /** What to add at the end of the body */
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+            UIException, SQLException, IOException, AuthorizeException, ResourceNotFoundException
     {
-        if (this.bodyEmpty)
+        if (!isRedirect() && this.bodyEmpty)
         {
+            // Customization for LIBDRUM-363
             Division notFound = body.addDivision("bad-request","primary");
+            // End customization for LIBDRUM-363
             
             notFound.setHead(T_head);
             
             notFound.addPara(T_para1); 
-            
+
             notFound.addPara().addXref(contextPath + "/",T_go_home);
 
-	    HttpServletResponse response = (HttpServletResponse)objectModel
-		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            HttpServletResponse response = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+    }
+
+    private boolean isRedirect() {
+        final HttpServletResponse response = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+        try
+        {
+            return ((int) FieldUtils.readField(response, "statusCode", true)) == HttpServletResponse.SC_TEMPORARY_REDIRECT;
+        }
+        catch (Exception e)
+        {
+            return false;
         }
     }
 
     /** What page metadata to add to the document */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException
@@ -270,5 +262,10 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             return event;
         }
     }
-    
+
+    @Override
+    public void recycle() {
+        this.bodyEvent = null;
+        super.recycle();
+    }
 }

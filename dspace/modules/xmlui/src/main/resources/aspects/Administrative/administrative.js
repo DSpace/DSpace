@@ -374,47 +374,17 @@ function assertAdminCommunity(communityID) {
  */
 function assertEditGroup(groupID)
 {
-  // Check authorizations
-  if (groupID == -1)
-  {
-    // only system admin can create "top level" group
-    assertAdministrator();
-  }
-  else
-  {
-    assertAuthorized(Constants.GROUP, groupID, Constants.WRITE);
-  }
-}
-
-// Customization for LIBDRUM-343 and LIBDRUM-376
-/**
- * Assert that the currently authenticated eperson can edit the given ETD department. If
- * they cannot then this method will never return.
- */
-function assertEditETDDepartment(etd_departmentID) {
 	// Check authorizations
-	if (etd_departmentID == -1) {
+	if (groupID == -1)
+	{
 		// only system admin can create "top level" group
 		assertAdministrator();
-	} else {
-		assertAuthorized(Constants.ETDUNIT, etd_departmentID, Constants.WRITE);
+	}
+	else
+	{
+		assertAuthorized(Constants.GROUP, groupID, Constants.WRITE);
 	}
 }
-
-/**
- * Assert that the currently authenticated eperson can edit the given unit. If
- * they cannot then this method will never return.
- */
-function assertEditUnits(unitID) {
-	// Check authorizations
-	if (unitID == -1) {
-		// only system admin can create "top level" group
-		assertAdministrator();
-	} else {
-		assertAuthorized(Constants.UNIT, unitID, Constants.WRITE);
-	}
-}
-// End customization for LIBDRUM-343 and LIBDRUM-376
 
 /**
  * Return whether the currently authenticated eperson is an
@@ -475,38 +445,6 @@ function startManageGroups()
 	getDSContext().complete();
 	cocoon.exit();
 }
-
-// Customization for LIBDRUM-343 and LIBDRUM-376
-/**
- * Start managing etd_departments
- */
-function startManageETDDepartments() {
-	assertAdministrator();
-
-	doManageETDDepartments();
-
-	// This should never return, but just in case it does then point
-	// the user to the home page.
-	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
-	cocoon.exit();
-}
-
-/**
- * Start managing units
- */
-function startManageUnits() {
-	assertAdministrator();
-
-	doManageUnits();
-
-	// This should never return, but just in case it does then point
-	// the user to the home page.
-	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
-	cocoon.exit();
-}
-// End customization for LIBDRUM-343 and LIBDRUM-376
 
 /**
  * Start managing the metadata registry
@@ -1160,363 +1098,6 @@ function doDeleteGroups(groupIDs)
     return null;
 }
 
-// Customization for LIBDRUM-343 and LIBDRUM-376
-/*******************************************************************************
- * ETDDepartment flows
- ******************************************************************************/
-
-/**
- * Manage ETDDepartments, allow users to create new, edit existing, or remove
- * ETDDepartments. The user may also search or browse for ETDDepartments.
- *
- * The is typically used as an entry point flow.
- */
-function doManageETDDepartments() {
-	assertAdministrator();
-
-	var highlightID = -1
-	var query = "";
-	var page = 0;
-	var result;
-	do {
-
-		sendPageAndWait("admin/etd_departments/main", {
-			"query" : query,
-			"page" : page,
-			"highlightID" : highlightID
-		}, result);
-		assertAdministrator();
-		result = null;
-
-		// Update the page parameter if supplied.
-		if (cocoon.request.get("page"))
-			page = cocoon.request.get("page");
-
-		if (cocoon.request.get("submit_search")) {
-			// Grab the new query and reset the page parameter
-			query = cocoon.request.get("query");
-			page = 0
-			highlightID = -1
-		} else if (cocoon.request.get("submit_add")) {
-			// Just create a blank etd_department then pass it to the group
-			// editor.
-			result = doEditETDDepartment(-1);
-
-			if (result != null && result.getParameter("etd_departmentID"))
-				highlightID = result.getParameter("etd_departmentID");
-		} else if (cocoon.request.get("submit_edit")
-				&& cocoon.request.get("etd_departmentID")) {
-			// Edit a specific etd_department
-			var etd_departmentID = cocoon.request.get("etd_departmentID");
-			result = doEditETDDepartment(etd_departmentID);
-			highlightID = etd_departmentID;
-		} else if (cocoon.request.get("submit_delete")
-				&& cocoon.request.get("select_etd_department")) {
-			// Delete a set of etd_departments
-			var etd_departmentIDs = cocoon.request
-					.getParameterValues("select_etd_department");
-			result = doDeleteETDDepartments(etd_departmentIDs);
-			highlightID = -1;
-		} else if (cocoon.request.get("submit_return")) {
-			// Not implemented in the UI, but should be in case someone links to
-			// us.
-			return;
-		}
-
-	} while (true) // only way to exit is to hit the submit_back button.
-}
-
-/**
- * This flow allows for the full editing of a etd_department, changing the
- * etd_department's name or removing members. Users may search for collections
- * to add as members to this etd_department.
- */
-function doEditETDDepartment(etd_departmentID) {
-	var etd_departmentName = FlowETDDepartmentUtils.getName(getDSContext(),
-			etd_departmentID);
-	var memberCollectionIDs = FlowETDDepartmentUtils.getCollectionMembers(
-			getDSContext(), etd_departmentID);
-
-	assertEditETDDepartment(etd_departmentID);
-
-	var highlightCollectionID;
-
-	var type = "";
-	var query = "";
-	var page = 0;
-	var result = null;
-
-	do {
-		sendPageAndWait("admin/etd_departments/edit", {
-			"etd_departmentID" : etd_departmentID,
-			"etd_departmentName" : etd_departmentName,
-			"memberCollectionIDs" : memberCollectionIDs.join(','),
-			"highlightCollectionID" : highlightCollectionID,
-			"query" : query,
-			"page" : page,
-			"type" : type
-		}, result);
-		assertEditETDDepartment(etd_departmentID);
-
-		result = null;
-		highlightCollectionID = null;
-
-		// Update the etd_departmentName
-		if (cocoon.request.get("etd_department_name"))
-			etd_departmentName = cocoon.request.get("etd_department_name");
-
-		if (cocoon.request.get("page"))
-			page = cocoon.request.get("page");
-
-		if (cocoon.request.get("submit_cancel")) {
-			// Just return without saving anything.
-			return null;
-		} else if (cocoon.request.get("submit_save")) {
-			result = FlowETDDepartmentUtils.processSaveETDDepartment(
-					getDSContext(), etd_departmentID, etd_departmentName,
-					memberCollectionIDs);
-
-			// In case a etd_department was created, update our id.
-			if (result != null && result.getParameter("etd_departmentID"))
-				etd_departmentID = result.getParameter("etd_departmentID");
-		} else if (cocoon.request.get("submit_search_collection")
-				&& cocoon.request.get("query")) {
-			// Perform a new search for collections.
-			query = cocoon.request.get("query");
-			page = 0;
-			type = "collection";
-		} else if (cocoon.request.get("submit_clear")) {
-			// Perform a new search for collections.
-			query = "";
-			page = 0;
-			type = "";
-		}
-
-		// Check if there were any add or delete operations.
-		var names = cocoon.request.getParameterNames();
-		while (names.hasMoreElements()) {
-			var name = names.nextElement();
-			var match = null;
-
-			if ((match = name.match(/submit_add_collection_(\d+)/)) != null) {
-				// Add a collection
-				var collectionID = match[1];
-				memberCollectionIDs = FlowETDDepartmentUtils.addMember(
-						memberCollectionIDs, collectionID);
-				highlightCollectionID = collectionID;
-			}
-			if ((match = name.match(/submit_remove_collection_(\d+)/)) != null) {
-				// remove a collection
-				var collectionID = match[1];
-				memberCollectionIDs = FlowETDDepartmentUtils.removeMember(
-						memberCollectionIDs, collectionID);
-				highlightCollectionID = collectionID;
-			}
-		}
-	} while (result == null || !result.getContinue())
-
-	return result;
-}
-
-/**
- * Confirm that the given etd_departmentIDs should be deleted, if confirmed they
- * will be deleted.
- */
-function doDeleteETDDepartments(etd_departmentIDs) {
-	assertAdministrator();
-
-	sendPageAndWait("admin/etd_departments/delete", {
-		"etd_departmentIDs" : etd_departmentIDs.join(',')
-	});
-
-	if (cocoon.request.get("submit_confirm")) {
-		// The user has confirmed, actually delete these etd_departments
-		assertAdministrator();
-		var result = FlowETDDepartmentUtils.processDeleteETDDepartments(
-				getDSContext(), etd_departmentIDs);
-		return result;
-	}
-	return null;
-}
-
-/*******************************************************************************
- * Unit flows
- ******************************************************************************/
-
-/**
- * Manage Units, allow users to create new, edit existing, or remove
- * Units. The user may also search or browse for Units.
- *
- * The is typically used as an entry point flow.
- */
-function doManageUnits() {
-	assertAdministrator();
-
-	var highlightID = -1
-	var query = "";
-	var page = 0;
-	var result;
-	do {
-
-		sendPageAndWait("admin/units/main", {
-			"query" : query,
-			"page" : page,
-			"highlightID" : highlightID
-		}, result);
-		assertAdministrator();
-		result = null;
-
-		// Update the page parameter if supplied.
-		if (cocoon.request.get("page"))
-			page = cocoon.request.get("page");
-
-		if (cocoon.request.get("submit_search")) {
-			// Grab the new query and reset the page parameter
-			query = cocoon.request.get("query");
-			page = 0
-			highlightID = -1
-		} else if (cocoon.request.get("submit_add")) {
-			// Just create a blank unit then pass it to the group
-			// editor.
-			result = doEditUnits(-1);
-
-			if (result != null && result.getParameter("unitID"))
-				highlightID = result.getParameter("unitID");
-		} else if (cocoon.request.get("submit_edit")
-				&& cocoon.request.get("unitID")) {
-			// Edit a specific unit
-			var unitID = cocoon.request.get("unitID");
-			result = doEditUnits(unitID);
-			highlightID = unitID;
-		} else if (cocoon.request.get("submit_delete")
-				&& cocoon.request.get("select_unit")) {
-			// Delete a set of units
-			var unitIDs = cocoon.request
-					.getParameterValues("select_unit");
-			result = doDeleteUnits(unitIDs);
-			highlightID = -1;
-		} else if (cocoon.request.get("submit_return")) {
-			// Not implemented in the UI, but should be in case someone links to
-			// us.
-			return;
-		}
-
-	} while (true) // only way to exit is to hit the submit_back button.
-}
-
-/**
- * This flow allows for the full editing of a unit, changing the
- * unit's name or removing members. Users may search for groups
- * to add as members to this unit.
- */
-function doEditUnits(unitID) {
-	var unitName = FlowUnitsUtils.getName(getDSContext(),
-			unitID);
-	var memberGroupIDs = FlowUnitsUtils.getUnitMembers(
-			getDSContext(), unitID);
-
-	assertEditUnits(unitID);
-
-	var highlightGroupID;
-
-	var type = "";
-	var query = "";
-	var page = 0;
-	var result = null;
-
-	do {
-		sendPageAndWait("admin/units/edit", {
-			"unitID" : unitID,
-			"unitName" : unitName,
-			"memberGroupIDs" : memberGroupIDs.join(','),
-			"highlightGroupID" : highlightGroupID,
-			"query" : query,
-			"page" : page,
-			"type" : type
-		}, result);
-		assertEditUnits(unitID);
-
-		result = null;
-		highlightGroupID = null;
-
-		// Update the unitName
-		if (cocoon.request.get("unit_name"))
-			unitName = cocoon.request.get("unit_name");
-
-		if (cocoon.request.get("page"))
-			page = cocoon.request.get("page");
-
-		if (cocoon.request.get("submit_cancel")) {
-			// Just return without saving anything.
-			return null;
-		} else if (cocoon.request.get("submit_save")) {
-			result = FlowUnitsUtils.processSaveUnits(
-					getDSContext(), unitID, unitName,
-					memberGroupIDs, cocoon.request);
-
-			// In case a unit was created, update our id.
-			if (result != null && result.getParameter("unitID"))
-				unitID = result.getParameter("unitID");
-		} else if (cocoon.request.get("submit_search_group")
-				&& cocoon.request.get("query")) {
-			// Perform a new search for groups.
-			query = cocoon.request.get("query");
-			page = 0;
-			type = "collection";
-		} else if (cocoon.request.get("submit_clear")) {
-			// Perform a new search for groups.
-			query = "";
-			page = 0;
-			type = "";
-		}
-
-		// Check if there were any add or delete operations.
-		var names = cocoon.request.getParameterNames();
-		while (names.hasMoreElements()) {
-			var name = names.nextElement();
-			var match = null;
-
-			if ((match = name.match(/submit_add_group_(\d+)/)) != null) {
-				// Add a group
-				var groupID = match[1];
-				memberGroupIDs = FlowUnitsUtils.addMember(
-						memberGroupIDs, groupID);
-				highlightGroupID = groupID;
-			}
-			if ((match = name.match(/submit_remove_group_(\d+)/)) != null) {
-				// remove a group
-				var groupID = match[1];
-				memberGroupIDs = FlowUnitsUtils.removeMember(
-						memberGroupIDs, groupID);
-				highlightGroupID = groupID;
-			}
-		}
-	} while (result == null || !result.getContinue())
-
-	return result;
-}
-
-/**
- * Confirm that the given unitIDs should be deleted, if confirmed they
- * will be deleted.
- */
-function doDeleteUnits(unitIDs) {
-	assertAdministrator();
-
-	sendPageAndWait("admin/units/delete", {
-		"unitIDs" : unitIDs.join(',')
-	});
-
-	if (cocoon.request.get("submit_confirm")) {
-		// The user has confirmed, actually delete these units
-		assertAdministrator();
-		var result = FlowUnitsUtils.processDeleteUnits(
-				getDSContext(), unitIDs);
-		return result;
-	}
-	return null;
-}
-// End customization for LIBDRUM-343 and LIBDRUM-376
 
 /**************************
  * Registries: Metadata flows
@@ -3671,3 +3252,419 @@ function doCurate()
     }
     while (true);
 }
+
+// Customization for LIBDRUM-343 and LIBDRUM-376
+/**
+ * Assert that the currently authenticated eperson can edit the given ETD department. If
+ * they cannot then this method will never return.
+ */
+function assertEditETDDepartment(etd_departmentID) {
+	// Check authorizations
+	if (etd_departmentID == -1) {
+		// only system admin can create "top level" group
+		assertAdministrator();
+	} else {
+		assertAuthorized(Constants.ETDUNIT, etd_departmentID, Constants.WRITE);
+	}
+}
+
+/**
+ * Assert that the currently authenticated eperson can edit the given unit. If
+ * they cannot then this method will never return.
+ */
+function assertEditUnits(unitID) {
+	// Check authorizations
+	if (unitID == -1) {
+		// only system admin can create "top level" group
+		assertAdministrator();
+	} else {
+		assertAuthorized(Constants.UNIT, unitID, Constants.WRITE);
+	}
+}
+
+/**
+ * Start managing etd_departments
+ */
+function startManageETDDepartments() {
+	assertAdministrator();
+
+	doManageETDDepartments();
+
+	// This should never return, but just in case it does then point
+	// the user to the home page.
+	cocoon.redirectTo(cocoon.request.getContextPath());
+	getDSContext().complete();
+	cocoon.exit();
+}
+
+/**
+ * Start managing units
+ */
+function startManageUnits() {
+	assertAdministrator();
+
+	doManageUnits();
+
+	// This should never return, but just in case it does then point
+	// the user to the home page.
+	cocoon.redirectTo(cocoon.request.getContextPath());
+	getDSContext().complete();
+	cocoon.exit();
+}
+
+/*******************************************************************************
+ * ETDDepartment flows
+ ******************************************************************************/
+
+/**
+ * Manage ETDDepartments, allow users to create new, edit existing, or remove
+ * ETDDepartments. The user may also search or browse for ETDDepartments.
+ *
+ * The is typically used as an entry point flow.
+ */
+function doManageETDDepartments() {
+	assertAdministrator();
+
+	var highlightID = -1
+	var query = "";
+	var page = 0;
+	var result;
+	do {
+
+		sendPageAndWait("admin/etd_departments/main", {
+			"query" : query,
+			"page" : page,
+			"highlightID" : highlightID
+		}, result);
+		assertAdministrator();
+		result = null;
+
+		// Update the page parameter if supplied.
+		if (cocoon.request.get("page"))
+			page = cocoon.request.get("page");
+
+		if (cocoon.request.get("submit_search")) {
+			// Grab the new query and reset the page parameter
+			query = cocoon.request.get("query");
+			page = 0
+			highlightID = -1
+		} else if (cocoon.request.get("submit_add")) {
+			// Just create a blank etd_department then pass it to the group
+			// editor.
+			result = doEditETDDepartment(-1);
+
+			if (result != null && result.getParameter("etd_departmentID"))
+				highlightID = result.getParameter("etd_departmentID");
+		} else if (cocoon.request.get("submit_edit")
+				&& cocoon.request.get("etd_departmentID")) {
+			// Edit a specific etd_department
+			var etd_departmentID = cocoon.request.get("etd_departmentID");
+			result = doEditETDDepartment(etd_departmentID);
+			highlightID = etd_departmentID;
+		} else if (cocoon.request.get("submit_delete")
+				&& cocoon.request.get("select_etd_department")) {
+			// Delete a set of etd_departments
+			var etd_departmentIDs = cocoon.request
+					.getParameterValues("select_etd_department");
+			result = doDeleteETDDepartments(etd_departmentIDs);
+			highlightID = -1;
+		} else if (cocoon.request.get("submit_return")) {
+			// Not implemented in the UI, but should be in case someone links to
+			// us.
+			return;
+		}
+
+	} while (true) // only way to exit is to hit the submit_back button.
+}
+
+/**
+ * This flow allows for the full editing of a etd_department, changing the
+ * etd_department's name or removing members. Users may search for collections
+ * to add as members to this etd_department.
+ */
+function doEditETDDepartment(etd_departmentID) {
+	var etd_departmentName = FlowETDDepartmentUtils.getName(getDSContext(),
+			etd_departmentID);
+	var memberCollectionIDs = FlowETDDepartmentUtils.getCollectionMembers(
+			getDSContext(), etd_departmentID);
+
+	assertEditETDDepartment(etd_departmentID);
+
+	var highlightCollectionID;
+
+	var type = "";
+	var query = "";
+	var page = 0;
+	var result = null;
+
+	do {
+		sendPageAndWait("admin/etd_departments/edit", {
+			"etd_departmentID" : etd_departmentID,
+			"etd_departmentName" : etd_departmentName,
+			"memberCollectionIDs" : memberCollectionIDs.join(','),
+			"highlightCollectionID" : highlightCollectionID,
+			"query" : query,
+			"page" : page,
+			"type" : type
+		}, result);
+		assertEditETDDepartment(etd_departmentID);
+
+		result = null;
+		highlightCollectionID = null;
+
+		// Update the etd_departmentName
+		if (cocoon.request.get("etd_department_name"))
+			etd_departmentName = cocoon.request.get("etd_department_name");
+
+		if (cocoon.request.get("page"))
+			page = cocoon.request.get("page");
+
+		if (cocoon.request.get("submit_cancel")) {
+			// Just return without saving anything.
+			return null;
+		} else if (cocoon.request.get("submit_save")) {
+			result = FlowETDDepartmentUtils.processSaveETDDepartment(
+					getDSContext(), etd_departmentID, etd_departmentName,
+					memberCollectionIDs);
+
+			// In case a etd_department was created, update our id.
+			if (result != null && result.getParameter("etd_departmentID"))
+				etd_departmentID = result.getParameter("etd_departmentID");
+		} else if (cocoon.request.get("submit_search_collection")
+				&& cocoon.request.get("query")) {
+			// Perform a new search for collections.
+			query = cocoon.request.get("query");
+			page = 0;
+			type = "collection";
+		} else if (cocoon.request.get("submit_clear")) {
+			// Perform a new search for collections.
+			query = "";
+			page = 0;
+			type = "";
+		}
+
+		// Check if there were any add or delete operations.
+		var names = cocoon.request.getParameterNames();
+		while (names.hasMoreElements()) {
+			var name = names.nextElement();
+			var match = null;
+
+			if ((match = name.match(/submit_add_collection_(\d+)/)) != null) {
+				// Add a collection
+				var collectionID = match[1];
+				memberCollectionIDs = FlowETDDepartmentUtils.addMember(
+						memberCollectionIDs, collectionID);
+				highlightCollectionID = collectionID;
+			}
+			if ((match = name.match(/submit_remove_collection_(\d+)/)) != null) {
+				// remove a collection
+				var collectionID = match[1];
+				memberCollectionIDs = FlowETDDepartmentUtils.removeMember(
+						memberCollectionIDs, collectionID);
+				highlightCollectionID = collectionID;
+			}
+		}
+	} while (result == null || !result.getContinue())
+
+	return result;
+}
+
+/**
+ * Confirm that the given etd_departmentIDs should be deleted, if confirmed they
+ * will be deleted.
+ */
+function doDeleteETDDepartments(etd_departmentIDs) {
+	assertAdministrator();
+
+	sendPageAndWait("admin/etd_departments/delete", {
+		"etd_departmentIDs" : etd_departmentIDs.join(',')
+	});
+
+	if (cocoon.request.get("submit_confirm")) {
+		// The user has confirmed, actually delete these etd_departments
+		assertAdministrator();
+		var result = FlowETDDepartmentUtils.processDeleteETDDepartments(
+				getDSContext(), etd_departmentIDs);
+		return result;
+	}
+	return null;
+}
+
+/*******************************************************************************
+ * Unit flows
+ ******************************************************************************/
+
+/**
+ * Manage Units, allow users to create new, edit existing, or remove
+ * Units. The user may also search or browse for Units.
+ *
+ * The is typically used as an entry point flow.
+ */
+function doManageUnits() {
+	assertAdministrator();
+
+	var highlightID = -1
+	var query = "";
+	var page = 0;
+	var result;
+	do {
+
+		sendPageAndWait("admin/units/main", {
+			"query" : query,
+			"page" : page,
+			"highlightID" : highlightID
+		}, result);
+		assertAdministrator();
+		result = null;
+
+		// Update the page parameter if supplied.
+		if (cocoon.request.get("page"))
+			page = cocoon.request.get("page");
+
+		if (cocoon.request.get("submit_search")) {
+			// Grab the new query and reset the page parameter
+			query = cocoon.request.get("query");
+			page = 0
+			highlightID = -1
+		} else if (cocoon.request.get("submit_add")) {
+			// Just create a blank unit then pass it to the group
+			// editor.
+			result = doEditUnits(-1);
+
+			if (result != null && result.getParameter("unitID"))
+				highlightID = result.getParameter("unitID");
+		} else if (cocoon.request.get("submit_edit")
+				&& cocoon.request.get("unitID")) {
+			// Edit a specific unit
+			var unitID = cocoon.request.get("unitID");
+			result = doEditUnits(unitID);
+			highlightID = unitID;
+		} else if (cocoon.request.get("submit_delete")
+				&& cocoon.request.get("select_unit")) {
+			// Delete a set of units
+			var unitIDs = cocoon.request
+					.getParameterValues("select_unit");
+			result = doDeleteUnits(unitIDs);
+			highlightID = -1;
+		} else if (cocoon.request.get("submit_return")) {
+			// Not implemented in the UI, but should be in case someone links to
+			// us.
+			return;
+		}
+
+	} while (true) // only way to exit is to hit the submit_back button.
+}
+
+/**
+ * This flow allows for the full editing of a unit, changing the
+ * unit's name or removing members. Users may search for groups
+ * to add as members to this unit.
+ */
+function doEditUnits(unitID) {
+	var unitName = FlowUnitsUtils.getName(getDSContext(),
+			unitID);
+	var memberGroupIDs = FlowUnitsUtils.getUnitMembers(
+			getDSContext(), unitID);
+
+	assertEditUnits(unitID);
+
+	var highlightGroupID;
+
+	var type = "";
+	var query = "";
+	var page = 0;
+	var result = null;
+
+	do {
+		sendPageAndWait("admin/units/edit", {
+			"unitID" : unitID,
+			"unitName" : unitName,
+			"memberGroupIDs" : memberGroupIDs.join(','),
+			"highlightGroupID" : highlightGroupID,
+			"query" : query,
+			"page" : page,
+			"type" : type
+		}, result);
+		assertEditUnits(unitID);
+
+		result = null;
+		highlightGroupID = null;
+
+		// Update the unitName
+		if (cocoon.request.get("unit_name"))
+			unitName = cocoon.request.get("unit_name");
+
+		if (cocoon.request.get("page"))
+			page = cocoon.request.get("page");
+
+		if (cocoon.request.get("submit_cancel")) {
+			// Just return without saving anything.
+			return null;
+		} else if (cocoon.request.get("submit_save")) {
+			result = FlowUnitsUtils.processSaveUnits(
+					getDSContext(), unitID, unitName,
+					memberGroupIDs, cocoon.request);
+
+			// In case a unit was created, update our id.
+			if (result != null && result.getParameter("unitID"))
+				unitID = result.getParameter("unitID");
+		} else if (cocoon.request.get("submit_search_group")
+				&& cocoon.request.get("query")) {
+			// Perform a new search for groups.
+			query = cocoon.request.get("query");
+			page = 0;
+			type = "collection";
+		} else if (cocoon.request.get("submit_clear")) {
+			// Perform a new search for groups.
+			query = "";
+			page = 0;
+			type = "";
+		}
+
+		// Check if there were any add or delete operations.
+		var names = cocoon.request.getParameterNames();
+		while (names.hasMoreElements()) {
+			var name = names.nextElement();
+			var match = null;
+
+			if ((match = name.match(/submit_add_group_(\d+)/)) != null) {
+				// Add a group
+				var groupID = match[1];
+				memberGroupIDs = FlowUnitsUtils.addMember(
+						memberGroupIDs, groupID);
+				highlightGroupID = groupID;
+			}
+			if ((match = name.match(/submit_remove_group_(\d+)/)) != null) {
+				// remove a group
+				var groupID = match[1];
+				memberGroupIDs = FlowUnitsUtils.removeMember(
+						memberGroupIDs, groupID);
+				highlightGroupID = groupID;
+			}
+		}
+	} while (result == null || !result.getContinue())
+
+	return result;
+}
+
+/**
+ * Confirm that the given unitIDs should be deleted, if confirmed they
+ * will be deleted.
+ */
+function doDeleteUnits(unitIDs) {
+	assertAdministrator();
+
+	sendPageAndWait("admin/units/delete", {
+		"unitIDs" : unitIDs.join(',')
+	});
+
+	if (cocoon.request.get("submit_confirm")) {
+		// The user has confirmed, actually delete these units
+		assertAdministrator();
+		var result = FlowUnitsUtils.processDeleteUnits(
+				getDSContext(), unitIDs);
+		return result;
+	}
+	return null;
+}
+// End customization for LIBDRUM-343 and LIBDRUM-376

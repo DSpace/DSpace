@@ -15,40 +15,16 @@ import gr.ekt.bte.dataloader.FileDataLoader;
 import gr.ekt.bteio.generators.DSpaceOutputGenerator;
 import gr.ekt.bteio.loaders.OAIPMHDataLoader;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.io.*;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.zip.ZipEntry;
+import java.util.*;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
 
 import javax.mail.MessagingException;
 import javax.xml.parsers.DocumentBuilder;
@@ -72,19 +48,8 @@ import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Metadatum;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.InstallItem;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -125,13 +90,15 @@ public class ItemImport
 {
     private static final Logger log = Logger.getLogger(ItemImport.class);
 
-    static boolean useWorkflow = false;
-
+    // Begin UMD Customization
     static boolean checkTitle = false;
 
     static Connection connection = null;
 
     static PreparedStatement st = null;
+    // End UMD Customization
+
+    private static boolean useWorkflow = false;
 
     private static boolean useWorkflowSendEmail = false;
 
@@ -216,8 +183,10 @@ public class ItemImport
             options.addOption("R", "resume", false,
                     "resume a failed import (add only)");
             options.addOption("q", "quiet", false, "don't display metadata");
+            // Begin UMD Customization
             options.addOption("k", "title-check", false,
                     "check for duplicate titles (if yes, send notification)");
+            // End UMD Customization
 
             options.addOption("h", "help", false, "help");
 
@@ -303,10 +272,12 @@ public class ItemImport
                 mapfile = line.getOptionValue('m');
             }
 
+            // Begin UMD Customization
             if (line.hasOption('k'))
             {
                 checkTitle = true;
             }
+            // End UMD Customization
 
             if (line.hasOption('e')) // eperson
             {
@@ -486,6 +457,7 @@ public class ItemImport
             {
                 System.out.println("Destination collections:");
 
+                // Begin UMD Customization
                 // open the database connection
                 if (checkTitle)
                 {
@@ -493,6 +465,7 @@ public class ItemImport
                     st = connection
                             .prepareStatement("select count(distinct item_id) from itemsbytitle where sort_title=?");
                 }
+                // End UMD Customization
 
                 mycollections = new Collection[collections.length];
 
@@ -595,11 +568,13 @@ public class ItemImport
                 System.out.println("Unable to delete temporary zip archive location: " + tempWorkDir);
             }
 
+            // Begin UMD Customization
             // complete database session
             if (checkTitle)
             {
                 st.close();
             }
+            // End UMD Customization
 
 
             if (isTest)
@@ -685,14 +660,14 @@ public class ItemImport
         if (dataLoader!=null){
             System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
 
-		te.setDataLoader(dataLoader);
+        	te.setDataLoader(dataLoader);
 
-		DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
-		outputGenerator.setOutputDirectory(outputFolder);
+        	DSpaceOutputGenerator outputGenerator = new DSpaceOutputGenerator(outputMap);
+        	outputGenerator.setOutputDirectory(outputFolder);
 
-		te.setOutputGenerator(outputGenerator);
+        	te.setOutputGenerator(outputGenerator);
 
-		try {
+        	try {
         		TransformationResult res = te.transform(new TransformationSpec());
         		List<String> output = res.getOutput();
         		outputGenerator.writeOutput(output);
@@ -1018,75 +993,15 @@ public class ItemImport
 
         c.commit();
 
+        // Begin UMD Customization
         // check for duplicate titles
         if (checkTitle && !isTest)
         {
             checkTitle(c, myitem, mycollections);
         }
+        // End UMD Customization
 
         return myitem;
-    }
-
-    // check for duplicate titles
-    private void checkTitle(Context c, Item item, Collection[] collections)
-            throws Exception
-    {
-        // Get the list of collections
-        StringBuffer sbCollections = new StringBuffer();
-        for (int j = 0; j < collections.length; j++)
-        {
-            if (sbCollections.length() > 0)
-            {
-                sbCollections.append(", ");
-            }
-            sbCollections.append(collections[j].getMetadata("name"));
-        }
-
-        // Get the title(s)
-        Metadatum dc[] = item.getDC("title", null, Item.ANY);
-
-        // Process each title
-        for (int i = 0; i < dc.length; i++)
-        {
-            String title = "TODO: normalized title"; // Browse.getNormalizedTitle(dc[i].value,
-                                                     // dc[i].language);
-
-            st.setString(1, title);
-            ResultSet rs = st.executeQuery();
-            if (rs.next())
-            {
-                int count = rs.getInt(1);
-
-                if (count > 1)
-                {
-                    System.out.println("Duplicate title: " + title);
-
-                    // Send an email notice
-
-                    // Get the email recipient
-                    String email = ConfigurationManager
-                            .getProperty("mail.duplicate_title");
-                    if (email == null)
-                    {
-                        email = ConfigurationManager.getProperty("mail.admin");
-                    }
-
-                    if (email != null)
-                    {
-                        // Send the email
-                        Email bean = ConfigurationManager
-                                .getEmail("duplicate_title");
-                        bean.addRecipient(email);
-                        bean.addArgument(title);
-                        bean.addArgument("" + item.getID());
-                        bean.addArgument(HandleManager.findHandle(c, item));
-                        bean.addArgument(sbCollections.toString());
-                        bean.send();
-                    }
-                }
-                rs.close();
-            }
-        }
     }
 
     // remove, given the actual item
@@ -1242,7 +1157,7 @@ public class ItemImport
         }
         else
         {
-		value = value.trim();
+        	value = value.trim();
         }
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");
@@ -1273,21 +1188,21 @@ public class ItemImport
         else
         {
             // If we're just test the import, let's check that the actual metadata field exists.
-		MetadataSchema foundSchema = MetadataSchema.find(c,schema);
+        	MetadataSchema foundSchema = MetadataSchema.find(c,schema);
 
-		if (foundSchema == null)
-		{
-			System.out.println("ERROR: schema '"+schema+"' was not found in the registry.");
-			return;
-		}
+        	if (foundSchema == null)
+        	{
+        		System.out.println("ERROR: schema '"+schema+"' was not found in the registry.");
+        		return;
+        	}
 
-		int schemaID = foundSchema.getSchemaID();
-		MetadataField foundField = MetadataField.findByElement(c, schemaID, element, qualifier);
+        	int schemaID = foundSchema.getSchemaID();
+        	MetadataField foundField = MetadataField.findByElement(c, schemaID, element, qualifier);
 
-		if (foundField == null)
-		{
-			System.out.println("ERROR: Metadata field: '"+schema+"."+element+"."+qualifier+"' was not found in the registry.");
-			return;
+        	if (foundField == null)
+        	{
+        		System.out.println("ERROR: Metadata field: '"+schema+"."+element+"."+qualifier+"' was not found in the registry.");
+        		return;
             }
         }
     }
@@ -1760,7 +1675,7 @@ public class ItemImport
      */
     private void registerBitstream(Context c, Item i, int assetstore,
             String bitstreamPath, String bundleName, String description )
-		throws SQLException, IOException, AuthorizeException
+        	throws SQLException, IOException, AuthorizeException
     {
         // TODO validate assetstore number
         // TODO make sure the bitstream is there
@@ -2591,4 +2506,68 @@ public class ItemImport
         System.out.println("Deleting temporary zip directory: " + tempWorkDir);
         ItemImport.deleteDirectory(new File(tempWorkDir));
     }
+
+    // Begin UMD Customization
+    // check for duplicate titles
+    private void checkTitle(Context c, Item item, Collection[] collections)
+            throws Exception
+    {
+        // Get the list of collections
+        StringBuffer sbCollections = new StringBuffer();
+        for (int j = 0; j < collections.length; j++)
+        {
+            if (sbCollections.length() > 0)
+            {
+                sbCollections.append(", ");
+            }
+            sbCollections.append(collections[j].getMetadata("name"));
+        }
+
+        // Get the title(s)
+        Metadatum dc[] = item.getDC("title", null, Item.ANY);
+
+        // Process each title
+        for (int i = 0; i < dc.length; i++)
+        {
+            String title = "TODO: normalized title"; // Browse.getNormalizedTitle(dc[i].value,
+                                                     // dc[i].language);
+
+            st.setString(1, title);
+            ResultSet rs = st.executeQuery();
+            if (rs.next())
+            {
+                int count = rs.getInt(1);
+
+                if (count > 1)
+                {
+                    System.out.println("Duplicate title: " + title);
+
+                    // Send an email notice
+
+                    // Get the email recipient
+                    String email = ConfigurationManager
+                            .getProperty("mail.duplicate_title");
+                    if (email == null)
+                    {
+                        email = ConfigurationManager.getProperty("mail.admin");
+                    }
+
+                    if (email != null)
+                    {
+                        // Send the email
+                        Email bean = ConfigurationManager
+                                .getEmail("duplicate_title");
+                        bean.addRecipient(email);
+                        bean.addArgument(title);
+                        bean.addArgument("" + item.getID());
+                        bean.addArgument(HandleManager.findHandle(c, item));
+                        bean.addArgument(sbCollections.toString());
+                        bean.send();
+                    }
+                }
+                rs.close();
+            }
+        }
+    }
+    // End UMD Customization
 }
