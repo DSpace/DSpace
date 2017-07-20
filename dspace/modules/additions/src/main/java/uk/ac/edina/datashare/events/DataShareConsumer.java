@@ -69,7 +69,7 @@ public class DataShareConsumer implements Consumer{
                     break;
                 }
                 case Event.REMOVE:{
-                    new ItemDataset(this.event.getHandle()).delete();
+                    new ItemDataset(context, this.event.getHandle()).delete();
                     break;
                 }
                 default:{

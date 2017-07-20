@@ -14,10 +14,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -39,10 +40,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 import org.dspace.handle.HandleManager;
-import org.dspace.submit.step.AccessStep;
-import org.mortbay.log.Log;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -228,6 +225,11 @@ public class FlowItemUtils
 		
 		item.update();
 		context.commit();
+		
+	    // DATASHARE - start
+        // check dataset status
+        new ItemDataset(context, item).checkDataset();
+        // DATASHARE - end
 		
 		result.setContinue(true);
 		

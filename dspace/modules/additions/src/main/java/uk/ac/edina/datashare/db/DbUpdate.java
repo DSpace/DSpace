@@ -28,9 +28,9 @@ public class DbUpdate
             "DELETE FROM batch_import WHERE id = ?";
         try
         {
-            stmt = context.getDBConnection().prepareStatement(DELETE_BATCH);        
+            stmt = context.getDBConnection().prepareStatement(DELETE_BATCH);
             stmt.setInt(1, batchId);
-            stmt.executeUpdate();            
+            stmt.executeUpdate();
         }
         catch (SQLException e)
         {
@@ -42,6 +42,33 @@ public class DbUpdate
             cleanUp(stmt);
         }
     }
+    
+    /**
+     * Delete dataset by dataset filename.
+     * @param context
+     * @param fileName
+     */
+    public static void deleteDataset(Context context, String fileName){
+        PreparedStatement stmt = null;
+        
+        final String DELETE_DATASET = 
+            "DELETE FROM dataset WHERE file_name = ?";
+        try
+        {
+            stmt = context.getDBConnection().prepareStatement(DELETE_DATASET);
+            stmt.setString(1, fileName);
+            stmt.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            LOG.error("Problem deleting dataset. " + e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            cleanUp(stmt);
+        }
+    }    
     
     /**
      * Insert a batch import. 
@@ -87,7 +114,7 @@ public class DbUpdate
      * Insert dataset metadata. 
      * @param context DSpace context.
      * @param itemId Dspace item id.
-     * @param fileName dataset zip file full path.
+     * @param fileName dataset zip file name.
      * @param checksum zipfile checksum.
      */
     public static void insertDataset(Context context, int itemId, String fileName, String checksum)

@@ -59,7 +59,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import uk.ac.edina.datashare.db.DbQuery;
 import uk.ac.edina.datashare.utils.DSpaceUtils;
 
 /**
