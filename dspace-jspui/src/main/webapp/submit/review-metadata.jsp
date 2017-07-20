@@ -124,11 +124,11 @@
 
           if (inputType.equals("qualdrop_value"))
           {
-             values = item.getMetadata(inputs[z].getSchema(), inputs[z].getElement(), Item.ANY, Item.ANY);
+             values = item.getMetadataWithoutPlaceholder(inputs[z].getSchema(), inputs[z].getElement(), Item.ANY, Item.ANY);
           }
           else
           {
-             values = item.getMetadata(inputs[z].getSchema(), inputs[z].getElement(), inputs[z].getQualifier(), Item.ANY);
+             values = item.getMetadataWithoutPlaceholder(inputs[z].getSchema(), inputs[z].getElement(), inputs[z].getQualifier(), Item.ANY);
           }
           if (values.length == 0)
           {
