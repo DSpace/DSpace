@@ -30,8 +30,10 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
+import org.dspace.plugin.BitstreamHomeProcessor;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 
@@ -209,6 +211,8 @@ public class BitstreamServlet extends DSpaceServlet
             }
         }
         
+        preProcessBitstreamHome(context, request, response, bitstream);
+        
         // Pipe the bits
         InputStream is = bitstream.retrieve();
      
@@ -230,5 +234,24 @@ public class BitstreamServlet extends DSpaceServlet
         Utils.bufferedCopy(is, response.getOutputStream());
         is.close();
         response.getOutputStream().flush();
+    }
+    
+    private void preProcessBitstreamHome(Context context, HttpServletRequest request,
+            HttpServletResponse response, Bitstream item)
+        throws ServletException, IOException, SQLException
+    {
+        try
+        {
+            BitstreamHomeProcessor[] chp = (BitstreamHomeProcessor[]) PluginManager.getPluginSequence(BitstreamHomeProcessor.class);
+            for (int i = 0; i < chp.length; i++)
+            {
+                chp[i].process(context, request, response, item);
+            }
+        }
+        catch (Exception e)
+        {
+            log.error("caught exception: ", e);
+            throw new ServletException(e);
+        }
     }
 }
