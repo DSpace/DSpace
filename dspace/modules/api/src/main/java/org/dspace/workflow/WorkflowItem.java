@@ -319,7 +319,7 @@ public class WorkflowItem implements InProgressSubmission {
                 DCValue[] titles = item.getMetadata("dc", "title", Item.ANY, Item.ANY);
                 if (titles != null && titles.length > 0) {
                     DCValue title = titles[0];
-                    matched = JournalUtils.compareTitleToManuscript(title.value, manuscript, 0.3, result);
+                    matched = JournalUtils.compareTitleToManuscript(title.value.replace("Data from: ", ""), manuscript, 0.4, result);
                 }
             }
         }
