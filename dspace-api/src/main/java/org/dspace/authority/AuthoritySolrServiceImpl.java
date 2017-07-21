@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This class is the one that is actually called by index-authority, not SolrAuthorityServiceImpl.
  *
  * @author Antoine Snyers (antoine at atmire.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
