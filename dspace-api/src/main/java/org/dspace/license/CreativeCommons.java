@@ -379,9 +379,14 @@ public class CreativeCommons
             return null;
         }
 
-        // create a ByteArrayOutputStream
+        // create a ByteArrayOutputStream        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Utils.copy(bs.retrieve(), baos);
+        try {
+            Utils.copy(bs.retrieve(), baos);
+        }
+        catch(Exception ex) {
+            log.error(ex.getMessage());
+        }
 
         return baos.toByteArray();
     }
