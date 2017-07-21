@@ -177,7 +177,7 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
         // Sponsor
         DryadOrganizationConcept sponsorConcept = shoppingcart.getSponsoringOrganization(context);
         StringBuilder sponsorName = new StringBuilder();
-        if (sponsorConcept != null) {
+        if (sponsorConcept != null && sponsorConcept.getSubscriptionPaid()) {
             sponsorName.append(sponsorConcept.getFullName());
             if (DryadJournalConcept.conceptIsValidJournal(sponsorConcept.getUnderlyingConcept())) {
                 sponsorName.append(" (journal concept ");
