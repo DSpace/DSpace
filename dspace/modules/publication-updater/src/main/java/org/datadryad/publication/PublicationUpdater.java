@@ -14,6 +14,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.ApproveRejectReviewItem;
 import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
@@ -250,6 +251,10 @@ public class PublicationUpdater extends HttpServlet {
                                 StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ");
                                 if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
                                     message = provenance;
+                                }
+                                if (databaseManuscript.isAccepted()) {
+                                    // see if this can be pushed out of review
+                                    ApproveRejectReviewItem.processWorkflowItemWithManuscript(context, wfi, databaseManuscript);
                                 }
                             }
                         }
