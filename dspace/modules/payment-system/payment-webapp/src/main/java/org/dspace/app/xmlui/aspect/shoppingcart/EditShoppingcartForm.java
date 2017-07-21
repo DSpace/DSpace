@@ -258,10 +258,9 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
             transactionIdField.setLabel(T_transaction);
             transactionIdField.setValue(transactionId);
 
-            if (secureToken != null) {
-                depositorInfo.addLabel(T_token);
-                depositorInfo.addItem().addContent(secureToken);
-            }
+            Text secureTokenField = depositorInfo.addItem().addText("secureToken");
+            secureTokenField.setLabel(T_token);
+            secureTokenField.setValue(secureToken);
 
             depositorInfo.addLabel(T_basic_fee);
             depositorInfo.addItem().addText("basicFee").setValue(basicFee);
