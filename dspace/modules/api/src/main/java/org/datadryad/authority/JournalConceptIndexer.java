@@ -65,7 +65,7 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    protected List<AuthorityValue> createAuthorityValues(DryadOrganizationConcept concept) {
+    public List<AuthorityValue> createAuthorityValues(DryadOrganizationConcept concept) {
         ArrayList<AuthorityValue> authorityValues = new ArrayList<AuthorityValue>();
         ArrayList<String> names = new ArrayList<String>();
         names.add(concept.getFullName());
