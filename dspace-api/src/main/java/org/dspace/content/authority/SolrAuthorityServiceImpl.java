@@ -28,6 +28,7 @@ import java.util.List;
 
 /**
  * Extended Solr Authority Service supporting Editable Authority Control.
+ * (Note: this class does not seem to be called by index-authority.)
  *
  * 1.) Adds AuthorityValues as Concepts in Appropriate Scheme.
  * 2.) AuthorityConceptEventConsumer assures they are indexed into Solr.
