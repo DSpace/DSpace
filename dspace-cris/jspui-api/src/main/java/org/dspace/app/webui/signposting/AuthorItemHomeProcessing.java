@@ -77,7 +77,7 @@ public class AuthorItemHomeProcessing implements ItemSignPostingProcessor
                                 response.addHeader("Link",
                                         MessageFormat.format(getPattern(),
                                                 pe.getAsText()) + "; rel=\""
-                                                + getMetadataField() + "\"");
+                                                + getRelationHeader() + "\"");
                             }
                         }
                     }

@@ -28,7 +28,6 @@
 	<bean id="authorSignPosting" class="org.dspace.app.webui.signposting.AuthorItemHomeProcessing">
 		<property name="metadataField" value="dc.contributor.author" />
 		<property name="relationHeader" value="author" />
-		<property name="retrievedExternally" value="orcid" />
 		<property name="pattern" value="http://orcid.org/{0}" />
 	</bean>
 -->
