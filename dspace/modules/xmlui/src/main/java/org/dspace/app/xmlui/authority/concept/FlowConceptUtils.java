@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.authority.concept;
+package org.dspace.app.xmlui.authority.concept;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
