@@ -244,8 +244,8 @@ public class EditShoppingcartForm  extends AbstractDSpaceTransformer
 
         Double total = shoppingcart.getTotal();
 
-        String secureToken = shoppingcart.getSecureToken() == null ? shoppingcart.getSecureToken() : "";
-        String transactionId = shoppingcart.getTransactionId() == null ? shoppingcart.getTransactionId() : "";
+        String secureToken = shoppingcart.getSecureToken() == null ? "" : shoppingcart.getSecureToken();
+        String transactionId = shoppingcart.getTransactionId() == null ? "" : shoppingcart.getTransactionId();
         if (StringUtils.isNotEmpty(request.getParameter("transactionId"))) {
             transactionId = request.getParameter("transactionId");
         }
