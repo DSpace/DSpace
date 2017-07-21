@@ -133,6 +133,14 @@ public class ApproveRejectReviewItem {
         }
     }
 
+    public static void processWorkflowItemWithManuscript(Context context, WorkflowItem wfi, Manuscript manuscript) {
+        try {
+            reviewItem(context, statusIsApproved(manuscript.getStatus()), wfi, manuscript);
+        } catch (ApproveRejectReviewItemException e) {
+            log.error("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage());
+        }
+    }
+
     public static void reviewManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
         Context c = null;
         try {
