@@ -46,6 +46,7 @@ public class FlowShoppingcartUtils {
             String basicFee = request.getParameter("basicFee");
             String surCharge = request.getParameter("surCharge");
             String transactionId = request.getParameter("transactionId");
+            String secureToken = request.getParameter("secureToken");
             String status = request.getParameter("status");
             String note = request.getParameter("note");
             PaymentSystemService paymentSystemService = new DSpace().getSingletonService(PaymentSystemService.class);
@@ -55,6 +56,7 @@ public class FlowShoppingcartUtils {
 
             String countryOriginal = shoppingCart.getCountry();
             String transactionIdOriginal = shoppingCart.getTransactionId();
+            String secureTokenOriginal = shoppingCart.getSecureToken();
 
             if (!StringUtils.isEmpty(note)) {
                 shoppingCart.setNote(note);
@@ -104,6 +106,13 @@ public class FlowShoppingcartUtils {
             } else {
                 if (!transactionId.equals(transactionIdOriginal)) {
                     shoppingCart.setTransactionId(transactionId);
+                }
+            }
+            if (StringUtils.isEmpty(secureToken)) {
+                shoppingCart.setSecureToken(null);
+            } else {
+                if (!secureToken.equals(secureTokenOriginal)) {
+                    shoppingCart.setSecureToken(secureToken);
                 }
             }
             shoppingCart.update();
