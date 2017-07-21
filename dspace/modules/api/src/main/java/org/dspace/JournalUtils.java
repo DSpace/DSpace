@@ -561,63 +561,24 @@ public class JournalUtils {
         return true;
     }
 
-    public static boolean compareItemAuthorsToManuscript(Item item, Manuscript manuscript, StringBuilder result) {
-        boolean matched = false;
+    public static int compareItemAuthorsToManuscript(Item item, Manuscript manuscript, StringBuilder result) {
+        int numMatched = 0;
         // count number of authors and number of matched authors: if equal, this is a match.
         DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
-        result.append("item has " + itemAuthors.length + " authors while manuscript has " + manuscript.getAuthorList().size() + " authors\n");
-        if (manuscript.getAuthorList().size() == itemAuthors.length) {
-            int numMatched = 0;
-            for (int j = 0; j < itemAuthors.length; j++) {
-                for (Author a : manuscript.getAuthorList()) {
-                    double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), a.getNormalizedFullName().toLowerCase());
-                    result.append("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score + "\n");
-                    if (score > 0.6) {
-                        numMatched++;
-                        break;
-                    }
-                }
-            }
-
-            if (numMatched == itemAuthors.length) {
-                matched = true;
-                result.append("matched " + item.getID() + " by authors");
-            }
-        }
-        return matched;
-    }
-
-    public static boolean compareItemToManuscript(Item item, Manuscript manuscript, StringBuilder result) {
-        boolean matched = false;
-        // check to see if this matches by msid:
-        DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
-        if (msids != null && msids.length > 0) {
-            DCValue msid = msids[0];
-            try {
-                String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msid.value, manuscript.getJournalConcept());
-                if (manuscript.getManuscriptId().equals(canonicalMSID)) {
-                    log.debug("matched " + item.getID() + " by msid");
-                    matched = true;
-                }
-            } catch (Exception e) {
-                log.error("couldn't parse msid " + msid.value);
-            }
-        }
-
-        if (!matched) {
-            // compare authors
-            matched = JournalUtils.compareItemAuthorsToManuscript(item, manuscript, result);
-            if (matched) {
-                // compare titles
-                // check to see if this matches by msid:
-                DCValue[] titles = item.getMetadata("dc", "title", Item.ANY, Item.ANY);
-                if (titles != null && titles.length > 0) {
-                    DCValue title = titles[0];
-                    matched = JournalUtils.compareTitleToManuscript(title.value, manuscript, 0.3, result);
+        result.append("item " + item.getID() + " has " + itemAuthors.length + " authors while manuscript has " + manuscript.getAuthorList().size() + " authors\n");
+        for (int j = 0; j < itemAuthors.length; j++) {
+            for (Author a : manuscript.getAuthorList()) {
+                double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), a.getNormalizedFullName().toLowerCase());
+                result.append("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score + "\n");
+                if (score > 0.6) {
+                    numMatched++;
+                    break;
                 }
             }
         }
-        return matched;
+
+        result.append(numMatched + " authors matched");
+        return numMatched;
     }
 
     public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) {

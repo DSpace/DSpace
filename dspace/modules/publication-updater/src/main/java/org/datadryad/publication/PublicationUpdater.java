@@ -321,7 +321,7 @@ public class PublicationUpdater extends HttpServlet {
                 if (Double.valueOf(score) < 1.0) {
                     // does the matched manuscript have the same authors?
                     StringBuilder authormatches = new StringBuilder();
-                    if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
+                    if (matchedManuscript.getAuthorList().size() == JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
                         LOGGER.debug("same authors");
                         // update the item's metadata
                         StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");
