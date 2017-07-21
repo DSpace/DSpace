@@ -15,6 +15,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -264,7 +265,10 @@ public class XOAI {
             if (dc.qualifier != null) {
                 key += "." + dc.qualifier;
             }
-            doc.addField(key, dc.value);
+            
+            String val =StringUtils.equals(dc.value, MetadataValue.PARENT_PLACEHOLDER_VALUE)? "N/D":dc.value;  
+
+            doc.addField(key, val);
             if (dc.authority != null) {
                 doc.addField(key + ".authority", dc.authority);
                 doc.addField(key + ".confidence", dc.confidence + "");
