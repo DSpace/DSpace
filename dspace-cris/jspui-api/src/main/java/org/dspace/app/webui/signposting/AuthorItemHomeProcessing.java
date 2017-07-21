@@ -33,11 +33,15 @@ public class AuthorItemHomeProcessing implements ItemSignPostingProcessor
 {
 
     private String metadataField;
+
     private String relationHeader;
+
     private String retrievedExternally;
+
     private String pattern;
+
     private ApplicationService applicationService;
-    
+
     @Override
     public void process(Context context, HttpServletRequest request,
             HttpServletResponse response, Item item)
@@ -45,28 +49,52 @@ public class AuthorItemHomeProcessing implements ItemSignPostingProcessor
     {
 
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-        if (mam.isAuthorityControlled(getMetadataField().replaceAll("\\.", "_")))
+        if (mam.isAuthorityControlled(
+                getMetadataField().replaceAll("\\.", "_")))
         {
-            if(StringUtils.isNotBlank(getRetrievedExternally())) {
-                Metadatum[] metadatums = item.getMetadataByMetadataString(getMetadataField());
+            if (StringUtils.isNotBlank(getRetrievedExternally()))
+            {
+                Metadatum[] metadatums = item
+                        .getMetadataByMetadataString(getMetadataField());
                 for (Metadatum metadatum : metadatums)
                 {
                     String authority = metadatum.authority;
-                    ResearcherPage entity = applicationService.getEntityByCrisId(authority, ResearcherPage.class);
-                    List<RPProperty> values = entity.getAnagrafica4view().get(getRetrievedExternally());
-                    for(RPProperty val : values) {
-                        PropertyEditor pe = val.getTypo().getRendering().getPropertyEditor(applicationService);
-                        pe.setValue(val.getObject());
-                        response.addHeader("Link", MessageFormat.format(getPattern(), pe.getAsText()) + "; rel=\"" + getMetadataField() + "\""  );
+                    if (StringUtils.isNotBlank(authority))
+                    {
+                        ResearcherPage entity = applicationService
+                                .getEntityByCrisId(authority,
+                                        ResearcherPage.class);
+                        if (entity != null)
+                        {
+                            List<RPProperty> values = entity
+                                    .getAnagrafica4view()
+                                    .get(getRetrievedExternally());
+                            for (RPProperty val : values)
+                            {
+                                PropertyEditor pe = val.getTypo().getRendering()
+                                        .getPropertyEditor(applicationService);
+                                pe.setValue(val.getObject());
+                                response.addHeader("Link",
+                                        MessageFormat.format(getPattern(),
+                                                pe.getAsText()) + "; rel=\""
+                                                + getMetadataField() + "\"");
+                            }
+                        }
                     }
                 }
             }
-            else {
-                Metadatum[] metadatums = item.getMetadataByMetadataString(getMetadataField());
+            else
+            {
+                Metadatum[] metadatums = item
+                        .getMetadataByMetadataString(getMetadataField());
                 for (Metadatum metadatum : metadatums)
                 {
-                    if(StringUtils.isNotBlank(metadatum.value)) {
-                        response.addHeader("Link", MessageFormat.format(getPattern(), metadatum.authority) + "; rel=\"" + getRelationHeader() + "\""  );
+                    if (StringUtils.isNotBlank(metadatum.value))
+                    {
+                        response.addHeader("Link",
+                                MessageFormat.format(getPattern(),
+                                        metadatum.authority) + "; rel=\""
+                                        + getRelationHeader() + "\"");
                     }
                 }
             }
@@ -74,11 +102,14 @@ public class AuthorItemHomeProcessing implements ItemSignPostingProcessor
         else
         {
 
-            Metadatum[] metadatums = item.getMetadataByMetadataString(getMetadataField());
+            Metadatum[] metadatums = item
+                    .getMetadataByMetadataString(getMetadataField());
             for (Metadatum metadatum : metadatums)
             {
-                if(StringUtils.isNotBlank(metadatum.value)) {
-                    response.addHeader("Link", metadatum.value + "; rel=\"" + getRelationHeader() + "\""  );
+                if (StringUtils.isNotBlank(metadatum.value))
+                {
+                    response.addHeader("Link", metadatum.value + "; rel=\""
+                            + getRelationHeader() + "\"");
                 }
             }
 

@@ -8,8 +8,8 @@
 package org.dspace.app.webui.components.signposting;
 
 import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,13 +18,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.plugin.ItemHomeProcessor;
 import org.dspace.plugin.PluginException;
 import org.dspace.plugin.signposting.ItemSignPostingProcessor;
 
@@ -36,31 +32,43 @@ public class IdentifierItemHome implements ItemSignPostingProcessor
 
     /** log4j category */
     private static Logger log = Logger.getLogger(IdentifierItemHome.class);
-    
+
     private String relation = "identifier";
+
     private String metadataField;
+
     private String pattern;
-    
+
     @Override
     public void process(Context context, HttpServletRequest request,
             HttpServletResponse response, Item item)
             throws PluginException, AuthorizeException
     {
-        
+
         try
         {
             if (item != null)
             {
-                String metadata = item.getMetadata(getMetadataField());
-                String value = UIUtil.encodeBitstreamName(metadata,
-                        Constants.DEFAULT_ENCODING);
-                if(StringUtils.isNotBlank(pattern)) {
-                    response.addHeader("Link", MessageFormat.format(getPattern(), value) + "; rel=\"" + getRelation()
-                        + "\"");
-                }
-                else {
-                    response.addHeader("Link", value + "; rel=\"" + getRelation()
-                    + "\"");
+                List<String> mm = item.getMetadataValue(getMetadataField());
+                for (String metadata : mm)
+                {
+                    if (StringUtils.isNotBlank(metadata))
+                    {
+                        String value = UIUtil.encodeBitstreamName(metadata,
+                                Constants.DEFAULT_ENCODING);
+                        if (StringUtils.isNotBlank(pattern))
+                        {
+                            response.addHeader("Link",
+                                    MessageFormat.format(getPattern(), value)
+                                            + "; rel=\"" + getRelation()
+                                            + "\"");
+                        }
+                        else
+                        {
+                            response.addHeader("Link",
+                                    value + "; rel=\"" + getRelation() + "\"");
+                        }
+                    }
                 }
             }
         }

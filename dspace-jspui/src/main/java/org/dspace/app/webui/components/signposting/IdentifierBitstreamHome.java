@@ -10,6 +10,7 @@ package org.dspace.app.webui.components.signposting;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,16 +29,16 @@ import org.dspace.plugin.signposting.BitstreamSignPostingProcessor;
 /**
  * @author Pascarelli Luigi Andrea
  */
-public class IdentifierBitstreamHome
-        implements BitstreamSignPostingProcessor
+public class IdentifierBitstreamHome implements BitstreamSignPostingProcessor
 {
 
     /** log4j category */
-    private static Logger log = Logger
-            .getLogger(IdentifierBitstreamHome.class);
+    private static Logger log = Logger.getLogger(IdentifierBitstreamHome.class);
 
     private String relation = "identifier";
+
     private String metadataField;
+
     private String pattern;
 
     @Override
@@ -51,16 +52,26 @@ public class IdentifierBitstreamHome
             DSpaceObject dso = bitstream.getParentObject();
             if (dso != null)
             {
-                String metadata = dso.getMetadata(getMetadataField());
-                String value = UIUtil.encodeBitstreamName(metadata,
-                        Constants.DEFAULT_ENCODING);
-                if(StringUtils.isNotBlank(pattern)) {
-                    response.addHeader("Link", MessageFormat.format(getPattern(), value) + "; rel=\"" + getRelation()
-                        + "\"");
-                }
-                else {
-                    response.addHeader("Link", value + "; rel=\"" + getRelation()
-                    + "\"");
+                List<String> mm = dso.getMetadataValue(getMetadataField());
+                for (String metadata : mm)
+                {
+                    if (StringUtils.isNotBlank(metadata))
+                    {
+                        String value = UIUtil.encodeBitstreamName(metadata,
+                                Constants.DEFAULT_ENCODING);
+                        if (StringUtils.isNotBlank(pattern))
+                        {
+                            response.addHeader("Link",
+                                    MessageFormat.format(getPattern(), value)
+                                            + "; rel=\"" + getRelation()
+                                            + "\"");
+                        }
+                        else
+                        {
+                            response.addHeader("Link",
+                                    value + "; rel=\"" + getRelation() + "\"");
+                        }
+                    }
                 }
             }
         }
