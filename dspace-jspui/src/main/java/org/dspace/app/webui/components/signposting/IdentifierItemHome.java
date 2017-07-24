@@ -72,9 +72,9 @@ public class IdentifierItemHome implements ItemSignPostingProcessor
                 }
             }
         }
-        catch (UnsupportedEncodingException e)
+        catch (Exception ex)
         {
-            throw new PluginException(e);
+            log.error("Problem to add signposting pattern", ex);
         }
     }
 

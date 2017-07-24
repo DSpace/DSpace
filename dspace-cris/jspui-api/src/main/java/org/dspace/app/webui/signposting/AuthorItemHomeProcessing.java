@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.cris.model.ResearcherPage;
 import org.dspace.app.cris.model.jdyna.RPProperty;
 import org.dspace.app.cris.service.ApplicationService;
@@ -32,6 +33,10 @@ import org.dspace.plugin.signposting.ItemSignPostingProcessor;
 public class AuthorItemHomeProcessing implements ItemSignPostingProcessor
 {
 
+    /** log4j category */
+    private static Logger log = Logger
+            .getLogger(AuthorItemHomeProcessing.class);
+
     private String metadataField;
 
     private String relationHeader;
@@ -48,73 +53,82 @@ public class AuthorItemHomeProcessing implements ItemSignPostingProcessor
             throws PluginException, AuthorizeException
     {
 
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-        if (mam.isAuthorityControlled(
-                getMetadataField().replaceAll("\\.", "_")))
+        try
         {
-            if (StringUtils.isNotBlank(getRetrievedExternally()))
+            MetadataAuthorityManager mam = MetadataAuthorityManager
+                    .getManager();
+            if (mam.isAuthorityControlled(
+                    getMetadataField().replaceAll("\\.", "_")))
             {
-                Metadatum[] metadatums = item
-                        .getMetadataByMetadataString(getMetadataField());
-                for (Metadatum metadatum : metadatums)
+                if (StringUtils.isNotBlank(getRetrievedExternally()))
                 {
-                    String authority = metadatum.authority;
-                    if (StringUtils.isNotBlank(authority))
+                    Metadatum[] metadatums = item
+                            .getMetadataByMetadataString(getMetadataField());
+                    for (Metadatum metadatum : metadatums)
                     {
-                        ResearcherPage entity = applicationService
-                                .getEntityByCrisId(authority,
-                                        ResearcherPage.class);
-                        if (entity != null)
+                        String authority = metadatum.authority;
+                        if (StringUtils.isNotBlank(authority))
                         {
-                            List<RPProperty> values = entity
-                                    .getAnagrafica4view()
-                                    .get(getRetrievedExternally());
-                            for (RPProperty val : values)
+                            ResearcherPage entity = applicationService
+                                    .getEntityByCrisId(authority,
+                                            ResearcherPage.class);
+                            if (entity != null)
                             {
-                                PropertyEditor pe = val.getTypo().getRendering()
-                                        .getPropertyEditor(applicationService);
-                                pe.setValue(val.getObject());
-                                response.addHeader("Link",
-                                        MessageFormat.format(getPattern(),
-                                                pe.getAsText()) + "; rel=\""
-                                                + getRelationHeader() + "\"");
+                                List<RPProperty> values = entity
+                                        .getAnagrafica4view()
+                                        .get(getRetrievedExternally());
+                                for (RPProperty val : values)
+                                {
+                                    PropertyEditor pe = val.getTypo()
+                                            .getRendering().getPropertyEditor(
+                                                    applicationService);
+                                    pe.setValue(val.getObject());
+                                    response.addHeader("Link",
+                                            MessageFormat.format(getPattern(),
+                                                    pe.getAsText()) + "; rel=\""
+                                                    + getRelationHeader()
+                                                    + "\"");
+                                }
                             }
+                        }
+                    }
+                }
+                else
+                {
+                    Metadatum[] metadatums = item
+                            .getMetadataByMetadataString(getMetadataField());
+                    for (Metadatum metadatum : metadatums)
+                    {
+                        if (StringUtils.isNotBlank(metadatum.value))
+                        {
+                            response.addHeader("Link",
+                                    MessageFormat.format(getPattern(),
+                                            metadatum.authority) + "; rel=\""
+                                            + getRelationHeader() + "\"");
                         }
                     }
                 }
             }
             else
             {
+
                 Metadatum[] metadatums = item
                         .getMetadataByMetadataString(getMetadataField());
                 for (Metadatum metadatum : metadatums)
                 {
                     if (StringUtils.isNotBlank(metadatum.value))
                     {
-                        response.addHeader("Link",
-                                MessageFormat.format(getPattern(),
-                                        metadatum.authority) + "; rel=\""
-                                        + getRelationHeader() + "\"");
+                        response.addHeader("Link", metadatum.value + "; rel=\""
+                                + getRelationHeader() + "\"");
                     }
                 }
+
             }
         }
-        else
+        catch (Exception ex)
         {
-
-            Metadatum[] metadatums = item
-                    .getMetadataByMetadataString(getMetadataField());
-            for (Metadatum metadatum : metadatums)
-            {
-                if (StringUtils.isNotBlank(metadatum.value))
-                {
-                    response.addHeader("Link", metadatum.value + "; rel=\""
-                            + getRelationHeader() + "\"");
-                }
-            }
-
+            log.error("Problem to add signposting pattern", ex);
         }
-
     }
 
     public String getMetadataField()

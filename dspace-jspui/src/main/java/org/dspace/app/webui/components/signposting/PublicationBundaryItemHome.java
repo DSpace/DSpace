@@ -62,9 +62,9 @@ public class PublicationBundaryItemHome implements ItemSignPostingProcessor
                 }                
             }
         }
-        catch (SQLException | UnsupportedEncodingException e)
+        catch (Exception ex)
         {
-            throw new PluginException(e);
+            log.error("Problem to add signposting pattern", ex);
         }
     }
 

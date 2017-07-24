@@ -57,9 +57,9 @@ public class PublicationBundaryBitstreamHome
                         + "\"");
             }
         }
-        catch (SQLException | UnsupportedEncodingException e)
+        catch (Exception ex)
         {
-            throw new PluginException(e);
+            log.error("Problem to add signposting pattern on bitstream", ex);
         }
     }
 
