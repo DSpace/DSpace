@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>solr</artifactId>
-   <version>5.7-SNAPSHOT</version>
+   <version>5.8-SNAPSHOT</version>
    <packaging>war</packaging>
    <name>DSpace SOLR :: Local Customizations</name>
    <description>
@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>5.7-SNAPSHOT</version>
+      <version>5.8-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
