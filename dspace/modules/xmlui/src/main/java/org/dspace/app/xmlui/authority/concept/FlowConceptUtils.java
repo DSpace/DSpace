@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.authority.concept;
+package org.dspace.app.xmlui.authority.concept;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -16,16 +16,21 @@ import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
+import org.datadryad.authority.JournalConceptIndexer;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.aspect.authority.FlowAuthorityMetadataValueUtils;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.indexer.AuthorityIndexingService;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.authority.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.JournalUtils;
 import org.datadryad.api.DryadJournalConcept;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.utils.DSpace;
 
 /**
  * Utility methods to processes actions on EPeople. These methods are used
@@ -344,7 +349,19 @@ public class FlowConceptUtils {
 
         Concept concept = Concept.find(context, Integer.parseInt(conceptID));
         if (DryadJournalConcept.conceptIsValidJournal(concept)) {
-            JournalUtils.updateDryadJournalConcept(new DryadJournalConcept(context, concept));
+            DryadJournalConcept journalConcept = new DryadJournalConcept(context, concept);
+            JournalUtils.updateDryadJournalConcept(journalConcept);
+
+            if (journalConcept.isAccepted()) {
+                JournalConceptIndexer journalConceptIndexer = new JournalConceptIndexer();
+                List<AuthorityValue> authorityValues = journalConceptIndexer.createAuthorityValues(journalConcept);
+                DSpace dspace = new DSpace();
+                ServiceManager serviceManager = dspace.getServiceManager();
+                AuthorityIndexingService indexingService = serviceManager.getServiceByName(AuthorityIndexingService.class.getName(),AuthorityIndexingService.class);
+                for (AuthorityValue authorityValue : authorityValues) {
+                    indexingService.indexContent(authorityValue, true);
+                }
+            }
         }
         return flowResult;
     }

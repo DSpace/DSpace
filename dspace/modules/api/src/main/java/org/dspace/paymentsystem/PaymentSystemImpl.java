@@ -393,7 +393,7 @@ public class PaymentSystemImpl implements PaymentSystemService {
         voucher.addButton("apply", "apply");
         if (voucher1 != null) {
             voucherText.setValue(voucher1.getCode());
-            info.addItem("remove-voucher", "remove-voucher").addXref("#", "Remove voucher : " + voucher1.getCode(), "remove-voucher", "remove-voucher");
+            info.addItem("remove-voucher", "remove-voucher").addXref("#", "Remove voucher: " + voucher1.getCode(), "remove-voucher", "remove-voucher");
         } else {
             info.addItem("remove-voucher", "remove-voucher").addXref("#", "", "remove-voucher", "remove-voucher");
         }

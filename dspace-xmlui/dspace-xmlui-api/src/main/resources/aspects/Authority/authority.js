@@ -10,7 +10,7 @@ importClass(Packages.java.util.Set);
 importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 
 
-importClass(Packages.org.dspace.app.xmlui.aspect.authority.concept.FlowConceptUtils);
+importClass(Packages.org.dspace.app.xmlui.authority.concept.FlowConceptUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.authority.term.FlowTermUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.authority.scheme.FlowSchemeUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.authority.AuthorityUtils);
