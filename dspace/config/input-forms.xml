@@ -567,6 +567,16 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Please list any specific restrictions or requirements pertaining to the use of this item in publications.</hint>
          <required></required>
        </field>
+       
+       <field>
+         <dc-schema>vsim</dc-schema>
+         <dc-element>peerreview</dc-element>
+         <repeatable>false</repeatable>
+         <label>Peer review status</label>
+         <input-type>textarea</input-type>
+         <hint>For model files only.</hint>
+         <required></required>
+       </field>
        -->
      </page>
    </form>
