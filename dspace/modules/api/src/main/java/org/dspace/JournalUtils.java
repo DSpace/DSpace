@@ -542,43 +542,43 @@ public class JournalUtils {
 
         // sanity check:
         if (matchedManuscript != null) {
-            double matchScore = getHamrScore(queryManuscript.getTitle().toLowerCase(), matchedManuscript.getTitle().toLowerCase());
-            matchedManuscript.optionalProperties.put("crossref-score", String.valueOf(matchScore));
             // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
-            if (matchScore < 0.5) {
-                resultString.append("BAD MATCH: \"" + queryManuscript.getTitle() + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
+            if (!compareTitleToManuscript(queryManuscript.getTitle(), matchedManuscript, 0.5, resultString)) {
                 return null;
-            } else {
-                resultString.append("GOOD MATCH: \"" + queryManuscript.getTitle() + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
             }
         }
         return matchedManuscript;
     }
 
-    public static boolean compareItemAuthorsToManuscript(Item item, Manuscript manuscript, StringBuilder result) {
-        boolean matched = false;
+    public static boolean compareTitleToManuscript(String title, Manuscript matchedManuscript, double threshold, StringBuilder resultString) {
+        double matchScore = getHamrScore(title.toLowerCase(), matchedManuscript.getTitle().toLowerCase());
+        if (matchScore < threshold) {
+            resultString.append("BAD MATCH: \"" + title + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
+            return false;
+        } else {
+            resultString.append("GOOD MATCH: \"" + title + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
+        }
+        return true;
+    }
+
+    public static int compareItemAuthorsToManuscript(Item item, Manuscript manuscript, StringBuilder result) {
+        int numMatched = 0;
         // count number of authors and number of matched authors: if equal, this is a match.
         DCValue[] itemAuthors = item.getMetadata("dc", "contributor", "author", Item.ANY);
-        result.append("item has " + itemAuthors.length + " authors while manuscript has " + manuscript.getAuthorList().size() + " authors\n");
-        if (manuscript.getAuthorList().size() == itemAuthors.length) {
-            int numMatched = 0;
-            for (int j = 0; j < itemAuthors.length; j++) {
-                for (Author a : manuscript.getAuthorList()) {
-                    double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), a.getNormalizedFullName().toLowerCase());
-                    result.append("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score + "\n");
-                    if (score > 0.6) {
-                        numMatched++;
-                        break;
-                    }
+        result.append("item " + item.getID() + " has " + itemAuthors.length + " authors while manuscript has " + manuscript.getAuthorList().size() + " authors\n");
+        for (int j = 0; j < itemAuthors.length; j++) {
+            for (Author a : manuscript.getAuthorList()) {
+                double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), a.getNormalizedFullName().toLowerCase());
+                result.append("author " + itemAuthors[j].value + " matched " + a.getUnicodeFullName() + " with a score of " + score + "\n");
+                if (score > 0.6) {
+                    numMatched++;
+                    break;
                 }
             }
-
-            if (numMatched == itemAuthors.length) {
-                matched = true;
-                result.append("matched " + item.getID() + " by authors");
-            }
         }
-        return matched;
+
+        result.append(numMatched + " authors matched");
+        return numMatched;
     }
 
     public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) {

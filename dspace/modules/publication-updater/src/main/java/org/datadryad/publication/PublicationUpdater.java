@@ -14,6 +14,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.ApproveRejectReviewItem;
 import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
@@ -251,6 +252,10 @@ public class PublicationUpdater extends HttpServlet {
                                 if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
                                     message = provenance;
                                 }
+                                if (databaseManuscript.isAccepted()) {
+                                    // see if this can be pushed out of review
+                                    ApproveRejectReviewItem.processWorkflowItemWithManuscript(context, wfi, databaseManuscript);
+                                }
                             }
                         }
                     } catch (ParseException e) {
@@ -321,7 +326,7 @@ public class PublicationUpdater extends HttpServlet {
                 if (Double.valueOf(score) < 1.0) {
                     // does the matched manuscript have the same authors?
                     StringBuilder authormatches = new StringBuilder();
-                    if (JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
+                    if (matchedManuscript.getAuthorList().size() == JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
                         LOGGER.debug("same authors");
                         // update the item's metadata
                         StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");

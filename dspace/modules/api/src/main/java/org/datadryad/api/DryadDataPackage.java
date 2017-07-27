@@ -76,6 +76,10 @@ public class DryadDataPackage extends DryadObject {
     private static final String AUTHOR_ELEMENT = "contributor";
     private static final String AUTHOR_QUALIFIER = "author";
 
+    private final static String PUBLICATION_DATE_SCHEMA = "dc";
+    private final static String PUBLICATION_DATE_ELEMENT = "date";
+    private final static String PUBLICATION_DATE_QUALIFIER = "issued";
+
     private Set<DryadDataFile> dataFiles;
     private static Logger log = Logger.getLogger(DryadDataPackage.class);
 
@@ -292,6 +296,13 @@ public class DryadDataPackage extends DryadObject {
         return foundIndex;
     }
 
+    public String getPublicationDate() throws SQLException {
+        return getSingleMetadataValue(PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER);
+    }
+
+    public void setPublicationDate(String publicationDate) throws SQLException {
+        addSingleMetadataValue(Boolean.TRUE, PUBLICATION_DATE_SCHEMA, PUBLICATION_DATE_ELEMENT, PUBLICATION_DATE_QUALIFIER, publicationDate);
+    }
 
     public String getPublicationName() throws SQLException {
         return getSingleMetadataValue(PUBLICATION_NAME_SCHEMA, PUBLICATION_NAME_ELEMENT, PUBLICATION_NAME_QUALIFIER);

@@ -16,12 +16,12 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchService;
 import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.actions.WorkflowActionConfig;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +36,12 @@ import java.util.List;
  * Updated by dcl9 (dan.leehr@nescent.org) 04-Sep-2014 - exposing reviewItem as static methods
  */
 public class ApproveRejectReviewItem {
+    private static final String PUBLICATION_DOI = "dc.relation.isreferencedby";
+    private static final String MANUSCRIPT = "dc.identifier.manuscriptNumber";
+    private static final String ARTICLE_TITLE = "dc.title";
+    private static final String ABSTRACT = "dc.description";
+    private static final String PUBLICATION_DATE = "dc.date.issued";
+
     private static final Logger log = Logger.getLogger(ApproveRejectReviewItem.class);
     public static void main(String[] args) throws ApproveRejectReviewItemException, ParseException {
         // create an options object and populate it
@@ -127,6 +133,14 @@ public class ApproveRejectReviewItem {
         }
     }
 
+    public static void processWorkflowItemWithManuscript(Context context, WorkflowItem wfi, Manuscript manuscript) {
+        try {
+            reviewItem(context, statusIsApproved(manuscript.getStatus()), wfi, manuscript);
+        } catch (ApproveRejectReviewItemException e) {
+            log.error("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage());
+        }
+    }
+
     public static void reviewManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
         Context c = null;
         try {
@@ -191,7 +205,8 @@ public class ApproveRejectReviewItem {
             // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
             Item item = wfi.getItem();
             DryadDataPackage dataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
-            associateWithManuscript(dataPackage, manuscript);
+            StringBuilder provenance = new StringBuilder();
+            associateWithManuscript(dataPackage, manuscript, provenance);
             if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
                 log.debug ("Item " + item.getID() + " not found or not in review");
             } else {
@@ -209,7 +224,7 @@ public class ApproveRejectReviewItem {
                     if (manuscript != null) {
                         manuscriptNumber = manuscript.getManuscriptId();
                     }
-                    item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem based on metadata for " + manuscriptNumber + " on " + DCDate.getCurrent().toString() + " (GMT)");
+                    item.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", "Approved by ApproveRejectReviewItem based on metadata for " + manuscriptNumber + " on " + DCDate.getCurrent().toString() + " (GMT)" + provenance.toString());
                     item.update();
                 } else { // reject
                     String reason = "The journal with which your data submission is associated has notified us that your manuscript is no longer being considered for publication. If you feel this has happened in error or wish to re-submit your data associated with a different journal, please contact us at help@datadryad.org.";
@@ -254,17 +269,22 @@ public class ApproveRejectReviewItem {
      * Copies manuscript metadata into a dryad data package
      * @param dataPackage
      * @param manuscript
+     * @param message
      * @throws SQLException
      */
-    private static void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript) throws SQLException {
+    private static void associateWithManuscript(DryadDataPackage dataPackage, Manuscript manuscript, StringBuilder message) throws SQLException {
         if (manuscript != null) {
             // set publication DOI
-            if (manuscript.getPublicationDOI() != null) {
+            if (!"".equals(manuscript.getPublicationDOI()) && !dataPackage.getItem().hasMetadataEqualTo(PUBLICATION_DOI, manuscript.getPublicationDOI())) {
+                String oldValue = dataPackage.getPublicationDOI();
                 dataPackage.setPublicationDOI(manuscript.getPublicationDOI());
+                message.append(" " + PUBLICATION_DOI + " was updated from " + oldValue + ".");
             }
             // set Manuscript ID
-            if (manuscript.getManuscriptId() != null) {
+            if (!"".equals(manuscript.getManuscriptId()) && !dataPackage.getItem().hasMetadataEqualTo(MANUSCRIPT, manuscript.getManuscriptId())) {
+                String oldValue = dataPackage.getManuscriptNumber();
                 dataPackage.setManuscriptNumber(manuscript.getManuscriptId());
+                message.append(" " + MANUSCRIPT + " was updated from " + oldValue + ".");
             }
             // union keywords
             if (manuscript.getKeywords().size() > 0) {
@@ -278,16 +298,25 @@ public class ApproveRejectReviewItem {
                 dataPackage.setKeywords(unionKeywords);
             }
             // set title
-            if (manuscript.getTitle() != null) {
+            if (!"".equals(manuscript.getTitle()) && !dataPackage.getItem().hasMetadataEqualTo(ARTICLE_TITLE, manuscript.getTitle())) {
+                String oldValue = dataPackage.getTitle();
                 dataPackage.setTitle(prefixTitle(manuscript.getTitle()));
+                message.append(" " + ARTICLE_TITLE + " was updated from \"" + oldValue + "\".");
             }
             // set abstract
-            if (manuscript.getAbstract() != null) {
+            if (!"".equals(manuscript.getAbstract()) && !dataPackage.getItem().hasMetadataEqualTo(ABSTRACT, manuscript.getAbstract())) {
                 dataPackage.setAbstract(manuscript.getAbstract());
+                message.append(" " + ABSTRACT + " was updated.");
             }
             // set publicationDate
             if (manuscript.getPublicationDate() != null) {
-                dataPackage.setBlackoutUntilDate(manuscript.getPublicationDate());
+                SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
+                String dateString = dateIso.format(manuscript.getPublicationDate());
+                String oldValue = dataPackage.getPublicationDate();
+                if (!oldValue.equals(dateString)) {
+                    dataPackage.setPublicationDate(dateString);
+                    message.append(" " + PUBLICATION_DATE + " was updated from " + oldValue + ".");
+                }
             }
         }
     }

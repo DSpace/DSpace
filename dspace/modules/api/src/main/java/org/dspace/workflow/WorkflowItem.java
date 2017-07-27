@@ -2,7 +2,6 @@ package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadJournalConcept;
-import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
@@ -20,7 +19,6 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
 
 import java.io.IOException;
-import java.lang.Boolean;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -278,37 +276,10 @@ public class WorkflowItem implements InProgressSubmission {
 
         try {
             workflowItems = WorkflowItem.findAllByJournalCode(context, journalCode);
-            for (int i=0;i<workflowItems.length;i++) {
-                Boolean matched = false;
-                WorkflowItem wfi = workflowItems[i];
-                Item item = wfi.getItem();
-                // check to see if this matches by msid:
-                DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
-                for (int j=0; j<msids.length; j++) {
-                    try {
-                        String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msids[j].value, journalConcept);
-                        if (manuscript.getManuscriptId().equals(canonicalMSID)) {
-                            log.debug("matched " + item.getID() + " by msid");
-                            matched = true;
-                        }
-                    } catch (Exception e) {
-                        log.error("couldn't parse msid " + msids[j].value);
-                    }
-
-                    // TEMPORARY FIX: manuscript numbers from metadata files had the JournalCode prefixed onto the manuscript number as well.
-                    String alt_msid = journalCode + "-" + manuscript.getManuscriptId();
-                    if (alt_msid.equals(msids[j].value)) {
-                        log.debug("matched " + item.getID() + " by msid (metadata file method)");
-                        matched = true;
-                    }
-                }
-
-                if (matched == false) {
-                    StringBuilder authormatches = new StringBuilder();
-                    matched = JournalUtils.compareItemAuthorsToManuscript(item, manuscript, authormatches);
-                }
-
-                if (matched) {
+            for (WorkflowItem wfi : workflowItems) {
+                StringBuilder result = new StringBuilder();
+                if (wfi.compareToManuscript(manuscript, result)) {
+                    log.debug("MATCHED " + manuscript.getTitle() + " to " + wfi.getItem().getID() + "\n" + result.toString());
                     matchingItems.add(wfi);
                 }
             }
@@ -321,6 +292,38 @@ public class WorkflowItem implements InProgressSubmission {
         }
 
         return matchingItems;
+    }
+
+    private boolean compareToManuscript(Manuscript manuscript, StringBuilder result) {
+        boolean matched = false;
+        Item item = getItem();
+        // check to see if this matches by msid:
+        DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
+        if (msids != null && msids.length > 0) {
+            DCValue msid = msids[0];
+            try {
+                String canonicalMSID = JournalUtils.getCanonicalManuscriptID(msid.value, manuscript.getJournalConcept());
+                if (manuscript.getManuscriptId().equals(canonicalMSID)) {
+                    log.debug("matched " + item.getID() + " by msid");
+                    matched = true;
+                }
+            } catch (Exception e) {
+                log.error("couldn't parse msid " + msid.value);
+            }
+        }
+
+        if (!matched) {
+            // compare authors: if at least one matches, compare titles.
+            if (JournalUtils.compareItemAuthorsToManuscript(item, manuscript, result) > 0) {
+                // compare titles
+                DCValue[] titles = item.getMetadata("dc", "title", Item.ANY, Item.ANY);
+                if (titles != null && titles.length > 0) {
+                    DCValue title = titles[0];
+                    matched = JournalUtils.compareTitleToManuscript(title.value.replace("Data from: ", ""), manuscript, 0.4, result);
+                }
+            }
+        }
+        return matched;
     }
 
     /**
