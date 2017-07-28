@@ -121,8 +121,10 @@ public class FormAdministrationDOController extends
         boolean check_change = false;
         for (DynamicObjectDTO researcher : dto.getList())
         {
-            ResearchObject realResearcher = applicationService
-                .get(ResearchObject.class, researcher.getId());
+//            ResearchObject realResearcher = applicationService
+//                .get(ResearchObject.class, researcher.getId());
+            ResearchObject realResearcher = researcher.getDynamicObject();
+            
             if (realResearcher.getStatus() != null
                     && realResearcher.getStatus() != researcher.getStatus())
             {

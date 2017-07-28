@@ -113,8 +113,9 @@ public class FormAdministrationResearcherController extends
         boolean check_change = false;
         for (ResearcherPageDTO researcher : dto.getList())
         {
-            ResearcherPage realResearcher = applicationService
-                    .get(ResearcherPage.class, researcher.getId());
+//            ResearcherPage realResearcher = applicationService
+//                    .get(ResearcherPage.class, researcher.getId());
+            ResearcherPage realResearcher = researcher.getRp();
             if (realResearcher.getStatus() != null
                     && realResearcher.getStatus() != researcher.getStatus())
             {

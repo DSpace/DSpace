@@ -114,8 +114,9 @@ public class FormAdministrationProjectController extends
         boolean check_change = false;
         for (ProjectDTO researcher : dto.getList())
         {
-            Project realResearcher = applicationService
-                    .get(Project.class, researcher.getId());
+//            Project realResearcher = applicationService
+//                    .get(Project.class, researcher.getId());
+            Project realResearcher = researcher.getGrant();
             if (realResearcher.getStatus() != null
                     && realResearcher.getStatus() != researcher.getStatus())
             {

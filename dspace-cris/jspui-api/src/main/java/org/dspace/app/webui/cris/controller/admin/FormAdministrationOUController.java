@@ -114,8 +114,9 @@ public class FormAdministrationOUController extends
         boolean check_change = false;
         for (OrganizationUnitDTO researcher : dto.getList())
         {
-            OrganizationUnit realResearcher = applicationService
-                .get(OrganizationUnit.class, researcher.getId());
+//            OrganizationUnit realResearcher = applicationService
+//                .get(OrganizationUnit.class, researcher.getId());
+            OrganizationUnit realResearcher = researcher.getOrganizationUnit();
             if (realResearcher.getStatus() != null
                     && realResearcher.getStatus() != researcher.getStatus())
             {
