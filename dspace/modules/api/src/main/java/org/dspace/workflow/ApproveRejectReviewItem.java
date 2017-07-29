@@ -286,17 +286,17 @@ public class ApproveRejectReviewItem {
                 dataPackage.setManuscriptNumber(manuscript.getManuscriptId());
                 message.append(" " + MANUSCRIPT + " was updated from " + oldValue + ".");
             }
-            // union keywords
-            if (manuscript.getKeywords().size() > 0) {
-                ArrayList<String> unionKeywords = new ArrayList<String>();
-                unionKeywords.addAll(dataPackage.getKeywords());
-                for (String newKeyword : manuscript.getKeywords()) {
-                    if (!unionKeywords.contains(newKeyword)) {
-                        unionKeywords.add(newKeyword);
-                    }
-                }
-                dataPackage.setKeywords(unionKeywords);
-            }
+//            // union keywords
+//            if (manuscript.getKeywords().size() > 0) {
+//                ArrayList<String> unionKeywords = new ArrayList<String>();
+//                unionKeywords.addAll(dataPackage.getKeywords());
+//                for (String newKeyword : manuscript.getKeywords()) {
+//                    if (!unionKeywords.contains(newKeyword)) {
+//                        unionKeywords.add(newKeyword);
+//                    }
+//                }
+//                dataPackage.setKeywords(unionKeywords);
+//            }
             // set title
             if (!"".equals(manuscript.getTitle()) && !dataPackage.getItem().hasMetadataEqualTo(ARTICLE_TITLE, manuscript.getTitle())) {
                 String oldValue = dataPackage.getTitle();
