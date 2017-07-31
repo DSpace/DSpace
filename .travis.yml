@@ -1,7 +1,7 @@
 language: java
 sudo: false
 
-env: 
+env:
   # Give Maven 1GB of memory to work with
   - MAVEN_OPTS=-Xmx1024M
 
@@ -44,7 +44,7 @@ script:
   #        -B => Maven batch/non-interactive mode (recommended for CI)
   #        -V => Display Maven version info before build
   #        -Dsurefire.rerunFailingTestsCount=2 => try again for flakey tests, and keep track of/report on number of retries
-  - "mvn clean install license:check -Dmaven.test.skip=false -DskipITs=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2"
+  - "mvn clean install -Dmaven.test.skip=false -DskipITs=false -P !assembly -B -V -Dsurefire.rerunFailingTestsCount=2"
   # 2. [Assemble DSpace] Ensure assembly process works (from [src]/dspace/), including Mirage 2
   #        -Dmirage2.on=true => Build Mirage2
   #        -Dmirage2.deps.included=false => Don't include Mirage2 build dependencies (We installed them in before_install)
