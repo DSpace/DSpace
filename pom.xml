@@ -60,7 +60,7 @@
                                     <requireJavaVersion>
                                         <version>${java.version}</version>
                                     </requireJavaVersion>
-                                </rules>    
+                                </rules>
                             </configuration>
                         </execution>
                         <!-- Make sure that we do not have conflicting dependencies-->
@@ -197,12 +197,6 @@
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>2.7</version>
                 </plugin>
-                <!-- Used to validate License Headers (see build process) -->
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>2.11</version>
-                </plugin>
                 <!-- Used to generate a new release via Sonatype (see release profile). -->
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
@@ -251,59 +245,6 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
-            <!-- Check license headers in all files using LICENSE_HEADER template -->
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <!-- License header file (can be a URL, but that's less stable if external site is down on occasion) -->
-                    <header>${root.basedir}/LICENSE_HEADER</header>
-                    <!--Just check headers of everything in the /src directory -->
-                    <includes>
-                        <include>src/**</include>
-                    </includes>
-                    <!--Use all default exclusions for IDE files & Maven files, see: 
-                        http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_excludes -->
-                    <useDefaultExcludes>true</useDefaultExcludes>
-                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes> 
-                         Individual Maven projects may choose to override these defaults. -->
-                    <excludes>
-                        <exclude>**/src/test/resources/**</exclude>
-                        <exclude>**/src/test/data/**</exclude>
-                        <exclude>**/src/main/license/**</exclude>
-                        <exclude>**/test.cfg</exclude>
-                        <exclude>**/META-INF/**</exclude>
-                        <exclude>**/robots.txt</exclude>
-                        <exclude>**/*.LICENSE</exclude>
-                        <exclude>**/LICENSE*</exclude>
-                        <exclude>**/README*</exclude>
-                        <exclude>**/readme*</exclude>
-                        <exclude>**/.gitignore</exclude>
-                    </excludes>
-                    <mapping> 
-                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
-                             *.xmap, *.xslt, *.wsdd, *.wsdl, *.ttl, *.LICENSE -->
-                        <xmap>XML_STYLE</xmap>
-                        <xslt>XML_STYLE</xslt>
-                        <wsdd>XML_STYLE</wsdd>
-                        <wsdl>XML_STYLE</wsdl>
-                        <ttl>SCRIPT_STYLE</ttl>
-                        <LICENSE>TEXT</LICENSE>
-                    </mapping>  
-                    <encoding>UTF-8</encoding>
-                    <!-- maven-license-plugin recommends a strict check (e.g. check spaces/tabs too) -->
-                    <strictCheck>true</strictCheck>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>check-headers</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <!-- Enforce our version of Java, Maven, dependencies, etc. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -311,7 +252,7 @@
             </plugin>
         </plugins>
     </build>
-   
+
     <profiles>
         <!-- Skip Unit Tests by default, but allow override on command line
            by setting property "-Dmaven.test.skip=false" -->
@@ -346,8 +287,8 @@
         </profile>
 
         <!-- Allow for passing extra memory to Unit/Integration tests.
-             By default this gives unit tests 512MB of memory (when tests are enabled), 
-             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since 
+             By default this gives unit tests 512MB of memory (when tests are enabled),
+             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since
              m-surefire-p and m-failsafe-p both fork a new JVM for testing, they ignores MAVEN_OPTS. -->
         <profile>
             <id>test-argLine</id>
@@ -362,8 +303,8 @@
         </profile>
 
         <!-- This profile ensures that we ONLY generate the Unit Test Environment,
-             if the testEnvironment.xml file is found AND we are not skipping Unit 
-             Tests (see also skiptests profile). That way the Test Environment is 
+             if the testEnvironment.xml file is found AND we are not skipping Unit
+             Tests (see also skiptests profile). That way the Test Environment is
              also NOT built when running a 'mvn package' on a "binary" release. -->
         <profile>
             <id>generate-test-env</id>
@@ -405,7 +346,7 @@
             </build>
         </profile>
 
-        <!-- 
+        <!--
              Generate a list of all THIRD PARTY open source licenses for all DSpace dependencies.
              This list is automatically written to the [src]/LICENSES_THIRD_PARTY file.
              Third party tools whose licenses are unknown by Maven are maintained in
@@ -512,7 +453,7 @@
                 <javadoc.opts>-Xdoclint:none</javadoc.opts>
             </properties>
         </profile>
-        
+
         <!-- PostgreSQL ships different JDBC drivers based on the version of Java
              you are running. See https://jdbc.postgresql.org/download.html
              These next two profiles handle pulling in the correct PostgreSQL JDBC driver. -->
@@ -720,7 +661,7 @@
                <module>dspace-xmlui-mirage2</module>
            </modules>
         </profile>
-        
+
         <!--
            Builds XMLUI WAR for DSpace
         -->
@@ -809,7 +750,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- Sign any new releases via GPG. 
+                    <!-- Sign any new releases via GPG.
                          NOTE: you may optionall specify the "gpg.passphrase" in your settings.xml -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -966,7 +907,7 @@
                 <version>[6.0.0,7.0.0)</version>
                 <type>war</type>
             </dependency>
-         
+
             <!-- DSpace third Party Dependencies -->
             <dependency>
                 <groupId>org.hibernate</groupId>
