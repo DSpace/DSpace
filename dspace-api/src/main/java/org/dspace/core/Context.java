@@ -537,8 +537,8 @@ public class Context
 
         try
         {
-            // Rollback if we have a database connection, and it is NOT Read Only
-            if (isValid())
+            // Rollback ONLY if we have a database connection, and it is NOT Read Only
+            if (isValid() && !isReadOnly())
             {
                 dbConnection.rollback();
             }
