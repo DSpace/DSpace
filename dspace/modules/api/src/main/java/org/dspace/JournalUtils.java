@@ -552,6 +552,7 @@ public class JournalUtils {
 
     public static boolean compareTitleToManuscript(String title, Manuscript matchedManuscript, double threshold, StringBuilder resultString) {
         double matchScore = getHamrScore(title.toLowerCase(), matchedManuscript.getTitle().toLowerCase());
+        matchedManuscript.optionalProperties.put("crossref-score", String.valueOf(matchScore));
         if (matchScore < threshold) {
             resultString.append("BAD MATCH: \"" + title + "\" matched \"" + matchedManuscript.getTitle() + "\" with score " + matchScore);
             return false;
@@ -629,9 +630,6 @@ public class JournalUtils {
             manuscript.setJournalConcept(dryadJournalConcept);
         }
         manuscript.setStatus(Manuscript.STATUS_PUBLISHED);
-        if (jsonNode.path("score") != null) {
-            manuscript.optionalProperties.put("crossref-score", String.valueOf(jsonNode.path("score").floatValue()));
-        }
         return manuscript;
     }
 
