@@ -3154,11 +3154,11 @@
     <message key="xmlui.ItemViewer.versionInWorkflow">A newer version of this item has been submitted to Dryad. It is waiting for curator review.</message>
 
 	<message key="xmlui.dryad.page_title">Dryad data file: </message>
-    <message key="xmlui.utils.TombstoneTransformer.message">The requested Item is unavailable. For more information contact an &#160;</message>
+    <message key="xmlui.utils.TombstoneTransformer.message">The requested item is unavailable. The data submission associated with this DOI was not completed. For more information, contact an </message>
     <message key="xmlui.utils.TombstoneTransformer.message_link">administrator</message>
     <message key="xmlui.utils.TombstoneTransformer.head1">Tombstone</message>
-    <message key="xmlui.utils.IdentifierNotFoundTransformer.message">The requested identifier is unavailable. For more information contact an &#160;</message>
-    <message key="xmlui.utils.IdentifierNotFoundTransformer.message_link">administrator &#160;</message>
+    <message key="xmlui.utils.IdentifierNotFoundTransformer.message">The requested identifier is unavailable. The data submission associated with this DOI was not completed. For more information, contact an </message>
+    <message key="xmlui.utils.IdentifierNotFoundTransformer.message_link">administrator</message>
     <message key="xmlui.utils.IdentifierNotFoundTransformer.head1">Identifier Not Found</message>
 
     <message key="xmlui.Submission.Submissions.default.pendingPublicationStep.claimAction">Pending Publication Step - Awaiting curator review</message>
