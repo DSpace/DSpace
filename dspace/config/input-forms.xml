@@ -488,7 +488,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>true</repeatable>
          <label>Item Type/Genre</label>
          <input-type value-pairs-name="item_types">dropdown</input-type>
-         <hint>Please select the item(s) that best describe the item's type/genre.</hint>
+         <hint>Please select the type(s)/genre(s) that best describe the item.</hint>
          <required></required>
        </field>
 
