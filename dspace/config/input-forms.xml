@@ -51,17 +51,7 @@
          <!-- dc.title -->
          <required>You must enter a valid title for the project.</required>
        </field>
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>publisher</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Publishing Institution</label>
-         <input-type>onebox</input-type>
-         <hint>Please provide the name of the institution responsible for the creation of this project.</hint>
-         <!-- dc.publisher -->
-         <required></required>
-       </field>
+ 
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
@@ -90,7 +80,7 @@
          <repeatable>false</repeatable>
          <label>Research Objective</label>
          <input-type>textarea</input-type>
-         <hint>Please briefly describe the research objective of the project.</hint>
+         <hint>Please briefly describe the research objective(s) and/or goal(s) of the project.</hint>
          <!-- vsim.research.objective -->
          <required></required>
        </field>
@@ -112,7 +102,7 @@
          <label>Project Dates</label>
          <input-type>onebox</input-type>
          <!-- <input-type>date</input-type> -->
-         <hint>Please specify dates for the project. Include a start date and end date, and list relevant project phases (e.g., "Research Start Date 2011; Model built in 2012; Completed project website in 2014").</hint>
+         <hint>Please specify dates for the project. Include a start date and end date, and list relevant project phases as appropriate.</hint>
          <!-- dc.date.created -->
          <required></required>
        </field>
@@ -134,7 +124,7 @@
          <repeatable>false</repeatable>
          <label>Acknowledgements</label>
          <input-type>textarea</input-type>
-         <hint>Please use this field to acknowledge any other contributors to this project</hint>
+         <hint>Please use this field to acknowledge any other contributors to this project.</hint>
          <!-- vsim.acknowledgements -->
          <required></required>
        </field>
@@ -165,8 +155,8 @@
          <dc-qualifier>temporal</dc-qualifier>
          <repeatable>true</repeatable>
          <label>Temporal Scope</label>
-         <input-type value-pairs-name="historical_periods">qualdrop_value</input-type>
-         <hint>Please describe the project's primary time period(s).</hint>
+         <input-type value-pairs-name="historical_periods">dropdown</input-type>
+         <hint>Please select the project's primary time period(s).</hint>
          <!-- dc.coverage.temporal -->
          <required></required>
        </field>
@@ -176,7 +166,7 @@
          <dc-qualifier></dc-qualifier>
          <repeatable>true</repeatable>
          <label>Subject</label>
-         <input-type value-pairs-name="project_subjects">qualdrop_value</input-type>
+         <input-type value-pairs-name="project_subjects">dropdown</input-type>
          <hint>Please select the project's main subject area discipline(s).</hint>
          <!-- dc.subject -->
          <required></required>
@@ -198,7 +188,7 @@
          <repeatable>true</repeatable>
          <label>Author(s)/PI(s)</label>
          <input-type>name</input-type>
-         <hint>Please list the names of the principal author(s) and/or PI(s) of this project.</hint>
+         <hint>Please list the names of the principal author(s) and/or PI(s) of this project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
          <!-- dc.contributor.author -->
          <required></required>
        </field>
@@ -209,7 +199,7 @@
          <repeatable>true</repeatable>
          <label>Contributor(s)</label>
          <input-type>name</input-type>
-         <hint>Please enter the names of other key contributors to this project.</hint>
+         <hint>Please enter the names of other key contributors to this project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
          <!-- dc.contributor.other -->
          <required></required>
        </field>
@@ -229,9 +219,9 @@
          <dc-element>contributor</dc-element>
          <dc-qualifier>advisor</dc-qualifier>
          <repeatable>true</repeatable>
-         <label>Associated Advisors/Scientific Committee</label>
+         <label>Associated Advisor(s)/Scientific Committee</label>
          <input-type>name</input-type>
-         <hint>Please enter the names of external advisors to this project.</hint>
+         <hint>Please enter the names of external advisors to this project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
          <!-- dc.contributor.advisor -->
          <required></required>
        </field>
@@ -469,6 +459,7 @@ it, please enter the types and the actual numbers or codes.</hint>
        </field>
        -->
 
+       <!--
        <field>
          <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
@@ -479,6 +470,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Please provide a short abstract describing the item.</hint>
          <required></required>
        </field>
+       -->
        
        <field>
          <dc-schema>dc</dc-schema>
@@ -486,7 +478,17 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Item Description</label>
          <input-type>textarea</input-type>
-         <hint>Please use this field to provide a more detailed description of this item, if desired.</hint>
+         <hint>Please provide a short description of this item, if desired.</hint>
+         <required></required>
+       </field>
+       
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>type</dc-element>
+         <repeatable>true</repeatable>
+         <label>Item Type/Genre</label>
+         <input-type value-pairs-name="item_types">dropdown</input-type>
+         <hint>Please select the item(s) that best describe the item's type/genre.</hint>
          <required></required>
        </field>
 
@@ -567,17 +569,29 @@ it, please enter the types and the actual numbers or codes.</hint>
          <hint>Please list any specific restrictions or requirements pertaining to the use of this item in publications.</hint>
          <required></required>
        </field>
+       -->
        
        <field>
          <dc-schema>vsim</dc-schema>
          <dc-element>peerreview</dc-element>
+         <dc-qualifier>status</dc-qualifier>
          <repeatable>false</repeatable>
          <label>Peer review status</label>
          <input-type>textarea</input-type>
-         <hint>For model files only.</hint>
+         <hint>For model files only. Please indicate if the model has passed peer review.</hint>
          <required></required>
        </field>
-       -->
+
+       <field>
+         <dc-schema>vsim</dc-schema>
+         <dc-element>peerreview</dc-element>
+         <dc-qualifier>agency</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Peer review agency</label>
+         <input-type>textarea</input-type>
+         <hint>For model files only. If the model has passed peer reivew, please list the journal/publisher/community that conducted the peer review and are conferring their imprimatur on the model.</hint>
+         <required></required>
+       </field>
      </page>
    </form>
 
@@ -671,16 +685,16 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>Architecture</stored-value>
      </pair>
      <pair>
-       <displayed-value>Art</displayed-value>
-       <stored-value>Art</stored-value>
+       <displayed-value>Arts and Sculpture</displayed-value>
+       <stored-value>Arts and Sculpture</stored-value>
      </pair>
      <pair>
-       <displayed-value>Cars and Vehicles</displayed-value>
-       <stored-value>Cars and Vehicles</stored-value>
+       <displayed-value>Vehicles</displayed-value>
+       <stored-value>Vehicles</stored-value>
      </pair>
      <pair>
-       <displayed-value>Cultural Heritage Environments</displayed-value>
-       <stored-value>Cultural Heritage Environments</stored-value>
+       <displayed-value>Cultural Heritage</displayed-value>
+       <stored-value>Cultural Heritage</stored-value>
      </pair>
      <pair>
        <displayed-value>Science and Technology</displayed-value>
@@ -695,16 +709,143 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>Urban Environments</stored-value>
      </pair>
      <pair>
-       <displayed-value>Sculpture</displayed-value>
-       <stored-value>Sculpture</stored-value>
+       <displayed-value>Reconstructions</displayed-value>
+       <stored-value>Reconstructions</stored-value>
      </pair>
      <pair>
-       <displayed-value>Artifacts</displayed-value>
-       <stored-value>Artifacts</stored-value>
+       <displayed-value>Artifacts and Objects</displayed-value>
+       <stored-value>Artifacts and Objects</stored-value>
      </pair>
      <pair>
        <displayed-value>Miscellaneous</displayed-value>
        <stored-value>Miscellaneous</stored-value>
+     </pair>
+   </value-pairs>
+   
+   <value-pairs value-pairs-name="item_types" dc-term="type">
+     <pair>
+       <displayed-value>Model</displayed-value>
+       <stored-value>Model</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Narrative</displayed-value>
+       <stored-value>Narrative</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Embedded Resources</displayed-value>
+       <stored-value>Embedded Resources</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Book</displayed-value>
+       <stored-value>Book</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Manuscript</displayed-value>
+       <stored-value>Manuscript</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Letter</displayed-value>
+       <stored-value>Letter</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Article</displayed-value>
+       <stored-value>Article</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Ephemera/Brochure</displayed-value>
+       <stored-value>Ephemera/Brochure</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Chapter/Anthology</displayed-value>
+       <stored-value>Chapter/Anthology</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Newspaper Article</displayed-value>
+       <stored-value>Newspaper Article</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Conference Proceedings</displayed-value>
+       <stored-value>Conference Proceedings</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Dissertation/Thesis</displayed-value>
+       <stored-value>Dissertation/Thesis</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Advertisement</displayed-value>
+       <stored-value>Advertisement</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Cartoon/Comic</displayed-value>
+       <stored-value>Cartoon/Comic</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Map/Chart</displayed-value>
+       <stored-value>Map/Chart</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Architectural Drawings: Plans</displayed-value>
+       <stored-value>Architectural Drawings: Plans</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Architectural Drawings: Sections</displayed-value>
+       <stored-value>Architectural Drawings: Sections</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Architectural Drawings: Elevations</displayed-value>
+       <stored-value>Architectural Drawings: Elevations</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Architectural Drawings</displayed-value>
+       <stored-value>Architectural Drawings</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Photograph, Contemporary</displayed-value>
+       <stored-value>Photograph, Contemporary</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Photograph, Historical</displayed-value>
+       <stored-value>Photograph, Historical</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Interview</displayed-value>
+       <stored-value>Interview</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Lecture/Speech</displayed-value>
+       <stored-value>Lecture/Speech</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Live Performance</displayed-value>
+       <stored-value>Live Performance</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Film</displayed-value>
+       <stored-value>Film</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Television/Radio</displayed-value>
+       <stored-value>Television/Radio</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Music/Audio</displayed-value>
+       <stored-value>Music/Audio</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Painting/Artwork</displayed-value>
+       <stored-value>Painting/Artwork</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Project Materials</displayed-value>
+       <stored-value>Project Materials</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Dataset</displayed-value>
+       <stored-value>Dataset</stored-value>
+     </pair>
+     <pair>
+       <displayed-value>Other</displayed-value>
+       <stored-value>Other</stored-value>
      </pair>
    </value-pairs>
 
@@ -734,7 +875,7 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>isbn</stored-value>
      </pair>
    </value-pairs>
-
+   <!-- 
    <value-pairs value-pairs-name="common_types" dc-term="type">
      <pair>
        <displayed-value>Animation</displayed-value>
@@ -825,7 +966,7 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>Other</stored-value>
      </pair>
    </value-pairs>
-
+   -->
    <!-- default language order: (from dspace 1.2.1)
         "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
      -->
