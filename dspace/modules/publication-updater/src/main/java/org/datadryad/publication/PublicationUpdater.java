@@ -323,25 +323,17 @@ public class PublicationUpdater extends HttpServlet {
             } else {
                 LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" matched a title \"" + matchedManuscript.getTitle() + "\" with score " + score);
                 LOGGER.debug("matched publication DOI is " + matchedManuscript.getPublicationDOI());
-                if (Double.valueOf(score) < 1.0) {
-                    // does the matched manuscript have the same authors?
-                    StringBuilder authormatches = new StringBuilder();
-                    if (matchedManuscript.getAuthorList().size() == JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
-                        LOGGER.debug("same authors");
-                        // update the item's metadata
-                        StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");
-                        if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
-                            message = provenance;
-                        }
-                    } else {
-                        LOGGER.debug("different authors: " + authormatches);
-                    }
-                } else {
-                    LOGGER.debug("perfect title match");
-                    StringBuilder provenance = new StringBuilder("Associated publication with perfect title match was found: \"" + matchedManuscript.getTitle() + "\".");
+                // does the matched manuscript have the same authors?
+                StringBuilder authormatches = new StringBuilder();
+                if (matchedManuscript.getAuthorList().size() == JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
+                    LOGGER.debug("same authors");
+                    // update the item's metadata
+                    StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");
                     if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
                         message = provenance;
                     }
+                } else {
+                    LOGGER.debug("different authors: " + authormatches);
                 }
             }
         } else {
