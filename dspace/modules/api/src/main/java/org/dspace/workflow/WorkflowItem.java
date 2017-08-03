@@ -313,8 +313,8 @@ public class WorkflowItem implements InProgressSubmission {
         }
 
         if (!matched) {
-            // compare authors: if at least one matches, compare titles.
-            if (JournalUtils.compareItemAuthorsToManuscript(item, manuscript, result) > 0) {
+            // compare authors: if they all match, compare titles.
+            if (JournalUtils.compareItemAuthorsToManuscript(item, manuscript, result) == manuscript.getAuthorList().size()) {
                 // compare titles
                 DCValue[] titles = item.getMetadata("dc", "title", Item.ANY, Item.ANY);
                 if (titles != null && titles.length > 0) {
