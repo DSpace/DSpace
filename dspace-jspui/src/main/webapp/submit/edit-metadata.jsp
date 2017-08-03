@@ -950,7 +950,7 @@
       sb.append("<div class=\"row\">");  
       for (int i = 0; i < fieldCount; i++)
       {
-    	  if(i>0){
+    	  if(i>0 && hasParent){
     		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
     	  }
     	  
