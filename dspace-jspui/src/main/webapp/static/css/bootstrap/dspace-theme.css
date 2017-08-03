@@ -291,3 +291,8 @@ footer .container {
 	right:auto;
 }
 .fullheight {min-height: 35em;}
+
+.metadata-divider {
+	margin-top:5px;
+	margin-bottom:5px;
+}
