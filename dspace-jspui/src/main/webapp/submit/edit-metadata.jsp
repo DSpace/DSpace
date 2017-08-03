@@ -64,14 +64,19 @@
     request.setAttribute("LanguageSwitch", "hide");
 
     HashMap<String,List<DCInput>> parent2child = new HashMap<String,List<DCInput>>();
+    
+    
 %>
 <%!
     // required by Controlled Vocabulary  add-on and authority addon
         String contextPath;
 
+	Locale lcl;
     // An unknown value of confidence for new, empty input fields,
     // so no icon appears yet.
     int unknownConfidence = Choices.CF_UNSET - 100;
+    
+		
 
     // This method is resposible for showing a link next to an input box
     // that pops up a window that to display a controlled vocabulary.
@@ -137,7 +142,51 @@
         }
         return null;
     }
+
     
+    StringBuffer doChildInput(Item item,DCInput child,int count,int fieldCount, boolean repeatable,boolean readonly, int fieldCountIncr, PageContext pageContext,int collectionID){
+      
+      StringBuffer sb = new StringBuffer();
+    	
+	  String childSchema = child.getSchema();
+	  String childElement = child.getElement();
+	  String childQualifier = child.getQualifier();
+	  Metadatum[] meta = item.getMetadata(childSchema, childElement, childQualifier, Item.ANY);
+	  
+	  String childFieldName="";
+	  if (childQualifier != null && !childQualifier.equals("*"))
+           childFieldName = childSchema + "_" + childElement + '_' + childQualifier;
+	  else
+           childFieldName = childSchema + "_" + childElement;
+	  String childAuthorityType = getAuthorityType(pageContext, childFieldName, collectionID);
+	  
+	  sb.append("<label class=\"col-md-12"+ (child.isRequired()?" label-required":"") +"\">").append(child.getLabel()).append("</label>");
+	  String inputType = child.getInputType();
+	  if(StringUtils.equals(inputType, "name")){
+			sb.append(doPersonalNameInput(meta, count, childAuthorityType, fieldCount, childFieldName, childSchema, childElement, 
+					childQualifier, repeatable, child.isRequired(), readonly, fieldCountIncr, pageContext, collectionID, true));
+	  }
+	  else if(StringUtils.equals(inputType, "date")){
+		  sb.append(doDateInput(meta, count, fieldCount, childFieldName, childSchema, childElement, 
+				  childQualifier, repeatable, child.isRequired(), readonly, fieldCountIncr, pageContext, collectionID, true));
+	  }
+	  else if(StringUtils.equals(inputType, "textarea")){
+		  sb.append(doTextAreaInput(meta, count, childAuthorityType, fieldCount, childFieldName, childSchema, childElement, 
+				  childQualifier, repeatable, child.isRequired(), readonly, fieldCountIncr, pageContext, child.getVocabulary(),
+				  child.isClosedVocabulary(), collectionID, true));		  
+	  }
+	  else if(StringUtils.equals(inputType, "number")){
+		  sb.append(doNumberInput(meta, count, childAuthorityType, fieldCount, childFieldName, childSchema, childElement, 
+				  childQualifier, repeatable, child.isRequired(), readonly, fieldCountIncr, pageContext, collectionID, true));
+	  }	  
+	  else{
+	  		sb.append(doOneBoxInput(meta, count, childAuthorityType, fieldCount, childFieldName, childSchema, childElement, 
+			  childQualifier, repeatable, child.isRequired(), readonly, fieldCountIncr, pageContext, child.getVocabulary(), 
+			  child.isClosedVocabulary(), collectionID,true));
+	  }
+	  
+	  return sb;
+    }
     // Render the choice/authority controlled entry, or, if not indicated,
     // returns the given default inputBlock
     StringBuffer doAuthority(PageContext pageContext, String fieldName,
@@ -281,39 +330,26 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">").append(label).append("</label>");
-	  sb.append("<div class=\"col-md-10\">");     
+      sb.append("<div class=\"row\">");
       for (int i = 0; i < fieldCount; i++)
       {
+    	  if(i>0){
+    		  sb.append("<hr class=\"metadata-divider col-md-offset-1 col-md-10\"/>");
+    	  }
+          sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">").append(label).append("</label>");
+    	  sb.append("<div class=\"col-md-10\">");     
+
     	  sb.append(doPersonalNameInput(defaults,i,authorityType, fieldCount, fieldName, schema, element, 
     	    		 qualifier, repeatable,  required,  readonly, fieldCountIncr, pageContext,collectionID,hasParent) );
     	  if(children !=null){
 	    	  for(DCInput child: children){
-	    		  String childSchema = child.getSchema();
-	    		  String childElement = child.getElement();
-	    		  String childQualifier = child.getQualifier();
-	    		  Metadatum[] meta = item.getMetadata(childSchema, childElement, childQualifier, Item.ANY);
-				  
-	    		  String childFieldName="";
-	    		  if (childQualifier != null && !childQualifier.equals("*"))
-	    	           childFieldName = childSchema + "_" + childElement + '_' + childQualifier;
-	    		  else
-	    	           childFieldName = childSchema + "_" + childElement;
-	    		  String childAuthorityType = getAuthorityType(pageContext, childFieldName, collectionID);
-	    		  
-	    		  sb.append("<label class=\"col-md-12"+ (child.isRequired()?" label-required":"") +"\">").append(child.getLabel()).append("</label>");
-	    		  
-	    	  	sb.append(doOneBoxInput(meta, i, childAuthorityType, fieldCount, childFieldName, childSchema, childElement, 
-	    			  childQualifier, repeatable, child.isRequired(), readonly, fieldCountIncr, pageContext, child.getVocabulary(), 
-	    			  child.isClosedVocabulary(), collectionID,true));
-	    	  	
+	    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID));
 	    	  }
     	  }
-    	  
+    	  sb.append("</div>");
       }
       
-      
-	  sb.append("</div></div><br/>");
+	  sb.append("</div><br/>");
       out.write(sb.toString());
     }
 
@@ -418,7 +454,7 @@
     
     void doYear(boolean allowInPrint, javax.servlet.jsp.JspWriter out, Item item,
             String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
-            boolean readonly, int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request,List<DCInput> children,boolean hasParent)
+            boolean readonly, int fieldCountIncr, String label, PageContext pageContext, List<DCInput> children,boolean hasParent)
 			throws java.io.IOException {
     	List<String> valuePair = new ArrayList<String>();
     	// display value
@@ -454,118 +490,143 @@
     
     void doDate(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable, boolean required,
-      boolean readonly, int fieldCountIncr, String label, PageContext pageContext, HttpServletRequest request,List<DCInput> children,boolean hasParent)
+      boolean readonly, int fieldCountIncr, String label, PageContext pageContext, int collectionID,List<DCInput> children,boolean hasParent)
       throws java.io.IOException
     {
 
       Metadatum[] defaults = item.getMetadata(schema, element, qualifier, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();
-      org.dspace.content.DCDate dateIssued;
 
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
-        .append(label)
-        .append("</label><div class=\"col-md-10\">");
+      sb.append("<div class=\"row\">");
       
       for (int i = 0; i < fieldCount; i++)
       {
-         if (i < defaults.length)
-            dateIssued = new org.dspace.content.DCDate(defaults[i].value);
-         else
-            dateIssued = new org.dspace.content.DCDate("");
-    
-         sb.append("<div class=\"row col-md-12\"><div class=\"input-group col-md-10\"><div class=\"row\">")
-			.append("<span class=\"input-group col-md-6\"><span class=\"input-group-addon\">")
-         	.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.month"))
-            .append("</span><select class=\"form-control\" name=\"")
-            .append(fieldName)
-            .append("_month");
-         if (repeatable && i>0)
-         {
-            sb.append('_').append(i);
-         }
-         if (readonly)
-         {
-             sb.append("\" disabled=\"disabled");
-         }
-         sb.append("\"><option value=\"-1\"")
-            .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
-//          .append(">(No month)</option>");
-            .append(">")
-            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.no_month"))
-            .append("</option>");
-            
-         for (int j = 1; j < 13; j++)
-         {
-            sb.append("<option value=\"")
-              .append(j)
-              .append((dateIssued.getMonth() == j ? "\" selected=\"selected\"" : "\"" ))
-              .append(">")
-              .append(org.dspace.content.DCDate.getMonthName(j,I18nUtil.getSupportedLocale(request.getLocale())))
-              .append("</option>");
-         }
-    
-         sb.append("</select></span>")
-	            .append("<span class=\"input-group col-md-2\"><span class=\"input-group-addon\">")
-                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.day"))
-                .append("</span><input class=\"form-control\" type=\"text\" name=\"")
-            .append(fieldName)
-            .append("_day");
-         if (repeatable && i>0)
-            sb.append("_").append(i);
-         if (readonly)
-         {
-             sb.append("\" disabled=\"disabled");
-         }
-         sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
-            .append((dateIssued.getDay() > 0 ?
-                     String.valueOf(dateIssued.getDay()) : "" ))
-                .append("\"/></span><span class=\"input-group col-md-4\"><span class=\"input-group-addon\">")
-                .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.year"))
-                .append("</span><input class=\"form-control\" type=\"text\" name=\"")
-            .append(fieldName)
-            .append("_year");
-         if (repeatable && i>0)
-            sb.append("_").append(i);
-         if (readonly)
-         {
-             sb.append("\" disabled=\"disabled");
-         }
-         sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
-            .append((dateIssued.getYear() > 0 ?
-                 String.valueOf(dateIssued.getYear()) : "" ))
-            .append("\"/></span></div></div>\n");
-    
-         if (repeatable && !readonly && i < defaults.length)
-         {
-            // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
-              .append(fieldName)
-              .append("_remove_")
-              .append(i)
-              .append("\" value=\"")
-              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
-         }
-         else if (repeatable && !readonly && i == fieldCount - 1)
-         {
-            // put a 'more' button next to the last space
-            sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
-              .append(fieldName)
-              .append("_add\" value=\"")
-              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
-         }
-         // put a blank if nothing else
-         sb.append("</div>");
+    	  if(i>0){
+    		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
+    	  }
+    	  sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">")
+      .append(label)
+      .append("</label><div class=\"col-md-10\">");
+    	  sb.append(doDateInput(defaults,i, fieldCount, fieldName,  schema,  element, qualifier, 
+			   		 repeatable, required, readonly, fieldCountIncr, pageContext, collectionID,hasParent));
+	    	if(children !=null){
+		    	  for(DCInput child: children){
+		    		  sb.append(doChildInput(item,child, i, fieldCount,repeatable,readonly, fieldCountIncr, pageContext, collectionID));
+		    	  }
+	    	}
+	    	sb.append("</div>");
       }
-      sb.append("</div></div><br/>");
+      sb.append("</div><br/>");
       out.write(sb.toString());
     }
 
+    StringBuffer doDateInput(Metadatum[] defaults,int count,int fieldCount, String fieldName, String schema, String element, 
+    		String qualifier, boolean repeatable, boolean required, boolean readonly, int fieldCountIncr, PageContext pageContext,int collectionID,boolean hasParent){
+
+    	StringBuffer sb = new StringBuffer();
+    	org.dspace.content.DCDate dateIssued;
+    	
+        if (count < defaults.length)
+           dateIssued = new org.dspace.content.DCDate(defaults[count].value);
+        else
+           dateIssued = new org.dspace.content.DCDate("");
+   
+        sb.append("<div class=\"row col-md-12\"><div class=\"input-group col-md-10\"><div class=\"row\">")
+			.append("<span class=\"input-group col-md-6\"><span class=\"input-group-addon\">")
+        	.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.month"))
+           .append("</span><select class=\"form-control\" name=\"")
+           .append(fieldName)
+           .append("_month");
+        
+        if(repeatable && hasParent && count==0)
+        	count=1;
+        
+        
+        if (repeatable && count>0)
+        {
+           sb.append('_').append(count);
+        }
+        if (readonly)
+        {
+            sb.append("\" disabled=\"disabled");
+        }
+        sb.append("\"><option value=\"-1\"")
+           .append((dateIssued.getMonth() == -1 ? " selected=\"selected\"" : ""))
+//         .append(">(No month)</option>");
+           .append(">")
+           .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.no_month"))
+           .append("</option>");
+           
+        for (int j = 1; j < 13; j++)
+        {
+           sb.append("<option value=\"")
+             .append(j)
+             .append((dateIssued.getMonth() == j ? "\" selected=\"selected\"" : "\"" ))
+             .append(">")
+             .append(org.dspace.content.DCDate.getMonthName(j,I18nUtil.getSupportedLocale(lcl)))
+             .append("</option>");
+        }
+   
+        sb.append("</select></span>")
+	            .append("<span class=\"input-group col-md-2\"><span class=\"input-group-addon\">")
+               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.day"))
+               .append("</span><input class=\"form-control\" type=\"text\" name=\"")
+           .append(fieldName)
+           .append("_day");
+        if (repeatable && count>0)
+           sb.append("_").append(count);
+        if (readonly)
+        {
+            sb.append("\" disabled=\"disabled");
+        }
+        sb.append("\" size=\"2\" maxlength=\"2\" value=\"")
+           .append((dateIssued.getDay() > 0 ?
+                    String.valueOf(dateIssued.getDay()) : "" ))
+               .append("\"/></span><span class=\"input-group col-md-4\"><span class=\"input-group-addon\">")
+               .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.year"))
+               .append("</span><input class=\"form-control\" type=\"text\" name=\"")
+           .append(fieldName)
+           .append("_year");
+        if (repeatable && count>0)
+           sb.append("_").append(count);
+        if (readonly)
+        {
+            sb.append("\" disabled=\"disabled");
+        }
+        sb.append("\" size=\"4\" maxlength=\"4\" value=\"")
+           .append((dateIssued.getYear() > 0 ?
+                String.valueOf(dateIssued.getYear()) : "" ))
+           .append("\"/></span></div></div>\n");
+   
+        if (!hasParent && repeatable && !readonly && count < defaults.length)
+        {
+           // put a remove button next to filled in values
+           sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+             .append(fieldName)
+             .append("_remove_")
+             .append(count)
+             .append("\" value=\"")
+             .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+             .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
+        }
+        else if (!hasParent && repeatable && !readonly && count == fieldCount - 1)
+        {
+           // put a 'more' button next to the last space
+           sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
+             .append(fieldName)
+             .append("_add\" value=\"")
+             .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+             .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
+        }
+        // put a blank if nothing else
+        sb.append("</div>");
+     	return sb;
+    }
+    
     void doSeriesNumber(javax.servlet.jsp.JspWriter out, Item item,
       String fieldName, String schema, String element, String qualifier, boolean repeatable,
       boolean required, boolean readonly, int fieldCountIncr, String label, PageContext pageContext,List<DCInput> children,boolean hasParent)
@@ -664,77 +725,100 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
-      	.append(label)
-      	.append("</label><div class=\"col-md-10\">");
+      sb.append("<div class=\"row\">");
       
       for (int i = 0; i < fieldCount; i++)
       {
-         if (i < defaults.length)
-         {
-           val = defaults[i].value;
-              auth = defaults[i].authority;
-              conf = defaults[i].confidence;
-         }
-         else
-         {
-           val = "";
-            auth = "";
-         }
-         sb.append("<div class=\"row col-md-12\">\n");
-         String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-         sb.append("<div class=\"col-md-10\">");
-         if (authorityType != null)
-         {
-        	 sb.append("<div class=\"col-md-10\">");
-         }
-         sb.append("<textarea class=\"form-control\" name=\"").append(fieldNameIdx)
-           .append("\" rows=\"4\" cols=\"45\" id=\"")
-           .append(fieldNameIdx).append("_id\" ")
-           .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
-           .append(">")
-           .append(val)
-           .append("</textarea>")
-           .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
-         if (authorityType != null)
-         {
-        	 sb.append("</div><div class=\"col-md-2\">");
-	         sb.append(doAuthority(pageContext, fieldName, i, fieldCount, fieldName,
-                            auth, conf, false, repeatable,
-                            defaults, null, collectionID));
-	         sb.append("</div>");
-         }
-
-         sb.append("</div>");
-           
-         
-         if (repeatable && !readonly && i < defaults.length)
-         {
-            // put a remove button next to filled in values
-            sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
-              .append(fieldName)
-              .append("_remove_")
-              .append(i)
-              .append("\" value=\"")
-              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-              .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
-         }
-         else if (repeatable && !readonly && i == fieldCount - 1)
-         {
-            // put a 'more' button next to the last space
-            sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
-              .append(fieldName)
-              .append("_add\" value=\"")
-              .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-              .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
-         }
-
-         // put a blank if nothing else
-         sb.append("</div>");
+    	  if(i>0){
+    		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
+    	  }
+    	  
+    	  sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">")
+        	.append(label)
+          	.append("</label><div class=\"col-md-10\">");
+			sb.append(doTextAreaInput(defaults,i, authorityType, fieldCount, fieldName,  schema,  element, qualifier, 
+			   		 repeatable, required, readonly, fieldCountIncr, pageContext, vocabulary, closedVocabulary,collectionID,hasParent));
+	    	if(children !=null){
+		    	  for(DCInput child: children){
+		    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID));		    	  	
+		    	  }
+	    	}
+	    	sb.append("</div>");
       }
-      sb.append("</div></div><br/>");
+      sb.append("</div><br/>");
       
       out.write(sb.toString());
+    }
+    
+    StringBuffer doTextAreaInput(Metadatum[] defaults,int count,String authorityType,int fieldCount, String fieldName, String schema, String element, 
+    		String qualifier, boolean repeatable, boolean required, boolean readonly, int fieldCountIncr, PageContext pageContext,String vocabulary,
+    		boolean closedVocabulary,int collectionID,boolean hasParent){
+        StringBuffer sb = new StringBuffer();
+        
+        String auth,val;
+        int conf=0;
+    	if (count < defaults.length)
+        {
+             val = StringUtils.replaceEachRepeatedly(defaults[count].value,new String[]{"\"",MetadataValue.PARENT_PLACEHOLDER_VALUE},new String[]{"&quot;",""});
+             auth = defaults[count].authority;
+             conf = defaults[count].confidence;
+        }
+        else
+        {
+          val = "";
+           auth = "";
+        }
+        sb.append("<div class=\"row col-md-12\">\n");
+        String fieldNameIdx = fieldName + ((repeatable && count != fieldCount-1)?"_" + (count+1):"");
+        sb.append("<div class=\"col-md-10\">");
+        if (authorityType != null)
+        {
+       	 sb.append("<div class=\"col-md-10\">");
+        }
+        sb.append("<textarea class=\"form-control\" name=\"").append(fieldNameIdx)
+          .append("\" rows=\"4\" cols=\"45\" id=\"")
+          .append(fieldNameIdx).append("_id\" ")
+          .append((hasVocabulary(vocabulary)&&closedVocabulary)||readonly?" disabled=\"disabled\" ":"")
+          .append(">")
+          .append(val)
+          .append("</textarea>")
+          .append(doControlledVocabulary(fieldNameIdx, pageContext, vocabulary, readonly));
+        if (authorityType != null)
+        {
+       	 sb.append("</div><div class=\"col-md-2\">");
+	         sb.append(doAuthority(pageContext, fieldName, count, fieldCount, fieldName,
+                           auth, conf, false, repeatable,
+                           defaults, null, collectionID));
+	         sb.append("</div>");
+        }
+
+        sb.append("</div>");
+          
+        
+        if (!hasParent && repeatable && !readonly && count < defaults.length)
+        {
+           // put a remove button next to filled in values
+           sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+             .append(fieldName)
+             .append("_remove_")
+             .append(count)
+             .append("\" value=\"")
+             .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+             .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
+        }
+        else if (!hasParent && repeatable && !readonly && count == fieldCount - 1)
+        {
+           // put a 'more' button next to the last space
+           sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
+             .append(fieldName)
+             .append("_add\" value=\"")
+             .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+             .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
+        }
+
+        // put a blank if nothing else
+        sb.append("</div>");
+        return sb;
     }
 
     void doNumber(javax.servlet.jsp.JspWriter out, Item item,
@@ -753,80 +837,101 @@
         if (fieldCount == 0)
            fieldCount = 1;
 
-        sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
-          .append(label)
-          .append("</label>");
-        sb.append("<div class=\"col-md-10\">");  
+        sb.append("<div class=\"row\">");  
         for (int i = 0; i < fieldCount; i++)
         {
-             if (i < defaults.length)
-             {
-               val = defaults[i].value.replaceAll("\"", "&quot;");
-               auth = defaults[i].authority;
-               conf = defaults[i].confidence;
-             }
-             else
-             {
-               val = "";
-               auth = "";
-               conf= unknownConfidence;
-             }
-
-             sb.append("<div class=\"row col-md-12\">");
-             String fieldNameIdx = fieldName + ((repeatable && i != fieldCount-1)?"_" + (i+1):"");
-             
-             sb.append("<div class=\"col-md-10\">");
-             if (authorityType != null)
-             {
-          	   sb.append("<div class=\"row col-md-10\">");
-             }
-             
-             sb.append("<div class=\"row col-md-4\">");
-             sb.append("<input class=\"form-control\" type=\"number\" step=\"any\"  name=\"")
-               .append(fieldNameIdx)
-               .append("\" id=\"")
-               .append(fieldNameIdx).append("\" value=\"")
-               .append(val +"\"")
-               .append(readonly?" disabled=\"disabled\" ":"")
-               .append("/>")  			              
-               .append("</div>").append("</div>");
-             
-             if (authorityType != null)
-             {
-          	   sb.append("<div class=\"col-md-2\">");
-  	           sb.append(doAuthority(pageContext, fieldName, i,  fieldCount,
-                                fieldName, auth, conf, false, repeatable,
-                                defaults, null, collectionID));
-             	   sb.append("</div></div>");
-             }             
-
-            if (repeatable && !readonly && i < defaults.length)
-            {
-               // put a remove button next to filled in values
-               sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
-                 .append(fieldName)
-                 .append("_remove_")
-                 .append(i)
-                 .append("\" value=\"")
-                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
-                 .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
-            }
-            else if (repeatable && !readonly && i == fieldCount - 1)
-            {
-               // put a 'more' button next to the last space
-               sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
-                 .append(fieldName)
-                 .append("_add\" value=\"")
-                 .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
-                 .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
-            }
-
-            sb.append("</div>");
-          }
-        sb.append("</div>");
+      	  if(i>0){
+    		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
+    	  }        	
+        	sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">")
+            .append(label)
+            .append("</label>");
+            sb.append("<div class=\"col-md-10\">");
+        	sb.append(doNumberInput(defaults, i, authorityType, fieldCount, fieldName, schema, element, qualifier, repeatable, required, 
+        			readonly, fieldCountIncr, pageContext, collectionID, hasParent));
+	    	if(children !=null){
+		    	  for(DCInput child: children){
+		    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID));		    	  	
+		    	  }
+	    	}
+	    	sb.append("</div>");
+        }
         sb.append("</div><br/>");
-  	  
         out.write(sb.toString());
+    }
+    
+    StringBuffer doNumberInput(Metadatum[] defaults,int count,String authorityType,int fieldCount, String fieldName, String schema, String element, 
+    		String qualifier, boolean repeatable, boolean required, boolean readonly, int fieldCountIncr, PageContext pageContext,
+    		int collectionID,boolean hasParent){
+
+    	StringBuffer sb = new StringBuffer();
+    	String val,auth;
+    	int conf =0;
+    	
+        if (count < defaults.length)
+        {
+          val = defaults[count].value.replaceAll("\"", "&quot;");
+          auth = defaults[count].authority;
+          conf = defaults[count].confidence;
+        }
+        else
+        {
+          val = "";
+          auth = "";
+          conf= unknownConfidence;
+        }
+
+        sb.append("<div class=\"row col-md-12\">");
+        String fieldNameIdx = fieldName + ((repeatable && count != fieldCount-1)?"_" + (count+1):"");
+        
+        sb.append("<div class=\"col-md-10\">");
+        if (authorityType != null)
+        {
+     	   sb.append("<div class=\"row col-md-10\">");
+        }
+        
+        sb.append("<div class=\"row col-md-4\">");
+        sb.append("<input class=\"form-control\" type=\"number\" step=\"any\"  name=\"")
+          .append(fieldNameIdx)
+          .append("\" id=\"")
+          .append(fieldNameIdx).append("\" value=\"")
+          .append(val +"\"")
+          .append(readonly?" disabled=\"disabled\" ":"")
+          .append("/>")  			              
+          .append("</div>").append("</div>");
+        
+        if (authorityType != null)
+        {
+     	   sb.append("<div class=\"col-md-2\">");
+	           sb.append(doAuthority(pageContext, fieldName, count,  fieldCount,
+                           fieldName, auth, conf, false, repeatable,
+                           defaults, null, collectionID));
+        	   sb.append("</div></div>");
+        }             
+
+       if (!hasParent && repeatable && !readonly && count < defaults.length)
+       {
+          // put a remove button next to filled in values
+          sb.append("<button class=\"btn btn-danger col-md-2\" name=\"submit_")
+            .append(fieldName)
+            .append("_remove_")
+            .append(count)
+            .append("\" value=\"")
+            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove"))
+            .append("\"><span class=\"glyphicon glyphicon-trash\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.remove")+"</button>");
+       }
+       else if (!hasParent && repeatable && !readonly && count == fieldCount - 1)
+       {
+          // put a 'more' button next to the last space
+          sb.append("<button class=\"btn btn-default col-md-2\" name=\"submit_")
+            .append(fieldName)
+            .append("_add\" value=\"")
+            .append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add"))
+            .append("\"><span class=\"glyphicon glyphicon-plus\"></span>&nbsp;&nbsp;"+LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.edit-metadata.button.add")+"</button>");
+       }
+
+       sb.append("</div>");
+  	   return sb;       	
     }
     
     void doOneBox(javax.servlet.jsp.JspWriter out, Item item,
@@ -842,37 +947,27 @@
       if (fieldCount == 0)
          fieldCount = 1;
 
-      sb.append("<div class=\"row\"><label class=\"col-md-2"+ (required?" label-required":"") +"\">")
-        .append(label)
-        .append("</label>");
-      sb.append("<div class=\"col-md-10\">");  
+      sb.append("<div class=\"row\">");  
       for (int i = 0; i < fieldCount; i++)
       {
+    	  if(i>0){
+    		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
+    	  }
+    	  
+    	  sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">")
+          .append(label)
+          .append("</label>");
+        sb.append("<div class=\"col-md-10\">");
     	  sb.append(doOneBoxInput(defaults,i, authorityType, fieldCount, fieldName,  schema,  element, qualifier, 
     	    		 repeatable, required, readonly, fieldCountIncr, pageContext, vocabulary, closedVocabulary,collectionID,hasParent) );
     	  if(children !=null){
 	    	  for(DCInput child: children){
-	    		  String childSchema = child.getSchema();
-	    		  String childElement = child.getElement();
-	    		  String childQualifier = child.getQualifier();
-	    		  Metadatum[] meta = item.getMetadata(childSchema, childElement, childQualifier, Item.ANY);
-				  
-	    		  String childFieldName="";
-	    		  if (childQualifier != null && !childQualifier.equals("*"))
-	    	           childFieldName = childSchema + "_" + childElement + '_' + childQualifier;
-	    		  else
-	    	           childFieldName = childSchema + "_" + childElement;
-	    		  String childAuthorityType = getAuthorityType(pageContext, childFieldName, collectionID);
-	    		  
-	    		  sb.append("<label class=\"col-md-12"+ (child.isRequired()?" label-required":"") +"\">").append(child.getLabel()).append("</label>");
-	    		  
-	    	  	sb.append(doOneBoxInput(meta, i, childAuthorityType, fieldCount, childFieldName, childSchema, childElement, 
-	    			  childQualifier, repeatable, child.isRequired(), readonly, fieldCountIncr, pageContext, child.getVocabulary(), child.isClosedVocabulary(), collectionID,true));
-	    	  	
+	    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID));	    	  	
 	    	  }
     	  }
+    	  sb.append("</div>");  
       }
-      sb.append("</div>");
+      
       sb.append("</div><br/>");
 	  
       out.write(sb.toString());
@@ -1440,6 +1535,7 @@
 
 <%
         contextPath = request.getContextPath();
+		lcl = request.getLocale();
 %>
 
 
@@ -1625,17 +1721,17 @@
        else if (inputType.equals("date"))
        {
            doDate(out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                          repeatable, required, readonly, fieldCountIncr, label, pageContext, request,parent2child.get(fieldName),hasParent);
+                          repeatable, required, readonly, fieldCountIncr, label, pageContext, collectionID,parent2child.get(fieldName),hasParent);
        }
        else if (inputType.equals("year")) 
        {
     	   doYear(true, out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                   repeatable, required, readonly, fieldCountIncr, label, pageContext, request,parent2child.get(fieldName),hasParent);
+                   repeatable, required, readonly, fieldCountIncr, label, pageContext, parent2child.get(fieldName),hasParent);
        }
        else if (inputType.equals("year_noinprint")) 
        {
     	   doYear(false, out, item, fieldName, dcSchema, dcElement, dcQualifier,
-                   repeatable, required, readonly, fieldCountIncr, label, pageContext, request,parent2child.get(fieldName),hasParent);
+                   repeatable, required, readonly, fieldCountIncr, label, pageContext, parent2child.get(fieldName),hasParent);
        }
        else if (inputType.equals("number")) 
        {
