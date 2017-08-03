@@ -87,7 +87,7 @@ public class DescribeStep extends AbstractProcessingStep
     // there were validation errors found
     public static final int STATUS_ERROR_VALIDATION_FIELDS = 3;
     
-    private HashMap<String,String> fieldName2inputType =new HashMap<String,String>();
+    private HashMap<String,DCInput> fieldName2input =new HashMap<String,DCInput>();
 
     /** Constructor */
     public DescribeStep() throws ServletException
@@ -175,7 +175,8 @@ public class DescribeStep extends AbstractProcessingStep
         for(DCInput input: inputs){
         	String field = MetadataField
                     .formKey(input.getSchema(), input.getElement(), input.getQualifier());
-        	fieldName2inputType.put(field, input.getInputType());
+        	fieldName2input.put(field, input);
+        	
         	
         }
         // Fetch the document type (dc.type)
@@ -768,8 +769,10 @@ public class DescribeStep extends AbstractProcessingStep
         
         String parentMetadataField = "";
         String parentMetadataFieldParam = "";
+        boolean parentRepeatable = false;
         if(dcInput.hasParent()){
         	parentMetadataField=dcInput.getParent();
+        	parentRepeatable = fieldName2input.get(parentMetadataField).isRepeatable();
         }
 
         // Values to add
@@ -777,9 +780,9 @@ public class DescribeStep extends AbstractProcessingStep
         List<String> auths = null;
         List<String> confs = null;
 
-        if (repeated && dcInput.hasParent())
+        if (parentRepeatable)
         {
-        	String parentType= fieldName2inputType.get(parentMetadataField);
+        	String parentType= fieldName2input.get(parentMetadataField).getInputType();
             if (StringUtils.equals(parentType,"name"))
             {
                 parentMetadataFieldParam = parentMetadataField+"_last";
@@ -798,12 +801,13 @@ public class DescribeStep extends AbstractProcessingStep
             }else{
             	parentMetadataFieldParam = parentMetadataField;
             }
+            	
             
             vals = getRepeatedParameterParent(request, metadataField, metadataField,parentMetadataField,parentMetadataFieldParam);
             if (isAuthorityControlled)
             {
-                auths = getRepeatedParameterParent(request, metadataField, metadataField+"_authority",parentMetadataField,parentMetadataField+"_authority");
-                confs = getRepeatedParameterParent(request, metadataField, metadataField+"_confidence",parentMetadataField,parentMetadataField+"_confidence");
+                auths = getRepeatedParameterParent(request, metadataField, metadataField+"_authority",parentMetadataField,parentMetadataFieldParam);
+                confs = getRepeatedParameterParent(request, metadataField, metadataField+"_confidence",parentMetadataField,parentMetadataFieldParam);
             }
 
             // Find out if the relevant "remove" button was pressed
@@ -826,7 +830,7 @@ public class DescribeStep extends AbstractProcessingStep
                 }
             }
         }
-        else if(repeated){
+        else if(!dcInput.hasParent() && repeated ){
             vals = getRepeatedParameter(request, metadataField, metadataField);
             if (isAuthorityControlled)
             {
@@ -857,7 +861,28 @@ public class DescribeStep extends AbstractProcessingStep
         }else if(StringUtils.isNotBlank(parentMetadataField)){
             vals = new LinkedList<String>();
             String value = request.getParameter(metadataField);
-            String parent = request.getParameter(parentMetadataField);
+            String parent = "";
+            String parentType= fieldName2input.get(parentMetadataField).getInputType();
+            
+            if (StringUtils.equals(parentType,"name"))
+            {
+            	parent = request.getParameter(parentMetadataField+"_last");
+            }
+            else if (StringUtils.equals(parentType,"date"))
+            {
+            	parent = request.getParameter(parentMetadataField+"_year");
+            }
+            else if (StringUtils.equals(parentType,"series"))
+            {
+            	parent = request.getParameter(parentMetadataField+"_series");
+            }
+            else if (StringUtils.equals(parentType,"qualdrop_value"))
+            {
+            	parent = request.getParameter(parentMetadataField+"_value");
+            }else{
+            	parent = request.getParameter(parentMetadataField);
+            }
+
             if (StringUtils.isNotBlank(parent))
             {
             	if(StringUtils.isNotBlank(value)){
@@ -969,11 +994,62 @@ public class DescribeStep extends AbstractProcessingStep
     {
         String metadataField = MetadataField
                 .formKey(schema, element, qualifier);
+        String parentMetadataField ="";
+        String parentMetadataFieldParam ="";
+        List<String> vals =null;
+        
+        boolean parentRepeatable= false;
+        if(dcInput.hasParent() ){
+        	parentMetadataField = dcInput.getParent();
+        	parentRepeatable = fieldName2input.get(parentMetadataField).isRepeatable();
+        }
+        
+        if(parentRepeatable){
+        	String parentType= fieldName2input.get(parentMetadataField).getInputType();
+            if (StringUtils.equals(parentType,"name"))
+            {
+                parentMetadataFieldParam = parentMetadataField+"_last";
+            }
+            else if (StringUtils.equals(parentType,"date"))
+            {
+            	parentMetadataFieldParam = parentMetadataField+"_year";
+            }
+            else if (StringUtils.equals(parentType,"series"))
+            {
+            	parentMetadataFieldParam = parentMetadataField+"_series";
+            }
+            else if (StringUtils.equals(parentType,"qualdrop_value"))
+            {
+            	parentMetadataFieldParam = parentMetadataField+"_value";
+            }else{
+            	parentMetadataFieldParam = parentMetadataField;
+            }
+            	
+            
+            vals = getDateRepeatedParameterParent(request, metadataField, metadataField,parentMetadataField,parentMetadataFieldParam);
 
+            // Find out if the relevant "remove" button was pressed
+            // TODO: These separate remove buttons are only relevant
+            // for DSpace JSP UI, and the code below can be removed
+            // once the DSpace JSP UI is obsolete!
+            String buttonPressed = Util.getSubmitButton(request, "");
+            String removeButton = "submit_" + parentMetadataField + "_remove_";
+
+            if (buttonPressed.startsWith(removeButton))
+            {
+                int valToRemove = Integer.parseInt(buttonPressed
+                        .substring(removeButton.length()));
+
+                vals.remove(valToRemove);
+
+            }
+        }
         int year = Util.getIntParameter(request, metadataField + "_year");
         int month = Util.getIntParameter(request, metadataField + "_month");
         int day = Util.getIntParameter(request, metadataField + "_day");
 
+
+        
         // FIXME: Probably should be some more validation
         // Make a standard format date
         DCDate d = new DCDate(year, month, day, -1, -1, -1);
@@ -1177,6 +1253,80 @@ public class DescribeStep extends AbstractProcessingStep
         return vals;
     }
 
+   
+    protected List<String> getDateRepeatedParameterParent(HttpServletRequest request,
+            String metadataField, String param,String parentMetadataField, String parentParam)
+    {
+        List<String> vals = new LinkedList<String>();
+
+        int i = 1;    //start index at the first of the previously entered values
+        boolean foundLast = false;
+
+        // Iterate through the values in the form.
+        while (!foundLast)
+        {
+            String s = null;
+            String parent = null;
+            //First, add the previously entered values.
+            // This ensures we preserve the order that these values were entered
+            s = request.getParameter(param + "_" + i);
+            parent = request.getParameter(parentParam + "_" + i);
+
+            // If there are no more previously entered values,
+            // see if there's a new value entered in textbox
+            if (!StringUtils.isNotBlank(parent))
+            {
+                s = request.getParameter(param);
+                parent= request.getParameter(parentParam);
+                //this will be the last value added
+                foundLast = true;
+            }
+
+            // We're only going to add non-null values
+            if (StringUtils.isNotBlank(parent))
+            {
+                boolean addValue = true;
+
+                // Check to make sure that this value was not selected to be
+                // removed.
+                // (This is for the "remove multiple" option available in
+                // Manakin)
+                String[] selected = request.getParameterValues(parentMetadataField
+                        + "_selected");
+
+                if (selected != null)
+                {
+                    for (int j = 0; j < selected.length; j++)
+                    {
+                        if (selected[j].equals(parentMetadataField + "_" + i))
+                        {
+                            addValue = false;
+                        }
+                    }
+                }
+
+                if (addValue)
+                {
+                	if(!StringUtils.isNotBlank(s) && StringUtils.equals(param, metadataField)){
+                		//vals.add(MetadataValue.PARENT_PLACEHOLDER_VALUE);
+                	}else if(StringUtils.isNotBlank(s)){
+                		//vals.add();
+                	}else{
+                		//vals.add("");
+                	}
+                		
+
+                }
+            }
+
+            i++;
+        }
+
+        log.debug("getRepeatedParameter: metadataField=" + metadataField
+                + " param=" + metadataField + ", return count = "+vals.size());
+
+        return vals;
+    }    
     
     protected List<String> getRepeatedParameterParent(HttpServletRequest request,
             String metadataField, String param,String parentMetadataField, String parentParam)
