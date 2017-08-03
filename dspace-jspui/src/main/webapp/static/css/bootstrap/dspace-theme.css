@@ -412,4 +412,9 @@ div.panel.panel-primary ul.list-group li.list-group-item.active .badge {backgrou
 
 .help-block {
 	color: #000000;
-}		
+}
+
+.metadata-divider {
+	margin-top:5px;
+	margin-bottom:5px;
+}
