@@ -2502,7 +2502,6 @@
     <message key="xmlui.Submission.submit.StartSubmissionLookupStep.lookup_help">Fill in a publication ID, DOI, Title or Author and then press "Search".  A list of all matching publications will be shown to you to select in order to proceed with the submission process.</message>
     <message key="xmlui.Submission.submit.StartSubmissionLookupStep.submit_publication_item">Imported publication Record</message>
     <message key="xmlui.Submission.submit.progressbar.lookup">Lookup</message>
-    <message key="xmlui.ChoiceLookupTransformer.lookup">Lookup</message>
 
 
 </catalogue>
