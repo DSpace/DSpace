@@ -185,6 +185,10 @@
 			  child.isClosedVocabulary(), collectionID,true));
 	  }
 	  
+      if(last){
+          sb.append("<hr class=\"metadata-divider col-md-offset-1 col-md-10\"/>");
+      }
+
 	  return sb;
     }
     // Render the choice/authority controlled entry, or, if not indicated,

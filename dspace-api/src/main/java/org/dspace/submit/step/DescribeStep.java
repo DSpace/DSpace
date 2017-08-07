@@ -795,6 +795,8 @@ public class DescribeStep extends AbstractProcessingStep
             else if (StringUtils.equals(parentType,"qualdrop_value"))
             {
             	parentMetadataFieldParam = parentMetadataField+"_value";
+            }else{
+            	parentMetadataFieldParam = parentMetadataField;
             }
             
             vals = getRepeatedParameterParent(request, metadataField, metadataField,parentMetadataField,parentMetadataFieldParam);
