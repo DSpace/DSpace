@@ -144,7 +144,7 @@
     }
 
     
-    StringBuffer doChildInput(Item item,DCInput child,int count,int fieldCount, boolean repeatable,boolean readonly, int fieldCountIncr, PageContext pageContext,int collectionID){
+    StringBuffer doChildInput(Item item,DCInput child,int count,int fieldCount, boolean repeatable,boolean readonly, int fieldCountIncr, PageContext pageContext,int collectionID, boolean last){
       
       StringBuffer sb = new StringBuffer();
     	
@@ -333,17 +333,17 @@
       sb.append("<div class=\"row\">");
       for (int i = 0; i < fieldCount; i++)
       {
-    	  if(i>0){
-    		  sb.append("<hr class=\"metadata-divider col-md-offset-1 col-md-10\"/>");
-    	  }
+
           sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">").append(label).append("</label>");
     	  sb.append("<div class=\"col-md-10\">");     
 
     	  sb.append(doPersonalNameInput(defaults,i,authorityType, fieldCount, fieldName, schema, element, 
     	    		 qualifier, repeatable,  required,  readonly, fieldCountIncr, pageContext,collectionID,hasParent) );
     	  if(children !=null){
+    	      int countChild = 1;
 	    	  for(DCInput child: children){
-	    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID));
+	    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID, children.size()==countChild));
+	    		  countChild++;
 	    	  }
     	  }
     	  sb.append("</div>");
@@ -505,17 +505,16 @@
       
       for (int i = 0; i < fieldCount; i++)
       {
-    	  if(i>0){
-    		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
-    	  }
     	  sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">")
       .append(label)
       .append("</label><div class=\"col-md-10\">");
     	  sb.append(doDateInput(defaults,i, fieldCount, fieldName,  schema,  element, qualifier, 
 			   		 repeatable, required, readonly, fieldCountIncr, pageContext, collectionID,hasParent));
 	    	if(children !=null){
+	    	      int countChild = 1;    
 		    	  for(DCInput child: children){
-		    		  sb.append(doChildInput(item,child, i, fieldCount,repeatable,readonly, fieldCountIncr, pageContext, collectionID));
+		    		  sb.append(doChildInput(item,child, i, fieldCount,repeatable,readonly, fieldCountIncr, pageContext, collectionID, children.size()==countChild));
+		    		  countChild++;
 		    	  }
 	    	}
 	    	sb.append("</div>");
@@ -729,18 +728,16 @@
       
       for (int i = 0; i < fieldCount; i++)
       {
-    	  if(i>0){
-    		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
-    	  }
-    	  
     	  sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">")
         	.append(label)
           	.append("</label><div class=\"col-md-10\">");
 			sb.append(doTextAreaInput(defaults,i, authorityType, fieldCount, fieldName,  schema,  element, qualifier, 
 			   		 repeatable, required, readonly, fieldCountIncr, pageContext, vocabulary, closedVocabulary,collectionID,hasParent));
 	    	if(children !=null){
+	    	      int countChild = 1;
 		    	  for(DCInput child: children){
-		    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID));		    	  	
+		    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID, children.size()==countChild));
+		    		  countChild++;
 		    	  }
 	    	}
 	    	sb.append("</div>");
@@ -840,9 +837,6 @@
         sb.append("<div class=\"row\">");  
         for (int i = 0; i < fieldCount; i++)
         {
-      	  if(i>0){
-    		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
-    	  }        	
         	sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">")
             .append(label)
             .append("</label>");
@@ -850,8 +844,10 @@
         	sb.append(doNumberInput(defaults, i, authorityType, fieldCount, fieldName, schema, element, qualifier, repeatable, required, 
         			readonly, fieldCountIncr, pageContext, collectionID, hasParent));
 	    	if(children !=null){
+	    	      int countChild = 1;
 		    	  for(DCInput child: children){
-		    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID));		    	  	
+		    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID, children.size()==countChild));
+		    		  countChild++;
 		    	  }
 	    	}
 	    	sb.append("</div>");
@@ -950,10 +946,6 @@
       sb.append("<div class=\"row\">");  
       for (int i = 0; i < fieldCount; i++)
       {
-    	  if(i>0 && hasParent){
-    		  sb.append("<hr class=\"col-md-offset-1 col-md-10\"/>");
-    	  }
-    	  
     	  sb.append("<label class=\"col-md-2"+ (required?" label-required":"") +"\">")
           .append(label)
           .append("</label>");
@@ -961,8 +953,10 @@
     	  sb.append(doOneBoxInput(defaults,i, authorityType, fieldCount, fieldName,  schema,  element, qualifier, 
     	    		 repeatable, required, readonly, fieldCountIncr, pageContext, vocabulary, closedVocabulary,collectionID,hasParent) );
     	  if(children !=null){
+    	      int countChild = 1;
 	    	  for(DCInput child: children){
-	    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID));	    	  	
+	    		  sb.append(doChildInput(item,child, i, fieldCount, repeatable,readonly,fieldCountIncr, pageContext, collectionID, children.size()==countChild));
+	    	  	  countChild++;
 	    	  }
     	  }
     	  sb.append("</div>");  
