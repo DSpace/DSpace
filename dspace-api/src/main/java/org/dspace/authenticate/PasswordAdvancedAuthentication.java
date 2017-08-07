@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.authenticate;
 
 import java.util.Arrays;
@@ -9,9 +16,12 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 
-
-
-
+/**
+ * Password Authentication to assign a group for domain 
+ * 
+ * @author Riccardo Fazio (riccardo.fazio at 4science dot it)
+ *
+ */
 public class PasswordAdvancedAuthentication extends PasswordAuthentication {
 	
 	private static Logger log = Logger.getLogger(PasswordAdvancedAuthentication.class);
