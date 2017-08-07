@@ -336,7 +336,7 @@ public class ItemTag extends TagSupport
         Context context = UIUtil.obtainContext(request);
 
         // Get all the metadata
-        Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        Metadatum[] values = item.getMetadataWithoutPlaceholder(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         // Three column table - DC field, value, language
 		out.println("<table class=\"table itemDisplayTable\">");

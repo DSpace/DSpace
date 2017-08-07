@@ -19,6 +19,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
@@ -190,6 +191,8 @@ public class SolrBrowseCreateDAO implements BrowseCreateDAO,
                                                         + (values[x].qualifier == null
                                                                 ? ""
                                                                 : "." + values[x].qualifier));
+                                    }else if(StringUtils.equals(values[x].value, MetadataValue.PARENT_PLACEHOLDER_VALUE) ){
+                                    	continue;
                                     }
                                     else
                                     {

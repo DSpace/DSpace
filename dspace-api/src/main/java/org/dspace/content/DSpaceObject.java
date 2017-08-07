@@ -656,6 +656,36 @@ public abstract class DSpaceObject implements IGlobalSearchResult
         return values;
     }
 
+    public Metadatum[] getMetadataWithoutPlaceholder(String schema, String element, String qualifier,
+            String lang)
+	{
+		// Build up list of matching values
+		List<Metadatum> values = new ArrayList<Metadatum>();
+		for (Metadatum dcv : getMetadata())
+		{
+			if (!StringUtils.equals(dcv.value, MetadataValue.PARENT_PLACEHOLDER_VALUE) && match(schema, element, qualifier, lang, dcv))
+			{
+				// We will return a copy of the object in case it is altered
+				Metadatum copy = new Metadatum();
+				copy.element = dcv.element;
+				copy.qualifier = dcv.qualifier;
+				copy.value = dcv.value;
+				copy.language = dcv.language;
+				copy.schema = dcv.schema;
+				copy.authority = dcv.authority;
+				copy.confidence = dcv.confidence;
+				values.add(copy);
+				}
+		}
+		
+		// Create an array of matching values
+		Metadatum[] valueArray = new Metadatum[values.size()];
+		valueArray = (Metadatum[]) values.toArray(valueArray);
+		
+		return valueArray;
+	}
+
+    
     /**
      * Retrieve first metadata field value
      */

@@ -220,7 +220,7 @@
 %>
                 <td headers="t6" class="<%= row %>Row<%= column %>Col" style="text-align:center"> 
                     <button class="btn btn-default pull-left" type="submit" name="submit_editPolicy_<%= bitstreams[i].getID() %>" value="<fmt:message key="jsp.submit.upload-file-list.button1"/>">
-                    <span class="glyphicon glyphicon-lock"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button1"/>
+                    <span class="fa fa-lock"></span>&nbsp;&nbsp;<fmt:message key="jsp.submit.upload-file-list.button1"/>
                     </button>
                 </td>
 <%

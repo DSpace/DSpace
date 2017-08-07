@@ -30,6 +30,7 @@ import org.dspace.app.cris.model.ResearchObject;
 import org.dspace.app.cris.service.ApplicationService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -166,6 +167,9 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
                         {
                             Object dcvalue = buildGenericValue(context, item,
                                     value, details);
+                            if(dcvalue!= null && dcvalue.equals(MetadataValue.PARENT_PLACEHOLDER_VALUE)){
+                            	continue;
+                            }
                             if (!containsValue(props, dcvalue))
                             {
                                 ResearcherPageUtils.buildGenericValue(
@@ -188,7 +192,9 @@ public class ItemMetadataImportFiller implements ImportAuthorityFiller
                             }
                             Object dcvalue = buildGenericValue(context, item,
                                     value, details);
-                            
+                            if(dcvalue!= null && dcvalue.equals(MetadataValue.PARENT_PLACEHOLDER_VALUE)){
+                            	continue;
+                            }
                             if (!containsValue(props, dcvalue))
                             {
                                 ResearcherPageUtils.buildGenericValue(

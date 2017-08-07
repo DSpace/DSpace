@@ -74,6 +74,9 @@ public class DCInput
 
     /** allowed document types */
     private List<String> typeBind = null;
+    
+    /** parent metadata */
+    private String parent = null;
 
     private String validation;
     
@@ -146,6 +149,8 @@ public class DCInput
         		typeBind.add( type.trim() );
         	}
         }
+        
+        parent = fieldMap.get("parent");
         validation = fieldMap.get("validation");
         if (StringUtils.isBlank(validation) && "number".equals(inputType))
         {
@@ -344,7 +349,15 @@ public class DCInput
         this.vocabulary = vocabulary;
     }
 
-    /**
+    public String getParent() {
+		return parent;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
+	}
+
+	/**
      * Gets the display string that corresponds to the passed storage string in
      * a particular display-storage pair set.
      * 
@@ -464,6 +477,14 @@ public class DCInput
     
     public boolean requireValidation() {
         if (StringUtils.isNotBlank(getValidation()))
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean hasParent(){
+        if (StringUtils.isNotBlank(getParent()))
         {
             return true;
         }

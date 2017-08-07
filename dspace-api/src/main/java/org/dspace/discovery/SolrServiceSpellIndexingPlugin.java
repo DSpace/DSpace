@@ -10,10 +10,12 @@ package org.dspace.discovery;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
+import org.dspace.content.MetadataValue;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 
@@ -38,7 +40,7 @@ public class SolrServiceSpellIndexingPlugin implements SolrServiceIndexPlugin {
 
                 String value = Metadatum.value;
 
-                if (value == null)
+                if (value == null || StringUtils.equals(value, MetadataValue.PARENT_PLACEHOLDER_VALUE))
                 {
                     continue;
                 }

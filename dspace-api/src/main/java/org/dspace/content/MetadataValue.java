@@ -32,6 +32,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  */
 public class MetadataValue
 {
+	public static final String PARENT_PLACEHOLDER_VALUE ="#PLACEHOLDER_PARENT_METADATA_VALUE#";
     /** The reference to the metadata field */
     private int fieldId = 0;
 

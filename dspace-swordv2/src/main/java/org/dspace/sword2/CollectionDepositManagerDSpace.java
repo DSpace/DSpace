@@ -75,6 +75,7 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI implements Co
 			}
 
 			// get the deposit target
+			context.turnOffItemWrapper();
 			Collection collection = this.getDepositTarget(context, collectionUri, config);
             if (collection == null)
             {
@@ -177,6 +178,8 @@ public class CollectionDepositManagerDSpace extends DSpaceSwordAPI implements Co
 					}
 				}
 				throw e;
+			}finally {
+				context.restoreItemWrapperState();
 			}
 
             // now we've produced a deposit, we need to decide on its workflow state
