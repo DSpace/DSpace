@@ -8,18 +8,19 @@ $bootstrap-sass-asset-helper: false !default;
 //
 //## Gray and brand colors for use across Bootstrap.
 
+$white:                  #fff;
 $gray-base:              #000 !default;
 $gray-darker:            lighten($gray-base, 13.5%) !default; // #222
-$gray-dark:              #67655D;   // #333
-$gray:                   #B74934; // #555
-$gray-light:             #AA9A66; // #777
+$gray-dark:              #3e3e3e;   // as per Echo
+$gray:                   #B74934; // not used
+$gray-light:             #c0c3c6; // as per Echo
 $gray-lighter:           #A8A8A1; // #eee
 
-$brand-primary:         #577492; // #337ab7
-$brand-success:         #739157 !default; //5cb85c
-$brand-info:            #5bc0de !default;
-$brand-warning:         #f0ad4e !default;
-$brand-danger:          #d9534f !default;
+$brand-primary:         #0033a0; // as per Echo
+$brand-success:         #00a3e0 !default; //as per Echo
+$brand-info:            #5bc0de !default; //as per Echo
+$brand-warning:         #fbe122 !default; //as per Echo
+$brand-danger:          #d9534f !default; //retained from previous iteration
 
 
 //== Scaffolding
@@ -27,7 +28,7 @@ $brand-danger:          #d9534f !default;
 //## Settings for some of the most global styles.
 
 //** Background color for `<body>`.
-$body-bg:               #D4D8D1;
+$body-bg:               $white;
 //** Global text color on `<body>`.
 $text-color:            $gray-dark !default;
 
@@ -44,13 +45,20 @@ $link-hover-decoration: underline !default;
 //
 //## Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif:  "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Tahoma, sans-serif;
-$font-family-serif:       Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif !default;
-//** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
-$font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace !default;
-$font-family-base:        $font-family-serif !default;
+// fontstacks courtesy of http://www.cssfontstack.com
+//
+// PT Sans: font-family: "PT Sans", "Gill Sans", Calibri, sans-serif;
+// Roboto Mono: font-family: "Roboto Mono", "Inconsolata", "Andale Mono", AndaleMono, monospace;
+// Arial: font-family:  Arial, "Helvetica Neue", Helvetica, sans-serif;
 
-$font-size-base:          14px !default;
+$font-family-sans-serif:  "PT Sans", "Gill Sans", Calibri, sans-serif;
+$font-family-serif:       Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif !default;
+$font-family-arial:       Arial, "Helvetica Neue", Helvetica, sans-serif;
+//** Default monospace fonts for `<code>`, `<kbd>`, and `<pre>`.
+$font-family-monospace:   "Roboto Mono", "Inconsolata", "Andale Mono", AndaleMono, monospace;
+$font-family-base:        $font-family-sans-serif !default;
+
+$font-size-base:          15px !default;
 $font-size-large:         ceil(($font-size-base * 1.25)) !default; // ~18px
 $font-size-small:         ceil(($font-size-base * 0.85)) !default; // ~12px
 
