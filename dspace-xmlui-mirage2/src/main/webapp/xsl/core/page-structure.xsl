@@ -830,6 +830,26 @@
             <script src="{$theme-path}{@src}">&#160;</script>
         </xsl:for-each>
 
+        <xsl:if test="confman:getProperty('altmetric.enabled')">
+            <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
+        </xsl:if>
+
+        <xsl:variable name="plumx_type" select="confman:getProperty('plumx.widget-type')"/>
+        <xsl:variable name="plumx-script-url">
+            <xsl:choose>
+                <xsl:when test="boolean($plumx_type)">
+                    <xsl:value-of
+                            select="concat($scheme, 'd39af2mgp1pqhg.cloudfront.net/widget-', $plumx_type, '.js')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="concat($scheme, 'd39af2mgp1pqhg.cloudfront.net/widget-popup.js')"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <script type="text/javascript" src="{$plumx-script-url}">&#xFEFF;
+        </script>
+
         <!-- Add javascript specified in DRI -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
             <script>
