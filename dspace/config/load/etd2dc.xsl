@@ -72,7 +72,7 @@
      </dcvalue>
    </xsl:template>
 
-   <xsl:template match="DISS_keyword">
+   <xsl:template match="DISS_keyword[text()]">
      <xsl:call-template name="Parse_DISS_keyword">
        <xsl:with-param name="text" select="."/>
      </xsl:call-template>
