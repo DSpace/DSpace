@@ -6,7 +6,7 @@
   <parent>
     <artifactId>article-metrics-all</artifactId>
     <groupId>org.dspace</groupId>
-    <version>CRIS-5.7.0</version>
+    <version>CRIS-5.7.1-SNAPSHOT</version>
   </parent>
   
   <name>Article Metrics :: PubMed :: Lookup JSP Web</name>
