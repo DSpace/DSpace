@@ -192,6 +192,7 @@ public class DOIOrganiser {
 
                 for (DOI doi : dois) {
                     organiser.reserve(doi);
+                    context.commit();
                     context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
@@ -213,6 +214,7 @@ public class DOIOrganiser {
                 for (DOI doi : dois)
                 {
                     organiser.register(doi);
+                    context.commit();
                     context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
@@ -238,6 +240,7 @@ public class DOIOrganiser {
                 for (DOI doi : dois)
                 {
                     organiser.update(doi);
+                    context.commit();
                     context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
@@ -262,6 +265,7 @@ public class DOIOrganiser {
                     DOI doi = iterator.next();
                     iterator.remove();
                     organiser.delete(doi.getDoi());
+                    context.commit();
                     context.uncacheEntity(doi);
                 }
             } catch (SQLException ex) {
