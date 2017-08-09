@@ -160,11 +160,12 @@ public class IndexEventConsumer implements Consumer {
         if (objectsToUpdate != null && handlesToDelete != null) {
 
             // update the changed Items not deleted because they were on create list
-            for (DSpaceObject iu : objectsToUpdate) {
+            for (DSpaceObject o : objectsToUpdate) {
                 /* we let all types through here and 
                  * allow the search indexer to make 
                  * decisions on indexing and/or removal
                  */
+                DSpaceObject iu = ctx.reloadEntity(o);
                 String hdl = iu.getHandle();
                 if (hdl != null && !handlesToDelete.contains(hdl)) {
                     try {
