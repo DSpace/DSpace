@@ -37,3 +37,8 @@ a.list-group-item {
 .ds-option-set-head {
     text-align: center;
 }
+
+// make the navbar border thicker
+.navbar-default {
+    border-width: 0 0 4px 0;
+}
