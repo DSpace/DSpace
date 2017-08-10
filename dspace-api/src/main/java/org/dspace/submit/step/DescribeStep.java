@@ -1194,11 +1194,11 @@ public class DescribeStep extends AbstractProcessingStep
             //First, add the previously entered values.
             // This ensures we preserve the order that these values were entered
             s = request.getParameter(param + "_" + i);
-            parent = request.getParameter(parentParam + "_" + i);
+            parent = request.getParameter(parentMetadataField + "_" + i);
 
             // If there are no more previously entered values,
             // see if there's a new value entered in textbox
-            if (!StringUtils.isNotBlank(parent))
+            if (StringUtils.isBlank(parent))
             {
                 s = request.getParameter(param);
                 parent= request.getParameter(parentParam);
@@ -1231,7 +1231,7 @@ public class DescribeStep extends AbstractProcessingStep
 
                 if (addValue)
                 {
-                	if(!StringUtils.isNotBlank(s) && StringUtils.equals(param, metadataField)){
+                	if(StringUtils.isBlank(s) && StringUtils.equals(param, metadataField)){
                 		vals.add(MetadataValue.PARENT_PLACEHOLDER_VALUE);
                 	}else if(StringUtils.isNotBlank(s)){
                 		vals.add(StringUtils.trim(s));
