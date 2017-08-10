@@ -405,6 +405,7 @@ public class MetadataImport
 
                 if (change) {
                     //only clear cache if changes have been made.
+                    c.commit();
                     c.uncacheEntity(wsItem);
                     c.uncacheEntity(wfItem);
                     c.uncacheEntity(item);
