@@ -105,17 +105,17 @@ public class DescribeStep extends AbstractProcessingStep
             // lookup applicable inputs
             Collection c = subInfo.getSubmissionItem().getCollection();
             
-        	String customHeading = inputsReader.getInputs(c.getHandle()).getHeading(pageNumber);
+            String customHeading = inputsReader.getInputs(c.getHandle()).getHeading(pageNumber);
             if (StringUtils.isNotBlank(customHeading)) {
-            	return customHeading;
+                return customHeading;
             }
         }
         catch (DCInputsReaderException | NullPointerException e)
         {
-        	return heading;
+            return heading;
         }
-    	return heading;
-	}
+        return heading;
+    }
     
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -173,11 +173,11 @@ public class DescribeStep extends AbstractProcessingStep
         }
 
         for(DCInput input: inputs){
-        	String field = MetadataField
+            String field = MetadataField
                     .formKey(input.getSchema(), input.getElement(), input.getQualifier());
-        	fieldName2input.put(field, input);
-        	
-        	
+            fieldName2input.put(field, input);
+            
+            
         }
         // Fetch the document type (dc.type)
         String documentType = "";
@@ -188,52 +188,52 @@ public class DescribeStep extends AbstractProcessingStep
         
         String scope ="";
         if(subInfo.isInWorkflow()){
-        	WorkflowItem wfi = (WorkflowItem)subInfo.getSubmissionItem();
-        	int wfState = wfi.getState();
-        	switch (wfState){
-        		case WorkflowManager.WFSTATE_STEP1:
-        			scope = DCInput.WORKFLOW_STEP1_SCOPE;
-        			break;
-        		case WorkflowManager.WFSTATE_STEP2:
-        			scope = DCInput.WORKFLOW_STEP2_SCOPE;
-        			break;
-        		case WorkflowManager.WFSTATE_STEP3:
-        		    scope = DCInput.WORKFLOW_STEP3_SCOPE;
-        		    break;
+            WorkflowItem wfi = (WorkflowItem)subInfo.getSubmissionItem();
+            int wfState = wfi.getState();
+            switch (wfState){
+                case WorkflowManager.WFSTATE_STEP1:
+                    scope = DCInput.WORKFLOW_STEP1_SCOPE;
+                    break;
+                case WorkflowManager.WFSTATE_STEP2:
+                    scope = DCInput.WORKFLOW_STEP2_SCOPE;
+                    break;
+                case WorkflowManager.WFSTATE_STEP3:
+                    scope = DCInput.WORKFLOW_STEP3_SCOPE;
+                    break;
                 default:
-                	scope = DCInput.WORKFLOW_SCOPE;
-        	}
-        	
+                    scope = DCInput.WORKFLOW_SCOPE;
+            }
+            
         }else{
-        	scope = DCInput.SUBMISSION_SCOPE;
+            scope = DCInput.SUBMISSION_SCOPE;
         }
         // Step 1:
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
         {
 
-        	// Allow the clearing out of the metadata defined for other document types, provided it can change anytime
+            // Allow the clearing out of the metadata defined for other document types, provided it can change anytime
             if (!subInfo.isEditing() && !inputs[i]
                     .isVisible(scope))
             {
                 continue;
             }
             
-	        if (inputs[i].getInputType().equals("qualdrop_value"))
-	        {
-		        @SuppressWarnings("unchecked") // This cast is correct
-		        List<String> pairs = inputs[i].getPairs();
-		        for (int j = 0; j < pairs.size(); j += 2)
-		        {
-			        String qualifier = pairs.get(j+1);
-			        item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
-		        }
-	        }
-	        else
-	        {
-		        String qualifier = inputs[i].getQualifier();
-		        item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
-	        }
+            if (inputs[i].getInputType().equals("qualdrop_value"))
+            {
+                @SuppressWarnings("unchecked") // This cast is correct
+                List<String> pairs = inputs[i].getPairs();
+                for (int j = 0; j < pairs.size(); j += 2)
+                {
+                    String qualifier = pairs.get(j+1);
+                    item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
+                }
+            }
+            else
+            {
+                String qualifier = inputs[i].getQualifier();
+                item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(), qualifier, Item.ANY);
+            }
         }
 
         // Clear required-field errors first since missing authority
@@ -247,10 +247,10 @@ public class DescribeStep extends AbstractProcessingStep
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
-        	// Omit fields not allowed for this document type
+            // Omit fields not allowed for this document type
             if(!inputs[j].isAllowedFor(documentType))
             {
-            	continue;
+                continue;
             }
 
             if (!subInfo.isEditing() && !inputs[j]
@@ -369,11 +369,11 @@ public class DescribeStep extends AbstractProcessingStep
         {
             for (int i = 0; i < inputs.length; i++)
             {
-            	// Do not check the required attribute if it is not visible or not allowed for the document type
+                // Do not check the required attribute if it is not visible or not allowed for the document type
 
                 if (!subInfo.isEditing() && !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
                 {
-                	continue;
+                    continue;
                 }
 
                 String qualifier = inputs[i].getQualifier();
@@ -771,8 +771,8 @@ public class DescribeStep extends AbstractProcessingStep
         String parentMetadataFieldParam = "";
         boolean parentRepeatable = false;
         if(dcInput.hasParent()){
-        	parentMetadataField=dcInput.getParent();
-        	parentRepeatable = fieldName2input.get(parentMetadataField).isRepeatable();
+            parentMetadataField=dcInput.getParent();
+            parentRepeatable = fieldName2input.get(parentMetadataField).isRepeatable();
         }
 
         // Values to add
@@ -782,26 +782,26 @@ public class DescribeStep extends AbstractProcessingStep
 
         if (parentRepeatable)
         {
-        	String parentType= fieldName2input.get(parentMetadataField).getInputType();
+            String parentType= fieldName2input.get(parentMetadataField).getInputType();
             if (StringUtils.equals(parentType,"name"))
             {
                 parentMetadataFieldParam = parentMetadataField+"_last";
             }
             else if (StringUtils.equals(parentType,"date"))
             {
-            	parentMetadataFieldParam = parentMetadataField+"_year";
+                parentMetadataFieldParam = parentMetadataField+"_year";
             }
             else if (StringUtils.equals(parentType,"series"))
             {
-            	parentMetadataFieldParam = parentMetadataField+"_series";
+                parentMetadataFieldParam = parentMetadataField+"_series";
             }
             else if (StringUtils.equals(parentType,"qualdrop_value"))
             {
-            	parentMetadataFieldParam = parentMetadataField+"_value";
+                parentMetadataFieldParam = parentMetadataField+"_value";
             }else{
-            	parentMetadataFieldParam = parentMetadataField;
+                parentMetadataFieldParam = parentMetadataField;
             }
-            	
+                
             
             vals = getRepeatedParameterParent(request, metadataField, metadataField,parentMetadataField,parentMetadataFieldParam);
             if (isAuthorityControlled)
@@ -866,40 +866,40 @@ public class DescribeStep extends AbstractProcessingStep
             
             if (StringUtils.equals(parentType,"name"))
             {
-            	parent = request.getParameter(parentMetadataField+"_last");
+                parent = request.getParameter(parentMetadataField+"_last");
             }
             else if (StringUtils.equals(parentType,"date"))
             {
-            	parent = request.getParameter(parentMetadataField+"_year");
+                parent = request.getParameter(parentMetadataField+"_year");
             }
             else if (StringUtils.equals(parentType,"series"))
             {
-            	parent = request.getParameter(parentMetadataField+"_series");
+                parent = request.getParameter(parentMetadataField+"_series");
             }
             else if (StringUtils.equals(parentType,"qualdrop_value"))
             {
-            	parent = request.getParameter(parentMetadataField+"_value");
+                parent = request.getParameter(parentMetadataField+"_value");
             }else{
-            	parent = request.getParameter(parentMetadataField);
+                parent = request.getParameter(parentMetadataField);
             }
 
             if (StringUtils.isNotBlank(parent))
             {
-            	if(StringUtils.isNotBlank(value)){
-            		vals.add(value.trim());
-            	}else{
-            		vals.add(MetadataValue.PARENT_PLACEHOLDER_VALUE);
-            	}
+                if(StringUtils.isNotBlank(value)){
+                    vals.add(value.trim());
+                }else{
+                    vals.add(MetadataValue.PARENT_PLACEHOLDER_VALUE);
+                }
                 
-	            if (isAuthorityControlled)
-	            {
-	                auths = new LinkedList<String>();
-	                confs = new LinkedList<String>();
-	                String av = request.getParameter(metadataField+"_authority");
-	                String cv = request.getParameter(metadataField+"_confidence");
-	                auths.add(av == null ? "":av.trim());
-	                confs.add(cv == null ? "":cv.trim());
-	            }
+                if (isAuthorityControlled)
+                {
+                    auths = new LinkedList<String>();
+                    confs = new LinkedList<String>();
+                    String av = request.getParameter(metadataField+"_authority");
+                    String cv = request.getParameter(metadataField+"_confidence");
+                    auths.add(av == null ? "":av.trim());
+                    confs.add(cv == null ? "":cv.trim());
+                }
             }
         }
         else
@@ -1000,31 +1000,31 @@ public class DescribeStep extends AbstractProcessingStep
         
         boolean parentRepeatable= false;
         if(dcInput.hasParent() ){
-        	parentMetadataField = dcInput.getParent();
-        	parentRepeatable = fieldName2input.get(parentMetadataField).isRepeatable();
+            parentMetadataField = dcInput.getParent();
+            parentRepeatable = fieldName2input.get(parentMetadataField).isRepeatable();
         }
         
         if(parentRepeatable){
-        	String parentType= fieldName2input.get(parentMetadataField).getInputType();
+            String parentType= fieldName2input.get(parentMetadataField).getInputType();
             if (StringUtils.equals(parentType,"name"))
             {
                 parentMetadataFieldParam = parentMetadataField+"_last";
             }
             else if (StringUtils.equals(parentType,"date"))
             {
-            	parentMetadataFieldParam = parentMetadataField+"_year";
+                parentMetadataFieldParam = parentMetadataField+"_year";
             }
             else if (StringUtils.equals(parentType,"series"))
             {
-            	parentMetadataFieldParam = parentMetadataField+"_series";
+                parentMetadataFieldParam = parentMetadataField+"_series";
             }
             else if (StringUtils.equals(parentType,"qualdrop_value"))
             {
-            	parentMetadataFieldParam = parentMetadataField+"_value";
+                parentMetadataFieldParam = parentMetadataField+"_value";
             }else{
-            	parentMetadataFieldParam = parentMetadataField;
+                parentMetadataFieldParam = parentMetadataField;
             }
-            	
+                
             
             vals = getDateRepeatedParameterParent(request, metadataField, metadataField,parentMetadataField,parentMetadataFieldParam);
 
@@ -1307,14 +1307,14 @@ public class DescribeStep extends AbstractProcessingStep
 
                 if (addValue)
                 {
-                	if(!StringUtils.isNotBlank(s) && StringUtils.equals(param, metadataField)){
-                		//vals.add(MetadataValue.PARENT_PLACEHOLDER_VALUE);
-                	}else if(StringUtils.isNotBlank(s)){
-                		//vals.add();
-                	}else{
-                		//vals.add("");
-                	}
-                		
+                    if(!StringUtils.isNotBlank(s) && StringUtils.equals(param, metadataField)){
+                        //vals.add(MetadataValue.PARENT_PLACEHOLDER_VALUE);
+                    }else if(StringUtils.isNotBlank(s)){
+                        //vals.add();
+                    }else{
+                        //vals.add("");
+                    }
+                        
 
                 }
             }
@@ -1344,11 +1344,11 @@ public class DescribeStep extends AbstractProcessingStep
             //First, add the previously entered values.
             // This ensures we preserve the order that these values were entered
             s = request.getParameter(param + "_" + i);
-            parent = request.getParameter(parentMetadataField + "_" + i);
+            parent = request.getParameter(parentParam + "_" + i);
 
             // If there are no more previously entered values,
             // see if there's a new value entered in textbox
-            if (StringUtils.isBlank(parent))
+            if (!StringUtils.isNotBlank(parent))
             {
                 s = request.getParameter(param);
                 parent= request.getParameter(parentParam);
@@ -1381,14 +1381,14 @@ public class DescribeStep extends AbstractProcessingStep
 
                 if (addValue)
                 {
-                	if(StringUtils.isBlank(s) && StringUtils.equals(param, metadataField)){
-                		vals.add(MetadataValue.PARENT_PLACEHOLDER_VALUE);
-                	}else if(StringUtils.isNotBlank(s)){
-                		vals.add(StringUtils.trim(s));
-                	}else{
-                		vals.add("");
-                	}
-                		
+                    if(!StringUtils.isNotBlank(s) && StringUtils.equals(param, metadataField)){
+                        vals.add(MetadataValue.PARENT_PLACEHOLDER_VALUE);
+                    }else if(StringUtils.isNotBlank(s)){
+                        vals.add(StringUtils.trim(s));
+                    }else{
+                        vals.add("");
+                    }
+                        
 
                 }
             }
