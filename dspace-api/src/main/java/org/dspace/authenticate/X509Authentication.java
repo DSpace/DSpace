@@ -619,7 +619,7 @@ public class X509Authentication implements AuthenticationMethod
                         authenticationService.initEPerson(context, request,
                                 eperson);
                         ePersonService.update(context, eperson);
-                        context.dispatchEvents();
+                        context.commit();
                         context.restoreAuthSystemState();
                         context.setCurrentUser(eperson);
                         setSpecialGroupsFlag(request, email);

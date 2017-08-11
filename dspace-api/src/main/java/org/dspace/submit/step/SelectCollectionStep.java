@@ -113,7 +113,7 @@ public class SelectCollectionStep extends AbstractProcessingStep
             subInfo.setSubmissionItem(wi);
 
             // commit changes to database
-            context.dispatchEvents();
+            context.commit();
 
             // need to reload current submission process config,
             // since it is based on the Collection selected

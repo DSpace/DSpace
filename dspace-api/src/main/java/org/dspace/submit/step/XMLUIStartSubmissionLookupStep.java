@@ -61,7 +61,7 @@ public class XMLUIStartSubmissionLookupStep extends AbstractProcessingStep {
 
                 itemService.update(context, item);
 
-                context.dispatchEvents();
+                context.commit();
 
             } catch (MetadataSourceException e) {
                 log.error(e);

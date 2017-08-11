@@ -283,11 +283,12 @@ public class HarvestScheduler implements Runnable
         log.debug("****** Entered the addThread method. Active threads: " + harvestThreads.toString());
         context.setCurrentUser(harvestAdmin);
 
+        UUID collectionID = harvestedCollection.getCollection().getID();
         harvestedCollection.setHarvestStatus(HarvestedCollection.STATUS_QUEUED);
         harvestedCollectionService.update(context, harvestedCollection);
-        context.dispatchEvents();
+        context.commit();
 
-        HarvestThread ht = new HarvestThread(harvestedCollection.getCollection().getID());
+        HarvestThread ht = new HarvestThread(collectionID);
         harvestThreads.push(ht);
 
         log.debug("****** Queued up a thread. Active threads: " + harvestThreads.toString());

@@ -365,7 +365,7 @@ public class UploadStep extends AbstractProcessingStep
             return STATUS_NO_FILES_ERROR;
         }
 
-        context.dispatchEvents();
+        context.commit();
 
         return STATUS_COMPLETE;
     }
@@ -603,7 +603,7 @@ public class UploadStep extends AbstractProcessingStep
 
                 // If we got this far then everything is more or less ok.
 
-                context.dispatchEvents();
+                context.commit();
 
                 // save this bitstream to the submission info, as the
                 // bitstream we're currently working with
@@ -729,8 +729,6 @@ public class UploadStep extends AbstractProcessingStep
             subInfo.getBitstream().setDescription(context,
                     request.getParameter("description"));
             bitstreamService.update(context, subInfo.getBitstream());
-
-            context.dispatchEvents();
         }
         else
         {

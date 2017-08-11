@@ -137,7 +137,7 @@ public class LicenseStep extends AbstractProcessingStep
             LicenseUtils.grantLicense(context, item, license);
 
             // commit changes
-            context.dispatchEvents();
+            context.commit();
         }
 
         // completed without errors

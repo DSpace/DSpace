@@ -270,7 +270,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             }
 
             // commit changes to database
-            context.dispatchEvents();
+            context.commit();
 
             // need to reload current submission process config,
             // since it is based on the Collection selected

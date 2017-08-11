@@ -389,7 +389,7 @@ public class Harvest
                 harvestedCollectionService.update(context, hc);
     		}
     		context.restoreAuthSystemState();
-            context.dispatchEvents();
+            context.commit();
     	}
     	catch (Exception e) {
     		System.out.println("Changes could not be committed");

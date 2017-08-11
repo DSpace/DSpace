@@ -739,7 +739,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		// Commit the new eperson
 		AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
         ePersonService.update(context, eperson);
-		context.dispatchEvents();
+		context.commit();
 
 		// Turn authorizations back on.
 		context.restoreAuthSystemState();
@@ -845,7 +845,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			log.debug("Updated the eperson's '"+field+"' metadata using header: '"+header+"' = '"+value+"'.");
 		}
         ePersonService.update(context, eperson);
-        context.dispatchEvents();
+        context.commit();
 		context.restoreAuthSystemState();
 	}
 
@@ -1190,4 +1190,3 @@ public class ShibAuthentication implements AuthenticationMethod
 
 
 }
-

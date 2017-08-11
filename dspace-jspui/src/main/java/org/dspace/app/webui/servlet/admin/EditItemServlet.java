@@ -422,7 +422,6 @@ public class EditItemServlet extends DSpaceServlet
 				creativeCommonsService.removeLicense(context, uriField, nameField, item);
 
 				itemService.update(context, item);
-	            context.dispatchEvents();
     			exit = true;
         	}
         	else if (licenseclass.equals("webui.Submission.submit.CCLicenseStep.select_change")) {
@@ -445,8 +444,6 @@ public class EditItemServlet extends DSpaceServlet
 					}
 
 					itemService.update(context, item);
-					context.dispatchEvents();
-
 				}
 			}
             showEditForm(context, request, response, item);
