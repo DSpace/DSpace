@@ -990,7 +990,7 @@ public class ItemsResource extends Resource
                     "ELEMENT= ? AND ";
                     parameterList.add(metadata[0]);
                     parameterList.add(metadata[1]);
-            if (metadata.length > 3)
+            if (metadata.length == 3)
             {
                 sql += "QUALIFIER= ? AND ";
                 parameterList.add(metadata[2]);
