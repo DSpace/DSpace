@@ -118,14 +118,14 @@
                                     </div>
                                 </div>
 
-                                <!--
+                            </div>
+
+                            <!--
                             The footer div, dropping whatever extra information is needed on the page. It will
                             most likely be something similar in structure to the currently given example. -->
                             <div class="hidden-xs">
                             <xsl:call-template name="buildFooter"/>
                              </div>
-                         </div>
-
 
                         </xsl:otherwise>
                     </xsl:choose>
@@ -421,12 +421,9 @@
                             </xsl:choose>
 
                             <!-- small navigation buttons for sm and xs screens, keep scrolling down for the full-sized buttons -->
-                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/discover">discover</a></li>
-                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/pages/add">submit works</a></li>
-                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/pages/about">about</a></li>
-                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/pages/tour">tour</a></li>
-                            <li><a class="btn btn-sm btn-info" role="button" href="{$app_path}/pages/faq">FAQ</a></li>
-                            <li><a class="btn btn-sm btn-success" role="button" href="{$app_path}/pages/download">download VSim</a></li>
+                            <li><a class="btn" role="button" href="{$app_path}/discover">browse</a></li>
+                            <li><a class="btn" role="button" href="{$app_path}/pages/add">submit project</a></li>
+                            <li><a class="btn" role="button" href="{$app_path}/pages/download">download</a></li>
 
                         </ul>
                               </div>
@@ -461,7 +458,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="btn btn-info btn-sm" href="{/dri:document/dri:meta/dri:userMeta/
+                                                <a class="btn" href="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='logoutURL']}">
                                                     <i18n:text>xmlui.dri2xhtml.structural.logout</i18n:text>
                                                 </a>
@@ -471,42 +468,27 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <li>
-                                        <a class="btn btn-info btn-sm" href="{/dri:document/dri:meta/dri:userMeta/
+                                        <a class="btn" href="{/dri:document/dri:meta/dri:userMeta/
                             dri:metadata[@element='identifier' and @qualifier='loginURL']}">
-                                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span> <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
+                                        <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
                                         </a>
                                     </li>
                                 </xsl:otherwise>
                             </xsl:choose>
 
                                     <li>
-                                        <a class="btn btn-info btn-sm" href="{$app_path}/discover">
-                                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> Discover</span>
+                                        <a class="btn" href="{$app_path}/discover">
+                                            <span class="hidden-xs hidden-sm"> Browse</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="btn btn-info btn-sm" href="{$app_path}/pages/add">
-                                          <span class="glyphicon glyphicon-upload" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> Submit Works</span>
+                                        <a class="btn" href="{$app_path}/pages/add">
+                                          <span class="hidden-xs hidden-sm"> Submit Project</span>
                                         </a>
                                     </li>
-                                    <li>
-                                        <a class="btn btn-info btn-sm" href="{$app_path}/pages/about">
-                                          <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> About</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="btn btn-info btn-sm" href="{$app_path}/pages/tour">
-                                          <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> Tour</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="btn btn-info btn-sm" href="{$app_path}/pages/faq">
-                                          <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><span class="hidden-xs hidden-sm"> FAQ</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="btn btn-success btn-sm" href="{$app_path}/pages/download">
-                                          <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download VSim
+                                   <li>
+                                        <a class="btn" href="{$app_path}/pages/download">
+                                           Download
                                         </a>
                                     </li>
 
@@ -581,9 +563,6 @@
     <xsl:template match="dri:trail">
         <!--put an arrow between the parts of the trail-->
         <li>
-            <xsl:if test="position()=1">
-                <i class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
-            </xsl:if>
             <!-- Determine whether we are dealing with a link or plain text trail link -->
             <xsl:choose>
                 <xsl:when test="./@target">
@@ -612,10 +591,7 @@
                         <xsl:attribute name="href">
                             <xsl:value-of select="./@target"/>
                         </xsl:attribute>
-                        <xsl:if test="position()=1">
-                            <i class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
-                        </xsl:if>
-                        <xsl:apply-templates />
+                       <xsl:apply-templates />
                     </a>
                 </xsl:when>
                 <xsl:when test="position() > 1 and position() = last()">
@@ -626,9 +602,6 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="class">active</xsl:attribute>
-                    <xsl:if test="position()=1">
-                        <i class="glyphicon glyphicon-home" aria-hidden="true"/>&#160;
-                    </xsl:if>
                     <xsl:apply-templates />
                 </xsl:otherwise>
             </xsl:choose>
@@ -741,14 +714,39 @@
 
     <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
-        <footer>
-                <div class="row">
-                    <hr/>
+        <footer class="vsim-footer">
+                <div>
                     <div class="col-xs-7 col-sm-8">
-                        <div>
-                            VSim: Explore. Interact. Understand.
+                        <div class="pull-left">
+                            <a href="https://www.library.ucla.edu/">
+                                <img src="{$theme-path}images/UCLALibrary.png" />
+                            </a>
+                            <a href="https://idre.ucla.edu/">
+                                <img src="{$theme-path}images/IDRE.png" />
+                            </a>
+                            <a href="https://www.neh.gov/">
+                                <img src="{$theme-path}images/Humanities.png" />
+                            </a>
                         </div>
-                        <div class="hidden-print">
+                    </div>
+                    <div class="col-xs-5 col-sm-4 hidden-print">
+                        <div class="pull-right">
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of
+                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                        <xsl:text>/pages/about</xsl:text>
+                                </xsl:attribute>
+                                About
+                            </a><br/>
+                            <a>
+                                <xsl:attribute name="href">
+                                    <xsl:value-of
+                                            select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                                        <xsl:text>/pages/faq</xsl:text>
+                                </xsl:attribute>
+                                FAQ
+                            </a><br/>
                             <a>
                                 <xsl:attribute name="href">
                                     <xsl:value-of
@@ -756,8 +754,7 @@
                                     <xsl:text>/contact</xsl:text>
                                 </xsl:attribute>
                                 <i18n:text>xmlui.dri2xhtml.structural.contact-link</i18n:text>
-                            </a>
-                            <xsl:text> | </xsl:text>
+                            </a><br/>
                             <a>
                                 <xsl:attribute name="href">
                                     <xsl:value-of
@@ -766,11 +763,6 @@
                                 </xsl:attribute>
                                 <i18n:text>xmlui.dri2xhtml.structural.feedback-link</i18n:text>
                             </a>
-                        </div>
-                    </div>
-                    <div class="col-xs-5 col-sm-4 hidden-print">
-                        <div class="pull-right">
-                            <!-- additional footer text can be put here -->
                         </div>
 
                     </div>

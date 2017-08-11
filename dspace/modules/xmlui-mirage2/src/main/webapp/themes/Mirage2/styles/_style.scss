@@ -42,3 +42,70 @@ a.list-group-item {
 .navbar-default {
     border-width: 0 0 4px 0;
 }
+
+// override the styling for the breadcrumb trail
+.trail-wrapper {
+    background-color: $white;
+
+    .breadcrumb{
+        background-color: transparent;
+        margin-bottom: 0;
+        margin-top: 0;
+        padding: 0;
+        font-family: $font-family-monospace;
+
+        > li {
+            + li:before {
+                color: $gray-dark;
+                content: " > ";
+            }
+            > a {
+                color: $gray-dark;
+            }
+        }
+        > .active {
+            color: $gray-dark;
+        }
+    }
+}
+
+
+/*
+ * Footer
+ */
+
+.vsim-footer {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-top: 100px;
+  color: $white;
+  text-align: center;
+  background-color: $brand-primary;
+}
+.vsim-footer a {
+  color: $white;
+  text-decoration: none;
+}
+.vsim-footer-links {
+  padding-left: 0;
+  margin-bottom: 20px;
+}
+.vsim-footer-links li {
+  display: inline-block;
+}
+.vsim-footer-links li + li {
+  margin-left: 15px;
+}
+
+@media (min-width: 768px) {
+  .vsim-footer {
+    text-align: left;
+  }
+  .vsim-footer p {
+    margin-bottom: 0;
+  }
+  .vsim-footer img {
+    padding: 20px;
+  }
+}
+
