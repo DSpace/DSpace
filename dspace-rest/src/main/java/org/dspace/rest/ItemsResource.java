@@ -997,22 +997,25 @@ public class ItemsResource extends Resource
             }
             if (org.dspace.storage.rdbms.DatabaseManager.isOracle())
             {
-                sql += "dbms_lob.compare(TEXT_VALUE, ?) = 0 AND ";
+                sql += "dbms_lob.compare(TEXT_VALUE, ?) = 0";
                 parameterList.add(metadataEntry.getValue());
             }
             else
             {
-                sql += "TEXT_VALUE=? AND ";
+                sql += "TEXT_VALUE=?";
                 parameterList.add(metadataEntry.getValue());
             }
             if (metadataEntry.getLanguage() != null)
             {
-                sql += "TEXT_LANG=?";
-                parameterList.add(metadataEntry.getLanguage());
+                // omit text_lang from where clause if we have *
+                if(!metadataEntry.getLanguage().equals(org.dspace.content.Item.ANY)){
+                    sql += " AND TEXT_LANG=?";
+                    parameterList.add(metadataEntry.getLanguage());
+                }
             }
             else
             {
-                sql += "TEXT_LANG is null";
+                sql += " AND TEXT_LANG is null";
             }
 
             Object[] parameters = parameterList.toArray();
