@@ -336,7 +336,7 @@
                         </button>
 
                         <a href="{$context-path}/" class="navbar-brand">
-                            <img src="{$theme-path}/images/DSpace-logo-line.svg" />
+                            <img src="{$theme-path}images/DSpace-logo-line.svg" />
                         </a>
 
 
@@ -721,8 +721,8 @@
                         <div class="pull-right">
                             <span class="theme-by">Theme by&#160;</span>
                             <br/>
-                            <a title="@mire NV" target="_blank" href="http://atmire.com">
-                                <img alt="@mire NV" src="{concat($theme-path, '/images/@mirelogo-small.png')}"/>
+                            <a title="Atmire NV" target="_blank" href="http://atmire.com">
+                                <img alt="Atmire NV" src="{concat($theme-path, 'images/@mirelogo-small.png')}"/>
                             </a>
                         </div>
 
@@ -870,7 +870,13 @@
     </xsl:template>
 
     <!--The Language Selection-->
+ <!--The Language Selection
+        Uses a page metadata curRequestURI which was introduced by in /xmlui-mirage2/src/main/webapp/themes/Mirage2/sitemap.xmap-->
     <xsl:template name="languageSelection">
+        <xsl:variable name="curRequestURI">
+            <xsl:value-of select="substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='curRequestURI'],/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'])"/>
+        </xsl:variable>
+
         <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='supportedLocale']) &gt; 1">
             <li id="ds-language-selection" class="dropdown">
                 <xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
@@ -894,8 +900,8 @@
                             </xsl:if>
                             <a>
                                 <xsl:attribute name="href">
-                                    <xsl:value-of select="$current-uri"/>
-                                    <xsl:text>?locale-attribute=</xsl:text>
+                                    <xsl:value-of select="$curRequestURI"/>
+                                    <xsl:call-template name="getLanguageURL"/>
                                     <xsl:value-of select="$locale"/>
                                 </xsl:attribute>
                                 <xsl:value-of
@@ -906,6 +912,35 @@
                 </ul>
             </li>
         </xsl:if>
+    </xsl:template>
+
+    <!-- Builds the Query String part of the language URL. If there already is an existing query string
+    like: ?filtertype=subject&filter_relational_operator=equals&filter=keyword1 it appends the locale parameter with the ampersand (&) symbol -->
+    <xsl:template name="getLanguageURL">
+        <xsl:variable name="queryString" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='queryString']"/>
+        <xsl:choose>
+            <!-- There allready is a query string so append it and the language argument -->
+            <xsl:when test="$queryString != ''">
+                <xsl:text>?</xsl:text>
+                <xsl:choose>
+                    <xsl:when test="contains($queryString, '&amp;locale-attribute')">
+                        <xsl:value-of select="substring-before($queryString, '&amp;locale-attribute')"/>
+                        <xsl:text>&amp;locale-attribute=</xsl:text>
+                    </xsl:when>
+                    <!-- the query string is only the locale-attribute so remove it to append the correct one -->
+                    <xsl:when test="starts-with($queryString, 'locale-attribute')">
+                        <xsl:text>locale-attribute=</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$queryString"/>
+                        <xsl:text>&amp;locale-attribute=</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>?locale-attribute=</xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -35,16 +35,14 @@ do
   
   sed -i .patch 's/\/dspace-api\//\/dspace\/modules\/additions\//g' scripts/patches/$listName
 
-  modules="lni oai rdf rest swordv2 xmlui xmlui-mirage2"
-  for module in $modules
-  do
-    if [ "$listName" != "xmlui-mirage2.list" ]  ; then
-      sed 's/\/dspace-'$module'\//\/dspace\/modules\/'$module'\//g' < scripts/patches/$listName | cat > scripts/patches/$listName.patch
-    fi
-    if [ "$listName" = "xmlui-mirage2.list" ] ; then
-      sed 's/\/dspace-'$module'\//\/dspace\/modules\/'$module'\//g' < scripts/patches/$listName | sed 's/main\/webapp\//main\/webapp\/themes\/Mirage2\//g' | cat > scripts/patches/$listName.patch
-    fi
-  done
+  module=`echo $listName | cut -d"." -f1`
+  if [ "$listName" != "additions.list" ]  ; then
+    sed "s/\/dspace-$module\//\/dspace\/modules\/$module\//g" < scripts/patches/$listName | cat > scripts/patches/$listName.patch
+  fi
+  if [ "$listName" = "xmlui-mirage2.list" ] ; then
+    sed 's/main\/webapp\//main\/webapp\/themes\/Mirage2\//g' < scripts/patches/$listName.patch | cat > scripts/patches/$listName.patch.new
+    mv scripts/patches/$listName.patch.new scripts/patches/$listName.patch
+  fi
 
   rm scripts/patches/$listName
   

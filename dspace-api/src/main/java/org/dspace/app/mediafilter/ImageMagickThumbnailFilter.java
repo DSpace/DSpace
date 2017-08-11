@@ -23,6 +23,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.im4java.core.ConvertCmd;
+import org.im4java.core.Info;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.process.ProcessStarter;
@@ -34,7 +35,7 @@ import org.dspace.core.ConfigurationManager;
  * thumbnail.maxwidth, thumbnail.maxheight, the size we want our thumbnail to be
  * no bigger than. Creates only JPEGs.
  */
-public abstract class ImageMagickThumbnailFilter extends MediaFilter implements SelfRegisterInputFormats
+public abstract class ImageMagickThumbnailFilter extends MediaFilter
 {
 	private static int width = 180;
 	private static int height = 120;
@@ -42,6 +43,8 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 	static String bitstreamDescription = "IM Thumbnail";
 	static final String defaultPattern = "Generated Thumbnail";
 	static Pattern replaceRegex = Pattern.compile(defaultPattern);
+	static String cmyk_profile;
+	static String srgb_profile;
 	
 	static {
 		String pre = ImageMagickThumbnailFilter.class.getName();
@@ -51,6 +54,8 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
 		height = ConfigurationManager.getIntProperty("thumbnail.maxheight", height);
                 flatten = ConfigurationManager.getBooleanProperty(pre + ".flatten", flatten);
 		String description = ConfigurationManager.getProperty(pre + ".bitstreamDescription");
+		cmyk_profile = ConfigurationManager.getProperty(pre + ".cmyk_profile");
+		srgb_profile = ConfigurationManager.getProperty(pre + ".srgb_profile");
 		if (description != null) {
 			bitstreamDescription = description;
 		}
@@ -132,12 +137,19 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
     	f2.deleteOnExit();
     	ConvertCmd cmd = new ConvertCmd();
 		IMOperation op = new IMOperation();
+		Info imageInfo = new Info(f.getAbsolutePath(),true);
 		String s = "[" + page + "]";
 		op.addImage(f.getAbsolutePath()+s);
                 if (flatten)
                 {
                     op.flatten();
                 }
+		String imageClass = imageInfo.getImageClass();
+		// PDFs using the CMYK color system can be handled specially if profiles are defined
+		if (imageClass.contains("CMYK") && cmyk_profile != null && srgb_profile != null) {
+			op.profile(cmyk_profile);
+			op.profile(srgb_profile);
+		}
 		op.addImage(f2.getAbsolutePath());
         if (MediaFilterManager.isVerbose) {
 		    System.out.println("IM Image Param: "+op);
@@ -183,18 +195,4 @@ public abstract class ImageMagickThumbnailFilter extends MediaFilter implements 
         return true; //assume that the thumbnail is a custom one
     }
 
-     public String[] getInputMIMETypes()
-    {
-        return ImageIO.getReaderMIMETypes();
-    }
-
-    public String[] getInputDescriptions()
-    {
-        return null;
-    }
-
-    public String[] getInputExtensions()
-    {
-        return ImageIO.getReaderFileSuffixes();
-    }
 }

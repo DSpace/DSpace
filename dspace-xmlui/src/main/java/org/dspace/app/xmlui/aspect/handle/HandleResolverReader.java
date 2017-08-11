@@ -144,7 +144,6 @@ public class HandleResolverReader extends AbstractReader implements Recyclable {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(jsonString.getBytes("UTF-8"));
             IOUtils.copy(inputStream, out);
             out.flush();
-            out.close();
         } catch (Exception e) {
             log.error("Error: ", e);
         }
