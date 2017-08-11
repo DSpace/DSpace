@@ -16,10 +16,11 @@
  <!ATTLIST page 
  		   number NMTOKEN #REQUIRED
  		   heading CDATA #IMPLIED>
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, type-bind?, input-type, hint, required?, vocabulary?, visibility?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, type-bind?, input-type, hint, required?, vocabulary?, visibility?, parent?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
+ <!ELEMENT parent (#PCDATA) >
  <!ELEMENT type-bind (#PCDATA) >
  
  <!ELEMENT repeatable (#PCDATA) >
