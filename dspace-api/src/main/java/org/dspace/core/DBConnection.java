@@ -20,13 +20,15 @@ import java.sql.SQLException;
  *
  * <p> This class should only be accessed by an enclosing {@link Context} object.
  *
+ * <p> <em>Note</em> that the user's HTTPSession is an unrelated concept.
+ *
  * @author kevinvandevelde at atmire.com
- * @param <T> class type
+ * @param <T> type of the persistence provider's session object.
  */
 public interface DBConnection<T> {
 
     /**
-     * Access to the underlying session object.
+     * Access to the underlying persistence provider's session object.
      * @return the provider's session object for this connection.
      * @throws SQLException passed through.
      */
@@ -80,7 +82,7 @@ public interface DBConnection<T> {
 
     /**
      * Identify certain characteristics of the DBMS being used to support persistence.
-     * @return a collection of DBMS and database information.
+     * @return a collection of DBMS, database and connection information.
      * @throws SQLException passed through.
      */
     public DatabaseConfigVO getDatabaseConfig() throws SQLException;
@@ -125,6 +127,10 @@ public interface DBConnection<T> {
     /**
      * Remove a DSpace object from the session cache when batch processing a
      * large number of objects.
+     *
+     * <p>Objects removed from cache are not saved in any way. Therefore, if you
+     * have modified an object, you should be sure to {@link commit()} changes
+     * before calling this method.
      * @param <E> Type of {@link entity}
      * @param entity The DSpace object to decache.
      * @throws java.sql.SQLException
