@@ -232,7 +232,7 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
         // commit all changes to DB
         ContentServiceFactory.getInstance().getInProgressSubmissionService(subInfo.getSubmissionItem()).update(context, subInfo.getSubmissionItem());
-        context.dispatchEvents();
+        context.commit();
 
         return STATUS_COMPLETE; // no errors!
     }

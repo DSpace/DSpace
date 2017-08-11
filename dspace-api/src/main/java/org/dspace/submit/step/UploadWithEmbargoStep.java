@@ -280,6 +280,7 @@ public class UploadWithEmbargoStep extends UploadStep
                     }
                 }
             }
+            context.commit();
             return STATUS_COMPLETE;
         }
         
@@ -351,6 +352,8 @@ public class UploadWithEmbargoStep extends UploadStep
         {
             return STATUS_NO_FILES_ERROR;
         }
+
+        context.commit();
         return STATUS_COMPLETE;
     }
 
@@ -502,10 +505,6 @@ public class UploadWithEmbargoStep extends UploadStep
 
                 // If we got this far then everything is more or less ok.
 
-                // Comment - not sure if this is the right place for a commit here
-                // but I'm not brave enough to remove it - Robin.
-                context.dispatchEvents();
-
                 // save this bitstream to the submission info, as the
                 // bitstream we're currently working with
                 subInfo.setBitstream(b);
@@ -521,8 +520,6 @@ public class UploadWithEmbargoStep extends UploadStep
 
 
         return STATUS_COMPLETE;
-
-
     }
 
     private void processAccessFields(Context context, HttpServletRequest request, SubmissionInfo subInfo, Bitstream b) throws SQLException, AuthorizeException {
@@ -584,7 +581,7 @@ public class UploadWithEmbargoStep extends UploadStep
                 return STATUS_EDIT_POLICIES_DUPLICATED_POLICY;
             }
             resourcePolicyService.update(context, rp);
-            context.dispatchEvents();
+            context.commit();
             return STATUS_EDIT_POLICIES;
         }
         // FORM: EditBitstreamPolicies SELECTED OPERATION: go to EditPolicyForm
@@ -619,7 +616,7 @@ public class UploadWithEmbargoStep extends UploadStep
             Bitstream b = bitstreamService.find(context, Util.getUUIDParameter(request, "bitstream_id"));
             subInfo.setBitstream(b);
             org.dspace.submit.step.AccessStep.removePolicy(context, buttonPressed);
-            context.dispatchEvents();
+            context.commit();
             return STATUS_EDIT_POLICIES;
         }
         return -1;

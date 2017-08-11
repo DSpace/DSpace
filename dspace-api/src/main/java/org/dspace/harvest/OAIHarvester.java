@@ -365,8 +365,6 @@ public class OAIHarvester {
 						currentRecord++;
 
 						processRecord(record, OREPrefix, currentRecord, totalListSize);
-						ourContext.dispatchEvents();
-
 						intermediateCommit();
 					}
 				}
@@ -390,7 +388,6 @@ public class OAIHarvester {
                     ourContext.restoreAuthSystemState();
                 }
 
-				ourContext.dispatchEvents();
 				intermediateCommit();
 			}
 		}

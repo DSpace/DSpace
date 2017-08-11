@@ -185,7 +185,7 @@ public class CCLicenseStep extends AbstractProcessingStep
     		creativeCommonsService.removeLicense(context, uriField, nameField, item);
     		
 			itemService.update(context, item);
-            context.dispatchEvents();
+            context.commit();
 			removeRequiredAttributes(session);
 			
     		return STATUS_COMPLETE;
@@ -211,7 +211,7 @@ public class CCLicenseStep extends AbstractProcessingStep
     		}
             
     		itemService.update(context, item);
-            context.dispatchEvents();
+            context.commit();
     		removeRequiredAttributes(session);
     		session.removeAttribute("inProgress");
     	} 

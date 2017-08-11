@@ -130,7 +130,7 @@ public class AccessStep extends AbstractProcessingStep
         // SELECTED OPERATION: Remove Policies
         if(wasRemovePolicyPressed(buttonPressed)){
             removePolicy(context, buttonPressed);
-            context.dispatchEvents();
+            context.commit();
             return STATUS_COMPLETE;
         }
 
@@ -160,7 +160,7 @@ public class AccessStep extends AbstractProcessingStep
                 return STATUS_DUPLICATED_POLICY;
             }
             resourcePolicyService.update(context, rp);
-            context.dispatchEvents();
+            context.commit();
             return STATUS_COMPLETE;
         }
 
@@ -188,7 +188,7 @@ public class AccessStep extends AbstractProcessingStep
             item.setDiscoverable(false);
         }
         itemService.update(context, item);
-        context.dispatchEvents();
+        context.commit();
 
         return STATUS_COMPLETE;
     }
@@ -229,7 +229,7 @@ public class AccessStep extends AbstractProcessingStep
             }
 
             resourcePolicyService.update(context, resourcePolicy);
-            context.dispatchEvents();
+            context.commit();
         }
         return STATUS_COMPLETE;
     }

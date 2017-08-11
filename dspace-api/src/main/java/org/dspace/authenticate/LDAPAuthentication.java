@@ -312,7 +312,7 @@ public class LDAPAuthentication
                             context.turnOffAuthorisationSystem();
                             eperson.setNetid(netid.toLowerCase());
                             ePersonService.update(context, eperson);
-                            context.dispatchEvents();
+                            context.commit();
                             context.restoreAuthSystemState();
                             context.setCurrentUser(eperson);
 
@@ -350,7 +350,7 @@ public class LDAPAuthentication
                                     eperson.setCanLogIn(true);
                                     authenticationService.initEPerson(context, request, eperson);
                                     ePersonService.update(context, eperson);
-                                    context.dispatchEvents();
+                                    context.commit();
                                     context.setCurrentUser(eperson);
 
                                     // assign user to groups based on ldap dn
