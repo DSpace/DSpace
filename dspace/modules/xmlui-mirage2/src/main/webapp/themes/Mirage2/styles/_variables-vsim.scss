@@ -157,8 +157,9 @@ $table-border-color:            #67655D;
 //## For each of Bootstrap's buttons, define text, background and border color.
 
 $btn-font-weight:                normal !default;
+$btn-font-size:                  20px !default;
 
-$btn-default-color:              #333 !default;
+$btn-default-color:              $gray-dark !default;
 $btn-default-bg:                 #fff !default;
 $btn-default-border:             darken($btn-default-bg, 10%) !default;
 
@@ -376,7 +377,6 @@ $navbar-collapse-max-height:       340px !default;
 $navbar-default-color:             $gray-dark !default;
 $navbar-default-bg:                $white;
 $navbar-default-border:            $brand-primary !default;
-$navbar-default-border-width:      4px !default;
 
 // Navbar links
 $navbar-default-link-color:                $gray-dark !default;
@@ -879,6 +879,7 @@ $hr-border:                   $gray-lighter !default;
 //** tweaks
 
 .btn {
-        font-family: $font-family-sans-serif;
+        font-family: $font-family-monospace;
+        font-size: 25px;
         text-decoration: none;
     }
