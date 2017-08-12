@@ -111,8 +111,17 @@
                                                 <xsl:call-template name="buildFooter"/>
                                             </div>
                                         </div>
+                                        <!-- VSIM-40 this is the sidebar we need to "turn off" for all home pages (main, collection and community) -->
                                         <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
-                                            <xsl:apply-templates select="dri:options"/>
+
+                                        <xsl:choose>
+                                            <xsl:when test="string-length($request-uri)&gt;0">
+                                                <xsl:apply-templates select="dri:options"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+
                                         </div>
 
                                     </div>
@@ -478,12 +487,12 @@
 
                                     <li>
                                         <a class="btn" href="{$app_path}/discover">
-                                            <span class="hidden-xs hidden-sm"> Browse</span>
+                                            Browse
                                         </a>
                                     </li>
                                     <li>
                                         <a class="btn" href="{$app_path}/pages/add">
-                                          <span class="hidden-xs hidden-sm"> Submit Project</span>
+                                            Submit Project
                                         </a>
                                     </li>
                                    <li>
