@@ -875,7 +875,6 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>isbn</stored-value>
      </pair>
    </value-pairs>
-   <!-- 
    <value-pairs value-pairs-name="common_types" dc-term="type">
      <pair>
        <displayed-value>Animation</displayed-value>
@@ -966,7 +965,6 @@ it, please enter the types and the actual numbers or codes.</hint>
        <stored-value>Other</stored-value>
      </pair>
    </value-pairs>
-   -->
    <!-- default language order: (from dspace 1.2.1)
         "en_US", "en", "es", "de", "fr", "it", "ja", "zh", "other", ""
      -->
