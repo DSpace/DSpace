@@ -39,6 +39,7 @@
             </activation>
             <modules>
             	<module>additions</module>
+              <module>atmire-statistics-exporter</module>
                 <module>rest</module>
                 <module>oai</module>
                 <module>xmlui-mirage2</module>
@@ -58,6 +59,7 @@
             <id>all-modules</id>
             <modules>
             	<module>additions</module>
+              <module>atmire-statistics-exporter</module>
                 <module>lni</module>
             	<module>jspui</module>
                 <module>rest</module>

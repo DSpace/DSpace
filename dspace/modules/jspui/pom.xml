@@ -4,6 +4,12 @@
 	<groupId>org.dspace.modules</groupId>
 	<artifactId>jspui</artifactId>
 	<packaging>war</packaging>
+  <excludes>
+    <!--
+      keep lang web.xml from overiding xmlui
+    -->
+    <exclude>WEB-INF/classes/**</exclude>
+  </excludes>
 	<name>DSpace JSP-UI :: Local Customizations</name>
 	<description>
         This project allows you to overlay your own local JSP-UI customizations
@@ -93,6 +99,12 @@
 	</build>
 
 	<dependencies>
+    <dependency>
+      <groupId>com.atmire</groupId>
+      <artifactId>atmire-statistics-exporter-api</artifactId>
+      <version>1.0.0</version>
+			<type>jar</type>
+    </dependency>
 
 		<dependency>
 			<groupId>org.dspace.modules</groupId>

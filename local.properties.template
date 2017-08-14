@@ -233,3 +233,6 @@ identifier.doi.ezid.password = apitest
 # If generateDataciteXML bean property is enabled. Set default publisher in the
 # XSL file configured by: crosswalk.dissemination.DataCite.stylesheet file.
 identifier.doi.ezid.publisher = Digital Repository at the University of Maryland
+
+# IRUS Tracker Environment
+tracker.environment = 
