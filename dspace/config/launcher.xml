@@ -403,4 +403,11 @@
             <class>org.dspace.app.util.Version</class>
         </step>
     </command>
+    <command>
+        <name>retry-tracker</name>
+        <description>Retry all failed commits to the OpenURLTracker</description>
+        <step>
+            <class>com.atmire.statistics.export.RetryOpenUrlTracker</class>
+        </step>
+    </command>
 </commands>
