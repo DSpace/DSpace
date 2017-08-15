@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.List;
@@ -18,13 +15,13 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.jena.atlas.lib.DS;
 import org.apache.log4j.Logger;
-import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 
@@ -32,7 +29,9 @@ import uk.ac.edina.datashare.db.DbQuery;
 import uk.ac.edina.datashare.db.DbUpdate;
 import uk.ac.edina.datashare.utils.DSpaceUtils;
 
-
+/**
+ * DataShare item dataset. That is a zip file that contains all item bitstreams.
+ */
 public class ItemDataset {
     private static final Logger LOG = Logger.getLogger(ItemDataset.class);
     private Context context = null;
@@ -44,6 +43,12 @@ public class ItemDataset {
     public ItemDataset(Context context, Item item){
         this.context = context;
         this.item = item;
+        this.init();
+    }
+    
+    public ItemDataset(Context context, String handle){
+        this.context = context;
+        this.handle = handle;
         this.init();
     }
     
@@ -84,10 +89,15 @@ public class ItemDataset {
             throw new RuntimeException(dir + " doesn't exist");
         }
     }
-        
+    
+    /**
+     * Check if item has been put under embargo or tombstoned.  If so, delete dataset.
+     */
     public void checkDataset(){
         if (this.exists()){
-            if(DSpaceUtils.hasEmbargo(this.context, this.item)){
+            if(DSpaceUtils.hasEmbargo(this.context, this.item) ||
+                    DSpaceUtils.showTombstone(context, item)){
+                LOG.info("Delete dataset for " + item.getHandle());
                 this.delete();
             }
         }
@@ -113,6 +123,11 @@ public class ItemDataset {
 
         if(!zip.delete()){
             LOG.warn("Problem deleting " + zip);
+        }
+        else{
+            String fp = zip.toString();
+            String fname = fp.substring(fp.lastIndexOf('/') + 1);
+            DbUpdate.deleteDataset(context, fname);
         }
     }
     
@@ -177,7 +192,9 @@ public class ItemDataset {
     }
     
     private boolean itemIsAvailable(Context context, Item item){
-        return !DSpaceUtils.hasEmbargo(context, item); 
+        return !DSpaceUtils.hasEmbargo(context, item) &&
+                !item.isWithdrawn() &&
+                !DSpaceUtils.showTombstone(context, item); 
     }
     
     private class DatasetZip implements Runnable {
@@ -196,7 +213,7 @@ public class ItemDataset {
                     String cksum = createChecksum(context);
                     
                     DbUpdate.insertDataset(
-                            context, item.getID(), getFullPath(), cksum);
+                            context, item.getID(), getFileName(), cksum);
                 }
                 else{
                     ItemDataset.LOG.warn("Zip creation for " + item.getHandle() + " not allowed.");
@@ -217,22 +234,10 @@ public class ItemDataset {
         }
         private String createChecksum(Context context){
             String cksum = null;
-            InputStream is = null;
-            DigestInputStream dis = null;
             try{
-                is = new FileInputStream(getFullPath());
-                
-                try{
-                    dis = new DigestInputStream(is, MessageDigest.getInstance("MD5")); 
-                    cksum = Utils.toHex(dis.getMessageDigest().digest());
-                }
-                catch (NoSuchAlgorithmException ex){
-                    throw new RuntimeException(ex);
-                }
-                finally{
-                    dis.close();
-                    is.close();
-                }
+                FileInputStream fis = new FileInputStream(new File(getFullPath()));
+                cksum = DigestUtils.md5Hex(fis);
+                fis.close();
             }
             catch(IOException ex){
                 throw new RuntimeException(ex);
@@ -299,6 +304,9 @@ public class ItemDataset {
         }
     }
     
+    /**
+     * Process all datasets in the system.
+     */
     public static void main(String[] args){
         try{    
             DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
@@ -319,8 +327,14 @@ public class ItemDataset {
                 Item item = iter.next();
                 ItemDataset ds = new ItemDataset(item); 
                 if(ds.exists()){
-                    System.out.println("Item already exists " + item.getHandle());
-                    datasetMap.put(item.getID(), true);
+                    if(DSpaceUtils.showTombstone(context, item)){
+                        System.out.println("Delete tombstoned dataset: " + item.getHandle());
+                        ds.delete();
+                    }
+                    else{
+                        System.out.println("Item already exists " + item.getHandle());
+                        datasetMap.put(item.getID(), true);
+                    }
                 }
                 else{
                     System.out.println("Create dataset for " + ds.getFullPath() + " for " + item.getHandle());
