@@ -47,7 +47,7 @@
          <repeatable>false</repeatable>
          <label>*Project Title</label>
          <input-type>onebox</input-type>
-         <hint>Required. This field is for the main title of your project (e.g., Digital Karnak or Virtual Turin). Please use appropriate title casing.</hint>
+         <hint>Required. This field is for the main title of the project (e.g., Digital Karnak or Virtual Turin). Please use appropriate title casing.</hint>
          <!-- dc.title -->
          <required>You must enter a valid title for the project.</required>
        </field>
@@ -59,7 +59,7 @@
          <repeatable>false</repeatable>
          <label>Project Abstract</label>
          <input-type>textarea</input-type>
-         <hint>Please provide a short abstract describing the project.</hint>
+         <hint>Provide a short abstract describing the project.</hint>
          <!-- dc.description.abstract -->
          <required></required>
        </field>
@@ -69,7 +69,7 @@
          <repeatable>false</repeatable>
          <label>Project Description</label>
          <input-type>textarea</input-type>
-         <hint>Please use this field to provide a more detailed description of this project compared to the abstract, if desired.</hint>
+         <hint>Provide a more detailed description of the project compared to the abstract, if desired.</hint>
          <!-- dc.description -->
          <required></required>
        </field>
@@ -80,18 +80,8 @@
          <repeatable>false</repeatable>
          <label>Research Objective</label>
          <input-type>textarea</input-type>
-         <hint>Please briefly describe the research objective(s) and/or goal(s) of the project.</hint>
+         <hint>Briefly describe the research objective(s) and/or goal(s) of the project.</hint>
          <!-- vsim.research.objective -->
-         <required></required>
-       </field>
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>relation</dc-element>
-         <repeatable>true</repeatable>
-         <label>Institutional Affiliation</label>
-         <input-type>onebox</input-type>
-         <hint>Please list the institution(s) associated with the project.</hint>
-         <!-- dc.relation -->
          <required></required>
        </field>
        <field>
@@ -102,83 +92,18 @@
          <label>Project Dates</label>
          <input-type>onebox</input-type>
          <!-- <input-type>date</input-type> -->
-         <hint>Please specify dates for the project. Include a start date and end date, and list relevant project phases as appropriate.</hint>
+         <hint>Specify dates for the project. Include a start date and end date, and list relevant project phases as appropriate.</hint>
          <!-- dc.date.created -->
          <required></required>
        </field>
        <field>
          <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier>sponsorship</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Project Sponsorship</label>
-         <input-type>textarea</input-type>
-         <hint>Please provide details about this project's funders/sponsors.</hint>
-         <!-- dc.description.sponsorship -->
-         <required></required>
-       </field>
-       <field>
-         <dc-schema>vsim</dc-schema>
-         <dc-element>acknowledgements</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Acknowledgements</label>
-         <input-type>textarea</input-type>
-         <hint>Please use this field to acknowledge any other contributors to this project.</hint>
-         <!-- vsim.acknowledgements -->
-         <required></required>
-       </field>
-        <field>
-         <dc-schema>vsim</dc-schema>
-         <dc-element>bibliography</dc-element>
-         <repeatable>false</repeatable>
-         <label>Bibliography</label>
-         <input-type>textarea</input-type>
-         <hint>Please use this field to list relevant publications about the project or about the modeled environment. Note that this information can be refined later.</hint>
-         <!-- vsim.bibliography -->
-         <required></required>
-       </field>
-     <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>coverage</dc-element>
-         <dc-qualifier>spatial</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Spatial Scope</label>
-         <input-type>onebox</input-type>
-         <hint>Please describe the primary spatial/geographic scope of the project. The autocomplete values are drawn from the Getty Thesaurus of Geographic Names (TGN).</hint>
-         <!-- dc.coverage.spatial -->
-         <required></required>
-       </field>
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>coverage</dc-element>
-         <dc-qualifier>temporal</dc-qualifier>
+         <dc-element>relation</dc-element>
          <repeatable>true</repeatable>
-         <label>Temporal Scope</label>
-         <input-type value-pairs-name="historical_periods">dropdown</input-type>
-         <hint>Please select the project's primary time period(s).</hint>
-         <!-- dc.coverage.temporal -->
-         <required></required>
-       </field>
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>subject</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>true</repeatable>
-         <label>Subject</label>
-         <input-type value-pairs-name="project_subjects">dropdown</input-type>
-         <hint>Please select the project's main subject area discipline(s).</hint>
-         <!-- dc.subject -->
-         <required></required>
-       </field>
-       <field>
-         <dc-schema>vsim</dc-schema>
-         <dc-element>keywords</dc-element>
-         <repeatable>false</repeatable>
-         <label>Keywords</label>
+         <label>Institutional Affiliation</label>
          <input-type>onebox</input-type>
-         <hint>Please enter a comma-separated list of keywords to describe this project. Keywords are used to improve search results.</hint>
-         <!-- vsim.keywords -->
+         <hint>List the institution(s) associated with the project.</hint>
+         <!-- dc.relation -->
          <required></required>
        </field>
        <field>
@@ -188,7 +113,7 @@
          <repeatable>true</repeatable>
          <label>Author(s)/PI(s)</label>
          <input-type>name</input-type>
-         <hint>Please list the names of the principal author(s) and/or PI(s) of this project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
+         <hint>List the names of the principal author(s) and/or PI(s) of the project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
          <!-- dc.contributor.author -->
          <required></required>
        </field>
@@ -199,7 +124,7 @@
          <repeatable>true</repeatable>
          <label>Contributor(s)</label>
          <input-type>name</input-type>
-         <hint>Please enter the names of other key contributors to this project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
+         <hint>Enter the names of other key contributors to the project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
          <!-- dc.contributor.other -->
          <required></required>
        </field>
@@ -210,7 +135,7 @@
          <repeatable>false</repeatable>
          <label>Contributor Details</label>
          <input-type>textarea</input-type>
-         <hint>Please use this space to provide any additional information regarding contributors to this project, including the roles and responsibilities of the various team members.</hint>
+         <hint>Provide any additional information regarding contributors to the project, including the roles and responsibilities of the various team members.</hint>
          <!-- vsim.contributor.details -->
          <required></required>
        </field>
@@ -221,8 +146,83 @@
          <repeatable>true</repeatable>
          <label>Associated Advisor(s)/Scientific Committee</label>
          <input-type>name</input-type>
-         <hint>Please enter the names of external advisors to this project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
+         <hint>Enter the names of external advisors to the project. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
          <!-- dc.contributor.advisor -->
+         <required></required>
+       </field>
+       <field>
+         <dc-schema>vsim</dc-schema>
+         <dc-element>acknowledgements</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Acknowledgements</label>
+         <input-type>textarea</input-type>
+         <hint>List any special thanks or acknowledgments.</hint>
+         <!-- vsim.acknowledgements -->
+         <required></required>
+       </field>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>description</dc-element>
+         <dc-qualifier>sponsorship</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Project Sponsorship</label>
+         <input-type>textarea</input-type>
+         <hint>Provide details about the project's funders/sponsors.</hint>
+         <!-- dc.description.sponsorship -->
+         <required></required>
+       </field>
+        <field>
+         <dc-schema>vsim</dc-schema>
+         <dc-element>bibliography</dc-element>
+         <repeatable>false</repeatable>
+         <label>Bibliography</label>
+         <input-type>textarea</input-type>
+         <hint>List any relevant publications about the project or about the modeled environment.</hint>
+         <!-- vsim.bibliography -->
+         <required></required>
+       </field>
+     <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>spatial</dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Spatial Scope</label>
+         <input-type>onebox</input-type>
+         <hint>Describe the primary spatial/geographic scope of the project. The autocomplete values are drawn from the Getty Thesaurus of Geographic Names (TGN).</hint>
+         <!-- dc.coverage.spatial -->
+         <required></required>
+       </field>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>coverage</dc-element>
+         <dc-qualifier>temporal</dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Temporal Scope</label>
+         <input-type value-pairs-name="historical_periods">dropdown</input-type>
+         <hint>Describe the project's primary time period(s). Hold down the Ctrl key to select more than one period.</hint>
+         <!-- dc.coverage.temporal -->
+         <required></required>
+       </field>
+       <field>
+         <dc-schema>dc</dc-schema>
+         <dc-element>subject</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>true</repeatable>
+         <label>Subject</label>
+         <input-type value-pairs-name="project_subjects">dropdown</input-type>
+         <hint>Select the project's main subject area discipline(s). Hold down the Ctrl key to select more than one subject.</hint>
+         <!-- dc.subject -->
+         <required></required>
+       </field>
+       <field>
+         <dc-schema>vsim</dc-schema>
+         <dc-element>keywords</dc-element>
+         <repeatable>false</repeatable>
+         <label>Keywords</label>
+         <input-type>onebox</input-type>
+         <hint>Enter a comma-separated list of keywords to describe the project. Keywords are used to improve search results.</hint>
+         <!-- vsim.keywords -->
          <required></required>
        </field>
         <field>
@@ -232,7 +232,7 @@
          <repeatable>false</repeatable>
          <label>Project Website</label>
          <input-type>onebox</input-type>
-         <hint>Please provide the URI/URL of an external site associated with this project, if available.</hint>
+         <hint>Provide the URI/URL of an external site associated with the project, if available.</hint>
          <!-- dc.description.uri -->
          <required></required>
        </field>
@@ -242,7 +242,7 @@
          <repeatable>false</repeatable>
          <label>News</label>
          <input-type>textarea</input-type>
-         <hint>This is a freeform text entry field for project updates and news. This information will be displayed on the project's main page, and can be updated as desired after project creation.</hint>
+         <hint>This is a freeform text entry field for project updates and news. This information will be displayed on the project's main page, and can be updated as desired after the project is submitted to the archive.</hint>
          <!-- vsim.news -->
          <required></required>
        </field>
@@ -254,7 +254,7 @@
          <repeatable>false</repeatable>
          <label>Date of Availability</label>
          <input-type>date</input-type>
-         <hint>Please give the date this project was made available for use (not the date of previous publication or public distribution). You can leave out the day and/or month if they aren't applicable.</hint>
+         <hint>Please give the date the project was made available for use (not the date of previous publication or public distribution). You can leave out the day and/or month if they aren't applicable.</hint>
          <required></required>
        </field>
        -->
@@ -265,7 +265,7 @@
          <repeatable>false</repeatable>
          <label>Rights Holder</label>
          <input-type>textarea</input-type>
-         <hint>Please name the copyright holder for this project.</hint>
+         <hint>Name the copyright holder for the project.</hint>
          <!-- dc.rights.holder -->
          <required></required>
        </field>
@@ -276,7 +276,7 @@
          <repeatable>false</repeatable>
          <label>Date of Copyright</label>
          <input-type>date</input-type>
-         <hint>Please give the copyright date for this project. You can leave out the day and/or month if they aren't applicable.</hint>
+         <hint>Give the copyright date for the project. Leave out the day and/or month if they are not applicable.</hint>
          <!-- dc.date.copyright -->
          <required></required>
        </field>
@@ -286,7 +286,7 @@
          <repeatable>false</repeatable>
          <label>Permissions and Reuse</label>
          <input-type>textarea</input-type>
-         <hint>Please list any specific restrictions or requirements pertaining to the use of content related to the project in publications.</hint>
+         <hint>List any specific restrictions or requirements pertaining to the use of content related to the project in publications.</hint>
          <!-- formerly dc.rights; DSpace uses dc.rights to hold the CC license -->
          <required></required>
        </field>
@@ -297,7 +297,7 @@
          <repeatable>false</repeatable>
          <label>*Date of Publication</label>
          <input-type>date</input-type>
-         <hint>Required. Please list the date of previous publication or public distribution of the project. If the project has not been previously published or publically distributed, please use today’s date. You can leave out the day and/or month if they aren't applicable.</hint>
+         <hint>Required. List the date of previous publication or public distribution of the project. If the project has not been previously published or publically distributed, use today’s date. Leave out the day and/or month if they are not applicable.</hint>
          <!-- dc.date.issued -->
          <required>You must at least specify the year.</required>
        </field>
@@ -326,7 +326,7 @@
          <repeatable>true</repeatable>
          <label>Authors</label>
          <input-type>name</input-type>
-         <hint>Please enter the name(s) of the author(s) of this item, if applicable.</hint>
+         <hint>Please enter the name(s) of the author(s) of the item, if applicable. Use the "Lookup" button to chose a name from the ORCID Registry.</hint>
          <required></required>
        </field>
 
@@ -337,8 +337,8 @@
          <repeatable>false</repeatable>
          <label>*Title</label>
          <input-type>onebox</input-type>
-         <hint>This is the main name of the item in the repository.</hint>
-         <required>You must enter a main title for this item.</required>
+         <hint>Required. Provide a main name or title for the item in the repository.</hint>
+         <required>You must enter a name or title for the item.</required>
        </field>
 
        <!--
@@ -362,7 +362,7 @@
          <repeatable>false</repeatable>
          <label>*Date of Publication</label>
          <input-type>date</input-type>
-         <hint>Required. Please give the date of previous publication or public distribution of the item. Feel free to estimate. You can leave out the day and/or month if they aren't applicable.</hint>
+         <hint>Required. Provide the date or estimated date of publication or public distribution of the item. Leave out the day and/or month if they are not applicable.</hint>
          <required>You must enter at least the year.</required>
        </field>
 
@@ -373,7 +373,7 @@
          <repeatable>true</repeatable>
          <label>Publisher</label>
          <input-type>onebox</input-type>
-         <hint>Please provide the name(s) of the institution(s) responsible for the creation of this item.</hint>
+         <hint>Provide the name(s) of the institution(s) responsible for the publication or public distribution of the item.</hint>
          <required></required>
        </field>
 
@@ -386,7 +386,7 @@
          <label>Citation</label>
          <input-type>onebox</input-type>
          <hint>Enter the standard citation for the previously issued instance
-           of this item.</hint>
+           of the item.</hint>
          <required></required>
        </field>
 
@@ -397,7 +397,7 @@
          <repeatable>true</repeatable>
          <label>Series/Report No.</label>
          <input-type>series</input-type>
-         <hint>Enter the series and number assigned to this item by your
+         <hint>Enter the series and number assigned to the item by your
            community.</hint>
          <required></required>
        </field>
@@ -478,7 +478,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Item Description</label>
          <input-type>textarea</input-type>
-         <hint>Please provide a short description of this item, if desired.</hint>
+         <hint>Provide a short description of the subject matter of the item.</hint>
          <required></required>
        </field>
        
@@ -488,7 +488,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>true</repeatable>
          <label>Item Type/Genre</label>
          <input-type value-pairs-name="item_types">dropdown</input-type>
-         <hint>Please select the type(s)/genre(s) that best describe the item.</hint>
+         <hint>Select the type(s)/genre(s) that best describe the item.</hint>
          <required></required>
        </field>
 
@@ -512,7 +512,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Bibliography</label>
          <input-type>textarea</input-type>
-         <hint>Please use this field to list relevant publications about the item (not necessary for non-VSim files).</hint>
+         <hint>For VSim files only. List relevant publications about the item.</hint>
          <required></required>
        </field>
        
@@ -523,7 +523,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>true</repeatable>
          <label>Contributor(s)</label>
          <input-type>name</input-type>
-         <hint>Please enter the names of other key contributors to this item (not necessary for non-VSim files).</hint>
+         <hint>For VSim files only. Enter the names of other key contributors to the item.</hint>
          <required></required>
        </field>
 
@@ -534,7 +534,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Contributor Details</label>
          <input-type>textarea</input-type>
-         <hint>Please use this space to provide any additional information regarding contributors to this item, including the roles and responsibilities of the various team members (not necessary for non-VSim files).</hint>
+         <hint>For VSim files only. Provide any additional information regarding contributors to the item, including the roles and responsibilities of the various team members.</hint>
          <required></required>
        </field>
 
@@ -545,7 +545,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Rights Holder</label>
          <input-type>textarea</input-type>
-         <hint>Please name the copyright holder for this item, if known.</hint>
+         <hint>Name the copyright holder for the item, if known.</hint>
          <required></required>
        </field>
 
@@ -556,7 +556,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Date of Copyright</label>
          <input-type>date</input-type>
-         <hint>Please give the copyright date for this item. You can leave out the day and/or month if they aren't applicable.</hint>
+         <hint>List the copyright date for the item. Leave out the day and/or month if they are not applicable.</hint>
          <required></required>
        </field>
        <!-- formerly dc.rights; DSpace uses dc.rights to hold the CC license
@@ -566,7 +566,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Permissions and Reuse</label>
          <input-type>textarea</input-type>
-         <hint>Please list any specific restrictions or requirements pertaining to the use of this item in publications.</hint>
+         <hint>Please list any specific restrictions or requirements pertaining to the use of the item in publications.</hint>
          <required></required>
        </field>
        -->
@@ -578,7 +578,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Peer review status</label>
          <input-type>textarea</input-type>
-         <hint>For model files only. Please indicate if the model has passed peer review.</hint>
+         <hint>For VSim files only. Indicate if the model has passed peer review.</hint>
          <required></required>
        </field>
 
@@ -589,7 +589,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>false</repeatable>
          <label>Peer review agency</label>
          <input-type>textarea</input-type>
-         <hint>For model files only. If the model has passed peer reivew, please list the journal/publisher/community that conducted the peer review and are conferring their imprimatur on the model.</hint>
+         <hint>For VSim files only. If the model has passed peer reivew, please list the journal/publisher/community that conducted the peer review and are conferring their imprimatur on the model.</hint>
          <required></required>
        </field>
      </page>
@@ -604,7 +604,7 @@ it, please enter the types and the actual numbers or codes.</hint>
          <repeatable>true</repeatable>
          <label>One: Authors</label>
          <input-type>name</input-type>
-         <hint>Enter the names of the authors of this item.</hint>
+         <hint>Enter the names of the authors of the item.</hint>
          <required></required>
        </field>
       </page>
