@@ -184,17 +184,19 @@ public class HibernateDBConnection implements DBConnection<Session> {
                 }
             }
 
+            // ITEM
             if (entity instanceof Item) {
                 Item item = (Item) entity;
 
-                if(Hibernate.isInitialized(item.getSubmitter())) {
-                    uncacheEntity(item.getSubmitter());
-                }
+                //DO NOT uncache the submitter. This could be the current eperson. Uncaching could lead to
+                //LazyInitializationExceptions (see DS-3648)
+
                 if(Hibernate.isInitialized(item.getBundles())) {
                     for (Bundle bundle : Utils.emptyIfNull(item.getBundles())) {
                         uncacheEntity(bundle);
                     }
                 }
+            // BUNDLE
             } else if (entity instanceof Bundle) {
                 Bundle bundle = (Bundle) entity;
 
@@ -203,44 +205,45 @@ public class HibernateDBConnection implements DBConnection<Session> {
                         uncacheEntity(bitstream);
                     }
                 }
-            //} else if(entity instanceof Bitstream) {
-            //    Bitstream bitstream = (Bitstream) entity;
-            //    No specific child entities to decache
+            // BITSTREAM
+            // No specific child entities to decache
+
+            // COMMUNITY
             } else if (entity instanceof Community) {
                 Community community = (Community) entity;
-                if(Hibernate.isInitialized(community.getAdministrators())) {
-                    uncacheEntity(community.getAdministrators());
-                }
+
+                // We don't uncache groups as they might still be referenced from the Context object
 
                 if(Hibernate.isInitialized(community.getLogo())) {
                     uncacheEntity(community.getLogo());
                 }
+
+            // COLLECTION
             } else if (entity instanceof Collection) {
                 Collection collection = (Collection) entity;
+
+                //We don't uncache groups as they might still be referenced from the Context object
+
                 if(Hibernate.isInitialized(collection.getLogo())) {
                     uncacheEntity(collection.getLogo());
-                }
-                if(Hibernate.isInitialized(collection.getAdministrators())) {
-                    uncacheEntity(collection.getAdministrators());
-                }
-                if(Hibernate.isInitialized(collection.getSubmitters())) {
-                    uncacheEntity(collection.getSubmitters());
                 }
                 if(Hibernate.isInitialized(collection.getTemplateItem())) {
                     uncacheEntity(collection.getTemplateItem());
                 }
-                if(Hibernate.isInitialized(collection.getWorkflowStep1())) {
-                    uncacheEntity(collection.getWorkflowStep1());
-                }
-                if(Hibernate.isInitialized(collection.getWorkflowStep2())) {
-                    uncacheEntity(collection.getWorkflowStep2());
-                }
-                if(Hibernate.isInitialized(collection.getWorkflowStep3())) {
-                    uncacheEntity(collection.getWorkflowStep3());
-                }
             }
 
-            getSession().evict(entity);
+            // Unless this object exists in the session, we won't do anything
+            if(getSession().contains(entity)) {
+
+                // If our Session has unsaved changes (dirty) and not READ-ONLY
+                if(!readOnlyEnabled && getSession().isDirty()) {
+                    // write changes to database (don't worry if transaction fails, flushed changes will be rolled back)
+                    getSession().flush();
+                }
+
+                // Remove object from Session
+                getSession().evict(entity);
+            }
         }
     }
 }

@@ -30,16 +30,16 @@ import org.dspace.workflow.factory.WorkflowServiceFactory;
  * This is the class which defines what happens once a submission completes!
  * <P>
  * This class performs all the behind-the-scenes processing that
- * this particular step requires.  This class's methods are utilized 
+ * this particular step requires.  This class's methods are utilized
  * by both the JSP-UI and the Manakin XML-UI
  * <P>
  * This step is non-interactive (i.e. no user interface), and simply performs
  * the processing that is necessary after a submission has been completed!
- * 
+ *
  * @see org.dspace.app.util.SubmissionConfig
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
- * 
+ *
  * @author Tim Donohue
  * @version $Revision$
  */
@@ -58,7 +58,7 @@ public class CompleteStep extends AbstractProcessingStep
      * <P>
      * NOTE: If this step is a non-interactive step (i.e. requires no UI), then
      * it should perform *all* of its processing in this method!
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -100,7 +100,7 @@ public class CompleteStep extends AbstractProcessingStep
         // commit changes to database
             if (success)
             {
-                context.dispatchEvents();
+                context.commit();
             }
         }
         return STATUS_COMPLETE;
@@ -120,12 +120,12 @@ public class CompleteStep extends AbstractProcessingStep
      * Steps which are non-interactive (i.e. they do not display an interface to
      * the user) should return a value of 1, so that they are only processed
      * once!
-     * 
+     *
      * @param request
      *            The HTTP Request
      * @param subInfo
      *            The current submission information object
-     * 
+     *
      * @return the number of pages in this step
      */
     @Override
