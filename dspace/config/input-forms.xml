@@ -151,17 +151,6 @@
          <required></required>
        </field>
        <field>
-         <dc-schema>vsim</dc-schema>
-         <dc-element>acknowledgements</dc-element>
-         <dc-qualifier></dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Acknowledgements</label>
-         <input-type>textarea</input-type>
-         <hint>List any special thanks or acknowledgments.</hint>
-         <!-- vsim.acknowledgements -->
-         <required></required>
-       </field>
-       <field>
          <dc-schema>dc</dc-schema>
          <dc-element>description</dc-element>
          <dc-qualifier>sponsorship</dc-qualifier>
@@ -170,6 +159,17 @@
          <input-type>textarea</input-type>
          <hint>Provide details about the project's funders/sponsors.</hint>
          <!-- dc.description.sponsorship -->
+         <required></required>
+       </field>
+       <field>
+         <dc-schema>vsim</dc-schema>
+         <dc-element>acknowledgements</dc-element>
+         <dc-qualifier></dc-qualifier>
+         <repeatable>false</repeatable>
+         <label>Acknowledgements</label>
+         <input-type>textarea</input-type>
+         <hint>List any special thanks or acknowledgments.</hint>
+         <!-- vsim.acknowledgements -->
          <required></required>
        </field>
         <field>
