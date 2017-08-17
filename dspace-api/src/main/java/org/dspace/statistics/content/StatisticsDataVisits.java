@@ -487,6 +487,9 @@ public class StatisticsDataVisits extends StatisticsData
             //TODO: CHANGE & THROW AWAY THIS ENTIRE METHOD
             //Check if int
             String dsoId;
+            //DS 3602: Until all legacy stats records have been upgraded to using UUID, 
+            //duplicate reports may be presented for each DSO.  A note will be appended when reporting legacy counts.
+            String legacyNote = "";
             int dsoLength = query.getDsoLength();
             try {
                 dsoId = UUID.fromString(value).toString();
@@ -494,6 +497,7 @@ public class StatisticsDataVisits extends StatisticsData
                 try {
                     //Legacy identifier support
                     dsoId = String.valueOf(Integer.parseInt(value));
+                    legacyNote="(legacy)";
                 } catch (NumberFormatException e1) {
                     dsoId = null;
                 }
@@ -511,7 +515,7 @@ public class StatisticsDataVisits extends StatisticsData
                         {
                             break;
                         }
-                        return bit.getName();
+                        return bit.getName() + legacyNote;
                     case Constants.ITEM:
                         Item item = itemService.findByIdOrLegacyId(context, dsoId);
                         if(item == null)
@@ -532,7 +536,7 @@ public class StatisticsDataVisits extends StatisticsData
                             }
                         }
 
-                        return name;
+                        return name + legacyNote;
 
                     case Constants.COLLECTION:
                         Collection coll = collectionService.findByIdOrLegacyId(context, dsoId);
@@ -549,7 +553,7 @@ public class StatisticsDataVisits extends StatisticsData
                                 name = name.substring(0, firstSpace) + " ...";
                             }
                         }
-                        return name;
+                        return name + legacyNote;
 
                     case Constants.COMMUNITY:
                         Community comm = communityService.findByIdOrLegacyId(context, dsoId);
@@ -566,7 +570,7 @@ public class StatisticsDataVisits extends StatisticsData
                                 name = name.substring(0, firstSpace) + " ...";
                             }
                         }
-                        return name;
+                        return name + legacyNote;
                 }
             }
         }
@@ -805,8 +809,11 @@ public class StatisticsDataVisits extends StatisticsData
                 if(dso != null)
                 {
                     query += (query.equals("") ? "" : " AND ");
+
+                    //DS-3602: For clarity, adding "id:" to the right hand side of the search
+                    //In the solr schema, "id" has been declared as the defaultSearchField so the field name is optional
                     if(dso instanceof DSpaceObjectLegacySupport){
-                        query += " (id:" + dso.getID() + " OR " + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
+                        query += " (id:" + dso.getID() + " OR id:" + ((DSpaceObjectLegacySupport) dso).getLegacyId() + ")";
                     }else{
                         query += "id:" + dso.getID();
                     }
@@ -828,7 +835,13 @@ public class StatisticsDataVisits extends StatisticsData
                             owningStr = "owningComm";
                             break;
                     }
-                    owningStr += ":" + currentDso.getID();
+                    if(currentDso instanceof DSpaceObjectLegacySupport){
+                        owningStr = "(" + owningStr + ":" + currentDso.getID() + " OR " 
+                            + owningStr + ":" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
+                    }else{
+                        owningStr += ":" + currentDso.getID();
+                    }
+                    
                     query += owningStr;
                 }
 
