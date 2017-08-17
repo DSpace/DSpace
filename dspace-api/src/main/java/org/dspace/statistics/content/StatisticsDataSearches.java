@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.DSpaceObjectLegacySupport;
 import org.dspace.core.Context;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.statistics.Dataset;
@@ -201,8 +202,12 @@ public class StatisticsDataSearches extends StatisticsData {
     protected String getQuery() {
         String query;
         if(currentDso != null){
-            query = "scopeType: " + currentDso.getType() + " AND scopeId: " + currentDso.getID();
-
+            query = "scopeType: " + currentDso.getType() + " AND ";
+            if(currentDso instanceof DSpaceObjectLegacySupport){
+                query += " (scopeId:" + currentDso.getID() + " OR scopeId:" + ((DSpaceObjectLegacySupport) currentDso).getLegacyId() + ")";
+            }else{
+                query += "scopeId:" + currentDso.getID();
+            }
         }else{
             query = "*:*";
         }
