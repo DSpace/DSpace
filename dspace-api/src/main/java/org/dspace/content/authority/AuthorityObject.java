@@ -300,44 +300,7 @@ public abstract class AuthorityObject extends DSpaceObject {
 
         return metadataValues;
     }
-
-    /**
-     * Get all metadata for a given term for ALL AuthorityObjects. This method is for initializing runtime structures.
-     * @param mdString
-     * @return
-     */
-    public static ArrayList<AuthorityMetadataValue> getAllAuthorityMetadataValues(String mdTable, String mdString) {
-        ArrayList<AuthorityMetadataValue> resultSet = new ArrayList<AuthorityMetadataValue>();
-        Context context = null;
-        try {
-            context = new Context();
-            int field_id = MetadataField.findByElement(context, mdString).getFieldID();
-            TableRowIterator tri = DatabaseManager.queryTable(context, mdTable,
-                    "SELECT * FROM " + mdTable + " WHERE field_id = ? ORDER BY parent_id",
-                    field_id);
-
-            if (tri != null) {
-                try {
-                    while (tri.hasNext()) {
-                        TableRow resultRow = tri.next();
-                        AuthorityMetadataValue amv = new AuthorityMetadataValue(context, resultRow);
-                        resultSet.add(amv);
-                    }
-                } finally {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null) {
-                        tri.close();
-                    }
-                }
-            }
-            context.complete();
-        } catch (SQLException e) {
-            log.error("cannot load metadata: " + e.getMessage());
-            context.abort();
-        }
-        return resultSet;
-    }
-
+    
     /**
      * Get metadata for the item in a chosen schema.
      * See <code>MetadataSchema</code> for more information about schemas.
