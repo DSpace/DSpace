@@ -512,11 +512,11 @@ public class EtdLoader
             scope.setBrowseIndex(bi);
             scope.setResultsPerPage(10);
 
-            String[] words = title.split(" ");
+            String[] words = title.trim().split(" ");
 
             StringBuilder searchTerm = new StringBuilder();
 
-            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT); wordCount++)
+            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT && wordCount < words.length); wordCount++)
             {
                 searchTerm = searchTerm.append(words[wordCount]);
                 searchTerm = searchTerm.append(" ");
