@@ -7,7 +7,6 @@
  */
 package org.dspace.content.authority;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -16,17 +15,12 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 
-import java.lang.reflect.Array;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -56,6 +50,7 @@ public abstract class AuthorityObject extends DSpaceObject {
     /** The row in the table representing this object */
     protected TableRow myRow;
 
+    private HashMap<Integer, ArrayList<AuthorityMetadataValue>> cachedMetadataValues;
     AuthorityObject(Context context, TableRow row) throws SQLException
     {
         myRow = row;
@@ -221,8 +216,8 @@ public abstract class AuthorityObject extends DSpaceObject {
     public abstract String getMetadataTable();
 
     public ArrayList<AuthorityMetadataValue> getMetadata(Context context, String schemaName, String element, String qualifier) {
-        ArrayList<AuthorityMetadataValue> metadataValues;
-        metadataValues = new ArrayList<AuthorityMetadataValue>();
+
+        ArrayList<AuthorityMetadataValue> resultMetadataValues = new ArrayList<AuthorityMetadataValue>();
 
         try {
             MetadataField field = null;
@@ -243,35 +238,34 @@ public abstract class AuthorityObject extends DSpaceObject {
             }
             if (field == null) {
                 throw new SQLException("no such field " + schemaName + "." + element + "." + qualifier);
-            }
-            TableRowIterator tri = DatabaseManager.queryTable(context, this.getMetadataTable() ,
-                        "SELECT * FROM " + this.getMetadataTable() + " WHERE parent_id= ? AND field_id= ?",
-                        getID(), field.getFieldID());
-
-            if (tri != null) {
-                try {
-                    while (tri.hasNext()) {
-                        TableRow resultRow = tri.next();
-                        AuthorityMetadataValue amv = new AuthorityMetadataValue(context, resultRow);
-                        metadataValues.add(amv);
-                    }
-                } finally {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null) {
-                        tri.close();
-                    }
-                }
+            } else {
+                return getCachedMetadata().get(field.getFieldID());
             }
         } catch (SQLException e) {
             log.error("cannot load metadata: " + e.getMessage());
         }
 
-        return metadataValues;
+        return resultMetadataValues;
     }
 
     public ArrayList<AuthorityMetadataValue> getMetadata() {
-        ArrayList<AuthorityMetadataValue> metadataValues;
-        metadataValues = new ArrayList<AuthorityMetadataValue>();
+        ArrayList<AuthorityMetadataValue> resultList = new ArrayList<AuthorityMetadataValue>();
+        // return all metadata for this item
+        for (ArrayList<AuthorityMetadataValue> fieldList : getCachedMetadata().values()) {
+            resultList.addAll(fieldList);
+        }
+        return resultList;
+    }
+
+    // get all metadata associated with an AuthorityObject
+    private HashMap<Integer, ArrayList<AuthorityMetadataValue>> getCachedMetadata() {
+        // if cached values present, return cache
+        if (cachedMetadataValues != null) {
+            return cachedMetadataValues;
+        }
+
+        // otherwise, refresh cache
+        cachedMetadataValues = new HashMap<Integer, ArrayList<AuthorityMetadataValue>>();
         Context context = getContext();
         try {
             TableRowIterator tri = DatabaseManager.queryTable(context, this.getMetadataTable() ,
@@ -283,7 +277,10 @@ public abstract class AuthorityObject extends DSpaceObject {
                     while (tri.hasNext()) {
                         TableRow resultRow = tri.next();
                         AuthorityMetadataValue amv = new AuthorityMetadataValue(context, resultRow);
-                        metadataValues.add(amv);
+                        if (cachedMetadataValues.get(amv.fieldId) == null) {
+                            cachedMetadataValues.put(amv.fieldId, new ArrayList<AuthorityMetadataValue>());
+                        }
+                        cachedMetadataValues.get(amv.fieldId).add(amv);
                     }
                 } finally {
                     // close the TableRowIterator to free up resources
@@ -298,7 +295,7 @@ public abstract class AuthorityObject extends DSpaceObject {
             abortContext(context);
         }
 
-        return metadataValues;
+        return cachedMetadataValues;
     }
     
     /**
@@ -443,6 +440,8 @@ public abstract class AuthorityObject extends DSpaceObject {
         } catch (SQLException e) {
             log.error("couldn't clear metadata for " + getID() + ": " + schema + "." + element + "." + qualifier + ", lang=" + lang);
         }
+        // invalidate cache
+        cachedMetadataValues = null;
     }
 
     private boolean match(String schema, String element, String qualifier,
@@ -583,6 +582,8 @@ public abstract class AuthorityObject extends DSpaceObject {
         } catch (SQLException e) {
             log.error("couldn't add metadata for " + getID() + ": " + schema + "." + element + "." + qualifier + ", lang=" + lang);
         }
+        // invalidate cache
+        cachedMetadataValues = null;
     }
 
     public void addMetadata(Context context, String mdString, String value) {
@@ -656,6 +657,8 @@ public abstract class AuthorityObject extends DSpaceObject {
 
         context.commit();
         log.info(LogManager.getHeader(context, "delete_" + TABLE , "id=" + getID()));
+        // invalidate cache
+        cachedMetadataValues = null;
     }
 
     protected void deleteAssociatedData(Context context) throws SQLException, AuthorizeException {
