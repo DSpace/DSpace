@@ -527,13 +527,12 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 <a name="statistics"></a>
 ## Statistics
 
-		add item,bitstream views count (with monthly update)
-		add Item option to not update last modified date
-		view standard stats from admin interface
-		embargo statistics	
+		show bitstream download count on item page
 		
 			
 *Java Source*
+
+* [ItemAdapter.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/objectmanager/ItemAdapter.java) - get the view count for bitstream
 
 * [Item.java](../modules/additions/src/main/java/org/dspace/content/Item.java) - add item and bitstream statistics
 
@@ -566,14 +565,6 @@ handle-6.2.jar - add handle 6.2 to the lib folder
 * [EmbargoListDisplay.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/EmbargoListDisplay.java) - Class used to display the table with the list of embargos.
 
 * [EmbargoListDownloader.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/EmbargoListDownloader.java) - Class responsible for populating the CSV of the embargo data.
-
-* [ViewArtifacts/sitemap.xmap](../modules/xmlui/src/main/resources/aspects/ViewArtifacts/sitemap.xmap) - sitemap that triggers the EmbargoListDisplay class and the MonthlyStatistics class.
-
-* [sitemap.xmap](../modules/xmlui/src/main/webapp/sitemap.xmap) - sitemap that triggers the EmbargoListDownloader and the MonthlyStatisticsDownloader.
-
-* [MonthlyStatistics.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/MonthlyStatistics.java) - Class used to display a list of the available monthly statistics files.
-
-* [MonthlyStatisticsDownloader.java](../modules/xmlui/src/main/java/org/dspace/app/xmlui/aspect/artifactbrowser/MonthlyStatisticsDownloader.java) - Class used to download the text file with the monthly statistics data.
 
 
 *Database Schema*

@@ -1055,7 +1055,6 @@
 
     <!-- DRUM customizations -->
     <message key="xmlui.administrative.Navigation.DRUM_customizations">DRUM Customizations</message>
-    <message key="xmlui.administrative.Navigation.monthly_statistics">Monthly Statistics</message>
     <message key="xmlui.administrative.Navigation.embargo_list">Embargo List</message>
     <message key="xmlui.administrative.Navigation.units">Units</message>
     <message key="xmlui.administrative.Navigation.ETD_departments">ETD Departments</message>
