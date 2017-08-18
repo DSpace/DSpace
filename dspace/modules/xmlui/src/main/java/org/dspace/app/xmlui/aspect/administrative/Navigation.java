@@ -89,7 +89,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     // DRUM Customizations
     private static final Message T_DRUM_customizations              = message("xmlui.administrative.Navigation.DRUM_customizations");
-    private static final Message T_DRUM_monthly_statistics          = message("xmlui.administrative.Navigation.monthly_statistics");
     private static final Message T_DRUM_embargo_list                = message("xmlui.administrative.Navigation.embargo_list");
     private static final Message T_DRUM_units                       = message("xmlui.administrative.Navigation.units");
     private static final Message T_DRUM_ETD_departments             = message("xmlui.administrative.Navigation.ETD_departments");    
@@ -320,8 +319,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             // DRUM Customizations
             List drum = admin.addList("drum");
             drum.setHead(T_DRUM_customizations);
-            drum.addItemXref(contextPath + "/monthly-statistics",
-                    T_DRUM_monthly_statistics);
             drum.addItemXref(contextPath + "/embargo-list", T_DRUM_embargo_list);
             drum.addItemXref(contextPath + "/admin/etd_departments",
                     T_DRUM_ETD_departments);
