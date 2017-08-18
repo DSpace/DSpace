@@ -115,10 +115,10 @@
                                         <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
 
                                         <xsl:choose>
-                                            <xsl:when test="string-length($request-uri)&gt;0">
+                                            <xsl:when test="string-length($request-uri)&gt;0 and not (starts-with($request-uri, 'pages/'))">
                                                 <xsl:apply-templates select="dri:options"/>
                                             </xsl:when>
-                                            <xsl:otherwise>
+                                             <xsl:otherwise>
                                             </xsl:otherwise>
                                         </xsl:choose>
 
