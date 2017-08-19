@@ -279,6 +279,16 @@ public class MetadataField
     }
 
     public static MetadataField findByElement(Context context, String schemaName, String element, String qualifier) throws SQLException {
+        // check cache first
+        if (term2field != null) {
+            String temp_qualifier = qualifier;
+            if (qualifier != null && qualifier.equals(Item.ANY)) {
+                temp_qualifier = "null";
+            }
+            log.debug("finding cached element for " + String.join(".", schemaName, element, temp_qualifier));
+            return term2field.get(String.join(".", schemaName, element, temp_qualifier));
+        }
+
         MetadataSchema schema = MetadataSchema.find(context, schemaName);
         int schemaID = -1;
         if (schema != null) {
