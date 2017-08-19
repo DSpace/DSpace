@@ -115,6 +115,24 @@ public class RestIndex {
                   		"<li>DELETE /bitstreams/{bitstream id} - Delete the specified bitstream from DSpace.</li>" +
                   		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete the specified bitstream policy.</li>" +
                   	"</ul>" +
+					"<h2>Search</h2>"+
+					"<ul>" +
+                  		"<li>GET /discover - Return all items in DSpace.</li>" +
+                  		"<li>GET /discover HTTP request parameters:"+
+							"<ul>"+
+							"<li>page: Page number.</li>"+
+							"<li>rpp: Number of results per page.</li>"+
+							"<li>query: A text who wanna show.</li>"+
+							"<li>scope</li>"+
+							"<li>sort_by: Sort option for results.</li>"+
+							"<li>order: order option for results.</li>"+
+							"<li>filter_field_{filter_number>0}</li>"+
+							"<li>filter_type_{filter_number>0}</li>"+
+							"<li>filter_value_{filter_number>0}</li>"+
+							"<li>Example: /rest/discover?scope=%2F&query=cancer&filter_field_1=author&filter_value_1=mohsen&filter_type_1=contains</li>"+
+							"</ul>"+
+						"</li>" +
+                  	"</ul>" +
                 "</body></html> ";
     }
     
