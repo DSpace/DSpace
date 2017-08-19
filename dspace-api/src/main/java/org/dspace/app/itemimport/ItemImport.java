@@ -1007,17 +1007,7 @@ public class ItemImport
         }
         else
         {
-            // If we're just test the import, let's check that the actual metadata field exists.
-        	MetadataSchema foundSchema = MetadataSchema.find(c,schema);
-        	
-        	if (foundSchema == null)
-        	{
-        		System.out.println("ERROR: schema '"+schema+"' was not found in the registry.");
-        		return;
-        	}
-        	
-        	int schemaID = foundSchema.getSchemaID();
-        	MetadataField foundField = MetadataField.findByElement(c, schemaID, element, qualifier);
+        	MetadataField foundField = MetadataField.findByElement(c, schema, element, qualifier);
         	
         	if (foundField == null)
         	{

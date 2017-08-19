@@ -340,7 +340,7 @@ public class DSpaceAIPIngester
                 //If Schema found, try to locate field from database
                 if(mdSchema!=null)
                 {
-                    mdField = MetadataField.findByElement(context, mdSchema.getSchemaID(), md.element, md.qualifier);
+                    mdField = MetadataField.findByElement(context, md.schema, md.element, md.qualifier);
                 }
             }
             catch(SQLException se)

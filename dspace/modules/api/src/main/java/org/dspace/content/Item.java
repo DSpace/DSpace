@@ -723,11 +723,7 @@ public class Item extends DSpaceObject
     public static ItemIterator findByMetadataFieldAuthority(Context context, String mdString, String authority) throws SQLException, AuthorizeException, IOException {
         String[] elements = getElementsFilled(mdString);
         String schema = elements[0], element = elements[1], qualifier = elements[2];
-        MetadataSchema mds = MetadataSchema.find(context, schema);
-        if (mds == null) {
-            throw new IllegalArgumentException("No such metadata schema: " + schema);
-        }
-        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+        MetadataField mdf = MetadataField.findByElement(context, schema, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                     "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
@@ -2606,12 +2602,7 @@ public class Item extends DSpaceObject
                                                    String schema, String element, String qualifier, String value, Boolean in_archive)
             throws SQLException, AuthorizeException, IOException
     {
-        MetadataSchema mds = MetadataSchema.find(context, schema);
-        if (mds == null)
-        {
-            throw new IllegalArgumentException("No such metadata schema: " + schema);
-        }
-        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+        MetadataField mdf = MetadataField.findByElement(context, schema, element, qualifier);
         if (mdf == null)
         {
             throw new IllegalArgumentException(
@@ -2808,12 +2799,7 @@ public class Item extends DSpaceObject
                                                     String schema, String element, String qualifier, String value)
             throws SQLException, AuthorizeException, IOException
     {
-        MetadataSchema mds = MetadataSchema.find(context, schema);
-        if (mds == null)
-        {
-            throw new IllegalArgumentException("No such metadata schema: " + schema);
-        }
-        MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+        MetadataField mdf = MetadataField.findByElement(context, schema, element, qualifier);
         if (mdf == null)
         {
             throw new IllegalArgumentException("No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);

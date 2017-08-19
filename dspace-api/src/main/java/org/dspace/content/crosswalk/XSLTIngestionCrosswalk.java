@@ -327,27 +327,18 @@ public class XSLTIngestionCrosswalk
                 String schema = elt.getAttributeValue("mdschema");
                 String element = elt.getAttributeValue("element");
                 String qualifier = elt.getAttributeValue("qualifier");
-                MetadataSchema ms = MetadataSchema.find(context, schema);
-                if (ms == null )
+                if (qualifier != null && qualifier.equals(""))
                 {
-                    System.err.println("DIM Error, Cannot find metadata schema for: schema=\""+schema+
-                        "\" (... element=\""+element+"\", qualifier=\""+qualifier+"\")");
-    }
-                else
+                    System.err.println("DIM Warning, qualifier is empty string: "+
+                          " schema=\""+schema+"\", element=\""+element+"\", qualifier=\""+qualifier+"\"");
+                    qualifier = null;
+                }
+                MetadataField mf = MetadataField.findByElement(context,
+                              schema, element, qualifier);
+                if (mf == null)
                 {
-                    if (qualifier != null && qualifier.equals(""))
-                    {
-                        System.err.println("DIM Warning, qualifier is empty string: "+
-                              " schema=\""+schema+"\", element=\""+element+"\", qualifier=\""+qualifier+"\"");
-                        qualifier = null;
-                    }
-                    MetadataField mf = MetadataField.findByElement(context,
-                                  ms.getSchemaID(), element, qualifier);
-                    if (mf == null)
-                    {
-                        System.err.println("DIM Error, Cannot find metadata field for: schema=\"" + schema +
-                                "\", element=\"" + element + "\", qualifier=\"" + qualifier + "\"");
-                    }
+                    System.err.println("DIM Error, Cannot find metadata field for: schema=\"" + schema +
+                            "\", element=\"" + element + "\", qualifier=\"" + qualifier + "\"");
                 }
             }
             else

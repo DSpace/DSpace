@@ -133,7 +133,7 @@ public class DCType
             String qualifier) throws SQLException, AuthorizeException
     {
         MetadataField field = MetadataField.findByElement(context,
-                MetadataSchema.DC_SCHEMA_ID, element, qualifier);
+                MetadataSchema.DC_SCHEMA, element, qualifier);
 
         if (field == null)
         {
