@@ -220,18 +220,11 @@ public abstract class AuthorityObject extends DSpaceObject {
         ArrayList<AuthorityMetadataValue> resultMetadataValues = new ArrayList<AuthorityMetadataValue>();
 
         try {
-            MetadataField field = null;
+            MetadataField field = MetadataField.findByElement(context, schemaName, element, qualifier);;
             if (Item.ANY.equals(schemaName)) {
                 if (Item.ANY.equals(element)) {
                     // return all metadata for this item
                     return getMetadata();
-                }
-                MetadataSchema[] schemas = MetadataSchema.findAll(context);
-                for (int i=0; i<schemas.length; i++) {
-                    field = MetadataField.findByElement(context, schemas[i].getName(), element, qualifier);
-                    if (field != null) {
-                        break;
-                    }
                 }
             } else {
                 field = MetadataField.findByElement(context, schemaName, element, qualifier);
@@ -263,6 +256,7 @@ public abstract class AuthorityObject extends DSpaceObject {
     private HashMap<Integer, ArrayList<AuthorityMetadataValue>> getCachedMetadata() {
         // if cached values present, return cache
         if (cachedMetadataValues != null) {
+            log.debug("hey, cached");
             return cachedMetadataValues;
         }
 
