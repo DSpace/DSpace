@@ -324,8 +324,7 @@ public class Concept extends AuthorityObject
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
         try {
-            MetadataSchema mds = MetadataSchema.find(context, metadataSchema);
-            MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), metadataElement, null);
+            MetadataField mdf = MetadataField.findByElement(context, metadataSchema, metadataElement, null);
             int target_field_id = mdf.getFieldID();
             log.info ("looking up concept metadata for " + searchString + " in field number " + target_field_id);
             TableRowIterator row = DatabaseManager.queryTable(context, TABLE, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", searchString, target_field_id);

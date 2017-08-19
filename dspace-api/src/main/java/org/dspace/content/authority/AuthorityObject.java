@@ -220,20 +220,19 @@ public abstract class AuthorityObject extends DSpaceObject {
         ArrayList<AuthorityMetadataValue> resultMetadataValues = new ArrayList<AuthorityMetadataValue>();
 
         try {
-            MetadataField field = MetadataField.findByElement(context, schemaName, element, qualifier);;
             if (Item.ANY.equals(schemaName)) {
                 if (Item.ANY.equals(element)) {
                     // return all metadata for this item
                     return getMetadata();
                 }
             } else {
-                field = MetadataField.findByElement(context, schemaName, element, qualifier);
-            }
-            if (field == null) {
-                throw new SQLException("no such field " + schemaName + "." + element + "." + qualifier);
-            } else {
-                if (getCachedMetadata().get(field.getFieldID()) != null) {
-                    resultMetadataValues.addAll(getCachedMetadata().get(field.getFieldID()));
+                MetadataField field = MetadataField.findByElement(context, schemaName, element, qualifier);
+                if (field == null) {
+                    throw new SQLException("no such field " + schemaName + "." + element + "." + qualifier);
+                } else {
+                    if (getCachedMetadata().get(field.getFieldID()) != null) {
+                        resultMetadataValues.addAll(getCachedMetadata().get(field.getFieldID()));
+                    }
                 }
             }
         } catch (SQLException e) {

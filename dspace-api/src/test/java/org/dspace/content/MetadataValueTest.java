@@ -64,7 +64,7 @@ public class MetadataValueTest extends AbstractUnitTest
         {
             context.turnOffAuthorisationSystem();
             this.mf = MetadataField.findByElement(context,
-                    MetadataSchema.DC_SCHEMA_ID, element, qualifier);
+                    MetadataSchema.DC_SCHEMA, element, qualifier);
             this.mv = new MetadataValue(mf);
             this.mv.setItemId(Item.create(context).getID());
             context.commit();

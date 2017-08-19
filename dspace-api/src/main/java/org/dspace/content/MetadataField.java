@@ -127,6 +127,32 @@ public class MetadataField
             this.row = row;
         }
     }
+    protected Context getContext() {
+        Context context = null;
+        try {
+            context = new Context();
+        } catch (SQLException ex) {
+            log.error("Unable to instantiate DSpace context", ex);
+        }
+        return context;
+    }
+
+    protected void completeContext(Context context) throws SQLException {
+        try {
+            context.complete();
+        } catch (SQLException ex) {
+            // Abort the context to force a new connection
+            abortContext(context);
+            throw ex;
+        }
+    }
+
+    protected void abortContext(Context context) {
+        if (context != null) {
+            log.error("aborting context");
+            context.abort();
+        }
+    }
 
     /**
      * Get the element name.
@@ -296,6 +322,7 @@ public class MetadataField
         } else {
             throw new SQLException("no schema called " + schemaName);
         }
+
         return findByElement(context, schemaID, element, qualifier);
     }
 
@@ -313,45 +340,34 @@ public class MetadataField
             String element, String qualifier) throws SQLException
     {
         MetadataField result = null;
-        // check cache first
-        if (term2field != null) {
-            String temp_qualifier = qualifier;
-            if (qualifier != null && qualifier.equals(Item.ANY)) {
-                temp_qualifier = "null";
-            }
-            result = term2field.get(String.join(".", MetadataSchema.find(context,schemaID).getName(), element, temp_qualifier));
+        // Grab rows from DB
+        TableRowIterator tri;
+        if (qualifier == null) {
+            tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
+                    "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
+                            "AND element= ?  AND qualifier is NULL ",
+                    schemaID, element);
+        } else {
+            tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
+                    "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
+                            "AND element= ?  AND qualifier= ? ",
+                    schemaID, element, qualifier);
         }
-        // if no result from cache, ask DB.
-        if (result == null) {
-            // Grab rows from DB
-            TableRowIterator tri;
-            if (qualifier == null) {
-                tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
-                        "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
-                                "AND element= ?  AND qualifier is NULL ",
-                        schemaID, element);
-            } else {
-                tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
-                        "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
-                                "AND element= ?  AND qualifier= ? ",
-                        schemaID, element, qualifier);
-            }
 
-            TableRow row = null;
-            try {
-                if (tri.hasNext()) {
-                    row = tri.next();
-                }
-            } finally {
-                // close the TableRowIterator to free up resources
-                if (tri != null) {
-                    tri.close();
-                }
+        TableRow row = null;
+        try {
+            if (tri.hasNext()) {
+                row = tri.next();
             }
+        } finally {
+            // close the TableRowIterator to free up resources
+            if (tri != null) {
+                tri.close();
+            }
+        }
 
-            if (row != null) {
-                result = new MetadataField(row);
-            }
+        if (row != null) {
+            result = new MetadataField(row);
         }
         return result;
     }

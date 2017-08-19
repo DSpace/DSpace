@@ -72,24 +72,13 @@ public class AddMetadataAction extends UpdateMetadataAction {
 							ItemUpdate.pr("Metadata to add: " + dtom.toString());
 							   //validity tests that would occur in actual processing
 	        	            // If we're just test the import, let's check that the actual metadata field exists.
-	        	        	MetadataSchema foundSchema = MetadataSchema.find(context, dtom.schema);
-	        	        	
-	        	        	if (foundSchema == null)
-	        	        	{
-	        	        		ItemUpdate.pr("ERROR: schema '" 
-	        	        			+ dtom.schema + "' was not found in the registry; found on item " + dirname);
-	        	        	}
-	        	        	else
-	        	        	{
-		        	        	int schemaID = foundSchema.getSchemaID();
-		        	        	MetadataField foundField = MetadataField.findByElement(context, schemaID, dtom.element, dtom.qualifier);
-		        	        	
-		        	        	if (foundField == null)
-		        	        	{
-		        	        		ItemUpdate.pr("ERROR: Metadata field: '" + dtom.schema + "." + dtom.element + "." 
-		        	        				+ dtom.qualifier + "' not found in registry; found on item " + dirname);
-		        	            }		
-	        				}						
+							MetadataField foundField = MetadataField.findByElement(context, dtom.schema, dtom.element, dtom.qualifier);
+
+							if (foundField == null)
+							{
+								ItemUpdate.pr("ERROR: Metadata field: '" + dtom.schema + "." + dtom.element + "."
+										+ dtom.qualifier + "' not found in registry; found on item " + dirname);
+							}
 						}
 						else
 						{

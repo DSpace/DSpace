@@ -706,7 +706,7 @@ public class OAIHarvester {
 
             if (mdSchema != null) {
                 // Verify that the element exists; this part is reachable only if the metadata schema is valid
-                MetadataField mdField = MetadataField.findByElement(ourContext, mdSchema.getSchemaID(), value.element, value.qualifier);
+                MetadataField mdField = MetadataField.findByElement(ourContext, mdSchema.getName(), value.element, value.qualifier);
                 if (mdField == null) {
                     if (fieldChoice.equals("add")) {
                         mdField = new MetadataField(mdSchema, value.element, value.qualifier, null);

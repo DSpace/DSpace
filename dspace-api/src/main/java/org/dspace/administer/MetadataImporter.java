@@ -229,13 +229,13 @@ public class MetadataImporter
         
         // Find the matching schema object
         MetadataSchema schemaObj = MetadataSchema.find(context, schema);
-        
+
         if (schemaObj == null)
         {
             throw new RegistryImportException("Schema '" + schema + "' is not registered");
         }
-        
-        MetadataField mf = MetadataField.findByElement(context, schemaObj.getSchemaID(), element, qualifier);
+
+        MetadataField mf = MetadataField.findByElement(context, schemaObj.getName(), element, qualifier);
         if (mf != null)
         {
             System.out.println("already exists, skipping");
