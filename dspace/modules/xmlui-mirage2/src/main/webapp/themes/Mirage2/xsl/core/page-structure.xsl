@@ -40,6 +40,7 @@
     -->
     <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
     <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
+    <xsl:variable name="containerType" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']" />
 
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
@@ -115,7 +116,7 @@
                                         <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
 
                                         <xsl:choose>
-                                            <xsl:when test="string-length($request-uri)&gt;0 and not (starts-with($request-uri, 'pages/'))">
+                                            <xsl:when test="string-length($request-uri)&gt;0 and not (starts-with($request-uri, 'pages/')) and not ($containerType='type:community' or $containerType='type:collection')">
                                                 <xsl:apply-templates select="dri:options"/>
                                             </xsl:when>
                                              <xsl:otherwise>
