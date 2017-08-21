@@ -39,7 +39,8 @@ public class VersionItemServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        Integer itemID = UIUtil.getIntParameter(request,"itemID");
+        context.turnOffItemWrapper();
+    	Integer itemID = UIUtil.getIntParameter(request,"itemID");
         Item item = Item.find(context,itemID);
         String submit = UIUtil.getSubmitButton(request,"submit");
         if (submit!=null && submit.equals("submit")){
