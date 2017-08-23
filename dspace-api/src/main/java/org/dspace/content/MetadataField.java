@@ -127,32 +127,6 @@ public class MetadataField
             this.row = row;
         }
     }
-    protected Context getContext() {
-        Context context = null;
-        try {
-            context = new Context();
-        } catch (SQLException ex) {
-            log.error("Unable to instantiate DSpace context", ex);
-        }
-        return context;
-    }
-
-    protected void completeContext(Context context) throws SQLException {
-        try {
-            context.complete();
-        } catch (SQLException ex) {
-            // Abort the context to force a new connection
-            abortContext(context);
-            throw ex;
-        }
-    }
-
-    protected void abortContext(Context context) {
-        if (context != null) {
-            log.error("aborting context");
-            context.abort();
-        }
-    }
 
     /**
      * Get the element name.
@@ -293,7 +267,7 @@ public class MetadataField
      * @param mdString
      *        the schema.element[.qualifier] in a string
      */
-    public static MetadataField findByElement(Context context, String mdString) throws SQLException {
+    public static MetadataField findByElement(String mdString) throws SQLException {
         String[] tokens = StringUtils.split(mdString, ".");
         String schema = tokens[0];
         String element = tokens[1];
@@ -301,43 +275,27 @@ public class MetadataField
         if (tokens.length > 2) {
             qualifier = tokens[2];
         }
-        return findByElement(context, schema, element, qualifier);
+        return findByElement(schema, element, qualifier);
     }
 
-    public static MetadataField findByElement(Context context, String schemaName, String element, String qualifier) throws SQLException {
-        // check cache first
-        if (term2field != null) {
-            String temp_qualifier = qualifier;
-            if (qualifier != null && qualifier.equals(Item.ANY)) {
-                temp_qualifier = "null";
-            }
-            log.debug("finding cached element for " + String.join(".", schemaName, element, temp_qualifier));
-            return term2field.get(String.join(".", schemaName, element, temp_qualifier));
+    public static MetadataField findByElement(String schemaName, String element, String qualifier) throws SQLException {
+        if (!isCacheInitialized()) {
+            initCache();
         }
 
-        MetadataSchema schema = MetadataSchema.find(context, schemaName);
-        int schemaID = -1;
-        if (schema != null) {
-            schemaID = schema.getSchemaID();
-        } else {
-            throw new SQLException("no schema called " + schemaName);
-        }
-
-        return findByElement(context, schemaID, element, qualifier);
+        return term2field.get(schemaName + "." + element + "." + (qualifier == null ? "null" : qualifier));
     }
 
     /**
      * Retrieves the metadata field from the database.
      *
-     * @param context dspace context
      * @param schemaID schema by ID
      * @param element element name
      * @param qualifier qualifier (may be ANY or null)
      * @return recalled metadata field
      * @throws SQLException
      */
-    public static MetadataField findByElement(Context context, int schemaID,
-            String element, String qualifier) throws SQLException
+    public static MetadataField findByElement(int schemaID, String element, String qualifier) throws SQLException
     {
         MetadataSchema schema = MetadataSchema.find(schemaID);
         if (schema == null) {
@@ -347,13 +305,10 @@ public class MetadataField
             initCache();
         }
 
-        if (qualifier == null) {
-            qualifier = "null";
-        }
-        return term2field.get(schema.getName() + "." + element + "." + qualifier);
+        return term2field.get(schema.getName() + "." + element + "." + (qualifier == null ? "null" : qualifier));
     }
 
-    private static List<TableRow> findAllRows(Context context) throws SQLException {
+    private static List<TableRow> findAllRows() throws SQLException {
         if (!isCacheInitialized()) {
             initCache();
         }
@@ -368,14 +323,13 @@ public class MetadataField
     /**
      * Retrieve all Dublin Core types from the registry
      *
-     * @param context dspace context
      * @return an array of all the Dublin Core types
      * @throws SQLException
      */
-    public static MetadataField[] findAll(Context context) throws SQLException
+    public static MetadataField[] findAll() throws SQLException
     {
         List<MetadataField> fields = new ArrayList<MetadataField>();
-        List<TableRow> tableRows = findAllRows(context);
+        List<TableRow> tableRows = findAllRows();
         for (TableRow tableRow : tableRows) {
             fields.add(new MetadataField(tableRow));
         }
@@ -388,35 +342,19 @@ public class MetadataField
     /**
      * Return all metadata fields that are found in a given schema.
      *
-     * @param context dspace context
      * @param schemaID schema by db ID
      * @return array of metadata fields
      * @throws SQLException
      */
-    public static MetadataField[] findAllInSchema(Context context, int schemaID)
+    public static MetadataField[] findAllInSchema(int schemaID)
             throws SQLException
     {
         List<MetadataField> fields = new ArrayList<MetadataField>();
+        MetadataField[] allFields = findAll();
 
-        // Get all the metadatafieldregistry rows
-        TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
-                "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
-                " ORDER BY element, qualifier", schemaID);
-
-        try
-        {
-            // Make into DC Type objects
-            while (tri.hasNext())
-            {
-                fields.add(new MetadataField(tri.next()));
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
+        for (MetadataField field : allFields) {
+            if (schemaID == field.schemaID) {
+                fields.add(field);
             }
         }
 
@@ -448,7 +386,7 @@ public class MetadataField
         // query to ensure that there is not already a duplicate name field.
         if (row.getIntColumn("metadata_schema_id") != schemaID)
         {
-            if (MetadataField.hasElement(context, schemaID, element, qualifier))
+            if (MetadataField.hasElement(schemaID, element, qualifier))
             {
                 throw new NonUniqueMetadataException(
                         "Duplcate field name found in target schema");
@@ -478,17 +416,16 @@ public class MetadataField
      * Return true if and only if the schema has a field with the given element
      * and qualifier pair.
      *
-     * @param context dspace context
      * @param schemaID schema by ID
      * @param element element name
      * @param qualifier qualifier name
      * @return true if the field exists
      * @throws SQLException
      */
-    private static boolean hasElement(Context context, int schemaID,
-            String element, String qualifier) throws SQLException
+    private static boolean hasElement(int schemaID,
+                                      String element, String qualifier) throws SQLException
     {
-        return MetadataField.findByElement(context, schemaID, element,
+        return MetadataField.findByElement(schemaID, element,
                 qualifier) != null;
     }
 
@@ -614,14 +551,12 @@ public class MetadataField
      * Find the field corresponding to the given numeric ID.  The ID is
      * a database key internal to DSpace.
      *
-     * @param context
-     *            context, in case we need to read it in from DB
      * @param id
      *            the metadata field ID
      * @return the metadata field object
      * @throws SQLException
      */
-    public static MetadataField find(Context context, int id)
+    public static MetadataField find(int id)
             throws SQLException
     {
         if (!isCacheInitialized())

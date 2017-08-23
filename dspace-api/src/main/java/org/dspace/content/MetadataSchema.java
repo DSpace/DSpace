@@ -357,11 +357,10 @@ public class MetadataSchema
     /**
      * Return all metadata schemas.
      *
-     * @param context DSpace context
      * @return array of metadata schemas
      * @throws SQLException
      */
-    public static MetadataSchema[] findAll(Context context) throws SQLException
+    public static MetadataSchema[] findAll() throws SQLException
     {
         if (!isCacheInitialized()) {
             initCache();
@@ -486,14 +485,12 @@ public class MetadataSchema
      * Get the schema corresponding with this numeric ID.
      * The ID is a database key internal to DSpace.
      *
-     * @param context
-     *            context, in case we need to read it in from DB
      * @param id
      *            the schema ID
      * @return the metadata schema object
      * @throws SQLException
      */
-    public static MetadataSchema find(Context context, int id)
+    public static MetadataSchema find(int id)
             throws SQLException
     {
         if (!isCacheInitialized())
@@ -515,14 +512,12 @@ public class MetadataSchema
     /**
      * Get the schema corresponding with this short name.
      *
-     * @param context
-     *            context, in case we need to read it in from DB
      * @param shortName
      *            the short name for the schema
      * @return the metadata schema object
      * @throws SQLException
      */
-    public static MetadataSchema find(Context context, String shortName)
+    public static MetadataSchema find(String shortName)
         throws SQLException
     {
         // If we are not passed a valid schema name then return
