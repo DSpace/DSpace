@@ -339,55 +339,28 @@ public class MetadataField
     public static MetadataField findByElement(Context context, int schemaID,
             String element, String qualifier) throws SQLException
     {
-        MetadataField result = null;
-        // Grab rows from DB
-        TableRowIterator tri;
+        MetadataSchema schema = MetadataSchema.find(schemaID);
+        if (schema == null) {
+            return null;
+        }
+        if (!isCacheInitialized()) {
+            initCache();
+        }
+
         if (qualifier == null) {
-            tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
-                    "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
-                            "AND element= ?  AND qualifier is NULL ",
-                    schemaID, element);
-        } else {
-            tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
-                    "SELECT * FROM MetadataFieldRegistry WHERE metadata_schema_id= ? " +
-                            "AND element= ?  AND qualifier= ? ",
-                    schemaID, element, qualifier);
+            qualifier = "null";
         }
-
-        TableRow row = null;
-        try {
-            if (tri.hasNext()) {
-                row = tri.next();
-            }
-        } finally {
-            // close the TableRowIterator to free up resources
-            if (tri != null) {
-                tri.close();
-            }
-        }
-
-        if (row != null) {
-            result = new MetadataField(row);
-        }
-        return result;
+        return term2field.get(schema.getName() + "." + element + "." + qualifier);
     }
 
     private static List<TableRow> findAllRows(Context context) throws SQLException {
-        ArrayList<TableRow> rows = new ArrayList<TableRow>();
-        // Get all the metadatafieldregistry rows
-        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
-                "SELECT mfr.* FROM MetadataFieldRegistry mfr, MetadataSchemaRegistry msr where mfr.metadata_schema_id= msr.metadata_schema_id ORDER BY msr.short_id,  mfr.element, mfr.qualifier");
+        if (!isCacheInitialized()) {
+            initCache();
+        }
 
-        try {
-            // Make into DC Type objects
-            while (tri.hasNext()) {
-                rows.add(tri.next());
-            }
-        } finally {
-            // close the TableRowIterator to free up resources
-            if (tri != null) {
-                tri.close();
-            }
+        ArrayList<TableRow> rows = new ArrayList<TableRow>();
+        for (Integer key : id2field.keySet()) {
+            rows.add(id2field.get(key).row);
         }
         return rows;
     }
@@ -653,7 +626,7 @@ public class MetadataField
     {
         if (!isCacheInitialized())
         {
-            initCache(context);
+            initCache();
         }
 
         // 'sanity check' first.
@@ -678,7 +651,7 @@ public class MetadataField
     }
     
     // load caches if necessary
-    private static synchronized void initCache(Context context) throws SQLException
+    private static synchronized void initCache() throws SQLException
     {
         if (!isCacheInitialized())
         {
@@ -686,6 +659,13 @@ public class MetadataField
             Map<String, MetadataField> new_term2field = new HashMap<String, MetadataField>();
             log.info("Loading MetadataField elements into cache.");
 
+            Context context = null;
+            try {
+                context = new Context();
+            } catch (SQLException ex) {
+                log.error("Unable to instantiate DSpace context", ex);
+                throw ex;
+            }
             // Grab rows from DB
             TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
                     "SELECT * from MetadataFieldRegistry");
@@ -697,7 +677,7 @@ public class MetadataField
                     TableRow row = tri.next();
                     int fieldID = row.getIntColumn("metadata_field_id");
                     MetadataField mf = new MetadataField(row);
-                    String term = String.join(".", MetadataSchema.find(context, mf.schemaID).getName(), mf.getElement(), mf.getQualifier());
+                    String term = String.join(".", MetadataSchema.find(mf.schemaID).getName(), mf.getElement(), mf.getQualifier());
                     log.info("adding field " + fieldID + " with term " + term);
                     new_id2field.put(Integer.valueOf(fieldID), mf);
                     new_term2field.put(term, mf);
@@ -710,6 +690,12 @@ public class MetadataField
                 {
                     tri.close();
                 }
+            }
+            try {
+                context.complete();
+            } catch (Exception ex) {
+                // Abort the context to force a new connection
+                context.abort();
             }
 
             id2field = new_id2field;

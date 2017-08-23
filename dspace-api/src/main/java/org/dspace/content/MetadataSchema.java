@@ -11,10 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -366,32 +363,20 @@ public class MetadataSchema
      */
     public static MetadataSchema[] findAll(Context context) throws SQLException
     {
-        List<MetadataSchema> schemas = new ArrayList<MetadataSchema>();
-
-        // Get all the metadataschema rows
-        TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataSchemaRegistry",
-                        "SELECT * FROM MetadataSchemaRegistry ORDER BY metadata_schema_id");
-
-        try
-        {
-            // Make into DC Type objects
-            while (tri.hasNext())
-            {
-                schemas.add(new MetadataSchema(tri.next()));
-            }
+        if (!isCacheInitialized()) {
+            initCache();
         }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-            {
-                tri.close();
-            }
+
+        List<MetadataSchema> schemas = new ArrayList<MetadataSchema>();
+        TreeSet<Integer> keys = new TreeSet<Integer>();
+        keys.addAll(id2schema.keySet());
+        for (Integer key : keys) {
+            schemas.add(id2schema.get(key));
         }
 
         // Convert list into an array
         MetadataSchema[] typeArray = new MetadataSchema[schemas.size()];
-        return (MetadataSchema[]) schemas.toArray(typeArray);
+        return schemas.toArray(typeArray);
     }
 
     /**
@@ -513,7 +498,7 @@ public class MetadataSchema
     {
         if (!isCacheInitialized())
         {
-            initCache(context);
+            initCache();
         }
         
         Integer iid = Integer.valueOf(id);
@@ -548,7 +533,7 @@ public class MetadataSchema
 
         if (!isCacheInitialized())
         {
-            initCache(context);
+            initCache();
         }
 
         if (!name2schema.containsKey(shortName))
@@ -572,14 +557,20 @@ public class MetadataSchema
     }
 
     // load caches if necessary
-    private static synchronized void initCache(Context context) throws SQLException
+    private static synchronized void initCache() throws SQLException
     {
         if (!isCacheInitialized())
         {
             log.info("Loading schema cache for fast finds");
             Map<Integer, MetadataSchema> new_id2schema = new HashMap<Integer, MetadataSchema>();
             Map<String, MetadataSchema> new_name2schema = new HashMap<String, MetadataSchema>();
-
+            Context context = null;
+            try {
+                context = new Context();
+            } catch (SQLException ex) {
+                log.error("Unable to instantiate DSpace context", ex);
+                throw ex;
+            }
             TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
                     "SELECT * from MetadataSchemaRegistry");
 
@@ -590,7 +581,7 @@ public class MetadataSchema
                     TableRow row = tri.next();
 
                     MetadataSchema s = new MetadataSchema(row);
-                    new_id2schema.put(Integer.valueOf(s.schemaID), s);
+                    new_id2schema.put(s.schemaID, s);
                     new_name2schema.put(s.name, s);
                 }
             }
@@ -601,6 +592,13 @@ public class MetadataSchema
                 {
                     tri.close();
                 }
+            }
+
+            try {
+                context.complete();
+            } catch (Exception ex) {
+                // Abort the context to force a new connection
+                context.abort();
             }
 
             id2schema = new_id2schema;
