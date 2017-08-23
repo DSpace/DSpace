@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -215,7 +214,7 @@ public abstract class AuthorityObject extends DSpaceObject {
      */
     public abstract String getMetadataTable();
 
-    public ArrayList<AuthorityMetadataValue> getMetadata(Context context, String schemaName, String element, String qualifier) {
+    public ArrayList<AuthorityMetadataValue> getMetadata(String schemaName, String element, String qualifier) {
 
         ArrayList<AuthorityMetadataValue> resultMetadataValues = new ArrayList<AuthorityMetadataValue>();
 
@@ -226,7 +225,7 @@ public abstract class AuthorityObject extends DSpaceObject {
                     return getMetadata();
                 }
             } else {
-                MetadataField field = MetadataField.findByElement(context, schemaName, element, qualifier);
+                MetadataField field = MetadataField.findByElement(schemaName, element, qualifier);
                 if (field == null) {
                     throw new SQLException("no such field " + schemaName + "." + element + "." + qualifier);
                 } else {
@@ -340,24 +339,20 @@ public abstract class AuthorityObject extends DSpaceObject {
      * @return metadata fields that match the parameters
      */
     public AuthorityMetadataValue[] getMetadata(String schema, String element, String qualifier, String lang) {
-        Context context = getContext();
-        try {
-            // Build up list of matching values
-            List<AuthorityMetadataValue> values = new ArrayList<AuthorityMetadataValue>();
-            ArrayList<AuthorityMetadataValue> amvList = getMetadata(context, schema, element, qualifier);
-            for (AuthorityMetadataValue amv : amvList) {
-                if (match(schema, element, qualifier, lang, amv)) {
-                    values.add(amv);
-                }
+        // Build up list of matching values
+        List<AuthorityMetadataValue> values = new ArrayList<AuthorityMetadataValue>();
+        ArrayList<AuthorityMetadataValue> amvList = getMetadata(schema, element, qualifier);
+        for (AuthorityMetadataValue amv : amvList) {
+            if (match(schema, element, qualifier, lang, amv)) {
+                values.add(amv);
             }
+        }
 
-            // Create an array of matching values
+        // Create an array of matching values
+        if (values.size() > 0) {
             AuthorityMetadataValue[] valueArray = new AuthorityMetadataValue[values.size()];
             valueArray = (AuthorityMetadataValue[]) values.toArray(valueArray);
-            completeContext(context);
             return valueArray;
-        } catch (SQLException e) {
-            abortContext(context);
         }
         return new AuthorityMetadataValue[0];
     }
@@ -427,7 +422,7 @@ public abstract class AuthorityObject extends DSpaceObject {
 
     public void clearMetadata(Context context, String schema, String element, String qualifier, String lang) {
         try {
-            ArrayList<AuthorityMetadataValue> amvList = getMetadata(context, schema, element, qualifier);
+            ArrayList<AuthorityMetadataValue> amvList = getMetadata(schema, element, qualifier);
             for (AuthorityMetadataValue amv : amvList) {
                 DatabaseManager.updateQuery(context, "DELETE FROM " + getMetadataTable() + " WHERE id= ? ", amv.getValueId());
             }
@@ -508,7 +503,7 @@ public abstract class AuthorityObject extends DSpaceObject {
         ArrayList<AuthorityMetadataValue> metadataValues = new ArrayList<AuthorityMetadataValue>();
         try {
             // verify that this is a valid schema.element.qualifier:
-            MetadataField field = MetadataField.findByElement(context, schema, element, qualifier);
+            MetadataField field = MetadataField.findByElement(schema, element, qualifier);
             if (field == null) {
                 throw new SQLException("bad_dublin_core " + "schema=" + schema + ", " + element + " " + qualifier);
             }
@@ -561,7 +556,7 @@ public abstract class AuthorityObject extends DSpaceObject {
                 addDetails(fieldName);
             }
             // add the new values into the metadataTable, starting with the last place.
-            ArrayList<AuthorityMetadataValue> amvList = getMetadata(context, schema, element, qualifier);
+            ArrayList<AuthorityMetadataValue> amvList = getMetadata(schema, element, qualifier);
             int placeNum = amvList.size() + 1;
             for (AuthorityMetadataValue amv : metadataValues) {
                 AuthorityMetadataValue metadata = new AuthorityMetadataValue(this.getMetadataTable());
