@@ -15,7 +15,6 @@
   --%>
 
 <%@ page import="org.dspace.content.MetadataSchema" %>
-<%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
@@ -80,7 +79,7 @@
 		for (int dc = 0; dc < dcTypes.length; dc++)
 		{ %>
 					<option value="<%= dcTypes[dc].getFieldID() %>"><%= dcTypes[dc].getQualifier() == null ?
-					    MetadataSchema.find(UIUtil.obtainContext(request), dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() : MetadataSchema.find(UIUtil.obtainContext(request), dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() + "." + dcTypes[dc].getQualifier() %></option>
+					    MetadataSchema.find(dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() : MetadataSchema.find(dcTypes[dc].getSchemaID()).getName() + "." + dcTypes[dc].getElement() + "." + dcTypes[dc].getQualifier() %></option>
 <%      } %>
 				</select></td>
 				<td headers="t2" class="<%= row %>RowEvenCol">

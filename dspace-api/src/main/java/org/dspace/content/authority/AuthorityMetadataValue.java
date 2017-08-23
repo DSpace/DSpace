@@ -8,7 +8,6 @@
 package org.dspace.content.authority;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -98,8 +97,8 @@ public class AuthorityMetadataValue {
     public AuthorityMetadataValue(Context context, TableRow row) {
         this(row);
         try {
-            MetadataField field = MetadataField.find(context, fieldId);
-            MetadataSchema thisSchema = MetadataSchema.find(context, field.getSchemaID());
+            MetadataField field = MetadataField.find(fieldId);
+            MetadataSchema thisSchema = MetadataSchema.find(field.getSchemaID());
             if (thisSchema != null) {
                 schema = thisSchema.getName();
             }

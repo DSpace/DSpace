@@ -79,7 +79,7 @@ public class DCType
     public static String[] quickFind(Context context, int id)
             throws SQLException
     {
-        MetadataField field = MetadataField.find(context, id);
+        MetadataField field = MetadataField.find(id);
 
         String[] result = new String[2];
 
@@ -108,7 +108,7 @@ public class DCType
      */
     public static DCType find(Context context, int id) throws SQLException
     {
-        MetadataField field = MetadataField.find(context, id);
+        MetadataField field = MetadataField.find(id);
         return new DCType(context, field);
     }
 
@@ -132,7 +132,7 @@ public class DCType
     public static DCType findByElement(Context context, String element,
             String qualifier) throws SQLException, AuthorizeException
     {
-        MetadataField field = MetadataField.findByElement(context,
+        MetadataField field = MetadataField.findByElement(
                 MetadataSchema.DC_SCHEMA, element, qualifier);
 
         if (field == null)
@@ -154,7 +154,7 @@ public class DCType
     public static DCType[] findAll(Context context) throws SQLException
     {
 
-        MetadataField field[] = MetadataField.findAll(context);
+        MetadataField field[] = MetadataField.findAll();
         DCType[] typeArray = new DCType[field.length];
 
         for (int ii = 0; ii < field.length; ii++)

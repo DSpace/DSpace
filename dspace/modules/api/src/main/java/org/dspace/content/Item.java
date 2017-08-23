@@ -30,9 +30,6 @@ import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.event.Event;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -666,7 +663,7 @@ public class Item extends DSpaceObject
     public static ItemIterator findByMetadataFieldAuthority(Context context, String mdString, String authority) throws SQLException, AuthorizeException, IOException {
         String[] elements = getElementsFilled(mdString);
         String schema = elements[0], element = elements[1], qualifier = elements[2];
-        MetadataField mdf = MetadataField.findByElement(context, schema, element, qualifier);
+        MetadataField mdf = MetadataField.findByElement(schema, element, qualifier);
         if (mdf == null) {
             throw new IllegalArgumentException(
                     "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
@@ -1785,7 +1782,7 @@ public class Item extends DSpaceObject
     {
         if (allMetadataFields == null)
         {
-            allMetadataFields = MetadataField.findAll(ourContext);
+            allMetadataFields = MetadataField.findAll();
         }
 
         if (allMetadataFields != null)
@@ -1808,7 +1805,7 @@ public class Item extends DSpaceObject
     private int getMetadataSchemaID(DCValue dcv) throws SQLException
     {
         int schemaID;
-        MetadataSchema schema = MetadataSchema.find(ourContext,dcv.schema);
+        MetadataSchema schema = MetadataSchema.find(dcv.schema);
         if (schema == null)
         {
             schemaID = MetadataSchema.DC_SCHEMA_ID;
@@ -2545,7 +2542,7 @@ public class Item extends DSpaceObject
                                                    String schema, String element, String qualifier, String value, Boolean in_archive)
             throws SQLException, AuthorizeException, IOException
     {
-        MetadataField mdf = MetadataField.findByElement(context, schema, element, qualifier);
+        MetadataField mdf = MetadataField.findByElement(schema, element, qualifier);
         if (mdf == null)
         {
             throw new IllegalArgumentException(
@@ -2742,7 +2739,7 @@ public class Item extends DSpaceObject
                                                     String schema, String element, String qualifier, String value)
             throws SQLException, AuthorizeException, IOException
     {
-        MetadataField mdf = MetadataField.findByElement(context, schema, element, qualifier);
+        MetadataField mdf = MetadataField.findByElement(schema, element, qualifier);
         if (mdf == null)
         {
             throw new IllegalArgumentException("No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
@@ -2773,12 +2770,12 @@ public class Item extends DSpaceObject
 
                             // Get the associated metadata field and schema information
                             int fieldID = resultRow.getIntColumn("metadata_field_id");
-                            MetadataField field = MetadataField.find(ourContext, fieldID);
+                            MetadataField field = MetadataField.find(fieldID);
 
                             if (field == null) {
                                 log.error("Loading item - cannot find metadata field " + fieldID);
                             } else {
-                                MetadataSchema schema = MetadataSchema.find(ourContext, field.getSchemaID());
+                                MetadataSchema schema = MetadataSchema.find(field.getSchemaID());
                                 if (schema == null) {
                                     log.error("Loading item - cannot find metadata schema " + field.getSchemaID() + ", field " + fieldID);
                                 } else {

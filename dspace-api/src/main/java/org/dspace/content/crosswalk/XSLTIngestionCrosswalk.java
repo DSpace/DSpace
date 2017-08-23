@@ -21,7 +21,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.packager.PackageUtils;
 import org.dspace.core.Constants;
@@ -333,8 +332,8 @@ public class XSLTIngestionCrosswalk
                           " schema=\""+schema+"\", element=\""+element+"\", qualifier=\""+qualifier+"\"");
                     qualifier = null;
                 }
-                MetadataField mf = MetadataField.findByElement(context,
-                              schema, element, qualifier);
+                MetadataField mf = MetadataField.findByElement(
+                        schema, element, qualifier);
                 if (mf == null)
                 {
                     System.err.println("DIM Error, Cannot find metadata field for: schema=\"" + schema +

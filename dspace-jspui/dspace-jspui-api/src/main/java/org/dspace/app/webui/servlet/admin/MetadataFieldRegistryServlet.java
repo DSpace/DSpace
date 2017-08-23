@@ -82,7 +82,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
             try
             {
                 // Update the metadata for a DC type
-                MetadataField dc = MetadataField.find(context, UIUtil
+                MetadataField dc = MetadataField.find(UIUtil
                         .getIntParameter(request, "dc_type_id"));
             dc.setElement(request.getParameter("element"));
 
@@ -151,7 +151,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         else if (button.equals("submit_delete"))
         {
             // Start delete process - go through verification step
-            MetadataField dc = MetadataField.find(context, UIUtil
+            MetadataField dc = MetadataField.find(UIUtil
                     .getIntParameter(request, "dc_type_id"));
             request.setAttribute("type", dc);
             JSPManager.showJSP(request, response,
@@ -160,7 +160,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         else if (button.equals("submit_confirm_delete"))
         {
             // User confirms deletion of type
-            MetadataField dc = MetadataField.find(context, UIUtil
+            MetadataField dc = MetadataField.find(UIUtil
                     .getIntParameter(request, "dc_type_id"));
             try
             {
@@ -198,7 +198,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
                     for (int ii = 0; ii < param.length; ii++)
                     {
                         int fieldID = Integer.parseInt(param[ii]);
-                        MetadataField field = MetadataField.find(context,
+                        MetadataField field = MetadataField.find(
                                 fieldID);
                         field.setSchemaID(schemaID);
                         field.update(context);
@@ -271,15 +271,15 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
     {
         // Find matching metadata fields
         MetadataField[] types = MetadataField
-                .findAllInSchema(context, schemaID);
+                .findAllInSchema(schemaID);
         request.setAttribute("types", types);
 
         // Pull the metadata schema object as well
-        MetadataSchema schema = MetadataSchema.find(context, schemaID);
+        MetadataSchema schema = MetadataSchema.find(schemaID);
         request.setAttribute("schema", schema);
 
         // Pull all metadata schemas for the pulldown
-        MetadataSchema[] schemas = MetadataSchema.findAll(context);
+        MetadataSchema[] schemas = MetadataSchema.findAll();
         request.setAttribute("schemas", schemas);
 
         JSPManager

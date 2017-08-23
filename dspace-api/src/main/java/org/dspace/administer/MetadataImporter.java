@@ -158,7 +158,7 @@ public class MetadataImporter
         System.out.print("Registering Schema: " + name + " - " + namespace + " ... ");
         
         // check to see if the schema already exists
-        MetadataSchema s = MetadataSchema.find(context, name);
+        MetadataSchema s = MetadataSchema.find(name);
         
         if (s == null)
         {
@@ -228,14 +228,14 @@ public class MetadataImporter
         System.out.print("Registering Metadata: " + schema + "." + element + "." + qualifier + " ... ");
         
         // Find the matching schema object
-        MetadataSchema schemaObj = MetadataSchema.find(context, schema);
+        MetadataSchema schemaObj = MetadataSchema.find(schema);
 
         if (schemaObj == null)
         {
             throw new RegistryImportException("Schema '" + schema + "' is not registered");
         }
 
-        MetadataField mf = MetadataField.findByElement(context, schemaObj.getName(), element, qualifier);
+        MetadataField mf = MetadataField.findByElement(schemaObj.getName(), element, qualifier);
         if (mf != null)
         {
             System.out.println("already exists, skipping");

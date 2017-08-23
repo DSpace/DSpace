@@ -336,11 +336,11 @@ public class DSpaceAIPIngester
             try
             {
                 //Try to access this Schema
-                mdSchema = MetadataSchema.find(context, md.schema);
+                mdSchema = MetadataSchema.find(md.schema);
                 //If Schema found, try to locate field from database
                 if(mdSchema!=null)
                 {
-                    mdField = MetadataField.findByElement(context, md.schema, md.element, md.qualifier);
+                    mdField = MetadataField.findByElement(md.schema, md.element, md.qualifier);
                 }
             }
             catch(SQLException se)

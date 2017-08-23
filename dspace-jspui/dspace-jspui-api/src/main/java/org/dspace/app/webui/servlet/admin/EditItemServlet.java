@@ -389,18 +389,18 @@ public class EditItemServlet extends DSpaceServlet
         Collection[] collections = item.getCollections();
 
         // All DC types in the registry
-        MetadataField[] types = MetadataField.findAll(context);
+        MetadataField[] types = MetadataField.findAll();
         
         // Get a HashMap of metadata field ids and a field name to display
         Map<Integer, String> metadataFields = new HashMap<Integer, String>();
         
         // Get all existing Schemas
-        MetadataSchema[] schemas = MetadataSchema.findAll(context);
+        MetadataSchema[] schemas = MetadataSchema.findAll();
         for (int i = 0; i < schemas.length; i++)
         {
             String schemaName = schemas[i].getName();
             // Get all fields for the given schema
-            MetadataField[] fields = MetadataField.findAllInSchema(context, schemas[i].getSchemaID());
+            MetadataField[] fields = MetadataField.findAllInSchema(schemas[i].getSchemaID());
             for (int j = 0; j < fields.length; j++)
             {
                 Integer fieldID = Integer.valueOf(fields[j].getFieldID());
@@ -718,8 +718,8 @@ public class EditItemServlet extends DSpaceServlet
                 }
             }
 
-            MetadataField field = MetadataField.find(context, dcTypeID);
-            MetadataSchema schema = MetadataSchema.find(context, field
+            MetadataField field = MetadataField.find(dcTypeID);
+            MetadataSchema schema = MetadataSchema.find(field
                     .getSchemaID());
             item.addMetadata(schema.getName(), field.getElement(), field
                     .getQualifier(), lang, value);

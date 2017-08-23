@@ -78,7 +78,7 @@ public class DeleteMetadataFieldsConfirm extends AbstractDSpaceTransformer
 		ArrayList<MetadataField> fields = new ArrayList<MetadataField>();
 		for (String id : idsString.split(","))
 		{
-			MetadataField field = MetadataField.find(context,Integer.valueOf(id));
+			MetadataField field = MetadataField.find(Integer.valueOf(id));
 			fields.add(field);
 		}
  
@@ -107,7 +107,7 @@ public class DeleteMetadataFieldsConfirm extends AbstractDSpaceTransformer
 			String fieldEelement = field.getElement();
 			String fieldQualifier = field.getQualifier();
 			
-			MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
+			MetadataSchema schema = MetadataSchema.find(field.getSchemaID());
 			String schemaName = schema.getName();
 			
 			StringBuilder fieldName = new StringBuilder()

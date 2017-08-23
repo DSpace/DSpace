@@ -1007,7 +1007,7 @@ public class ItemImport
         }
         else
         {
-        	MetadataField foundField = MetadataField.findByElement(c, schema, element, qualifier);
+        	MetadataField foundField = MetadataField.findByElement(schema, element, qualifier);
         	
         	if (foundField == null)
         	{
