@@ -1645,6 +1645,12 @@
 			<artifactId>addon-commons-api</artifactId>
 			<version>${commons.addon.modules}</version>
 		</dependency>
+		<dependency>
+			<groupId>it.4science</groupId>
+			<artifactId>dev-orcid-jaxb</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+		</dependency>		
       </dependencies>
    </dependencyManagement>
 
