@@ -49,7 +49,7 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
 
         Division dataPackageDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
 
-        dataPackageDiv.addPara().addContent("Thank you for your submission! Your data package has been forwarded to Dryad curation staff, and you have been sent a confirmation email containing a provisional DOI for your data package. Once your submission has been reviewed and approved, the DOI becomes permanent and can be used to cite your data package. You will hear from us within two business days.");
+        dataPackageDiv.addPara().addContent("Thank you for your submission! Your data package has been forwarded to Dryad curation staff, and you have been sent a confirmation email containing a provisional DOI for your data package. Once your submission has been reviewed and approved, the DOI becomes permanent and can be used to cite your data package. You should hear from us within two business days. (Large or complex submissions may require a longer response time).");
 
 	dataPackageDiv.addPara("data-label", "bold").addContent(item.getName());
 
