@@ -13,7 +13,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 
 import org.dspace.core.Context;
 
@@ -72,7 +71,7 @@ public class AddMetadataAction extends UpdateMetadataAction {
 							ItemUpdate.pr("Metadata to add: " + dtom.toString());
 							   //validity tests that would occur in actual processing
 	        	            // If we're just test the import, let's check that the actual metadata field exists.
-							MetadataField foundField = MetadataField.findByElement(context, dtom.schema, dtom.element, dtom.qualifier);
+							MetadataField foundField = MetadataField.findByElement(dtom.schema, dtom.element, dtom.qualifier);
 
 							if (foundField == null)
 							{

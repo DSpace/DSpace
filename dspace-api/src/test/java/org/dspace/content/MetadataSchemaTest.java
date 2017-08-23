@@ -46,7 +46,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
         super.init();
         try
         {
-            this.ms = MetadataSchema.find(context, MetadataSchema.DC_SCHEMA_ID);
+            this.ms = MetadataSchema.find(MetadataSchema.DC_SCHEMA_ID);
         }
         catch (SQLException ex)
         {
@@ -346,7 +346,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
     @Test
     public void testFindAll() throws Exception
     {
-        MetadataSchema[] found = MetadataSchema.findAll(context);
+        MetadataSchema[] found = MetadataSchema.findAll();
         assertThat("testFindAll 0",found, notNullValue());
         assertTrue("testFindAll 1",found.length >= 1);
 
@@ -368,7 +368,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
     public void testFind_Context_int() throws Exception
     {
         int id = MetadataSchema.DC_SCHEMA_ID;
-        MetadataSchema found = MetadataSchema.find(context, id);
+        MetadataSchema found = MetadataSchema.find(id);
         assertThat("testFind_Context_int 0",found, notNullValue());
         assertThat("testFind_Context_int 1",found.getSchemaID(), equalTo(ms.getSchemaID()));
         assertThat("testFind_Context_int 2",found.getName(), equalTo(ms.getName()));
@@ -382,13 +382,13 @@ public class MetadataSchemaTest extends AbstractUnitTest
     public void testFind_Context_String() throws Exception
     {
         String shortName = ms.getName();
-        MetadataSchema found = MetadataSchema.find(context, shortName);
+        MetadataSchema found = MetadataSchema.find(shortName);
         assertThat("testFind_Context_String 0",found, notNullValue());
         assertThat("testFind_Context_String 1",found.getSchemaID(), equalTo(ms.getSchemaID()));
         assertThat("testFind_Context_String 2",found.getName(), equalTo(ms.getName()));
         assertThat("testFind_Context_String 3",found.getNamespace(), equalTo(ms.getNamespace()));
 
-        found = MetadataSchema.find(context, null);
+        found = MetadataSchema.find(null);
         assertThat("testFind_Context_String 4",found, nullValue());
     }
 

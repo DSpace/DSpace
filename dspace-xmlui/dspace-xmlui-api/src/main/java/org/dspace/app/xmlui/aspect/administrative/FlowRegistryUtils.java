@@ -124,10 +124,10 @@ public class FlowRegistryUtils
 		int count = 0;
 		for (String id : schemaIDs) 
     	{
-			MetadataSchema schema = MetadataSchema.find(context, Integer.valueOf(id));
+			MetadataSchema schema = MetadataSchema.find(Integer.valueOf(id));
 			
 			// First remove and fields in the schema
-			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
+			MetadataField[] fields = MetadataField.findAllInSchema(schema.getSchemaID());
 			for (MetadataField field : fields)
             {
 				field.delete(context);
@@ -254,7 +254,7 @@ public class FlowRegistryUtils
         }
 		
 		// Check to make sure the field is unique, sometimes the NonUniqueMetadataException is not thrown.
-		MetadataField possibleDuplicate = MetadataField.findByElement(context, schemaID, element, qualifier);
+		MetadataField possibleDuplicate = MetadataField.findByElement(schemaID, element, qualifier);
 		if (possibleDuplicate != null && possibleDuplicate.getFieldID() != fieldID)
         {
             result.addError("duplicate_field");
@@ -265,7 +265,7 @@ public class FlowRegistryUtils
 			try
 			{
 				// Update the metadata for a DC type
-				MetadataField field = MetadataField.find(context, fieldID);
+				MetadataField field = MetadataField.find(fieldID);
 				field.setElement(element);
 				field.setQualifier(qualifier);
 				field.setScopeNote(note);
@@ -361,7 +361,7 @@ public class FlowRegistryUtils
 		int count = 0;
 		for (String id : fieldIDs) 
 		{
-			MetadataField field = MetadataField.find(context, Integer.valueOf(id));
+			MetadataField field = MetadataField.find(Integer.valueOf(id));
 			field.setSchemaID(schemaID);
 			field.update(context);
 			count++;
@@ -394,7 +394,7 @@ public class FlowRegistryUtils
 		int count = 0;
 		for (String id : fieldIDs) 
     	{
-			MetadataField field = MetadataField.find(context, Integer.valueOf(id));
+			MetadataField field = MetadataField.find(Integer.valueOf(id));
 	        field.delete(context);
 	        count++;
     	}

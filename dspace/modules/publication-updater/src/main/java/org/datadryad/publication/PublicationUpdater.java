@@ -349,7 +349,7 @@ public class PublicationUpdater extends HttpServlet {
         // Find metadata field for publication name:
         MetadataField pubNameField = null;
         try {
-            pubNameField = MetadataField.findByElement(context, PUBLICATION_NAME);
+            pubNameField = MetadataField.findByElement(PUBLICATION_NAME);
         } catch (SQLException e) {
             LOGGER.error("couldn't find " + PUBLICATION_NAME);
             return items;
@@ -358,7 +358,7 @@ public class PublicationUpdater extends HttpServlet {
         // Find metadata field for citation:
         MetadataField citationField = null;
         try {
-            citationField = MetadataField.findByElement(context, FULL_CITATION);
+            citationField = MetadataField.findByElement(FULL_CITATION);
         } catch (SQLException e) {
             LOGGER.error("couldn't find " + FULL_CITATION);
             return items;
@@ -394,7 +394,7 @@ public class PublicationUpdater extends HttpServlet {
         // Look for items with a FULL_CITATION && CITATION_IN_PROGRESS exists && CITATION_IN_PROGRESS == TRUE
         MetadataField citationInProgressField = null;
         try {
-            citationInProgressField = MetadataField.findByElement(context, CITATION_IN_PROGRESS);
+            citationInProgressField = MetadataField.findByElement(CITATION_IN_PROGRESS);
         } catch (SQLException e) {
             LOGGER.error("couldn't find " + CITATION_IN_PROGRESS);
         }

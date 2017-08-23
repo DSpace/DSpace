@@ -72,13 +72,13 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
 	public void addBody(Body body) throws WingException, SQLException, AuthorizeException
 	{
 		// Get all our parameters
-		MetadataSchema[] schemas = MetadataSchema.findAll(context); 
+		MetadataSchema[] schemas = MetadataSchema.findAll();
 		String idsString = parameters.getParameter("fieldIDs", null);
 		
 		ArrayList<MetadataField> fields = new ArrayList<MetadataField>();
 		for (String id : idsString.split(","))
 		{
-			MetadataField field = MetadataField.find(context,Integer.valueOf(id));
+			MetadataField field = MetadataField.find(Integer.valueOf(id));
 			fields.add(field);
 		}
  
@@ -100,7 +100,7 @@ public class MoveMetadataFields extends AbstractDSpaceTransformer
 			String fieldEelement = field.getElement();
 			String fieldQualifier = field.getQualifier();
 			
-			MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
+			MetadataSchema schema = MetadataSchema.find(field.getSchemaID());
 			String schemaName = schema.getName();
 			
 			StringBuilder fieldName = new StringBuilder()

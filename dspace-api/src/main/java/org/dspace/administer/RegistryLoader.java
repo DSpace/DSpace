@@ -240,7 +240,7 @@ public class RegistryLoader
         String namespace = getElementData(node, "namespace");
 
         // Check if the schema exists already
-        MetadataSchema schema = MetadataSchema.find(context, shortname);
+        MetadataSchema schema = MetadataSchema.find(shortname);
         if (schema == null)
         {
         	// If not create it.
@@ -278,7 +278,7 @@ public class RegistryLoader
         }
 
         // Find the matching schema object
-        MetadataSchema schemaObj = MetadataSchema.find(context, schema);
+        MetadataSchema schemaObj = MetadataSchema.find(schema);
         
         MetadataField field = new MetadataField();
         field.setSchemaID(schemaObj.getSchemaID());

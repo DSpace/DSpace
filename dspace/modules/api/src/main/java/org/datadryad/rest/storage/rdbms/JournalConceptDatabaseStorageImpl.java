@@ -68,10 +68,10 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
         boolean isISSN = Pattern.compile("\\d{4}-\\p{Alnum}{4}").matcher(codeOrISSN).matches();
         String query;
         if (isISSN) {
-            int issnField = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.ISSN)).getFieldID();
+            int issnField = MetadataField.findByElement(DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.ISSN)).getFieldID();
             query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + issnField;
         } else {
-            int journalcodeField = MetadataField.findByElement(context, DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.JOURNAL_ID)).getFieldID();
+            int journalcodeField = MetadataField.findByElement(DryadJournalConcept.metadataProperties.getProperty(DryadJournalConcept.JOURNAL_ID)).getFieldID();
             query = "SELECT * FROM " + CONCEPT_TABLE + " WHERE UPPER(text_value) = UPPER(?) and field_id = " + journalcodeField;
         }
         TableRow row = DatabaseManager.querySingleTable(context, CONCEPT_TABLE, query, codeOrISSN);

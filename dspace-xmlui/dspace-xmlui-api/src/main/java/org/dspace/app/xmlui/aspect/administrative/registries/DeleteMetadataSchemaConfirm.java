@@ -75,7 +75,7 @@ public class DeleteMetadataSchemaConfirm extends AbstractDSpaceTransformer
 		ArrayList<MetadataSchema> schemas = new ArrayList<MetadataSchema>();
 		for (String id : idsString.split(","))
 		{
-			MetadataSchema schema = MetadataSchema.find(context,Integer.valueOf(id));
+			MetadataSchema schema = MetadataSchema.find(Integer.valueOf(id));
 			schemas.add(schema);
 		}
  

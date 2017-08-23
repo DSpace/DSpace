@@ -136,11 +136,11 @@ public class EditSchemeMetadataValueForm extends AbstractDSpaceTransformer {
 
         Select addName = addForm.addItem().addSelect("field");
         addName.setLabel(T_name_label);
-        MetadataField[] fields = MetadataField.findAll(context);
+        MetadataField[] fields = MetadataField.findAll();
         for (MetadataField field : fields)
         {
             int fieldID = field.getFieldID();
-            MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
+            MetadataSchema schema = MetadataSchema.find(field.getSchemaID());
             String name = schema.getName() +"."+field.getElement();
             if (field.getQualifier() != null)
             {

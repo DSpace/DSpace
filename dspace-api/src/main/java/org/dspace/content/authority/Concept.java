@@ -19,7 +19,6 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 
 import java.io.IOException;
 import java.lang.Exception;
@@ -324,7 +323,7 @@ public class Concept extends AuthorityObject
     {
         ArrayList<Concept> concepts = new ArrayList<Concept>();
         try {
-            MetadataField mdf = MetadataField.findByElement(context, metadataSchema, metadataElement, null);
+            MetadataField mdf = MetadataField.findByElement(metadataSchema, metadataElement, null);
             int target_field_id = mdf.getFieldID();
             log.info ("looking up concept metadata for " + searchString + " in field number " + target_field_id);
             TableRowIterator row = DatabaseManager.queryTable(context, TABLE, "select c.* from concept as c, conceptmetadatavalue as cmv where upper(cmv.text_value) = ? and cmv.parent_id = c.id and cmv.field_id = ?;", searchString, target_field_id);
@@ -424,7 +423,7 @@ public class Concept extends AuthorityObject
         ArrayList<Concept> conceptArrayList = new ArrayList<Concept>();
         // find the metadata field id from the registry:
         try {
-            MetadataField mdf = MetadataField.findByElement(context, metadatafield);
+            MetadataField mdf = MetadataField.findByElement(metadatafield);
             TableRowIterator tri = DatabaseManager.queryTable(context, CONCEPT_METADATA_TABLE, "SELECT * FROM " + CONCEPT_METADATA_TABLE + " where field_id = ?", mdf.getFieldID());
             while (tri.hasNext()) {
                 TableRow row = tri.next();
