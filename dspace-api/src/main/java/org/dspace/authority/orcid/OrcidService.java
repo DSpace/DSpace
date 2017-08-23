@@ -29,7 +29,6 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -48,24 +47,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.dspace.authority.AuthorityValue;
-import org.dspace.authority.orcid.jaxb.Funding;
-import org.dspace.authority.orcid.jaxb.FundingExternalIdentifier;
-import org.dspace.authority.orcid.jaxb.FundingExternalIdentifiers;
-import org.dspace.authority.orcid.jaxb.FundingList;
-import org.dspace.authority.orcid.jaxb.OrcidActivities;
-import org.dspace.authority.orcid.jaxb.OrcidBio;
-import org.dspace.authority.orcid.jaxb.OrcidMessage;
-import org.dspace.authority.orcid.jaxb.OrcidProfile;
-import org.dspace.authority.orcid.jaxb.OrcidSearchResult;
-import org.dspace.authority.orcid.jaxb.OrcidSearchResults;
-import org.dspace.authority.orcid.jaxb.OrcidWork;
-import org.dspace.authority.orcid.jaxb.OrcidWorks;
-import org.dspace.authority.orcid.jaxb.WorkExternalIdentifier;
-import org.dspace.authority.orcid.jaxb.WorkExternalIdentifiers;
+import org.dspace.authority.orcid.jaxb.activities.Fundings;
+import org.dspace.authority.orcid.jaxb.activities.Works;
+import org.dspace.authority.orcid.jaxb.funding.Funding;
 import org.dspace.authority.rest.RestSource;
 import org.dspace.content.DCPersonName;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.utils.DSpace;
+import org.orcid.ns.record.Record;
+import org.orcid.ns.search.Result;
+import org.orcid.ns.search.Search;
 import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -90,30 +81,40 @@ public class OrcidService extends RestSource {
 	 * log4j logger
 	 */
 	private static Logger log = Logger.getLogger(OrcidService.class);
-
-	private static final String WORK_CREATE_ENDPOINT = "/orcid-works";
-	private static final String PROFILE_CREATE_ENDPOINT = "/orcid-profile";
-	private static final String FUNDING_CREATE_ENDPOINT = "/funding";
+    
+	public static final String RECORD_ENDPOINT = "/record";
 	
-	private static final String READ_PROFILE_ENDPOINT = "/orcid-profile";
-	private static final String READ_WORKS_ENDPOINT = "/orcid-works";
-	private static final String READ_FUNDING_ENDPOINT = "/funding";
-	private static final String READ_BIO_ENDPOINT = "/orcid-bio";
+    public static final String ACTIVITIES_ENDPOINT = "/activities";  
+    public static final String ADDRESS_ENDPOINT = "/address";
+    public static final String BIOGRAPHY_ENDPOINT = "/biography";
+    public static final String EDUCATION_ENDPOINT = "/education";
+    public static final String EDUCATION_SUMMARY_ENDPOINT = "/education/summary";
+    public static final String EMAIL_ENDPOINT = "/email";
+    public static final String EMPLOYMENT_ENDPOINT = "/employment";
+    public static final String EMPLOYMENT_SUMMARY_ENDPOINT = "/employment/summary";
+    public static final String EXTERNAL_IDENTIFIERS_ENDPOINT = "/external-identifiers";
+    public static final String FUNDING_ENDPOINT = "/funding";
+    public static final String FUNDING_SUMMARY_ENDPOINT = "/funding/summary";
+    public static final String FUNDINGS_ENDPOINT = "/fundings";
+    public static final String KEYWORDS_ENDPOINT = "/keywords";
+    public static final String OTHER_NAMES_ENDPOINT = "/other-names";
+    public static final String PEERREVIEW_ENDPOINT = "/peer-review";
+    public static final String PEERREVIEW_SUMMARY_ENDPOINT = "/peer-review/summary";
+    public static final String PERSON_ENDPOINT = "/person";
+    public static final String PERSONAL_DETAILS_ENDPOINT = "/personal-details";
+    public static final String RESEARCHER_URLS_ENDPOINT = "/researcher-urls";
+    public static final String WORK_ENDPOINT = "/work";
+    public static final String WORK_SUMMARY_ENDPOINT = "/work/summary";
+    public static final String WORKS_ENDPOINT = "/works";
 	
-	private static final String BIO_UPDATE_ENDPOINT = "/orcid-bio";
-	private static final String AFFILIATION_UPDATE_ENDPOINT = "/affiliations";
-	private static final String SEARCH_ENDPOINT = "search/orcid-bio/";	
+	private static final String SEARCH_ENDPOINT = "search";	
 
 	private static final String READ_PUBLIC_SCOPE = "/read-public";
-	private static final String PROFILE_CREATE_SCOPE = "/orcid-profile/create";
-
-	public static final String MESSAGE_VERSION = "1.2";
+	private static final String PROFILE_CREATE_SCOPE = "/person/update";
 
 	private static OrcidService orcid;
 	
 	private static String sourceClientName;
-
-	private final JAXBContext orcidMessageContext;
 
 	private final MediaType APPLICATION_ORCID_XML = new MediaType("application", "orcid+xml");
 	private final MediaType APPLICATION_VDN_ORCID_XML = new MediaType("application", "vdn.orcid+xml");
@@ -140,9 +141,47 @@ public class OrcidService extends RestSource {
 		this.clientID = clientID;
 		this.clientSecretKey = clientSecretKey;
 		this.tokenURL = tokenURL;
-		orcidMessageContext = JAXBContext.newInstance(OrcidMessage.class);
 	}
 
+	
+    /**
+     * HTTP GET method using to read resources from WS-REST
+     * 
+     * @param endpoint
+     * @param token
+     * @param putCode
+     * @return
+     */
+    private <T> Response get(String endpoint, final String token,
+            final String putCode)
+    {
+        Response response = null;
+        if(StringUtils.isNotBlank(putCode)) {
+            endpoint = endpoint + "/" + putCode;
+        }
+        WebTarget target = restConnector.getClientRest(endpoint);
+
+        if (token != null)
+        {
+            response = target.request()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8")
+                    .get();
+        }
+        else
+        {
+            response = target.request().accept(MediaType.APPLICATION_XML)
+                    .acceptEncoding("UTF-8").get();
+        }
+
+
+        log.debug("[GET].[Response.Status] " + response.getStatus());
+        log.debug("[GET].[Response.StatusInfo.Reason] "
+                + response.getStatusInfo().getReasonPhrase());
+        
+        return response;
+    }
+	
 	/**
 	 * Returns the fields and "works" research activities that are set as
 	 * "Public" in the ORCID Record for the scholar represented by the specified
@@ -154,7 +193,7 @@ public class OrcidService extends RestSource {
 	 * @param id
 	 * @return
 	 */
-	public OrcidProfile getProfile(String id) {
+	public Record getProfile(String id) {
 
 		OrcidAccessToken token = null;
 		try {
@@ -181,74 +220,40 @@ public class OrcidService extends RestSource {
 	 * @param token
 	 * @return
 	 */
-    public OrcidProfile getProfile(String id, String token)
+    public Record getProfile(String id, String token)
     {
 
-        WebTarget target = restConnector
-                .getClientRest(id + READ_PROFILE_ENDPOINT);
-        String response;
-        if (token != null)
-        {
-            response = target.request()
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                    .accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8")
-                    .get(String.class);
-        }
-        else
-        {
-            response = target.request().accept(MediaType.APPLICATION_XML)
-                    .acceptEncoding("UTF-8").get(String.class);
-        }
-        OrcidMessage message = null;
-        try
-        {
-            StringReader sr = new StringReader(response);
-            message = (OrcidMessage) orcidMessageContext.createUnmarshaller()
-                    .unmarshal(sr);
-        }
-        catch (JAXBException e)
-        {
-            log.error(e);
-        }
-        return message.getOrcidProfile();
+        String endpoint = id + RECORD_ENDPOINT;
+        return get(endpoint, token, null).readEntity(Record.class);
+
     }
 
-	public OrcidWorks getWorks(String id, String token) {
+	public Works getWorks(String id, String token) {
 
-		WebTarget target = restConnector.getClientRest(id + READ_WORKS_ENDPOINT);
-		String response = target.request().header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-				.accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8").get(String.class);
-		OrcidMessage message = null;
+		String endpoint = id + WORKS_ENDPOINT;
+		Works message = null;
 		try {
-			StringReader sr = new StringReader(response);
-			message = (OrcidMessage) orcidMessageContext.createUnmarshaller().unmarshal(sr);
-		} catch (JAXBException e) {
+			message = get(endpoint, token, null).readEntity(Works.class);
+		} catch (Exception e) {
 			log.error(e);
 		}
-		return message.getOrcidProfile().getOrcidActivities().getOrcidWorks();
+		return message;
 	}
 
-    public FundingList getFundings(String id, String token)
+    public Fundings getFundings(String id, String token)
     {
 
-        WebTarget target = restConnector
-                .getClientRest(id + READ_FUNDING_ENDPOINT);
-        String response = target.request()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                .accept(MediaType.APPLICATION_XML).acceptEncoding("UTF-8")
-                .get(String.class);
-        OrcidMessage message = null;
+        String endpoint = id + FUNDINGS_ENDPOINT;
+        Fundings message = null;
         try
         {
-            StringReader sr = new StringReader(response);
-            message = (OrcidMessage) orcidMessageContext.createUnmarshaller()
-                    .unmarshal(sr);
+            message = get(endpoint, token, null).readEntity(Fundings.class);
         }
-        catch (JAXBException e)
+        catch (Exception e)
         {
             log.error(e);
         }
-        return message.getOrcidProfile().getOrcidActivities().getFundingList();
+        return message;
     }
 	   
 	   
@@ -262,7 +267,7 @@ public class OrcidService extends RestSource {
 	 */
 	@Override
 	public AuthorityValue queryAuthorityID(String id) {
-		OrcidProfile bio = getProfile(id);
+		Record bio = getProfile(id);
 		return OrcidAuthorityValue.create(bio);
 	}
 
@@ -292,7 +297,7 @@ public class OrcidService extends RestSource {
 
 		query += " OR other-names:(" + text + ")";
 
-		OrcidSearchResults results = search(query, start, max);
+		List<Result> results = search(query, start, max);
 
 		return getAuthorityValuesFromOrcidResults(results);
 	}
@@ -310,7 +315,7 @@ public class OrcidService extends RestSource {
 	 * @throws IOException
 	 * @throws JAXBException
 	 */
-	public String buildProfile(OrcidProfile profile) throws IOException, JAXBException {
+	public String buildProfile(Record profile) throws IOException, JAXBException {
 		WebTarget target = restConnector.getClientRest(PROFILE_CREATE_ENDPOINT);
 
 		StringWriter sw = new StringWriter();
@@ -372,7 +377,7 @@ public class OrcidService extends RestSource {
 	 * @throws IOException
 	 * @throws JAXBException
 	 */
-	public OrcidMessage updateBio(String id, String token, OrcidProfile profile) throws IOException, JAXBException {
+	public OrcidMessage updateBio(String id, String token, Record profile) throws IOException, JAXBException {
 		WebTarget target = restConnector.getClientRest(id + BIO_UPDATE_ENDPOINT);
 
 		StringWriter sw = new StringWriter();
@@ -409,7 +414,7 @@ public class OrcidService extends RestSource {
      * @throws IOException
      * @throws JAXBException
      */
-    public OrcidMessage updateAffiliations(String id, String token, OrcidProfile profile) throws IOException, JAXBException {
+    public OrcidMessage updateAffiliations(String id, String token, Record profile) throws IOException, JAXBException {
         WebTarget target = restConnector.getClientRest(id + AFFILIATION_UPDATE_ENDPOINT);
 
         StringWriter sw = new StringWriter();
@@ -455,7 +460,7 @@ public class OrcidService extends RestSource {
 		works.getOrcidWork().add(work);
 		OrcidActivities activities = new OrcidActivities();
 		activities.setOrcidWorks(works);
-		OrcidProfile profile = new OrcidProfile();
+		Record profile = new Record();
 		profile.setOrcidActivities(activities);
 		OrcidMessage message = new OrcidMessage();
 		message.setOrcidProfile(profile);
@@ -469,7 +474,7 @@ public class OrcidService extends RestSource {
 	private static OrcidMessage wrapWorks(OrcidWorks works) {
 		OrcidActivities activities = new OrcidActivities();
 		activities.setOrcidWorks(works);
-		OrcidProfile profile = new OrcidProfile();
+		Record profile = new Record();
 		profile.setOrcidActivities(activities);
 		OrcidMessage message = new OrcidMessage();
 		message.setOrcidProfile(profile);
@@ -483,7 +488,7 @@ public class OrcidService extends RestSource {
 	private static OrcidMessage wrapFundings(FundingList fundings) {
 		OrcidActivities activities = new OrcidActivities();
 		activities.setFundingList(fundings);
-		OrcidProfile profile = new OrcidProfile();
+		Record profile = new Record();
 		profile.setOrcidActivities(activities);
 		OrcidMessage message = new OrcidMessage();
 		message.setOrcidProfile(profile);
@@ -499,7 +504,7 @@ public class OrcidService extends RestSource {
 		fundings.getFunding().add(funding);
 		OrcidActivities activities = new OrcidActivities();
 		activities.setFundingList(fundings);
-		OrcidProfile profile = new OrcidProfile();
+		Record profile = new Record();
 		profile.setOrcidActivities(activities);
 		OrcidMessage message = new OrcidMessage();
 		message.setOrcidProfile(profile);
@@ -508,9 +513,9 @@ public class OrcidService extends RestSource {
 	}
 
 	/**
-	 * Wrap an OrcidProfile inside an empty OrcidMessage
+	 * Wrap an Record inside an empty OrcidMessage
 	 */
-	private static OrcidMessage wrapProfile(OrcidProfile profile) {
+	private static OrcidMessage wrapProfile(Record profile) {
 		OrcidMessage message = new OrcidMessage();
 		message.setOrcidProfile(profile);
 		message.setMessageVersion(MESSAGE_VERSION);
@@ -527,7 +532,7 @@ public class OrcidService extends RestSource {
 	 * @return
 	 * @throws IOException
 	 */
-	public OrcidSearchResults search(String query, int page, int pagesize) throws IOException {
+	public List<Result> search(String query, int page, int pagesize) throws IOException {
 		if (query == null || query.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
@@ -542,29 +547,18 @@ public class OrcidService extends RestSource {
 		}
 
 		Builder builder = target.request().accept(APPLICATION_ORCID_XML);
-		StringReader reader = null;
+		List<Result> reader = null;
 		try {
-			reader = new StringReader(builder.get(String.class));
-		} catch (ForbiddenException ex) {
+			reader = builder.get().readEntity(Search.class).getResult();
+		} catch (ForbiddenException e1) {
 			builder = builder.header(HttpHeaders.AUTHORIZATION, "Bearer " + getMemberSearchToken().getAccess_token());
-			reader = new StringReader(builder.get(String.class));
+			reader = builder.get().readEntity(Search.class).getResult();
 		}
-
-		try {
-			Unmarshaller um = orcidMessageContext.createUnmarshaller();
-			OrcidMessage message = (OrcidMessage) um.unmarshal(reader);
-			if (message.getOrcidSearchResults() == null) {
-				// shouldn't happen but there's a bug ORCiD side.
-				OrcidSearchResults r = new OrcidSearchResults();
-				r.setNumFound(BigInteger.ZERO);
-				return r;
-			} else {
-				return message.getOrcidSearchResults();
-			}
-		} catch (JAXBException e) {
-			log.info("Problem unmarshalling return value " + e);
-			throw new IOException(e);
+		catch (Exception e2) {
+			log.info("Problem unmarshalling return value " + e2);
+			throw new IOException(e2);
 		}
+		return reader;
 	}
 
 	/**
@@ -644,7 +638,7 @@ public class OrcidService extends RestSource {
 	 */
 	@Override
 	public List<AuthorityValue> queryAuthorities(String field, String text, int start, int max) throws IOException {
-		OrcidSearchResults results = search(field + ":" + URLEncoder.encode(text), start, max);
+		Result results = search(field + ":" + URLEncoder.encode(text), start, max);
 
 		return getAuthorityValuesFromOrcidResults(results);
 	}
@@ -655,10 +649,10 @@ public class OrcidService extends RestSource {
 	 * @param results
 	 * @return
 	 */
-	private List<AuthorityValue> getAuthorityValuesFromOrcidResults(OrcidSearchResults results) {
+	private List<AuthorityValue> getAuthorityValuesFromOrcidResults(List<Result> results) {
 		List<AuthorityValue> authorities = new ArrayList<AuthorityValue>();
-		for (OrcidSearchResult result : results.getOrcidSearchResult()) {
-			authorities.add(OrcidAuthorityValue.create(result.getOrcidProfile()));
+		for (Result result : results) {
+			authorities.add(OrcidAuthorityValue.create(result.getOrcidIdentifier()));
 		}
 		return authorities;
 	}
