@@ -145,8 +145,6 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
             } else {
 
                 // 3. iterate over the items
-                context.uncacheEntity(currentItem);
-
                 if (itemIterator.hasNext()) {
                     currentItem = itemIterator.next();
                     //Reset our current field index
