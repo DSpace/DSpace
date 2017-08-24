@@ -21,17 +21,15 @@
 
 	<bean class="org.dspace.app.cris.integration.ResearcherLoggedInAction">
 		<property name="applicationService" ref="applicationService" />
-		<property name="netidSourceRef" value="orcid"></property>
+		<property name="typeSourceRef" value="orcid"></property>
 	</bean>
 	<bean class="org.dspace.app.cris.integration.ResearcherLoggedInActionEmail">
 		<property name="applicationService" ref="applicationService" />
-		<property name="netidSourceRef" value="orcid"></property>
+		<property name="typeSourceRef" value="orcid"></property>
 	</bean>
 	<bean class="org.dspace.app.cris.integration.ResearcherClaimOrcidProfile">
 		<property name="applicationService" ref="applicationService" />
-		<property name="netidSourceRef" value="orcid"></property>
 	</bean>
-	
 	<alias name="org.dspace.app.cris.integration.ResearcherClaimOrcidProfile"
 		alias="org.dspace.authenticate.ExtraLoggedInAction" />		
 </beans>
