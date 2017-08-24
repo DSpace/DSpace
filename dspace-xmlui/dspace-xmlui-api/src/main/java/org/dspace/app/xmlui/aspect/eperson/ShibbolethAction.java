@@ -100,6 +100,7 @@ public class ShibbolethAction extends AbstractAction
                 //
                 // TODO: have no idea what this is, but leave it as it is, could be broken
                 context.setCurrentUser(null);
+                context.complete();
                 
                 return new HashMap();
             }

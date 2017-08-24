@@ -224,7 +224,7 @@ public class OAuthAuthenticateAction extends AbstractAction
                     // request is preformed fore the user was authenticated and the other half after it succedded. This
                     // way the user is fully authenticated from the start of the request.
                     context.setCurrentUser(null);
-
+                    context.complete();
                     return new HashMap();
                 }
             }
