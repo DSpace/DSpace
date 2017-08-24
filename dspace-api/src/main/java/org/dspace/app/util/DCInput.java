@@ -33,7 +33,7 @@ public class DCInput
     private boolean language = false;
     
     /** the language code use for the input */
-    private String languageName = "common_iso_languages";
+    private String languageName = null;
 
     /** the language list and their value */
     private List<String> valueLanguageList = null;
