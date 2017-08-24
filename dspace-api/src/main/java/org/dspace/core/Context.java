@@ -419,6 +419,8 @@ public class Context
             // commit any changes made as part of the transaction
             if (isValid())
             {
+                // Dispatch events before committing changes to the database,
+                // as the consumers may change something too
                 dispatchEvents();
             }
 
