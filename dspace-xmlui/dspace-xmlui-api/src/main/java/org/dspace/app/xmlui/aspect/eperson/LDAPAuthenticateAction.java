@@ -97,6 +97,7 @@ public class LDAPAuthenticateAction extends AbstractAction {
 				// way the user is fully authenticated from the start of the
 				// request.
 				context.setCurrentUser(null);
+				context.complete();
 
 				return new HashMap();
 			}
