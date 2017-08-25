@@ -73,13 +73,12 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         return context;
     }
 
-    private static void completeContext(Context context) throws SQLException {
+    private static void completeContext(Context context) {
         try {
             context.complete();
         } catch (SQLException ex) {
             // Abort the context to force a new connection
             abortContext(context);
-            throw ex;
         }
     }
 
@@ -358,7 +357,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         }
 
         // Clean up the context.  Read operation so we can abort it.
-        abortContext(context);
+        completeContext(context);
         return doi;
     }
 
@@ -384,7 +383,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         }
 
         // Clean up the context.  Read operation so we can abort it.
-        abortContext(context);
+        completeContext(context);
         return dois;
     }
 
@@ -410,7 +409,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         }
 
         // Clean up the context.  Read operation so we can abort it.
-        abortContext(context);
+        completeContext(context);
         return dois;
     }
 
@@ -433,7 +432,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         }
 
         // Clean up the context.  Read operation so we can abort it.
-        abortContext(context);
+        completeContext(context);
         return found;
     }
 
@@ -455,7 +454,7 @@ public class PGDOIDatabase implements org.springframework.beans.factory.Initiali
         }
 
         // Clean up the context.  Read operation so we can abort it.
-        abortContext(context);
+        completeContext(context);
         return (int)size;
 
     }
