@@ -57,6 +57,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
 
     private static Logger log = Logger.getLogger(DSpaceControlledVocabulary.class);
     private static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')]";
+    private final static String xpathTemplate_ALL = "//node";
     private static String idTemplate = "//node[@id = '%s']";
     private static String pluginNames[] = null;
 
@@ -161,7 +162,14 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     {
     	init();
     	log.debug("Getting matches for '" + text + "'");
-    	String xpathExpression = String.format(xpathTemplate, text.replaceAll("'", "&apos;").toLowerCase());
+    	String xpathExpression;
+    	
+    	if (text != null) {
+    		xpathExpression = String.format(xpathTemplate, text.replaceAll("'", "&apos;").toLowerCase());
+    	}
+    	else {
+    		xpathExpression = xpathTemplate_ALL;
+    	}
     	XPath xpath = XPathFactory.newInstance().newXPath();
     	Choice[] choices;
     	try {
