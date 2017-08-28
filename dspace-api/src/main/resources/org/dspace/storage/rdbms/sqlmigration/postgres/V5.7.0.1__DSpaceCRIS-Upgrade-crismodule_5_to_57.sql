@@ -29,6 +29,7 @@ begin
 	UPDATE CRIS_RPAGE_PDEF SET SHORTNAME = 'system-orcid-profile-pref-preferredName' WHERE SHORTNAME = 'orcid-profile-pref-preferredName';
 	UPDATE CRIS_RPAGE_PDEF SET SHORTNAME = 'system-orcid-profile-pref-otheremails' WHERE SHORTNAME = 'orcid-profile-pref-otheremails';
 
+	ALTER TABLE cris_orcid_history ADD COLUMN orcid varchar(255);
 exception when others then
  
     raise notice 'The transaction is in an uncommittable state. '

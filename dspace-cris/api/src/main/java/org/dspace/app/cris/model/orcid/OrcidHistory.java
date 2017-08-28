@@ -54,6 +54,8 @@ public class OrcidHistory extends IdentifiableObject {
     
     private String owner;
     
+    private String orcid;
+    
     @Embedded
     @AttributeOverride(name = "timestamp", column = @Column(name = "lastAttempt"))
     private SingleTimeStampInfo timestampLastAttempt;
@@ -141,5 +143,15 @@ public class OrcidHistory extends IdentifiableObject {
     public void setPutCode(String putCode)
     {
         this.putCode = putCode;
+    }
+
+    public String getOrcid()
+    {
+        return orcid;
+    }
+
+    public void setOrcid(String orcid)
+    {
+        this.orcid = orcid;
     }
 }

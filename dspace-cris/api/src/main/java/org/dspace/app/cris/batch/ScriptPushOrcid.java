@@ -74,7 +74,7 @@ public class ScriptPushOrcid {
 					"Script work only on RP names modified after this date (ADMIN MODE default PUT method)");
 			options.addOption("D", "MODE_HOUR", true,
 					"Script work only on RP names modified in this hours range (ADMIN MODE default PUT method)");
-			options.addOption("p", "post", false, "works/fundings send with a POST call (using only with -a and -s - ADMIN MODE default PUT method)");
+			options.addOption("p", "overwrite", false, "activities overwrite (DELETE + POST) - using only with -a and -s - ADMIN MODE default PUT method");
 			
 			CommandLine line = parser.parse(options, args);
 
@@ -108,9 +108,9 @@ public class ScriptPushOrcid {
 				System.exit(1);
 			}
 
-            String mode = "PUT";
+            String mode = null;
             if (line.hasOption('p')) {
-                mode = "POST";
+                mode = "DELETE";
             }
             
 			List<ResearcherPage> rps = null;

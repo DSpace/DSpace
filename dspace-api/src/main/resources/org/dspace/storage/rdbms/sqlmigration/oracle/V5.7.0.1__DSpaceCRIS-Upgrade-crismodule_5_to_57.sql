@@ -20,7 +20,8 @@ BEGIN
 	UPDATE CRIS_RPAGE_PDEF SET SHORTNAME = "system-orcid-profile-pref-email" WHERE SHORTNAME = "orcid-profile-pref-email";
 	UPDATE CRIS_RPAGE_PDEF SET SHORTNAME = "system-orcid-profile-pref-fullName" WHERE SHORTNAME = "orcid-profile-pref-fullName";
 	UPDATE CRIS_RPAGE_PDEF SET SHORTNAME = "system-orcid-profile-pref-preferredName" WHERE SHORTNAME = "orcid-profile-pref-preferredName";
-	UPDATE CRIS_RPAGE_PDEF SET SHORTNAME = "system-orcid-profile-pref-otheremails" WHERE SHORTNAME = "orcid-profile-pref-otheremails";'	
+	UPDATE CRIS_RPAGE_PDEF SET SHORTNAME = "system-orcid-profile-pref-otheremails" WHERE SHORTNAME = "orcid-profile-pref-otheremails";
+	ALTER TABLE cris_orcid_history ADD COLUMN orcid varchar2(255);'	
 	EXCEPTION
 	WHEN OTHERS
     THEN
