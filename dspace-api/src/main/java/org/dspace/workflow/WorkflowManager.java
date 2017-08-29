@@ -417,8 +417,7 @@ public class WorkflowManager
             // advance(...) will call itself if no workflow step group exists
             // so we need to check permissions only if a workflow step group is
             // in place.
-                if (wi.getCollection().getWorkflowGroup(1) != null && !wi.getCollection().getWorkflowGroup(1).isEmpty())
-            {
+            if (wi.getCollection().getWorkflowGroup(1) != null && !wi.getCollection().getWorkflowGroup(1).isEmpty()) {
                 // FIXME note:  authorizeAction ASSUMES that c.getCurrentUser() == e!
                 AuthorizeManager.authorizeAction(c, wi.getCollection(), Constants.WORKFLOW_STEP_1, true);
             }
@@ -436,8 +435,7 @@ public class WorkflowManager
             // advance(...) will call itself if no workflow step group exists
             // so we need to check permissions only if a workflow step group is
             // in place.
-                if (wi.getCollection().getWorkflowGroup(1) != null && !wi.getCollection().getWorkflowGroup(1).isEmpty())
-            {
+            if (wi.getCollection().getWorkflowGroup(1) != null && !wi.getCollection().getWorkflowGroup(1).isEmpty()) {
                 AuthorizeManager.authorizeAction(c, wi.getCollection(), Constants.WORKFLOW_STEP_2, true);
             }
 
@@ -454,8 +452,7 @@ public class WorkflowManager
             // advance(...) will call itself if no workflow step group exists
             // so we need to check permissions only if a workflow step group is
             // in place.
-                if (wi.getCollection().getWorkflowGroup(3) != null && !wi.getCollection().getWorkflowGroup(3).isEmpty())
-            {
+            if (wi.getCollection().getWorkflowGroup(3) != null && !wi.getCollection().getWorkflowGroup(3).isEmpty()) {
                 AuthorizeManager.authorizeAction(c, wi.getCollection(), Constants.WORKFLOW_STEP_3, true);
             }
 
