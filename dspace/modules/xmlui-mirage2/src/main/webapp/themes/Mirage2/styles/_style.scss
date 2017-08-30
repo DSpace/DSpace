@@ -17,6 +17,23 @@
     ::selection { @content; }
 }
 
+// tweak the carousel controls
+.carousel-control {
+        opacity:100;
+        top:95%
+}
+.carousel-control.left, .carousel-control.right {
+   background-image:none !important;
+   filter:none !important;
+}
+
+// utility class for centering divs
+.center {
+     float: none;
+     margin-left: auto;
+     margin-right: auto;
+}
+
 // add back underlined links, because we like them
 a {
     text-decoration: underline;
