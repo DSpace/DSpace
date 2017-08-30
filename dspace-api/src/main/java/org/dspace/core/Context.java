@@ -39,8 +39,8 @@ import java.util.*;
  * changes and free up the resources.
  * <P>
  * The context object is also used as a cache for CM API objects.
- *
- *
+ * 
+ * 
  * @version $Revision$
  */
 public class Context
@@ -129,7 +129,7 @@ public class Context
     /**
      * Construct a new context object with the given mode enabled. A database connection is opened.
      * No user is authenticated.
-     *
+     * 
      * @param mode   The mode to use when opening the context.
      */
     public Context(Mode mode)
@@ -139,7 +139,7 @@ public class Context
     }
 
     /**
-     * Initializes a new context object.
+     * Initializes a new context object. 
      *
      * @exception SQLException
      *                if there was an error obtaining a database connection
@@ -185,7 +185,7 @@ public class Context
 
     /**
      * Get the database connection associated with the context
-     *
+     * 
      * @return the database connection
      */
     DBConnection getDBConnection()
@@ -205,7 +205,7 @@ public class Context
     /**
      * Set the current user. Authentication must have been performed by the
      * caller - this call does not attempt any authentication.
-     *
+     * 
      * @param user
      *            the new current user, or <code>null</code> if no user is
      *            authenticated
@@ -217,7 +217,7 @@ public class Context
 
     /**
      * Get the current (authenticated) user
-     *
+     * 
      * @return the current user, or <code>null</code> if no user is
      *         authenticated
      */
@@ -228,7 +228,7 @@ public class Context
 
     /**
      * Gets the current Locale
-     *
+     * 
      * @return Locale the current Locale
      */
     public Locale getCurrentLocale()
@@ -238,7 +238,7 @@ public class Context
 
     /**
      * set the current Locale
-     *
+     * 
      * @param locale
      *            the current Locale
      */
@@ -249,7 +249,7 @@ public class Context
 
     /**
      * Find out if the authorisation system should be ignored for this context.
-     *
+     * 
      * @return <code>true</code> if authorisation should be ignored for this
      *         session.
      */
@@ -282,7 +282,7 @@ public class Context
      * <code>
      *     mycontext.turnOffAuthorisationSystem();
      *     some java code that require no authorisation check
-     *     mycontext.restoreAuthSystemState();
+     *     mycontext.restoreAuthSystemState(); 
          * </code> If Context debug is enabled, the correct sequence calling will be
      * checked and a warning will be displayed if not.
      */
@@ -331,7 +331,7 @@ public class Context
      * current Web user's session:
      * <P>
      * <code>setExtraLogInfo("session_id="+request.getSession().getId());</code>
-     *
+     * 
      * @param info
      *            the extra information to log
      */
@@ -343,7 +343,7 @@ public class Context
     /**
      * Get extra information to be logged with message logged in the scope of
      * this context.
-     *
+     * 
      * @return the extra log info - guaranteed non- <code>null</code>
      */
     public String getExtraLogInfo()
@@ -358,7 +358,7 @@ public class Context
      * <p>
      * Calling complete() on a Context which is no longer valid (isValid()==false),
      * is a no-op.
-     *
+     * 
      * @exception SQLException
      *                if there was an error completing the database transaction
      *                or closing the connection
@@ -406,26 +406,36 @@ public class Context
         // If Context is no longer open/valid, just note that it has already been closed
         if(!isValid()) {
             log.info("commit() was called on a closed Context object. No changes to commit.");
-            return;
         }
 
         if(isReadOnly()) {
             throw new UnsupportedOperationException("You cannot commit a read-only context");
         }
 
-        // As long as we have a valid, writeable database connection,
-        // commit any changes made as part of the transaction
-        if(log.isDebugEnabled()) {
-            log.debug("Cache size on commit is " + getCacheSize());
+        // Our DB Connection (Hibernate) will decide if an actual commit is required or not
+        try
+        {
+            // As long as we have a valid, writeable database connection,
+            // commit any changes made as part of the transaction
+            if (isValid())
+            {
+                // Dispatch events before committing changes to the database,
+                // as the consumers may change something too
+                dispatchEvents();
+            }
+
+        } finally {
+            if(log.isDebugEnabled()) {
+                log.debug("Cache size on commit is " + getCacheSize());
+            }
+
+            if(dbConnection != null)
+            {
+                //Commit our changes
+                dbConnection.commit();
+                reloadContextBoundEntities();
+            }
         }
-
-        //Commit our changes to database, finalizing the transaction
-        dbConnection.commit();
-        // Refresh any entities required to be in Context
-        reloadContextBoundEntities();
-
-        // Finally, dispatch events to event consumers
-        dispatchEvents();
     }
 
 
@@ -454,7 +464,7 @@ public class Context
 
     /**
      * Select an event dispatcher, <code>null</code> selects the default
-     *
+     * 
      * @param dispatcher dispatcher
      */
     public void setDispatcher(String dispatcher)
@@ -469,12 +479,12 @@ public class Context
 
     /**
      * Add an event to be dispatched when this context is committed.
-     *
+     * 
      * @param event
      */
     public void addEvent(Event event)
     {
-        /*
+        /* 
          * invalid condition if in read-only mode: events - which
          * indicate mutation - are firing: no recourse but to bail
          */
@@ -493,7 +503,7 @@ public class Context
     /**
      * Get the current event list. If there is a separate list of events from
      * already-committed operations combine that with current list.
-     *
+     * 
      * @return List of all available events.
      */
     public LinkedList<Event> getEvents()
@@ -566,10 +576,10 @@ public class Context
     }
 
     /**
-     *
+     * 
      * Find out if this context is valid. Returns <code>false</code> if this
      * context has been aborted or completed.
-     *
+     * 
      * @return <code>true</code> if the context is still valid, otherwise
      *         <code>false</code>
      */
@@ -581,7 +591,7 @@ public class Context
 
     /**
      * Reports whether context supports updating DSpaceObjects, or only reading.
-     *
+     * 
      * @return <code>true</code> if the context is read-only, otherwise
      *         <code>false</code>
      */
@@ -599,7 +609,7 @@ public class Context
 
     /**
      * test if member of special group
-     *
+     * 
      * @param groupID
      *            ID of special group to test
      * @return true if member
