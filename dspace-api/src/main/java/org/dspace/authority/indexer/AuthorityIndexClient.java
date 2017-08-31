@@ -72,6 +72,8 @@ public class AuthorityIndexClient {
                 for (AuthorityValue authorityValue : authorityValues) {
                     toIndexValues.put(authorityValue.getId(), authorityValue);
                 }
+
+                context.uncacheEntity(item);
             }
         }
 
