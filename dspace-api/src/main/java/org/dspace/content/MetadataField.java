@@ -13,10 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -590,8 +587,8 @@ public class MetadataField
     {
         if (!isCacheInitialized())
         {
-            Map<Integer, MetadataField> new_id2field = new HashMap<Integer, MetadataField>();
-            Map<String, MetadataField> new_term2field = new HashMap<String, MetadataField>();
+            Map<Integer, MetadataField> new_id2field = new TreeMap<Integer, MetadataField>();
+            Map<String, MetadataField> new_term2field = new TreeMap<String, MetadataField>();
             log.info("Loading MetadataField elements into cache.");
 
             Context context = null;
