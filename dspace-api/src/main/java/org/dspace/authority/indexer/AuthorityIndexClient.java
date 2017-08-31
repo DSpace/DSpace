@@ -62,19 +62,15 @@ public class AuthorityIndexClient {
         for (AuthorityIndexerInterface indexerInterface : indexers) {
             log.info("Initialize " + indexerInterface.getClass().getName());
             System.out.println("Initialize " + indexerInterface.getClass().getName());
+
             Iterator<Item> allItems = itemService.findAll(context);
             while (allItems.hasNext()) {
                 Item item = allItems.next();
 
-                indexerInterface.init(context, item);
-                while (indexerInterface.hasMore()) {
-                    AuthorityValue authorityValue = indexerInterface.nextValue();
-                    if(authorityValue != null){
-                        toIndexValues.put(authorityValue.getId(), authorityValue);
-                    }
+                List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(context, item);
+                for (AuthorityValue authorityValue : authorityValues) {
+                    toIndexValues.put(authorityValue.getId(), authorityValue);
                 }
-                //Close up
-                indexerInterface.close();
             }
         }
 
