@@ -465,8 +465,8 @@ public class JournalUtils {
         SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
             log.error("starting search");
-            int pubNameFieldID = MetadataField.findByElement(context,"prism.publicationName").getFieldID();
-            int dateAccFieldID = MetadataField.findByElement(context,"dc.date.accessioned").getFieldID();
+            int pubNameFieldID = MetadataField.findByElement("prism.publicationName").getFieldID();
+            int dateAccFieldID = MetadataField.findByElement("dc.date.accessioned").getFieldID();
             String querystring = "select * from ArchivedPackagesForJournal(?, ?, ?)";
             TableRowIterator tri = DatabaseManager.query(context, querystring, journalConcept.getFullName(), pubNameFieldID, dateAccFieldID);
             while (tri.hasNext()) {

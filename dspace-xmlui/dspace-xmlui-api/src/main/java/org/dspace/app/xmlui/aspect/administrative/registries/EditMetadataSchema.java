@@ -119,8 +119,8 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		int schemaID = parameters.getParameterAsInteger("schemaID",-1);
 		int updateID = parameters.getParameterAsInteger("updateID",-1);
 		int highlightID = parameters.getParameterAsInteger("highlightID",-1);
-		MetadataSchema schema = MetadataSchema.find(context,schemaID);
-		MetadataField[] fields = MetadataField.findAllInSchema(context, schemaID);
+		MetadataSchema schema = MetadataSchema.find(schemaID);
+		MetadataField[] fields = MetadataField.findAllInSchema(schemaID);
 		String schemaName = schema.getName();
 		String schemaNamespace = schema.getNamespace();
 		
@@ -219,7 +219,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			// Only show the actions if there are fields available to preform them on.
 			Para actions = main.addPara();
 			actions.addButton("submit_delete").setValue(T_submit_delete);
-			if (MetadataSchema.findAll(context).length > 1)
+			if (MetadataSchema.findAll().length > 1)
             {
                 actions.addButton("submit_move").setValue(T_submit_move);
             }
@@ -287,7 +287,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	public void addUpdateFieldForm(Division div, String schemaName, int fieldID, java.util.List<String> errors) throws WingException, SQLException
 	{
 		
-		MetadataField field = MetadataField.find(context, fieldID);
+		MetadataField field = MetadataField.find(fieldID);
 		
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		String elementValue = request.getParameter("updateElement");

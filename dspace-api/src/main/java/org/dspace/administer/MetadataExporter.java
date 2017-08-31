@@ -108,19 +108,19 @@ public class MetadataExporter
         if (schema != null && !"".equals(schema))
         {
             // Get the id of that schema
-            MetadataSchema mdSchema = MetadataSchema.find(context, schema);
+            MetadataSchema mdSchema = MetadataSchema.find(schema);
             if (mdSchema == null)
             {
                 throw new RegistryExportException("no schema to export");
             }
             
             // Get the metadata fields only for the specified schema
-            mdFields = MetadataField.findAllInSchema(context, mdSchema.getSchemaID());
+            mdFields = MetadataField.findAllInSchema(mdSchema.getSchemaID());
         }
         else
         {
             // Get the metadata fields for all the schemas
-            mdFields = MetadataField.findAll(context);
+            mdFields = MetadataField.findAll();
         }
         
         // Output the metadata fields
@@ -150,14 +150,14 @@ public class MetadataExporter
         if (schema != null && !"".equals(schema))
         {
             // Find a single named schema
-            MetadataSchema mdSchema = MetadataSchema.find(context, schema);
+            MetadataSchema mdSchema = MetadataSchema.find(schema);
             
             saveSchema(xmlSerializer, mdSchema);
         }
         else
         {
             // Find all schemas
-            MetadataSchema[] mdSchemas = MetadataSchema.findAll(context);
+            MetadataSchema[] mdSchemas = MetadataSchema.findAll();
             
             for (MetadataSchema mdSchema : mdSchemas)
             {
@@ -297,7 +297,7 @@ public class MetadataExporter
         if (name == null)
         {
             // Name not retrieved before, so get the schema now
-            MetadataSchema mdSchema = MetadataSchema.find(context, mdField.getSchemaID());
+            MetadataSchema mdSchema = MetadataSchema.find(mdField.getSchemaID());
             if (mdSchema != null)
             {
                 name = mdSchema.getName();

@@ -168,16 +168,8 @@ public class DSpaceCSV implements Serializable
                         metadataQualifier = parts[2];
                     }
 
-                    // Check that the scheme exists
-                    MetadataSchema foundSchema = MetadataSchema.find(c, metadataSchema);
-                    if (foundSchema == null) {
-                        throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.SCHEMA);
-                    }
-
                     // Check that the metadata element exists in the schema
-                    int schemaID = foundSchema.getSchemaID();
-                    MetadataField foundField = MetadataField.findByElement(c, schemaID, metadataElement, metadataQualifier);
+                    MetadataField foundField = MetadataField.findByElement(metadataSchema, metadataElement, metadataQualifier);
                     if (foundField == null) {
                         throw new MetadataImportInvalidHeadingException(clean[0],
                                                                         MetadataImportInvalidHeadingException.ELEMENT);

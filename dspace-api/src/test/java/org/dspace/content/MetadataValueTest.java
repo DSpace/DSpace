@@ -8,7 +8,6 @@
 package org.dspace.content;
 
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 import org.dspace.AbstractUnitTest;
@@ -63,8 +62,8 @@ public class MetadataValueTest extends AbstractUnitTest
         try
         {
             context.turnOffAuthorisationSystem();
-            this.mf = MetadataField.findByElement(context,
-                    MetadataSchema.DC_SCHEMA_ID, element, qualifier);
+            this.mf = MetadataField.findByElement(
+                    MetadataSchema.DC_SCHEMA, element, qualifier);
             this.mv = new MetadataValue(mf);
             this.mv.setItemId(Item.create(context).getID());
             context.commit();

@@ -100,7 +100,7 @@ public class MetadataIntegrationTest  extends AbstractIntegrationTest
         assertThat("testCreateSchema 1", field1.getSchemaID(), equalTo(schema.getSchemaID()));
         assertThat("testCreateSchema 2", field2.getSchemaID(), equalTo(schema.getSchemaID()));
 
-        MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
+        MetadataField[] fields = MetadataField.findAllInSchema(schema.getSchemaID());
         assertTrue("testCreateSchema 3", fields.length == 2);
         boolean exist = true;
         for(MetadataField f : fields)

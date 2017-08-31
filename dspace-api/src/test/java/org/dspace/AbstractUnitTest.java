@@ -161,7 +161,7 @@ public class AbstractUnitTest
             //we can't check via a boolean value (even static) as the class is destroyed by the
             //JUnit classloader. We rely on a value that will always be in the database if it has
             //been initialized to avoid doing the work twice            
-            if(MetadataField.find(ctx, 1) == null)
+            if(MetadataField.find(1) == null)
             {
                 String base = testProps.getProperty("test.folder") + File.separator + "config"+ File.separator +"registries"+ File.separator;
 

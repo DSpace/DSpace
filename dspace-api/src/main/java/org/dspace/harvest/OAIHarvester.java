@@ -677,7 +677,7 @@ public class OAIHarvester {
     	for (DCValue value : values) 
     	{
     		// Verify that the schema exists
-    		MetadataSchema mdSchema = MetadataSchema.find(ourContext, value.schema);
+    		MetadataSchema mdSchema = MetadataSchema.find(value.schema);
     		if (mdSchema == null && !clearList.contains(value.schema)) {
     			// add a new schema, giving it a namespace of "unknown". Possibly a very bad idea.
     			if (schemaChoice.equals("add")) {
@@ -706,7 +706,7 @@ public class OAIHarvester {
 
             if (mdSchema != null) {
                 // Verify that the element exists; this part is reachable only if the metadata schema is valid
-                MetadataField mdField = MetadataField.findByElement(ourContext, mdSchema.getSchemaID(), value.element, value.qualifier);
+                MetadataField mdField = MetadataField.findByElement(mdSchema.getName(), value.element, value.qualifier);
                 if (mdField == null) {
                     if (fieldChoice.equals("add")) {
                         mdField = new MetadataField(mdSchema, value.element, value.qualifier, null);

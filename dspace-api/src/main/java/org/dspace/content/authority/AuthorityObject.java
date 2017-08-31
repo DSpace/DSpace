@@ -7,26 +7,19 @@
  */
 package org.dspace.content.authority;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 
-import java.lang.reflect.Array;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -56,6 +49,7 @@ public abstract class AuthorityObject extends DSpaceObject {
     /** The row in the table representing this object */
     protected TableRow myRow;
 
+    private HashMap<Integer, ArrayList<AuthorityMetadataValue>> cachedMetadataValues;
     AuthorityObject(Context context, TableRow row) throws SQLException
     {
         myRow = row;
@@ -220,45 +214,23 @@ public abstract class AuthorityObject extends DSpaceObject {
      */
     public abstract String getMetadataTable();
 
-    public ArrayList<AuthorityMetadataValue> getMetadata(Context context, String schemaName, String element, String qualifier) {
-        ArrayList<AuthorityMetadataValue> metadataValues;
-        metadataValues = new ArrayList<AuthorityMetadataValue>();
+    public ArrayList<AuthorityMetadataValue> getMetadata(String schemaName, String element, String qualifier) {
+
+        ArrayList<AuthorityMetadataValue> resultMetadataValues = new ArrayList<AuthorityMetadataValue>();
 
         try {
-            MetadataField field = null;
             if (Item.ANY.equals(schemaName)) {
                 if (Item.ANY.equals(element)) {
                     // return all metadata for this item
                     return getMetadata();
                 }
-                MetadataSchema[] schemas = MetadataSchema.findAll(context);
-                for (int i=0; i<schemas.length; i++) {
-                    field = MetadataField.findByElement(context, schemas[i].getName(), element, qualifier);
-                    if (field != null) {
-                        break;
-                    }
-                }
             } else {
-                field = MetadataField.findByElement(context, schemaName, element, qualifier);
-            }
-            if (field == null) {
-                throw new SQLException("no such field " + schemaName + "." + element + "." + qualifier);
-            }
-            TableRowIterator tri = DatabaseManager.queryTable(context, this.getMetadataTable() ,
-                        "SELECT * FROM " + this.getMetadataTable() + " WHERE parent_id= ? AND field_id= ?",
-                        getID(), field.getFieldID());
-
-            if (tri != null) {
-                try {
-                    while (tri.hasNext()) {
-                        TableRow resultRow = tri.next();
-                        AuthorityMetadataValue amv = new AuthorityMetadataValue(context, resultRow);
-                        metadataValues.add(amv);
-                    }
-                } finally {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null) {
-                        tri.close();
+                MetadataField field = MetadataField.findByElement(schemaName, element, qualifier);
+                if (field == null) {
+                    throw new SQLException("no such field " + schemaName + "." + element + "." + qualifier);
+                } else {
+                    if (getCachedMetadata().get(field.getFieldID()) != null) {
+                        resultMetadataValues.addAll(getCachedMetadata().get(field.getFieldID()));
                     }
                 }
             }
@@ -266,12 +238,28 @@ public abstract class AuthorityObject extends DSpaceObject {
             log.error("cannot load metadata: " + e.getMessage());
         }
 
-        return metadataValues;
+        return resultMetadataValues;
     }
 
     public ArrayList<AuthorityMetadataValue> getMetadata() {
-        ArrayList<AuthorityMetadataValue> metadataValues;
-        metadataValues = new ArrayList<AuthorityMetadataValue>();
+        ArrayList<AuthorityMetadataValue> resultList = new ArrayList<AuthorityMetadataValue>();
+        // return all metadata for this item
+        for (ArrayList<AuthorityMetadataValue> fieldList : getCachedMetadata().values()) {
+            resultList.addAll(fieldList);
+        }
+        return resultList;
+    }
+
+    // get all metadata associated with an AuthorityObject
+    private HashMap<Integer, ArrayList<AuthorityMetadataValue>> getCachedMetadata() {
+        // if cached values present, return cache
+        if (cachedMetadataValues != null) {
+            log.debug("hey, cached");
+            return cachedMetadataValues;
+        }
+
+        // otherwise, refresh cache
+        cachedMetadataValues = new HashMap<Integer, ArrayList<AuthorityMetadataValue>>();
         Context context = getContext();
         try {
             TableRowIterator tri = DatabaseManager.queryTable(context, this.getMetadataTable() ,
@@ -283,7 +271,10 @@ public abstract class AuthorityObject extends DSpaceObject {
                     while (tri.hasNext()) {
                         TableRow resultRow = tri.next();
                         AuthorityMetadataValue amv = new AuthorityMetadataValue(context, resultRow);
-                        metadataValues.add(amv);
+                        if (cachedMetadataValues.get(amv.fieldId) == null) {
+                            cachedMetadataValues.put(amv.fieldId, new ArrayList<AuthorityMetadataValue>());
+                        }
+                        cachedMetadataValues.get(amv.fieldId).add(amv);
                     }
                 } finally {
                     // close the TableRowIterator to free up resources
@@ -298,46 +289,9 @@ public abstract class AuthorityObject extends DSpaceObject {
             abortContext(context);
         }
 
-        return metadataValues;
+        return cachedMetadataValues;
     }
-
-    /**
-     * Get all metadata for a given term for ALL AuthorityObjects. This method is for initializing runtime structures.
-     * @param mdString
-     * @return
-     */
-    public static ArrayList<AuthorityMetadataValue> getAllAuthorityMetadataValues(String mdTable, String mdString) {
-        ArrayList<AuthorityMetadataValue> resultSet = new ArrayList<AuthorityMetadataValue>();
-        Context context = null;
-        try {
-            context = new Context();
-            int field_id = MetadataField.findByElement(context, mdString).getFieldID();
-            TableRowIterator tri = DatabaseManager.queryTable(context, mdTable,
-                    "SELECT * FROM " + mdTable + " WHERE field_id = ? ORDER BY parent_id",
-                    field_id);
-
-            if (tri != null) {
-                try {
-                    while (tri.hasNext()) {
-                        TableRow resultRow = tri.next();
-                        AuthorityMetadataValue amv = new AuthorityMetadataValue(context, resultRow);
-                        resultSet.add(amv);
-                    }
-                } finally {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null) {
-                        tri.close();
-                    }
-                }
-            }
-            context.complete();
-        } catch (SQLException e) {
-            log.error("cannot load metadata: " + e.getMessage());
-            context.abort();
-        }
-        return resultSet;
-    }
-
+    
     /**
      * Get metadata for the item in a chosen schema.
      * See <code>MetadataSchema</code> for more information about schemas.
@@ -385,24 +339,20 @@ public abstract class AuthorityObject extends DSpaceObject {
      * @return metadata fields that match the parameters
      */
     public AuthorityMetadataValue[] getMetadata(String schema, String element, String qualifier, String lang) {
-        Context context = getContext();
-        try {
-            // Build up list of matching values
-            List<AuthorityMetadataValue> values = new ArrayList<AuthorityMetadataValue>();
-            ArrayList<AuthorityMetadataValue> amvList = getMetadata(context, schema, element, qualifier);
-            for (AuthorityMetadataValue amv : amvList) {
-                if (match(schema, element, qualifier, lang, amv)) {
-                    values.add(amv);
-                }
+        // Build up list of matching values
+        List<AuthorityMetadataValue> values = new ArrayList<AuthorityMetadataValue>();
+        ArrayList<AuthorityMetadataValue> amvList = getMetadata(schema, element, qualifier);
+        for (AuthorityMetadataValue amv : amvList) {
+            if (match(schema, element, qualifier, lang, amv)) {
+                values.add(amv);
             }
+        }
 
-            // Create an array of matching values
+        // Create an array of matching values
+        if (values.size() > 0) {
             AuthorityMetadataValue[] valueArray = new AuthorityMetadataValue[values.size()];
             valueArray = (AuthorityMetadataValue[]) values.toArray(valueArray);
-            completeContext(context);
             return valueArray;
-        } catch (SQLException e) {
-            abortContext(context);
         }
         return new AuthorityMetadataValue[0];
     }
@@ -472,7 +422,7 @@ public abstract class AuthorityObject extends DSpaceObject {
 
     public void clearMetadata(Context context, String schema, String element, String qualifier, String lang) {
         try {
-            ArrayList<AuthorityMetadataValue> amvList = getMetadata(context, schema, element, qualifier);
+            ArrayList<AuthorityMetadataValue> amvList = getMetadata(schema, element, qualifier);
             for (AuthorityMetadataValue amv : amvList) {
                 DatabaseManager.updateQuery(context, "DELETE FROM " + getMetadataTable() + " WHERE id= ? ", amv.getValueId());
             }
@@ -480,6 +430,8 @@ public abstract class AuthorityObject extends DSpaceObject {
         } catch (SQLException e) {
             log.error("couldn't clear metadata for " + getID() + ": " + schema + "." + element + "." + qualifier + ", lang=" + lang);
         }
+        // invalidate cache
+        cachedMetadataValues = null;
     }
 
     private boolean match(String schema, String element, String qualifier,
@@ -551,7 +503,7 @@ public abstract class AuthorityObject extends DSpaceObject {
         ArrayList<AuthorityMetadataValue> metadataValues = new ArrayList<AuthorityMetadataValue>();
         try {
             // verify that this is a valid schema.element.qualifier:
-            MetadataField field = MetadataField.findByElement(context, schema, element, qualifier);
+            MetadataField field = MetadataField.findByElement(schema, element, qualifier);
             if (field == null) {
                 throw new SQLException("bad_dublin_core " + "schema=" + schema + ", " + element + " " + qualifier);
             }
@@ -604,7 +556,7 @@ public abstract class AuthorityObject extends DSpaceObject {
                 addDetails(fieldName);
             }
             // add the new values into the metadataTable, starting with the last place.
-            ArrayList<AuthorityMetadataValue> amvList = getMetadata(context, schema, element, qualifier);
+            ArrayList<AuthorityMetadataValue> amvList = getMetadata(schema, element, qualifier);
             int placeNum = amvList.size() + 1;
             for (AuthorityMetadataValue amv : metadataValues) {
                 AuthorityMetadataValue metadata = new AuthorityMetadataValue(this.getMetadataTable());
@@ -620,6 +572,8 @@ public abstract class AuthorityObject extends DSpaceObject {
         } catch (SQLException e) {
             log.error("couldn't add metadata for " + getID() + ": " + schema + "." + element + "." + qualifier + ", lang=" + lang);
         }
+        // invalidate cache
+        cachedMetadataValues = null;
     }
 
     public void addMetadata(Context context, String mdString, String value) {
@@ -693,6 +647,8 @@ public abstract class AuthorityObject extends DSpaceObject {
 
         context.commit();
         log.info(LogManager.getHeader(context, "delete_" + TABLE , "id=" + getID()));
+        // invalidate cache
+        cachedMetadataValues = null;
     }
 
     protected void deleteAssociatedData(Context context) throws SQLException, AuthorizeException {

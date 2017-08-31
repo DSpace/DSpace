@@ -245,8 +245,8 @@ public class FlowItemUtils
 		String value = request.getParameter("value");
 		String language = request.getParameter("language");
 		
-		MetadataField field = MetadataField.find(context,Integer.valueOf(fieldID));
-		MetadataSchema schema = MetadataSchema.find(context,field.getSchemaID());
+		MetadataField field = MetadataField.find(Integer.valueOf(fieldID));
+		MetadataSchema schema = MetadataSchema.find(field.getSchemaID());
 		
 		item.addMetadata(schema.getName(), field.getElement(), field.getQualifier(), language, value);
 		

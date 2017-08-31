@@ -97,7 +97,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
 				errors.add(error);
             }
 		}
-		MetadataSchema[] schemas = MetadataSchema.findAll(context); 
+		MetadataSchema[] schemas = MetadataSchema.findAll();
         
 		
 		

@@ -564,8 +564,8 @@ public class CollectionWizardServlet extends DSpaceServlet
 
             if ((dcTypeID != -1) && (value != null) && !value.equals(""))
             {
-                MetadataField field = MetadataField.find(context,dcTypeID);
-                MetadataSchema schema = MetadataSchema.find(context,field.getSchemaID());
+                MetadataField field = MetadataField.find(dcTypeID);
+                MetadataSchema schema = MetadataSchema.find(field.getSchemaID());
                 item.addMetadata(schema.getName(),field.getElement(), field.getQualifier(), lang, value);
             }
         }
@@ -699,7 +699,7 @@ public class CollectionWizardServlet extends DSpaceServlet
             // Next page is 'default item' iff there's a default item
             if (collection.getTemplateItem() != null)
             {
-                MetadataField[] types = MetadataField.findAll(context);
+                MetadataField[] types = MetadataField.findAll();
                 request.setAttribute("dctypes", types);
                 JSPManager.showJSP(request, response,
                         "/dspace-admin/wizard-default-item.jsp");
