@@ -52,7 +52,7 @@ public class AuthorityServiceImpl implements AuthorityService{
             while (indexerInterface.hasMore()) {
                 AuthorityValue authorityValue = indexerInterface.nextValue();
                 if(authorityValue != null)
-                    indexingService.indexContent(authorityValue, true);
+                    indexingService.indexContent(authorityValue);
             }
             //Close up
             indexerInterface.close();
