@@ -185,6 +185,14 @@ public class MetadataField
         return schemaID;
     }
 
+    public String getSchemaName() {
+        return MetadataSchema.find(schemaID).getName();
+    }
+
+    public String getFieldName() {
+        return String.join(".", getSchemaName(), getElement(), getQualifier());
+    }
+
     /**
      * Set the schema record key.
      *
