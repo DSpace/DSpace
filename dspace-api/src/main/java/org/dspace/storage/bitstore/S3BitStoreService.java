@@ -31,21 +31,24 @@ import java.util.Map;
 /**
  * Asset store using Amazon's Simple Storage Service (S3).
  * S3 is a commercial, web-service accessible, remote storage facility.
+ * The S3 API is implemented by contributors (like Ceph). You can use
+ * alternative implementations by offering an endpoint URL.
  * NB: you must have obtained an account with Amazon to use this store
- * 
+ *
  * @author Richard Rodgers, Peter Dietz
- */ 
+ */
 
 public class S3BitStoreService implements BitStoreService
 {
     /** log4j log */
     private static Logger log = Logger.getLogger(S3BitStoreService.class);
-    
+
     /** Checksum algorithm */
     private static final String CSA = "MD5";
 
     private String awsAccessKey;
     private String awsSecretKey;
+    private String awsEndpoint;
     private String awsRegionName;
 
     /** container for all the assets */
@@ -53,7 +56,7 @@ public class S3BitStoreService implements BitStoreService
 
     /** (Optional) subfolder within bucket where objects are stored */
     private String subfolder = null;
-    
+
     /** S3 service */
     private AmazonS3 s3Service = null;
 
@@ -76,6 +79,11 @@ public class S3BitStoreService implements BitStoreService
         // init client
         AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
         s3Service = new AmazonS3Client(awsCredentials);
+
+        // endpoint name
+        if (StringUtils.isNotEmpty(awsEndpoint)) {
+            s3Service.setEndpoint(awsEndpoint);
+        }
 
         // bucket name
         if (StringUtils.isEmpty(bucketName)) {
@@ -109,12 +117,12 @@ public class S3BitStoreService implements BitStoreService
 
         log.info("AWS S3 Assetstore ready to go! bucket:"+bucketName);
     }
-    
 
-    
+
+
     /**
      * Return an identifier unique to this asset store instance
-     * 
+     *
      * @return a unique ID
      */
     public String generateId()
@@ -125,7 +133,7 @@ public class S3BitStoreService implements BitStoreService
     /**
      * Retrieve the bits for the asset with ID. If the asset does not
      * exist, returns null.
-     * 
+     *
      * @param bitstream
      *            The ID of the asset to retrieve
      * @throws java.io.IOException
@@ -285,6 +293,15 @@ public class S3BitStoreService implements BitStoreService
     @Required
     public void setAwsSecretKey(String awsSecretKey) {
         this.awsSecretKey = awsSecretKey;
+    }
+
+    public String getAwsEndpoint() {
+        return awsEndpoint;
+    }
+
+    @Required
+    public void setAwsEndpoint(String awsEndpoint) {
+        this.awsEndpoint = awsEndpoint;
     }
 
     public String getAwsRegionName() {
