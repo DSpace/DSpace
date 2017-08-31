@@ -615,12 +615,9 @@ public class MetadataField
                 while (tri.hasNext())
                 {
                     TableRow row = tri.next();
-                    int fieldID = row.getIntColumn("metadata_field_id");
                     MetadataField mf = new MetadataField(row);
-                    String term = String.join(".", MetadataSchema.find(mf.schemaID).getName(), mf.getElement(), mf.getQualifier());
-                    log.info("adding field " + fieldID + " with term " + term);
-                    new_id2field.put(Integer.valueOf(fieldID), mf);
-                    new_term2field.put(term, mf);
+                    new_id2field.put(mf.getFieldID(), mf);
+                    new_term2field.put(mf.getFieldName(), mf);
                 }
             }
             finally
