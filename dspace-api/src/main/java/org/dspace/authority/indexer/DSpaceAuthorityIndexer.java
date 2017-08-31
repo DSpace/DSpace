@@ -73,6 +73,13 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
     public List<AuthorityValue> getAuthorityValues(Context context, Item item)
             throws SQLException, AuthorizeException
     {
+        return getAuthorityValues(context, item, null);
+    }
+
+    @Override
+    public List<AuthorityValue> getAuthorityValues(Context context, Item item, Map<String, AuthorityValue> cache)
+            throws SQLException, AuthorizeException
+    {
         List<AuthorityValue> values = new ArrayList<>();
 
         for (String metadataField : metadataFields) {
@@ -86,7 +93,17 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 boolean requiresItemUpdate = StringUtils.isBlank(authorityKey) ||
                         StringUtils.startsWith(authorityKey, AuthorityValueService.GENERATE);
 
-                AuthorityValue value = getAuthorityValue(context, metadataField, content, authorityKey);
+                AuthorityValue value = null;
+                if (StringUtils.isBlank(authorityKey) && cache != null) {
+                    // This is a value currently without an authority. So query
+                    // the cache, if an authority is found for the exact value.
+                    value = cache.get(content);
+                }
+
+                if (value == null)
+                {
+                    value = getAuthorityValue(context, metadataField, content, authorityKey);
+                }
 
                 if (value != null && requiresItemUpdate) {
                     value.updateItem(context, item, metadataValue);
@@ -95,6 +112,10 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                     } catch (Exception e) {
                         log.error("Error creating a metadatavalue's authority", e);
                     }
+                }
+
+                if (cache != null) {
+                    cache.put(content, value);
                 }
 
                 values.add(value);

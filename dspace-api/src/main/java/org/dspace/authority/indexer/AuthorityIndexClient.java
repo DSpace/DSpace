@@ -64,10 +64,11 @@ public class AuthorityIndexClient {
             System.out.println("Initialize " + indexerInterface.getClass().getName());
 
             Iterator<Item> allItems = itemService.findAll(context);
+            Map<String, AuthorityValue> authorityCache = new HashMap<>();
             while (allItems.hasNext()) {
                 Item item = allItems.next();
 
-                List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(context, item);
+                List<AuthorityValue> authorityValues = indexerInterface.getAuthorityValues(context, item, authorityCache);
                 for (AuthorityValue authorityValue : authorityValues) {
                     toIndexValues.put(authorityValue.getId(), authorityValue);
                 }

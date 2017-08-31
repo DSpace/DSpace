@@ -15,6 +15,7 @@ import org.dspace.core.Context;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -26,6 +27,9 @@ import java.util.List;
 public interface AuthorityIndexerInterface {
 
     public List<AuthorityValue> getAuthorityValues(Context context, Item item)
+            throws SQLException, AuthorizeException;
+
+    public List<AuthorityValue> getAuthorityValues(Context context, Item item, Map<String, AuthorityValue> cache)
             throws SQLException, AuthorizeException;
 
     public boolean isConfiguredProperly();
