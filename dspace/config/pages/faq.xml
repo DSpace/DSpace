@@ -46,6 +46,7 @@
         <pageMeta>
             <metadata element="title">VSim FAQ</metadata>
             <trail target="../">VSim Home</trail>
+            <trail target="#">VSim FAQ</trail>
         </pageMeta>
     </meta>
 

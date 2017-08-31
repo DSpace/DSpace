@@ -23,6 +23,7 @@
         <pageMeta>
             <metadata element="title">About VSim</metadata>
             <trail target="../">VSim Home</trail>
+            <trail target="#">About VSim</trail>
         </pageMeta>
     </meta>
 

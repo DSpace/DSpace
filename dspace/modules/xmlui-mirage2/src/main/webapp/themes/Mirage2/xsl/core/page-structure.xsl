@@ -101,14 +101,89 @@
 
                             <div id="main-container" class="container">
 
+
+
+
                                 <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
                                         <div class="col-xs-12 col-sm-12 col-md-9 main-content">
+
+                                    <xsl:choose>
+                                        <!-- if this is the main home page, show the main hero block, the featured collection block, and the fancy buttons -->
+                                        <xsl:when test="normalize-space($request-uri)=''">
+                                            <h1 class="text-center">Let VSim facilitate real-time<br/>exploration in your classroom</h1>
+                                            <div class="container">
+                                            <div class="row-fluid">
+                                                <div class="span8">
+                                                <div class="hero-unit">
+                                                    <h1>Digital Karnak</h1>
+                                                    <p>This is a bit about the featured collection, Digital Karnak.</p>
+                                                </div>
+                                                </div>
+                                                <div class="span4">
+                                                insert digital karnak photo here
+                                                </div>
+                                            </div></div>
+                                            <p class="text-center">
+                                                    <a href="{$app_path}/pages/tour" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/TourLink.png" alt=" Tour "/></a>
+                                                    <a href="{$app_path}/pages/download" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/DownloadLink.png" alt=" Download "/></a>
+                                                    <a href="{$app_path}/discover" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/BrowseLink.png" alt=" Browse "/></a>
+                                            </p>
+                                        </xsl:when>
+                                        <!-- if this is the tour page, show the tour carousel -->
+                                        <xsl:when test="normalize-space($request-uri)='pages/tour'">
+
+                                        <div id="carousel-vsim" class="carousel slide" data-ride="carousel" data-interval="0">
+                                            <ol class="carousel-indicators">
+                                                <li data-target="#carousel-vsim" data-slide-to="0" class="active"></li>
+                                                <li data-target="#carousel-vsim" data-slide-to="1"></li>
+                                                <li data-target="#carousel-vsim" data-slide-to="2"></li>
+                                                <li data-target="#carousel-vsim" data-slide-to="3"></li>
+                                                <li data-target="#carousel-vsim" data-slide-to="4"></li>
+                                                <li data-target="#carousel-vsim" data-slide-to="5"></li>
+                                            </ol>
+                                            <div class="carousel-inner">
+                                                <div class="item active">
+                                                    <img src="/xmlui/themes/Mirage2/images/vsim-tour-0.jpg" alt="VSim: VSim is an interface for exploring computer models of historic sites and environments. It's flexible, and perfect for teaching and learning. This tour will guide you through the basic steps to get started."></img>
+                                                </div>
+                                                <div class="item">
+                                                    <img src="/xmlui/themes/Mirage2/images/vsim-tour-1.jpg" alt="1. Download and Install VSim: VSim is available for either Windows or Mac."></img>
+                                                </div>
+                                                <div class="item">
+                                                    <img src="/xmlui/themes/Mirage2/images/vsim-tour-2.jpg" alt="2. Download a model: Use the searchbox or Browse to find something that you want to explore. Save the model file on your computer."></img>
+                                                </div>
+                                                <div class="item">
+                                                    <img src="/xmlui/themes/Mirage2/images/vsim-tour-3.jpg" alt="3. Open your model: Launch VSim, and then open a model by clicing File > Open Model."></img>
+                                                </div>
+                                                <div class="item">
+                                                    <img src="/xmlui/themes/Mirage2/images/vsim-tour-4.jpg" alt="4. Learn to Navigate: Learning how to navigate in VSim is key to learning the software. Toggle through numbers 1,2, and 3 on your keyboard to activate different navigation modes."></img>
+                                                </div>
+                                                <div class="item">
+                                                    <img src="/xmlui/themes/Mirage2/images/vsim-tour-5.jpg" alt="5. Create and Explore: VSim's narrative and embedded resrouce features allow you to turn your model into and information rich learning environment."></img>
+                                                </div>
+                                            </div>
+                                          <!-- Left and right controls -->
+                                          <a class="left carousel-control" href="#carousel-vsim" data-slide="prev">
+                                            <span class="glyphicon glyphicon-chevron-left"></span>
+                                            <span class="sr-only">Previous</span>
+                                          </a>
+                                          <a class="right carousel-control" href="#carousel-vsim" data-slide="next">
+                                            <span class="glyphicon glyphicon-chevron-right"></span>
+                                            <span class="sr-only">Next</span>
+                                          </a>
+                                        </div>
+
+
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+
+                                            <!-- and now proceed with the normal content -->
                                             <xsl:apply-templates select="*[not(self::dri:options)]"/>
 
-                                            <script type="text/javascript">DSpace.getTemplate(vsim-carousel);</script>
 
-                                            <div class="hidden-lg">
+                                              <div class="hidden-lg">
                                                 <xsl:call-template name="buildFooter"/>
                                             </div>
                                         </div>
@@ -119,6 +194,9 @@
                                             <xsl:when test="string-length($request-uri)&gt;0 and not (starts-with($request-uri, 'pages/')) and not ($containerType='type:community' or $containerType='type:collection')">
                                                 <xsl:apply-templates select="dri:options"/>
                                             </xsl:when>
+
+
+
                                              <xsl:otherwise>
                                             </xsl:otherwise>
                                         </xsl:choose>
