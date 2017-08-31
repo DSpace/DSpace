@@ -100,25 +100,34 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                     value = cache.get(content);
                 }
 
-                if (value == null)
-                {
-                    value = getAuthorityValue(context, metadataField, content, authorityKey);
+                if (value == null) {
+                    value = getAuthorityValue(context, metadataField, content,authorityKey);
                 }
 
-                if (value != null && requiresItemUpdate) {
-                    value.updateItem(context, item, metadataValue);
-                    try {
-                        itemService.update(context, item);
-                    } catch (Exception e) {
-                        log.error("Error creating a metadatavalue's authority", e);
+                if (value != null) {
+                    if (requiresItemUpdate) {
+                        value.updateItem(context, item, metadataValue);
+
+                        try {
+                            itemService.update(context, item);
+                        }
+                        catch (Exception e) {
+                            log.error("Error creating a metadatavalue's authority", e);
+                        }
                     }
-                }
 
-                if (cache != null) {
-                    cache.put(content, value);
-                }
+                    if (cache != null) {
+                        cache.put(content, value);
+                    }
 
-                values.add(value);
+                    values.add(value);
+                }
+                else {
+                    log.error("Error getting an authority value for " +
+                            "the metadata value \"" + content + "\" " +
+                            "in the field \"" + metadataField + "\" " +
+                            "of the item " + item.getHandle());
+                }
             }
         }
 
