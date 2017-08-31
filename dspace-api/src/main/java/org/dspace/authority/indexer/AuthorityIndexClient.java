@@ -11,9 +11,13 @@ import org.dspace.authority.AuthorityValue;
 import org.apache.log4j.Logger;
 import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authority.service.AuthorityService;
+import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +35,7 @@ public class AuthorityIndexClient {
     protected static final AuthorityService authorityService = AuthorityServiceFactory.getInstance().getAuthorityService();
     protected static final AuthorityIndexingService indexingService = AuthorityServiceFactory.getInstance().getAuthorityIndexingService();
     protected static final List<AuthorityIndexerInterface> indexers = AuthorityServiceFactory.getInstance().getAuthorityIndexers();
+    protected static final ItemService itemService = ContentServiceFactory.getInstance().getItemService();
 
     public static void main(String[] args) throws Exception {
 
@@ -53,18 +58,24 @@ public class AuthorityIndexClient {
 
         //Get all our values from the input forms
         Map<String, AuthorityValue> toIndexValues = new HashMap<>();
+
         for (AuthorityIndexerInterface indexerInterface : indexers) {
             log.info("Initialize " + indexerInterface.getClass().getName());
             System.out.println("Initialize " + indexerInterface.getClass().getName());
-            indexerInterface.init(context, true);
-            while (indexerInterface.hasMore()) {
-                AuthorityValue authorityValue = indexerInterface.nextValue();
-                if(authorityValue != null){
-                    toIndexValues.put(authorityValue.getId(), authorityValue);
+            Iterator<Item> allItems = itemService.findAll(context);
+            while (allItems.hasNext()) {
+                Item item = allItems.next();
+
+                indexerInterface.init(context, item);
+                while (indexerInterface.hasMore()) {
+                    AuthorityValue authorityValue = indexerInterface.nextValue();
+                    if(authorityValue != null){
+                        toIndexValues.put(authorityValue.getId(), authorityValue);
+                    }
                 }
+                //Close up
+                indexerInterface.close();
             }
-            //Close up
-            indexerInterface.close();
         }
 
 

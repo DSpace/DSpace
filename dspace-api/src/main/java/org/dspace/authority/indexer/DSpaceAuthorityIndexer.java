@@ -27,8 +27,7 @@ import java.util.*;
 /**
  * DSpaceAuthorityIndexer is used in IndexClient, which is called by the AuthorityConsumer and the indexing-script.
  * <p>
- * An instance of DSpaceAuthorityIndexer is bound to a list of items.
- * This can be one item or all items too depending on the init() method.
+ * An instance of DSpaceAuthorityIndexer is bound to an item.
  * <p>
  * DSpaceAuthorityIndexer lets you iterate over each metadata value
  * for each metadata field defined in dspace.cfg with 'authority.author.indexer.field'
@@ -44,8 +43,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
 
     private static final Logger log = Logger.getLogger(DSpaceAuthorityIndexer.class);
 
-    protected Iterator<Item> itemIterator;
-    protected Item currentItem;
+    protected Item item;
     /**
      * The list of metadata fields which are to be indexed *
      */
@@ -54,13 +52,14 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
     protected int currentMetadataIndex;
     protected AuthorityValue nextValue;
     protected Context context;
+
     @Autowired(required = true)
     protected AuthorityValueService authorityValueService;
+
     @Autowired(required = true)
     protected ItemService itemService;
     protected boolean useCache;
     protected Map<String, AuthorityValue> cache;
-    
 
     @Autowired(required = true)
     protected ConfigurationService configurationService;
@@ -76,35 +75,10 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
         }
     }
 
-
     @Override
     public void init(Context context, Item item) {
-        ArrayList<Item> itemList = new ArrayList<>();
-        itemList.add(item);
-        this.itemIterator = itemList.iterator();
-        currentItem = this.itemIterator.next();
-        initialize(context);
-    }
-
-    @Override
-    public void init(Context context) {
-        init(context, false);
-    }
-
-    @Override
-    public void init(Context context, boolean useCache) {
-        try {
-            this.itemIterator = itemService.findAll(context);
-            currentItem = this.itemIterator.next();
-        } catch (SQLException e) {
-            log.error("Error while retrieving all items in the metadata indexer");
-        }
-        initialize(context);
-        this.useCache = useCache;
-    }
-
-    protected void initialize(Context context) {
         this.context = context;
+        this.item = item;
 
         currentFieldIndex = 0;
         currentMetadataIndex = 0;
@@ -117,17 +91,12 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
         return nextValue;
     }
 
-
     @Override
     public boolean hasMore() throws SQLException, AuthorizeException {
-        if (currentItem == null) {
-            return false;
-        }
-
         // 1. iterate over the metadata values
 
         String metadataField = metadataFields.get(currentFieldIndex);
-        List<MetadataValue> values = itemService.getMetadataByMetadataString(currentItem, metadataField);
+        List<MetadataValue> values = itemService.getMetadataByMetadataString(item, metadataField);
         if (currentMetadataIndex < values.size()) {
             prepareNextValue(metadataField, values.get(currentMetadataIndex));
 
@@ -143,18 +112,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
                 currentMetadataIndex = 0;
                 return hasMore();
             } else {
-
-                // 3. iterate over the items
-                if (itemIterator.hasNext()) {
-                    currentItem = itemIterator.next();
-                    //Reset our current field index
-                    currentFieldIndex = 0;
-                    //Reset our current metadata index
-                    currentMetadataIndex = 0;
-                } else {
-                    currentItem = null;
-                }
-                return hasMore();
+                return false;
             }
         }
     }
@@ -163,6 +121,7 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
      * This method looks at the authority of a metadata.
      * If the authority can be found in solr, that value is reused.
      * Otherwise a new authority value will be generated that will be indexed in solr.
+     *
      * If the authority starts with AuthorityValueGenerator.GENERATE, a specific type of AuthorityValue will be generated.
      * Depending on the type this may involve querying an external REST service
      *
@@ -196,9 +155,9 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
             nextValue = authorityValueService.generate(context, authorityKey, content, metadataField.replaceAll("\\.", "_"));
         }
         if (nextValue != null && requiresItemUpdate) {
-            nextValue.updateItem(context, currentItem, value);
+            nextValue.updateItem(context, item, value);
             try {
-                itemService.update(context, currentItem);
+                itemService.update(context, item);
             } catch (Exception e) {
                 log.error("Error creating a metadatavalue's authority", e);
             }
@@ -210,7 +169,6 @@ public class DSpaceAuthorityIndexer implements AuthorityIndexerInterface, Initia
 
     @Override
     public void close() {
-        itemIterator = null;
         cache.clear();
     }
 

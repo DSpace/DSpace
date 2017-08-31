@@ -26,10 +26,6 @@ public interface AuthorityIndexerInterface {
 
     public void init(Context context, Item item);
 
-    public void init(Context context, boolean useCache);
-
-    public void init(Context context);
-
     public AuthorityValue nextValue();
 
     public boolean hasMore() throws SQLException, AuthorizeException;
