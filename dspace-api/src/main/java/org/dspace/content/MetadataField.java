@@ -311,8 +311,8 @@ public class MetadataField
         }
 
         ArrayList<TableRow> rows = new ArrayList<TableRow>();
-        for (Integer key : id2field.keySet()) {
-            rows.add(id2field.get(key).row);
+        for (String key : term2field.keySet()) {
+            rows.add(term2field.get(key).row);
         }
         return rows;
     }
