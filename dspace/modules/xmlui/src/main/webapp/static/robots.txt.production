@@ -27,6 +27,9 @@ Disallow: /handle/10255/dryad.40383
 Disallow: /handle/10255/dryad.40382
 Disallow: /handle/10255/dryad.40384
 Disallow: /handle/10255/dryad.40381
+Disallow: /handle/10255/dryad.7872
+Disallow: /handle/10255/dryad.7872/discover
+Disallow: /handle/10255/dryad.7872/search-filter
 
 # Collection-specific search/browse for Data Files
 Disallow: /handle/10255/2/search
