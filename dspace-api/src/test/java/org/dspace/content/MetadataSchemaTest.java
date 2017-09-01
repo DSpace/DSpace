@@ -33,29 +33,6 @@ public class MetadataSchemaTest extends AbstractUnitTest
     private MetadataSchema ms;
 
     /**
-     * This method will be run before every test as per @Before. It will
-     * initialize resources required for the tests.
-     *
-     * Other methods can be annotated with @Before here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @Before
-    @Override
-    public void init()
-    {
-        super.init();
-        try
-        {
-            this.ms = MetadataSchema.find(MetadataSchema.DC_SCHEMA_ID);
-        }
-        catch (SQLException ex)
-        {
-            log.error("SQL Error in init", ex);
-            fail("SQL Error in init");
-        }
-    }
-
-    /**
      * This method will be run after every test as per @After. It will
      * clean resources initialized by the @Before methods.
      *
