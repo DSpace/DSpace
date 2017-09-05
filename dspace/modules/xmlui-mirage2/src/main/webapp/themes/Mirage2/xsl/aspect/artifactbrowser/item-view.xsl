@@ -427,6 +427,11 @@
         <xsl:param name="size" />
         <div>
             <a>
+                <!-- DATASHARE start -->
+                <xsl:call-template name="addFileSizeCheck">
+                  <xsl:with-param name="size" select="$size"/>
+                </xsl:call-template>
+                <!-- DATASHARE end -->
                 <xsl:attribute name="href">
                     <xsl:value-of select="$href"/>
                 </xsl:attribute>
@@ -600,11 +605,13 @@
     </xsl:template>
     <xsl:template name="downloadAllButton">
       <xsl:param name="show_checksum" />
-      <!-- <xsl:variable name="var"><xsl:value-of select="$xyz" /></xsl:variable> -->
       <xsl:if test="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download_all_file']">
         <div id="item-page-download-all">
           <div id="item-page-download-all-button">
             <a>
+              <xsl:call-template name="addFileSizeCheck">
+                <xsl:with-param name="size" select="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download_all_file_size']"/>
+              </xsl:call-template>
               <xsl:attribute name="href">
                 <xsl:value-of select="$document/dri:meta/dri:pageMeta/dri:metadata[@element='download_all_file']"/>
               </xsl:attribute>
@@ -631,7 +638,18 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:template>
-
+    <xsl:template name="addFileSizeCheck">
+      <xsl:param name="size"/>
+        <!-- if download is larger than 10 GB warn user -->
+        <xsl:if test="$size &gt; 1024 * 1024 * 1024 * 10">
+          <xsl:attribute name="onclick">
+          <xsl:text>return confirm&#40;&quot;You are attempting to download a large file. Download may take a long time.&quot;&#41;</xsl:text>
+          </xsl:attribute>
+        </xsl:if>
+      <xsl:attribute name="test">
+         <xsl:value-of select="$size"/>
+      </xsl:attribute>
+    </xsl:template>
     <!-- DATASHARE - end -->
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
@@ -732,6 +750,12 @@
             <div class="col-xs-6 col-sm-3">
                 <div class="thumbnail">
                     <a class="image-link">
+                        <!-- DATASHARE start -->
+                        <xsl:call-template name="addFileSizeCheck">
+                            <xsl:with-param name="size" select="@SIZE"/>
+                        </xsl:call-template>
+                        <!-- DATASHARE end -->
+
                         <xsl:attribute name="href">
                             <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                         </xsl:attribute>
@@ -846,7 +870,9 @@
                         <xsl:call-template name="display-rights"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:call-template name="view-open"/>
+                        <xsl:call-template name="view-open">
+                          <xsl:with-param name="size" select="@SIZE"/>
+                        </xsl:call-template>
                     </xsl:otherwise>
                 </xsl:choose>
             </div>
@@ -855,7 +881,14 @@
 </xsl:template>
 
     <xsl:template name="view-open">
+        <!-- DATASHARE start -->
+        <xsl:param name="size"/>
         <a>
+            <xsl:call-template name="addFileSizeCheck">
+                <xsl:with-param name="size" select="@SIZE"/>
+            </xsl:call-template>
+            <!-- DATASHARE end -->
+
             <xsl:attribute name="href">
                 <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
             </xsl:attribute>

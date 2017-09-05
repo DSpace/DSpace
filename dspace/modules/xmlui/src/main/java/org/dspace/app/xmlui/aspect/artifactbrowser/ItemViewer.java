@@ -282,6 +282,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
                         ds.getURL().toString());
                 pageMeta.addMetadata("download_all_file_cs").addContent(
                         ds.getChecksum());
+                pageMeta.addMetadata("download_all_file_size").addContent(
+                        Long.toString(ds.getSize()));
             }
         }
         // DATASHARE - end
