@@ -76,9 +76,9 @@ public class DbUpdate
      * @param mapFile Full path to batch mapfile.
      * @return The primary key of the new entry.
      */
-    public static int insertBatchImport(Context context, String mapFile)
+    public static long insertBatchImport(Context context, String mapFile)
     {
-        int key = -1;
+        long key = -1;
         PreparedStatement stmt = null;
         
         final String INSERT_BATCH = 
@@ -94,8 +94,8 @@ public class DbUpdate
             
             ResultSet rs = stmt.getResultSet();
             if (rs.next()) {
-                key = rs.getInt(1);
-              }
+                key = rs.getLong(1);
+            }
         }
         catch (SQLException e)
         {

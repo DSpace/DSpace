@@ -69,6 +69,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
+import org.dspace.content.ItemDataset;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.WorkspaceItem;
@@ -598,6 +599,7 @@ public class ItemImport
             System.out.println("Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime.getTime() - startTime.getTime()) + " msecs)");
         }
 
+        log.info("exit batch");
         System.exit(status);
     }
 
@@ -810,10 +812,21 @@ public class ItemImport
             }
             // DATASHARE - add batch import index and send license email
             if (!isTest){
-                int batchId = DbUpdate.insertBatchImport(c, mapFile);
-
+                // wait for all dataset to be created
+                for (Item item : deposits) {
+                    Thread th = new ItemDataset(c, item).monitorDataset();
+                    try{
+                        th.join();
+                    }
+                    catch(InterruptedException ex){
+                        System.out.println(ex);
+                    }
+                }                
+                
+                log.info("insertBatchImport " + mapFile);
+                long batchId = DbUpdate.insertBatchImport(c, mapFile);
+                
                 StringBuffer items = new StringBuffer();
-
                 for (Item item : deposits) {
                     items.append(MetaDataUtil.getTitle(item) + "\n"); 
                 }
@@ -827,6 +840,7 @@ public class ItemImport
                 mail.addArgument(url);
                 mail.addRecipient(user.getEmail());
                 mail.send();
+                log.info("send email");
             }
             // DATASHARE end
         }

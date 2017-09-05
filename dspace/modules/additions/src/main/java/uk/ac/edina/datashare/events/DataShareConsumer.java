@@ -92,7 +92,9 @@ public class DataShareConsumer implements Consumer{
         
         // clear hijacked spatial field
         DSpaceUtils.clearHijackedSpatial(item);
-       
+        
+        LOG.info("DataShareConsumer: create dataset");
+        
         // create zip file
         new ItemDataset(item).createDataset();
         

@@ -16,7 +16,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.jena.atlas.lib.DS;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -40,12 +39,22 @@ public class ItemDataset {
     private static final String DIR_PROP = "datasets.path";
     private static String dir = null;
     
+    /**
+     * Initialise dataset with DSpace context and item.
+     * @param context
+     * @param item
+     */
     public ItemDataset(Context context, Item item){
         this.context = context;
         this.item = item;
         this.init();
     }
-    
+
+    /**
+     * Initialise dataset with DSpace context and item handle.
+     * @param context
+     * @param handle
+     */
     public ItemDataset(Context context, String handle){
         this.context = context;
         this.handle = handle;
@@ -79,6 +88,9 @@ public class ItemDataset {
         }
     }
     
+    /**
+     * Initialise dataset.
+     */
     private void init(){
         dir = org.dspace.core.ConfigurationManager.getProperty(DIR_PROP);
         if(dir == null){
@@ -105,7 +117,11 @@ public class ItemDataset {
             LOG.warn("No dataset exists to check " + this.item.getHandle());
         }
     }
-    
+        
+    /**
+     * Create dataset zip file.
+     * @return Thread that dataset is created on. 
+     */
     public Thread createDataset(){
         Thread th = new Thread(new DatasetZip());
         th.start();
@@ -167,6 +183,27 @@ public class ItemDataset {
         return dir + File.separator + getFileName();
     }
     
+    /**
+     * @return size in bytes of dataset zip file.
+     */
+    public long getSize(){
+        return new File(getFullPath()).length();
+    }
+
+    /**
+     * @return Temporary dataset file name.
+     */
+    public String getTmpFileName(){
+        return getFullPath() + ".tmp";
+    }
+
+    /**
+     * @return size in bytes of dataset tmp zip file.
+     */
+    public long getTmpSize(){
+        return new File(getTmpFileName()).length();
+    }    
+    
     public URL getURL(){
         URL url;
         try{
@@ -197,6 +234,16 @@ public class ItemDataset {
                 !DSpaceUtils.showTombstone(context, item); 
     }
     
+    /**
+     * Create a monitor on dataset creation, to track progress.
+     * @return Thread that monitor is created on.
+     */
+    public Thread monitorDataset(){
+        Thread th = new Thread(new DatasetMonitor());
+        th.start();
+        return th;
+    }
+
     private class DatasetZip implements Runnable {
         
         public void run() {
@@ -209,9 +256,11 @@ public class ItemDataset {
                 item = Item.find(context, item.getID());
                 
                 if(itemIsAvailable(context, item)){
+                    LOG.info("create zip for " + item.getHandle());
                     createZip(context);                    
                     String cksum = createChecksum(context);
                     
+                    LOG.info("zip complete");
                     DbUpdate.insertDataset(
                             context, item.getID(), getFileName(), cksum);
                 }
@@ -232,6 +281,7 @@ public class ItemDataset {
                 }
             }
         }
+        
         private String createChecksum(Context context){
             String cksum = null;
             try{
@@ -247,12 +297,12 @@ public class ItemDataset {
         }
         
         private void createZip(Context context){
-            String tmpDir = getFullPath() + ".tmp";
+            String tmpZip = getTmpFileName();
             
             try{
                 final byte[] BUFFER = new byte[8192];
                 
-                FileOutputStream fos = new FileOutputStream(tmpDir);
+                FileOutputStream fos = new FileOutputStream(tmpZip);
                 ZipOutputStream zos = new ZipOutputStream(fos);
                 zos.setLevel(0);
                 
@@ -265,6 +315,7 @@ public class ItemDataset {
                     for(int j = 0; j < bitstreams.length; j++){
                         // only add bitstream if valid 
                         if(includeBitstream(context, bitstreams[j])){ 
+                            LOG.info("do " + bitstreams[j].getName());
                             ZipEntry entry = new ZipEntry(bitstreams[j].getName());
 
                             zos.putNextEntry(entry);
@@ -284,23 +335,54 @@ public class ItemDataset {
                 fos.close();
                 
                 // rename zip with temporary file to final name 
-                if(!new File(tmpDir).renameTo(new File(getFullPath()))){
-                    LOG.error("Problem renaming " + tmpDir + " to " + getFullPath());
+                if(!new File(tmpZip).renameTo(new File(getFullPath()))){
+                    LOG.error("Problem renaming " + tmpZip + " to " + getFullPath());
                 }
                 LOG.info(getFileName() + " complete");
             }
             catch(AuthorizeException ex){
+                LOG.error(ex);
                 throw new RuntimeException(ex);
             }
             catch(SQLException ex){
+                LOG.error(ex);
                 throw new RuntimeException(ex);
             }
             catch(FileNotFoundException ex){
+                LOG.error(ex);
                 throw new RuntimeException(ex);
             }
             catch(IOException ex){
+                LOG.error(ex);
                 throw new RuntimeException(ex);
             }            
+        }
+    }
+    
+    /**
+     * This will monitor the progress of a creation of a dataset printing out
+     * its size.
+     */
+    private class DatasetMonitor implements Runnable {
+        public void run() {
+            boolean cont = true;
+            int sleep = 5000;
+            System.out.println("Checking dataset " + item.getHandle() + " ...");
+            while(cont){
+                if(exists()){
+                    System.out.println("dataset exists");
+                    cont = false;
+                }
+                else{
+                    try{
+                        Thread.sleep(sleep);
+                        System.out.println("size: " + getTmpSize());
+                    }
+                    catch(InterruptedException ex){
+                        System.err.println(ex);
+                    }
+                }
+            }
         }
     }
     
