@@ -13,10 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -188,6 +185,14 @@ public class MetadataField
         return schemaID;
     }
 
+    public String getSchemaName() {
+        return MetadataSchema.find(schemaID).getName();
+    }
+
+    public String getFieldName() {
+        return String.join(".", getSchemaName(), getElement(), getQualifier());
+    }
+
     /**
      * Set the schema record key.
      *
@@ -314,8 +319,8 @@ public class MetadataField
         }
 
         ArrayList<TableRow> rows = new ArrayList<TableRow>();
-        for (Integer key : id2field.keySet()) {
-            rows.add(id2field.get(key).row);
+        for (String key : term2field.keySet()) {
+            rows.add(term2field.get(key).row);
         }
         return rows;
     }
@@ -590,8 +595,8 @@ public class MetadataField
     {
         if (!isCacheInitialized())
         {
-            Map<Integer, MetadataField> new_id2field = new HashMap<Integer, MetadataField>();
-            Map<String, MetadataField> new_term2field = new HashMap<String, MetadataField>();
+            Map<Integer, MetadataField> new_id2field = new TreeMap<Integer, MetadataField>();
+            Map<String, MetadataField> new_term2field = new TreeMap<String, MetadataField>();
             log.info("Loading MetadataField elements into cache.");
 
             Context context = null;
@@ -610,12 +615,9 @@ public class MetadataField
                 while (tri.hasNext())
                 {
                     TableRow row = tri.next();
-                    int fieldID = row.getIntColumn("metadata_field_id");
                     MetadataField mf = new MetadataField(row);
-                    String term = String.join(".", MetadataSchema.find(mf.schemaID).getName(), mf.getElement(), mf.getQualifier());
-                    log.info("adding field " + fieldID + " with term " + term);
-                    new_id2field.put(Integer.valueOf(fieldID), mf);
-                    new_term2field.put(term, mf);
+                    new_id2field.put(mf.getFieldID(), mf);
+                    new_term2field.put(mf.getFieldName(), mf);
                 }
             }
             finally

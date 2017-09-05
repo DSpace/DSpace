@@ -491,7 +491,6 @@ public class MetadataSchema
      * @throws SQLException
      */
     public static MetadataSchema find(int id)
-            throws SQLException
     {
         if (!isCacheInitialized())
         {
@@ -518,7 +517,6 @@ public class MetadataSchema
      * @throws SQLException
      */
     public static MetadataSchema find(String shortName)
-        throws SQLException
     {
         // If we are not passed a valid schema name then return
         if (shortName == null)
@@ -552,7 +550,7 @@ public class MetadataSchema
     }
 
     // load caches if necessary
-    private static synchronized void initCache() throws SQLException
+    private static synchronized void initCache()
     {
         if (!isCacheInitialized())
         {
@@ -562,15 +560,8 @@ public class MetadataSchema
             Context context = null;
             try {
                 context = new Context();
-            } catch (SQLException ex) {
-                log.error("Unable to instantiate DSpace context", ex);
-                throw ex;
-            }
-            TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
+                TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
                     "SELECT * from MetadataSchemaRegistry");
-
-            try
-            {
                 while (tri.hasNext())
                 {
                     TableRow row = tri.next();
@@ -579,23 +570,18 @@ public class MetadataSchema
                     new_id2schema.put(s.schemaID, s);
                     new_name2schema.put(s.name, s);
                 }
+                tri.close();
+            } catch (Exception e) {
+                log.error("problem initializing MetadataSchema cache");
             }
-            finally
-            {
-                // close the TableRowIterator to free up resources
-                if (tri != null)
-                {
-                    tri.close();
+            if (context != null) {
+                try {
+                    context.complete();
+                } catch (Exception ex) {
+                    // Abort the context to force a new connection
+                    context.abort();
                 }
             }
-
-            try {
-                context.complete();
-            } catch (Exception ex) {
-                // Abort the context to force a new connection
-                context.abort();
-            }
-
             id2schema = new_id2schema;
             name2schema = new_name2schema;
         }
