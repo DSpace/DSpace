@@ -1003,9 +1003,9 @@
      {
         "issn" : "0363-6445",
         "embargo" : "Y",
-        "submission" : "A",
+        "submission" : "R",
         "hidden" : "Y",
-        "integrated" : "N",
+        "integrated" : "Y",
         "title" : "Systematic Botany",
         "sponsor" : "American Society of Plant Taxonomists"
      },
