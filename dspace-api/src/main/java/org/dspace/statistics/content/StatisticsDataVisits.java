@@ -498,7 +498,7 @@ public class StatisticsDataVisits extends StatisticsData
                 try {
                     //Legacy identifier support
                     dsoId = String.valueOf(Integer.parseInt(value));
-                    legacyNote = I18nUtil.getMessage("jsp.statistics.note.legacy", context);
+                    legacyNote = I18nUtil.getMessage("org.dspace.statistics.content.StatisticsDataVisits.legacy", context);
                 } catch (NumberFormatException e1) {
                     dsoId = null;
                 }
