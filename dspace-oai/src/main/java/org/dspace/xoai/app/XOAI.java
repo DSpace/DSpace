@@ -245,6 +245,9 @@ public class XOAI {
         boolean pub = this.isPublic(item);
         doc.addField("item.public", pub);
         String handle = item.getHandle();
+        if (verbose) {
+            println("Prepare handle " + handle);
+        }
         doc.addField("item.handle", handle);
         doc.addField("item.lastmodified", item.getLastModified());
         if (item.getSubmitter() != null) {

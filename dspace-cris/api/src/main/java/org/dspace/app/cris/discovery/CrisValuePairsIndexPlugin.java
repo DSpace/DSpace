@@ -277,7 +277,7 @@ public class CrisValuePairsIndexPlugin implements CrisServiceIndexPlugin,
         }
         catch (Exception e)
         {
-            log.error(e.getMessage(), e);
+            log.warn(e.getMessage(), e);
         }
         if (StringUtils.isNotBlank(language))
         {
