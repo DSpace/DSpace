@@ -26,6 +26,7 @@ import org.dspace.statistics.factory.StatisticsServiceFactory;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.LocationUtils;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.app.util.Util;
@@ -497,7 +498,7 @@ public class StatisticsDataVisits extends StatisticsData
                 try {
                     //Legacy identifier support
                     dsoId = String.valueOf(Integer.parseInt(value));
-                    legacyNote="(legacy)";
+                    legacyNote = I18nUtil.getMessage("org.dspace.statistics.content.StatisticsDataVisits.legacy", context);
                 } catch (NumberFormatException e1) {
                     dsoId = null;
                 }
