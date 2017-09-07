@@ -929,6 +929,24 @@
         "sponsor" : "American Society of Plant Biologists"
      },
      {
+        "issn" : "1940-3372",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "The Plant Genome",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
+     },
+     {
+        "issn" : "0000-0000",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "The Plant Phenome Journal",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
+     },
+     {
         "integrated" : "N",
         "embargo" : "Y",
         "issn" : "0032-0889",
@@ -1098,6 +1116,24 @@
         "issn" : "1096-6080",
         "embargo" : "Y",
         "submission" : "R"
+     },
+     {
+        "issn" : "2352-0566",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Urban Agriculture & Regional Food Systems",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
+     },
+     {
+        "issn" : "1539-1663",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Vadose Zone Journal",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
      },
      {
         "integrated" : "Y",
