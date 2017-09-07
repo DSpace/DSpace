@@ -10,6 +10,15 @@
         "sponsor" : "$120"
      },
      {
+        "issn" : "2471-9625",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Agricultural & Environmental Letters",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
+     },
+     {
         "issn" : "0002-9122",
         "embargo" : "Y",
         "submission" : "A",
