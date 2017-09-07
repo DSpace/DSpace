@@ -10,24 +10,6 @@
         "sponsor" : "$120"
      },
      {
-        "issn" : "2471-9625",
-        "embargo" : "Y",
-        "submission" : "A",
-        "hidden" : “N”,
-        "integrated" : "Y",
-        "title" : "Agricultural & Environmental Letters",
-        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
-     },
-     {
-        "issn" : "1435-0645",
-        "embargo" : "Y",
-        "submission" : "A",
-        "hidden" : “N”,
-        "integrated" : "Y",
-        "title" : "Agronomy Journal",
-        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
-     },
-     {
         "issn" : "0002-9122",
         "embargo" : "Y",
         "submission" : "A",
@@ -1021,9 +1003,9 @@
      {
         "issn" : "0363-6445",
         "embargo" : "Y",
-        "submission" : "A",
+        "submission" : "R",
         "hidden" : "Y",
-        "integrated" : "N",
+        "integrated" : "Y",
         "title" : "Systematic Botany",
         "sponsor" : "American Society of Plant Taxonomists"
      },
