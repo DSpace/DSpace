@@ -144,11 +144,8 @@
             </div>
         </xsl:if>
         <!-- Data Files in package -->
-        <xsl:if test="$datafiles">
-            <div class="ds-static-div primary">&#160;
-                <xsl:apply-templates select="$embeddedViewReferenceSet"/>
-            </div>
-        </xsl:if>
+        <xsl:apply-templates select="$embeddedViewReferenceSet"/>
+
         <!-- citing -->
         <!-- CITATION FOR DATA FILE -->
         <!-- Citation for the data file is different from the citation for the

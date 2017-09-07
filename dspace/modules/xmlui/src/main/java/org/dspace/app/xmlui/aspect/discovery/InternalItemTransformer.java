@@ -164,12 +164,25 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
         else {
             referenceSet = division.addReferenceSet("collection-viewer",ReferenceSet.TYPE_SUMMARY_VIEW);
         }
+        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
+
+        // run duplicate checker
+        item.checkForDuplicateItems(context);
+
+        DCValue[] dupItemIDs = item.getMetadata("dryad.duplicateItem");
+        if (dupItemIDs != null && dupItemIDs.length > 0) {
+            ReferenceSet duplicateItems = itemRef.addReferenceSet("embeddedView", null, "duplicateItems");
+            for (DCValue dupItemID : dupItemIDs) {
+                Item dupItem = Item.find(context, Integer.valueOf(dupItemID.value));
+                if (dupItem != null && !item.equals(dupItem)) {
+                    duplicateItems.addReference(dupItem);
+                }
+            }
+        }
 
         /*
          * reference any isPartOf items to create listing...
          */
-        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
-
         if (item.getMetadata("dc.relation.haspart").length > 0){
             ReferenceSet hasParts;
             hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
