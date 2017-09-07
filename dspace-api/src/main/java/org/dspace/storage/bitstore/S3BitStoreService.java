@@ -7,12 +7,15 @@
  */
 package org.dspace.storage.bitstore;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -77,12 +80,19 @@ public class S3BitStoreService implements BitStoreService
         }
 
         // init client
-        AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
-        s3Service = new AmazonS3Client(awsCredentials);
-
-        // endpoint name
-        if (StringUtils.isNotEmpty(awsEndpoint)) {
-            s3Service.setEndpoint(awsEndpoint);
+        System.setProperty("aws.accessKeyId", getAwsAccessKey());
+        System.setProperty("aws.secretKey", getAwsSecretKey());
+        if (StringUtils.isEmpty(awsEndpoint)) {
+            s3Service = AmazonS3ClientBuilder.standard()
+                    .build();
+        } else {
+            ClientConfiguration clientConfiguration = new ClientConfiguration();
+            clientConfiguration.setSignerOverride("S3SignerType");
+            s3Service = AmazonS3ClientBuilder.standard()
+                    .withClientConfiguration(clientConfiguration)
+                    .withPathStyleAccessEnabled(true)
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsEndpoint, null))
+                    .build();
         }
 
         // bucket name
