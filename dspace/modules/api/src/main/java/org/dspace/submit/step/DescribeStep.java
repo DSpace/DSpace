@@ -49,6 +49,9 @@ public class DescribeStep extends AbstractProcessingStep {
     public static final int STATUS_MISSING_REQUIRED_FIELDS = 2;
     public static final int STATUS_FILE_UPLOAD_ONLY = 3;
 
+    // this item is a duplicate of one we already have:
+    public static final int STATUS_DUPLICATE_SUBMISSION = 4;
+
     protected static final int FILE_UPLOAD_ERROR = 0;
     protected static final int FILE_NO_UPLOAD = 1;
     protected static final int FILE_UPLOAD_OK = 2;

@@ -2928,6 +2928,9 @@
     <message key="xmlui.submit.publication.describe.nodetails">
         <div><strong>We don't have any details about your article, so you will have to provide its description.</strong></div>
 	</message>
+	<message key="xmlui.submit.publication.describe.duplicatesubmission">
+		<div><strong>ALERT:</strong> It looks like there is already a data package in our system associated with this publication. Please do not create multiple Dryad submissions associated with the same publication. If you need assistance modifying an existing submission, please email us (<a href="mailto:help@datadryad.org">help@datadryad.org</a>) or send us a message via our <a href='https://datadryad.org/feedback'>contact form</a>.</div>
+	</message>
 	<message key="xmlui.submit.publication.describe.form.help">Publication metadata</message>
 
 	<message key="xmlui.submit.dataset.describe.head">Add and describe data file</message>
