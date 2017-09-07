@@ -19,6 +19,15 @@
         "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
      },
      {
+        "issn" : "1435-0645",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Agronomy Journal",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
+     },
+     {
         "issn" : "0002-9122",
         "embargo" : "Y",
         "submission" : "A",
@@ -197,6 +206,24 @@
         "embargo" : "Y",
         "issn" : "1993-0771",
         "submission" : "A"
+     },
+     {
+        "issn" : "2374-3832",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Crop, Forage, & Turfgrass Management",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
+     },
+     {
+        "issn" : "1435-0653",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Crop Science",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
      },
      {
         "title" : "Deutsche Entomologische Zeitschrift",
@@ -577,6 +604,15 @@
         "submission" : "R"
      },
      {
+        "issn" : "1537-2537",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Journal of Environmental Quality",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
+     },
+     {
         "title" : "Journal of Evolutionary Biology",
         "sponsor" : "European Society for Evolutionary Biology",
         "integrated" : "Y",
@@ -658,6 +694,15 @@
         "integrated" : "Y"
      },
      {
+        "issn" : "1940-3496",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Journal of Plant Registrations",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
+     },
+     {
         "title" : "Journal of Systematics and Evolution",
         "sponsor" : "Journal of Systematics and Evolution",
         "submission" : "R",
@@ -720,6 +765,15 @@
         "submission" : "A",
         "hidden" : "Y",
         "integrated" : "Y"
+     },
+     {
+        "issn" : "2168-8281",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Natural Sciences Education",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
      },
      {
         "sponsor" : "$120",
@@ -990,6 +1044,15 @@
         "hidden" : "Y",
         "title" : "Scientific Data",
         "sponsor" : "$120"
+     },
+     {
+        "issn" : "1435-0661",
+        "embargo" : "Y",
+        "submission" : "A",
+        "hidden" : "N",
+        "integrated" : "Y",
+        "title" : "Soil Science Society of America Journal",
+        "sponsor" : "Alliance of Crop, Soil, and Environmental Science Societies"
      },
      {
         "integrated" : "Y",
