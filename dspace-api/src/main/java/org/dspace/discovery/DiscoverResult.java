@@ -22,6 +22,7 @@ public class DiscoverResult {
     private int start;
     private List<DSpaceObject> dspaceObjects;
     private Map<String, List<FacetResult>> facetResults;
+    private Map<String, List<FacetDateResult>> facetDateResults;
     /** A map that contains all the documents sougth after, the key is a string representation of the DSpace object */
     private Map<String, List<SearchDocument>> searchDocuments;
     private int maxResults = -1;
@@ -33,6 +34,7 @@ public class DiscoverResult {
     public DiscoverResult() {
         dspaceObjects = new ArrayList<DSpaceObject>();
         facetResults = new LinkedHashMap<String, List<FacetResult>>();
+        facetDateResults = new LinkedHashMap<String, List<FacetDateResult>>();
         searchDocuments = new LinkedHashMap<String, List<SearchDocument>>();
         highlightedResults = new HashMap<String, DSpaceObjectHighlightResult>();
     }
@@ -98,6 +100,24 @@ public class DiscoverResult {
         return facetResults.get(facet) == null ? new ArrayList<FacetResult>() : facetResults.get(facet);
     }
 
+    public void addFacetDateResult(String facetDateField, FacetDateResult ...facetResults){
+        List<FacetDateResult> facetValues = this.facetDateResults.get(facetDateField);
+        if(facetValues == null)
+        {
+            facetValues = new ArrayList<>();
+        }
+        facetValues.addAll(Arrays.asList(facetResults));
+        this.facetDateResults.put(facetDateField, facetValues);
+    }
+
+    public Map<String, List<FacetDateResult>> getFacetDateResults() {
+        return facetDateResults;
+    }
+
+    public List<FacetDateResult> getFacetDateResult(String facet){
+        return facetDateResults.get(facet) == null ? new ArrayList<FacetDateResult>() : facetDateResults.get(facet);
+    }
+
     public DSpaceObjectHighlightResult getHighlightedResults(DSpaceObject dso)
     {
         return highlightedResults.get(dso.getHandle());
@@ -150,6 +170,23 @@ public class DiscoverResult {
             return authorityKey != null?"authority":"equals";
         }
     }
+    public static final class FacetDateResult{
+        private String name;
+        private long count;
+
+        public FacetDateResult(String name, long count) {
+            this.name= name;
+            this.count = count;
+        }
+
+        public String getName(){
+            return name;
+        }
+        public long getCount(){
+            return count;
+        }
+    }
+
 
     public String getSpellCheckQuery() {
         return spellCheckQuery;
