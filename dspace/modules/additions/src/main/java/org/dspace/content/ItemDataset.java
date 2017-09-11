@@ -9,9 +9,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -36,6 +38,7 @@ public class ItemDataset {
     private Context context = null;
     private Item item = null;
     private String handle = null;
+    private static final String TMP_FILE_NAME_EXT = ".tmp";
     private static final String DIR_PROP = "datasets.path";
     private static String dir = null;
     
@@ -61,6 +64,17 @@ public class ItemDataset {
         this.init();
     }
     
+    /**
+     * Initialise dataset with DSpace context and dataset zip file.
+     * @param context
+     * @param ds
+     */
+    public ItemDataset(Context context, File ds){
+        this.context = context;
+        this.setHandle(ds);
+        this.init();
+    }
+
     public ItemDataset(Item item){
         this.item = item;
         this.init();
@@ -70,7 +84,7 @@ public class ItemDataset {
         this.handle = handle;
         this.init();
     }
-
+    
     public ItemDataset(Context context, Bitstream bitstream){
         try{
             DSpaceObject ob = bitstream.getParentObject();
@@ -128,6 +142,9 @@ public class ItemDataset {
         return th;
     }
     
+    /**
+     * Delete dataset from system.
+     */
     public void delete(){
         File zip = null;
         if(this.item != null){
@@ -173,7 +190,11 @@ public class ItemDataset {
     private String getFileName(){
         return ItemDataset.getFileName(this.item.getHandle());
     }
-    
+
+    private String getHandle(){
+        return this.handle;
+    }
+
     public static String getFileName(String handle){
         String aHandle[] = handle.split("/");
         return "DS_" + aHandle[0] + "_" + aHandle[1] + ".zip";
@@ -194,7 +215,7 @@ public class ItemDataset {
      * @return Temporary dataset file name.
      */
     public String getTmpFileName(){
-        return getFullPath() + ".tmp";
+        return getFullPath() + TMP_FILE_NAME_EXT;
     }
 
     /**
@@ -243,9 +264,25 @@ public class ItemDataset {
         th.start();
         return th;
     }
+    
+    /**
+     * Given a dataset file object, set handle. 
+     */
+    private void setHandle(File ds){
+        Pattern p = Pattern.compile(".+DS_(\\d+)_(\\d+).zip");
+        Matcher matcher = p.matcher(ds.getAbsolutePath());
+        while (matcher.find()) {
+            this.handle = matcher.group(1) + "/" + matcher.group(2);
+        }
+    }
 
+    /**
+     * Create dataset zip file in a seperate thread.
+     */
     private class DatasetZip implements Runnable {
-        
+        /**
+         * Start thread.
+         */
         public void run() {
             Context context = null;
             try{
@@ -390,56 +427,81 @@ public class ItemDataset {
      * Process all datasets in the system.
      */
     public static void main(String[] args){
+        Context context = null;
         try{    
             DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
             if (!kernelImpl.isRunning())
             {
                 kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
-            Context context = new Context();
-            
-            Hashtable<Integer, Boolean> datasetMap = new Hashtable<Integer, Boolean>(10000);
-            List<Integer> ids = DbQuery.fetchDatasetIds(context);
-            for (Integer id : ids) {
-                datasetMap.put(id, false);
-            }
-            
+            context = new Context();
+                        
+            List <String> itemHandles = new ArrayList<String>(10000);
             ItemIterator iter = Item.findAll(context);
             while(iter.hasNext()){
                 Item item = iter.next();
-                ItemDataset ds = new ItemDataset(item); 
-                if(ds.exists()){
-                    if(DSpaceUtils.showTombstone(context, item)){
-                        System.out.println("Delete tombstoned dataset: " + item.getHandle());
-                        ds.delete();
+                if(item.isArchived()){
+                    itemHandles.add(item.getHandle());
+                    ItemDataset ds = new ItemDataset(context, item); 
+                    if(ds.exists()){
+                        if(DSpaceUtils.showTombstone(context, item)){
+                            System.out.println("Delete tombstoned dataset: " + item.getHandle());
+                            ds.delete();
+                        }
+                        else{
+                            System.out.println("Dataset already exists " + item.getHandle());
+                        }
                     }
                     else{
-                        System.out.println("Item already exists " + item.getHandle());
-                        datasetMap.put(item.getID(), true);
-                    }
-                }
-                else{
-                    System.out.println("Create dataset for " + ds.getFullPath() + " for " + item.getHandle());
-                    Thread th = ds.createDataset();
-                    try{
-                        th.join();
-                        datasetMap.put(item.getID(), true);
-                    }
-                    catch(InterruptedException ex){
-                        System.out.println(ex);
+                        if(ds.itemIsAvailable(context, item)){
+                            System.out.println("Create dataset for " + ds.getFullPath() +
+                                    " for " + item.getHandle() + ", id: " + item.getID());
+                            Thread th = ds.createDataset();
+                            try{
+                                th.join();
+                            }
+                            catch(InterruptedException ex){
+                                System.out.println(ex);
+                            } 
+                        }
+                        else{
+                            System.out.println("Item is currently unavailable: " + item.getHandle());
+                        }
                     }
                 }
             }
             
-            Set<Integer> keys = datasetMap.keySet();
-            for (Integer itemId : keys) {
-                if(!datasetMap.get(itemId)){
-                    System.out.println("*** Item " + itemId + " has no dataset");
+            // now see if any datasets are orphaned, just in case
+            File datasets[] = new File(dir).listFiles();
+            for (File zip : datasets) {
+                if(zip.getName().endsWith(TMP_FILE_NAME_EXT)){
+                    // if file is a temporary file delete it if more than one day old
+                    long diff = new Date().getTime() - zip.lastModified();
+                    if (diff > 24 * 60 * 60 * 1000) {
+                        zip.delete();
+                    } 
                 }
-            }
+                else{
+                    ItemDataset ds = new ItemDataset(context, zip);
+                    if(!itemHandles.contains(ds.getHandle())){
+                        System.err.println("*** dataset " + zip + " exists with no item. Delete it.");
+                        ds.delete();
+                    }
+                }
+            }            
+            
         }
         catch(SQLException ex){
             System.out.println(ex);
         }
+        finally{
+            try{
+                context.complete();
+            }
+            catch(SQLException ex){
+            }
+        }
+        
+        System.out.println("exit");
     }
 }
