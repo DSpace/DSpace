@@ -738,6 +738,72 @@
             <artifactId>jackson-annotations</artifactId>
             <version>2.7.0</version>
         </dependency>
+	<dependency>
+   	 <groupId>com.google.cloud</groupId>
+   	 <artifactId>google-cloud-storage</artifactId>
+    	<version>0.8.0-beta</version>
+	    <exclusions>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
+		<exclusion>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+		</exclusion>
+                <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                        <groupId>com.google.api.grpc</groupId>
+                        <artifactId>grpc-google-common-protos</artifactId>
+                </exclusion>
+                <exclusion>
+                        <groupId>com.google.auto.value</groupId>
+                        <artifactId>auto-value</artifactId>
+                </exclusion>
+                <exclusion>
+                        <groupId>com.google.auth</groupId>
+                        <artifactId>google-auth-library-credentials</artifactId>
+                </exclusion>
+                <exclusion>
+                        <groupId>org.codehaus.jackson</groupId>
+                        <artifactId>jackson-core-asl</artifactId>
+                </exclusion>
+            </exclusions>
+	</dependency>
+	<dependency>
+		<groupId>com.google.auth</groupId>
+		<artifactId>google-auth-library-oauth2-http</artifactId>
+		<version>0.6.0</version>
+	</dependency>
+        <dependency>
+            <groupId>com.google.api.grpc</groupId>
+            <artifactId>grpc-google-common-protos</artifactId>
+            <version>0.1.2</version>
+	    <exclusions>
+		<exclusion>
+	            <groupId>com.google.auth</groupId>
+	            <artifactId>google-auth-library-credentials</artifactId>
+		</exclusion>
+	    </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-credentials</artifactId>
+            <version>0.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
     </dependencies>
 
 </project>
