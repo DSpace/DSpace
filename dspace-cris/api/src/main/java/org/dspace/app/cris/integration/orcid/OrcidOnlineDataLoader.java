@@ -2,7 +2,6 @@ package org.dspace.app.cris.integration.orcid;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -16,24 +15,26 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpException;
 import org.dspace.app.itemimport.BTEBatchImportService;
 import org.dspace.authority.orcid.OrcidService;
-import org.dspace.authority.orcid.jaxb.Citation;
-import org.dspace.authority.orcid.jaxb.CitationType;
-import org.dspace.authority.orcid.jaxb.Contributor;
-import org.dspace.authority.orcid.jaxb.CreditName;
-import org.dspace.authority.orcid.jaxb.JournalTitle;
-import org.dspace.authority.orcid.jaxb.LanguageCode;
-import org.dspace.authority.orcid.jaxb.OrcidId;
-import org.dspace.authority.orcid.jaxb.OrcidProfile;
-import org.dspace.authority.orcid.jaxb.OrcidWork;
-import org.dspace.authority.orcid.jaxb.OrcidWorks;
-import org.dspace.authority.orcid.jaxb.PersonalDetails;
-import org.dspace.authority.orcid.jaxb.PublicationDate;
-import org.dspace.authority.orcid.jaxb.Source;
-import org.dspace.authority.orcid.jaxb.Url;
-import org.dspace.authority.orcid.jaxb.WorkContributors;
-import org.dspace.authority.orcid.jaxb.WorkExternalIdentifier;
-import org.dspace.authority.orcid.jaxb.WorkExternalIdentifiers;
-import org.dspace.authority.orcid.jaxb.WorkTitle;
+import org.dspace.authority.orcid.jaxb.activities.WorkGroup;
+import org.dspace.authority.orcid.jaxb.activities.Works;
+import org.dspace.authority.orcid.jaxb.common.CreditName;
+import org.dspace.authority.orcid.jaxb.common.ExternalId;
+import org.dspace.authority.orcid.jaxb.common.ExternalIds;
+import org.dspace.authority.orcid.jaxb.common.FuzzyDate;
+import org.dspace.authority.orcid.jaxb.common.LanguageCode;
+import org.dspace.authority.orcid.jaxb.common.OrcidId;
+import org.dspace.authority.orcid.jaxb.common.SourceType;
+import org.dspace.authority.orcid.jaxb.common.Url;
+import org.dspace.authority.orcid.jaxb.personaldetails.NameCtype;
+import org.dspace.authority.orcid.jaxb.personaldetails.PersonalDetails;
+import org.dspace.authority.orcid.jaxb.work.Citation;
+import org.dspace.authority.orcid.jaxb.work.CitationType;
+import org.dspace.authority.orcid.jaxb.work.Contributor;
+import org.dspace.authority.orcid.jaxb.work.Work;
+import org.dspace.authority.orcid.jaxb.work.WorkContributors;
+import org.dspace.authority.orcid.jaxb.work.WorkSummary;
+import org.dspace.authority.orcid.jaxb.work.WorkTitle;
+import org.dspace.authority.orcid.jaxb.work.WorkType;
 import org.dspace.core.Context;
 import org.dspace.submit.lookup.NetworkSubmissionLookupDataLoader;
 import org.dspace.submit.util.SubmissionLookupPublication;
@@ -47,12 +48,8 @@ import gr.ekt.bte.core.MutableRecord;
 import gr.ekt.bte.core.Record;
 import gr.ekt.bte.core.RecordSet;
 import gr.ekt.bte.core.StringValue;
-import gr.ekt.bte.core.TransformationEngine;
-import gr.ekt.bte.core.TransformationResult;
-import gr.ekt.bte.core.TransformationSpec;
 import gr.ekt.bte.core.Value;
 import gr.ekt.bte.dataloader.FileDataLoader;
-import gr.ekt.bteio.generators.DSpaceOutputGenerator;
 
 public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 {
@@ -96,30 +93,50 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 
                 try
                 {
-                    OrcidProfile profile = orcidService.getProfile(orcid);
+                    PersonalDetails profile = orcidService
+                            .getPersonalDetails(orcid, null);
                     if (profile != null)
                     {
-                        OrcidWorks orcidWorks = profile.getOrcidActivities()
-                                .getOrcidWorks();
-                        for (OrcidWork orcidWork : orcidWorks.getOrcidWork())
-                        {       
-                            Source source = orcidWork.getSource();
-                            String sourceNameWork = "";
-                            if(source!=null) {
-                                sourceNameWork = source.getSourceName().getContent();
-                            }
-                            if (StringUtils.isBlank(sourceNameWork) || !StringUtils.equals(sourceNameWork, sourceName))
+                        Works orcidWorks = orcidService.getWorks(orcid, null);
+                        workgroup: for (WorkGroup orcidGroup : orcidWorks.getGroup())
+                        {
+                            int higher = orcidService.higherDisplayIndex(orcidGroup);
+                            worksummary : for (WorkSummary orcidSummary : orcidGroup
+                                    .getWorkSummary())
                             {
-                                PersonalDetails personalDetails = profile
-                                        .getOrcidBio().getPersonalDetails();
-                                try
+                                if (StringUtils.isNotBlank(orcidSummary.getDisplayIndex()))
                                 {
-                                    results.add(convertOrcidWorkToRecord(
-                                            personalDetails, orcid, orcidWork));
+                                    int current = Integer.parseInt(orcidSummary.getDisplayIndex());
+                                    if (current < higher)
+                                    {
+                                        continue worksummary;
+                                    }
                                 }
-                                catch (Exception e)
+                                SourceType source = orcidSummary.getSource();
+                                String sourceNameWork = "";
+                                if (source != null)
                                 {
-                                    throw new IOException(e);
+                                    sourceNameWork = source.getSourceName()
+                                            .getContent();
+                                }
+                                if (StringUtils.isBlank(sourceNameWork)
+                                        || !StringUtils.equals(sourceNameWork,
+                                                sourceName))
+                                {
+                                    try
+                                    {
+                                        results.add(convertOrcidWorkToRecord(
+                                                profile, orcid,
+                                                orcidService.getWork(orcid,
+                                                        null,
+                                                        orcidSummary
+                                                                .getPutCode()
+                                                                .toString())));
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        throw new IOException(e);
+                                    }
                                 }
                             }
                         }
@@ -135,7 +152,7 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
     }
 
     private Record convertOrcidWorkToRecord(PersonalDetails personalDetails,
-            String orcid, OrcidWork orcidWork) throws Exception
+            String orcid, Work orcidWork) throws Exception
     {
         MutableRecord record = new SubmissionLookupPublication("");
 
@@ -144,36 +161,33 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
         {
             record.addValue("url", new StringValue(url.getValue()));
         }
-        WorkTitle workTitle = orcidWork.getWorkTitle();
+        WorkTitle workTitle = orcidWork.getTitle();
         if (workTitle != null)
         {
             record.addValue("title", new StringValue(workTitle.getTitle()));
         }
 
-        String workType = orcidWork.getWorkType();
-        if (StringUtils.isNotBlank(workType))
+        WorkType workType = orcidWork.getType();
+        if (workType != null && StringUtils.isNotBlank(workType.value()))
         {
-            record.addValue("providerType", new StringValue(workType));
+            record.addValue("providerType", new StringValue(workType.value()));
         }
 
-        WorkExternalIdentifiers identifiers = orcidWork
-                .getWorkExternalIdentifiers();
+        ExternalIds identifiers = orcidWork.getExternalIds();
         if (identifiers != null)
         {
-            for (WorkExternalIdentifier identifier : identifiers
-                    .getWorkExternalIdentifier())
+            for (ExternalId identifier : identifiers.getExternalId())
             {
-                String extType = identifier.getWorkExternalIdentifierType();
-                String extIdentifier = identifier.getWorkExternalIdentifierId();
+                String extType = identifier.getExternalIdType();
+                String extIdentifier = identifier.getExternalIdValue();
                 record.addValue(extType, new StringValue(extIdentifier));
             }
         }
 
-        JournalTitle journalTitle = orcidWork.getJournalTitle();
-        if (journalTitle != null)
+        String journalTitle = orcidWork.getJournalTitle();
+        if (StringUtils.isNotBlank(journalTitle))
         {
-            record.addValue("sourceTitle",
-                    new StringValue(journalTitle.getContent()));
+            record.addValue("sourceTitle", new StringValue(journalTitle));
         }
 
         String abs = orcidWork.getShortDescription();
@@ -182,7 +196,7 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
             record.addValue("abstract", new StringValue(abs));
         }
 
-        PublicationDate issued = orcidWork.getPublicationDate();
+        FuzzyDate issued = orcidWork.getPublicationDate();
         if (issued != null)
         {
             record.addValue("issued",
@@ -198,7 +212,7 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
         LinkedList<Value> authNames = new LinkedList<Value>();
         LinkedList<Value> authOrcid = new LinkedList<Value>();
 
-        WorkContributors contributors = orcidWork.getWorkContributors();
+        WorkContributors contributors = orcidWork.getContributors();
         if (contributors != null)
         {
             for (Contributor contributor : contributors.getContributor())
@@ -211,8 +225,7 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
                 OrcidId orcidid = contributor.getContributorOrcid();
                 if (orcidid != null)
                 {
-                    authOrcid.add(new StringValue(
-                            orcidid.getContent().get(0).getValue()));
+                    authOrcid.add(new StringValue(orcidid.getUriPath()));
                 }
                 else
                 {
@@ -221,26 +234,31 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
             }
 
         }
-        if(authNames.isEmpty()) {
-            CreditName name = personalDetails.getCreditName();
+        if (authNames.isEmpty())
+        {
+            NameCtype name = personalDetails.getName();
             if (name != null)
             {
-                authNames.add(new StringValue(name.getValue()));
-            }
-            else
-            {
-                authNames.add(new StringValue(personalDetails.getFamilyName()
-                        + ", " + personalDetails.getGivenNames()));
+                CreditName cname = name.getCreditName();
+                if (cname != null)
+                {
+                    authNames.add(new StringValue(cname.getValue()));
+                }
+                else
+                {
+                    authNames.add(new StringValue(name.getFamilyName() + ", "
+                            + name.getGivenNames()));
+                }
             }
             authOrcid.add(new StringValue(orcid));
         }
         record.addField("authors", authNames);
         record.addField("orcid", authOrcid);
 
-        Citation citation = orcidWork.getWorkCitation();
+        Citation citation = orcidWork.getCitation();
         if (citation != null)
         {
-            CitationType citationType = citation.getWorkCitationType();
+            CitationType citationType = citation.getCitationType();
             if (citationType != null)
             {
                 // Get all the possible data loaders from the Spring
@@ -253,13 +271,14 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
                     if (dataLoaderType.equals(citationType.value()))
                     {
                         File file = File.createTempFile("tmp", ".json");
-                        Files.write(citation.getCitation(), file, Charsets.UTF_8);
+                        Files.write(citation.getCitationValue(), file,
+                                Charsets.UTF_8);
                         DataLoader dataLoader = dls.getDataLoaders()
                                 .get(dataLoaderType);
                         if (dataLoader instanceof FileDataLoader)
                         {
                             FileDataLoader fdl = (FileDataLoader) dataLoader;
-                            fdl.setFilename(file.getAbsolutePath());                            
+                            fdl.setFilename(file.getAbsolutePath());
 
                             RecordSet citationRecord = dataLoader.getRecords();
                             for (Record rr : citationRecord.getRecords())
@@ -278,11 +297,13 @@ public class OrcidOnlineDataLoader extends NetworkSubmissionLookupDataLoader
 
     private void compare(Record rr, MutableRecord record)
     {
-        for(String field : rr.getFields()) {
-            if(!record.hasField(field)) {
+        for (String field : rr.getFields())
+        {
+            if (!record.hasField(field))
+            {
                 record.addField(field, rr.getValues(field));
             }
-        }        
+        }
     }
 
 }

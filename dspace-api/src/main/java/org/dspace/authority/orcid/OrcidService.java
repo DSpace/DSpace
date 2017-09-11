@@ -39,7 +39,10 @@ import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.orcid.jaxb.activities.Educations;
 import org.dspace.authority.orcid.jaxb.activities.Employments;
 import org.dspace.authority.orcid.jaxb.activities.Fundings;
+import org.dspace.authority.orcid.jaxb.activities.WorkGroup;
 import org.dspace.authority.orcid.jaxb.activities.Works;
+import org.dspace.authority.orcid.jaxb.address.Address;
+import org.dspace.authority.orcid.jaxb.address.Addresses;
 import org.dspace.authority.orcid.jaxb.bulk.Bulk;
 import org.dspace.authority.orcid.jaxb.common.SourceType;
 import org.dspace.authority.orcid.jaxb.education.Education;
@@ -48,9 +51,18 @@ import org.dspace.authority.orcid.jaxb.email.Emails;
 import org.dspace.authority.orcid.jaxb.employment.Employment;
 import org.dspace.authority.orcid.jaxb.employment.EmploymentSummary;
 import org.dspace.authority.orcid.jaxb.funding.Funding;
+import org.dspace.authority.orcid.jaxb.keyword.Keyword;
+import org.dspace.authority.orcid.jaxb.keyword.Keywords;
+import org.dspace.authority.orcid.jaxb.othername.OtherName;
+import org.dspace.authority.orcid.jaxb.othername.OtherNames;
 import org.dspace.authority.orcid.jaxb.person.Person;
+import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifier;
+import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifiers;
 import org.dspace.authority.orcid.jaxb.personaldetails.PersonalDetails;
+import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrl;
+import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrls;
 import org.dspace.authority.orcid.jaxb.work.Work;
+import org.dspace.authority.orcid.jaxb.work.WorkSummary;
 import org.dspace.authority.rest.RestSource;
 import org.dspace.content.DCPersonName;
 import org.dspace.content.DSpaceObject;
@@ -79,6 +91,17 @@ public class OrcidService extends RestSource
      */
     private static Logger log = Logger.getLogger(OrcidService.class);
 
+    public static final Integer CONSTANT_PART_OF_RESEARCHER_ID = 9;
+    public static final Integer CONSTANT_PART_OF_RESEARCHER_TYPE = 9;
+    
+    public static final String CONSTANT_OTHERNAME_UUID = "OTHERNAME";
+    public static final String CONSTANT_RESEARCHERURL_UUID = "RESEARCHERURL";
+    public static final String CONSTANT_EXTERNALIDENTIFIER_UUID = "EXTERNALIDENTIFIER";
+    public static final String CONSTANT_ADDRESS_UUID = "ADDRESS";
+    public static final String CONSTANT_KEYWORD_UUID = "KEYWORD";
+    public static final String CONSTANT_EMPLOYMENT_UUID = "EMPLOYMENT";
+    public static final String CONSTANT_EDUCATION_UUID = "EDUCATION";
+    
     public static final String RECORD_ENDPOINT = "/record";
 
     public static final String ACTIVITIES_ENDPOINT = "/activities";
@@ -244,6 +267,39 @@ public class OrcidService extends RestSource
         try
         {
             message = get(endpoint, token, null).readEntity(Works.class);
+        }
+        catch (Exception e)
+        {
+            log.error(e);
+        }
+        return message;
+    }
+
+    public WorkSummary getWorkSummary(String id, String token, String putCode)
+    {
+
+        String endpoint = id + WORK_SUMMARY_ENDPOINT;
+        WorkSummary message = null;
+        try
+        {
+            message = get(endpoint, token, putCode)
+                    .readEntity(WorkSummary.class);
+        }
+        catch (Exception e)
+        {
+            log.error(e);
+        }
+        return message;
+    }
+
+    public Work getWork(String id, String token, String putCode)
+    {
+
+        String endpoint = id + WORK_ENDPOINT;
+        Work message = null;
+        try
+        {
+            message = get(endpoint, token, putCode).readEntity(Work.class);
         }
         catch (Exception e)
         {
@@ -961,6 +1017,503 @@ public class OrcidService extends RestSource
         }
     }
 
+    public OtherNames getOtherNames(final String token)
+    {
+        Response response = null;
+        try
+        {
+            response = get(OTHER_NAMES_ENDPOINT, token, null);
+
+            return response.readEntity(OtherNames.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public OtherName getOtherName(final String token, final String putCode)
+    {
+        Response response = null;
+        try
+        {
+            response = get(OTHER_NAMES_ENDPOINT, token, putCode);
+
+            return response.readEntity(OtherName.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    
+    public StatusType putOtherName(String id, String token, String putCode,
+            OtherName otherName) throws IOException, JAXBException
+    {
+        String endpoint = id + OTHER_NAMES_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = put(endpoint, token, putCode,
+                    Entity.entity(otherName, MediaType.APPLICATION_XML_TYPE));
+            return response.getStatusInfo();
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public void deleteOtherName(String id, String token, String putCode)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + OTHER_NAMES_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = delete(endpoint, token, putCode);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public String appendOtherName(String id, String token, OtherName otherName)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + OTHER_NAMES_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = post(endpoint, token,
+                    Entity.entity(otherName, MediaType.APPLICATION_XML_TYPE));
+            return retrievePutCode(response);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+    
+    //EXTIDS
+    public ExternalIdentifiers getExternalIdentifiers(final String token)
+    {
+        Response response = null;
+        try
+        {
+            response = get(EXTERNAL_IDENTIFIERS_ENDPOINT, token, null);
+
+            return response.readEntity(ExternalIdentifiers.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public ExternalIdentifier getExternalIdentifier(final String token, final String putCode)
+    {
+        Response response = null;
+        try
+        {
+            response = get(EXTERNAL_IDENTIFIERS_ENDPOINT, token, putCode);
+
+            return response.readEntity(ExternalIdentifier.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    
+    public StatusType putExternalIdentifier(String id, String token, String putCode,
+            ExternalIdentifier externalIdentifier) throws IOException, JAXBException
+    {
+        String endpoint = id + EXTERNAL_IDENTIFIERS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = put(endpoint, token, putCode,
+                    Entity.entity(externalIdentifier, MediaType.APPLICATION_XML_TYPE));
+            return response.getStatusInfo();
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public void deleteExternalIdentifier(String id, String token, String putCode)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + EXTERNAL_IDENTIFIERS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = delete(endpoint, token, putCode);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public String appendExternalIdentifier(String id, String token, ExternalIdentifier externalIdentifier)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + EXTERNAL_IDENTIFIERS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = post(endpoint, token,
+                    Entity.entity(externalIdentifier, MediaType.APPLICATION_XML_TYPE));
+            return retrievePutCode(response);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+    
+    //RESEARCHER URL    
+    public ResearcherUrls getResearcherUrls(final String token)
+    {
+        Response response = null;
+        try
+        {
+            response = get(RESEARCHER_URLS_ENDPOINT, token, null);
+
+            return response.readEntity(ResearcherUrls.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public ResearcherUrl getResearcherUrl(final String token, final String putCode)
+    {
+        Response response = null;
+        try
+        {
+            response = get(RESEARCHER_URLS_ENDPOINT, token, putCode);
+
+            return response.readEntity(ResearcherUrl.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    
+    public StatusType putResearcherUrl(String id, String token, String putCode,
+            ResearcherUrl researcherUrl) throws IOException, JAXBException
+    {
+        String endpoint = id + RESEARCHER_URLS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = put(endpoint, token, putCode,
+                    Entity.entity(researcherUrl, MediaType.APPLICATION_XML_TYPE));
+            return response.getStatusInfo();
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public void deleteResearcherUrl(String id, String token, String putCode)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + RESEARCHER_URLS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = delete(endpoint, token, putCode);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public String appendResearcherUrl(String id, String token, ResearcherUrl researcherUrl)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + RESEARCHER_URLS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = post(endpoint, token,
+                    Entity.entity(researcherUrl, MediaType.APPLICATION_XML_TYPE));
+            return retrievePutCode(response);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+    
+    //ADDRESS
+    public Addresses getAddresses(final String token)
+    {
+        Response response = null;
+        try
+        {
+            response = get(ADDRESS_ENDPOINT, token, null);
+
+            return response.readEntity(Addresses.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public Address getAddress(final String token, final String putCode)
+    {
+        Response response = null;
+        try
+        {
+            response = get(ADDRESS_ENDPOINT, token, putCode);
+
+            return response.readEntity(Address.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    
+    public StatusType putAddress(String id, String token, String putCode,
+            Address address) throws IOException, JAXBException
+    {
+        String endpoint = id + ADDRESS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = put(endpoint, token, putCode,
+                    Entity.entity(address, MediaType.APPLICATION_XML_TYPE));
+            return response.getStatusInfo();
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public void deleteAddress(String id, String token, String putCode)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + ADDRESS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = delete(endpoint, token, putCode);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public String appendAddress(String id, String token, Address address)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + ADDRESS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = post(endpoint, token,
+                    Entity.entity(address, MediaType.APPLICATION_XML_TYPE));
+            return retrievePutCode(response);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    } 
+
+    // KEYWORD
+    public Keywords getKeywords(final String token)
+    {
+        Response response = null;
+        try
+        {
+            response = get(KEYWORDS_ENDPOINT, token, null);
+
+            return response.readEntity(Keywords.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public Keyword getKeyword(final String token, final String putCode)
+    {
+        Response response = null;
+        try
+        {
+            response = get(KEYWORDS_ENDPOINT, token, putCode);
+
+            return response.readEntity(Keyword.class);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    
+    public StatusType putKeyword(String id, String token, String putCode,
+            Keyword keyword) throws IOException, JAXBException
+    {
+        String endpoint = id + KEYWORDS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = put(endpoint, token, putCode,
+                    Entity.entity(keyword, MediaType.APPLICATION_XML_TYPE));
+            return response.getStatusInfo();
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public void deleteKeyword(String id, String token, String putCode)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + KEYWORDS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = delete(endpoint, token, putCode);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+
+    public String appendKeyword(String id, String token, Keyword keyword)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + KEYWORDS_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = post(endpoint, token,
+                    Entity.entity(keyword, MediaType.APPLICATION_XML_TYPE));
+            return retrievePutCode(response);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }    
+    
+    // Utility call
+    public int higherDisplayIndex(WorkGroup orcidGroup)
+    {
+        int higher = 0;
+        for (WorkSummary orcidSummary : orcidGroup.getWorkSummary())
+        {
+            if (StringUtils.isNotBlank(orcidSummary.getDisplayIndex()))
+            {
+                int current = Integer.parseInt(orcidSummary.getDisplayIndex());
+                if (current > higher)
+                {
+                    higher = current;
+                }
+            }
+        }
+        return higher;
+    }
+
     // Higher level call
     /**
      * HTTP GET method using to read resources from WS-REST
@@ -989,8 +1542,18 @@ public class OrcidService extends RestSource
         }
         else
         {
-            response = target.request().accept(APPLICATION_ORCID_XML)
-                    .acceptEncoding("UTF-8").get();
+            try
+            {
+                response = target.request().header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + getAccessToken(READ_PUBLIC_SCOPE, "scope",
+                                "client_credentials").getAccess_token())
+                        .accept(APPLICATION_ORCID_XML).acceptEncoding("UTF-8")
+                        .get();
+            }
+            catch (IOException e)
+            {
+
+            }
         }
 
         log.debug("[GET] " + response.getStatus());
@@ -1165,4 +1728,5 @@ public class OrcidService extends RestSource
         }
 
     }
+
 }

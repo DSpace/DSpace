@@ -65,33 +65,17 @@ public class JSONOrcidQueueServlet extends JSONRequest {
 		String crisId = req.getParameter("id");
 
 		JsonObject jo = new JsonObject();
-		if (req.getPathInfo().contains("post")) {
+		if (req.getPathInfo().contains("rest")) {
 			String uuId = req.getParameter("uuid");
 			String owner = req.getParameter("owner");
 			boolean ok = false;
 			//send to ORCID Registry
 			if (req.getPathInfo().trim().endsWith("crisrp")) {
-				ok = orcidPreferencesUtils.postOrcidProfile(owner, uuId);
+				ok = orcidPreferencesUtils.sendOrcidProfile(owner, uuId);
 			} else if (req.getPathInfo().trim().endsWith("crispj")) {
-				ok = orcidPreferencesUtils.postOrcidFunding(owner, uuId);
+				ok = orcidPreferencesUtils.sendOrcidFunding(owner, uuId);
 			} else {
-				ok = orcidPreferencesUtils.postOrcidWork(owner, uuId);
-			}
-			if(ok) {				
-				jo.addProperty("status", true);
-			} else {
-				jo.addProperty("status", false);
-			}
-		} else if (req.getPathInfo().contains("put")) {
-			String owner = req.getParameter("owner");
-			boolean ok = false;
-			//send to ORCID Registry
-			if (req.getPathInfo().trim().endsWith("crisrp")) {
-				ok = orcidPreferencesUtils.putOrcidProfiles(owner);
-			} else if (req.getPathInfo().trim().endsWith("crispj")) {
-				ok = orcidPreferencesUtils.putOrcidFundings(owner);
-			} else {
-				ok = orcidPreferencesUtils.putOrcidWorks(owner);
+				ok = orcidPreferencesUtils.sendOrcidWork(owner, uuId);
 			}
 			if(ok) {				
 				jo.addProperty("status", true);

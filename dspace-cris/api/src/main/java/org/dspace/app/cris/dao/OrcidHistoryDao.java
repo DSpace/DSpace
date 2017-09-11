@@ -30,7 +30,8 @@ public interface OrcidHistoryDao extends PaginableObjectDao<OrcidHistory, Intege
 	public List<OrcidHistory> findOrcidHistoryInSuccessByOwner(String owner);
 	public List<OrcidHistory> findOrcidHistoryInSuccessByOwnerAndTypeId(String owner, Integer typeId);
 	public OrcidHistory uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId(String owner, Integer entityId, Integer typeId);
-	public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(String owner, Integer entityId, Integer typeId);	
+	public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(String owner, Integer entityId, Integer typeId);
+	public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityUUIDAndTypeId(String owner, String uuid, Integer typeId);
 	
 	
 }

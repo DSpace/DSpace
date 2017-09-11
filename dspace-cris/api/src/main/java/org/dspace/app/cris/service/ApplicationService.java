@@ -1007,6 +1007,13 @@ public class ApplicationService extends ExtendedTabService
 		return orcidHistoryDao.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(crisID, entityID, typeID);
 	}
 
+    public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityUUIDAndTypeId(
+            String crisID, String entityUUID, int typeID)
+    {
+        return orcidHistoryDao.uniqueOrcidHistoryByOwnerAndEntityUUIDAndTypeId(
+                crisID, entityUUID, typeID);
+    }
+
     public List<DynamicTypeNestedObject> findNestedMaskById(Class<DynamicObjectType> clazz, Integer id)
     {
         DynamicObjectTypeDao dao = (DynamicObjectTypeDao)getDaoByModel(clazz);

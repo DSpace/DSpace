@@ -28,6 +28,8 @@ import javax.mail.MessagingException;
 import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.core.Response.StatusType;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -57,6 +59,10 @@ import org.dspace.app.cris.service.RelationPreferenceService;
 import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.authority.orcid.OrcidExternalIdentifierType;
 import org.dspace.authority.orcid.OrcidService;
+import org.dspace.authority.orcid.jaxb.activities.FundingGroup;
+import org.dspace.authority.orcid.jaxb.activities.Fundings;
+import org.dspace.authority.orcid.jaxb.activities.WorkGroup;
+import org.dspace.authority.orcid.jaxb.activities.Works;
 import org.dspace.authority.orcid.jaxb.address.Address;
 import org.dspace.authority.orcid.jaxb.bulk.Bulk;
 import org.dspace.authority.orcid.jaxb.common.Amount;
@@ -82,10 +88,13 @@ import org.dspace.authority.orcid.jaxb.email.Email;
 import org.dspace.authority.orcid.jaxb.employment.Employment;
 import org.dspace.authority.orcid.jaxb.funding.Contributors;
 import org.dspace.authority.orcid.jaxb.funding.Funding;
+import org.dspace.authority.orcid.jaxb.funding.FundingSummary;
 import org.dspace.authority.orcid.jaxb.funding.FundingTitle;
 import org.dspace.authority.orcid.jaxb.funding.FundingType;
 import org.dspace.authority.orcid.jaxb.keyword.Keyword;
 import org.dspace.authority.orcid.jaxb.keyword.Keywords;
+import org.dspace.authority.orcid.jaxb.othername.OtherName;
+import org.dspace.authority.orcid.jaxb.othername.OtherNameCtype;
 import org.dspace.authority.orcid.jaxb.othername.OtherNames;
 import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifier;
 import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifiers;
@@ -101,6 +110,7 @@ import org.dspace.authority.orcid.jaxb.work.ContributorRole;
 import org.dspace.authority.orcid.jaxb.work.ContributorSequence;
 import org.dspace.authority.orcid.jaxb.work.Work;
 import org.dspace.authority.orcid.jaxb.work.WorkContributors;
+import org.dspace.authority.orcid.jaxb.work.WorkSummary;
 import org.dspace.authority.orcid.jaxb.work.WorkTitle;
 import org.dspace.authority.orcid.jaxb.work.WorkType;
 import org.dspace.content.DSpaceObject;
@@ -114,6 +124,8 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.handle.HandleManager;
 import org.dspace.util.SimpleMapConverter;
 import org.dspace.utils.DSpace;
+
+import com.hp.hpl.jena.tdb.store.Hash;
 
 import it.cilea.osd.common.core.SingleTimeStampInfo;
 import it.cilea.osd.jdyna.value.BooleanValue;
@@ -154,7 +166,7 @@ public class PushToORCID
     public static void prepareAndSend(Context context, List<ResearcherPage> rps,
             RelationPreferenceService relationPreferenceService,
             SearchService searchService, ApplicationService applicationService,
-            String mode) throws Exception
+            boolean delete) throws Exception
     {
         log.debug("Working... push to ORCID");
 
@@ -296,6 +308,8 @@ public class PushToORCID
                     // TODO v2.0 change the workflow to build profile from
                     // scratch
                     // https://members.orcid.org/api/integrate/create-records
+                    log.warn("NOT YET IMPLEMENTED:"
+                            + rp.getCrisID());                    
                 }
                 catch (Exception e)
                 {
@@ -344,10 +358,10 @@ public class PushToORCID
                             // items added in 1.2 and earlier have all been
                             // assigned put codes.
 
-                            buildOrcidProfile(applicationService, crisId,
-                                    mapResearcherMetadataToSend,
+                            buildOrcidProfile(orcidService, applicationService,
+                                    crisId, mapResearcherMetadataToSend,
                                     mapResearcherMetadataNestedToSend,
-                                    orcidConfigurationMapping, false);
+                                    orcidConfigurationMapping, delete, tokenUpdateBio, orcid);
 
                         }
                     }
@@ -377,12 +391,20 @@ public class PushToORCID
                                     {
                                         if (obj instanceof Work)
                                         {
-                                            String handle = getInternalIdentifier((Work)obj);
+                                            String handle = getInternalIdentifier(
+                                                    (Work) obj);
                                             buildHistory(context,
                                                     applicationService,
                                                     orcidService, access_token,
-                                                    crisId, orcid, HandleManager.resolveToObject(context, handle).getID(), handle,
-                                                    timestampAttempt, (ElementSummary)obj, Constants.ITEM);
+                                                    crisId, orcid,
+                                                    HandleManager
+                                                            .resolveToObject(
+                                                                    context,
+                                                                    handle)
+                                                            .getID(),
+                                                    handle, timestampAttempt,
+                                                    (ElementSummary) obj,
+                                                    Constants.ITEM);
                                         }
                                         else
                                         {
@@ -420,7 +442,12 @@ public class PushToORCID
                                 {
                                     String handle = getInternalIdentifier(work);
                                     buildHistory(context, applicationService,
-                                            orcidService, access_token, crisId, orcid, HandleManager.resolveToObject(context, handle).getID(), handle, timestampAttempt, work, Constants.ITEM);
+                                            orcidService, access_token, crisId,
+                                            orcid,
+                                            HandleManager.resolveToObject(
+                                                    context, handle).getID(),
+                                            handle, timestampAttempt, work,
+                                            Constants.ITEM);
                                 }
                                 else
                                 {
@@ -447,10 +474,16 @@ public class PushToORCID
                                         orcid, tokenUpdateActivities, funding);
                                 if (StringUtils.isNotBlank(putCode))
                                 {
-                                    String uuid = getInternalIdentifier(funding);
+                                    String uuid = getInternalIdentifier(
+                                            funding);
                                     buildHistory(context, applicationService,
                                             orcidService, access_token, crisId,
-                                            orcid, applicationService.getEntityByUUID(uuid).getID(), uuid, timestampAttempt, funding, CrisConstants.PROJECT_TYPE_ID);
+                                            orcid,
+                                            applicationService
+                                                    .getEntityByUUID(uuid)
+                                                    .getID(),
+                                            uuid, timestampAttempt, funding,
+                                            CrisConstants.PROJECT_TYPE_ID);
                                 }
                             }
                             log.info(
@@ -465,14 +498,22 @@ public class PushToORCID
                             for (Funding funding : fundings)
                             {
                                 StatusType status = orcidService.putFunding(
-                                        orcid, tokenUpdateActivities, funding.getPutCode().toString(), funding);
+                                        orcid, tokenUpdateActivities,
+                                        funding.getPutCode().toString(),
+                                        funding);
                                 if (status.getFamily()
                                         .equals(Family.SUCCESSFUL))
                                 {
-                                    String uuid = getInternalIdentifier(funding);
+                                    String uuid = getInternalIdentifier(
+                                            funding);
                                     buildHistory(context, applicationService,
                                             orcidService, access_token, crisId,
-                                            orcid, applicationService.getEntityByUUID(uuid).getID(), uuid, timestampAttempt, funding, CrisConstants.PROJECT_TYPE_ID);
+                                            orcid,
+                                            applicationService
+                                                    .getEntityByUUID(uuid)
+                                                    .getID(),
+                                            uuid, timestampAttempt, funding,
+                                            CrisConstants.PROJECT_TYPE_ID);
                                 }
                                 else
                                 {
@@ -488,99 +529,11 @@ public class PushToORCID
                         }
                         
                         log.info(
-                                "(Q4)Prepare Educations for ResearcherPage crisID:"
+                                "(Q4)Prepare Affiliations (Employments and Educations) for ResearcherPage crisID:"
                                         + crisId);
-                        List<WrapperEducation> educations = buildEducations(
-                                applicationService, crisId,
-                                mapResearcherMetadataToSend,
-                                mapResearcherMetadataNestedToSend,
-                                orcidConfigurationMapping);
-                        if (educations != null)
-                        {
-                            for (WrapperEducation wrapper : educations)
-                            {
-                                Education education = wrapper.getEducation();
-                                if(education.getPutCode()!=null) {
-                                    StatusType status = orcidService.putEducation(
-                                            orcid, tokenUpdateActivities, education.getPutCode().toString(), education);
-                                    if (status.getFamily()
-                                            .equals(Family.SUCCESSFUL))
-                                    {
-                                        buildHistory(context, applicationService,
-                                                orcidService, access_token, crisId,
-                                                orcid, wrapper.getId(), wrapper.getUuid(), timestampAttempt, education, wrapper.getType());
-                                    }
-                                    else
-                                    {
-                                        log.error("[REASON]"
-                                                + status.getStatusCode() + ":"
-                                                + status.getReasonPhrase());
-                                    }
-                                }
-                                else {
-                                    String putCode = orcidService.appendEducation(
-                                            orcid, tokenUpdateActivities, education);
-                                    if (StringUtils.isNotBlank(putCode))
-                                    {
-                                        buildHistory(context, applicationService,
-                                                orcidService, access_token, crisId,
-                                                orcid, wrapper.getId(), wrapper.getUuid(), timestampAttempt, education, wrapper.getType());
-                                    }
-                                }
-                            }
-                            log.info(
-                                    "(A4) Educations for ResearcherPage crisID:"
-                                            + crisId);
+                        buildAffiliations(orcidService, applicationService, crisId, mapResearcherMetadataToSend, mapResearcherMetadataNestedToSend, delete, tokenUpdateActivities, orcid);                     
 
-                        }
-                        
-                        log.info(
-                                "(Q5)Prepare Employments for ResearcherPage crisID:"
-                                        + crisId);
-                        List<WrapperEmployment> employments = buildEmployments(
-                                applicationService, crisId,
-                                mapResearcherMetadataToSend,
-                                mapResearcherMetadataNestedToSend,
-                                orcidConfigurationMapping);
-                        if (employments != null)
-                        {
-                            for (WrapperEmployment wrapper : employments)
-                            {
-                                Employment employment = wrapper.getEmployment();
-                                if(employment.getPutCode()!=null) {
-                                    StatusType status = orcidService.putEmployment(
-                                            orcid, tokenUpdateActivities, employment.getPutCode().toString(), employment);
-                                    if (status.getFamily()
-                                            .equals(Family.SUCCESSFUL))
-                                    {
-                                        buildHistory(context, applicationService,
-                                                orcidService, access_token, crisId,
-                                                orcid, wrapper.getId(), wrapper.getUuid(), timestampAttempt, employment, wrapper.getType());
-                                    }
-                                    else
-                                    {
-                                        log.error("[REASON]"
-                                                + status.getStatusCode() + ":"
-                                                + status.getReasonPhrase());
-                                    }
-                                }
-                                else {
-                                    String putCode = orcidService.appendEmployment(
-                                            orcid, tokenUpdateActivities, employment);
-                                    if (StringUtils.isNotBlank(putCode))
-                                    {
-                                        buildHistory(context, applicationService,
-                                                orcidService, access_token, crisId,
-                                                orcid, wrapper.getId(), wrapper.getUuid(), timestampAttempt, employment, wrapper.getType());
-                                    }
-                                }
-                            }
-                            log.info(
-                                    "(A5) Employments for ResearcherPage crisID:"
-                                            + crisId);
 
-                        }  
-                        
                     }
                 }
                 catch (Exception ex)
@@ -596,37 +549,42 @@ public class PushToORCID
 
     private static String getInternalIdentifier(Work obj)
     {
-        for(ExternalId extid : obj.getExternalIds().getExternalId()) {
-            if(OrcidExternalIdentifierType.HANDLE.toString().equals(extid.getExternalIdType())) {
+        for (ExternalId extid : obj.getExternalIds().getExternalId())
+        {
+            if (OrcidExternalIdentifierType.HANDLE.toString()
+                    .equals(extid.getExternalIdType()))
+            {
                 return extid.getExternalIdValue();
             }
         }
-            
+
         return null;
     }
 
     private static String getInternalIdentifier(Funding obj)
     {
-        for(ExternalId extid : obj.getExternalIds().getExternalId()) {
-            if("uuid".toString().equals(extid.getExternalIdType())) {
+        for (ExternalId extid : obj.getExternalIds().getExternalId())
+        {
+            if ("uuid".toString().equals(extid.getExternalIdType()))
+            {
                 return extid.getExternalIdValue();
             }
         }
-            
+
         return null;
     }
-    
+
     private static void buildHistory(Context context,
             ApplicationService applicationService, OrcidService orcidService,
-            String access_token, String orcid, String ownerId, Integer entityId, String entityUuid,
-            SingleTimeStampInfo timestampAttempt, ElementSummary element, Integer entityType)
+            String access_token, String orcid, String ownerId, Integer entityId,
+            String entityUuid, SingleTimeStampInfo timestampAttempt,
+            ElementSummary element, Integer entityType)
     {
         String putCode = element.getPutCode().toString();
 
         OrcidHistory orcidHistory = applicationService
-                .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
-                        ownerId, entityId,
-                        entityType);
+                .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(ownerId,
+                        entityId, entityType);
         if (orcidHistory == null)
         {
             orcidHistory = new OrcidHistory();
@@ -637,13 +595,9 @@ public class PushToORCID
         orcidHistory.setOwner(ownerId);
         orcidHistory.setPutCode(putCode);
         orcidHistory.setOrcid(orcid);
-        orcidHistory.setTimestampSuccessAttempt(
-                timestampAttempt);
-        orcidHistory.setTimestampLastAttempt(
-                timestampAttempt);
-        applicationService.saveOrUpdate(
-                OrcidHistory.class,
-                orcidHistory);
+        orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+        orcidHistory.setTimestampLastAttempt(timestampAttempt);
+        applicationService.saveOrUpdate(OrcidHistory.class, orcidHistory);
 
     }
 
@@ -653,66 +607,72 @@ public class PushToORCID
             SingleTimeStampInfo timestampAttempt)
     {
         String sourceName = orcidService.getSourceClientName();
-        OrcidWorks searchworks = orcidService.getWorks(orcid, access_token);
+        Works searchworks = orcidService.getWorks(orcid, access_token);
         if (searchworks != null)
         {
             try
             {
-                external: for (OrcidWork justWork : searchworks.getOrcidWork())
+                Works orcidWorks = orcidService.getWorks(orcid, null);
+                external: for (WorkGroup orcidGroup : orcidWorks.getGroup())
                 {
-                    if (StringUtils.equals(
-                            justWork.getSource().getSourceName().getContent(),
-                            sourceName))
+                    worksummary: for (WorkSummary orcidSummary : orcidGroup
+                            .getWorkSummary())
                     {
-                        WorkExternalIdentifiers extIds = justWork
-                                .getWorkExternalIdentifiers();
-                        if (extIds != null)
+                        if (StringUtils.equals(orcidSummary.getSource()
+                                .getSourceName().getContent(), sourceName))
                         {
-                            internal: for (WorkExternalIdentifier extId : extIds
-                                    .getWorkExternalIdentifier())
+                            ExternalIds extIds = orcidSummary.getExternalIds();
+                            if (extIds != null)
                             {
-                                if ("handle".equals(
-                                        extId.getWorkExternalIdentifierType()))
+                                internal: for (ExternalId extId : extIds
+                                        .getExternalId())
                                 {
-                                    if (StringUtils.isNotBlank(extId
-                                            .getWorkExternalIdentifierId()))
+                                    if ("handle"
+                                            .equals(extId.getExternalIdType()))
                                     {
-                                        String handle = extId
-                                                .getWorkExternalIdentifierId()
-                                                .trim();
-
-                                        DSpaceObject dso = HandleManager
-                                                .resolveToObject(context,
-                                                        handle);
-                                        OrcidHistory orcidHistory = applicationService
-                                                .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
-                                                        crisId, dso.getID(),
-                                                        Constants.ITEM);
-                                        if (orcidHistory == null)
+                                        if (StringUtils.isNotBlank(
+                                                extId.getExternalIdValue()))
                                         {
-                                            orcidHistory = new OrcidHistory();
+                                            String handle = extId
+                                                    .getExternalIdValue()
+                                                    .trim();
+
+                                            DSpaceObject dso = HandleManager
+                                                    .resolveToObject(context,
+                                                            handle);
+                                            OrcidHistory orcidHistory = applicationService
+                                                    .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
+                                                            crisId, dso.getID(),
+                                                            Constants.ITEM);
+                                            if (orcidHistory == null)
+                                            {
+                                                orcidHistory = new OrcidHistory();
+                                            }
+                                            orcidHistory
+                                                    .setEntityId(dso.getID());
+                                            orcidHistory.setEntityUuid(handle);
+                                            orcidHistory
+                                                    .setTypeId(Constants.ITEM);
+                                            orcidHistory.setOwner(crisId);
+                                            orcidHistory.setPutCode(orcidSummary
+                                                    .getPutCode().toString());
+                                            orcidHistory
+                                                    .setTimestampSuccessAttempt(
+                                                            timestampAttempt);
+                                            orcidHistory
+                                                    .setTimestampLastAttempt(
+                                                            timestampAttempt);
+                                            applicationService.saveOrUpdate(
+                                                    OrcidHistory.class,
+                                                    orcidHistory);
+                                            continue external;
                                         }
-                                        orcidHistory.setEntityId(dso.getID());
-                                        orcidHistory.setEntityUuid(handle);
-                                        orcidHistory.setTypeId(Constants.ITEM);
-                                        orcidHistory.setOwner(crisId);
-                                        orcidHistory.setPutCode(justWork
-                                                .getPutCode().toString());
-                                        orcidHistory.setTimestampSuccessAttempt(
-                                                timestampAttempt);
-                                        orcidHistory.setTimestampLastAttempt(
-                                                timestampAttempt);
-                                        applicationService.saveOrUpdate(
-                                                OrcidHistory.class,
-                                                orcidHistory);
-                                        continue external;
                                     }
                                 }
                             }
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -730,52 +690,54 @@ public class PushToORCID
             SingleTimeStampInfo timestampAttempt)
     {
         String sourceName = orcidService.getSourceClientName();
-        FundingList searchfunds = orcidService.getFundings(orcid, access_token);
+        Fundings searchfunds = orcidService.getFundings(orcid, access_token);
         if (searchfunds != null)
         {
             try
             {
-                for (Funding justWork : searchfunds.getFunding())
+                external: for (FundingGroup justWork : searchfunds.getGroup())
                 {
-                    if (StringUtils.equals(
-                            justWork.getSource().getSourceName().getContent(),
-                            sourceName))
+                    worksummary: for (FundingSummary orcidSummary : justWork
+                            .getFundingSummary())
                     {
-                        FundingExternalIdentifiers extIds = justWork
-                                .getFundingExternalIdentifiers();
-                        if (extIds != null)
+                        if (StringUtils.equals(orcidSummary.getSource()
+                                .getSourceName().getContent(), sourceName))
                         {
-                            for (FundingExternalIdentifier extId : extIds
-                                    .getFundingExternalIdentifier())
+                            ExternalIds extIds = orcidSummary.getExternalIds();
+                            if (extIds != null)
                             {
-                                if ("uuid".equals(extId
-                                        .getFundingExternalIdentifierType()))
+                                for (ExternalId extId : extIds.getExternalId())
                                 {
-                                    String uuid = extId
-                                            .getFundingExternalIdentifierValue();
-                                    ACrisObject pj = applicationService
-                                            .getEntityByUUID(uuid);
-                                    OrcidHistory orcidHistory = applicationService
-                                            .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
-                                                    crisId, pj.getId(),
-                                                    CrisConstants.PROJECT_TYPE_ID);
-                                    if (orcidHistory == null)
+                                    if ("uuid"
+                                            .equals(extId.getExternalIdType()))
                                     {
-                                        orcidHistory = new OrcidHistory();
+                                        String uuid = extId
+                                                .getExternalIdValue();
+                                        ACrisObject pj = applicationService
+                                                .getEntityByUUID(uuid);
+                                        OrcidHistory orcidHistory = applicationService
+                                                .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
+                                                        crisId, pj.getId(),
+                                                        CrisConstants.PROJECT_TYPE_ID);
+                                        if (orcidHistory == null)
+                                        {
+                                            orcidHistory = new OrcidHistory();
+                                        }
+                                        orcidHistory.setEntityId(pj.getId());
+                                        orcidHistory.setEntityUuid(uuid);
+                                        orcidHistory.setTypeId(
+                                                CrisConstants.PROJECT_TYPE_ID);
+                                        orcidHistory.setOwner(crisId);
+                                        orcidHistory.setPutCode(orcidSummary
+                                                .getPutCode().toString());
+                                        orcidHistory.setTimestampSuccessAttempt(
+                                                timestampAttempt);
+                                        orcidHistory.setTimestampLastAttempt(
+                                                timestampAttempt);
+                                        applicationService.saveOrUpdate(
+                                                OrcidHistory.class,
+                                                orcidHistory);
                                     }
-                                    orcidHistory.setEntityId(pj.getId());
-                                    orcidHistory.setEntityUuid(uuid);
-                                    orcidHistory.setTypeId(
-                                            CrisConstants.PROJECT_TYPE_ID);
-                                    orcidHistory.setOwner(crisId);
-                                    orcidHistory.setPutCode(
-                                            justWork.getPutCode().toString());
-                                    orcidHistory.setTimestampSuccessAttempt(
-                                            timestampAttempt);
-                                    orcidHistory.setTimestampLastAttempt(
-                                            timestampAttempt);
-                                    applicationService.saveOrUpdate(
-                                            OrcidHistory.class, orcidHistory);
                                 }
                             }
                         }
@@ -2017,9 +1979,9 @@ public class PushToORCID
     }
 
     /**
-     * Build OrcidProfile to send OrcidBio. see
-     * http://members.orcid.org/api/xml-orcid-bio
+     * Build OrcidProfile
      * 
+     * @param orcidService
      * @param applicationService
      * @param crisId
      * @param mapResearcherMetadataToSend
@@ -2027,91 +1989,420 @@ public class PushToORCID
      * @param orcidMetadataConfiguration
      * @param buildAffiliations
      *            - if true build xml with affiliations information
+     * 
      * @return
      */
-    public static void buildOrcidProfile(ApplicationService applicationService,
-            String crisId,
+    public static void buildOrcidProfile(OrcidService orcidService,
+            ApplicationService applicationService, String crisId,
             Map<String, Map<String, List<String>>> mapResearcherMetadataToSend,
             Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend,
             Map<String, String> orcidMetadataConfiguration,
-            boolean buildAffiliations)
+            boolean deleteAndPost, String token, String orcid)
     {
 
         Map<String, List<String>> metadata = mapResearcherMetadataToSend
                 .get(crisId);
-        Map<String, List<Map<String, List<String>>>> metadataNested = mapResearcherMetadataNestedToSend
-                .get(crisId);
-
-        List<String> name = metadata.get("name");
 
         // retrieve data from map
+        List<OtherName> otherNames = prepareOtherNames(metadata);
+        sendOtherNames(orcidService, applicationService, crisId, token, orcid,
+                otherNames, deleteAndPost);
 
-        String creditName = null;
-        List<String> creditname = metadata.get("credit-name");
-        if (creditname != null && !creditname.isEmpty())
-        {
-            creditName = creditname.get(0);
-        }
+        List<ResearcherUrl> researcherUrls = prepareResearcherUrls(
+                applicationService, orcidMetadataConfiguration, metadata);
+        sendResearcherUrls(orcidService, applicationService, crisId, token,
+                orcid, researcherUrls, deleteAndPost);
 
-        List<String> otherNames = new ArrayList<String>();
-        otherNames.add(name.get(0));
-        List<String> othernamesPlatform = metadata.get("other-names");
-        if (othernamesPlatform != null && !othernamesPlatform.isEmpty())
-        {
-            otherNames.addAll(othernamesPlatform);
-        }
+        List<ExternalIdentifier> externalIdentifiers = prepareExternalIdentifiers(
+                applicationService, orcidMetadataConfiguration, metadata);
+        sendExternalIdentifiers(orcidService, applicationService, crisId, token,
+                orcid, externalIdentifiers, deleteAndPost);
 
-        if (StringUtils.isNotBlank(creditName))
-        {
-            CreditName creditNameJAXB = new CreditName();
-            creditNameJAXB.setValue(creditName);
-        }
+        List<Address> addresses = prepareAddress(metadata);
+        sendAddresses(orcidService, applicationService, crisId, token, orcid,
+                addresses, deleteAndPost);
 
-        if (otherNames != null && !otherNames.isEmpty())
+        List<Keyword> keywords = prepareKeywords(metadata);
+        sendKeywords(orcidService, applicationService, crisId, token, orcid,
+                keywords, deleteAndPost);
+
+    }
+
+    public static void buildAffiliations(OrcidService orcidService,
+            ApplicationService applicationService, String crisId,
+            Map<String, Map<String, List<String>>> mapResearcherMetadataToSend,
+            Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend,            
+            boolean delete, String token, String orcid)
+    {
+
+        // retrieve data from map
+        List<WrapperEducation> wrapperEducations = buildEducations(
+                applicationService, crisId, mapResearcherMetadataToSend,
+                mapResearcherMetadataNestedToSend);
+        sendWrapperEducation(orcidService, applicationService, crisId, token,
+                orcid, wrapperEducations, delete);
+
+        List<WrapperEmployment> wrapperEmployments = buildEmployments(
+                applicationService, crisId, mapResearcherMetadataToSend,
+                mapResearcherMetadataNestedToSend);
+        sendWrapperEmployment(orcidService, applicationService, crisId, token,
+                orcid, wrapperEmployments, delete);       
+        
+
+    }
+    
+    // send sections
+    private static void sendWrapperEducation(OrcidService orcidService,
+            ApplicationService applicationService, String crisId, String token,
+            String orcid, List<WrapperEducation> wrapperEducations,
+            boolean delete)
+    {
+
+        if (wrapperEducations != null)
         {
-            OtherNames otherNamesJAXB = new OtherNames();
-            for (String otherName : otherNames)
+            for (WrapperEducation wrapperEducation : wrapperEducations)
             {
-                otherNamesJAXB.getOtherName().add(otherName);
+                Education education = wrapperEducation.getEducation();
+                sendPartOfResearcher(orcidService, applicationService, crisId, token, orcid, OrcidService.CONSTANT_EDUCATION_UUID, wrapperEducation.getUuid(), education, delete);
+            }
+
+        }
+    }
+    
+    private static void sendWrapperEmployment(OrcidService orcidService,
+            ApplicationService applicationService, String crisId, String token,
+            String orcid, List<WrapperEmployment> wrapperEmployments,
+            boolean delete)
+    {
+
+        if (wrapperEmployments != null)
+        {
+            for (WrapperEmployment wrapperEmployment : wrapperEmployments)
+            {
+                Employment employment = wrapperEmployment.getEmployment();
+                sendPartOfResearcher(orcidService, applicationService, crisId, token, orcid, OrcidService.CONSTANT_EMPLOYMENT_UUID, wrapperEmployment.getUuid(), employment, delete);
+            }
+
+        }
+    }
+
+    private static void sendKeywords(OrcidService orcidService,
+            ApplicationService applicationService, String crisId, String token,
+            String orcid, List<Keyword> keywords, boolean deleteAndPost)
+    {
+        for (Keyword partOfResearcher : keywords)
+        {
+            String value = partOfResearcher.getContent();
+            String md5ContentPartOfResearcher = new String(
+                    DigestUtils.md5(value));
+            sendPartOfResearcher(orcidService, applicationService, crisId,
+                    token, orcid, OrcidService.CONSTANT_KEYWORD_UUID,
+                    md5ContentPartOfResearcher, partOfResearcher,
+                    deleteAndPost);
+        }
+
+    }
+
+    private static void sendAddresses(OrcidService orcidService,
+            ApplicationService applicationService, String crisId, String token,
+            String orcid, List<Address> addresses, boolean deleteAndPost)
+    {
+        for (Address partOfResearcher : addresses)
+        {
+            String value = partOfResearcher.getCountry();
+            String md5ContentPartOfResearcher = new String(
+                    DigestUtils.md5(value));
+            sendPartOfResearcher(orcidService, applicationService, crisId,
+                    token, orcid, OrcidService.CONSTANT_ADDRESS_UUID,
+                    md5ContentPartOfResearcher, partOfResearcher,
+                    deleteAndPost);
+        }
+    }
+
+    private static void sendResearcherUrls(OrcidService orcidService,
+            ApplicationService applicationService, String crisId, String token,
+            String orcid, List<ResearcherUrl> researcherUrl,
+            boolean deleteAndPost)
+    {
+        for (ResearcherUrl partOfResearcher : researcherUrl)
+        {
+            String value = partOfResearcher.getUrl().getValue();
+            String md5ContentPartOfResearcher = new String(
+                    DigestUtils.md5(value));
+            sendPartOfResearcher(orcidService, applicationService, crisId,
+                    token, orcid, OrcidService.CONSTANT_RESEARCHERURL_UUID,
+                    md5ContentPartOfResearcher, partOfResearcher,
+                    deleteAndPost);
+        }
+    }
+
+    private static void sendExternalIdentifiers(OrcidService orcidService,
+            ApplicationService applicationService, String crisId, String token,
+            String orcid, List<ExternalIdentifier> externalIdentifier,
+            boolean deleteAndPost)
+    {
+        for (ExternalIdentifier partOfResearcher : externalIdentifier)
+        {
+            String value = partOfResearcher.getExternalIdUrl();
+            String md5ContentPartOfResearcher = new String(
+                    DigestUtils.md5(value));
+            sendPartOfResearcher(orcidService, applicationService, crisId,
+                    token, orcid, OrcidService.CONSTANT_EXTERNALIDENTIFIER_UUID,
+                    md5ContentPartOfResearcher, partOfResearcher,
+                    deleteAndPost);
+        }
+    }
+
+    private static void sendOtherNames(OrcidService orcidService,
+            ApplicationService applicationService, String crisId, String token,
+            String orcid, List<OtherName> otherNames, boolean deleteAndPost)
+    {
+        for (OtherName partOfResearcher : otherNames)
+        {
+            String value = partOfResearcher.getContent();
+            String md5ContentPartOfResearcher = new String(
+                    DigestUtils.md5(value));
+            sendPartOfResearcher(orcidService, applicationService, crisId,
+                    token, orcid, OrcidService.CONSTANT_OTHERNAME_UUID,
+                    md5ContentPartOfResearcher, partOfResearcher,
+                    deleteAndPost);
+        }
+    }
+
+    private static void sendPartOfResearcher(OrcidService orcidService,
+            ApplicationService applicationService, String crisId, String token,
+            String orcid, String constantUuidPrefix, String constantUuid, 
+            Serializable partOfResearcher,
+            boolean delete)
+    {
+        if (partOfResearcher != null)
+        {
+            Integer constantType = OrcidService.CONSTANT_PART_OF_RESEARCHER_TYPE;
+            Integer constantId = OrcidService.CONSTANT_PART_OF_RESEARCHER_ID;
+            String constantUuidPartOf = constantUuidPrefix +"::"+constantUuid;
+            
+            try
+            {
+                OrcidHistory orcidHistory = applicationService
+                        .uniqueOrcidHistoryByOwnerAndEntityUUIDAndTypeId(crisId, constantUuidPartOf, constantType);
+                if (delete)
+                {
+                    if (orcidHistory != null)
+                    {
+                        String putCode = orcidHistory.getPutCode();
+                        switch (constantUuidPrefix)
+                        {
+                        case OrcidService.CONSTANT_OTHERNAME_UUID:
+                            orcidService.deleteOtherName(orcid, token, putCode);
+                            break;
+                        case OrcidService.CONSTANT_RESEARCHERURL_UUID:
+                            orcidService.deleteResearcherUrl(orcid, token,
+                                    putCode);
+                            break;
+                        case OrcidService.CONSTANT_EXTERNALIDENTIFIER_UUID:
+                            orcidService.deleteExternalIdentifier(orcid, token,
+                                    putCode);
+                            break;
+                        case OrcidService.CONSTANT_ADDRESS_UUID:
+                            orcidService.deleteAddress(orcid, token, putCode);
+                            break;
+                        case OrcidService.CONSTANT_KEYWORD_UUID:
+                            orcidService.deleteKeyword(orcid, token, putCode);
+                            break;
+                        case OrcidService.CONSTANT_EMPLOYMENT_UUID:
+                            orcidService.deleteEmployment(orcid, token, putCode);
+                            break;
+                        case OrcidService.CONSTANT_EDUCATION_UUID:
+                            orcidService.deleteEducation(orcid, token, putCode);
+                            break;                            
+                        }
+                        applicationService.delete(OrcidHistory.class,
+                                orcidHistory.getId());
+                    }
+                }
+                String putCode = null;
+                String errorMessage = null;
+                if (delete || orcidHistory == null)
+                {
+                    orcidHistory = new OrcidHistory();
+                    try
+                    {
+                        switch (constantUuidPrefix)
+                        {
+                        case OrcidService.CONSTANT_OTHERNAME_UUID:
+                            putCode = orcidService.appendOtherName(orcid, token,
+                                    (OtherName) partOfResearcher);
+                            break;
+                        case OrcidService.CONSTANT_RESEARCHERURL_UUID:
+                            putCode = orcidService.appendResearcherUrl(orcid,
+                                    token, (ResearcherUrl) partOfResearcher);
+                            break;
+                        case OrcidService.CONSTANT_EXTERNALIDENTIFIER_UUID:
+                            orcidService.appendExternalIdentifier(orcid, token,
+                                    (ExternalIdentifier) partOfResearcher);
+                            break;
+                        case OrcidService.CONSTANT_ADDRESS_UUID:
+                            orcidService.appendAddress(orcid, token,
+                                    (Address) partOfResearcher);
+                            break;
+                        case OrcidService.CONSTANT_KEYWORD_UUID:
+                            orcidService.appendKeyword(orcid, token,
+                                    (Keyword) partOfResearcher);
+                            break;
+                        case OrcidService.CONSTANT_EMPLOYMENT_UUID:
+                            orcidService.appendEmployment(orcid, token,
+                                    (Employment) partOfResearcher);
+                            break;
+                        case OrcidService.CONSTANT_EDUCATION_UUID:
+                            orcidService.appendEducation(orcid, token,
+                                    (Education) partOfResearcher);
+                            break;                               
+                        }
+                        orcidHistory.setPutCode(putCode);
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessage = ex.getMessage();
+                    }
+
+                    orcidHistory.setEntityId(constantId);
+                    orcidHistory.setEntityUuid(constantUuidPartOf);
+                    orcidHistory.setTypeId(constantType);
+                    orcidHistory.setOwner(crisId);
+                }
+                else
+                {
+                    StatusType status = null;
+                    switch (constantUuidPrefix)
+                    {
+                    case OrcidService.CONSTANT_OTHERNAME_UUID:
+                        OtherName otherName = (OtherName) partOfResearcher;
+                        otherName.setPutCode(
+                                new BigInteger(orcidHistory.getPutCode()));
+                        status = orcidService.putOtherName(orcid, token,
+                                orcidHistory.getPutCode(), otherName);
+                        break;
+                    case OrcidService.CONSTANT_RESEARCHERURL_UUID:
+                        ResearcherUrl researcherUrl = (ResearcherUrl) partOfResearcher;
+                        researcherUrl.setPutCode(
+                                new BigInteger(orcidHistory.getPutCode()));
+                        status = orcidService.putResearcherUrl(orcid, token,
+                                orcidHistory.getPutCode(), researcherUrl);
+                        break;
+                    case OrcidService.CONSTANT_EXTERNALIDENTIFIER_UUID:
+                        ExternalIdentifier externalIdentifier = (ExternalIdentifier) partOfResearcher;
+                        externalIdentifier.setPutCode(
+                                new BigInteger(orcidHistory.getPutCode()));
+                        status = orcidService.putExternalIdentifier(orcid,
+                                token, orcidHistory.getPutCode(),
+                                externalIdentifier);
+                        break;
+                    case OrcidService.CONSTANT_ADDRESS_UUID:
+                        Address address = (Address) partOfResearcher;
+                        address.setPutCode(
+                                new BigInteger(orcidHistory.getPutCode()));
+                        status = orcidService.putAddress(orcid, token, putCode,
+                                address);
+                        break;
+                    case OrcidService.CONSTANT_KEYWORD_UUID:
+                        Keyword keyword = (Keyword) partOfResearcher;
+                        keyword.setPutCode(
+                                new BigInteger(orcidHistory.getPutCode()));
+                        status = orcidService.putKeyword(orcid, token, putCode,
+                                keyword);
+                        break;
+                    case OrcidService.CONSTANT_EMPLOYMENT_UUID:
+                        Employment employment = (Employment) partOfResearcher;
+                        status = orcidService.putEmployment(orcid, token, putCode,
+                                employment);
+                        break;
+                    case OrcidService.CONSTANT_EDUCATION_UUID:
+                        Education education = (Education) partOfResearcher;
+                        status = orcidService.putEducation(orcid, token, putCode,
+                                education);
+                        break;
+                    }
+                    if (!status.getFamily().equals(Family.SUCCESSFUL))
+                    {
+                        errorMessage = status.getStatusCode() + " REASON:"
+                                + status.getReasonPhrase();
+                    }
+                }
+
+                SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(
+                        new Date());
+                orcidHistory.setTimestampLastAttempt(timestampAttempt);
+
+                if (StringUtils.isNotBlank(errorMessage))
+                {
+                    // build message for orcid history
+                    orcidHistory.setResponseMessage(errorMessage);
+                    log.error("ERROR!!! (E1)::PUSHORCID::" + constantUuidPartOf
+                            + " for ResearcherPage crisID:" + crisId);
+                }
+                else
+                {
+                    orcidHistory.setTimestampSuccessAttempt(timestampAttempt);
+                    log.info("(A1)::PUSHORCID::" + constantUuidPartOf
+                            + " for ResearcherPage crisID:" + crisId);
+                }
+                applicationService.saveOrUpdate(OrcidHistory.class,
+                        orcidHistory);
+            }
+            catch (Exception e)
+            {
+                log.error("ERROR!!! (E0)::PUSHORCID::" + constantUuidPartOf
+                        + " for ResearcherPage crisID:" + crisId, e);
+            }
+            finally
+            {
+                OrcidPreferencesUtils.printXML(partOfResearcher);
             }
         }
 
-        List<String> biographyString = metadata.get("biography");
-        String biography = null;
-        if (biographyString != null && !biographyString.isEmpty())
+    }
+
+    // prepare section
+    private static List<ExternalIdentifier> prepareExternalIdentifiers(
+            ApplicationService applicationService,
+            Map<String, String> orcidMetadataConfiguration,
+            Map<String, List<String>> metadata)
+    {
+        List<ExternalIdentifier> externalIdentifiers = new ArrayList<ExternalIdentifier>();
+
+        for (String key : metadata.keySet())
         {
-            biography = biographyString.get(0);
+            if (key.startsWith("external-identifier-"))
+            {
+                RPPropertiesDefinition rpPD = applicationService
+                        .findPropertiesDefinitionByShortName(
+                                RPPropertiesDefinition.class,
+                                orcidMetadataConfiguration.get(key));
+
+                for (String value : metadata.get(key))
+                {
+                    if (StringUtils.isNotBlank(value))
+                    {
+                        ExternalIdentifier externalIdentifier = new ExternalIdentifier();
+                        externalIdentifier.setExternalIdRelationship(
+                                RelationshipType.SELF);
+                        externalIdentifier.setExternalIdUrl(value);
+                        externalIdentifier.setExternalIdType(rpPD.getLabel());
+                        externalIdentifier.setExternalIdValue(value);
+                        externalIdentifiers.add(externalIdentifier);
+                    }
+                }
+            }
         }
+        return externalIdentifiers;
+    }
 
-        String primaryEmail = null;
-        List<String> primaryEmailString = metadata.get("primary-email");
-        if (primaryEmailString != null && !primaryEmailString.isEmpty())
-        {
-            primaryEmail = primaryEmailString.get(0);
-        }
-
-        List<String> emails = metadata.get("other-emails");
-
-        List<String> isoCountryString = metadata.get("iso-3166-country");
-        String country = null;
-        if (isoCountryString != null && !isoCountryString.isEmpty())
-        {
-            country = isoCountryString.get(0);
-        }
-
-        List<String> keywords = metadata.get("keywords");
-
-        List<Map<String, List<String>>> employments = metadataNested
-                .get("affiliations-employment");
-
-        List<Map<String, List<String>>> educations = metadataNested
-                .get("affiliations-education");
-
-        // start researcher-urls and external-identifiers
-        ResearcherUrls researcherUrls = new ResearcherUrls();
-        ExternalIdentifiers externalIdentifiers = new ExternalIdentifiers();
-        boolean buildResearcherUrls = false;
-        boolean buildExternalIdentifier = false;
+    private static List<ResearcherUrl> prepareResearcherUrls(
+            ApplicationService applicationService,
+            Map<String, String> orcidMetadataConfiguration,
+            Map<String, List<String>> metadata)
+    {
+        List<ResearcherUrl> researcherUrls = new ArrayList<ResearcherUrl>();
 
         if (metadata.containsKey("researcher-urls"))
         {
@@ -2123,120 +2414,97 @@ public class PushToORCID
                 Url url = new Url();
                 url.setValue(l.split("###")[1]);
                 researcherUrl.setUrl(url);
-                researcherUrls.getResearcherUrl().add(researcherUrl);
-                buildResearcherUrls = true;
+                researcherUrls.add(researcherUrl);
             }
         }
 
         for (String key : metadata.keySet())
         {
-            if (key.startsWith("researcher-url-")
-                    || key.startsWith("external-identifier-"))
+            if (key.startsWith("researcher-url-"))
             {
                 RPPropertiesDefinition rpPD = applicationService
                         .findPropertiesDefinitionByShortName(
                                 RPPropertiesDefinition.class,
                                 orcidMetadataConfiguration.get(key));
 
-                if (key.startsWith("researcher-url-"))
+                for (String value : metadata.get(key))
                 {
-                    for (String value : metadata.get(key))
+                    if (StringUtils.isNotBlank(value))
                     {
-                        if (StringUtils.isNotBlank(value))
-                        {
-                            ResearcherUrl researcherUrl = new ResearcherUrl();
-                            researcherUrl.setUrlName(rpPD.getLabel());
-                            Url url = new Url();
-                            url.setValue(value);
-                            researcherUrl.setUrl(url);
-                            researcherUrls.getResearcherUrl()
-                                    .add(researcherUrl);
-                            buildResearcherUrls = true;
-                        }
-                    }
-                }
-                if (key.startsWith("external-identifier-"))
-                {
-                    for (String value : metadata.get(key))
-                    {
-                        if (StringUtils.isNotBlank(value))
-                        {
-                            ExternalIdentifier externalIdentifier = new ExternalIdentifier();
-                            ExternalIdCommonName commonName = new ExternalIdCommonName();
-                            commonName.setContent(rpPD.getLabel());
-                            externalIdentifier
-                                    .setExternalIdCommonName(commonName);
-                            ExternalIdReference externalIdReference = new ExternalIdReference();
-                            externalIdReference.setContent(value);
-                            externalIdentifier.setExternalIdReference(
-                                    externalIdReference);
-                            ExternalIdUrl externalIdUrl = new ExternalIdUrl();
-                            externalIdUrl.setValue(value);
-                            externalIdentifier.setExternalIdUrl(externalIdUrl);
-                            externalIdentifiers.getExternalIdentifier()
-                                    .add(externalIdentifier);
-                            buildExternalIdentifier = true;
-                        }
+                        ResearcherUrl researcherUrl = new ResearcherUrl();
+                        researcherUrl.setUrlName(rpPD.getLabel());
+                        Url url = new Url();
+                        url.setValue(value);
+                        researcherUrl.setUrl(url);
+                        researcherUrls.add(researcherUrl);
                     }
                 }
             }
         }
-        if (buildResearcherUrls)
-        {
-            bioJAXB.setResearcherUrls(researcherUrls);
-        }
-        if (buildExternalIdentifier)
-        {
-            bioJAXB.setExternalIdentifiers(externalIdentifiers);
-        }
+        return researcherUrls;
+    }
 
-        // start contact details
-        ContactDetails contactDetailsJAXB = new ContactDetails();
+    private static List<OtherName> prepareOtherNames(
+            Map<String, List<String>> metadata)
+    {
+        List<String> otherNames = new ArrayList<String>();
 
-        List<Email> emailsJAXB = contactDetailsJAXB.getEmail();
-
-        boolean buildContactDetails = false;
-        if (StringUtils.isNotBlank(primaryEmail))
+        // prepare names
+        List<String> name = metadata.get("name");
+        String creditName = null;
+        List<String> creditname = metadata.get("credit-name");
+        if (creditname != null && !creditname.isEmpty())
         {
-            Email emailJAXB = new Email();
-            emailJAXB.setPrimary(true);
-            emailJAXB.setValue(primaryEmail);
-            emailsJAXB.add(emailJAXB);
-            buildContactDetails = true;
+            creditName = creditname.get(0);
+            otherNames.add(creditName);
         }
 
-        if (emails != null)
+        otherNames.add(name.get(0));
+        List<String> othernamesPlatform = metadata.get("other-names");
+        if (othernamesPlatform != null && !othernamesPlatform.isEmpty())
         {
-            for (String e : emails)
+            otherNames.addAll(othernamesPlatform);
+        }
+
+        List<OtherName> otherNamesJAXB = new ArrayList<OtherName>();
+        // fill name
+        if (otherNames != null && !otherNames.isEmpty())
+        {
+            for (String otherName : otherNames)
             {
-                if (StringUtils.isNotBlank(e))
-                {
-                    Email ee = new Email();
-                    ee.setValue(e);
-                    emailsJAXB.add(ee);
-                    buildContactDetails = true;
-                }
+                OtherName otherNameJAXB = new OtherName();
+                otherNameJAXB.setContent(otherName);
+                otherNamesJAXB.add(otherNameJAXB);
             }
         }
 
-        if (StringUtils.isNotBlank(country))
-        {
-            Address addressJAXB = new Address();
-            Country countryJAXB = new Country();
-            countryJAXB.setValue(country);
-            addressJAXB.setCountry(countryJAXB);
-            contactDetailsJAXB.setAddress(addressJAXB);
-            buildContactDetails = true;
-        }
+        return otherNamesJAXB;
+    }
 
-        if (buildContactDetails)
-        {
-            bioJAXB.setContactDetails(contactDetailsJAXB);
-        }
+    private static List<Address> prepareAddress(
+            Map<String, List<String>> metadata)
+    {
+        List<Address> addresses = new ArrayList<Address>();
 
-        // start keywords
-        boolean buildKeywords = false;
-        Keywords keywordsJAXB = new Keywords();
+        List<String> isoCountryString = metadata.get("iso-3166-country");
+        for (String country : isoCountryString)
+        {
+            if (StringUtils.isNotBlank(country))
+            {
+                Address addressJAXB = new Address();
+                addressJAXB.setCountry(country);
+                addresses.add(addressJAXB);
+            }
+        }
+        return addresses;
+    }
+
+    private static List<Keyword> prepareKeywords(
+            Map<String, List<String>> metadata)
+    {
+        List<String> keywords = metadata.get("keywords");
+
+        List<Keyword> keywordsJAXB = new ArrayList<Keyword>();
         if (keywords != null)
         {
             for (String kk : keywords)
@@ -2245,35 +2513,24 @@ public class PushToORCID
                 {
                     Keyword k = new Keyword();
                     k.setContent(kk);
-                    keywordsJAXB.getKeyword().add(k);
-                    buildKeywords = true;
+                    keywordsJAXB.add(k);
                 }
             }
         }
-        if (buildKeywords)
-        {
-            bioJAXB.setKeywords(keywordsJAXB);
-        }
-
-        if (buildAffiliations)
-        {
-            OrcidActivities orcidActivities = new OrcidActivities();
-            Affiliations affiliations = buildOrcidAffiliations(employments,
-                    educations);
-            orcidActivities.setAffiliations(affiliations);
-            profile.setOrcidActivities(orcidActivities);
-        }
-        profile.setOrcidBio(bioJAXB);
-        return profile;
+        return keywordsJAXB;
     }
 
+    // build sections
     private static List<WrapperEmployment> buildEmployments(
             ApplicationService applicationService, String crisId,
             Map<String, Map<String, List<String>>> mapResearcherMetadataToSend,
-            Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend,
-            Map<String, String> orcidConfigurationMapping)
+            Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend)
     {
 
+        log.info(
+                "Prepare Employments for ResearcherPage crisID:"
+                        + crisId);
+        
         Map<String, List<Map<String, List<String>>>> metadataNested = mapResearcherMetadataNestedToSend
                 .get(crisId);
 
@@ -2291,7 +2548,8 @@ public class PushToORCID
                 wrapper.setEmployment(affiliation);
                 wrapper.setId(Integer.parseInt(employment.get("id").get(0)));
                 wrapper.setUuid(employment.get("uuid").get(0));
-                wrapper.setType(Integer.parseInt(employment.get("type").get(0)));
+                wrapper.setType(
+                        Integer.parseInt(employment.get("type").get(0)));
                 List<String> listStartDate = employment
                         .get("affiliationstartdate");
 
@@ -2470,11 +2728,13 @@ public class PushToORCID
                 affiliation.setOrganization(organization);
 
                 List<String> putcode = employment.get("employmentputcode");
-                if (putcode != null && !putcode.isEmpty()) {
-                    for(String pc : putcode) {
+                if (putcode != null && !putcode.isEmpty())
+                {
+                    for (String pc : putcode)
+                    {
                         affiliation.setPutCode(new BigInteger(pc));
                     }
-                }   
+                }
                 affiliations.add(wrapper);
             }
         }
@@ -2484,9 +2744,12 @@ public class PushToORCID
     private static List<WrapperEducation> buildEducations(
             ApplicationService applicationService, String crisId,
             Map<String, Map<String, List<String>>> mapResearcherMetadataToSend,
-            Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend,
-            Map<String, String> orcidConfigurationMapping)
+            Map<String, Map<String, List<Map<String, List<String>>>>> mapResearcherMetadataNestedToSend)
     {
+        
+        log.info(
+                "Prepare Educations for ResearcherPage crisID:"
+                        + crisId);
 
         Map<String, List<Map<String, List<String>>>> metadataNested = mapResearcherMetadataNestedToSend
                 .get(crisId);
@@ -2500,9 +2763,9 @@ public class PushToORCID
             for (Map<String, List<String>> education : educations)
             {
                 WrapperEducation wrapper = new WrapperEducation();
-                
+
                 Education affiliation = new Education();
-                
+
                 wrapper.setEducation(affiliation);
                 wrapper.setId(Integer.parseInt(education.get("id").get(0)));
                 wrapper.setUuid(education.get("uuid").get(0));
@@ -2685,13 +2948,15 @@ public class PushToORCID
                 organization.setName(stringOUname);
                 organization.setAddress(organizationAddress);
                 affiliation.setOrganization(organization);
-                
+
                 List<String> putcode = education.get("educationputcode");
-                if (putcode != null && !putcode.isEmpty()) {
-                    for(String pc : putcode) {
+                if (putcode != null && !putcode.isEmpty())
+                {
+                    for (String pc : putcode)
+                    {
                         affiliation.setPutCode(new BigInteger(pc));
                     }
-                }                  
+                }
                 affiliations.add(wrapper);
             }
         }
@@ -2716,7 +2981,7 @@ public class PushToORCID
             switch (orcidQueue.getTypeId())
             {
             case CrisConstants.RP_TYPE_ID:
-                result = sendOrcidProfile(applicationService, owner, uuid);
+                result = sendOrcidProfile(applicationService, owner);
                 break;
             case CrisConstants.PROJECT_TYPE_ID:
                 result = sendOrcidFunding(applicationService, owner, uuid);
@@ -2789,14 +3054,14 @@ public class PushToORCID
 
                         log.info("(Q1)Prepare for Work:" + uuid
                                 + " for ResearcherPage crisID:" + crisId);
-                        OrcidWork work = PushToORCID.buildOrcidWork(context,
+                        Work work = PushToORCID.buildOrcidWork(context,
                                 dso.getID(), orcidHistory.getPutCode());
                         if (work != null)
                         {
                             try
                             {
                                 String putCode = orcidService.appendWork(orcid,
-                                        tokenCreateWork, work, uuid);
+                                        tokenCreateWork, work);
                                 result = true;
                                 orcidHistory.setTimestampSuccessAttempt(
                                         timestampAttempt);
@@ -2867,7 +3132,7 @@ public class PushToORCID
     }
 
     public static boolean sendOrcidProfile(
-            ApplicationService applicationService, String crisId, String uuid)
+            ApplicationService applicationService, String crisId)
     {
         boolean result = false;
         try
@@ -2884,7 +3149,7 @@ public class PushToORCID
 
             OrcidService orcidService = OrcidService.getOrcid();
 
-            log.info("Starts update ORCID Profile for:" + crisId);
+            log.info("Starts update ORCID Profile/Affiliations for:" + crisId);
 
             String orcid = null;
             for (RPProperty propOrcid : researcher.getAnagrafica4view()
@@ -2898,117 +3163,49 @@ public class PushToORCID
             {
                 log.info("Prepare push for ResearcherPage crisID:" + crisId
                         + " AND orcid iD:" + orcid);
-                OrcidHistory orcidHistory = null;
                 try
                 {
                     String tokenUpdateBio = getTokenReleasedForSync(researcher,
-                            "system-orcid-token-orcid-bio-update");
-                    orcidHistory = applicationService
-                            .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
-                                    researcher.getCrisID(), researcher.getID(),
-                                    researcher.getType());
-
+                            OrcidService.SYSTEM_ORCID_TOKEN_PROFILE_CREATE_SCOPE);
+                    String tokenActivities = getTokenReleasedForSync(researcher,
+                            OrcidService.SYSTEM_ORCID_TOKEN_ACTIVITIES_CREATE_SCOPE);
                     if (tokenUpdateBio != null)
                     {
-
-                        if (orcidHistory == null)
-                        {
-                            orcidHistory = new OrcidHistory();
-                            orcidHistory.setEntityId(researcher.getId());
-                            orcidHistory.setEntityUuid(researcher.getUuid());
-                            orcidHistory.setTypeId(researcher.getType());
-                            orcidHistory.setOwner(researcher.getCrisID());
-                        }
-                        SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(
-                                new Date());
-                        orcidHistory.setTimestampLastAttempt(timestampAttempt);
 
                         log.info(
                                 "(Q1)Prepare OrcidProfile for ResearcherPage crisID:"
                                         + crisId);
-                        OrcidProfile profile = PushToORCID.buildOrcidProfile(
+                        PushToORCID.buildOrcidProfile(orcidService,
                                 applicationService, crisId,
                                 mapResearcherMetadataToSend,
                                 mapResearcherMetadataNestedToSend,
-                                orcidConfigurationMapping, false);
-                        OrcidProfile affiliations = PushToORCID
-                                .buildOrcidProfileForAffiliations(
-                                        applicationService, crisId,
-                                        mapResearcherMetadataToSend,
-                                        mapResearcherMetadataNestedToSend,
-                                        orcidConfigurationMapping);
-                        if (profile != null)
-                        {
-                            try
-                            {
-                                OrcidPreferencesUtils.printXML(profile);
-                                OrcidMessage message = orcidService.updateBio(
-                                        orcid, tokenUpdateBio, profile);
-                                if (message.getErrorDesc() != null)
-                                {
-                                    throw new RuntimeException(message
-                                            .getErrorDesc().getContent());
-                                }
-                                else
-                                {
-                                    result = true;
-                                    orcidHistory.setTimestampSuccessAttempt(
-                                            timestampAttempt);
-                                    log.info(
-                                            "(A1) OK OrcidProfile for ResearcherPage crisID:"
-                                                    + crisId);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                // build message for orcid history
-                                orcidHistory
-                                        .setResponseMessage(ex.getMessage());
-                                log.error(
-                                        "ERROR!!! (E1) ERROR OrcidProfile ResearcherPage crisID:"
-                                                + crisId);
-                            }
-                            applicationService.saveOrUpdate(OrcidHistory.class,
-                                    orcidHistory);
-                            log.info(
-                                    "(A2) OK OrcidHistory for ResearcherPage crisID:"
-                                            + crisId);
-                        }
-                        if (affiliations != null)
-                        {
-                            try
-                            {
-                                OrcidPreferencesUtils.printXML(affiliations);
-                                OrcidMessage message = orcidService
-                                        .updateAffiliations(orcid,
-                                                tokenUpdateBio, affiliations);
-                                if (message.getErrorDesc() != null)
-                                {
-                                    throw new RuntimeException(message
-                                            .getErrorDesc().getContent());
-                                }
-                                else
-                                {
-                                    result = true;
-                                    log.info(
-                                            "(A1) OK Affiliations for ResearcherPage crisID:"
-                                                    + crisId);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                log.error(
-                                        "ERROR!!! (E1) ERROR Affiliations ResearcherPage crisID:"
-                                                + crisId);
-                            }
-                            log.info(
-                                    "(A2) OK Affiliations for ResearcherPage crisID:"
-                                            + crisId);
-                        }
+                                orcidConfigurationMapping, false,
+                                tokenUpdateBio, orcid);
+
                     }
                     else
                     {
-                        log.warn("WARNING!!! (W1) Token not released for:"
+                        log.warn("WARNING!!! (W1) Token Update Profile not released for:"
+                                + crisId);
+                    }
+
+                    if (tokenActivities != null)
+                    {
+
+                        log.info(
+                                "(Q2)Prepare Affiliations (Employments and Educations) for ResearcherPage crisID:"
+                                        + crisId);
+                        PushToORCID.buildAffiliations(orcidService,
+                                applicationService, crisId,
+                                mapResearcherMetadataToSend,
+                                mapResearcherMetadataNestedToSend,
+                                false,
+                                tokenActivities, orcid);
+
+                    }
+                    else
+                    {
+                        log.warn("WARNING!!! (W1) Token Update Activities not released for:"
                                 + crisId);
                     }
 
@@ -3016,31 +3213,25 @@ public class PushToORCID
                 catch (Exception ex)
                 {
                     log.error(
-                            "ERROR!!! (E2) ERROR OrcidProfile ResearcherPage crisID:"
+                            "ERROR!!! (E2) ERROR OrcidProfile/Affiliations ResearcherPage crisID:"
                                     + crisId,
                             ex);
-                    if (orcidHistory != null)
-                    {
-                        orcidHistory.setResponseMessage(ex.getMessage());
-                        applicationService.saveOrUpdate(OrcidHistory.class,
-                                orcidHistory);
-                    }
                 }
             }
             else
             {
                 log.warn("WARNING!!! (W0) Orcid not found for:" + crisId);
             }
-            log.info("Ends update ORCID Profile for:" + crisId);
+            log.info("Ends update ORCID Profile/Affiliations for:" + crisId);
         }
         catch (Exception e)
         {
             log.error(e.getMessage(), e);
         }
 
-        if (result && StringUtils.isNotBlank(uuid))
+        if (result)
         {
-            applicationService.deleteOrcidQueueByOwnerAndUuid(crisId, uuid);
+            applicationService.deleteOrcidQueueByOwnerAndTypeId(crisId, OrcidService.CONSTANT_PART_OF_RESEARCHER_TYPE);
         }
         return result;
     }
@@ -3112,8 +3303,7 @@ public class PushToORCID
                             try
                             {
                                 String putCode = orcidService.appendFunding(
-                                        orcid, tokenCreateFunding, funding,
-                                        uuid);
+                                        orcid, tokenCreateFunding, funding);
                                 result = true;
                                 orcidHistory.setTimestampSuccessAttempt(
                                         timestampAttempt);
@@ -3188,287 +3378,4 @@ public class PushToORCID
         return result;
     }
 
-    public static boolean putOrcidProfile(ApplicationService applicationService,
-            String owner)
-    {
-        return sendOrcidProfile(applicationService, owner, null);
-    }
-
-    public static boolean putOrcidFundings(
-            ApplicationService applicationService, String owner,
-            Map<Integer, String> projects)
-    {
-        boolean result = false;
-        log.debug("Create DSpace context");
-        Context context = null;
-        try
-        {
-            ResearcherPage researcher = (ResearcherPage) applicationService
-                    .getEntityByCrisId(owner, ResearcherPage.class);
-
-            context = new Context();
-            context.turnOffAuthorisationSystem();
-
-            OrcidService orcidService = OrcidService.getOrcid();
-
-            log.info("Starts update ORCID Profile for:" + owner);
-
-            String orcid = null;
-            for (RPProperty propOrcid : researcher.getAnagrafica4view()
-                    .get("orcid"))
-            {
-                orcid = propOrcid.toString();
-                break;
-            }
-
-            if (StringUtils.isNotBlank(orcid))
-            {
-                log.info("Prepare put for Works for ResearcherPage crisID:"
-                        + owner + " AND orcid iD:" + orcid);
-
-                try
-                {
-                    String tokenCreateWork = PushToORCID
-                            .getTokenReleasedForSync(researcher,
-                                    "system-orcid-token-funding-create");
-                    if (tokenCreateWork != null)
-                    {
-
-                        Map<String, Map<Integer, String>> mapProjectsToSend = new HashMap<String, Map<Integer, String>>();
-                        mapProjectsToSend.put(owner, projects);
-                        FundingList works = PushToORCID.buildOrcidFundings(
-                                context, applicationService, owner,
-                                mapProjectsToSend);
-                        String error = null;
-
-                        if (works != null)
-                        {
-                            try
-                            {
-                                orcidService.putFundings(orcid, tokenCreateWork,
-                                        works);
-                                result = true;
-                                log.info(
-                                        "(A1) OK for put Works for ResearcherPage crisID:"
-                                                + owner);
-                            }
-                            catch (RuntimeException ex)
-                            {
-                                // build message for orcid history
-                                error = ex.getMessage();
-                                log.error(
-                                        "ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:"
-                                                + owner);
-                            }
-
-                            for (Integer i : projects.keySet())
-                            {
-                                Project project = applicationService
-                                        .get(Project.class, i);
-                                OrcidHistory orcidHistory = applicationService
-                                        .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
-                                                owner, i,
-                                                CrisConstants.PROJECT_TYPE_ID);
-                                if (orcidHistory == null)
-                                {
-                                    orcidHistory = new OrcidHistory();
-                                }
-                                orcidHistory.setEntityId(i);
-                                orcidHistory.setEntityUuid(project.getUuid());
-                                orcidHistory.setTypeId(
-                                        CrisConstants.PROJECT_TYPE_ID);
-                                orcidHistory.setOwner(owner);
-                                orcidHistory.setPutCode(projects.get(i));
-                                SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(
-                                        new Date());
-                                orcidHistory.setTimestampLastAttempt(
-                                        timestampAttempt);
-                                if (StringUtils.isNotBlank(error))
-                                {
-                                    orcidHistory.setResponseMessage(error);
-                                }
-                                else
-                                {
-                                    orcidHistory.setTimestampSuccessAttempt(
-                                            timestampAttempt);
-                                }
-                                applicationService.saveOrUpdate(
-                                        OrcidHistory.class, orcidHistory);
-                            }
-
-                            log.info(
-                                    "(A2) OK OrcidHistory for put Works for ResearcherPage crisID:"
-                                            + owner);
-                        }
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    log.info(
-                            "ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:"
-                                    + owner);
-                    log.error(ex.getMessage());
-                }
-            }
-            else
-            {
-                log.warn("WARNING!!! (W0) Orcid not found for ResearcherPage:"
-                        + owner);
-            }
-            log.info("Ends append ORCID  Works for ResearcherPage crisID:"
-                    + owner);
-            applicationService.saveOrUpdate(ResearcherPage.class, researcher,
-                    false);
-        }
-        catch (Exception e)
-        {
-            log.error(e.getMessage(), e);
-        }
-        finally
-        {
-            if (context != null && context.isValid())
-            {
-                context.abort();
-            }
-        }
-        return result;
-    }
-
-    public static boolean putOrcidWorks(ApplicationService applicationService,
-            String owner, Map<Integer, String> items)
-    {
-        boolean result = false;
-        log.debug("Create DSpace context");
-        Context context = null;
-        try
-        {
-            ResearcherPage researcher = (ResearcherPage) applicationService
-                    .getEntityByCrisId(owner, ResearcherPage.class);
-
-            context = new Context();
-            context.turnOffAuthorisationSystem();
-
-            OrcidService orcidService = OrcidService.getOrcid();
-
-            log.info("Starts update ORCID Profile for:" + owner);
-
-            String orcid = null;
-            for (RPProperty propOrcid : researcher.getAnagrafica4view()
-                    .get("orcid"))
-            {
-                orcid = propOrcid.toString();
-                break;
-            }
-
-            if (StringUtils.isNotBlank(orcid))
-            {
-                log.info("Prepare put for Works for ResearcherPage crisID:"
-                        + owner + " AND orcid iD:" + orcid);
-
-                try
-                {
-                    String tokenCreateWork = PushToORCID
-                            .getTokenReleasedForSync(researcher,
-                                    "system-orcid-token-orcid-works-create");
-                    if (tokenCreateWork != null)
-                    {
-
-                        Map<String, Map<Integer, String>> mapPublicationsToSend = new HashMap<String, Map<Integer, String>>();
-                        mapPublicationsToSend.put(owner, items);
-                        OrcidWorks works = PushToORCID.buildOrcidWorks(context,
-                                owner, mapPublicationsToSend);
-                        String error = null;
-                        OrcidPreferencesUtils.printXML(works);
-                        if (works != null)
-                        {
-                            try
-                            {
-                                orcidService.putWorks(orcid, tokenCreateWork,
-                                        works);
-                                result = true;
-                                log.info(
-                                        "(A1) OK for put Works for ResearcherPage crisID:"
-                                                + owner);
-                            }
-                            catch (RuntimeException ex)
-                            {
-                                // build message for orcid history
-                                error = ex.getMessage();
-                                log.error(
-                                        "ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:"
-                                                + owner);
-                            }
-
-                            for (Integer i : items.keySet())
-                            {
-                                Item item = Item.find(context, i);
-                                OrcidHistory orcidHistory = applicationService
-                                        .uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(
-                                                owner, i, Constants.ITEM);
-                                if (orcidHistory == null)
-                                {
-                                    orcidHistory = new OrcidHistory();
-                                }
-                                orcidHistory.setEntityId(i);
-                                orcidHistory.setEntityUuid(item.getHandle());
-                                orcidHistory.setTypeId(Constants.ITEM);
-                                orcidHistory.setOwner(owner);
-                                orcidHistory.setPutCode(items.get(i));
-                                SingleTimeStampInfo timestampAttempt = new SingleTimeStampInfo(
-                                        new Date());
-                                orcidHistory.setTimestampLastAttempt(
-                                        timestampAttempt);
-                                if (StringUtils.isNotBlank(error))
-                                {
-                                    orcidHistory.setResponseMessage(error);
-                                }
-                                else
-                                {
-                                    orcidHistory.setTimestampSuccessAttempt(
-                                            timestampAttempt);
-                                }
-                                applicationService.saveOrUpdate(
-                                        OrcidHistory.class, orcidHistory);
-                            }
-
-                            log.info(
-                                    "(A2) OK OrcidHistory for put Works for ResearcherPage crisID:"
-                                            + owner);
-                        }
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    log.info(
-                            "ERROR!!! (E1) ERROR for put Works for ResearcherPage crisID:"
-                                    + owner);
-                    log.error(ex.getMessage());
-                }
-            }
-            else
-            {
-                log.warn("WARNING!!! (W0) Orcid not found for ResearcherPage:"
-                        + owner);
-            }
-            log.info("Ends append ORCID  Works for ResearcherPage crisID:"
-                    + owner);
-            applicationService.saveOrUpdate(ResearcherPage.class, researcher,
-                    false);
-        }
-        catch (Exception e)
-        {
-            log.error(e.getMessage(), e);
-        }
-        finally
-        {
-            if (context != null && context.isValid())
-            {
-                context.abort();
-            }
-        }
-        return result;
-    }
-    
 }

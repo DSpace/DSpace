@@ -36,7 +36,8 @@ import it.cilea.osd.common.model.IdentifiableObject;
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccessByOwner", query = "from OrcidHistory where owner = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccessByOwnerAndTypeId", query = "from OrcidHistory where owner = ? and typeId = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
     @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId", query = "from OrcidHistory where owner = ? and entityId = ? and typeId = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp"),
-    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId", query = "from OrcidHistory where owner = ? and entityId = ? and typeId = ?")    
+    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId", query = "from OrcidHistory where owner = ? and entityId = ? and typeId = ?"),
+    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryByOwnerAndEntityUUIDAndTypeId", query = "from OrcidHistory where owner = ? and entityUuid = ? and typeId = ?")
 })
 public class OrcidHistory extends IdentifiableObject {
     
@@ -154,4 +155,5 @@ public class OrcidHistory extends IdentifiableObject {
     {
         this.orcid = orcid;
     }
+
 }

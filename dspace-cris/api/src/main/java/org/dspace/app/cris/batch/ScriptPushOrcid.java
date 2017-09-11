@@ -108,9 +108,9 @@ public class ScriptPushOrcid {
 				System.exit(1);
 			}
 
-            String mode = null;
+            boolean delete = false;
             if (line.hasOption('p')) {
-                mode = "DELETE";
+                delete = true;
             }
             
 			List<ResearcherPage> rps = null;
@@ -182,7 +182,7 @@ public class ScriptPushOrcid {
 						log.error("Error retrieving documents", e);
 					}
 				}
-				PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService, applicationService, mode);
+				PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService, applicationService, delete);
 			} else {
 				if (line.hasOption('s')) {
 					// get researcher by parameter
@@ -199,7 +199,7 @@ public class ScriptPushOrcid {
 					ResearcherPage researcher = applicationService.getEntityByCrisId(rp, ResearcherPage.class);
 					rps.add(researcher);
 					PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService,
-							applicationService, mode);
+							applicationService, delete);
 				} else {
 					System.out.println("\n\nUSAGE:\n ScriptPushOrcid [-a|-s <researcher_identifier>] \n");
 					System.out.println("Option a or s is needed - run with no option works on cris_queue table");
