@@ -179,7 +179,8 @@ public class ItemDataset {
     private boolean includeBitstream(Context context, Bitstream bitstream)
     {
         final String WBFF = "Written by FormatFilter";
-        return (!bitstream.getSource().startsWith(WBFF) &&
+        return (bitstream.getSource() != null &&
+                !bitstream.getSource().startsWith(WBFF) &&
                 !bitstream.getName().equals(Constants.LICENSE_BITSTREAM_NAME));
     }
     
@@ -390,8 +391,10 @@ public class ItemDataset {
                 throw new RuntimeException(ex);
             }
             catch(IOException ex){
-                LOG.error(ex);
-                throw new RuntimeException(ex);
+                final String msg = "Problem with " + tmpZip + ": " + ex.getMessage(); 
+                System.err.println(msg);
+                LOG.error(msg);
+                throw new RuntimeException(msg);
             }            
         }
     }
@@ -441,8 +444,13 @@ public class ItemDataset {
             while(iter.hasNext()){
                 Item item = iter.next();
                 if(item.isArchived()){
+                    String handle = item.getHandle();
+                    if(handle == null){
+                        System.err.println("*** Item with id " + item.getID() + " has no handle");
+                        continue;
+                    }
                     itemHandles.add(item.getHandle());
-                    ItemDataset ds = new ItemDataset(context, item); 
+                    ItemDataset ds = new ItemDataset(context, item);
                     if(ds.exists()){
                         if(DSpaceUtils.showTombstone(context, item)){
                             System.out.println("Delete tombstoned dataset: " + item.getHandle());
@@ -481,7 +489,7 @@ public class ItemDataset {
                         zip.delete();
                     } 
                 }
-                else{
+                else if(!zip.getName().equals("README.txt")){
                     ItemDataset ds = new ItemDataset(context, zip);
                     if(!itemHandles.contains(ds.getHandle())){
                         System.err.println("*** dataset " + zip + " exists with no item. Delete it.");
