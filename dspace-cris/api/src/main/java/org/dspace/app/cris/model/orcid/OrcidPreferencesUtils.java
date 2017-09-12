@@ -8,6 +8,7 @@
 package org.dspace.app.cris.model.orcid;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.dspace.authority.orcid.jaxb.email.Emails;
 import org.dspace.authority.orcid.jaxb.keyword.Keyword;
 import org.dspace.authority.orcid.jaxb.keyword.KeywordCtype;
 import org.dspace.authority.orcid.jaxb.keyword.Keywords;
+import org.dspace.authority.orcid.jaxb.othername.OtherNameCtype;
 import org.dspace.authority.orcid.jaxb.othername.OtherNames;
 import org.dspace.authority.orcid.jaxb.person.Person;
 import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifier;
@@ -61,6 +63,7 @@ import org.dspace.core.Context;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.utils.DSpace;
 
+import it.cilea.osd.common.core.SingleTimeStampInfo;
 import it.cilea.osd.jdyna.value.BooleanValue;
 
 public class OrcidPreferencesUtils
@@ -882,7 +885,28 @@ public class OrcidPreferencesUtils
                                                 : VisibilityConstants.HIDE);
                     }
                 }
-
+                
+                if (mapMetadata.containsKey("other-names"))
+                {
+                    OtherNames otherNames = orcidProfile.getOtherNames();
+                    if (otherNames != null)
+                    {
+                        for (OtherNameCtype otherName : otherNames.getOtherName())
+                        {
+                            String value = otherName.getContent();
+                            if (StringUtils.isNotBlank(value))
+                            {
+                                ResearcherPageUtils.buildTextValue(crisObject,
+                                        value,
+                                        mapMetadata.get("other-names"),
+                                        otherName.getVisibility() == Visibility.PUBLIC
+                                                ? VisibilityConstants.PUBLIC
+                                                : VisibilityConstants.HIDE);
+                            }
+                        }
+                    }
+                }
+                
                 if (mapMetadata.containsKey("iso-3166-country"))
                 {
                     Addresses addresses = orcidProfile.getAddresses();
@@ -899,9 +923,6 @@ public class OrcidPreferencesUtils
                                         address.getVisibility() == Visibility.PUBLIC
                                                 ? VisibilityConstants.PUBLIC
                                                 : VisibilityConstants.HIDE);
-                                orcidService.buildHistory(crisObject,
-                                        address.getPutCode(),
-                                        address.getSource(), address.getPath());
                             }
                         }
                     }
@@ -920,9 +941,6 @@ public class OrcidPreferencesUtils
                                     key.getVisibility() == Visibility.PUBLIC
                                             ? VisibilityConstants.PUBLIC
                                             : VisibilityConstants.HIDE);
-                            orcidService.buildHistory(crisObject,
-                                    key.getPutCode(), key.getSource(),
-                                    key.getPath());
                         }
                     }
                 }
@@ -940,9 +958,6 @@ public class OrcidPreferencesUtils
                                     url.getVisibility() == Visibility.PUBLIC
                                             ? VisibilityConstants.PUBLIC
                                             : VisibilityConstants.HIDE);
-                            orcidService.buildHistory(crisObject,
-                                    url.getPutCode(), url.getSource(),
-                                    url.getPath());
                         }
                     }
                 }
@@ -963,9 +978,6 @@ public class OrcidPreferencesUtils
                                     eid.getVisibility() == Visibility.PUBLIC
                                             ? VisibilityConstants.PUBLIC
                                             : VisibilityConstants.HIDE);
-                            orcidService.buildHistory(crisObject,
-                                    eid.getPutCode(), eid.getSource(),
-                                    eid.getPath());
                         }
                     }
                 }

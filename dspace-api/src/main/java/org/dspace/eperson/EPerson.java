@@ -359,18 +359,18 @@ public class EPerson extends DSpaceObject
         Integer o = MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "orcid", null).getFieldID();
 
         // Create the parameter array, including limit and offset if part of the query
-        Object[] paramArr = new Object[] {Constants.EPERSON,f, Constants.EPERSON,l, o, int_param,params,params,params};
+        Object[] paramArr = new Object[] {Constants.EPERSON,f, Constants.EPERSON,l, Constants.EPERSON, o, int_param,params,params,params,params};
         if (limit > 0 && offset > 0)
         {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, o, int_param,params,params,params, limit, offset};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, Constants.EPERSON, o, int_param,params,params,params,params, limit, offset};
         }
         else if (limit > 0)
         {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, o, int_param,params,params,params, limit};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, Constants.EPERSON, o, int_param,params,params,params,params, limit};
         }
         else if (offset > 0)
         {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, o, int_param,params,params,params, offset};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, Constants.EPERSON, o, int_param,params,params,params,params, offset};
         }
 
         // Get all the epeople that match the query

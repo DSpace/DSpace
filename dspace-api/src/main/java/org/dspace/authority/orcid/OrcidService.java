@@ -68,6 +68,7 @@ import org.dspace.content.DCPersonName;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.utils.DSpace;
+import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.orcid.ns.record.Record;
 import org.orcid.ns.search.Result;
 import org.orcid.ns.search.Search;
@@ -152,7 +153,7 @@ public class OrcidService extends RestSource
 
     public static final String WORKS_ENDPOINT = "/works";
 
-    private static final String SEARCH_ENDPOINT = "search";
+    private static final String SEARCH_ENDPOINT = "/search";
 
     private static final String READ_PUBLIC_SCOPE = "/read-public";
 
@@ -460,7 +461,7 @@ public class OrcidService extends RestSource
         {
             reader = builder.get().readEntity(Search.class).getResult();
         }
-        catch (ForbiddenException e1)
+        catch (ForbiddenException | MessageBodyProviderNotFoundException e1)
         {
             builder = builder.header(HttpHeaders.AUTHORIZATION,
                     "Bearer " + getMemberSearchToken().getAccess_token());
@@ -652,6 +653,10 @@ public class OrcidService extends RestSource
                     Entity.entity(work, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
         finally
         {
             if (response != null)
@@ -737,6 +742,10 @@ public class OrcidService extends RestSource
                     Entity.entity(funding, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
         finally
         {
             if (response != null)
@@ -778,12 +787,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public Employments getEmployments(final String token)
+    public Employments getEmployments(String id, final String token)
     {
+        String endpoint = id + EMPLOYMENTS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(EMPLOYMENTS_ENDPOINT, token, null);
+            response = get(endpoint, token, null);
 
             return response.readEntity(Employments.class);
         }
@@ -796,12 +806,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public Employment getEmployment(final String token, final String putCode)
+    public Employment getEmployment(String id, final String token, final String putCode)
     {
+        String endpoint = id + EMPLOYMENT_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(EMPLOYMENT_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(Employment.class);
         }
@@ -814,13 +825,14 @@ public class OrcidService extends RestSource
         }
     }
 
-    public EmploymentSummary getEmploymentSummary(final String token,
+    public EmploymentSummary getEmploymentSummary(String id, final String token,
             final String putCode)
     {
+        String endpoint = id + EMPLOYMENT_SUMMARY_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(EMPLOYMENT_SUMMARY_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(EmploymentSummary.class);
         }
@@ -895,6 +907,10 @@ public class OrcidService extends RestSource
                     Entity.entity(employment, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }        
         finally
         {
             if (response != null)
@@ -904,12 +920,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public Educations getEducations(final String token)
+    public Educations getEducations(String id, final String token)
     {
+        String endpoint = id + EDUCATIONS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(EDUCATIONS_ENDPOINT, token, null);
+            response = get(endpoint, token, null);
 
             return response.readEntity(Educations.class);
         }
@@ -922,12 +939,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public Education getEducation(final String token, final String putCode)
+    public Education getEducation(String id, final String token, final String putCode)
     {
+        String endpoint = id + EDUCATION_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(EDUCATION_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(Education.class);
         }
@@ -940,13 +958,14 @@ public class OrcidService extends RestSource
         }
     }
 
-    public EducationSummary getEducationSummary(final String token,
+    public EducationSummary getEducationSummary(String id, final String token,
             final String putCode)
     {
+        String endpoint = id + EDUCATION_SUMMARY_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(EDUCATION_SUMMARY_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(EducationSummary.class);
         }
@@ -1008,6 +1027,10 @@ public class OrcidService extends RestSource
                     Entity.entity(education, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }        
         finally
         {
             if (response != null)
@@ -1017,12 +1040,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public OtherNames getOtherNames(final String token)
+    public OtherNames getOtherNames(String id, final String token)
     {
+        String endpoint = id + OTHER_NAMES_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(OTHER_NAMES_ENDPOINT, token, null);
+            response = get(endpoint, token, null);
 
             return response.readEntity(OtherNames.class);
         }
@@ -1035,12 +1059,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public OtherName getOtherName(final String token, final String putCode)
+    public OtherName getOtherName(String id, final String token, final String putCode)
     {
+        String endpoint = id + OTHER_NAMES_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(OTHER_NAMES_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(OtherName.class);
         }
@@ -1103,6 +1128,10 @@ public class OrcidService extends RestSource
                     Entity.entity(otherName, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }        
         finally
         {
             if (response != null)
@@ -1113,12 +1142,13 @@ public class OrcidService extends RestSource
     }
     
     //EXTIDS
-    public ExternalIdentifiers getExternalIdentifiers(final String token)
+    public ExternalIdentifiers getExternalIdentifiers(String id, final String token)
     {
+        String endpoint = id + EXTERNAL_IDENTIFIERS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(EXTERNAL_IDENTIFIERS_ENDPOINT, token, null);
+            response = get(endpoint, token, null);
 
             return response.readEntity(ExternalIdentifiers.class);
         }
@@ -1131,12 +1161,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public ExternalIdentifier getExternalIdentifier(final String token, final String putCode)
+    public ExternalIdentifier getExternalIdentifier(String id, final String token, final String putCode)
     {
+        String endpoint = id + EXTERNAL_IDENTIFIERS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(EXTERNAL_IDENTIFIERS_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(ExternalIdentifier.class);
         }
@@ -1199,6 +1230,10 @@ public class OrcidService extends RestSource
                     Entity.entity(externalIdentifier, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }        
         finally
         {
             if (response != null)
@@ -1209,12 +1244,13 @@ public class OrcidService extends RestSource
     }
     
     //RESEARCHER URL    
-    public ResearcherUrls getResearcherUrls(final String token)
+    public ResearcherUrls getResearcherUrls(String id, final String token)
     {
+        String endpoint = id + RESEARCHER_URLS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(RESEARCHER_URLS_ENDPOINT, token, null);
+            response = get(endpoint, token, null);
 
             return response.readEntity(ResearcherUrls.class);
         }
@@ -1227,12 +1263,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public ResearcherUrl getResearcherUrl(final String token, final String putCode)
+    public ResearcherUrl getResearcherUrl(String id, final String token, final String putCode)
     {
+        String endpoint = id + RESEARCHER_URLS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(RESEARCHER_URLS_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(ResearcherUrl.class);
         }
@@ -1295,6 +1332,10 @@ public class OrcidService extends RestSource
                     Entity.entity(researcherUrl, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }        
         finally
         {
             if (response != null)
@@ -1305,12 +1346,13 @@ public class OrcidService extends RestSource
     }
     
     //ADDRESS
-    public Addresses getAddresses(final String token)
+    public Addresses getAddresses(String id, final String token)
     {
+        String endpoint = id + ADDRESS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(ADDRESS_ENDPOINT, token, null);
+            response = get(endpoint, token, null);
 
             return response.readEntity(Addresses.class);
         }
@@ -1323,12 +1365,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public Address getAddress(final String token, final String putCode)
+    public Address getAddress(String id, final String token, final String putCode)
     {
+        String endpoint = id + ADDRESS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(ADDRESS_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(Address.class);
         }
@@ -1391,6 +1434,10 @@ public class OrcidService extends RestSource
                     Entity.entity(address, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
         finally
         {
             if (response != null)
@@ -1401,12 +1448,13 @@ public class OrcidService extends RestSource
     } 
 
     // KEYWORD
-    public Keywords getKeywords(final String token)
+    public Keywords getKeywords(String id, final String token)
     {
+        String endpoint = id + KEYWORDS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(KEYWORDS_ENDPOINT, token, null);
+            response = get(endpoint, token, null);
 
             return response.readEntity(Keywords.class);
         }
@@ -1419,12 +1467,13 @@ public class OrcidService extends RestSource
         }
     }
 
-    public Keyword getKeyword(final String token, final String putCode)
+    public Keyword getKeyword(String id, final String token, final String putCode)
     {
+        String endpoint = id + KEYWORDS_ENDPOINT;
         Response response = null;
         try
         {
-            response = get(KEYWORDS_ENDPOINT, token, putCode);
+            response = get(endpoint, token, putCode);
 
             return response.readEntity(Keyword.class);
         }
@@ -1487,6 +1536,10 @@ public class OrcidService extends RestSource
                     Entity.entity(keyword, MediaType.APPLICATION_XML_TYPE));
             return retrievePutCode(response);
         }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }        
         finally
         {
             if (response != null)
@@ -1634,7 +1687,7 @@ public class OrcidService extends RestSource
         return response;
     }
 
-    public String retrievePutCode(Response response)
+    public String retrievePutCode(Response response) throws Exception
     {
         StatusType status = response.getStatusInfo();
         if (status != null)
@@ -1643,7 +1696,8 @@ public class OrcidService extends RestSource
             {
                 log.error("[REASON]" + status.getStatusCode() + ":"
                         + status.getReasonPhrase());
-                return null;
+                throw new Exception(status.getStatusCode() + ":"
+                        + status.getReasonPhrase());
             }
         }
         String location = response.getLocation().toString();
@@ -1656,13 +1710,6 @@ public class OrcidService extends RestSource
         }
 
         return null;
-    }
-
-    public void buildHistory(DSpaceObject crisObject, BigInteger putCode,
-            SourceType source, String path)
-    {
-        // TODO Auto-generated method stub
-
     }
 
     public static boolean isValid(final String orcid)

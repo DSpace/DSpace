@@ -82,7 +82,7 @@ public class OAuthAuthenticationMethod implements AuthenticationMethod{
             return AuthenticationMethod.NO_SUCH_USER;
         }
         // No email address, perhaps the eperson has been setup, better check it
-        if (epersons == null)
+        if (epersons == null || epersons.length == 0)
         {
         	eperson = context.getCurrentUser();
             if (eperson != null)

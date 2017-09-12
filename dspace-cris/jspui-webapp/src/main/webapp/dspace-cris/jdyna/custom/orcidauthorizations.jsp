@@ -19,18 +19,13 @@
 <c:set var="showgrantedidicon" value="false"/>
 <c:set var="showgrantedeyesicon" value="false"/>
 <c:set var="showgrantedrepeaticon" value="false"/>
-<c:set var="showgrantedclouduploadicon" value="false"/>
 <c:set var="showmissedidicon" value="false"/>
 <c:set var="showmissedeyesicon" value="false"/>
 <c:set var="showmissedrepeaticon" value="false"/>
-<c:set var="showmissedclouduploadicon" value="false"/>
 <c:set var="showauthenticate" value="false"/>
 <c:set var="showorcidprofilereadlimited" value="false"/>
 <c:set var="showorcidbioupdate" value="false"/>
-<c:set var="showorcidworkscreate" value="false"/>
 <c:set var="showorcidworksupdate" value="false"/>
-<c:set var="showfundingcreate" value="false"/>
-<c:set var="showfundingupdate" value="false"/>
 
 <script type="text/javascript">
 <!--
@@ -74,12 +69,12 @@ j(document).ready(function() {
 						</c:otherwise>
 						</c:choose>
 						<c:choose>
-						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-orcid-profile-read-limited']}">
+						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-read-limited']}">
 							<c:set var="showgrantedeyesicon" value="true"/>
 							<c:set var="showorcidprofilereadlimited" value="true"/>
 						</c:when>
 						<c:otherwise>
-							<% if(scopeMetadata.contains("/orcid-profile/read-limited"))  { %>
+							<% if(scopeMetadata.contains("/read-limited"))  { %>
 								<c:set var="showmissedeyesicon" value="true"/>
 							<% } else { %>
 								<c:set var="showmissedeyesicon" value="false"/>
@@ -87,12 +82,12 @@ j(document).ready(function() {
 						</c:otherwise>
 						</c:choose>
 						<c:choose>
-						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-orcid-bio-update']}">
+						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-person-update']}">
 							<c:set var="showgrantedrepeaticon" value="true"/>
 							<c:set var="showorcidbioupdate" value="true"/>
 						</c:when>
 						<c:otherwise>
-							<% if(scopeMetadata.contains("/orcid-bio/update"))  { %>
+							<% if(scopeMetadata.contains("/person/update"))  { %>
 								<c:set var="showmissedrepeaticon" value="true"/>
 							<% } else { %>
 								<c:set var="showmissedrepeaticon" value="false"/>
@@ -100,57 +95,18 @@ j(document).ready(function() {
 						</c:otherwise>
 						</c:choose>
 						<c:choose>
-						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-orcid-works-create']}">
-							<c:set var="showgrantedclouduploadicon" value="true"/>
-							<c:set var="showorcidworkscreate" value="true"/>
-						</c:when>
-						<c:otherwise>
-							<% if(scopeMetadata.contains("/orcid-works/create"))  { %>
-								<c:set var="showmissedclouduploadicon" value="true"/>
-							<% } else { %>
-								<c:set var="showmissedclouduploadicon" value="false"/>
-							<% } %>
-						</c:otherwise>
-						</c:choose>
-						<c:choose>
-						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-orcid-works-update']}">
+						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-activities-update']}">
 							<c:set var="showgrantedrepeaticon" value="true"/>
 							<c:set var="showorcidworksupdate" value="true"/>
 						</c:when>
 						<c:otherwise>
-							<% if(scopeMetadata.contains("/orcid-works/update"))  { %>
+							<% if(scopeMetadata.contains("/activities/update"))  { %>
 								<c:set var="showmissedrepeaticon" value="true"/>
 							<% } else { %>
 								<c:set var="showmissedrepeaticon" value="false"/>
 							<% } %>						
 						</c:otherwise>
 						</c:choose>						
-						<c:choose>
-						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-funding-update']}">
-							<c:set var="showgrantedrepeaticon" value="true"/>
-							<c:set var="showfundingupdate" value="true"/>
-						</c:when>
-						<c:otherwise>
-							<% if(scopeMetadata.contains("/funding/update"))  { %>
-								<c:set var="showmissedrepeaticon" value="true"/>
-							<% } else { %>
-								<c:set var="showmissedrepeaticon" value="false"/>
-							<% } %>										
-						</c:otherwise>
-						</c:choose>								
-						<c:choose>
-						<c:when test="${!empty anagraficaObject.anagrafica4view['system-orcid-token-funding-create']}">
-							<c:set var="showgrantedclouduploadicon" value="true"/>
-							<c:set var="showfundingcreate" value="true"/>
-						</c:when>
-						<c:otherwise>
-							<% if(scopeMetadata.contains("/funding/create"))  { %>
-								<c:set var="showmissedclouduploadicon" value="true"/>
-							<% } else { %>
-								<c:set var="showmissedclouduploadicon" value="false"/>
-							<% } %>							
-						</c:otherwise>
-						</c:choose>							
 						<c:if test="${tipologiaDaVisualizzare.shortName eq 'orcid'}">
 							<dyna:display tipologia="${tipologiaDaVisualizzare.real}" hideLabel="false" values="${anagraficaObject.anagrafica4view[tipologiaDaVisualizzare.shortName]}" />
 							<div class="dynaClear">&nbsp;</div>
@@ -158,7 +114,7 @@ j(document).ready(function() {
 					</c:forEach>
 
 					<c:choose>
-					<c:when test="${showmissedidicon eq true or showmissedeyesicon eq true or showmissedrepeaticon eq true or showmissedclouduploadicon eq true}">
+					<c:when test="${showmissedidicon eq true or showmissedeyesicon eq true or showmissedrepeaticon eq true}">
 					<div class="col-md-5"><div class="panel panel-default">
   						<div class="panel-heading">
     						<h3 class="panel-title"><fmt:message key="jsp.orcid.custom.box.label.grantedauthorization"/></h3>
@@ -187,9 +143,6 @@ j(document).ready(function() {
 											<c:if test="${showgrantedrepeaticon eq true}">
 												<li><span class="mini-icon glyphicon glyphicon-repeat green"></span></li>
 											</c:if>	 
-											<c:if test="${showgrantedclouduploadicon eq true}">
-												<li><span class="mini-icon glyphicon glyphicon-cloud-upload green"></span></li>
-											</c:if>
 									</ul>
 								</div>
 							</div>
@@ -205,17 +158,8 @@ j(document).ready(function() {
 											<c:if test="${showorcidbioupdate eq true}">
 												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidbioupdate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidbioupdate"/></span></li>
 											</c:if>
-											<c:if test="${showorcidworkscreate eq true}">
-												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworkscreate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworkscreate"/></span></li>
-											</c:if>
 											<c:if test="${showorcidworksupdate eq true}">
 												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworksupdate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworksupdate"/></span></li>
-											</c:if>
-											<c:if test="${showfundingupdate eq true}">
-												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingupdate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingupdate"/></span></li>
-											</c:if>											
-											<c:if test="${showfundingcreate eq true}">
-												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingcreate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingcreate"/></span></li>
 											</c:if>
 									</ul>
 								</div>
@@ -226,7 +170,7 @@ j(document).ready(function() {
 					</c:otherwise>
 					</c:choose>
 					<c:choose>
-					<c:when test="${showmissedidicon eq true or showmissedeyesicon eq true or showmissedrepeaticon eq true or showmissedclouduploadicon eq true}">											
+					<c:when test="${showmissedidicon eq true or showmissedeyesicon eq true or showmissedrepeaticon eq true}">											
 						<div class="col-md-2">
 							<div class="row">
 							<a href="<%= request.getContextPath() %>/oauth-login">
@@ -255,9 +199,6 @@ j(document).ready(function() {
 											<c:if test="${showmissedrepeaticon eq true}">
 												<li><span class="mini-icon glyphicon glyphicon-repeat green"></span></li>
 											</c:if>	 
-											<c:if test="${showmissedclouduploadicon eq true}">
-												<li><span class="mini-icon glyphicon glyphicon-cloud-upload green"></span></li>
-											</c:if>
 									</ul>
 								</div>
   							</div>
@@ -273,18 +214,12 @@ j(document).ready(function() {
 											<c:if test="${showorcidbioupdate eq false && showmissedrepeaticon eq true}">
 												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidbioupdate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidbioupdate"/></span></li>
 											</c:if>
-											<c:if test="${showorcidworkscreate eq false && showmissedclouduploadicon eq true}">
-												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworkscreate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworkscreate"/></span></li>
-											</c:if>
 											<c:if test="${showorcidworksupdate eq false && showmissedrepeaticon eq true}">
 												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworksupdate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworksupdate"/></span></li>
 											</c:if>
-											<c:if test="${showfundingupdate eq false && showmissedrepeaticon eq true}">
+											<c:if test="${showmissedrepeaticon eq true}">
 												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingupdate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingupdate"/></span></li>
 											</c:if>											
-											<c:if test="${showfundingcreate eq false && showmissedclouduploadicon eq true}">
-												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingcreate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingcreate"/></span></li>
-											</c:if>
 									</ul>
 								</div>
 							</div>   
