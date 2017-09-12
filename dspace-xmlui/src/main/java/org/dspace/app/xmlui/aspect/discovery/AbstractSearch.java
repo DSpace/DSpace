@@ -533,7 +533,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         String description = collectionService.getMetadata(collection, "introductory_text");
         String description_abstract = collectionService.getMetadata(collection, "short_description");
         String description_table = collectionService.getMetadata(collection, "side_bar_text");
-        String identifier_uri = "http://hdl.handle.net/" + collection.getHandle();
+        String identifier_uri = handleService.getCanonicalPrefix() + collection.getHandle();
         String provenance = collectionService.getMetadata(collection, "provenance_description");
         String rights = collectionService.getMetadata(collection, "copyright_text");
         String rights_license = collectionService.getMetadata(collection, "license");
@@ -588,7 +588,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         String description = communityService.getMetadata(community, "introductory_text");
         String description_abstract = communityService.getMetadata(community, "short_description");
         String description_table = communityService.getMetadata(community, "side_bar_text");
-        String identifier_uri = "http://hdl.handle.net/" + community.getHandle();
+        String identifier_uri = handleService.getCanonicalPrefix() + community.getHandle();
         String rights = communityService.getMetadata(community, "copyright_text");
         String title = community.getName();
 

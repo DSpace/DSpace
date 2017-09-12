@@ -268,7 +268,7 @@ public class ItemExportServiceImpl implements ItemExportService
                      ("date".equals(metadataField.getElement()) && "accessioned".equals(qualifier)) ||
                      ("date".equals(metadataField.getElement()) && "available".equals(qualifier)) ||
                      ("identifier".equals(metadataField.getElement()) && "uri".equals(qualifier) &&
-                      (dcv.getValue() != null && dcv.getValue().startsWith("http://hdl.handle.net/" +
+                      (dcv.getValue() != null && dcv.getValue().startsWith(handleService.getCanonicalPrefix() +
                           handleService.getPrefix() + "/"))) ||
                      ("description".equals(metadataField.getElement()) && "provenance".equals(qualifier)) ||
                      ("format".equals(metadataField.getElement()) && "extent".equals(qualifier)) ||

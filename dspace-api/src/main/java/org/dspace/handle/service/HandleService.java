@@ -58,8 +58,17 @@ public interface HandleService {
             throws SQLException;
 
     /**
-     * Transforms handle into a URI using http://hdl.handle.net if not 
+     * Provides handle canonical prefix using http://hdl.handle.net/ if not 
      * overridden by the configuration property handle.canonical.prefix.
+     *
+     * No attempt is made to verify that prefix is in fact valid.
+     *
+     * @return The canonical prefix
+     */
+    public String getCanonicalPrefix();
+
+    /**
+     * Transforms handle into a URI using canonical handle prefix
      *
      * No attempt is made to verify that handle is in fact valid.
      *

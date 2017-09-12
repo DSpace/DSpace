@@ -29,6 +29,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.handle.factory.HandleServiceFactory;
+import org.dspace.handle.service.HandleService;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 
@@ -64,6 +66,7 @@ public class CSVOutputter extends AbstractReader implements Recyclable
 
     protected BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
+    protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
 
     public void setup(SourceResolver sourceResolver, Map objectModel, String src, Parameters parameters) throws IOException, SAXException, ProcessingException {
         log.info("CSV Writer for stats");
@@ -197,7 +200,7 @@ public class CSVOutputter extends AbstractReader implements Recyclable
                 entryValues[1] = bitstream.getName();
                 entryValues[2] = bitstream.getBundles().get(0).getName();
                 entryValues[3] = item.getName();
-                entryValues[4] = "http://hdl.handle.net/" + item.getHandle();
+                entryValues[4] = handleService.getCanonicalPrefix() + item.getHandle();
                 entryValues[5] = wrapInDelimitedString(itemService.getMetadataByMetadataString(item, "dc.creator"));
                 entryValues[6] = wrapInDelimitedString(itemService.getMetadataByMetadataString(item, "dc.publisher"));
                 entryValues[7] = wrapInDelimitedString(itemService.getMetadataByMetadataString(item, "dc.date.issued"));
