@@ -114,9 +114,14 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             }
 
             // DATASHARE - start
+            Item item = (Item)dso;
             String key = dso.getHandle() +
                     "full:" + showFullItem(objectModel) +
-                    "tombstone:" + DSpaceUtils.showTombstone(context, (Item)dso);
+                    "tombstone:" + DSpaceUtils.showTombstone(context, item);
+            ItemDataset ds = new ItemDataset(context, item);
+            if(ds.exists()){
+                key += "dscksum:"+ ds.getChecksum(); 
+            }
             return HashUtil.hash(key);
             // DATASHARE - end
         }
