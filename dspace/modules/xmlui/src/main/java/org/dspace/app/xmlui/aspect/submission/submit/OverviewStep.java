@@ -53,6 +53,7 @@ public class OverviewStep extends AbstractStep {
     private static final Message T_BUTTON_DATAFILE_EDIT = message("xmlui.Submission.submit.OverviewStep.button.datafile.edit");
     private static final Message T_BUTTON_DATAFILE_DELETE = message("xmlui.Submission.submit.OverviewStep.button.datafile.delete");
     private static final Message T_BUTTON_DATAFILE_CONTINUE = message("xmlui.Submission.submit.OverviewStep.button.datafile.continue");
+    private static final Message T_DUP_SUBMISSION = message("xmlui.submit.publication.describe.duplicatesubmission");
 
     private static final Message T_STEPS_HEAD_GENBANK = message("xmlui.Submission.submit.OverviewStep.headgenbank");
     private static final Message T_GENBANK_HELP = message("xmlui.Submission.submit.OverviewStep.genbankhelp");
@@ -62,11 +63,17 @@ public class OverviewStep extends AbstractStep {
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
+        org.dspace.content.Item publication = DryadWorkflowUtils.getDataPackage(context, submission.getItem());
 
         body.addDivision("step-link","step-link").addPara(T_TRAIL);
+
         Division helpDivision = body.addDivision("general-help","general-help");
         helpDivision.setHead(T_MAIN_HEAD);
         helpDivision.addPara(T_MAIN_HELP);
+        if (publication.checkForDuplicateItems(context)) {
+            Division dupDivision = body.addDivision("duplicate-info", "duplicate-info");
+            dupDivision.addPara(T_DUP_SUBMISSION);
+        }
 
         Division mainDiv = body.addInteractiveDivision("submit-completed-dataset", actionURL, Division.METHOD_POST, "primary submission");
 
@@ -74,7 +81,6 @@ public class OverviewStep extends AbstractStep {
 
         Division actionsDiv = mainDiv.addDivision("submit-completed-overview");
 
-        org.dspace.content.Item publication = DryadWorkflowUtils.getDataPackage(context, submission.getItem());
         if(publication == null)
             publication = submission.getItem();
 
