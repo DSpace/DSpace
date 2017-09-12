@@ -5123,7 +5123,7 @@
 			<ref bean="crisSearchService" />
 		</property>
 		<property name="clazzPD">
-			<value>org.dspace.app.cris.model.jdyna.RPPropertiesDefinition</value>
+			<value>it.cilea.osd.jdyna.model.PropertiesDefinition</value>
 		</property>				
 		<property name="viewName">
 			<value>resultSearchPointer</value>
@@ -5139,8 +5139,7 @@
 			<ref bean="crisSearchService" />
 		</property>
 		<property name="clazzPD">
-			<value>org.dspace.app.cris.model.jdyna.ProjectPropertiesDefinition
-			</value>
+			<value>it.cilea.osd.jdyna.model.PropertiesDefinition</value>
 		</property>				
 		<property name="viewName">
 			<value>resultSearchPointer</value>
@@ -5156,7 +5155,7 @@
 			<ref bean="crisSearchService" />
 		</property>
 		<property name="clazzPD">
-			<value>org.dspace.app.cris.model.jdyna.OUPropertiesDefinition</value>
+			<value>it.cilea.osd.jdyna.model.PropertiesDefinition</value>
 		</property>				
 		<property name="viewName">
 			<value>resultSearchPointer</value>
@@ -5172,7 +5171,7 @@
 			<ref bean="crisSearchService" />
 		</property>
 		<property name="clazzPD">
-			<value>org.dspace.app.cris.model.jdyna.DynamicPropertiesDefinition</value>
+			<value>it.cilea.osd.jdyna.model.PropertiesDefinition</value>
 		</property>				
 		<property name="viewName">
 			<value>resultSearchPointer</value>
