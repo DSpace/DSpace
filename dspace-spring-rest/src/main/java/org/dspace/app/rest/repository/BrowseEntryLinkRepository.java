@@ -20,23 +20,22 @@ import org.dspace.app.rest.converter.BrowseIndexConverter;
 import org.dspace.app.rest.model.BrowseEntryRest;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.hateoas.BrowseEntryResource;
-import org.dspace.browse.BrowseEngine;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseInfo;
-import org.dspace.browse.BrowserScope;
+import org.dspace.app.rest.utils.ScopeResolver;
+import org.dspace.browse.*;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.Consumer;
 
 /**
  * This is the repository responsible to retrieve the first level values
@@ -55,10 +54,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 	BrowseIndexConverter bixConverter;
 
 	@Autowired
-	CollectionService collectionService;
-
-	@Autowired
-	CommunityService communityService;
+	ScopeResolver scopeResolver;
 
 	// FIXME It will be nice to drive arguments binding by annotation as in normal spring controller methods
 	public Page<BrowseEntryRest> listBrowseEntries(HttpServletRequest request, String browseName,
@@ -70,17 +66,12 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 			scope = request.getParameter("scope");
 		}
 
+
 		Context context = obtainContext();
 		BrowseEngine be = new BrowseEngine(context);
 		BrowserScope bs = new BrowserScope(context);
-		DSpaceObject scopeObj = null;
-		if (scope != null) {
-			UUID uuid = UUID.fromString(scope);
-			scopeObj = communityService.find(context, uuid);
-			if (scopeObj == null) {
-				scopeObj = collectionService.find(context, uuid);
-			}
-		}
+
+		DSpaceObject scopeObj = scopeResolver.resolveScope(context, scope);
 
 		// process the input, performing some inline validation
 		final BrowseIndex bi;

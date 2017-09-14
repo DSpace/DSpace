@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery.configuration;
 
+import org.apache.commons.lang.StringUtils;
+import org.dspace.content.DSpaceObject;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
 import java.util.HashMap;
@@ -35,6 +37,38 @@ public class DiscoveryConfigurationService {
 
     public void setToIgnoreMetadataFields(Map<Integer, List<String>> toIgnoreMetadataFields) {
         this.toIgnoreMetadataFields = toIgnoreMetadataFields;
+    }
+
+    public DiscoveryConfiguration getDiscoveryConfiguration(DSpaceObject dso) {
+        String name;
+        if(dso == null) {
+            name = "site";
+        } else {
+            name = dso.getHandle();
+        }
+
+        return getDiscoveryConfiguration(name);
+    }
+
+    public DiscoveryConfiguration getDiscoveryConfiguration(final String name) {
+        DiscoveryConfiguration result;
+
+        result = StringUtils.isBlank(name) ? null : getMap().get(name);
+
+        if (result == null) {
+            //No specific configuration, get the default one
+            result = getMap().get("default");
+        }
+
+        return result;
+    }
+
+    public DiscoveryConfiguration getDiscoveryConfigurationByNameOrDso(final String configurationName, final DSpaceObject dso) {
+        if(StringUtils.isNotBlank(configurationName) && getMap().containsKey(configurationName)) {
+            return getMap().get(configurationName);
+        } else {
+            return getDiscoveryConfiguration(dso);
+        }
     }
 
     public static void main(String[] args) {
