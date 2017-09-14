@@ -709,7 +709,7 @@
 		</dependency>
 		<dependency>
 			<groupId>it.4science</groupId>
-			<artifactId>dev-orcid-jaxb</artifactId>
+			<artifactId>tools-orcid-jaxb</artifactId>
 		</dependency>					
     </dependencies>
 </project>

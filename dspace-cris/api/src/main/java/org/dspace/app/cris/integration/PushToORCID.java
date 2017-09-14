@@ -396,7 +396,7 @@ public class PushToORCID
                 try
                 {
                     String tokenCreateFunding = getTokenReleasedForSync(
-                            researcher, "system-orcid-token-funding-update");
+                            researcher, OrcidService.SYSTEM_ORCID_TOKEN_ACTIVITIES_CREATE_SCOPE);
 
                     Project project = (Project) applicationService
                             .getEntityByUUID(uuid);
@@ -461,7 +461,7 @@ public class PushToORCID
             for (WrapperEducation wrapperEducation : wrapperEducations)
             {
                 Education education = wrapperEducation.getEducation();
-                String md5ContentPartOfResearcher = getMd5Hash(education.getOrganization().getName());
+                String md5ContentPartOfResearcher = getMd5Hash(education.getOrganization().getName() + education.getStartDate().toString() + education.getEndDate().toString());
                 sendPartOfResearcher(orcidService, applicationService, crisId, token, orcid, OrcidService.CONSTANT_EDUCATION_UUID, md5ContentPartOfResearcher, education, delete, timestampAttempt);
             }
 
@@ -479,7 +479,7 @@ public class PushToORCID
             for (WrapperEmployment wrapperEmployment : wrapperEmployments)
             {
                 Employment employment = wrapperEmployment.getEmployment();
-                String md5ContentPartOfResearcher = getMd5Hash(employment.getOrganization().getName());
+                String md5ContentPartOfResearcher = getMd5Hash(employment.getOrganization().getName() + employment.getStartDate().toString() + employment.getEndDate().toString());
                 sendPartOfResearcher(orcidService, applicationService, crisId, token, orcid, OrcidService.CONSTANT_EMPLOYMENT_UUID, md5ContentPartOfResearcher, employment, delete, timestampAttempt);
             }
 
@@ -666,52 +666,57 @@ public class PushToORCID
                 }
                 else
                 {
+                    putCode = orcidHistory.getPutCode();
                     StatusType status = null;
                     switch (constantUuidPrefix)
                     {
                     case OrcidService.CONSTANT_OTHERNAME_UUID:
                         OtherName otherName = (OtherName) partOfResearcher;
                         otherName.setPutCode(
-                                new BigInteger(orcidHistory.getPutCode()));
+                                new BigInteger(putCode));
                         status = orcidService.putOtherName(orcid, token,
-                                orcidHistory.getPutCode(), otherName);
+                                putCode, otherName);
                         break;
                     case OrcidService.CONSTANT_RESEARCHERURL_UUID:
                         ResearcherUrl researcherUrl = (ResearcherUrl) partOfResearcher;
                         researcherUrl.setPutCode(
-                                new BigInteger(orcidHistory.getPutCode()));
+                                new BigInteger(putCode));
                         status = orcidService.putResearcherUrl(orcid, token,
-                                orcidHistory.getPutCode(), researcherUrl);
+                                putCode, researcherUrl);
                         break;
                     case OrcidService.CONSTANT_EXTERNALIDENTIFIER_UUID:
                         ExternalIdentifier externalIdentifier = (ExternalIdentifier) partOfResearcher;
                         externalIdentifier.setPutCode(
-                                new BigInteger(orcidHistory.getPutCode()));
+                                new BigInteger(putCode));
                         status = orcidService.putExternalIdentifier(orcid,
-                                token, orcidHistory.getPutCode(),
+                                token, putCode,
                                 externalIdentifier);
                         break;
                     case OrcidService.CONSTANT_ADDRESS_UUID:
                         Address address = (Address) partOfResearcher;
                         address.setPutCode(
-                                new BigInteger(orcidHistory.getPutCode()));
+                                new BigInteger(putCode));
                         status = orcidService.putAddress(orcid, token, putCode,
                                 address);
                         break;
                     case OrcidService.CONSTANT_KEYWORD_UUID:
                         Keyword keyword = (Keyword) partOfResearcher;
                         keyword.setPutCode(
-                                new BigInteger(orcidHistory.getPutCode()));
+                                new BigInteger(putCode));
                         status = orcidService.putKeyword(orcid, token, putCode,
                                 keyword);
                         break;
                     case OrcidService.CONSTANT_EMPLOYMENT_UUID:
                         Employment employment = (Employment) partOfResearcher;
+                        employment.setPutCode(
+                                new BigInteger(putCode));
                         status = orcidService.putEmployment(orcid, token, putCode,
                                 employment);
                         break;
                     case OrcidService.CONSTANT_EDUCATION_UUID:
                         Education education = (Education) partOfResearcher;
+                        education.setPutCode(
+                                new BigInteger(putCode));
                         status = orcidService.putEducation(orcid, token, putCode,
                                 education);
                         break;
@@ -1338,7 +1343,7 @@ public class PushToORCID
                     new Date());
 
             log.info("(Q4)Send Work for ResearcherPage crisID:" + crisId);
-            String value = getInternalIdentifier(funding);
+            String value = project.getUuid();
             sendFunding(orcidService, applicationService, crisId, token, orcid,
                     getMd5Hash(value), value, funding, deleteAndPost,
                     timestampAttempt);
@@ -1346,7 +1351,7 @@ public class PushToORCID
             // delete all values not in the current system both in the history
             // then into Orcid Registry
             List<OrcidHistory> histories = applicationService
-                    .findOrcidHistoryByOrcidAndTypeId(orcid, CrisConstants.PROJECT_TYPE_ID);
+                    .findOrcidHistoryByOrcidAndEntityUUIDAndTypeId(orcid, value, CrisConstants.PROJECT_TYPE_ID);
             for (OrcidHistory history : histories)
             {
                 if (history.getTimestampLastAttempt() != null)
@@ -1401,6 +1406,8 @@ public class PushToORCID
             funding.setAmount(amount);
         }
 
+        DecimalFormat dateMonthAndDayFormat = new DecimalFormat("00");
+        
         if (StringUtils.isNotBlank(itemMetadata.getStartYear())
                 || StringUtils.isNotBlank(itemMetadata.getStartMonth())
                 || StringUtils.isNotBlank(itemMetadata.getStartDay()))
@@ -1415,13 +1422,15 @@ public class PushToORCID
             if (StringUtils.isNotBlank(itemMetadata.getStartMonth()))
             {
                 Month month = new Month();
-                month.setValue(itemMetadata.getStartMonth());
+                month.setValue(dateMonthAndDayFormat
+                        .format(Long.parseLong(itemMetadata.getStartMonth())));
                 fuzzyDate.setMonth(month);
             }
             if (StringUtils.isNotBlank(itemMetadata.getStartDay()))
             {
                 Day day = new Day();
-                day.setValue(itemMetadata.getStartDay());
+                day.setValue(dateMonthAndDayFormat
+                        .format(Long.parseLong(itemMetadata.getStartDay())));
                 fuzzyDate.setDay(day);
             }
             funding.setStartDate(fuzzyDate);
@@ -1440,19 +1449,60 @@ public class PushToORCID
             if (StringUtils.isNotBlank(itemMetadata.getEndMonth()))
             {
                 Month month = new Month();
-                month.setValue(itemMetadata.getEndMonth());
+                month.setValue(dateMonthAndDayFormat
+                        .format(Long.parseLong(itemMetadata.getEndMonth())));
                 fuzzyDate.setMonth(month);
             }
             if (StringUtils.isNotBlank(itemMetadata.getEndDay()))
             {
                 Day day = new Day();
-                day.setValue(itemMetadata.getEndDay());
+                day.setValue(dateMonthAndDayFormat
+                        .format(Long.parseLong(itemMetadata.getEndDay())));
                 fuzzyDate.setDay(day);
             }
             funding.setEndDate(fuzzyDate);
             return funding;
         }
 
+        if (itemMetadata.getExternalIdentifier() != null)
+        {
+            ExternalIds fundingExternalIdentifiers = new ExternalIds();
+            for (String valIdentifier : itemMetadata.getExternalIdentifier())
+            {
+                ExternalId fundingExternalIdentifier = new ExternalId();
+                fundingExternalIdentifier.setExternalIdType(
+                        itemMetadata.getExternalIdentifierType(valIdentifier));
+                fundingExternalIdentifier.setExternalIdValue(valIdentifier);
+                fundingExternalIdentifier.setExternalIdRelationship(RelationshipType.SELF);
+                fundingExternalIdentifiers.getExternalId()
+                        .add(fundingExternalIdentifier);
+            }
+            funding.setExternalIds(fundingExternalIdentifiers);
+        }
+
+        if (StringUtils.isNotBlank(itemMetadata.getTitle()))
+        {
+            FundingTitle fundingTitle = new FundingTitle();
+            fundingTitle.setTitle(itemMetadata.getTitle());
+            funding.setTitle(fundingTitle);
+        }
+
+        if (StringUtils.isNotBlank(itemMetadata.getType()))
+        {
+            funding.setType(FundingType.fromValue(itemMetadata.getType()));
+        }
+
+        if (StringUtils.isNotBlank(itemMetadata.getAbstract()))
+        {
+            funding.setShortDescription(itemMetadata.getAbstract());
+        }
+        if (StringUtils.isNotBlank(itemMetadata.getURL()))
+        {
+            Url url = new Url();
+            url.setValue(itemMetadata.getURL());
+            funding.setUrl(url);
+        }
+        
         boolean buildFundingContributors = false;
         Contributors fundingContributors = new Contributors();
         if (itemMetadata.getContributorsLead() != null)
@@ -1478,44 +1528,7 @@ public class PushToORCID
         {
             funding.setContributors(fundingContributors);
         }
-
-        if (itemMetadata.getExternalIdentifier() != null)
-        {
-            ExternalIds fundingExternalIdentifiers = new ExternalIds();
-            for (String valIdentifier : itemMetadata.getExternalIdentifier())
-            {
-                ExternalId fundingExternalIdentifier = new ExternalId();
-                fundingExternalIdentifier.setExternalIdType(
-                        itemMetadata.getExternalIdentifierType(valIdentifier));
-                fundingExternalIdentifier.setExternalIdValue(valIdentifier);
-                fundingExternalIdentifiers.getExternalId()
-                        .add(fundingExternalIdentifier);
-            }
-            funding.setExternalIds(fundingExternalIdentifiers);
-        }
-
-        if (StringUtils.isNotBlank(itemMetadata.getTitle()))
-        {
-            FundingTitle fundingTitle = new FundingTitle();
-            fundingTitle.setTitle(itemMetadata.getTitle());
-            funding.setTitle(fundingTitle);
-        }
-
-        if (StringUtils.isNotBlank(itemMetadata.getType()))
-        {
-            funding.setType(FundingType.valueOf(itemMetadata.getType()));
-        }
-
-        if (StringUtils.isNotBlank(itemMetadata.getAbstract()))
-        {
-            funding.setShortDescription(itemMetadata.getAbstract());
-        }
-        if (StringUtils.isNotBlank(itemMetadata.getURL()))
-        {
-            Url url = new Url();
-            url.setValue(itemMetadata.getURL());
-            funding.setUrl(url);
-        }
+        
         if (StringUtils.isNotBlank(itemMetadata.getOrganization()))
         {
             Organization organization = new Organization();
@@ -1566,14 +1579,14 @@ public class PushToORCID
             }
         }
 
-        CreditName creditName = new CreditName();
+        org.dspace.authority.orcid.jaxb.common.CreditName creditName = new org.dspace.authority.orcid.jaxb.common.CreditName();
         creditName.setValue(name);
         contributor.setCreditName(creditName);
 
         org.dspace.authority.orcid.jaxb.funding.ContributorAttributes attributes = new org.dspace.authority.orcid.jaxb.funding.ContributorAttributes();
         attributes.setContributorRole(
                 org.dspace.authority.orcid.jaxb.funding.ContributorRole
-                        .valueOf(type));
+                        .fromValue(type));
         fundingContributors.getContributor().add(contributor);
     }
 
@@ -1630,7 +1643,7 @@ public class PushToORCID
                     new Date());
 
             log.info("(Q4)Send Work for ResearcherPage crisID:" + crisId);
-            String value = getInternalIdentifier(work);
+            String value = item.getHandle();
             sendWork(orcidService, applicationService, crisId, token, orcid,
                     getMd5Hash(value), value, work, deleteAndPost,
                     timestampAttempt);
@@ -1638,7 +1651,7 @@ public class PushToORCID
             // delete all values not in the current system both in the history
             // then into Orcid Registry
             List<OrcidHistory> histories = applicationService
-                    .findOrcidHistoryByOrcidAndTypeId(orcid, Constants.ITEM);
+                    .findOrcidHistoryByOrcidAndEntityUUIDAndTypeId(orcid, value, Constants.ITEM);
             for (OrcidHistory history : histories)
             {
                 if (history.getTimestampLastAttempt() != null)
@@ -1773,6 +1786,7 @@ public class PushToORCID
                 workExternalIdentifier.setExternalIdUrl(valIdentifier);
                 workExternalIdentifier.setExternalIdType(
                         itemMetadata.getExternalIdentifierType(valIdentifier));
+                workExternalIdentifier.setExternalIdRelationship(RelationshipType.SELF);
                 workExternalIdentifiers.getExternalId()
                         .add(workExternalIdentifier);
             }
@@ -1837,7 +1851,7 @@ public class PushToORCID
                 }
             }
 
-            CreditName creditName = new CreditName();
+            org.dspace.authority.orcid.jaxb.common.CreditName creditName = new org.dspace.authority.orcid.jaxb.common.CreditName();
             creditName.setValue(name);
             contributor.setCreditName(creditName);
 
@@ -1909,6 +1923,7 @@ public class PushToORCID
                 List<String> listStartDate = employment
                         .get("affiliationstartdate");
 
+                DecimalFormat dateMonthAndDayFormat = new DecimalFormat("00");
                 if (listStartDate != null && !listStartDate.isEmpty())
                 {
                     String stringStartDate = listStartDate.get(0);
@@ -1941,8 +1956,8 @@ public class PushToORCID
                     {
                         int monthSD = cal1.get(Calendar.MONTH);
                         Month month = new Month();
-                        month.setValue(MessageFormat.format("{0,number,#00}",
-                                new Object[] { new Integer(monthSD) }));
+                        month.setValue(dateMonthAndDayFormat
+                                .format(monthSD));
                         fuzzyStartDate.setMonth(month);
                     }
                     catch (Exception ex)
@@ -1954,8 +1969,8 @@ public class PushToORCID
                     {
                         int daySD = cal1.get(Calendar.DAY_OF_MONTH);
                         Day day = new Day();
-                        day.setValue(MessageFormat.format("{0,number,#00}",
-                                new Object[] { new Integer(daySD) }));
+                        day.setValue(dateMonthAndDayFormat
+                                .format(daySD));
                         fuzzyStartDate.setDay(day);
                     }
                     catch (Exception ex)
@@ -1998,8 +2013,8 @@ public class PushToORCID
                     {
                         int monthED = cal2.get(Calendar.MONTH);
                         Month month = new Month();
-                        month.setValue(MessageFormat.format("{0,number,#00}",
-                                new Object[] { new Integer(monthED) }));
+                        month.setValue(dateMonthAndDayFormat
+                                .format(monthED));
                         fuzzyEndDate.setMonth(month);
                     }
                     catch (Exception ex)
@@ -2011,8 +2026,8 @@ public class PushToORCID
                     {
                         int dayED = cal2.get(Calendar.DAY_OF_MONTH);
                         Day day = new Day();
-                        day.setValue(MessageFormat.format("{0,number,#00}",
-                                new Object[] { new Integer(dayED) }));
+                        day.setValue(dateMonthAndDayFormat
+                                .format(dayED));
                         fuzzyEndDate.setDay(day);
                     }
                     catch (Exception ex)
@@ -2082,14 +2097,6 @@ public class PushToORCID
                 organization.setName(stringOUname);
                 organization.setAddress(organizationAddress);
                 affiliation.setOrganization(organization);
-                List<String> putcode = employment.get("affiliationputcode");
-                if (putcode != null && !putcode.isEmpty())
-                {
-                    for (String pc : putcode)
-                    {
-                        affiliation.setPutCode(new BigInteger(pc));
-                    }
-                }
                 affiliations.add(wrapper);
             }
         }
@@ -2303,14 +2310,6 @@ public class PushToORCID
                 organization.setName(stringOUname);
                 organization.setAddress(organizationAddress);
                 affiliation.setOrganization(organization);
-                List<String> putcode = education.get("educationputcode");
-                if (putcode != null && !putcode.isEmpty())
-                {
-                    for (String pc : putcode)
-                    {
-                        affiliation.setPutCode(new BigInteger(pc));
-                    }
-                }
                 affiliations.add(wrapper);
             }
         }
@@ -2425,7 +2424,7 @@ public class PushToORCID
             for(EmploymentSummary nctype : employmentsOrcid.getEmploymentSummary()) {
                 String orcidSourceName = nctype.getSource().getSourceName().getContent();
                 if(orcidSourceName.equals(currentSourceName)) {
-                    String value = nctype.getOrganization().getName();
+                    String value = nctype.getOrganization().getName() + nctype.getStartDate().toString() + nctype.getEndDate().toString();
                     Integer constantType = OrcidService.CONSTANT_PART_OF_RESEARCHER_TYPE;
                     registerHistoryStillInOrcid(applicationService, crisId, orcid,
                             timestampAttemptToRetrieve, value, nctype.getPutCode().toString(), constantType, OrcidService.CONSTANT_EMPLOYMENT_UUID);
@@ -2445,7 +2444,7 @@ public class PushToORCID
             for(EducationSummary nctype : educationsOrcid.getEducationSummary()) {
                 String orcidSourceName = nctype.getSource().getSourceName().getContent();
                 if(orcidSourceName.equals(currentSourceName)) {
-                    String value = nctype.getOrganization().getName();
+                    String value = nctype.getOrganization().getName() + nctype.getStartDate().toString() + nctype.getEndDate().toString();
                     Integer constantType = OrcidService.CONSTANT_PART_OF_RESEARCHER_TYPE;
                     registerHistoryStillInOrcid(applicationService, crisId, orcid,
                             timestampAttemptToRetrieve, value, nctype.getPutCode().toString(), constantType, OrcidService.CONSTANT_EDUCATION_UUID);
@@ -2532,10 +2531,6 @@ public class PushToORCID
         if(OrcidService.CONSTANT_PART_OF_RESEARCHER_TYPE.equals(constantType)) {        
             constantUuidPartOf += "::"+md5ContentPartOfResearcher ;
         }
-        else if(constantType.equals(Constants.ITEM)) {
-            constantUuidPartOf = md5ContentPartOfResearcher;
-        }
-        
         try
         {
             OrcidHistory orcidHistory = applicationService
@@ -2733,7 +2728,7 @@ public class PushToORCID
                     query.addFilterQuery("{!field f=search.resourcetype}"
                             + CrisConstants.PROJECT_TYPE_ID);
                     query.addFilterQuery(
-                            "projectinvestigators_authority:" + crisID);
+                            "crisproject.principalinvestigator_authority:" + crisID);
                     query.addFilterQuery("-withdrawn:true");
                     query.setFields("search.resourceid", "search.resourcetype");
                     query.setRows(Integer.MAX_VALUE);

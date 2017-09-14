@@ -21,6 +21,7 @@ import it.cilea.osd.common.dao.PaginableObjectDao;
  */
 public interface OrcidHistoryDao extends PaginableObjectDao<OrcidHistory, Integer> {
 	
+    public List<OrcidHistory> findOrcidHistoryByOrcidAndEntityUUIDAndTypeId(String orcid, String uuid, Integer typeId);
 	public List<OrcidHistory> findOrcidHistoryByOrcidAndTypeId(String orcid, Integer typeId);
 	public List<OrcidHistory> findOrcidHistoryInSuccess();
 	public List<OrcidHistory> findOrcidHistoryInError();
