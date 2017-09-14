@@ -1,6 +1,7 @@
 package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
@@ -46,7 +47,16 @@ public class DryadWorkflowUtils {
     }
 
 
-    public static Item getDataPackage(Context context, Item dataFile){
+    public static Item getDataPackage(Context context, Item dataFile) {
+        // if this item is in fact a data package and not a data file, return the package (this item).
+        try {
+            if (dataFile.isIn(DryadDataPackage.getCollection(context))) {
+                return dataFile;
+            }
+        } catch (SQLException e) {
+            log.error("couldn't find collection for item " + dataFile.getID());
+        }
+
         DCValue[] dataPackageUrl = dataFile.getMetadata(MetadataSchema.DC_SCHEMA, "relation", "ispartof", Item.ANY);
 
         if(0 < dataPackageUrl.length){
