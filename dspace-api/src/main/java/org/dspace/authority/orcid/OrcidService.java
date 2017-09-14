@@ -92,7 +92,6 @@ public class OrcidService extends RestSource
      */
     private static Logger log = Logger.getLogger(OrcidService.class);
 
-    public static final Integer CONSTANT_PART_OF_RESEARCHER_ID = 9;
     public static final Integer CONSTANT_PART_OF_RESEARCHER_TYPE = 9;
     
     public static final String CONSTANT_OTHERNAME_UUID = "OTHERNAME";
@@ -701,7 +700,7 @@ public class OrcidService extends RestSource
     public StatusType putWork(String id, String token, String putCode,
             Work work) throws IOException, JAXBException
     {
-        String endpoint = id + EDUCATION_ENDPOINT;
+        String endpoint = id + WORK_ENDPOINT;
         Response response = null;
         try
         {
@@ -718,6 +717,24 @@ public class OrcidService extends RestSource
         }
     }
 
+    public void deleteWork(String id, String token, String putCode)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + WORK_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = delete(endpoint, token, putCode);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
+    
     // Fundings
     /**
      * Add funding
@@ -754,6 +771,24 @@ public class OrcidService extends RestSource
             }
         }
     }
+    
+    public void deleteFunding(String id, String token, String putCode)
+            throws IOException, JAXBException
+    {
+        String endpoint = id + FUNDING_ENDPOINT;
+        Response response = null;
+        try
+        {
+            response = delete(endpoint, token, putCode);
+        }
+        finally
+        {
+            if (response != null)
+            {
+                response.close();
+            }
+        }
+    }
 
     /**
      * Update funding
@@ -770,7 +805,7 @@ public class OrcidService extends RestSource
     public StatusType putFunding(String id, String token, String putCode,
             Funding funding) throws IOException, JAXBException
     {
-        String endpoint = id + EDUCATION_ENDPOINT;
+        String endpoint = id + FUNDING_ENDPOINT;
         Response response = null;
         try
         {

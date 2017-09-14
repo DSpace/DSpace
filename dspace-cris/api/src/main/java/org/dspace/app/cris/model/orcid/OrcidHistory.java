@@ -27,16 +27,12 @@ import it.cilea.osd.common.model.IdentifiableObject;
 @Table(name = "cris_orcid_history")
 @NamedQueries({
     @NamedQuery(name = "OrcidHistory.findAll", query = "from OrcidHistory order by id"),
-    @NamedQuery(name = "OrcidHistory.findOrcidHistoryByResearcherId", query = "from OrcidHistory where entityId = ? and typeId = 9 order by id"),
-    @NamedQuery(name = "OrcidHistory.findOrcidHistoryByProjectId", query = "from OrcidHistory where entityId = ? and typeId = 10 order by id"),
-    @NamedQuery(name = "OrcidHistory.findOrcidHistoryByPublicationId", query = "from OrcidHistory where entityId = ? and typeId = 2 order by id"),
-    @NamedQuery(name = "OrcidHistory.findOrcidHistoryByEntityIdAndTypeId", query = "from OrcidHistory where entityId = ? and typeId = ? order by id"),
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccess", query = "from OrcidHistory where timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryInError", query = "from OrcidHistory where timestampLastAttempt.timestamp > timestampSuccessAttempt.timestamp order by id"),
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccessByOwner", query = "from OrcidHistory where owner = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
     @NamedQuery(name = "OrcidHistory.findOrcidHistoryInSuccessByOwnerAndTypeId", query = "from OrcidHistory where owner = ? and typeId = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp order by id"),
-    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId", query = "from OrcidHistory where owner = ? and entityId = ? and typeId = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp"),
-    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId", query = "from OrcidHistory where owner = ? and entityId = ? and typeId = ?"),
+    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryInSuccessByOwnerAndEntityUUIDAndTypeId", query = "from OrcidHistory where owner = ? and entityUuid = ? and typeId = ? and timestampLastAttempt.timestamp = timestampSuccessAttempt.timestamp"),
+    @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryByOwnerAndOrcidAndTypeId", query = "from OrcidHistory where owner = ? and orcid = ? and typeId = ?"),
     @NamedQuery(name = "OrcidHistory.uniqueOrcidHistoryByOwnerAndEntityUUIDAndTypeId", query = "from OrcidHistory where owner = ? and entityUuid = ? and typeId = ?")
 })
 public class OrcidHistory extends IdentifiableObject {
@@ -46,8 +42,6 @@ public class OrcidHistory extends IdentifiableObject {
     @GeneratedValue(generator = "CRIS_ORCIDHISTORY_SEQ")
     @SequenceGenerator(name = "CRIS_ORCIDHISTORY_SEQ", sequenceName = "CRIS_ORCIDHISTORY_SEQ", allocationSize = 1)
     private Integer id;
-    
-    private Integer entityId;
     
     private Integer typeId;
     
@@ -102,14 +96,6 @@ public class OrcidHistory extends IdentifiableObject {
 
 	public void setResponseMessage(String responseMessage) {
 		this.responseMessage = responseMessage;
-	}
-
-	public Integer getEntityId() {
-		return entityId;
-	}
-
-	public void setEntityId(Integer entityId) {
-		this.entityId = entityId;
 	}
 
 	public Integer getTypeId() {

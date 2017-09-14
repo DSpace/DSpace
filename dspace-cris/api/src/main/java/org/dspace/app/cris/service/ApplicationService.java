@@ -989,8 +989,8 @@ public class ApplicationService extends ExtendedTabService
 	public OrcidQueue uniqueOrcidQueueByEntityIdAndTypeIdAndOwnerId(Integer entityID, Integer typeId, String ownerId) {
 		return orcidQueueDao.uniqueOrcidQueueByEntityIdAndTypeIdAndOwner(entityID, typeId, ownerId);
 	}
-	public List<OrcidHistory> findOrcidHistoryByEntityIdAndTypeId(Integer entityId, Integer typeId) {	
-		return orcidHistoryDao.findOrcidHistoryByEntityIdAndTypeId(entityId, typeId);
+	public List<OrcidHistory> findOrcidHistoryByOrcidAndTypeId(String orcid, Integer typeId) {	
+		return orcidHistoryDao.findOrcidHistoryByOrcidAndTypeId(orcid, typeId);
 	}
 
 	public void deleteOrcidQueueByOwnerAndTypeId(String crisID, int typeId) {
@@ -1009,12 +1009,12 @@ public class ApplicationService extends ExtendedTabService
 		return orcidHistoryDao.findOrcidHistoryInSuccessByOwnerAndTypeId(crisID, type);
 	}
 	
-	public OrcidHistory uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId(String crisID, int entityID, int typeID) {
-		return orcidHistoryDao.uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId(crisID, entityID, typeID);
+	public OrcidHistory uniqueOrcidHistoryInSuccessByOwnerAndEntityUUIDAndTypeId(String crisID, String uuid, int typeID) {
+		return orcidHistoryDao.uniqueOrcidHistoryInSuccessByOwnerAndEntityUUIDAndTypeId(crisID, uuid, typeID);
 	}
 	
-	public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(String crisID, int entityID, int typeID) {
-		return orcidHistoryDao.uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(crisID, entityID, typeID);
+	public OrcidHistory uniqueOrcidHistoryByOwnerAndOrcidAndTypeId(String crisID, String orcid, int typeID) {
+		return orcidHistoryDao.uniqueOrcidHistoryByOwnerAndOrcidAndTypeId(crisID, orcid, typeID);
 	}
 
     public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityUUIDAndTypeId(
