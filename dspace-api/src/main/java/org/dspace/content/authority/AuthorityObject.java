@@ -254,7 +254,6 @@ public abstract class AuthorityObject extends DSpaceObject {
     private HashMap<Integer, ArrayList<AuthorityMetadataValue>> getCachedMetadata() {
         // if cached values present, return cache
         if (cachedMetadataValues != null) {
-            log.debug("hey, cached");
             return cachedMetadataValues;
         }
 
