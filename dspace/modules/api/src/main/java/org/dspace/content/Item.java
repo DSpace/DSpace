@@ -276,9 +276,13 @@ public class Item extends DSpaceObject
                 ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", "manuscriptNumber", manuscript.getManuscriptId(), false);
                 while (itemIterator.hasNext()) {
                     Item item = itemIterator.next();
+                    // check journal name
+                    String journalName = item.getSingleMetadataValue("prism.publicationName");
                     log.debug("found an item " + item.getID() + " with same msid " + manuscript.getManuscriptId());
                     if (!resultList.contains(item)) {
-                        resultList.add(item);
+                        if (manuscript.getJournalName().equals(journalName)) {
+                            resultList.add(item);
+                        }
                     }
                 }
             }
@@ -658,6 +662,15 @@ public class Item extends DSpaceObject
             }
         }
         return dcValues;
+    }
+
+    public String getSingleMetadataValue(String mdString) {
+        DCValue[] dcValues = getMetadata(mdString);
+        String dcValue = "";
+        if (dcValues != null && dcValues.length > 0) {
+            dcValue = dcValues[0].value;
+        }
+        return dcValue;
     }
 
     /**
