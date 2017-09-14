@@ -108,7 +108,7 @@ jQuery(document).ready(function() {
 			var ttext = j(this).data("ttext");
 			j.ajax({
 				  type: "POST", //or GET
-				  url: "<%= request.getContextPath() %>/json/orcidqueue/post/"+ttext,
+				  url: "<%= request.getContextPath() %>/json/orcidqueue/rest/"+ttext,
 				  data: {
 		            "id" : "${entity.crisID}",
 		            "uuid" : uuid,
@@ -127,29 +127,6 @@ jQuery(document).ready(function() {
 		}
 	});
 
-
-	j('.btn-put-orcid').on('click', function() {
-			var ttext = j(this).data("ttext");
-			var id = j(this).attr('id');
-			j.ajax({
-				  type: "POST", //or GET
-				  url: "<%= request.getContextPath() %>/json/orcidqueue/put/"+ttext,
-				  data: {
-		            "id" : "${entity.crisID}",
-		            "owner" : "${entity.crisID}"
-		          },
-				  success: function(response){
-					  if(response.status==false) {
-						  alert(j("#orciderror").text());  
-					  }
-					  else {
-						  j('#'+id).hide();
-						  alert(j("#orcidsuccess").text());
-					  }				   		  	
-					  oTable = drawOrcidDatatable();
-				  }
-			} );	
-	});
 } );
 
 
@@ -182,15 +159,6 @@ jQuery(document).ready(function() {
 									<span class="label label-info"><fmt:message key="jsp.orcid.custom.box.label.preferences.batch"/></span>											
 								</c:otherwise>
 							</c:choose>
-								<c:if test="${!empty anagraficaObject.anagrafica4view['orcid-push-crisrp-activate-put'] && anagraficaObject.anagrafica4view['orcid-push-crisrp-activate-put'][0].value.object}">
-										<button class="btn btn-danger btn-put-orcid" id="buttonPutRP" data-ttext="crisrp"><fmt:message key="jsp.orcid.custom.box.label.preferences.researcher.force.put"/></button>
-								</c:if>
-								<c:if test="${!empty anagraficaObject.anagrafica4view['orcid-push-crispj-activate-put'] && anagraficaObject.anagrafica4view['orcid-push-crispj-activate-put'][0].value.object}">
-										<button class="btn btn-danger btn-put-orcid" id="buttonPutPJ" data-ttext="crispj"><fmt:message key="jsp.orcid.custom.box.label.preferences.project.force.put"/></button>
-								</c:if>
-								<c:if test="${!empty anagraficaObject.anagrafica4view['orcid-push-item-activate-put'] && anagraficaObject.anagrafica4view['orcid-push-item-activate-put'][0].value.object}">
-										<button class="btn btn-danger btn-put-orcid" id="buttonPutItem" data-ttext="item"><fmt:message key="jsp.orcid.custom.box.label.preferences.publication.force.put"/></button>
-								</c:if>
 							<hr/>
 							<div class="clearfix">&nbsp;</div>
 							<table id="orcidQueueTable" class="table table-striped table-bordered">

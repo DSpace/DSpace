@@ -21,16 +21,15 @@ import it.cilea.osd.common.dao.PaginableObjectDao;
  */
 public interface OrcidHistoryDao extends PaginableObjectDao<OrcidHistory, Integer> {
 	
-	public List<OrcidHistory> findOrcidHistoryByResearcherId(Integer entityId);
-	public List<OrcidHistory> findOrcidHistoryByProjectId(Integer entityId);
-	public List<OrcidHistory> findOrcidHistoryByPublicationId(Integer entityId);
-	public List<OrcidHistory> findOrcidHistoryByEntityIdAndTypeId(Integer entityId, Integer typeId);
+    public List<OrcidHistory> findOrcidHistoryByOrcidAndEntityUUIDAndTypeId(String orcid, String uuid, Integer typeId);
+	public List<OrcidHistory> findOrcidHistoryByOrcidAndTypeId(String orcid, Integer typeId);
 	public List<OrcidHistory> findOrcidHistoryInSuccess();
 	public List<OrcidHistory> findOrcidHistoryInError();
 	public List<OrcidHistory> findOrcidHistoryInSuccessByOwner(String owner);
 	public List<OrcidHistory> findOrcidHistoryInSuccessByOwnerAndTypeId(String owner, Integer typeId);
-	public OrcidHistory uniqueOrcidHistoryInSuccessByOwnerAndEntityIdAndTypeId(String owner, Integer entityId, Integer typeId);
-	public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityIdAndTypeId(String owner, Integer entityId, Integer typeId);	
+	public OrcidHistory uniqueOrcidHistoryInSuccessByOwnerAndEntityUUIDAndTypeId(String owner, String uuid, Integer typeId);
+	public OrcidHistory uniqueOrcidHistoryByOwnerAndOrcidAndTypeId(String owner, String orcid, Integer typeId);
+	public OrcidHistory uniqueOrcidHistoryByOwnerAndEntityUUIDAndTypeId(String owner, String uuid, Integer typeId);
 	
 	
 }

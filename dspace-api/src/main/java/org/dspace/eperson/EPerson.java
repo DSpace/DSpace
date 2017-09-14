@@ -290,8 +290,9 @@ public class EPerson extends DSpaceObject
         queryBuf.append("select e.* from eperson e " +
                 " LEFT JOIN metadatavalue fn on (resource_id=e.eperson_id AND fn.resource_type_id=? and fn.metadata_field_id=?) " +
                 " LEFT JOIN metadatavalue ln on (ln.resource_id=e.eperson_id AND ln.resource_type_id=? and ln.metadata_field_id=?) " +
+                " LEFT JOIN metadatavalue orcid on (orcid.resource_id=e.eperson_id AND orcid.resource_type_id=? and orcid.metadata_field_id=?) " +
                 " WHERE e.eperson_id = ? OR " +
-                "LOWER(fn.text_value) LIKE LOWER(?) OR LOWER(ln.text_value) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) ORDER BY  ");
+                "LOWER(fn.text_value) LIKE LOWER(?) OR LOWER(ln.text_value) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) OR LOWER(orcid.text_value) LIKE LOWER(?) ORDER BY  ");
 
         if(DatabaseManager.isOracle()) {
             queryBuf.append(" dbms_lob.substr(ln.text_value), dbms_lob.substr(fn.text_value) ASC");
@@ -355,20 +356,21 @@ public class EPerson extends DSpaceObject
 
         Integer f = MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "firstname", null).getFieldID();
         Integer l = MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "lastname", null).getFieldID();
+        Integer o = MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "orcid", null).getFieldID();
 
         // Create the parameter array, including limit and offset if part of the query
-        Object[] paramArr = new Object[] {Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params};
+        Object[] paramArr = new Object[] {Constants.EPERSON,f, Constants.EPERSON,l, Constants.EPERSON, o, int_param,params,params,params,params};
         if (limit > 0 && offset > 0)
         {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, limit, offset};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, Constants.EPERSON, o, int_param,params,params,params,params, limit, offset};
         }
         else if (limit > 0)
         {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, limit};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, Constants.EPERSON, o, int_param,params,params,params,params, limit};
         }
         else if (offset > 0)
         {
-            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, offset};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, Constants.EPERSON, o, int_param,params,params,params,params, offset};
         }
 
         // Get all the epeople that match the query

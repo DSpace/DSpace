@@ -74,7 +74,7 @@ public class ScriptPushOrcid {
 					"Script work only on RP names modified after this date (ADMIN MODE default PUT method)");
 			options.addOption("D", "MODE_HOUR", true,
 					"Script work only on RP names modified in this hours range (ADMIN MODE default PUT method)");
-			options.addOption("p", "post", false, "works/fundings send with a POST call (using only with -a and -s - ADMIN MODE default PUT method)");
+			options.addOption("p", "overwrite", false, "activities overwrite (DELETE + POST) - using only with -a and -s - ADMIN MODE default PUT method");
 			
 			CommandLine line = parser.parse(options, args);
 
@@ -108,9 +108,9 @@ public class ScriptPushOrcid {
 				System.exit(1);
 			}
 
-            String mode = "PUT";
+            boolean delete = false;
             if (line.hasOption('p')) {
-                mode = "POST";
+                delete = true;
             }
             
 			List<ResearcherPage> rps = null;
@@ -182,7 +182,7 @@ public class ScriptPushOrcid {
 						log.error("Error retrieving documents", e);
 					}
 				}
-				PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService, applicationService, mode);
+				PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService, applicationService, delete);
 			} else {
 				if (line.hasOption('s')) {
 					// get researcher by parameter
@@ -199,7 +199,7 @@ public class ScriptPushOrcid {
 					ResearcherPage researcher = applicationService.getEntityByCrisId(rp, ResearcherPage.class);
 					rps.add(researcher);
 					PushToORCID.prepareAndSend(context, rps, relationPreferenceService, searchService,
-							applicationService, mode);
+							applicationService, delete);
 				} else {
 					System.out.println("\n\nUSAGE:\n ScriptPushOrcid [-a|-s <researcher_identifier>] \n");
 					System.out.println("Option a or s is needed - run with no option works on cris_queue table");

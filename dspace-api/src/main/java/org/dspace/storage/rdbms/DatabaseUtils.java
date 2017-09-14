@@ -66,6 +66,10 @@ public class DatabaseUtils
                             File.separator + "search" +
                             File.separator + "conf" +
                             File.separator + "reindex.flag";
+    
+    private static final String rebuildCrisConfigFilePath = ConfigurationManager.getProperty("dspace.dir") +
+            File.separator + "etc" +
+            File.separator + "rebuildcrisconfiguration.flag";            
 
     // Types of databases supported by DSpace. See getDbType()
     public static final String DBMS_POSTGRES="postgres";
@@ -478,6 +482,7 @@ public class DatabaseUtils
 
                 // Flag that Discovery will need reindexing, since database was updated
                 setReindexDiscovery(true);
+                setRebuildCrisConfiguration(true);
             }
             else
                 log.info("DSpace database schema is up to date");
@@ -580,6 +585,10 @@ public class DatabaseUtils
         {
             // Item table exist. This database must be a DSpace already migrated on DSpace 3.x/4.x/5.x
             return checkOldVersion(connection, true);
+        }
+        
+        if(tableColumnExists(connection, "cris_orcid_history", "orcid", null, null)) {
+            return "5.8.0.0";
         }
         
         if(tableExists(connection, "cris_rp_box2policygroup")) {
@@ -1179,6 +1188,40 @@ public class DatabaseUtils
         }
     }
 
+    public static synchronized void setRebuildCrisConfiguration(boolean reindex)
+    {
+        
+        File reindexFlag = new File(rebuildCrisConfigFilePath);
+
+        // If we need to flag Cris Configuration to rebuild, we'll create a temporary file to do so.
+        if(reindex)
+        {
+            try
+            {
+                //If our flag file doesn't exist, create it as writeable to all
+                if(!reindexFlag.exists())
+                {
+                    reindexFlag.createNewFile();
+                    reindexFlag.setWritable(true, false);
+                }
+            }
+            catch(IOException io)
+            {
+                log.error("Unable to create Cris Configuration rebuild flag file " + reindexFlag.getAbsolutePath() + ". You may need to rebuild manually.", io);
+            }
+        }
+        else // Otherwise, CRIS configuration doesn't need to reindex. Delete the temporary file if it exists
+        {
+            //If our flag file exists, delete it
+            if(reindexFlag.exists())
+            {
+                boolean deleted = reindexFlag.delete();
+                if(!deleted)
+                    log.error("Unable to delete Cris Configuration rebuild flag file " + reindexFlag.getAbsolutePath() + ". You may need to delete it manually.");
+            }
+        }
+    }
+    
     /**
      * Whether or not reindexing is required in Discovery.
      * <P>
@@ -1194,6 +1237,13 @@ public class DatabaseUtils
         return reindexFlag.exists();
     }
 
+    public static boolean getRebuildCrisConfiguration()
+    {
+        // Simply check if the flag file exists
+        File reindexFlag = new File(rebuildCrisConfigFilePath);
+        return reindexFlag.exists();
+    }
+    
     /**
      * Method to check whether we need to reindex in Discovery (i.e. Solr). If
      * reindexing is necessary, it is performed. If not, nothing happens.
@@ -1216,7 +1266,7 @@ public class DatabaseUtils
             go.start();
         }
     }
-
+    
     /**
      * Determine the type of Database, based on the DB connection.
      *
@@ -1317,4 +1367,5 @@ public class DatabaseUtils
             }
         }
     }
+
 }

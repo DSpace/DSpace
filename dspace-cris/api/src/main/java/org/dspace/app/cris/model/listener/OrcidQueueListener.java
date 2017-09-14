@@ -34,24 +34,26 @@ import it.cilea.osd.common.listener.NativePostUpdateEventListener;
 import it.cilea.osd.common.model.Identifiable;
 import it.cilea.osd.jdyna.value.BooleanValue;
 
-public class OrcidQueueListener implements NativePostUpdateEventListener, PostLoadEventListener {
+public class OrcidQueueListener
+        implements NativePostUpdateEventListener, PostLoadEventListener
+{
 
-	private static final String PREFIX_ORCID_PROFILE_PREF = OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF;
+    private static final String PREFIX_ORCID_PROFILE_PREF = OrcidPreferencesUtils.PREFIX_ORCID_PROFILE_PREF;
 
-	private static final String RELATION_CRISPJ_PROJECTS = "crispj.projects";
+    private static final String RELATION_CRISPJ_PROJECTS = "crispj.projects";
 
-	private static final String RELATION_CRISRP_PUBLICATIONS = "crisrp.publications";
+    private static final String RELATION_CRISRP_PUBLICATIONS = "crisrp.publications";
 
-	private static final String ORCID_PUBLICATIONS_PREFS = OrcidPreferencesUtils.ORCID_PUBLICATIONS_PREFS;
+    private static final String ORCID_PUBLICATIONS_PREFS = OrcidPreferencesUtils.ORCID_PUBLICATIONS_PREFS;
 
-	private static final String ORCID_PROJECTS_PREFS = OrcidPreferencesUtils.ORCID_PROJECTS_PREFS;
+    private static final String ORCID_PROJECTS_PREFS = OrcidPreferencesUtils.ORCID_PROJECTS_PREFS;
 
-	@Transient
-	private static Logger log = Logger.getLogger(OrcidQueueListener.class);
+    @Transient
+    private static Logger log = Logger.getLogger(OrcidQueueListener.class);
 
-	private OrcidPreferencesUtils orcidPreferencesUtils;
+    private OrcidPreferencesUtils orcidPreferencesUtils;
 
-	@Override
+    @Override
 	public <T extends Identifiable> void onPostUpdate(T entity) {		
 		Object object = entity;
 		if (!(object instanceof ACrisObject) && !(object instanceof RelationPreference)) {
@@ -88,15 +90,13 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 										// project preference is changed?
 										if (!(oldPrefProject.equals(rpProp.getValue().toString()))) {
 										    rp.setOldOrcidProjectsPreference(rpProp.getValue().toString());
-	                                        // delete first all queued projects and notify that we needed a PUT
-											notifyPut(crisID, rp, rpProp, CrisConstants.PROJECT_TYPE_ID, OrcidPreferencesUtils.ORCID_PUSH_CRISPJ_ACTIVATE_PUT);
+										    prepareQueueByProjectPreferences(crisID);
 										}
 									}
 									else {
 									    if(rpProp.getValue()!=null && !("0".equals(rpProp.getValue().toString()))) {
 									        rp.setOldOrcidProjectsPreference(rpProp.getValue().toString());
-									        // delete first all queued projects and notify that we needed a PUT
-									        notifyPut(crisID, rp, rpProp, CrisConstants.PROJECT_TYPE_ID, OrcidPreferencesUtils.ORCID_PUSH_CRISPJ_ACTIVATE_PUT);
+                                            prepareQueueByProjectPreferences(crisID);
 									    }
 									}
 									break;
@@ -109,15 +109,15 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 										// publications preference change
 										if (!(oldPrefPublications.equals(rpProp.getValue().toString()))) {
 											rp.setOldOrcidPublicationsPreference(rpProp.getValue().toString());
-											// delete first all queued publications and notify that we needed a PUT
-											notifyPut(crisID, rp, rpProp, Constants.ITEM, OrcidPreferencesUtils.ORCID_PUSH_ITEM_ACTIVATE_PUT);
+											prepareQueueByItemPreference(
+                                                    crisID);
 										}
 									}
 									else {
 									    if(rpProp.getValue()!=null && !("0".equals(rpProp.getValue().toString()))) {
 									        rp.setOldOrcidPublicationsPreference(rpProp.getValue().toString());
-									        // delete first all queued publications and notify that we needed a PUT
-                                            notifyPut(crisID, rp, rpProp, Constants.ITEM, OrcidPreferencesUtils.ORCID_PUSH_ITEM_ACTIVATE_PUT);
+									        prepareQueueByItemPreference(
+                                                    crisID);
 									    }
 									}
 									break;
@@ -197,62 +197,107 @@ public class OrcidQueueListener implements NativePostUpdateEventListener, PostLo
 		log.debug("End Call onPostUpdate " + OrcidQueueListener.class);
 	}
 
-    private void notifyPut(String crisID, ResearcherPage rp, RPProperty rpProp, int typeToDeleteFromQueue, String putToActivate)
+    private void prepareQueueByItemPreference(String crisID)
     {
-        // remove the queue
-        orcidPreferencesUtils.deleteOrcidQueueByOwnerAndType(crisID,
-        		typeToDeleteFromQueue);
-        // notify that we needed a PUT
-        orcidPreferencesUtils.notifyPut(rp, putToActivate);
+        List<Integer> itemIDs = orcidPreferencesUtils.getPreferiteWorksToSendToOrcid(crisID);
+        for(Integer id : itemIDs) {
+            
+            Context context = null;
+            try {
+                context = new Context();
+                Item item = Item.find(context, id);
+                orcidPreferencesUtils.prepareOrcidQueue(crisID, item);
+            } catch (Exception ex) {
+                log.error(ex.getMessage(), ex);
+            } finally {
+                if (context != null && context.isValid()) {
+                    context.abort();
+                }
+            }
+        }
     }
 
-	public OrcidPreferencesUtils getOrcidPreferencesUtils() {
-		return orcidPreferencesUtils;
-	}
+    private void prepareQueueByProjectPreferences(String crisID)
+    {
+        List<String> projectUUIDs = orcidPreferencesUtils
+                .getPreferiteFundingToSendToOrcid(crisID);
+        for (String pjUUID : projectUUIDs)
+        {
+            Project project = (Project) orcidPreferencesUtils
+                    .getApplicationService().getEntityByUUID(pjUUID);
+            orcidPreferencesUtils.prepareOrcidQueue(crisID, project);
+        }
+    }
 
-	public void setOrcidPreferencesUtils(OrcidPreferencesUtils orcidPreferencesUtils) {
-		this.orcidPreferencesUtils = orcidPreferencesUtils;
-	}
+    public OrcidPreferencesUtils getOrcidPreferencesUtils()
+    {
+        return orcidPreferencesUtils;
+    }
 
-	@Override
-	public void onPostLoad(PostLoadEvent event) {
-		
-		Object object = event.getEntity();
-		if (object instanceof ResearcherPage) {
-			log.debug("Call onPostLoad " + OrcidQueueListener.class);
-			
-			ResearcherPage rp = (ResearcherPage) object;
+    public void setOrcidPreferencesUtils(
+            OrcidPreferencesUtils orcidPreferencesUtils)
+    {
+        this.orcidPreferencesUtils = orcidPreferencesUtils;
+    }
 
-			List<RPProperty> propsPublications = rp.getAnagrafica4view().get(ORCID_PUBLICATIONS_PREFS);
-			List<RPProperty> propsProjects = rp.getAnagrafica4view().get(ORCID_PROJECTS_PREFS);
+    @Override
+    public void onPostLoad(PostLoadEvent event)
+    {
 
-			for (RPProperty prop : propsPublications) {
-				rp.setOldOrcidPublicationsPreference(prop.toString());
-			}
-			for (RPProperty prop : propsProjects) {
-				rp.setOldOrcidProjectsPreference(prop.toString());
-			}
+        Object object = event.getEntity();
+        if (object instanceof ResearcherPage)
+        {
+            log.debug("Call onPostLoad " + OrcidQueueListener.class);
 
-			List<RPPropertiesDefinition> metadataDefinitions = orcidPreferencesUtils.getApplicationService()
-					.likePropertiesDefinitionsByShortName(RPPropertiesDefinition.class, PREFIX_ORCID_PROFILE_PREF);
-			for (RPPropertiesDefinition rppd : metadataDefinitions) {
-				String metadataShortnameINTERNAL = rppd.getShortName().replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
-				List<RPProperty> propsRps = rp.getAnagrafica4view().get(rppd.getShortName());
-				for (RPProperty prop : propsRps) {
-					BooleanValue booleanValue = (BooleanValue) (prop.getValue());
-					if (booleanValue.getObject()) {
-						rp.getOldOrcidProfilePreference().add(metadataShortnameINTERNAL);
-						List<String> listProps = new ArrayList<String>();
-						for(RPProperty props : rp.getAnagrafica4view().get(metadataShortnameINTERNAL)) {
-							//manage only first value
-							listProps.add(props.toString());
-						}
-						rp.getOldMapOrcidProfilePreference().put(metadataShortnameINTERNAL, listProps);
-					}
-				}
-			}
-			log.debug("End onPostLoad " + OrcidQueueListener.class);
-		}
-	}
+            ResearcherPage rp = (ResearcherPage) object;
+
+            List<RPProperty> propsPublications = rp.getAnagrafica4view()
+                    .get(ORCID_PUBLICATIONS_PREFS);
+            List<RPProperty> propsProjects = rp.getAnagrafica4view()
+                    .get(ORCID_PROJECTS_PREFS);
+
+            for (RPProperty prop : propsPublications)
+            {
+                rp.setOldOrcidPublicationsPreference(prop.toString());
+            }
+            for (RPProperty prop : propsProjects)
+            {
+                rp.setOldOrcidProjectsPreference(prop.toString());
+            }
+
+            List<RPPropertiesDefinition> metadataDefinitions = orcidPreferencesUtils
+                    .getApplicationService()
+                    .likePropertiesDefinitionsByShortName(
+                            RPPropertiesDefinition.class,
+                            PREFIX_ORCID_PROFILE_PREF);
+            for (RPPropertiesDefinition rppd : metadataDefinitions)
+            {
+                String metadataShortnameINTERNAL = rppd.getShortName()
+                        .replaceFirst(PREFIX_ORCID_PROFILE_PREF, "");
+                List<RPProperty> propsRps = rp.getAnagrafica4view()
+                        .get(rppd.getShortName());
+                for (RPProperty prop : propsRps)
+                {
+                    BooleanValue booleanValue = (BooleanValue) (prop
+                            .getValue());
+                    if (booleanValue.getObject())
+                    {
+                        rp.getOldOrcidProfilePreference()
+                                .add(metadataShortnameINTERNAL);
+                        List<String> listProps = new ArrayList<String>();
+                        for (RPProperty props : rp.getAnagrafica4view()
+                                .get(metadataShortnameINTERNAL))
+                        {
+                            // manage only first value
+                            listProps.add(props.toString());
+                        }
+                        rp.getOldMapOrcidProfilePreference()
+                                .put(metadataShortnameINTERNAL, listProps);
+                    }
+                }
+            }
+            log.debug("End onPostLoad " + OrcidQueueListener.class);
+        }
+    }
 
 }

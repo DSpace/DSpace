@@ -25,13 +25,18 @@ import org.apache.solr.common.SolrInputDocument;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.AuthorityValueGenerator;
 import org.dspace.authority.PersonAuthorityValue;
-import org.dspace.authority.orcid.jaxb.ExternalIdentifier;
-import org.dspace.authority.orcid.jaxb.Keyword;
-import org.dspace.authority.orcid.jaxb.Orcid;
-import org.dspace.authority.orcid.jaxb.OrcidBio;
-import org.dspace.authority.orcid.jaxb.OrcidProfile;
-import org.dspace.authority.orcid.jaxb.PersonalDetails;
-import org.dspace.authority.orcid.jaxb.ResearcherUrl;
+import org.dspace.authority.orcid.jaxb.address.AddressCtype;
+import org.dspace.authority.orcid.jaxb.address.Addresses;
+import org.dspace.authority.orcid.jaxb.common.ExternalId;
+import org.dspace.authority.orcid.jaxb.keyword.Keyword;
+import org.dspace.authority.orcid.jaxb.keyword.KeywordCtype;
+import org.dspace.authority.orcid.jaxb.othername.OtherNameCtype;
+import org.dspace.authority.orcid.jaxb.person.externalidentifier.ExternalIdentifier;
+import org.dspace.authority.orcid.jaxb.personaldetails.NameCtype;
+import org.dspace.authority.orcid.jaxb.personaldetails.PersonalDetails;
+import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrl;
+import org.dspace.authority.orcid.jaxb.researcherurl.ResearcherUrlCtype;
+import org.orcid.ns.record.Record;
 
 /**
  *
@@ -131,7 +136,7 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
 	/**
 	 * Create an authority based on a given orcid bio
 	 */
-	public static OrcidAuthorityValue create(OrcidProfile bio) {
+	public static OrcidAuthorityValue create(Record bio) {
 		OrcidAuthorityValue authority = OrcidAuthorityValue.create();
 
 		authority.setValues(bio);
@@ -139,26 +144,27 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
 		return authority;
 	}
 
-	public boolean setValues(OrcidProfile profile) {
+	public boolean setValues(Record profile) {
 
-		for (JAXBElement<String> string : profile.getOrcidIdentifier().getContent()) {
-			if ("path".equals(string.getName().getLocalPart())) {
-				if (updateValue(string.getValue(), getOrcid_id())) {
-					setOrcid_id(string.getValue());
-				}
+        if (profile.getOrcidIdentifier() != null)
+        {
+            if (updateValue(profile.getOrcidIdentifier().getUriPath(),
+                    getOrcid_id()))
+            {
+                setOrcid_id(profile.getOrcidIdentifier().getUriPath());
+            }
+        }
+
+		if (profile.getPerson() != null) {
+
+			NameCtype name = profile.getPerson().getName();
+
+			if (updateValue(name.getFamilyName().getValue(), getLastName())) {
+				setLastName(name.getFamilyName().getValue());
 			}
-		}
 
-		if (profile.getOrcidBio() != null) {
-
-			PersonalDetails name = profile.getOrcidBio().getPersonalDetails();
-
-			if (updateValue(name.getFamilyName(), getLastName())) {
-				setLastName(name.getFamilyName());
-			}
-
-			if (updateValue(name.getGivenNames(), getFirstName())) {
-				setFirstName(name.getGivenNames());
+			if (updateValue(name.getGivenNames().getValue(), getFirstName())) {
+				setFirstName(name.getGivenNames().getValue());
 			}
 
 			if (name.getCreditName() != null) {
@@ -169,56 +175,59 @@ public class OrcidAuthorityValue extends PersonAuthorityValue {
 					}
 				}
 			}
-			if (name.getOtherNames() != null) {
-				for (String otherName : name.getOtherNames().getOtherName()) {
-					if (!getNameVariants().contains(otherName)) {
-						addNameVariant(otherName);
+			
+			
+			if (profile.getPerson().getOtherNames() != null) {
+				for (OtherNameCtype otherName : profile.getPerson().getOtherNames().getOtherName()) {
+					if (!getNameVariants().contains(otherName.getContent())) {
+						addNameVariant(otherName.getContent());
 						update = true;
 					}
 				}
 			}
 
-			if (profile.getOrcidBio().getContactDetails() != null) {
-				if (profile.getOrcidBio().getContactDetails().getAddress() != null) {
-					if (profile.getOrcidBio().getContactDetails().getAddress().getCountry() != null) {
+			Addresses addresses = profile.getPerson().getAddresses();
+            if (addresses != null) {
+                for(AddressCtype address : addresses.getAddress()) {
+                    if (address.getCountry() != null) {
 						if (updateOtherMetadata("country",
-								profile.getOrcidBio().getContactDetails().getAddress().getCountry().getValue())) {
+								address.getCountry())) {
 							addOtherMetadata("country",
-									profile.getOrcidBio().getContactDetails().getAddress().getCountry().getValue());
+									address.getCountry());
 						}
 					}
 				}
 			}
-			if (profile.getOrcidBio().getKeywords() != null) {
-				for (Keyword keyword : profile.getOrcidBio().getKeywords().getKeyword()) {
+			if (profile.getPerson().getKeywords() != null) {
+				for (KeywordCtype keyword : profile.getPerson().getKeywords().getKeyword()) {
 					if (updateOtherMetadata("keyword", keyword.getContent())) {
 						addOtherMetadata("keyword", keyword.getContent());
 					}
 				}
 			}
 
-			if (profile.getOrcidBio().getExternalIdentifiers() != null) {
-				for (ExternalIdentifier externalIdentifier : profile.getOrcidBio().getExternalIdentifiers()
+			if (profile.getPerson().getExternalIdentifiers() != null) {
+				for (ExternalId externalIdentifier : profile.getPerson().getExternalIdentifiers()
 						.getExternalIdentifier()) {
 					if (updateOtherMetadata("external_identifier",
-							externalIdentifier.getExternalIdCommonName().getContent())) {
+							externalIdentifier.getExternalIdValue())) {
 						addOtherMetadata("external_identifier",
-								externalIdentifier.getExternalIdCommonName().getContent());
+								externalIdentifier.getExternalIdValue());
 					}
 				}
 			}
 
-			if (profile.getOrcidBio().getResearcherUrls() != null) {
-				for (ResearcherUrl researcherUrl : profile.getOrcidBio().getResearcherUrls().getResearcherUrl()) {
-					if (updateOtherMetadata("researcher_url", researcherUrl.toString())) {
-						addOtherMetadata("researcher_url", researcherUrl.toString());
+			if (profile.getPerson().getResearcherUrls() != null) {
+				for (ResearcherUrlCtype researcherUrl : profile.getPerson().getResearcherUrls().getResearcherUrl()) {
+					if (updateOtherMetadata("researcher_url", researcherUrl.getUrlName())) {
+						addOtherMetadata("researcher_url", researcherUrl.getUrlName());
 					}
 				}
 			}
 
-			if (profile.getOrcidBio().getBiography() != null) {
-				if (updateOtherMetadata("biography", profile.getOrcidBio().getBiography().getValue())) {
-					addOtherMetadata("biography", profile.getOrcidBio().getBiography().getValue());
+			if (profile.getPerson().getBiography() != null) {
+				if (updateOtherMetadata("biography", profile.getPerson().getBiography().getContent())) {
+					addOtherMetadata("biography", profile.getPerson().getBiography().getContent());
 				}
 			}
 

@@ -812,6 +812,32 @@ public class ImportCRISDataModelConfiguration
                     System.out
                             .println("Nested definition already founded - skip "
                                     + target + "/" + tmpSN);
+                    
+                    List<List<String>> nestedPropertiesDefinition = nestedMap
+                            .get(shortName);
+                    if (nestedPropertiesDefinition != null)
+                    {
+                        GenericXmlApplicationContext subctx = new GenericXmlApplicationContext();
+                        for (List<String> nestedSingleRow : nestedPropertiesDefinition)
+                        {
+                            String checkNestedMetadata = nestedSingleRow.get(1);
+                            NPD real =  applicationService.findPropertiesDefinitionByShortName(classNPD, checkNestedMetadata);
+                            if(real!=null) {
+                                System.out
+                                .println("Nested property definition already founded - skip "
+                                        + target + "/" + tmpSN + "/" + checkNestedMetadata);
+                                continue;
+                            }
+                            else {
+                                System.out.println("New nested property definition  " + target + "/" + tmpSN + "/" + checkNestedMetadata);
+                                DNPD decorator = createDecorator(applicationService,
+                                        nestedSingleRow, subctx, classNPD, classDNPD,
+                                        controlledListMap, true);
+                                System.out.println("End write  " + target + "/" + tmpSN + "/" + decorator.getShortName());                                
+                            }
+                        }
+                        subctx.destroy();
+                    }
 					continue;
 				}
             }

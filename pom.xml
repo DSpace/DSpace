@@ -1645,6 +1645,23 @@
 			<artifactId>addon-commons-api</artifactId>
 			<version>${commons.addon.modules}</version>
 		</dependency>
+		<dependency>
+			<groupId>it.4science</groupId>
+			<artifactId>tools-orcid-jaxb</artifactId>
+			<version>2.0</version>
+			<type>jar</type>
+			<exclusions>
+				<!-- Logging -->
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>		
       </dependencies>
    </dependencyManagement>
 

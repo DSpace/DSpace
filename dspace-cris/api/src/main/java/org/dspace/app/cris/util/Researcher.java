@@ -31,6 +31,11 @@ public class Researcher implements EPersonCRISIntegration
 {
     DSpace dspace = new DSpace();
 
+    public Researcher()
+    {
+        getApplicationService().checkRebuildCrisConfiguration();
+    }
+    
     public ApplicationService getApplicationService()
     {
         return dspace.getServiceManager().getServiceByName(
