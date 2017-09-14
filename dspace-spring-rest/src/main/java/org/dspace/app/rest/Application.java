@@ -2,21 +2,14 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
 
-import java.io.File;
-import java.sql.SQLException;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.servlet.Filter;
-
-import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
+import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.util.DSpaceContextListener;
 import org.dspace.kernel.DSpaceKernel;
@@ -28,6 +21,7 @@ import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
@@ -39,10 +33,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.RelProvider;
-import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.servlet.Filter;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import java.io.File;
+import java.util.List;
 
 /**
  * Define the Spring Boot Application settings itself. This class takes the place
@@ -58,8 +60,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  * @author Tim Donohue
  */
 @SpringBootApplication
-public class Application extends SpringBootServletInitializer {
-
+public class Application extends SpringBootServletInitializer
+{
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     @Autowired
@@ -73,6 +75,7 @@ public class Application extends SpringBootServletInitializer {
      * always relying on embedded Tomcat.
      * <p>
      * <p>
+     *
      * See: http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file
      *
      * @param application
@@ -80,15 +83,80 @@ public class Application extends SpringBootServletInitializer {
      */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+
+        //Load extra configs (see org.dspace.servicemanager.DSpaceServiceManager.startup())
+        String[] extraConfigs = dsConfigService.getPropertyAsType("service.manager.spring.configs", String[].class);
+
+        String[] extraSources = SpringServiceManager.getSpringPaths(false, extraConfigs, dsConfigService);
+
         return application.sources(Application.class)
-                .initializers(
-                        new DSpaceKernelInitializer(),
-                        new FlywayDatabaseMigrationInitializer());
+                .sources(extraSources);
     }
 
     @Bean
     public ServletContextInitializer contextInitializer() {
-        return servletContext -> servletContext.setInitParameter("dspace.dir", configuration.getDspaceHome());
+        return new ServletContextInitializer() {
+
+            private transient DSpaceKernelImpl kernelImpl;
+
+            @Override
+            public void onStartup(ServletContext servletContext)
+                    throws ServletException {
+                servletContext.setInitParameter("dspace.dir", configuration.getDspaceHome());
+
+                // start the kernel when the webapp starts
+                try {
+                    this.kernelImpl = DSpaceKernelInit.getKernel(null);
+                    if (!this.kernelImpl.isRunning()) {
+                        this.kernelImpl.start(getProvidedHome(configuration.getDspaceHome())); // init the kernel
+                    }
+
+                    //Set the DSpace Kernel Application context as a parent of the Spring Boot context so that
+                    //we can auto-wire all DSpace Kernel services
+                    springBootApplicationContext.setParent(kernelImpl.getServiceManager().getApplicationContext());
+
+                    //Add a listener for Spring Boot application shutdown so that we can nicely cleanup the DSpace kernel.
+                    springBootApplicationContext.addApplicationListener(new DSpaceKernelDestroyer(kernelImpl));
+
+                } catch (Exception e) {
+                    // failed to start so destroy it and log and throw an exception
+                    try {
+                        this.kernelImpl.destroy();
+                    } catch (Exception e1) {
+                        // nothing
+                    }
+                    String message = "Failure during ServletContext initialisation: " + e.getMessage();
+                    log.error(message + ":" + e.getMessage(), e);
+                    throw new RuntimeException(message, e);
+                }
+            }
+
+            /**
+             * Find DSpace's "home" directory.
+             * Initially look for JNDI Resource called "java:/comp/env/dspace.dir".
+             * If not found, look for "dspace.dir" initial context parameter.
+             */
+            private String getProvidedHome(String dspaceHome) {
+                String providedHome = null;
+                try {
+                    Context ctx = new InitialContext();
+                    providedHome = (String) ctx.lookup("java:/comp/env/" + DSpaceConfigurationService.DSPACE_HOME);
+                } catch (Exception e) {
+                    // do nothing
+                }
+
+                if (providedHome == null) {
+                    if (dspaceHome != null && !dspaceHome.equals("") &&
+                            !dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")) {
+                        File test = new File(dspaceHome);
+                        if (test.exists() && new File(test, DSpaceConfigurationService.DSPACE_CONFIG_PATH).exists()) {
+                            providedHome = dspaceHome;
+                        }
+                    }
+                }
+                return providedHome;
+            }
+        };
     }
 
     /**
@@ -140,7 +208,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public WebMvcConfigurer webMvcConfigurer() {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
@@ -148,6 +216,11 @@ public class Application extends SpringBootServletInitializer {
                 if (corsAllowedOrigins != null) {
                     registry.addMapping("/api/**").allowedOrigins(corsAllowedOrigins);
                 }
+            }
+
+            @Override
+            public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+                argumentResolvers.add(new SearchFilterResolver());
             }
         };
     }
@@ -240,12 +313,17 @@ public class Application extends SpringBootServletInitializer {
         }
     }
 
-    private class FlywayDatabaseMigrationInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        @Override
-        public void initialize(ConfigurableApplicationContext applicationContext) {
-            //If we fail to update the database, throw an exception
-            if(!org.dspace.core.Context.updateDatabase()) {
-                throw new RuntimeException("Unable to initialize the database");
+    private class DSpaceKernelDestroyer implements ApplicationListener<ContextClosedEvent> {
+        private DSpaceKernelImpl kernelImpl;
+
+        public DSpaceKernelDestroyer(DSpaceKernelImpl kernelImpl) {
+            this.kernelImpl = kernelImpl;
+        }
+
+        public void onApplicationEvent(final ContextClosedEvent event) {
+            if (this.kernelImpl != null) {
+                this.kernelImpl.destroy();
+                this.kernelImpl = null;
             }
         }
     }

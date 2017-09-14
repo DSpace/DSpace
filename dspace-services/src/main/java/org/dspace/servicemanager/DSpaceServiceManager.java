@@ -18,11 +18,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.kernel.Activator;
-import org.dspace.kernel.mixins.ConfigChangeListener;
-import org.dspace.kernel.mixins.InitializedService;
-import org.dspace.kernel.mixins.ServiceChangeListener;
-import org.dspace.kernel.mixins.ServiceManagerReadyAware;
-import org.dspace.kernel.mixins.ShutdownService;
+import org.dspace.kernel.mixins.*;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.spring.SpringServiceManager;
 import org.dspace.services.ConfigurationService;

@@ -7,14 +7,6 @@
  */
 package org.dspace.servicemanager.spring;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.dspace.kernel.config.SpringLoader;
 import org.dspace.servicemanager.DSpaceServiceManager;
 import org.dspace.servicemanager.ServiceManagerSystem;
@@ -27,6 +19,8 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.*;
 
 /**
  * This is the Spring implementation of the service manager.
@@ -178,7 +172,28 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     public void startup() {
         long startTime = System.currentTimeMillis();
         // get all spring config paths
-        ArrayList<String> pathList = new ArrayList<String>();
+        String[] allPaths = getSpringPaths(testMode, configPaths, configurationService);
+        applicationContext = new ClassPathXmlApplicationContext(allPaths, false);
+        // Make sure that the spring files from the config directoy can override the spring files from our jars
+        applicationContext.setAllowBeanDefinitionOverriding(true);
+        applicationContext.setAllowCircularReferences(true);
+        //applicationContext.registerShutdownHook(); // this interferes with the kernel shutdown hook
+        // add the config interceptors (partially done in the xml)
+        applicationContext.addBeanFactoryPostProcessor( new DSpaceBeanFactoryPostProcessor(parent, configurationService, testMode) );
+        applicationContext.refresh();
+        if (developmentMode) {
+            log.warn("Spring Service Manager is running in developmentMode, services will be loaded on demand only");
+            // TODO find a way to set this sucker to super duper lazy mode? it is currently not actually doing it
+        } else {
+            applicationContext.getBeanFactory().preInstantiateSingletons();
+            applicationContext.getBeanFactory().freezeConfiguration();
+        }
+        long totalTime = System.currentTimeMillis() - startTime;
+        log.info("Spring Service Manager started up in "+totalTime+" ms with "+applicationContext.getBeanDefinitionCount()+" services...");
+    }
+
+    public static String[] getSpringPaths(boolean testMode, String[] configPaths, DSpaceConfigurationService configurationService) {
+        List<String> pathList = new LinkedList<>();
         pathList.add(configPath);
         pathList.add(addonResourcePath);
         if (testMode) {
@@ -211,24 +226,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                 }
             }
         }
-        String[] allPaths = pathList.toArray(new String[pathList.size()]);
-        applicationContext = new ClassPathXmlApplicationContext(allPaths, false);
-        // Make sure that the spring files from the config directoy can override the spring files from our jars
-        applicationContext.setAllowBeanDefinitionOverriding(true);
-        applicationContext.setAllowCircularReferences(true);
-        //applicationContext.registerShutdownHook(); // this interferes with the kernel shutdown hook
-        // add the config interceptors (partially done in the xml)
-        applicationContext.addBeanFactoryPostProcessor( new DSpaceBeanFactoryPostProcessor(parent, configurationService, testMode) );
-        applicationContext.refresh();
-        if (developmentMode) {
-            log.warn("Spring Service Manager is running in developmentMode, services will be loaded on demand only");
-            // TODO find a way to set this sucker to super duper lazy mode? it is currently not actually doing it
-        } else {
-            applicationContext.getBeanFactory().preInstantiateSingletons();
-            applicationContext.getBeanFactory().freezeConfiguration();
-        }
-        long totalTime = System.currentTimeMillis() - startTime;
-        log.info("Spring Service Manager started up in "+totalTime+" ms with "+applicationContext.getBeanDefinitionCount()+" services...");
+        return pathList.toArray(new String[pathList.size()]);
     }
 
     @SuppressWarnings("unchecked")

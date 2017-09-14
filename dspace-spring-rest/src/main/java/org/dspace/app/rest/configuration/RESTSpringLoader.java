@@ -7,16 +7,13 @@
  */
 package org.dspace.app.rest.configuration;
 
-import java.io.File;
-import java.net.MalformedURLException;
-
 import org.dspace.kernel.config.SpringLoader;
 import org.dspace.services.ConfigurationService;
 
+import java.io.File;
+import java.net.MalformedURLException;
+
 /**
- * Utility class that will load the Spring XML configuration files related to the REST webapp
- *
- * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class RESTSpringLoader implements SpringLoader {
