@@ -64,12 +64,15 @@ public class OverviewStep extends AbstractStep {
         Collection collection = submission.getCollection();
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
         org.dspace.content.Item publication = DryadWorkflowUtils.getDataPackage(context, submission.getItem());
-
+        if(publication == null)
+            publication = submission.getItem();
+        
         body.addDivision("step-link","step-link").addPara(T_TRAIL);
 
         Division helpDivision = body.addDivision("general-help","general-help");
         helpDivision.setHead(T_MAIN_HEAD);
         helpDivision.addPara(T_MAIN_HELP);
+
         if (publication.checkForDuplicateItems(context)) {
             Division dupDivision = body.addDivision("duplicate-info", "duplicate-info");
             dupDivision.addPara(T_DUP_SUBMISSION);
@@ -80,9 +83,6 @@ public class OverviewStep extends AbstractStep {
 
 
         Division actionsDiv = mainDiv.addDivision("submit-completed-overview");
-
-        if(publication == null)
-            publication = submission.getItem();
 
         //First of all add all the publication info
         {
