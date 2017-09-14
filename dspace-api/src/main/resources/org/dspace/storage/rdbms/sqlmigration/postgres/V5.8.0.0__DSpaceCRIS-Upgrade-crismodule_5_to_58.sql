@@ -32,6 +32,7 @@ begin
 	UPDATE CRIS_RP_PDEF SET SHORTNAME = 'system-orcid-profile-pref-otheremails' WHERE SHORTNAME = 'orcid-profile-pref-otheremails';
 	
 	ALTER TABLE CRIS_ORCID_HISTORY ADD COLUMN orcid varchar(255);
+	ALTER TABLE CRIS_ORCID_HISTORY DROP COLUMN entityid;
 	
 	-- need mandatory to send affiliation (employment and education) to Orcid Registry
 	UPDATE CRIS_OU_PDEF SET MANDATORY = true WHERE SHORTNAME = 'city';

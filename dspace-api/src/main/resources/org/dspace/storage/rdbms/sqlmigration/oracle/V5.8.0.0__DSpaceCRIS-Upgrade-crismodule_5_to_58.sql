@@ -77,7 +77,8 @@ BEGIN
 	UPDATE CRIS_RP_PDEF SET SHORTNAME = '||system-orcid-profile-pref-fullName||' WHERE SHORTNAME = '||orcid-profile-pref-fullName||';
 	UPDATE CRIS_RP_PDEF SET SHORTNAME = '||system-orcid-profile-pref-preferredName||' WHERE SHORTNAME = '||orcid-profile-pref-preferredName||';
 	UPDATE CRIS_RP_PDEF SET SHORTNAME = '||system-orcid-profile-pref-otheremails||' WHERE SHORTNAME = '||orcid-profile-pref-otheremails||';
-	ALTER TABLE cris_orcid_history ADD COLUMN orcid varchar2(255);
+	ALTER TABLE CRIS_ORCID_HISTORY ADD COLUMN orcid varchar2(255);
+	ALTER TABLE CRIS_ORCID_HISTORY DROP COLUMN IF EXISTS entityid;
 	UPDATE CRIS_OU_PDEF SET MANDATORY = 1 WHERE SHORTNAME = '||city||';
 	UPDATE CRIS_OU_PDEF SET MANDATORY = 1 WHERE SHORTNAME = '||country||';
 	DELETE FROM CRIS_ORCID_HISTORY;'	

@@ -1870,7 +1870,7 @@ public class PushToORCID
         }
         else
         {
-            orcidWork.setType(WorkType.valueOf(
+            orcidWork.setType(WorkType.fromValue(
                     mapConverterModifier.getValue(itemMetadata.getWorkType())));
         }
 
