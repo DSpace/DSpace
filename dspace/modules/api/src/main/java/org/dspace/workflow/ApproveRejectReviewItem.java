@@ -97,13 +97,14 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    public static void reviewItem(WorkflowItem workflowItem) {
+    static void reviewItem(WorkflowItem workflowItem) {
         Item item = workflowItem.getItem();
         Manuscript manuscript = new Manuscript(item);
         ManuscriptDatabaseStorageImpl manuscriptDatabaseStorage = new ManuscriptDatabaseStorageImpl();
         try {
             List<Manuscript> storedManuscripts = manuscriptDatabaseStorage.getManuscriptsMatchingManuscript(manuscript);
             if (storedManuscripts != null && storedManuscripts.size() > 0) {
+                log.info("found stored manuscript " + storedManuscripts.get(0).getManuscriptId() + " with status " + storedManuscripts.get(0).getLiteralStatus());
                 reviewItem(storedManuscripts.get(0).isAccepted(), workflowItem.getID());
             }
         } catch (Exception e) {

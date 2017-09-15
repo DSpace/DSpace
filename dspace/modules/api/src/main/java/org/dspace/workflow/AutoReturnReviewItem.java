@@ -109,6 +109,8 @@ public class AutoReturnReviewItem {
         List<ClaimedTask> claimedTasks = null;
         try {
             if (wfi != null) {
+                // make sure that this item is updated according to the ApproveReject mechanism:
+                ApproveRejectReviewItem.reviewItem(wfi);
                 claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
                 //Check for a valid task
                 // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
@@ -119,7 +121,7 @@ public class AutoReturnReviewItem {
                     if (itemIsOldItemInReview(item)) {
                         context.turnOffAuthorisationSystem();
                         String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
-                        log.debug("returning item " + item.getID());
+                        log.info("returning item " + item.getID());
                         EPerson ePerson = EPerson.findByEmail(context, ConfigurationManager.getProperty("system.curator.account"));
                         //Also return all the data files
                         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, wfi.getItem());
@@ -155,7 +157,7 @@ public class AutoReturnReviewItem {
                     Date reviewDate = null;
                     try {
                         reviewDate = sdf.parse(dateString);
-                        log.debug("item " + item.getID() + " entered review on " + reviewDate.toString());
+                        log.info("item " + item.getID() + " entered review on " + reviewDate.toString());
                         return reviewDate.before(olderThanDate);
                     } catch (Exception e) {
                         log.error("couldn't find date in provenance for item " + item.getID() + ": " + dateString);
