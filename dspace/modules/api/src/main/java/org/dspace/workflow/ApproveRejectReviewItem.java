@@ -105,7 +105,7 @@ public class ApproveRejectReviewItem {
             List<Manuscript> storedManuscripts = manuscriptDatabaseStorage.getManuscriptsMatchingManuscript(manuscript);
             if (storedManuscripts != null && storedManuscripts.size() > 0) {
                 log.info("found stored manuscript " + storedManuscripts.get(0).getManuscriptId() + " with status " + storedManuscripts.get(0).getLiteralStatus());
-                reviewItem(storedManuscripts.get(0).isAccepted(), workflowItem.getID());
+                reviewItem(statusIsApproved(storedManuscripts.get(0).getStatus()), workflowItem.getID());
             }
         } catch (Exception e) {
             log.error("couldn't process review workflowitem " + workflowItem.getID());
