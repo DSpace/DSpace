@@ -6,7 +6,7 @@
    <packaging>pom</packaging>
    <version>CRIS-5.8.1-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
-   <url>https://github.com/Cineca/DSpace</url>
+   <url>https://github.com/4Science/DSpace</url>
    <description>
    	DSpace open source software is a turnkey institutional repository application. The DSpace-CRIS addon add the missing features to allow you to track all research entities!
    </description>
