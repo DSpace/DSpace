@@ -108,7 +108,7 @@ public class ApproveRejectReviewItem {
                 reviewItem(statusIsApproved(storedManuscripts.get(0).getStatus()), workflowItem.getID());
             }
         } catch (Exception e) {
-            log.error("couldn't process review workflowitem " + workflowItem.getID());
+            log.error("couldn't process review workflowitem " + workflowItem.getID() + ": " + e.getMessage());
         }
     }
 
