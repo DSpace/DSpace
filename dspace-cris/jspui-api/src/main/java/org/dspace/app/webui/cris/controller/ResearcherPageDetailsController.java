@@ -195,9 +195,15 @@ public class ResearcherPageDetailsController
             boolean subscribed = subscribeService.isSubscribed(currUser,
                     researcher);
             model.put("subscribed", subscribed);
-            EPerson eperson = EPerson.find(context, researcher.getEpersonID());
-            if (eperson != null) {
-            	model.put("subscriptions", subscribeService.getSubscriptions(eperson));
+            if (researcher.getEpersonID() != null)
+            {
+                EPerson eperson = EPerson.find(context,
+                        researcher.getEpersonID());
+                if (eperson != null)
+                {
+                    model.put("subscriptions",
+                            subscribeService.getSubscriptions(eperson));
+                }
             }
         }
 
