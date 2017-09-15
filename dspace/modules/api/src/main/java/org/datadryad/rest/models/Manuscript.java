@@ -94,7 +94,8 @@ public class Manuscript {
     );
 
     public static final List<String> ACCEPTED_STATUSES = Arrays.asList(
-            STATUS_ACCEPTED
+            STATUS_ACCEPTED,
+            STATUS_PUBLISHED
     );
 
     public static final List<String> REJECTED_STATUSES = Arrays.asList(
