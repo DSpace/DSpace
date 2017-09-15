@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>article-metrics-all</artifactId>
-		<version>CRIS-5.7.1-SNAPSHOT</version>
+		<version>CRIS-5.8.0</version>
 	</parent>
 
 	<dependencies>
