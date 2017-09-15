@@ -4,7 +4,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>CRIS-5.8.0</version>
+   <version>CRIS-5.8.1-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>https://github.com/Cineca/DSpace</url>
    <description>
@@ -1965,7 +1965,7 @@
       <connection>scm:git:https://github.com/4Science/DSpace.git</connection>
       <developerConnection>scm:git:https://github.com/4Science/DSpace.git</developerConnection>
       <url>https://github.com/4Science/DSpace.git</url>
-      <tag>dspace-cris-5.8.0</tag>
+      <tag>dspace-cris-master</tag>
    </scm>
 
    <repositories>
