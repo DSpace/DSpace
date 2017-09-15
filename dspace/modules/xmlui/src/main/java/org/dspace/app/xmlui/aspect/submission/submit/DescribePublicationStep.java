@@ -7,6 +7,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.submit.step.DescribeStep;
 import org.xml.sax.SAXException;
 
 import java.sql.SQLException;
@@ -26,6 +27,7 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
     private static final Message T_TRAIL = message("xmlui.submit.publication.describe.trail");
     private static final Message T_HELP = message("xmlui.submit.publication.describe.help");
     private static final Message T_NO_DETAILS = message("xmlui.submit.publication.describe.nodetails");
+    private static final Message T_DUP_SUBMISSION = message("xmlui.submit.publication.describe.duplicatesubmission");
     private static final Message T_FORM_HEAD = message("xmlui.submit.publication.describe.form.help");
     private static final Message T_complete_dataset = message("xmlui.Submission.general.submission.complete.datapackage");
     private static final Message T_complete_publication = message("xmlui.Submission.general.submission.complete.publication");
@@ -58,6 +60,11 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
         String actionURL = contextPath + "/handle/" + collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
         body.addDivision("step-link","step-link").addPara(T_TRAIL);
+
+        if (item.checkForDuplicateItems(context)) {
+            Division dupDivision = body.addDivision("duplicate-info", "duplicate-info");
+            dupDivision.addPara(T_DUP_SUBMISSION);
+        }
 
         Division helpDivision = body.addDivision("general-help","general-help");
         helpDivision.setHead(T_HEAD);

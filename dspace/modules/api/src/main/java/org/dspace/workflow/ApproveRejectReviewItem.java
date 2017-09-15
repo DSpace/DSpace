@@ -207,6 +207,8 @@ public class ApproveRejectReviewItem {
             DryadDataPackage dataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
             StringBuilder provenance = new StringBuilder();
             associateWithManuscript(dataPackage, manuscript, provenance);
+            // update duplicate submission metadata for this item.
+            item.checkForDuplicateItems(c);
             if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
                 log.debug ("Item " + item.getID() + " not found or not in review");
             } else {

@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.JournalUtils;
+import org.dspace.content.DCValue;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.datadryad.rest.legacymodels.LegacyManuscript;
 import org.datadryad.api.DryadJournalConcept;
@@ -236,6 +237,24 @@ public class Manuscript {
             for (String keyword : legacyManuscript.Classification.keyword) {
                 this.keywords.add(keyword);
             }
+        }
+    }
+
+    public Manuscript(Item item) {
+        String journalName = "";
+        DCValue[] journalNames = item.getMetadata(journalMetadata.getProperty(JOURNAL));
+        if (journalNames != null && journalNames.length > 0) {
+            journalName = journalNames[0].value;
+        }
+
+        journalConcept = JournalUtils.getJournalConceptByJournalName(journalName);
+        DCValue[] msids = item.getMetadata(journalMetadata.getProperty(MANUSCRIPT));
+        if (msids != null && msids.length > 0) {
+            setManuscriptId(msids[0].value);
+        }
+        DCValue[] pubDOIs = item.getMetadata(journalMetadata.getProperty(PUBLICATION_DOI));
+        if (pubDOIs != null && pubDOIs.length > 0) {
+            setPublicationDOI(pubDOIs[0].value);
         }
     }
 

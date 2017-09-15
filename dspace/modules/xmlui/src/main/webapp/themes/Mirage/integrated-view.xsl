@@ -24,22 +24,70 @@
 
 
     <xsl:template match="dri:referenceSet[@type = 'embeddedView']" priority="2">
-      <h2 class="ds-list-head">Files in this package</h2>
-        <div class="file-list">
-	   <!-- TODO: need to test if we have one of the specially-licensed items -->
-	   <p class="license-badges" style="font-size: 0.9em;">
-	     <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
-	     <xsl:text> </xsl:text>
-	     <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 (opens a new window)"/></a>
-	     <a href="http://opendefinition.org/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/opendata.png" alt="Open Data (opens a new window)"/></a>
-	   </p>
-	   
-          <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
-        </div>
+        <xsl:choose>
+            <xsl:when test="current()[@rend='hasPart']">
+                <div class="ds-static-div primary">
+                <h2 class="ds-list-head">Files in this package</h2>
+                <div class="file-list">
+                    <!-- TODO: need to test if we have one of the specially-licensed items -->
+                    <p class="license-badges" style="font-size: 0.9em;">
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
+                        <xsl:text> </xsl:text>
+                        <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/cc-zero.png" alt="CC0 (opens a new window)"/></a>
+                        <a href="http://opendefinition.org/" target="_blank" class="single-image-link"><img src="/themes/Dryad/images/opendata.png" alt="Open Data (opens a new window)"/></a>
+                    </p>
+                    <xsl:apply-templates select="*[not(name()='head')]" mode="embeddedView"/>
+                </div>
+                </div>
+            </xsl:when>
+            <xsl:when test="current()[@rend='duplicateItems']">
+                <div class="ds-static-div primary">
+                <h2>Duplicate items detected:</h2>
+                    <table class="package-file-description">
+                        <tbody>
+                            <xsl:apply-templates select="*" mode="duplicateItemsView"/>
+                        </tbody>
+                    </table>
+
+                </div>
+            </xsl:when>
+        </xsl:choose>
+
+    </xsl:template>
+
+    <!-- ################################ Pull out duplicate item reference and render it ################################ -->
+    <xsl:template match="dri:reference" mode="duplicateItemsView">
+        <xsl:variable name="url">
+            <xsl:text>https://www.datadryad.org/</xsl:text><xsl:value-of select="substring-before(substring-after(@url, '/metadata/'),'/mets.xml')"/>
+        </xsl:variable>
+        <tr><td>
+            <a>
+                <xsl:attribute name="href">
+                    <xsl:value-of select="$url"/>
+                </xsl:attribute>
+                <xsl:value-of select="$url"/>
+            </a>
+        </td></tr>
+        <!--<xsl:apply-templates select="document($externalMetadataURL)" mode="duplicateItemsView"/>-->
+        <xsl:apply-templates/>
+    </xsl:template>
+
+    <xsl:template match="mets:METS[mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']]" mode="duplicateItemsView">
+        <xsl:variable name="url" select="/"/>
+        <tr>
+            <td>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:text>https://www.datadryad.org/</xsl:text><xsl:value-of select="$url"/>
+                    </xsl:attribute>
+                    <xsl:text>https://www.datadryad.org/</xsl:text><xsl:value-of select="$url"/>
+                </a>
+            </td>
+        </tr>
     </xsl:template>
 
 
-  <!-- ################################ Pull out METS metadata reference and render it ################################ -->
+    <!-- ################################ Pull out METS metadata reference and render it ################################ -->
     <xsl:template match="dri:reference" mode="embeddedView">
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>

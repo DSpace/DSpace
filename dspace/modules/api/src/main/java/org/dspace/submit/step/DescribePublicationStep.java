@@ -8,7 +8,6 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.submit.step.DescribeStep;
 import org.dspace.usagelogging.EventLogger;
 
 import javax.servlet.ServletException;
@@ -212,7 +211,7 @@ public class DescribePublicationStep extends DescribeStep {
                 }
             }
         }
-
+        
         // Step 4:
         // Save changes to database
         subInfo.getSubmissionItem().update();

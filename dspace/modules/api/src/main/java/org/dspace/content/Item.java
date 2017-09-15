@@ -17,6 +17,7 @@ import java.util.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.datadryad.rest.models.Manuscript;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -253,6 +254,66 @@ public class Item extends DSpaceObject
         TableRowIterator rows = DatabaseManager.queryTable(context, "item", myQuery);
 
         return new ItemIterator(context, rows);
+    }
+
+    public static ArrayList<Item> findByManuscript(Context context, Manuscript manuscript) {
+        ArrayList<Item> resultList = new ArrayList<Item>();
+        try {
+            // look for items that have the same pub DOI
+            if (manuscript.getPublicationDOI() != null && !manuscript.getPublicationDOI().equals("")) {
+                log.debug("looking for items with doi " + manuscript.getPublicationDOI());
+                ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "relation", "isreferencedby", manuscript.getPublicationDOI(), false);
+                while (itemIterator.hasNext()) {
+                    Item item = itemIterator.next();
+                    log.debug("found an item " + item.getID() + " with same DOI " + manuscript.getPublicationDOI());
+                    resultList.add(item);
+                }
+            }
+
+            // look for items that have the same msid
+            if (manuscript.getManuscriptId() != null && !manuscript.getManuscriptId().equals("")) {
+                log.debug("looking for items with msid " + manuscript.getManuscriptId());
+                ItemIterator itemIterator = Item.findByMetadataField(context, "dc", "identifier", "manuscriptNumber", manuscript.getManuscriptId(), false);
+                while (itemIterator.hasNext()) {
+                    Item item = itemIterator.next();
+                    // check journal name
+                    String journalName = item.getSingleMetadataValue("prism.publicationName");
+                    log.debug("found an item " + item.getID() + " with same msid " + manuscript.getManuscriptId());
+                    if (!resultList.contains(item)) {
+                        if (manuscript.getJournalName().equals(journalName)) {
+                            resultList.add(item);
+                        }
+                    }
+                }
+            }
+            // look for items that have the same journal + title + authors?
+
+        } catch (Exception e) {
+            log.error("Exception while finding items matching manuscript " + manuscript.toString());
+        }
+        return resultList;
+    }
+
+    public boolean checkForDuplicateItems(Context context) {
+        Manuscript manuscript = new Manuscript(this);
+        List<Item> resultList = Item.findByManuscript(context, manuscript);
+        boolean result = false;
+        if (!resultList.isEmpty()) {
+            this.clearMetadata("dryad.duplicateItem");
+            for (Item i : resultList) {
+                if (!this.equals(i)) {
+                    log.debug("adding duplicate item " + i.getID() + " to item " + getID());
+                    this.addMetadata("dryad.duplicateItem", null, String.valueOf(i.getID()), null, Choices.CF_NOVALUE);
+                    result = true;
+                }
+            }
+            try {
+                this.update();
+            } catch (Exception e) {
+                log.error("exception " + e.getMessage());
+            }
+        }
+        return result;
     }
 
     /**
@@ -603,6 +664,15 @@ public class Item extends DSpaceObject
         return dcValues;
     }
 
+    public String getSingleMetadataValue(String mdString) {
+        DCValue[] dcValues = getMetadata(mdString);
+        String dcValue = "";
+        if (dcValues != null && dcValues.length > 0) {
+            dcValue = dcValues[0].value;
+        }
+        return dcValue;
+    }
+
     /**
      * Splits "schema.element.qualifier.language" into an array.
      * <p/>
@@ -912,11 +982,11 @@ public class Item extends DSpaceObject
      *            the ISO639 language code, optionally followed by an underscore
      *            and the ISO3166 country code. <code>null</code> means the
      *            value has no language (for example, a date).
-     * @param value
+     * @param valArray
      *            the value to add.
-     * @param authority
+     * @param authArray
      *            the external authority key for this value (or null)
-     * @param confidence
+     * @param confArray
      *            the authority confidence (default 0)
      */
     public void addMetadata(String mdString, String lang, String[] valArray, String[] authArray, int[] confArray) {
@@ -972,7 +1042,7 @@ public class Item extends DSpaceObject
      * Add a single metadata field. This is appended to existing
      * values. Use <code>clearMetadata</code> to remove values.
      *
-     * @param mdString
+     * @param schema
      *            the schema for the metadata field. <em>Must</em> match
      *            the <code>name</code> of an existing metadata schema.
      * @param element

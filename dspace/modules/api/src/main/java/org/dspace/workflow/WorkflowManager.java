@@ -498,7 +498,8 @@ public class WorkflowManager {
             provDescription = action.getProvenanceStartId() + " ";
         }
         // Get user's name + email address
-        provDescription = provDescription + "Rejected by " + getEPersonName(ePerson) + ", reason: "
+        String ePersonName = (ePerson == null) ? "no_user" : getEPersonName(ePerson);
+        provDescription = provDescription + "Rejected by " + ePersonName + ", reason: "
                 + rejection_message + " on " + now + " (GMT) ";
 
         // Add to item as a DC field
@@ -509,7 +510,7 @@ public class WorkflowManager {
         // convert into personal workspace
         WorkspaceItem wsi = returnToWorkspace(c, wi);
 
-        if(sendMail){
+        if (sendMail && ePerson != null) {
             // notify that it's been rejected
             WorkflowEmailManager.notifyOfReject(c, wi, ePerson, rejection_message);
         }

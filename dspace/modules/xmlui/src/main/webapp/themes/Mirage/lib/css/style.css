@@ -329,6 +329,12 @@ div.ds-option-set {
     box-shadow: 6px 6px 8px rgba(33, 33, 33, 0.25);
 }
 
+.duplicate-info {
+    background-color: #c4c4ff;
+    color: #1f2a6f;
+    border-color: #1f2a6f;
+}
+
 #submit-data-feature-box h1 {
     background-color: #87C033;
     border-bottom: none;

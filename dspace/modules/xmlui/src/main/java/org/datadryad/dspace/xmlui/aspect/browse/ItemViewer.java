@@ -39,6 +39,7 @@ import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.CrosswalkException;
@@ -495,6 +496,21 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
            */
         DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
         org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
+        if ( AuthorizeManager.isAdmin(context)) {
+            // run duplicate checker
+            item.checkForDuplicateItems(context);
+
+            DCValue[] dupItemIDs = item.getMetadata("dryad.duplicateItem");
+            if (dupItemIDs != null && dupItemIDs.length > 0) {
+                ReferenceSet duplicateItems = itemRef.addReferenceSet("embeddedView", null, "duplicateItems");
+                for (DCValue dupItemID : dupItemIDs) {
+                    Item dupItem = Item.find(context, Integer.valueOf(dupItemID.value));
+                    if (dupItem != null && !item.equals(dupItem)) {
+                        duplicateItems.addReference(dupItem);
+                    }
+                }
+            }
+        }
 
         if (item.getMetadata("dc.relation.haspart").length > 0) {
             ReferenceSet hasParts;

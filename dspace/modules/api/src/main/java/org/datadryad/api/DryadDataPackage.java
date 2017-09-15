@@ -492,10 +492,12 @@ public class DryadDataPackage extends DryadObject {
 
     public void setPublicationDOI(String publicationDOI) throws SQLException {
         // check that this DOI starts with the doi: prefix. if not, add it.
-        Pattern doiPattern = Pattern.compile("^doi:.*");
-        Matcher matcher = doiPattern.matcher(publicationDOI);
-        if (!("".equals(publicationDOI)) && !matcher.find()) {
-            publicationDOI = "doi:" + publicationDOI;
+        if (publicationDOI != null) {
+            Pattern doiPattern = Pattern.compile("^doi:.*");
+            Matcher matcher = doiPattern.matcher(publicationDOI);
+            if (!("".equals(publicationDOI)) && !matcher.find()) {
+                publicationDOI = "doi:" + publicationDOI;
+            }
         }
         addSingleMetadataValue(Boolean.FALSE, RELATION_SCHEMA, RELATION_ELEMENT, RELATION_ISREFERENCEDBY_QUALIFIER, publicationDOI);
     }
