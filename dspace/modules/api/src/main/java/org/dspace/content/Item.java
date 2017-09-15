@@ -297,13 +297,14 @@ public class Item extends DSpaceObject
     public boolean checkForDuplicateItems(Context context) {
         Manuscript manuscript = new Manuscript(this);
         List<Item> resultList = Item.findByManuscript(context, manuscript);
-
+        boolean result = false;
         if (!resultList.isEmpty()) {
             this.clearMetadata("dryad.duplicateItem");
             for (Item i : resultList) {
                 if (!this.equals(i)) {
                     log.debug("adding duplicate item " + i.getID() + " to item " + getID());
                     this.addMetadata("dryad.duplicateItem", null, String.valueOf(i.getID()), null, Choices.CF_NOVALUE);
+                    result = true;
                 }
             }
             try {
@@ -311,9 +312,8 @@ public class Item extends DSpaceObject
             } catch (Exception e) {
                 log.error("exception " + e.getMessage());
             }
-            return true;
         }
-        return false;
+        return result;
     }
 
     /**
