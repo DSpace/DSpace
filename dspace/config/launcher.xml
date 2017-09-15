@@ -381,6 +381,14 @@
         </step>
     </command>
 
+	<command>
+		<name>purge-review-item</name>
+		<description>Returns old items in review to their submitters' workspaces</description>
+		<step>
+			<class>org.dspace.workflow.AutoReturnReviewItem</class>
+		</step>
+	</command>
+
     <command>
         <name>pending-delete</name>
         <description>Deletes all the workflow items that have been in the pending deletion state for one month, and have not been resubmitted</description>
