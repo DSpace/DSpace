@@ -69,9 +69,9 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
         ArrayList<AuthorityValue> authorityValues = new ArrayList<AuthorityValue>();
         ArrayList<String> names = new ArrayList<String>();
         names.add(concept.getFullName());
-        for (String name : concept.getAlternateNames()) {
-            names.add(name);
-        }
+//        for (String name : concept.getAlternateNames()) {
+//            names.add(name);
+//        }
         for (String name : names) {
             AuthorityValue authorityValue = new AuthorityValue();
             authorityValue.setId(String.valueOf(concept.getConceptID()));
