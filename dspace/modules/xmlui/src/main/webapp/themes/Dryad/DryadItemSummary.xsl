@@ -138,7 +138,7 @@
                                                                 </xsl:when>
                                                                 <xsl:when test="starts-with($article_doi, 'doi:')">
                                                                     <xsl:value-of
-                                                                            select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                                            select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                                                                 </xsl:when>
                                                             </xsl:choose>
                                                         </xsl:attribute>
@@ -150,7 +150,7 @@
                                                     <a>
                                                         <xsl:attribute name="href">
                                                             <xsl:value-of
-                                                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                                    select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                                                         </xsl:attribute>
                                                         <xsl:value-of select="$article_doi"/>
                                                     </a>
@@ -179,7 +179,7 @@
                                                                         <xsl:when
                                                                                 test="starts-with($article_doi, 'doi:')">
                                                                             <xsl:value-of
-                                                                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                                                    select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                                                                         </xsl:when>
                                                                     </xsl:choose>
                                                                 </xsl:attribute>
@@ -248,7 +248,7 @@
                                         <xsl:choose>
                                             <xsl:when test="starts-with($id, 'doi')">
                                                 <xsl:value-of
-                                                        select="concat('http://dx.doi.org/', substring-after($id, 'doi:'))"/>
+                                                        select="concat('https://doi.org/', substring-after($id, 'doi:'))"/>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 <xsl:value-of select="concat('http://hdl.handle.net/', $id)"/>
@@ -364,7 +364,7 @@
                                                 <xsl:attribute name="href">http://www.delicious.com/save</xsl:attribute>
                                                 <xsl:attribute name="onclick">
                                                     <xsl:value-of
-                                                            select="concat($dfirstpart, $apos, 'http://dx.doi.org/', $pkgDOI, $apos, $dsecondpart,
+                                                            select="concat($dfirstpart, $apos, 'https://doi.org/', $pkgDOI, $apos, $dsecondpart,
 														$thistitle, $dthirdpart)"/>
                                                 </xsl:attribute>
                                                 <img src="http://www.delicious.com/static/img/delicious.small.gif"
@@ -404,7 +404,7 @@
                                                 <xsl:attribute name="class">DiggThisButton DiggCompact</xsl:attribute>
                                                 <xsl:attribute name="href">
                                                     <xsl:value-of
-                                                            select="concat('http://digg.com/submit?url=http://dx.doi.org/', $pkgDOI,
+                                                            select="concat('http://digg.com/submit?url=https://doi.org/', $pkgDOI,
 														'&amp;title=', $thistitle)"/>
                                                 </xsl:attribute>
                                                 <!-- xsl:text is a work around for formatting issues -->
@@ -425,7 +425,7 @@
                                                 <xsl:attribute name="href">http://reddit.com/submit</xsl:attribute>
                                                 <xsl:attribute name="onclick">
                                                     <xsl:value-of
-                                                            select="concat($rfirstpart, $apos, 'http://dx.doi.org/', $pkgDOI, $apos, $rsecondpart,
+                                                            select="concat($rfirstpart, $apos, 'https://doi.org/', $pkgDOI, $apos, $rsecondpart,
 														$thistitle, $rthirdpart)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://reddit.com/static/spreddit7.gif"
@@ -441,7 +441,7 @@
                                                 <xsl:attribute name="data-count">none</xsl:attribute>
                                                 <xsl:attribute name="data-via">datadryad</xsl:attribute>
                                                 <xsl:attribute name="data-url">
-                                                    <xsl:value-of select="concat('http://dx.doi.org/', $pkgDOI)"/>
+                                                    <xsl:value-of select="concat('https://doi.org/', $pkgDOI)"/>
                                                 </xsl:attribute>
                                                 <xsl:text>Tweet</xsl:text>
                                             </xsl:element>
@@ -451,7 +451,7 @@
                                                 <xsl:attribute name="src">
                                                     <xsl:value-of
                                                             select="concat('http://www.facebook.com/plugins/like.php?href=',
-														encoder:encode(concat('http://dx.doi.org/', $pkgDOI)),
+														encoder:encode(concat('https://doi.org/', $pkgDOI)),
 														'&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=21')"/>
                                                 </xsl:attribute>
                                                 <xsl:attribute name="scrolling">no</xsl:attribute>
@@ -520,7 +520,7 @@
                                         <a>
                                             <xsl:attribute name="href">
                                                 <xsl:value-of
-                                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                    select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                                             </xsl:attribute>
                                             <xsl:value-of select="$article_doi"/>
                                         </a>
@@ -530,7 +530,7 @@
                                         <a>
                                             <xsl:attribute name="href">
                                                 <xsl:value-of
-                                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                    select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                                             </xsl:attribute>
                                             <xsl:value-of select="$article_doi"/>
                                         </a>
@@ -559,7 +559,7 @@
                                                 <a>
                                                     <xsl:attribute name="href">
                                                         <xsl:value-of
-                                                            select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                            select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                                                     </xsl:attribute>
                                                     <xsl:value-of select="$article_doi"/>
                                                 </a>
@@ -691,7 +691,7 @@
                                             <xsl:choose>
                                                 <xsl:when test="$my_doi">
                                                     <xsl:value-of
-                                                            select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
+                                                            select="concat('https://doi.org/', substring-after($my_doi, 'doi:'))"/>
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <xsl:value-of select="$my_uri"/>
@@ -789,7 +789,7 @@
                                                 <xsl:attribute name="href">http://www.delicious.com/save</xsl:attribute>
                                                 <xsl:attribute name="onclick">
                                                     <xsl:value-of
-                                                            select="concat($dfirstpart, $apos, 'http://dx.doi.org/', $my_doi, $apos, $dsecondpart)"/>
+                                                            select="concat($dfirstpart, $apos, 'https://doi.org/', $my_doi, $apos, $dsecondpart)"/>
                                                 </xsl:attribute>
                                                 <img src="http://www.delicious.com/static/img/delicious.small.gif"
                                                      height="18" width="18" alt="Delicious"
@@ -816,7 +816,7 @@
                                                 <xsl:attribute name="class">DiggThisButton DiggCompact</xsl:attribute>
                                                 <xsl:attribute name="href">
                                                     <xsl:value-of
-                                                            select="concat('http://digg.com/submit?url=http://dx.doi.org/', $my_doi,
+                                                            select="concat('http://digg.com/submit?url=https://doi.org/', $my_doi,
 												'&amp;title=', $thistitle)"/>
                                                 </xsl:attribute>
                                                 <!-- xsl:text is a work around for formatting issues -->
@@ -837,7 +837,7 @@
                                                 <xsl:attribute name="href">http://reddit.com/submit</xsl:attribute>
                                                 <xsl:attribute name="onclick">
                                                     <xsl:value-of
-                                                            select="concat($rfirstpart, $apos, 'http://dx.doi.org/', $my_doi, $apos, $rsecondpart,
+                                                            select="concat($rfirstpart, $apos, 'https://doi.org/', $my_doi, $apos, $rsecondpart,
 												$thistitle, $rthirdpart)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://reddit.com/static/spreddit7.gif"
@@ -853,7 +853,7 @@
                                                 <xsl:attribute name="data-count">none</xsl:attribute>
                                                 <xsl:attribute name="data-via">datadryad</xsl:attribute>
                                                 <xsl:attribute name="data-url">
-                                                    <xsl:value-of select="concat('http://dx.doi.org/', $my_doi)"/>
+                                                    <xsl:value-of select="concat('https://doi.org/', $my_doi)"/>
                                                 </xsl:attribute>
                                                 <xsl:text>Tweet</xsl:text>
                                             </xsl:element>
@@ -863,7 +863,7 @@
                                                 <xsl:attribute name="src">
                                                     <xsl:value-of
                                                             select="concat('http://www.facebook.com/plugins/like.php?href=',
-													encoder:encode(concat('http://dx.doi.org/', $my_doi)),
+													encoder:encode(concat('https://doi.org/', $my_doi)),
 												'&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=21')"/>
                                                 </xsl:attribute>
                                                 <xsl:attribute name="scrolling">no</xsl:attribute>
@@ -1569,7 +1569,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.asnamnat.org/amnat')"/>
@@ -1586,7 +1586,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.blackwellpublishing.com/BIJ')"/>
@@ -1603,7 +1603,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://rsbl.royalsocietypublishing.org')"/>
@@ -1620,7 +1620,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.pensoft.net/journals/biorisk/')"/>
@@ -1637,7 +1637,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://bmjopen.bmj.com/')"/>
@@ -1654,7 +1654,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.pensoft.net/journals/compcytogen/')"/>
@@ -1671,7 +1671,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -1689,7 +1689,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -1707,7 +1707,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.wiley.com/bw/journal.asp?ref=0014-3820')"/>
@@ -1723,7 +1723,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -1741,7 +1741,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -1759,7 +1759,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -1777,7 +1777,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.nature.com/hdy/index.html')"/>
@@ -1793,7 +1793,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.pensoft.net/journals/ijm/')"/>
@@ -1809,7 +1809,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.journalofanimalecology.org')"/>
@@ -1826,7 +1826,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.blackwellpublishing.com/jeb_enhanced/')"/>
@@ -1843,7 +1843,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.fwspubs.org/loi/fwma')"/>
@@ -1860,7 +1860,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://jhered.oxfordjournals.org/')"/>
@@ -1877,7 +1877,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://openpublichealthdata.metajnl.com/')"/>
@@ -1894,7 +1894,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.journalofpaleontology.org/')"/>
@@ -1911,7 +1911,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://www.methodsinecologyandevolution.org/')"/>
@@ -1928,7 +1928,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://mbe.oxfordjournals.org/')"/>
@@ -1945,7 +1945,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -1963,7 +1963,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -1981,7 +1981,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -1999,7 +1999,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2017,7 +2017,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2035,7 +2035,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2053,7 +2053,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2071,7 +2071,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2089,7 +2089,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2107,7 +2107,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2125,7 +2125,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2143,7 +2143,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2161,7 +2161,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2179,7 +2179,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2197,7 +2197,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2215,7 +2215,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
@@ -2233,7 +2233,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="string('http://sysbio.oxfordjournals.org/')"/>
@@ -2250,7 +2250,7 @@
                         <xsl:choose>
                             <xsl:when test="contains($article-doi,'doi:')">
                                 <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of
