@@ -498,7 +498,7 @@ public class Manuscript {
     }
 
     private static String findDryadDOI(String searchString) {
-        // we need to look for anything matching the form doi:10.5061/dryad.xxxx as well as dx.doi.org/10.5061/dryad.xxxx
+        // we need to look for anything matching the form doi:10.5061/dryad.xxxx as well as doi.org/10.5061/dryad.xxxx
         Matcher manuscriptMatcher = Pattern.compile(Pattern.quote(DOIIdentifierProvider.getDryadDOIPrefix()) + "[a-zA-Z0-9]+").matcher(searchString);
         if (manuscriptMatcher.find()) {
             return "doi:" + manuscriptMatcher.group(0);

@@ -8,6 +8,7 @@ import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.submit.step.DescribeStep;
 import org.dspace.usagelogging.EventLogger;
 
@@ -349,14 +350,11 @@ public class DescribePublicationStep extends DescribeStep {
                     s = "Data from: " + s;
                 }
 
-		// ensure the article DOI is in the proper format if it's a DOI
+                // ensure the article DOI is in the proper format if it's a DOI
                 if (element.equals("relation") && qualifier.equals("isreferencedby")) {
-		    if(s.toLowerCase().startsWith("http://dx.doi.org/")) {
-			s = "doi:" + s.substring("http://dx.doi.org/".length());
-		    } else if(!s.toLowerCase().startsWith("doi:") &&
-                            !s.toLowerCase().startsWith("pmid:")) {
-			s = "doi:" + s;
-		    }
+                    if (!s.toLowerCase().startsWith("pmid:")) {
+                        s = DOIIdentifierProvider.getShortDOI(s);
+                    }
                 }
 
 

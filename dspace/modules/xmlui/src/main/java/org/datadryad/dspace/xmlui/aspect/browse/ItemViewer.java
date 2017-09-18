@@ -297,7 +297,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
 
                         if (!identifierSet) {
                             for (DCValue value : values) {
-                                if (value.value.startsWith("http://dx.doi.org/")) {
+                                if (value.value.startsWith("https://doi.org/")) {
                                     pageMeta.addMetadata("identifier", "package")
                                             .addContent(value.value.substring(18));
                                     identifierSet = true;
@@ -371,15 +371,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
 
                 id = metadata.value.substring(skip); // skip host name
 
-                if (id.startsWith("doi:") || id.startsWith("http://dx.doi.org/")) {
-                    if (id.startsWith("http://dx.doi.org/")) {
-                        id = id.substring("http://dx.doi.org/".length());
-
-                        // service with resolve with or without the "doi:" prepended
-                        if (!id.startsWith("doi:")) {
-                            id = "doi:" + id;
-                        }
-                    }
+                if (id.startsWith("doi:") || id.contains("doi.org/")) {
+                    id = DOIIdentifierProvider.getShortDOI(id);
 
                     DOIIdentifierProvider doiService = new DSpace().getSingletonService(DOIIdentifierProvider.class);
                     Item file = null;

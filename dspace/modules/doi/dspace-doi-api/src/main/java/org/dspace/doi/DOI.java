@@ -107,12 +107,12 @@ public class DOI {
 
 	/**
 	 * Outputs the URL string that references the DOI resolving service at
-	 * doi.org (<code>http://dx.doi.org/10.3456/dryad.12054</code>).
+	 * doi.org (<code>https://doi.org/10.3456/dryad.12054</code>).
 	 *
 	 * @return The URL at which the DOI can be resolved
 	 */
 	public String toExternalForm() {
-		return "http://dx.doi.org/" + myPrefix.toString() + "/"
+		return "https://doi.org/" + myPrefix.toString() + "/"
 				+ mySuffix.toString();
 	}
 

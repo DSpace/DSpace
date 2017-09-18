@@ -24,7 +24,7 @@ public class DataPackagesWithInsufficientMetadata extends ItemsWithInsufficientM
         DCValue[] references = item.getMetadata("dc.relation.isreferencedby");
         Integer validReferences = 0;
         for(DCValue value : references) {
-            if(value.value.startsWith("doi") || value.value.startsWith("http://dx.doi")) {
+            if(value.value.startsWith("doi") || value.value.startsWith("http://dx.doi") || value.value.startsWith("https://doi")) {
                 validReferences++;
             }
         }
