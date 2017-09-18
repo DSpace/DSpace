@@ -49,10 +49,8 @@ public class AutoReturnReviewItem {
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("ItemImport\n", options);
-        }
-
-        if(line.hasOption('i')) {
+            myhelp.printHelp("dspace purge-review-item\n", options);
+        } else if(line.hasOption('i')) {
             // get a WorkflowItem using a workflow ID
             Integer workflowItemId = Integer.parseInt(line.getOptionValue('i'));
             Context c = null;
@@ -80,7 +78,7 @@ public class AutoReturnReviewItem {
         } else if (line.hasOption('a')) {
             purgeOldItems();
         } else {
-            System.out.println("No manuscript number or workflow ID was given. One of these must be provided to identify the correct item in the review stage.");
+            System.out.println("No option was provided.");
             System.exit(1);
         }
     }

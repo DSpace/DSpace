@@ -61,7 +61,8 @@ public class ApproveRejectReviewItem {
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("ItemImport\n", options);
+            myhelp.printHelp("dspace review-item\n", options);
+            System.exit(1);
         }
         Boolean approved;
 
