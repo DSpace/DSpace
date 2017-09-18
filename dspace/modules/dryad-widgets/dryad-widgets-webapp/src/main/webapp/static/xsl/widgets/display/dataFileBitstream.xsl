@@ -71,7 +71,7 @@
                 <div class="dryad-ddw-unhandled">
                     <p class="dryad-ddw-unhandled">
                         The content for this data is unsupported for viewing.
-                        Please visit the <a href="http://dx.doi.org/{$doi}" target="_blank">Dryad site</a>
+                        Please visit the <a href="https://doi.org/{$doi}" target="_blank">Dryad site</a>
                         or download the data from this widget.
                     </p>
                 </div>

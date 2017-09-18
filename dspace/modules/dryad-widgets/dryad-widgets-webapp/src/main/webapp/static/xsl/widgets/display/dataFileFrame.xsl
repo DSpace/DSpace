@@ -35,12 +35,12 @@
         select="/parts/dri/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dryad'][@qualifier='downloads']"/>
     <xsl:variable name="publication-doi-url" select="/parts/object/ddf:DryadDataFile/ddf:isPartOf"/>
     <xsl:variable name="publication-doi-doi"
-        select="substring-after($publication-doi-url,'http://dx.doi.org/')"/>
+        select="substring-after($publication-doi-url,'doi.org/')"/>
     <xsl:variable name="format-id" select="/parts/meta-bitstream/d1:systemMetadata/formatId"/>
     <xsl:variable name="title" select="/parts/object/ddf:DryadDataFile/dcterms:title"/>
     <xsl:variable name="description" select="/parts/object/ddf:DryadDataFile/dcterms:description"/>
 
-    <xsl:variable name="doi-prefix" select="'http://dx.doi.org/'"/>
+    <xsl:variable name="doi-prefix" select="'https://doi.org/'"/>
     <xsl:variable name="article-doi"
         select="/parts/dri/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='identifier'][@qualifier='article']"/>
     <xsl:variable name="article-doi-url" select="concat($doi-prefix, $article-doi)"/>
@@ -242,21 +242,21 @@
 
     <xsl:template name="reddit-item">
         <a href="http://reddit.com/submit"
-            onclick="window.open('http://reddit.com/submit?url='+encodeURIComponent('http://dx.doi.org/doi:10.5061/dryad.87ht85rs')+'&amp;title=Data+from%3A+Robustness+of+compound+Dirichlet+priors+for+Bayesian+inference+of+branch+lengths.+','reddit','toolbar=no,width=550,height=550'); return false">
+            onclick="window.open('http://reddit.com/submit?url='+encodeURIComponent('https://doi.org/doi:10.5061/dryad.87ht85rs')+'&amp;title=Data+from%3A+Robustness+of+compound+Dirichlet+priors+for+Bayesian+inference+of+branch+lengths.+','reddit','toolbar=no,width=550,height=550'); return false">
             <img alt="Reddit" src="http://reddit.com/static/spreddit7.gif" border="0px;"/>
         </a>
     </xsl:template>
 
     <xsl:template name="twitter-item">
         <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true"
-            src="http://platform.twitter.com/widgets/tweet_button.1406859257.html#_=1407626732783&amp;count=none&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fdatadryad.org%2Fresource%2Fdoi%3A10.5061%2Fdryad.87ht85rs%2F1&amp;size=m&amp;text=USYB-2011-142.SupplData%20from%3A%20Robustness%20of%20compound%20Dirichlet%20priors%20for%20Bayesian%20inference%20of%20branch%20lengths.%20-%20Dryad&amp;url=http%3A%2F%2Fdx.doi.org%2Fdoi%3A10.5061%2Fdryad.87ht85rs&amp;via=datadryad"
+            src="http://platform.twitter.com/widgets/tweet_button.1406859257.html#_=1407626732783&amp;count=none&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fdatadryad.org%2Fresource%2Fdoi%3A10.5061%2Fdryad.87ht85rs%2F1&amp;size=m&amp;text=USYB-2011-142.SupplData%20from%3A%20Robustness%20of%20compound%20Dirichlet%20priors%20for%20Bayesian%20inference%20of%20branch%20lengths.%20-%20Dryad&amp;url=https%3A%2F%2Fdoi.org%2Fdoi%3A10.5061%2Fdryad.87ht85rs&amp;via=datadryad"
             class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-none"
             title="Twitter Tweet Button" data-twttr-rendered="true"/>
     </xsl:template>
 
     <xsl:template name="facebook-item">
         <iframe
-            src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fdx.doi.org%2Fdoi%3A10.5061%2Fdryad.87ht85rs&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light"
+            src="http://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fdoi.org%2Fdoi%3A10.5061%2Fdryad.87ht85rs&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light"
             scrolling="no" frameborder="0"
             style="border:none; overflow:hidden; width:80px;height:21px;" allowtransparency="true"/>
     </xsl:template>

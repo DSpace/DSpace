@@ -199,7 +199,7 @@ public class SyndicationFeed
         if (items != null)
         {
 
-            //http://dx.doi.org
+            //https://doi.org
             String host = ConfigurationManager.getProperty("doi.hostname");
 
             boolean localResolveeEnabled = ConfigurationManager.getBooleanProperty("webui.feed.localresolve", false);
@@ -231,9 +231,9 @@ public class SyndicationFeed
                         entry.setUri(dspaceURL + "/resource/" + id);
 
                     }
-                    // dx.doi.org
+                    // doi.org
                     else{
-                        // http://dx.doi.org/10.5061/dryad.j35f6.3
+                        // https://doi.org/10.5061/dryad.j35f6.3
                         entry.setLink(host + "/" + id.replace("doi:", ""));
                         entry.setUri(host + "/" +id.replace("doi:", ""));
                     }

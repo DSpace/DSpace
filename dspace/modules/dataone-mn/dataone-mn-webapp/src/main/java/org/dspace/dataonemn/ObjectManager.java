@@ -1020,13 +1020,7 @@ public class ObjectManager implements Constants {
 	    log.error("Attempt to normalize non-existant DOI");
 	    return "";
 	}
-	if(doi.startsWith("doi:")) {
-	    doi = "http://dx.doi.org/" + doi.substring("doi:".length());
-	}
-	if(doi.startsWith("10.")) {
-	    doi = "http://dx.doi.org/" + doi;
-	}
-	return doi;
+	return DOIIdentifierProvider.getFullDOIURL(doi);
     }
     
     public void writeBitstream(InputStream aInputStream,

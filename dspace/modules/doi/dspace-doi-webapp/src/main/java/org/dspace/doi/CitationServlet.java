@@ -42,7 +42,7 @@ public class CitationServlet extends HttpServlet {
 
 	private static final String ENCODING = "UTF-8";
 
-	private static final String DOI_URL = "http://dx.doi.org/";
+	private static final String DOI_URL = "https://doi.org/";
 
 	@Override
 	protected void doGet(HttpServletRequest aRequest,

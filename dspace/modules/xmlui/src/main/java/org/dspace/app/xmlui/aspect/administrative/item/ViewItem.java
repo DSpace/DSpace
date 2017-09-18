@@ -183,7 +183,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 
 				if (!identifierSet) {
 					for (DCValue value : values) {
-						if (value.value.startsWith("http://dx.doi.org/")) {
+						if (value.value.contains("/doi.org/")) {
 							pageMeta.addMetadata("identifier", "package")
 									.addContent(value.value.substring(18));
 							identifierSet = true;

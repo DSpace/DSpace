@@ -590,7 +590,7 @@ public class PublicationUpdater extends HttpServlet {
             return false;
         }
         LOGGER.debug("looking for mismatches for " + manuscript.getPublicationDOI());
-        // normalize the pubDOI from the manuscript: remove leading "doi:" or "dx.doi.org/"
+        // normalize the pubDOI from the manuscript: remove leading "doi:" or "doi.org/"
         String msDOI = null;
         Pattern doi = Pattern.compile(".*(10\\.\\d+/.+)");
         Matcher m = doi.matcher(manuscript.getPublicationDOI().toLowerCase());
