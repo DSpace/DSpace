@@ -283,7 +283,7 @@
                                     <xsl:when test="starts-with($id, 'doi')">
                                         <xsl:value-of  select="concat('https://doi.org/', substring-after($id, 'doi:'))"/>
                                     </xsl:when>
-                                    <xsl:when test="starts-with($id,'http://dx.doi')">
+                                    <xsl:when test="contains($id,'doi.org')">
                                       <xsl:value-of select="$id"/>
                                     </xsl:when>
                                     <xsl:otherwise>
@@ -300,7 +300,7 @@
                                                 <xsl:value-of
                                                         select="concat('https://doi.org/', substring-after($id, 'doi:'))"/>
                                             </xsl:when>
-                                            <xsl:when test="starts-with($id,'http://dx.doi')">
+                                            <xsl:when test="contains($id,'doi.org')">
                                                <xsl:value-of select="$id"/>
                                              </xsl:when>
                                             <xsl:otherwise>
@@ -315,7 +315,7 @@
                                             <xsl:value-of 
                                                         select="concat('https://doi.org/', substring-after($id, 'doi:'))"/>
                                         </xsl:when>
-                                        <xsl:when test="starts-with($id,'http://dx.doi')">
+                                        <xsl:when test="contains($id,'doi.org')">
                                            <xsl:value-of select="$id"/>
                                          </xsl:when>
                                         <xsl:otherwise>
