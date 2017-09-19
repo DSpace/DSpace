@@ -156,15 +156,18 @@ public class DepositAgreeAction  extends AbstractAction{
         try{
             int iId = Integer.parseInt(id);
             String mapFile = DbQuery.fetchBatchMapFile(context, iId);
+            LOG.info("using mapfile " + mapFile);
             try{
                 Map<String, String> files = ItemImport.readMapFile(mapFile);
                 for(String itemId : files.values()) {
                     Item item = agreeToItem(context, user, itemId, map);
                     
                     if(item != null){
+                        LOG.info("agree to " + item.getID());
                         items.add(item);
                     }
                     else{
+                        LOG.warn("couldnt find item to agree to " + itemId);
                         // if one fails stop processing
                         items.clear();
                         break;
@@ -172,6 +175,7 @@ public class DepositAgreeAction  extends AbstractAction{
                 }
             }
             catch(Exception ex){
+                LOG.error(ex);
                 map.put("result", "Problem finding batch: " + ex.getMessage());
             }
             

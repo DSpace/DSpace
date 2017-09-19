@@ -56,9 +56,12 @@ public class DepositAgree extends AbstractDSpaceTransformer{
             if(result.length() > 0){
                 this.errorMessage = result;
             }
+            else{
+                this.errorMessage = null;
+            }
         }
         catch(ParameterException ex){
-            LOG.info(ex);
+            LOG.warn(ex);
             errorMessage = "Invalid state";
         }
     }
