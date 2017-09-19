@@ -37,7 +37,7 @@
 				<default.doi.prefix>10.5061</default.doi.prefix>
 				<!-- Location of Dryad's DOI webapp/API -->
 				<default.doi.service>http://localhost:9999/doi</default.doi.service>
-				<!-- Whether DOIs/Handles should be rewritten to resolve locally (instead of going to dx.doi.org, etc., to be resolved) -->
+				<!-- Whether DOIs/Handles should be rewritten to resolve locally (instead of going to doi.org, etc., to be resolved) -->
 				<default.dryad.localize>true</default.dryad.localize>
 				<!-- Whether we really register DOIs or just pretend to -->
 				<default.doi.datacite.connected>false</default.doi.datacite.connected>
