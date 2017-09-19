@@ -19,7 +19,6 @@ public class DataPackagesWithInsufficientMetadata extends ItemsWithInsufficientM
     @Override
     protected void performItem(Item item) throws SQLException, IOException {
         // Need to have a dc.references
-        //  		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi') or starts-with(., 'http://dx.doi')]">
 
         DCValue[] references = item.getMetadata("dc.relation.isreferencedby");
         Integer validReferences = 0;
