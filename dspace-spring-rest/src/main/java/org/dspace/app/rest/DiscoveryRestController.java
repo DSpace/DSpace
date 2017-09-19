@@ -14,10 +14,13 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,9 +28,12 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/"+ DiscoveryRest.CATEGORY)
-public class DiscoveryRestController extends AbstractDSpaceRestRepository {
+public class DiscoveryRestController extends AbstractDSpaceRestRepository implements InitializingBean {
 
     private static final Logger log = Logger.getLogger(ScopeResolver.class);
+
+    @Autowired
+    DiscoverableEndpointsService discoverableEndpointsService;
 
     @Autowired
     private DiscoveryConfigurationService searchConfigurationService;
@@ -37,6 +43,12 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository {
 
     @Autowired
     private SearchService searchService;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        discoverableEndpointsService.register(this, Arrays.asList(new Link("/api/"+ DiscoveryRest.CATEGORY, DiscoveryRest.CATEGORY)));
+    }
+
 
     @RequestMapping(method = RequestMethod.GET, value = "/search")
     public void getSearchConfiguration(@RequestParam(name = "scope", required = false) String dsoScope,
@@ -123,5 +135,4 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository {
 
         //TODO
     }
-
 }
