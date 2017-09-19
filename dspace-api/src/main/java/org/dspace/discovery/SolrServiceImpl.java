@@ -2393,4 +2393,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         // rely on special characters to separate the field from the query value)
         return ClientUtils.escapeQueryChars(query);
     }
+
+    @Override
+    public FacetYearRange getFacetYearRange(Context context, DSpaceObject scope, DiscoverySearchFilterFacet facet, List<String> filterQueries) throws SearchServiceException {
+        FacetYearRange result = new FacetYearRange(facet);
+        result.calculateRange(context, filterQueries, scope, this);
+        return result;
+    }
 }

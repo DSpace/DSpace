@@ -15,4 +15,16 @@ public class SearchFilter {
         this.operator = operator;
         this.value = value;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }
