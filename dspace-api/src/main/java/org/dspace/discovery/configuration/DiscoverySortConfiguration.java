@@ -15,6 +15,9 @@
 package org.dspace.discovery.configuration;
 
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,5 +60,14 @@ public class DiscoverySortConfiguration {
 
     public void setDefaultSortOrder(SORT_ORDER defaultSortOrder) {
         this.defaultSortOrder = defaultSortOrder;
+    }
+    
+    public boolean isValidSortField(String sortField) {
+        for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
+            if(StringUtils.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

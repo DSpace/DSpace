@@ -2,9 +2,11 @@ package org.dspace.app.rest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.exception.InvalidRequestException;
 import org.dspace.app.rest.model.DiscoveryRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
+import org.dspace.app.rest.utils.DiscoverQueryBuilder;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -39,10 +41,13 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository implem
     private DiscoveryConfigurationService searchConfigurationService;
 
     @Autowired
+    private SearchService searchService;
+
+    @Autowired
     private ScopeResolver scopeResolver;
 
     @Autowired
-    private SearchService searchService;
+    private DiscoverQueryBuilder queryBuilder;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -66,6 +71,7 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository implem
         //TODO Call DiscoveryConfigurationConverter on configuration to convert this API model to the REST model
 
         //TODO Return REST model
+        //TODO set "hasMore" property on facets
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/objects")
@@ -88,16 +94,19 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository implem
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
 
+        try {
+            DiscoverQuery discoverQuery = queryBuilder.buildQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page);
+            DiscoverResult searchResult = searchService.search(context, scopeObject, discoverQuery);
 
-        //TODO CHECK org.dspace.app.xmlui.aspect.discovery.SidebarFacetsTransformer#getQueryArgs
-        //TODO DiscoverQuery discoverQuery = discoverQueryBuilder.buildQuery(configuration, scopeObject, query, searchFilters, dsoType, page);
+        } catch (InvalidRequestException e) {
+            log.warn("Received an invalid request", e);
+            //TODO TOM handle invalid request
+        } catch (SearchServiceException e) {
+            log.error("Error while searching with Discovery", e);
+            //TODO TOM handle search exception
+        }
 
-        //try {
-            //TODO DiscoverResult search = searchService.search(context, scopeObject, discoverQuery);
-
-        //} catch (SearchServiceException ex) {
-        //    log.error("Error while searching with Discovery", ex);
-        //}
+        //TODO convert search result to DSO list
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets")
