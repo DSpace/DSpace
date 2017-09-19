@@ -550,7 +550,7 @@ public class BitstreamResource extends Resource {
 
             UUID newBitstreamId = bitstreamStorageService.store(context, dspaceBitstream, is);
             log.trace("Bitstream data stored: " + newBitstreamId);
-
+            context.complete();
         } catch (SQLException e) {
             processException("Could not update bitstream(id=" + bitstreamId + ") data, SQLException. Message: " + e,
                              context);
@@ -690,6 +690,7 @@ public class BitstreamResource extends Resource {
                 log.trace("Policy for bitstream(id=" + bitstreamId + ") was successfully removed.");
             }
 
+            context.complete();
         } catch (SQLException e) {
             processException(
                 "Someting went wrong while deleting policy(id=" + policyId + ") to bitstream(id=" + bitstreamId
