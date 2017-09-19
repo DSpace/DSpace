@@ -564,6 +564,7 @@ public class BitstreamResource extends Resource
             UUID newBitstreamId = bitstreamStorageService.store(context, dspaceBitstream, is);
             log.trace("Bitstream data stored: " + newBitstreamId);
 
+            context.complete();
         }
         catch (SQLException e)
         {
@@ -701,7 +702,7 @@ public class BitstreamResource extends Resource
                 }
                 log.trace("Policy for bitstream(id=" + bitstreamId + ") was successfully removed.");
             }
-
+            context.complete();
         }
         catch (SQLException e)
         {
