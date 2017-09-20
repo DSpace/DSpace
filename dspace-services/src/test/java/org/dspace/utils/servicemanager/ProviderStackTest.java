@@ -7,16 +7,17 @@
  */
 package org.dspace.utils.servicemanager;
 
-import static org.junit.Assert.*;
+import org.dspace.kernel.ServiceManager;
+import org.dspace.kernel.mixins.OrderedService;
+import org.junit.Test;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.kernel.ServiceManager;
-import org.dspace.kernel.mixins.OrderedService;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 /**
@@ -60,6 +61,11 @@ public class ProviderStackTest {
             public <T> T getServiceByName(String name, Class<T> type) {
                 return null;
             }
+
+            public ConfigurableApplicationContext getApplicationContext() {
+                return null;
+            }
+
             public <T> List<T> getServicesByType(Class<T> type) {
                 return new ArrayList<T>();
             }

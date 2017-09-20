@@ -7,16 +7,9 @@
  */
 package org.dspace.servicemanager;
 
-import java.util.*;
-import java.util.Map.Entry;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.kernel.Activator;
-import org.dspace.kernel.mixins.ConfigChangeListener;
-import org.dspace.kernel.mixins.InitializedService;
-import org.dspace.kernel.mixins.ServiceChangeListener;
-import org.dspace.kernel.mixins.ServiceManagerReadyAware;
-import org.dspace.kernel.mixins.ShutdownService;
+import org.dspace.kernel.mixins.*;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.spring.SpringServiceManager;
 import org.dspace.services.ConfigurationService;
@@ -24,6 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This is the core service manager which ties together the other
@@ -299,6 +296,11 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             }
         }
         return service;
+    }
+
+    @Override
+    public ConfigurableApplicationContext getApplicationContext() {
+        return primaryServiceManager.getApplicationContext();
     }
 
     public <T> List<T> getServicesByType(Class<T> type) {

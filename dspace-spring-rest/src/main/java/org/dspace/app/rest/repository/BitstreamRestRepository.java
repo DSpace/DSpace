@@ -7,20 +7,11 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +19,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the repository responsible to manage Bitstream Rest object
@@ -38,7 +37,10 @@ import org.springframework.stereotype.Component;
 
 @Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME)
 public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest, UUID> {
-	BitstreamService bs = ContentServiceFactory.getInstance().getBitstreamService();
+
+	@Autowired
+	BitstreamService bs;
+
 	@Autowired
 	BitstreamConverter converter;
 	

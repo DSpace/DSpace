@@ -7,6 +7,8 @@
  */
 package org.dspace.kernel;
 
+import org.springframework.context.ConfigurableApplicationContext;
+
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +19,11 @@ import java.util.Map;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ServiceManager {
+
+    /**
+     * Get the application context
+     */
+    public ConfigurableApplicationContext getApplicationContext();
 
     /**
      * Allows developers to get the desired service singleton by the provided type. <br>

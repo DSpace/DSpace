@@ -56,9 +56,11 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 	@Autowired
 	ItemRestRepository itemRestRepository;
 
-	CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-	
-	CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+	@Autowired
+	CollectionService collectionService;
+
+	@Autowired
+	CommunityService communityService;
 
 	public Page<ItemRest> listBrowseItems(HttpServletRequest request, String browseName, Pageable pageable, String projection)
 			throws BrowseException, SQLException {

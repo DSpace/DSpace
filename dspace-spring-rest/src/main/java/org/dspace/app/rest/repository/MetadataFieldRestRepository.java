@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import org.dspace.app.rest.converter.MetadataFieldConverter;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.hateoas.MetadataFieldResource;
@@ -22,6 +19,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
+import java.util.List;
+
 /**
  * This is the repository responsible to manage MetadataField Rest object
  * 
@@ -30,7 +30,10 @@ import org.springframework.stereotype.Component;
  */
 @Component(MetadataFieldRest.CATEGORY + "." + MetadataFieldRest.NAME)
 public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFieldRest, Integer> {
-	MetadataFieldService metaFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+
+	@Autowired
+	MetadataFieldService metaFieldService;
+
 	@Autowired
 	MetadataFieldConverter converter;
 

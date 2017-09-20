@@ -7,6 +7,8 @@
  */
 package org.dspace.servicemanager;
 
+import org.springframework.context.ConfigurableApplicationContext;
+
 import java.util.List;
 import java.util.Map;
 
@@ -59,9 +61,13 @@ public class MockServiceManagerSystem implements ServiceManagerSystem {
         return this.sms.getServiceByName(name, type);
     }
 
+    public ConfigurableApplicationContext getApplicationContext() {
+        return sms.getApplicationContext();
+    }
+
     /* (non-Javadoc)
-     * @see org.dspace.kernel.ServiceManager#getServicesByType(java.lang.Class)
-     */
+         * @see org.dspace.kernel.ServiceManager#getServicesByType(java.lang.Class)
+         */
     public <T> List<T> getServicesByType(Class<T> type) {
         return this.sms.getServicesByType(type);
     }
