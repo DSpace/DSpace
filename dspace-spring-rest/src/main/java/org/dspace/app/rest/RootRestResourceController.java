@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
@@ -29,16 +28,38 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/api")
 public class RootRestResourceController {
+
 	@Autowired
 	DiscoverableEndpointsService discoverableEndpointsService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	ResourceSupport listDefinedEndpoint(HttpServletRequest request) {
+	public ResourceSupport listDefinedEndpoint(HttpServletRequest request) {
 		ResourceSupport root = new ResourceSupport();
 		for (Link l : discoverableEndpointsService.getDiscoverableEndpoints()) {
-			root.add(new Link(StringUtils.substringBeforeLast(request.getRequestURL().toString(), "/api")
-					+ l.getHref(), l.getRel()));
+			root.add(new Link(getRestURL(request) + l.getHref(), l.getRel()));
 		}
 		return root;
+	}
+
+	private StringBuffer getRestURL(HttpServletRequest request) {
+		StringBuffer url = new StringBuffer();
+		String scheme = request.getScheme();
+		int port = request.getServerPort();
+		if (port < 0) {
+			// Work around java.net.URL bug
+			port = 80;
+		}
+
+		url.append(scheme);
+		url.append("://");
+		url.append(request.getServerName());
+		if ((scheme.equals("http") && (port != 80))
+				|| (scheme.equals("https") && (port != 443))) {
+			url.append(':');
+			url.append(port);
+		}
+		url.append(request.getContextPath());
+
+		return url;
 	}
 }
