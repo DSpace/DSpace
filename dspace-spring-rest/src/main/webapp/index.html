@@ -291,7 +291,7 @@ Content-Type: application/json
 <script>
     var browser = new HAL.Browser({
         container: $('#browser'),
-        entryPoint: '/dspace-spring-rest/api'
+        entryPoint: window.location.pathname + 'api'
     });
     Backbone.history.start();
 </script>
