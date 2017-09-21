@@ -41,25 +41,8 @@ public class RootRestResourceController {
 		return root;
 	}
 
-	private StringBuffer getRestURL(HttpServletRequest request) {
-		StringBuffer url = new StringBuffer();
-		String scheme = request.getScheme();
-		int port = request.getServerPort();
-		if (port < 0) {
-			// Work around java.net.URL bug
-			port = 80;
-		}
-
-		url.append(scheme);
-		url.append("://");
-		url.append(request.getServerName());
-		if ((scheme.equals("http") && (port != 80))
-				|| (scheme.equals("https") && (port != 443))) {
-			url.append(':');
-			url.append(port);
-		}
-		url.append(request.getContextPath());
-
-		return url;
+	private String getRestURL(HttpServletRequest request) {
+		String url = request.getRequestURL().toString();
+		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath();
 	}
 }
