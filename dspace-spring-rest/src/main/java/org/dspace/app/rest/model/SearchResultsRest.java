@@ -71,12 +71,12 @@ public class SearchResultsRest extends BaseObjectRest<String> {
         this.appliedFilters = appliedFilters;
     }
 
-    public void addAppliedFilter(final String name, final String operator, final String value, final String label) {
+    public void addAppliedFilter(final AppliedFilter filter) {
         if(appliedFilters == null) {
             appliedFilters = new LinkedList<>();
         }
 
-        appliedFilters.add(new AppliedFilter(name, operator, value, label));
+        appliedFilters.add(filter);
     }
 
     public Sorting getSort() {
@@ -123,7 +123,7 @@ public class SearchResultsRest extends BaseObjectRest<String> {
         this.totalNumberOfResults = totalNumberOfResults;
     }
 
-    public class AppliedFilter {
+    public static class AppliedFilter {
 
         private String filter;
         private String operator;

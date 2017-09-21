@@ -80,7 +80,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             //TODO TOM handle search exception
         }
 
-        return discoverResultConverter.convert(discoverQuery, configurationName, dsoScope, searchFilters, page, searchResult);
+        return discoverResultConverter.convert(context, discoverQuery, configurationName, dsoScope, searchFilters, page, searchResult);
     }
 
     public void getFacetsConfiguration(final String dsoScope, final String configurationName) {
