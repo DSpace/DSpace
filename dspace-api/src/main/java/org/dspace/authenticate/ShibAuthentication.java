@@ -1042,6 +1042,7 @@ public class ShibAuthentication implements AuthenticationMethod
 
 	/**
 	 * Find a particular Shibboleth header value and return the all values.
+	 * If header value is empty, return null to prevent passing empty value further.
 	 * The header name uses a bit of fuzzy logic, so it will first try case
 	 * sensitive, then it will try lowercase, and finally it will try uppercase.
 	 * 
@@ -1071,12 +1072,11 @@ public class ShibAuthentication implements AuthenticationMethod
 		if (StringUtils.isEmpty(value))
 			value = request.getHeader(name.toUpperCase());
                 
-		// <J.R> - 7. 9. 2017
-        // Added extra check for blank value of attribute.
-        // In case that value is Empty, it should not be returned, return null instead.
+        // Added extra check for empty value of an attribute.
+        // In case that value is Empty, it should not be returned, return 'null' instead.
         if (StringUtils.isEmpty(value))
         {
-        	log.debug("ShibAuthentication - this value: " + name + " has value " + value + " == is empty!");
+        	log.debug("ShibAuthentication - attribute " + name + " is empty!");
        	 	return null;
         }
         
