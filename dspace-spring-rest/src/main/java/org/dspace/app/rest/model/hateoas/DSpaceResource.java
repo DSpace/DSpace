@@ -7,20 +7,6 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -33,7 +19,16 @@ import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
+
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A base class for DSpace Rest HAL Resource. The HAL Resource wraps the REST
@@ -44,13 +39,9 @@ import org.springframework.hateoas.ResourceSupport;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceResource<T extends RestModel> extends ResourceSupport {
+public abstract class DSpaceResource<T extends RestModel> extends HALResource {
 	@JsonUnwrapped
 	private final T data;
-
-	@JsonProperty(value = "_embedded")
-	@JsonInclude(Include.NON_EMPTY)
-	private Map<String, Object> embedded = new HashMap<String, Object>();
 
 	public DSpaceResource(T data, Utils utils, String... rels) {
 		this.data = data;

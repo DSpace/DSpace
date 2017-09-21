@@ -44,4 +44,9 @@ public class CollectionConverter
 	protected CollectionRest newInstance() {
 		return new CollectionRest();
 	}
+
+	@Override
+	protected Class<org.dspace.content.Collection> getModelClass() {
+		return org.dspace.content.Collection.class;
+	}
 }

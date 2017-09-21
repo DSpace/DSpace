@@ -7,13 +7,13 @@
  */
 package org.dspace.app.rest.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.eperson.Group;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is the converter from/to the Group in the DSpace API data model
@@ -49,6 +49,11 @@ public class GroupConverter extends DSpaceObjectConverter<Group, org.dspace.app.
 	@Override
 	protected GroupRest newInstance() {
 		return new GroupRest();
+	}
+
+	@Override
+	protected Class<Group> getModelClass() {
+		return Group.class;
 	}
 
 }
