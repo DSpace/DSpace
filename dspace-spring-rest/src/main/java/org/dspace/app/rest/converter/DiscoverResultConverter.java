@@ -2,12 +2,16 @@ package org.dspace.app.rest.converter;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
+import org.dspace.authority.AuthorityValue;
+import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +31,18 @@ import java.util.Map;
 public class DiscoverResultConverter {
 
     @Autowired
-    public List<DSpaceObjectConverter> converters;
+    private List<DSpaceObjectConverter> converters;
 
-    public SearchResultsRest convert(final DiscoverQuery discoverQuery, final String configurationName, final String scope,
-                                           final List<SearchFilter> searchFilters, final Pageable page, final DiscoverResult searchResult) {
+    @Autowired
+    private AuthorityValueService authorityValueService;
+
+
+    public SearchResultsRest convert(final Context context, final DiscoverQuery discoverQuery, final String configurationName, final String scope,
+                                     final List<SearchFilter> searchFilters, final Pageable page, final DiscoverResult searchResult) {
 
         SearchResultsRest resultsRest = new SearchResultsRest();
 
-        setRequestInformation(discoverQuery, configurationName, scope, searchFilters, page, resultsRest);
+        setRequestInformation(context, discoverQuery, configurationName, scope, searchFilters, page, resultsRest);
 
         addSearchResults(searchResult, resultsRest);
 
@@ -71,7 +79,8 @@ public class DiscoverResultConverter {
         return null;
     }
 
-    private void setRequestInformation(final DiscoverQuery discoverQuery, final String configurationName, final String scope, final List<SearchFilter> searchFilters, final Pageable page, final SearchResultsRest resultsRest) {
+    private void setRequestInformation(final Context context, final DiscoverQuery discoverQuery, final String configurationName, final String scope,
+                                       final List<SearchFilter> searchFilters, final Pageable page, final SearchResultsRest resultsRest) {
         resultsRest.setQuery(discoverQuery.getQuery());
         resultsRest.setConfigurationName(configurationName);
 
@@ -87,7 +96,26 @@ public class DiscoverResultConverter {
         }
 
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
-            resultsRest.addAppliedFilter(searchFilter.getName(), searchFilter.getOperator(), searchFilter.getValue(), searchFilter.getValue()); //TODO label
+
+            resultsRest.addAppliedFilter(convertSearchFilter(context, searchFilter));
         }
+    }
+
+    private SearchResultsRest.AppliedFilter convertSearchFilter(Context context, SearchFilter searchFilter) {
+        AuthorityValue authorityValue = null;
+        if(searchFilter.hasAuthorityOperator()) {
+            authorityValue = authorityValueService.findByUID(context, searchFilter.getValue());
+        }
+
+        SearchResultsRest.AppliedFilter appliedFilter;
+        if (authorityValue == null) {
+            appliedFilter = new SearchResultsRest.AppliedFilter(searchFilter.getName(), searchFilter.getOperator(),
+                    searchFilter.getValue(), searchFilter.getValue());
+        } else {
+            appliedFilter = new SearchResultsRest.AppliedFilter(searchFilter.getName(), searchFilter.getOperator(),
+                    searchFilter.getValue(), authorityValue.getValue());
+        }
+
+        return appliedFilter;
     }
 }

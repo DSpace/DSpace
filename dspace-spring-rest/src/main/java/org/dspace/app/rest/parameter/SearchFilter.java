@@ -1,5 +1,7 @@
 package org.dspace.app.rest.parameter;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Custom request parameter used in the Discovery search REST endpoint.
  * This parameter is resolved by TODO
@@ -26,5 +28,9 @@ public class SearchFilter {
 
     public String getValue() {
         return value;
+    }
+
+    public boolean hasAuthorityOperator() {
+        return StringUtils.equals(operator, "authority");
     }
 }
