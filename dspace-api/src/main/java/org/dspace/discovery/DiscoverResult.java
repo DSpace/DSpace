@@ -179,6 +179,10 @@ public class DiscoverResult {
         {
             return highlightResults.get(metadataKey);
         }
+
+        public Map<String, List<String>> getHighlightResults() {
+            return highlightResults;
+        }
     }
 
     public void addSearchDocument(DSpaceObject dso, SearchDocument searchDocument){

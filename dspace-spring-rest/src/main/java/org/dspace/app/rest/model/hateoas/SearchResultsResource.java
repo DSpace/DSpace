@@ -2,10 +2,14 @@ package org.dspace.app.rest.model.hateoas;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.utils.Utils;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -24,23 +28,26 @@ public class SearchResultsResource extends HALResource {
     @JsonUnwrapped
     private final SearchResultsRest data;
 
-    public SearchResultsResource(final SearchResultsRest data, final Utils utils) {
+    public SearchResultsResource(final SearchResultsRest data, final Pageable page, final Utils utils) {
         this.data = data;
 
 
         addLinks(data);
 
-        addEmbeds(data, utils);
+        addEmbeds(data, page, utils);
 
     }
 
-    private void addEmbeds(final SearchResultsRest data, final Utils utils) {
+    private void addEmbeds(final SearchResultsRest data, final Pageable pageable, final Utils utils) {
         List<SearchResultEntryResource> entryResources = new LinkedList<>();
         for (SearchResultEntryRest searchResultEntry : data.getSearchResults()) {
             entryResources.add(new SearchResultEntryResource(searchResultEntry, utils));
         }
 
-        embedResource("searchResults", new Resources<>(entryResources));
+        PageImpl<SearchResultEntryResource> page = new PageImpl<SearchResultEntryResource>(entryResources,
+                pageable, data.getTotalNumberOfResults());
+
+        embedResource("searchResults", new EmbeddedPage(buildBaseLink(data), page, entryResources));
 
         //TODO ADD FACETS
     }

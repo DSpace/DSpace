@@ -23,6 +23,7 @@ public class SearchResultsRest extends BaseObjectRest<String> {
 
     @JsonIgnore
     List<SearchResultEntryRest> searchResults;
+    private long totalNumberOfResults;
 
     //TODO List<SearchFacetEntryRest> facets;
 
@@ -112,6 +113,14 @@ public class SearchResultsRest extends BaseObjectRest<String> {
 
     public void setConfigurationName(final String configurationName) {
         this.configurationName = configurationName;
+    }
+
+    public long getTotalNumberOfResults() {
+        return totalNumberOfResults;
+    }
+
+    public void setTotalNumberOfResults(long totalNumberOfResults) {
+        this.totalNumberOfResults = totalNumberOfResults;
     }
 
     public class AppliedFilter {

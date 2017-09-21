@@ -1,6 +1,7 @@
 package org.dspace.app.rest.converter;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -11,11 +12,13 @@ import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO TOM UNIT TEST
@@ -26,7 +29,7 @@ public class DiscoverResultConverter {
     @Autowired
     public List<DSpaceObjectConverter> converters;
 
-    public Page<SearchResultsRest> convert(final DiscoverQuery discoverQuery, final String configurationName, final String scope,
+    public SearchResultsRest convert(final DiscoverQuery discoverQuery, final String configurationName, final String scope,
                                            final List<SearchFilter> searchFilters, final Pageable page, final DiscoverResult searchResult) {
 
         SearchResultsRest resultsRest = new SearchResultsRest();
@@ -35,15 +38,25 @@ public class DiscoverResultConverter {
 
         addSearchResults(searchResult, resultsRest);
 
-        return null;
+        resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
+
+        return resultsRest;
     }
 
-    private <T> void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
+    private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
         for (DSpaceObject dspaceObject : CollectionUtils.emptyIfNull(searchResult.getDspaceObjects())) {
             SearchResultEntryRest resultEntry = new SearchResultEntryRest();
 
+            //Convert the DSpace Object to its REST model
             resultEntry.setDspaceObject(convertDSpaceObject(dspaceObject));
-            //TODO HIT HIGHLIGHTING
+
+            //Add hit highlighting for this DSO if present
+            DiscoverResult.DSpaceObjectHighlightResult highlightedResults = searchResult.getHighlightedResults(dspaceObject);
+            if(highlightedResults != null && MapUtils.isNotEmpty(highlightedResults.getHighlightResults())) {
+                for (Map.Entry<String, List<String>> metadataHighlight : highlightedResults.getHighlightResults().entrySet()) {
+                    resultEntry.addHitHighlights(metadataHighlight.getKey(), metadataHighlight.getValue());
+                }
+            }
 
             resultsRest.addSearchResult(resultEntry);
         }

@@ -60,12 +60,12 @@ public class DiscoveryRestController implements InitializingBean {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/objects")
-    public PagedResources<SearchResultsResource> getSearchObjects(@RequestParam(name = "query", required = false) String query,
+    public SearchResultsResource getSearchObjects(@RequestParam(name = "query", required = false) String query,
                                                    @RequestParam(name = "dsoType", required = false) String dsoType,
                                                    @RequestParam(name = "scope", required = false) String dsoScope,
                                                    @RequestParam(name = "configuration", required = false) String configurationName,
                                                    List<SearchFilter> searchFilters,
-                                                   Pageable page, PagedResourcesAssembler<SearchResultsRest> assembler) {
+                                                   Pageable page) {
         if(log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
                     + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
@@ -75,15 +75,10 @@ public class DiscoveryRestController implements InitializingBean {
         }
 
         //Get the Search results in JSON format
-        Page<SearchResultsRest> searchResultsRest = discoveryRestRepository.getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page);
-
-        //Get the self link to this method
-        Link selfLink = linkTo(methodOn(this.getClass()).getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page, assembler)).withSelfRel();
+        SearchResultsRest searchResultsRest = discoveryRestRepository.getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page);
 
         //Convert the Search JSON results to paginated HAL resources
-        PagedResources<SearchResultsResource> pagedResources = assembler.toResource(searchResultsRest, new SearchResultsResourceAssembler(), selfLink);
-
-        return pagedResources;
+        return new SearchResultsResource(searchResultsRest, page, utils);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets")
@@ -114,11 +109,4 @@ public class DiscoveryRestController implements InitializingBean {
         //TODO
     }
 
-    private class SearchResultsResourceAssembler implements ResourceAssembler<SearchResultsRest, SearchResultsResource> {
-
-        public SearchResultsResource toResource(final SearchResultsRest entity) {
-            return new SearchResultsResource(entity, utils);
-        }
-
-    }
 }
