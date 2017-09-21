@@ -35,9 +35,12 @@ public class RootRestResourceController {
 	@RequestMapping(method = RequestMethod.GET)
 	public ResourceSupport listDefinedEndpoint(HttpServletRequest request) {
 		ResourceSupport root = new ResourceSupport();
+		String restURL = getRestURL(request);
+
 		for (Link l : discoverableEndpointsService.getDiscoverableEndpoints()) {
-			root.add(new Link(getRestURL(request) + l.getHref(), l.getRel()));
+			root.add(new Link(restURL + l.getHref(), l.getRel()));
 		}
+
 		return root;
 	}
 
