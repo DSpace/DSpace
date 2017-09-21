@@ -2,56 +2,49 @@ package org.dspace.app.rest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.exception.InvalidRequestException;
-import org.dspace.app.rest.model.DiscoveryRest;
+import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.app.rest.repository.AbstractDSpaceRestRepository;
-import org.dspace.app.rest.utils.DiscoverQueryBuilder;
+import org.dspace.app.rest.repository.DiscoveryRestRepository;
 import org.dspace.app.rest.utils.ScopeResolver;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverQuery;
-import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchServiceException;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryConfigurationService;
+import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 /**
  * TODO TOM UNIT TEST
  */
 @RestController
-@RequestMapping("/api/"+ DiscoveryRest.CATEGORY)
-public class DiscoveryRestController extends AbstractDSpaceRestRepository implements InitializingBean {
+@RequestMapping("/api/"+ SearchResultsRest.CATEGORY)
+public class DiscoveryRestController implements InitializingBean {
 
     private static final Logger log = Logger.getLogger(ScopeResolver.class);
 
     @Autowired
-    DiscoverableEndpointsService discoverableEndpointsService;
+    protected Utils utils;
 
     @Autowired
-    private DiscoveryConfigurationService searchConfigurationService;
+    private DiscoverableEndpointsService discoverableEndpointsService;
 
     @Autowired
-    private SearchService searchService;
-
-    @Autowired
-    private ScopeResolver scopeResolver;
-
-    @Autowired
-    private DiscoverQueryBuilder queryBuilder;
+    private DiscoveryRestRepository discoveryRestRepository;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        discoverableEndpointsService.register(this, Arrays.asList(new Link("/api/"+ DiscoveryRest.CATEGORY, DiscoveryRest.CATEGORY)));
+        discoverableEndpointsService.register(this, Arrays.asList(new Link("/api/"+ SearchResultsRest.CATEGORY, SearchResultsRest.CATEGORY)));
     }
 
 
@@ -63,24 +56,16 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository implem
                     + " and configuration name " + StringUtils.trimToEmpty(configurationName));
         }
 
-        Context context = obtainContext();
-
-        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
-        DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
-
-        //TODO Call DiscoveryConfigurationConverter on configuration to convert this API model to the REST model
-
-        //TODO Return REST model
-        //TODO set "hasMore" property on facets
+        discoveryRestRepository.getSearchConfiguration(dsoScope, configurationName);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search/objects")
-    public void getSearchObjects(@RequestParam(name = "query", required = false) String query,
-                                 @RequestParam(name = "dsoType", required = false) String dsoType,
-                                 @RequestParam(name = "scope", required = false) String dsoScope,
-                                 @RequestParam(name = "configuration", required = false) String configurationName,
-                                 List<SearchFilter> searchFilters,
-                                 Pageable page) {
+    public PagedResources<SearchResultsResource> getSearchObjects(@RequestParam(name = "query", required = false) String query,
+                                                   @RequestParam(name = "dsoType", required = false) String dsoType,
+                                                   @RequestParam(name = "scope", required = false) String dsoScope,
+                                                   @RequestParam(name = "configuration", required = false) String configurationName,
+                                                   List<SearchFilter> searchFilters,
+                                                   Pageable page, PagedResourcesAssembler<SearchResultsRest> assembler) {
         if(log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
                     + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
@@ -89,24 +74,16 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository implem
             //TODO add filters and page info
         }
 
-        Context context = obtainContext();
+        //Get the Search results in JSON format
+        Page<SearchResultsRest> searchResultsRest = discoveryRestRepository.getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page);
 
-        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
-        DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
+        //Get the self link to this method
+        Link selfLink = linkTo(methodOn(this.getClass()).getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page, assembler)).withSelfRel();
 
-        try {
-            DiscoverQuery discoverQuery = queryBuilder.buildQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page);
-            DiscoverResult searchResult = searchService.search(context, scopeObject, discoverQuery);
+        //Convert the Search JSON results to paginated HAL resources
+        PagedResources<SearchResultsResource> pagedResources = assembler.toResource(searchResultsRest, new SearchResultsResourceAssembler(), selfLink);
 
-        } catch (InvalidRequestException e) {
-            log.warn("Received an invalid request", e);
-            //TODO TOM handle invalid request
-        } catch (SearchServiceException e) {
-            log.error("Error while searching with Discovery", e);
-            //TODO TOM handle search exception
-        }
-
-        //TODO convert search result to DSO list
+        return pagedResources;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets")
@@ -117,15 +94,7 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository implem
                     + " and configuration name " + StringUtils.trimToEmpty(configurationName));
         }
 
-        //TODO
-        Context context = obtainContext();
-
-        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
-        DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
-
-        //TODO Call DiscoveryConfigurationConverter on configuration to convert this API model to the REST model
-
-        //TODO Return REST model
+        discoveryRestRepository.getFacetsConfiguration(dsoScope, configurationName);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets/{name}")
@@ -143,5 +112,13 @@ public class DiscoveryRestController extends AbstractDSpaceRestRepository implem
         }
 
         //TODO
+    }
+
+    private class SearchResultsResourceAssembler implements ResourceAssembler<SearchResultsRest, SearchResultsResource> {
+
+        public SearchResultsResource toResource(final SearchResultsRest entity) {
+            return new SearchResultsResource(entity, utils);
+        }
+
     }
 }

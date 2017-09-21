@@ -8,6 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.SiteRest;
+import org.dspace.content.Site;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,5 +34,10 @@ public class SiteConverter
 	@Override
 	protected SiteRest newInstance() {
 		return new SiteRest();
+	}
+
+	@Override
+	protected Class<Site> getModelClass() {
+		return Site.class;
 	}
 }
