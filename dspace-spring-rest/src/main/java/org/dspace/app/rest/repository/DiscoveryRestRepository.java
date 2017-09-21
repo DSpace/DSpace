@@ -59,7 +59,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         //TODO set "hasMore" property on facets
     }
 
-    public Page<SearchResultsRest> getSearchObjects(final String query, final String dsoType, final String dsoScope, final String configurationName, final List<SearchFilter> searchFilters, final Pageable page) {
+    public SearchResultsRest getSearchObjects(final String query, final String dsoType, final String dsoScope, final String configurationName, final List<SearchFilter> searchFilters, final Pageable page) {
         Context context = obtainContext();
 
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
@@ -69,7 +69,7 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DiscoverQuery discoverQuery = null;
 
         try {
-            DiscoverQuery discoverQuery = queryBuilder.buildQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page);
+            discoverQuery = queryBuilder.buildQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page);
             searchResult = searchService.search(context, scopeObject, discoverQuery);
 
         } catch (InvalidRequestException e) {
@@ -80,7 +80,6 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             //TODO TOM handle search exception
         }
 
-        //TODO convert search result to DSO list
         return discoverResultConverter.convert(discoverQuery, configurationName, dsoScope, searchFilters, page, searchResult);
     }
 

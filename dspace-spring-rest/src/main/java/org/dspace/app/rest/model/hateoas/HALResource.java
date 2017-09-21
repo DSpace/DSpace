@@ -21,7 +21,7 @@ public abstract class HALResource extends ResourceSupport {
         return embedded;
     }
 
-    public void embedResource(String relationship, ResourceSupport resource) {
+    public void embedResource(String relationship, Object resource) {
         embedded.put(relationship, resource);
     }
 
