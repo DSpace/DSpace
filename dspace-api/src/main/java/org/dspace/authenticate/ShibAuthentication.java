@@ -7,36 +7,40 @@
  */
 package org.dspace.authenticate;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authorize.AuthorizeException;
 
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.MetadataFieldService;
-import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.dspace.eperson.service.EPersonService;
-import org.dspace.eperson.service.GroupService;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * Shibboleth authentication for DSpace
@@ -68,20 +72,14 @@ public class ShibAuthentication implements AuthenticationMethod
 	private static Logger log = Logger.getLogger(ShibAuthentication.class);
 
 	/** Additional metadata mappings **/
-	protected Map<String,String> metadataHeaderMap = null;
+	private static Map<String,String> metadataHeaderMap = null;
 
 	/** Maximum length for eperson metadata fields **/
-    protected final int NAME_MAX_SIZE = 64;
-    protected final int PHONE_MAX_SIZE = 32;
+	private static final int NAME_MAX_SIZE = 64;
+	private static final int PHONE_MAX_SIZE = 32;
 
 	/** Maximum length for eperson additional metadata fields **/
-    protected final int METADATA_MAX_SIZE = 1024;
-
-    protected EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
-    protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
-    protected MetadataSchemaService metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
-    protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
+	private static final int METADATA_MAX_SIZE = 1024;
 
 
 	/**
@@ -159,10 +157,8 @@ public class ShibAuthentication implements AuthenticationMethod
 	 *         <br>
 	 *         NO_SUCH_USER - user not found using this method. <br>
 	 *         BAD_ARGS - user/pw not appropriate for this method
-         * @throws SQLException if database error
 	 */
-	@Override
-    public int authenticate(Context context, String username, String password,
+	public int authenticate(Context context, String username, String password,
 			String realm, HttpServletRequest request) throws SQLException {
 
 		// Check if sword compatibility is allowed, and if so see if we can
@@ -171,7 +167,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		// sword. This allows this compatibility without installing the password-based
 		// authentication method which has side effects such as allowing users to login
 		// with a username and password from the webui.
-		boolean swordCompatibility = configurationService.getBooleanProperty("authentication-shibboleth.sword.compatibility", true);
+		boolean swordCompatibility = ConfigurationManager.getBooleanProperty("authentication-shibboleth","sword.compatibility", true);
 		if ( swordCompatibility &&
 				username != null && username.length() > 0 &&
 				password != null && password.length() > 0 ) {
@@ -184,7 +180,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		}
 
 		// Initialize the additional EPerson metadata.
-		initialize(context);
+        initialize(context);
 
 		// Log all headers received if debugging is turned on. This is enormously
 		// helpful when debugging shibboleth related problems.
@@ -207,7 +203,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		}
 
 		// Should we auto register new users.
-		boolean autoRegister = configurationService.getBooleanProperty("authentication-shibboleth.autoregister", true);
+		boolean autoRegister = ConfigurationManager.getBooleanProperty("authentication-shibboleth","autoregister", true);
 
 		// Four steps to authenticate a user
 		try {
@@ -227,7 +223,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			// Step 4: Log the user in.
 			context.setCurrentUser(eperson);
 			request.getSession().setAttribute("shib.authenticated", true);
-			AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
+			AuthenticationManager.initEPerson(context, request, eperson);
 
 			log.info(eperson.getEmail()+" has been authenticated via shibboleth.");
 			return AuthenticationMethod.SUCCESS;
@@ -267,7 +263,7 @@ public class ShibAuthentication implements AuthenticationMethod
      * 
      * The values extracted (a user may have multiple roles) will be used to look
      * up which groups to place the user into. The groups are defined as
-     * {@code authentication.shib.role.<role-name>} which is a comma separated list of
+     * "authentication.shib.role.<role-name>" which is a comma separated list of
      * DSpace groups. 
      * 
      * @param context
@@ -280,34 +276,29 @@ public class ShibAuthentication implements AuthenticationMethod
      * @return array of EPerson-group IDs, possibly 0-length, but never
      *         <code>null</code>.
      */
-	@Override
-    public List<Group> getSpecialGroups(Context context, HttpServletRequest request)
+	public int[] getSpecialGroups(Context context, HttpServletRequest request)
 	{
 		try {
 			// User has not successfuly authenticated via shibboleth.
 			if ( request == null || 
 					context.getCurrentUser() == null || 
 					request.getSession().getAttribute("shib.authenticated") == null ) {
-				return ListUtils.EMPTY_LIST;
+				return new int[0];
 			}
 
 			// If we have already calculated the special groups then return them.
 			if (request.getSession().getAttribute("shib.specialgroup") != null)
 			{
 				log.debug("Returning cached special groups.");
-                List<UUID> sessionGroupIds = (List<UUID>) request.getSession().getAttribute("shib.specialgroup");
-                List<Group> result = new ArrayList<>();
-                for (UUID uuid : sessionGroupIds) {
-                    result.add(groupService.find(context, uuid));
-                }
-                return result;
+				return (int[]) 
+				request.getSession().getAttribute("shib.specialgroup");
 			}
 
 			log.debug("Starting to determine special groups");
-			String[] defaultRoles = configurationService.getArrayProperty("authentication-shibboleth.default-roles");
-			String roleHeader = configurationService.getProperty("authentication-shibboleth.role-header");
-			boolean ignoreScope = configurationService.getBooleanProperty("authentication-shibboleth.role-header.ignore-scope", true);
-			boolean ignoreValue = configurationService.getBooleanProperty("authentication-shibboleth.role-header.ignore-value", false);
+			String defaultRoles = ConfigurationManager.getProperty("authentication-shibboleth","default-roles");
+			String roleHeader = ConfigurationManager.getProperty("authentication-shibboleth","role-header");
+			boolean ignoreScope = ConfigurationManager.getBooleanProperty("authentication-shibboleth","role-header.ignore-scope", true);
+			boolean ignoreValue = ConfigurationManager.getBooleanProperty("authentication-shibboleth","role-header.ignore-value", false);
 
 			if (ignoreScope && ignoreValue) {
 				throw new IllegalStateException("Both config parameters for ignoring an roll attributes scope and value are turned on, this is not a permissable configuration. (Note: ignore-scope defaults to true) The configuration parameters are: 'authentication.shib.role-header.ignore-scope' and 'authentication.shib.role-header.ignore-value'");
@@ -317,14 +308,14 @@ public class ShibAuthentication implements AuthenticationMethod
 			List<String> affiliations = findMultipleAttributes(request, roleHeader);
 			if (affiliations == null) {
 				if (defaultRoles != null)
-					affiliations = Arrays.asList(defaultRoles);
-				log.debug("Failed to find Shibboleth role header, '"+roleHeader+"', falling back to the default roles: '"+ StringUtils.join(defaultRoles, ",") + "'");
+					affiliations = Arrays.asList(defaultRoles.split(","));
+				log.debug("Failed to find Shibboleth role header, '"+roleHeader+"', falling back to the default roles: '"+defaultRoles+"'");
 			} else {
 				log.debug("Found Shibboleth role header: '"+roleHeader+"' = '"+affiliations+"'");
 			}
 
 			// Loop through each affiliation
-			Set<Group> groups = new HashSet<>();
+			Set<Integer> groups = new HashSet<Integer>();
 			if (affiliations != null) {
 				for ( String affiliation : affiliations) {
 					// If we ignore the affiliation's scope then strip the scope if it exists.
@@ -343,28 +334,29 @@ public class ShibAuthentication implements AuthenticationMethod
 					} 
 
 					// Get the group names
-					String[] groupNames = configurationService.getArrayProperty("authentication-shibboleth.role." + affiliation);
-					if (groupNames == null || groupNames.length == 0) {
-						groupNames = configurationService.getArrayProperty("authentication-shibboleth.role." + affiliation.toLowerCase());
+					String groupNames = ConfigurationManager.getProperty("authentication-shibboleth","role." + affiliation);
+					if (groupNames == null || groupNames.trim().length() == 0) {
+						groupNames = ConfigurationManager.getProperty("authentication-shibboleth","role." + affiliation.toLowerCase());
 					}
 
 					if (groupNames == null) {
 						log.debug("Unable to find role mapping for the value, '"+affiliation+"', there should be a mapping in config/modules/authentication-shibboleth.cfg:  role."+affiliation+" = <some group name>");
 						continue;
 					} else {
-						log.debug("Mapping role affiliation to DSpace group: '"+ StringUtils.join(groupNames, ",") +"'");
+						log.debug("Mapping role affiliation to DSpace group: '"+groupNames+"'");
 					}
 
 					// Add each group to the list.
-					for (int i = 0; i < groupNames.length; i++) {
+					String[] names = groupNames.split(",");
+					for (int i = 0; i < names.length; i++) {
 						try {
-							Group group = groupService.findByName(context,groupNames[i].trim());
+							Group group = Group.findByName(context,names[i].trim());
 							if (group != null)
-								groups.add(group);
+								groups.add(group.getID());
 							else 
-								log.debug("Unable to find group: '"+groupNames[i].trim()+"'");
+								log.debug("Unable to find group: '"+names[i].trim()+"'");
 						} catch (SQLException sqle) {
-							log.error("Exception thrown while trying to lookup affiliation role for group name: '"+groupNames[i].trim()+"'",sqle);
+							log.error("Exception thrown while trying to lookup affiliation role for group name: '"+names[i].trim()+"'",sqle);
 						}
 					} // for each groupNames
 				} // foreach affiliations
@@ -373,20 +365,21 @@ public class ShibAuthentication implements AuthenticationMethod
 
 			log.info("Added current EPerson to special groups: "+groups);
 
-            List<UUID> groupIds = new ArrayList<>();
-            for(Group group : groups)
-            {
-                groupIds.add(group.getID());
-            }
+			// Convert from a Java Set to primitive int array
+			int groupIds[] = new int[groups.size()];
+			Iterator<Integer> it = groups.iterator();
+			for (int i = 0; it.hasNext(); i++) {
+				groupIds[i] = it.next();
+			}
 
 			// Cache the special groups, so we don't have to recalculate them again
 			// for this session.
 			request.getSession().setAttribute("shib.specialgroup", groupIds);
 
-			return new ArrayList<>(groups);
+			return groupIds;
 		} catch (Throwable t) {
 			log.error("Unable to validate any sepcial groups this user may belong too because of an exception.",t);
-			return ListUtils.EMPTY_LIST;
+			return new int[0];
 		}
 	}
 
@@ -401,11 +394,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	 *            HTTP request, in case anything in that is used to decide
 	 * @param email
 	 *            e-mail address of user attempting to register
-         * @throws SQLException if database error
 	 * 
 	 */
-	@Override
-    public boolean allowSetPassword(Context context,
+	public boolean allowSetPassword(Context context,
 			HttpServletRequest request, String email) throws SQLException {
 		// don't use password at all
 		return false;
@@ -420,8 +411,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * 
 	 * @return true if this method uses implicit authentication.
 	 */
-	@Override
-    public boolean isImplicit()
+	public boolean isImplicit()
 	{
 		return false;
 	}
@@ -436,11 +426,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	 *            HTTP request, in case anything in that is used to decide
 	 * @param username
 	 *            e-mail address of user attempting to register
-         * @throws SQLException if database error
 	 * 
 	 */
-	@Override
-    public boolean canSelfRegister(Context context, HttpServletRequest request,
+	public boolean canSelfRegister(Context context, HttpServletRequest request,
 			String username) throws SQLException {
 
 		// Shibboleth will auto create accounts if configured to do so, but that is not
@@ -459,11 +447,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param eperson
 	 *            newly created EPerson record - email + information from the
 	 *            registration form will have been filled out.
-         * @throws SQLException if database error
 	 * 
 	 */
-	@Override
-    public void initEPerson(Context context, HttpServletRequest request,
+	public void initEPerson(Context context, HttpServletRequest request,
 			EPerson eperson) throws SQLException {
 		// We don't do anything because all our work is done authenticate and special groups.
 	}
@@ -485,18 +471,17 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * 
 	 * @return fully-qualified URL or null
 	 */
-	@Override
-    public String loginPageURL(Context context, HttpServletRequest request,
+	public String loginPageURL(Context context, HttpServletRequest request,
 			HttpServletResponse response)
 	{	
 		// If this server is configured for lazy sessions then use this to
 		// login, otherwise default to the protected shibboleth url.
 
-		boolean lazySession = configurationService.getBooleanProperty("authentication-shibboleth.lazysession", false);
+		boolean lazySession = ConfigurationManager.getBooleanProperty("authentication-shibboleth","lazysession", false);
 
 		if ( lazySession ) {
-			String shibURL = configurationService.getProperty("authentication-shibboleth.lazysession.loginurl");
-			boolean forceHTTPS = configurationService.getBooleanProperty("authentication-shibboleth.lazysession.secure",true);
+			String shibURL = ConfigurationManager.getProperty("authentication-shibboleth","lazysession.loginurl");
+			boolean forceHTTPS = ConfigurationManager.getBooleanProperty("authentication-shibboleth","lazysession.secure",true);
 
 			// Shibboleth authentication initiator 
 			if (shibURL == null || shibURL.length() == 0)
@@ -549,8 +534,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * 
 	 * @return title text.
 	 */
-	@Override
-    public String loginPageTitle(Context context)
+	public String loginPageTitle(Context context)
 	{
 		return "org.dspace.authenticate.ShibAuthentication.title";
 	}
@@ -582,14 +566,12 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param context The DSpace database context
 	 * @param request The current HTTP Request
 	 * @return The EPerson identified or null.
-         * @throws SQLException if database error
-         * @throws AuthorizeException if authorization error
 	 */
-    protected EPerson findEPerson(Context context, HttpServletRequest request) throws SQLException, AuthorizeException {
+	private EPerson findEPerson(Context context, HttpServletRequest request) throws SQLException, AuthorizeException {
 
-		boolean isUsingTomcatUser = configurationService.getBooleanProperty("authentication-shibboleth.email-use-tomcat-remote-user");
-		String netidHeader = configurationService.getProperty("authentication-shibboleth.netid-header");
-		String emailHeader = configurationService.getProperty("authentication-shibboleth.email-header");
+		boolean isUsingTomcatUser = ConfigurationManager.getBooleanProperty("authentication-shibboleth","email-use-tomcat-remote-user");
+		String netidHeader = ConfigurationManager.getProperty("authentication-shibboleth","netid-header");
+		String emailHeader = ConfigurationManager.getProperty("authentication-shibboleth","email-header");
 
 		EPerson eperson = null;
 		boolean foundNetID = false;
@@ -603,7 +585,7 @@ public class ShibAuthentication implements AuthenticationMethod
 
 			if (netid != null) {
 				foundNetID = true;
-				eperson = ePersonService.findByNetid(context, netid);
+				eperson = EPerson.findByNetid(context, netid);
 
 				if (eperson == null)
 					log.info("Unable to identify EPerson based upon Shibboleth netid header: '"+netidHeader+"'='"+netid+"'.");
@@ -619,7 +601,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			if (email != null) {
 				foundEmail = true;
 				email = email.toLowerCase();
-				eperson = ePersonService.findByEmail(context, email);
+				eperson = EPerson.findByEmail(context, email);
 
 				if (eperson == null)
 					log.info("Unable to identify EPerson based upon Shibboleth email header: '"+emailHeader+"'='"+email+"'.");
@@ -641,7 +623,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			if (email != null) {
 				foundRemoteUser = true;
 				email = email.toLowerCase();
-				eperson = ePersonService.findByEmail(context, email);
+				eperson = EPerson.findByEmail(context, email);
 
 				if (eperson == null)
 					log.info("Unable to identify EPerson based upon Tomcat's remote user: '"+email+"'.");
@@ -682,16 +664,14 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param context The current DSpace database context
 	 * @param request The current HTTP Request
 	 * @return A new eperson object or null if unable to create a new eperson.
-         * @throws SQLException if database error
-	 * @throws AuthorizeException if authorization error
 	 */
-    protected EPerson registerNewEPerson(Context context, HttpServletRequest request) throws SQLException, AuthorizeException {
+	private EPerson registerNewEPerson(Context context, HttpServletRequest request) throws SQLException, AuthorizeException {
 
 		// Header names
-		String netidHeader = configurationService.getProperty("authentication-shibboleth.netid-header");
-		String emailHeader = configurationService.getProperty("authentication-shibboleth.email-header");
-		String fnameHeader = configurationService.getProperty("authentication-shibboleth.firstname-header");
-		String lnameHeader = configurationService.getProperty("authentication-shibboleth.lastname-header");
+		String netidHeader = ConfigurationManager.getProperty("authentication-shibboleth","netid-header");
+		String emailHeader = ConfigurationManager.getProperty("authentication-shibboleth","email-header");
+		String fnameHeader = ConfigurationManager.getProperty("authentication-shibboleth","firstname-header");
+		String lnameHeader = ConfigurationManager.getProperty("authentication-shibboleth","lastname-header");
 
 		// Header values
 		String netid = findSingleAttribute(request,netidHeader);
@@ -724,22 +704,22 @@ public class ShibAuthentication implements AuthenticationMethod
 
 		// Turn off authorizations to create a new user
 		context.turnOffAuthorisationSystem();
-		EPerson eperson = ePersonService.create(context);
+		EPerson eperson = EPerson.create(context);
 
 		// Set the minimum attributes for the new eperson
 		if (netid != null)
 			eperson.setNetid(netid);
 		eperson.setEmail(email.toLowerCase());
 		if ( fname != null )
-			eperson.setFirstName(context, fname);
+			eperson.setFirstName(fname);
 		if ( lname != null )
-			eperson.setLastName(context, lname);
+			eperson.setLastName(lname);
 		eperson.setCanLogIn(true);
 
 		// Commit the new eperson
-		AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
-        ePersonService.update(context, eperson);
-		context.dispatchEvents();
+		AuthenticationManager.initEPerson(context, request, eperson);
+		eperson.update();
+		context.commit();
 
 		// Turn authorizations back on.
 		context.restoreAuthSystemState();
@@ -773,22 +753,20 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param context The current DSpace database context
 	 * @param request The current HTTP Request
 	 * @param eperson The eperson object to update.
-         * @throws SQLException if database error
-	 * @throws AuthorizeException if authorization error
 	 */
-    protected void updateEPerson(Context context, HttpServletRequest request, EPerson eperson) throws SQLException, AuthorizeException {
+	private void updateEPerson(Context context, HttpServletRequest request, EPerson eperson) throws SQLException, AuthorizeException {
 
 		// Header names & values
-		String netidHeader = configurationService.getProperty("authentication-shibboleth.netid-header");
-		String emailHeader = configurationService.getProperty("authentication-shibboleth.email-header");
-		String fnameHeader = configurationService.getProperty("authentication-shibboleth.firstname-header");
-		String lnameHeader = configurationService.getProperty("authentication-shibboleth.lastname-header");
+		String netidHeader = ConfigurationManager.getProperty("authentication-shibboleth","netid-header");
+		String emailHeader = ConfigurationManager.getProperty("authentication-shibboleth","email-header");
+		String fnameHeader = ConfigurationManager.getProperty("authentication-shibboleth","firstname-header");
+		String lnameHeader = ConfigurationManager.getProperty("authentication-shibboleth","lastname-header");
 
 		String netid = findSingleAttribute(request,netidHeader);
 		String email = findSingleAttribute(request,emailHeader);
 		String fname = findSingleAttribute(request,fnameHeader);
 		String lname = findSingleAttribute(request,lnameHeader);
-
+		
 		// Truncate values of parameters that are too big.
 		if (fname != null && fname.length() > NAME_MAX_SIZE) {
 			log.warn("Truncating eperson's first name because it is longer than "+NAME_MAX_SIZE+": '"+fname+"'");
@@ -811,9 +789,9 @@ public class ShibAuthentication implements AuthenticationMethod
 			// The email could have changed if using netid based lookup.
 			eperson.setEmail(email.toLowerCase());
 		if (fname != null)
-			eperson.setFirstName(context, fname);
+			eperson.setFirstName(fname);
 		if (lname != null)
-			eperson.setLastName(context, lname);
+			eperson.setLastName(lname);
 
 		if (log.isDebugEnabled()) {
 			String message = "Updated the eperson's minimal metadata: \n";
@@ -841,11 +819,11 @@ public class ShibAuthentication implements AuthenticationMethod
 				value = value.substring(0,METADATA_MAX_SIZE);
 			}
 
-            ePersonService.setMetadata(context, eperson, field, value);
+			eperson.setMetadata(field, value);
 			log.debug("Updated the eperson's '"+field+"' metadata using header: '"+header+"' = '"+value+"'.");
 		}
-        ePersonService.update(context, eperson);
-        context.dispatchEvents();
+		eperson.update();
+		context.commit();
 		context.restoreAuthSystemState();
 	}
 
@@ -865,14 +843,17 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param password The password
 	 * @param request The HTTP Request
 	 * @return A valid DSpace Authentication Method status code.
-         * @throws SQLException if database error
 	 */
 	protected int swordCompatibility(Context context, String username, String password, HttpServletRequest request) throws SQLException {
 
 		EPerson eperson = null;
 
 		log.debug("Shibboleth Sword compatibility activated.");
-        eperson = ePersonService.findByEmail(context, username.toLowerCase());
+		try {
+			eperson = EPerson.findByEmail(context, username.toLowerCase());
+		} catch (AuthorizeException ae) {
+			// ignore exception, treat it as lookup failure.
+		}
 
 		if (eperson == null) {
 			// lookup failed.
@@ -888,9 +869,9 @@ public class ShibAuthentication implements AuthenticationMethod
 			return CERT_REQUIRED;
 		}
 
-		else if (ePersonService.checkPassword(context, eperson, password)) {
+		else if (eperson.checkPassword(password)) {
 			// Password matched
-			AuthenticateServiceFactory.getInstance().getAuthenticationService().initEPerson(context, request, eperson);
+			AuthenticationManager.initEPerson(context, request, eperson);
 			context.setCurrentUser(eperson);
 			log.info(eperson.getEmail()+" has been authenticated via shibboleth using password-based sword compatibility mode.");
 			return SUCCESS;
@@ -913,10 +894,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * the field will be automatically created.
 	 * 
 	 * It is safe to call this methods multiple times.
-         * @param context context
-         * @throws SQLException if database error
+     * @param context
 	 */
-    protected synchronized void initialize(Context context) throws SQLException {
+    private synchronized static void initialize(Context context) throws SQLException {
 
 		if (metadataHeaderMap != null)
 			return;
@@ -924,21 +904,22 @@ public class ShibAuthentication implements AuthenticationMethod
 
 		HashMap<String, String> map = new HashMap<String,String>();
 
-		String[] mappingString = configurationService.getArrayProperty("authentication-shibboleth.eperson.metadata");
-		boolean autoCreate = configurationService.getBooleanProperty("authentication-shibboleth.eperson.metadata.autocreate", true);
+		String mappingString = ConfigurationManager.getProperty("authentication-shibboleth","eperson.metadata");
+		boolean autoCreate = ConfigurationManager.getBooleanProperty("authentication-shibboleth","eperson.metadata.autocreate", true);
 
 		// Bail out if not set, returning an empty map.
-		if (mappingString == null || mappingString.length == 0) {
+		if (mappingString == null || mappingString.trim().length() == 0) {
 			log.debug("No additional eperson metadata mapping found: authentication.shib.eperson.metadata");
 
 			metadataHeaderMap = map;
 			return;
 		}
 
-		log.debug("Loading additional eperson metadata from: 'authentication.shib.eperson.metadata' = '"+ StringUtils.join(mappingString, ",") +"'");
+		log.debug("Loading additional eperson metadata from: 'authentication.shib.eperson.metadata' = '"+mappingString+"'");
 
 
-		for (String metadataString : mappingString) {
+		String[] metadataStringList =  mappingString.split(",");
+		for (String metadataString : metadataStringList) {
 			metadataString = metadataString.trim();
 
 			String[] metadataParts = metadataString.split("=>");
@@ -951,10 +932,10 @@ public class ShibAuthentication implements AuthenticationMethod
 			String header = metadataParts[0].trim();
 			String name = metadataParts[1].trim().toLowerCase();
 
-			boolean valid = checkIfEpersonMetadataFieldExists(context, name);
+            boolean valid = checkIfEpersonMetadataFieldExists(name,context);
 
 			if ( ! valid && autoCreate) {
-				valid = autoCreateEpersonMetadataField(context, name);
+                valid = autoCreateEpersonMetadataField(name,context);
 			}
 
 			if (valid) {
@@ -976,11 +957,10 @@ public class ShibAuthentication implements AuthenticationMethod
      * Check if a MetadataField for an eperson is available.
 	 * 
 	 * @param metadataName The name of the metadata field.
-         * @param context context
+     * @param context
 	 * @return True if a valid metadata field, otherwise false.
-         * @throws SQLException if database error
 	 */
-	protected synchronized boolean checkIfEpersonMetadataFieldExists(Context context, String metadataName) throws SQLException {
+    private static synchronized boolean checkIfEpersonMetadataFieldExists(String metadataName, Context context) throws SQLException {
 
 		if (metadataName == null)
 			return false;
@@ -989,22 +969,36 @@ public class ShibAuthentication implements AuthenticationMethod
 			// The phone is a predefined field
 			return true;
 
-        MetadataField metadataField = metadataFieldService.findByElement(context, "eperson", metadataName, null);
-        return metadataField != null;
+        MetadataSchema schemaObj = MetadataSchema.find(context, "eperson");
+
+        if (schemaObj == null)
+        {
+            log.error("Schema eperson is not registered and does not exist.");
+        } else
+        {
+            MetadataField eperson = MetadataField.findByElement(context, schemaObj.getSchemaID(), metadataName, null);
+
+            if ( eperson!=null) {
+                return true;
+				}
+            else {
+                log.error("Unable to find eperson named: '" + metadataName + "'");
+            }
+        }
+
+		return false;
 	}
 
 	/** Validate Postgres Column Names */
-    protected final String COLUMN_NAME_REGEX = "^[_A-Za-z0-9]+$";
+	private static final String COLUMN_NAME_REGEX = "^[_A-Za-z0-9]+$";
 	
 	/**
-         * Automatically create a new metadataField for an eperson
+     * Automattically create a new metadataField for an eperson
 	 * 
-         * @param context context
 	 * @param metadataName The name of the new metadata field.
 	 * @return True if successful, otherwise false.
-         * @throws SQLException if database error
 	 */
-    protected synchronized boolean autoCreateEpersonMetadataField(Context context, String metadataName) throws SQLException {
+    private static synchronized boolean autoCreateEpersonMetadataField(String metadataName, Context context) throws SQLException {
 
 		if (metadataName == null)
 			return false;
@@ -1016,22 +1010,34 @@ public class ShibAuthentication implements AuthenticationMethod
 		if ( ! metadataName.matches(COLUMN_NAME_REGEX))
 			return false;
 
-        MetadataSchema epersonSchema = metadataSchemaService.find(context, "eperson");
-        MetadataField metadataField = null;
-        try {
-            context.turnOffAuthorisationSystem();
-            metadataField = metadataFieldService.create(context, epersonSchema, metadataName, null, null);
-        } catch (AuthorizeException e) {
-            log.error(e.getMessage(), e);
-            return false;
-        } catch (NonUniqueMetadataException e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }finally {
-            context.restoreAuthSystemState();
+
+        MetadataSchema schemaObj = MetadataSchema.find(context, "eperson");
+
+        if (schemaObj == null)
+        {
+            log.error("Schema eperson is not registered and does not exist.");
+        } else {
+            MetadataField metadataField = new MetadataField(schemaObj, metadataName, null, null);
+		try {
+                metadataField.create(context);
+            } catch (IOException e) {
+                log.error("Unable to auto-create the eperson MetadataField with MetadataName " + metadataName ,e);
+                return false;
+            } catch (AuthorizeException e) {
+                log.error("Unauthorized to auto-create the eperson MetadataField with MetadataName " + metadataName + " MetadataField", e);
+                return false;
+            } catch (NonUniqueMetadataException e) {
+                log.error("The eperson MetadataField with MetadataName " + metadataName +" already exists",e);
+                return false;
+            }
+
+
+            log.info("Auto created the eperson metadataField: '" + metadataName + "'");
+			return true;
+
         }
-        return metadataField != null;
-    }
+			return false;
+	}
 
 
 	/**
@@ -1046,7 +1052,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param name The name of the attribute or header
 	 * @return The value of the attribute or header requested, or null if none found.
 	 */
-    protected String findAttribute(HttpServletRequest request, String name) {
+	private String findAttribute(HttpServletRequest request, String name) {
 		if ( name == null ) {
 			return null;
 		}
@@ -1065,9 +1071,19 @@ public class ShibAuthentication implements AuthenticationMethod
 		if (StringUtils.isEmpty(value))
 			value = request.getHeader(name.toUpperCase());
                 
+		// <J.R> - 7. 9. 2017
+        // Added extra check for blank value of attribute.
+        // In case that value is Empty, it should not be returned, return null instead.
+        if (StringUtils.isEmpty(value))
+        {
+        	log.debug("ShibAuthentication - this value: " + name + " has value " + value + " == is empty!");
+       	 	return null;
+        }
+        
                 boolean reconvertAttributes = 
-                		configurationService.getBooleanProperty(
-                            "authentication-shibboleth.reconvert.attributes",
+                        ConfigurationManager.getBooleanProperty(
+                            "authentication-shibboleth",
+                            "reconvert.attributes",
                             false);
                 
                 if (!StringUtils.isEmpty(value) && reconvertAttributes)
@@ -1099,7 +1115,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param name The name of the header
 	 * @return The value of the header requested, or null if none found.
 	 */
-    protected String findSingleAttribute(HttpServletRequest request, String name) {
+	private String findSingleAttribute(HttpServletRequest request, String name) {
 		if ( name == null) {
 			return null;
 		}
@@ -1144,7 +1160,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param name The name of the attribute
 	 * @return The list of values found, or null if none found.
 	 */
-    protected List<String> findMultipleAttributes(HttpServletRequest request, String name) {
+	private List<String> findMultipleAttributes(HttpServletRequest request, String name) {
 		String values = findAttribute(request, name);
 
 		if (values == null)
