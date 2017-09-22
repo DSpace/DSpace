@@ -21,7 +21,7 @@ public class RestProjectionFactory<T> implements MethodInterceptor {
     }
 
     public static <E> E createProjection(E wrapped, Class<?> projection) {
-        return (E) Enhancer.create(Item.class, new RestProjectionFactory(wrapped, projection));
+        return (E) Enhancer.create(wrapped.getClass(), new RestProjectionFactory(wrapped, projection));
     }
 
     public Object intercept(final Object o, final Method method, final Object[] objects, final MethodProxy methodProxy) throws Throwable {
