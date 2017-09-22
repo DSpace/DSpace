@@ -7,11 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.hateoas.SiteResource;
@@ -24,6 +19,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the repository responsible to manage Item Rest object
@@ -43,7 +43,7 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 	}
 
 	@Override
-	public SiteRest findOne(Context context, UUID id) {
+	public SiteRest findOne(Context context, UUID id, String projection) {
 		Site site = null;
 		try {
 			site = sitesv.find(context, id);
@@ -53,11 +53,11 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 		if (site == null) {
 			return null;
 		}
-		return converter.fromModel(site);
+		return converter.fromModel(utils.applyProjection(site, projection));
 	}
 
 	@Override
-	public Page<SiteRest> findAll(Context context, Pageable pageable) {
+	public Page<SiteRest> findAll(Context context, Pageable pageable, String projection) {
 		List<Site> sites = new ArrayList<Site>();
 		int total = 1;
 		try {
@@ -65,7 +65,9 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total).map(converter);
+		Page<SiteRest> page = new PageImpl<Site>(sites, pageable, total)
+				.map(object -> utils.applyProjection(object, projection))
+				.map(converter);
 		return page;
 	}
 	

@@ -7,14 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.app.rest.converter.BitstreamConverter;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
@@ -28,6 +20,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the repository responsible to manage Bitstream Rest object
@@ -47,7 +47,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 	}
 
 	@Override
-	public BitstreamRest findOne(Context context, UUID id) {
+	public BitstreamRest findOne(Context context, UUID id, String projection) {
 		Bitstream bit = null;
 		try {
 			bit = bs.find(context, id);
@@ -57,11 +57,11 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 		if (bit == null) {
 			return null;
 		}
-		return converter.fromModel(bit);
+		return converter.fromModel(utils.applyProjection(bit, projection));
 	}
 
 	@Override
-	public Page<BitstreamRest> findAll(Context context, Pageable pageable) {
+	public Page<BitstreamRest> findAll(Context context, Pageable pageable, String projection) {
 		List<Bitstream> bit = new ArrayList<Bitstream>();
 		Iterator<Bitstream> it = null;
 		int total = 0;
@@ -69,7 +69,7 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 			total = bs.countTotal(context);
 			it = bs.findAll(context, pageable.getPageSize(), pageable.getOffset());
 			while(it.hasNext()) {
-				bit.add(it.next());
+				bit.add(utils.applyProjection(it.next(), projection));
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);

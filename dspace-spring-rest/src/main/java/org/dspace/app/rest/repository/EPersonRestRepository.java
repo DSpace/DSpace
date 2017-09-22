@@ -7,10 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.hateoas.EPersonResource;
@@ -23,6 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the repository responsible to manage EPerson Rest object
@@ -39,7 +39,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 	EPersonConverter converter;
 	
 	@Override
-	public EPersonRest findOne(Context context, UUID id) {
+	public EPersonRest findOne(Context context, UUID id, String projection) {
 		EPerson eperson = null;
 		try {
 			eperson = es.find(context, id);
@@ -49,11 +49,11 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 		if (eperson == null) {
 			return null;
 		}
-		return converter.fromModel(eperson);
+		return converter.fromModel(utils.applyProjection(eperson, projection));
 	}
 
 	@Override
-	public Page<EPersonRest> findAll(Context context, Pageable pageable) {
+	public Page<EPersonRest> findAll(Context context, Pageable pageable, String projection) {
 		List<EPerson> epersons = null;
 		int total = 0;
 		try {
@@ -62,7 +62,9 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total).map(converter);
+		Page<EPersonRest> page = new PageImpl<EPerson>(epersons, pageable, total)
+				.map(object -> utils.applyProjection(object, projection))
+				.map(converter);
 		return page;
 	}
 	

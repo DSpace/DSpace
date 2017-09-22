@@ -7,16 +7,14 @@
  */
 package org.dspace.app.rest.utils;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-
-import java.util.List;
-
+import org.apache.commons.lang.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
+import org.dspace.app.rest.projection.RestProjectionFactory;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -25,8 +23,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 /**
  * Collection of utility methods
@@ -36,8 +39,26 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Utils {
+
 	@Autowired
 	ApplicationContext applicationContext;
+
+	@Autowired
+	private RepositoryRestConfiguration restConfiguration;
+
+	public <T> T applyProjection(T object, final String projectionName) {
+		if(StringUtils.isBlank(projectionName)) {
+			return object;
+		} else {
+			Class<?> projectionType = restConfiguration.getProjectionConfiguration().getProjectionType(object.getClass(), projectionName);
+
+			if(projectionType == null) {
+				return object;
+			} else {
+				return RestProjectionFactory.createProjection(object, projectionType);
+			}
+		}
+	}
 
 	public <T> Page<T> getPage(List<T> fullContents, Pageable pageable) {
 		int total = fullContents.size();

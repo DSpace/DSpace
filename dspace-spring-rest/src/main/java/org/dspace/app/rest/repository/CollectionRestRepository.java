@@ -7,11 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
@@ -24,6 +19,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the repository responsible to manage Item Rest object
@@ -44,7 +44,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 	}
 
 	@Override
-	public CollectionRest findOne(Context context, UUID id) {
+	public CollectionRest findOne(Context context, UUID id, String projection) {
 		Collection collection = null;
 		try {
 			collection = cs.find(context, id);
@@ -54,11 +54,11 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 		if (collection == null) {
 			return null;
 		}
-		return converter.fromModel(collection);
+		return converter.fromModel(utils.applyProjection(collection, projection));
 	}
 
 	@Override
-	public Page<CollectionRest> findAll(Context context, Pageable pageable) {
+	public Page<CollectionRest> findAll(Context context, Pageable pageable, String projection) {
 		List<Collection> it = null;
 		List<Collection> collections = new ArrayList<Collection>();
 		int total = 0;
@@ -66,7 +66,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 			total = cs.countTotal(context);
 			it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
 			for (Collection c: it) {
-				collections.add(c);
+				collections.add(utils.applyProjection(c, projection));
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);

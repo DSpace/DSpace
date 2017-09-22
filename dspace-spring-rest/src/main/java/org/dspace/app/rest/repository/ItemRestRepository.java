@@ -7,12 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
@@ -25,6 +19,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the repository responsible to manage Item Rest object
@@ -45,7 +45,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	}
 
 	@Override
-	public ItemRest findOne(Context context, UUID id) {
+	public ItemRest findOne(Context context, UUID id, String projection) {
 		Item item = null;
 		try {
 			item = is.find(context, id);
@@ -55,11 +55,11 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 		if (item == null) {
 			return null;
 		}
-		return converter.fromModel(item);
+		return converter.fromModel(utils.applyProjection(item, projection));
 	}
 
 	@Override
-	public Page<ItemRest> findAll(Context context, Pageable pageable) {
+	public Page<ItemRest> findAll(Context context, Pageable pageable, String projection) {
 		Iterator<Item> it = null;
 		List<Item> items = new ArrayList<Item>();
 		int total = 0;
@@ -73,7 +73,9 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<ItemRest> page = new PageImpl<Item>(items, pageable, total).map(converter);
+		Page<ItemRest> page = new PageImpl<Item>(items, pageable, total)
+				.map(object -> utils.applyProjection(object, projection))
+				.map(converter);
 		return page;
 	}
 	

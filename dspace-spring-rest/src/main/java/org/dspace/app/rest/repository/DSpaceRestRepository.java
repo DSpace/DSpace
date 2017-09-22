@@ -7,21 +7,15 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.io.Serializable;
-
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
-import org.dspace.services.RequestService;
-import org.dspace.services.model.Request;
-import org.dspace.utils.DSpace;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
+
+import java.io.Serializable;
 
 /**
  * This is the base class for any Rest Repository. It add a DSpaceContext to the
@@ -49,11 +43,15 @@ extends AbstractDSpaceRestRepository
 
 	@Override
 	public T findOne(ID id) {
-		Context context = obtainContext();
-		return findOne(context, id);
+		return findOne(id, null);
 	}
 
-	public abstract T findOne(Context context, ID id);
+	public T findOne(ID id, String projection) {
+		Context context = obtainContext();
+		return findOne(context, id, projection);
+	}
+
+	public abstract T findOne(Context context, ID id, String projection);
 
 	@Override
 	public boolean exists(ID id) {
@@ -108,11 +106,15 @@ extends AbstractDSpaceRestRepository
 
 	@Override
 	public Page<T> findAll(Pageable pageable) {
-		Context context = obtainContext();
-		return findAll(context, pageable);
+		return findAll(pageable, null);
 	}
 
-	public abstract Page<T> findAll(Context context, Pageable pageable);
+	public Page<T> findAll(Pageable pageable, String projection) {
+		Context context = obtainContext();
+		return findAll(context, pageable, projection);
+	}
+
+	public abstract Page<T> findAll(Context context, Pageable pageable, String projection);
 
 	public abstract Class<T> getDomainClass();
 

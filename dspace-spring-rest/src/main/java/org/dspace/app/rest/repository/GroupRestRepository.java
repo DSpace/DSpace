@@ -7,10 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.app.rest.converter.GroupConverter;
 import org.dspace.app.rest.model.GroupRest;
 import org.dspace.app.rest.model.hateoas.GroupResource;
@@ -23,6 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the repository responsible to manage Group Rest object
@@ -39,7 +39,7 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
 	GroupConverter converter;
 	
 	@Override
-	public GroupRest findOne(Context context, UUID id) {
+	public GroupRest findOne(Context context, UUID id, String projection) {
 		Group group = null;
 		try {
 			group = gs.find(context, id);
@@ -49,11 +49,11 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
 		if (group == null) {
 			return null;
 		}
-		return converter.fromModel(group);
+		return converter.fromModel(utils.applyProjection(group, projection));
 	}
 
 	@Override
-	public Page<GroupRest> findAll(Context context, Pageable pageable) {
+	public Page<GroupRest> findAll(Context context, Pageable pageable, String projection) {
 		List<Group> groups = null;
 		int total = 0;
 		try {
@@ -62,7 +62,9 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total).map(converter);
+		Page<GroupRest> page = new PageImpl<Group>(groups, pageable, total)
+				.map(object -> utils.applyProjection(object, projection))
+				.map(converter);
 		return page;
 	}
 	

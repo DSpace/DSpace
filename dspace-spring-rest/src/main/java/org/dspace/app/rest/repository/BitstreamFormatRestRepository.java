@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
@@ -21,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * This is the repository responsible to manage BitstreamFormat Rest object
@@ -39,7 +39,7 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 	}
 
 	@Override
-	public BitstreamFormatRest findOne(Context context, Integer id) {
+	public BitstreamFormatRest findOne(Context context, Integer id, String projection) {
 		BitstreamFormat bit = null;
 		try {
 			bit = bfs.find(context, id);
@@ -49,18 +49,20 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 		if (bit == null) {
 			return null;
 		}
-		return converter.fromModel(bit);
+		return converter.fromModel(utils.applyProjection(bit, projection));
 	}
 
 	@Override
-	public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
+	public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable, String projection) {
 		List<BitstreamFormat> bit = null;
 		try {
 			bit = bfs.findAll(context);
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<BitstreamFormatRest> page = utils.getPage(bit, pageable).map(converter);
+		Page<BitstreamFormatRest> page = utils.getPage(bit, pageable)
+				.map(object -> utils.applyProjection(object, projection))
+				.map(converter);
 		return page;
 	}
 

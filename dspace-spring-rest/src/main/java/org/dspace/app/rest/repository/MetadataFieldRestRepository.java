@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import org.dspace.app.rest.converter.MetadataFieldConverter;
 import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.hateoas.MetadataFieldResource;
@@ -21,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * This is the repository responsible to manage MetadataField Rest object
@@ -38,7 +38,7 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 	}
 
 	@Override
-	public MetadataFieldRest findOne(Context context, Integer id) {
+	public MetadataFieldRest findOne(Context context, Integer id, String projection) {
 		MetadataField metadataField = null;
 		try {
 			metadataField = metaFieldService.find(context, id);
@@ -48,18 +48,20 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 		if (metadataField == null) {
 			return null;
 		}
-		return converter.fromModel(metadataField);
+		return converter.fromModel(utils.applyProjection(metadataField, projection));
 	}
 
 	@Override
-	public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
+	public Page<MetadataFieldRest> findAll(Context context, Pageable pageable, String projection) {
 		List<MetadataField> metadataField = null;
 		try {
 			metadataField = metaFieldService.findAll(context);
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable).map(converter);
+		Page<MetadataFieldRest> page = utils.getPage(metadataField, pageable)
+				.map(object -> utils.applyProjection(object, projection))
+				.map(converter);
 		return page;
 	}
 

@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import org.dspace.app.rest.converter.MetadataSchemaConverter;
 import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.hateoas.MetadataSchemaResource;
@@ -21,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * This is the repository responsible to manage MetadataSchema Rest object
@@ -38,7 +38,7 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 	}
 
 	@Override
-	public MetadataSchemaRest findOne(Context context, Integer id) {
+	public MetadataSchemaRest findOne(Context context, Integer id, String projection) {
 		MetadataSchema metadataSchema = null;
 		try {
 			metadataSchema = metaScemaService.find(context, id);
@@ -48,18 +48,20 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 		if (metadataSchema == null) {
 			return null;
 		}
-		return converter.fromModel(metadataSchema);
+		return converter.fromModel(utils.applyProjection(metadataSchema, projection));
 	}
 
 	@Override
-	public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
+	public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable, String projection) {
 		List<MetadataSchema> metadataSchema = null;
 		try {
 			metadataSchema = metaScemaService.findAll(context);
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable).map(converter);
+		Page<MetadataSchemaRest> page = utils.getPage(metadataSchema, pageable)
+				.map(object -> utils.applyProjection(object, projection))
+				.map(converter);
 		return page;
 	}
 

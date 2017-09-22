@@ -7,18 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
@@ -41,11 +29,18 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * This is the main entry point of the new REST API. Its responsibility is to
@@ -109,7 +104,7 @@ public class RestResourceController implements InitializingBean {
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 		RestModel modelObject = null;
 		try {
-			modelObject = repository.findOne(id);
+			modelObject = repository.findOne(id, projection);
 		} catch (ClassCastException e) {
 		}
 		if (modelObject == null) {
@@ -170,7 +165,7 @@ public class RestResourceController implements InitializingBean {
 			}
 		}
 		
-		RestModel modelObject = repository.findOne(uuid);
+		RestModel modelObject = repository.findOne(uuid, projection);
 		DSpaceResource result = repository.wrapResource(modelObject, rel);
 		if (result.getLink(rel) == null) {
 			//TODO create a custom exception
@@ -208,7 +203,7 @@ public class RestResourceController implements InitializingBean {
 
 		Page<DSpaceResource<T>> resources;
 		try {
-			resources = repository.findAll(page).map(repository::wrapResource);
+			resources = repository.findAll(page, projection).map(repository::wrapResource);
 		} catch (PaginationException pe) {
 			resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
 		}

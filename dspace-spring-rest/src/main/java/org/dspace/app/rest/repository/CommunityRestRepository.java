@@ -7,11 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
@@ -24,6 +19,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * This is the repository responsible to manage Item Rest object
@@ -44,7 +44,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 	}
 
 	@Override
-	public CommunityRest findOne(Context context, UUID id) {
+	public CommunityRest findOne(Context context, UUID id, String projection) {
 		Community community = null;
 		try {
 			community = cs.find(context, id);
@@ -54,11 +54,11 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 		if (community == null) {
 			return null;
 		}
-		return converter.fromModel(community);
+		return converter.fromModel(utils.applyProjection(community, projection));
 	}
 
 	@Override
-	public Page<CommunityRest> findAll(Context context, Pageable pageable) {
+	public Page<CommunityRest> findAll(Context context, Pageable pageable, String projection) {
 		List<Community> it = null;
 		List<Community> communities = new ArrayList<Community>();
 		int total = 0;
@@ -66,7 +66,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 			total = cs.countTotal(context);
 			it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
 			for (Community c: it) {
-				communities.add(c);
+				communities.add(utils.applyProjection(c, projection));
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);

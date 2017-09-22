@@ -7,9 +7,12 @@
  */
 package org.dspace.app.rest.utils;
 
+import org.dspace.app.rest.projection.MetadataOnlyProjection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 /**
@@ -21,7 +24,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @Configuration
 @EnableSpringDataWebSupport
 @ComponentScan({ "org.dspace.app.rest.converter", "org.dspace.app.rest.repository", "org.dspace.app.rest.utils" })
-public class ApplicationConfig {
+public class ApplicationConfig extends RepositoryRestConfigurerAdapter {
 	@Value("${dspace.dir}")
 	private String dspaceHome;
 
@@ -37,4 +40,10 @@ public class ApplicationConfig {
 			return corsAllowedOrigins.split("\\s*,\\s*");
 		return null;
 	}
+
+	@Override
+	public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+		config.getProjectionConfiguration().addProjection(MetadataOnlyProjection.class);
+	}
+
 }
