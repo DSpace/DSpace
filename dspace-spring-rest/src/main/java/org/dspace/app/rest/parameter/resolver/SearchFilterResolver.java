@@ -8,6 +8,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,8 +23,7 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
     public static final String FILTER_OPERATOR_SEPARATOR = ",";
 
     public boolean supportsParameter(final MethodParameter parameter) {
-        return parameter.getParameterType().equals(SearchFilter.class) ||
-                (parameter.getParameterType().equals(List.class) && parameter.getNestedParameterType().equals(SearchFilter.class));
+        return parameter.getParameterType().equals(SearchFilter.class) || isSearchFilterList(parameter);
     }
 
     public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer, final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) throws Exception {
@@ -32,7 +32,7 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
         Iterator<String> parameterNames = webRequest.getParameterNames();
         while (parameterNames != null && parameterNames.hasNext()) {
             String parameterName = parameterNames.next();
-            
+
             if(parameterName.startsWith(SEARCH_FILTER_PREFIX)) {
                 String filterName = StringUtils.substringAfter(parameterName, SEARCH_FILTER_PREFIX);
 
@@ -50,5 +50,11 @@ public class SearchFilterResolver implements HandlerMethodArgumentResolver {
         } else {
             return result;
         }
+    }
+
+    private boolean isSearchFilterList(final MethodParameter parameter) {
+        return parameter.getParameterType().equals(List.class)
+                && parameter.getGenericParameterType() instanceof ParameterizedType
+                && ((ParameterizedType) parameter.getGenericParameterType()).getActualTypeArguments()[0].equals(SearchFilter.class);
     }
 }

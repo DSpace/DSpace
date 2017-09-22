@@ -63,6 +63,9 @@ public class DiscoverySortConfiguration {
     }
     
     public boolean isValidSortField(String sortField) {
+        if(StringUtils.equals("score", sortField)) {
+            return true;
+        }
         for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
             if(StringUtils.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
                 return true;

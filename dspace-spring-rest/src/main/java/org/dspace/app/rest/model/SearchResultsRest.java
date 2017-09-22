@@ -20,10 +20,10 @@ public class SearchResultsRest extends BaseObjectRest<String> {
     private String configurationName;
     private List<AppliedFilter> appliedFilters;
     private Sorting sort;
+    private long totalNumberOfResults;
 
     @JsonIgnore
     List<SearchResultEntryRest> searchResults;
-    private long totalNumberOfResults;
 
     //TODO List<SearchFacetEntryRest> facets;
 
