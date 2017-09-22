@@ -2,15 +2,12 @@ package org.dspace.app.rest.model.hateoas;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resources;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.LinkedList;
@@ -61,9 +58,11 @@ public class SearchResultsResource extends HALResource {
     }
 
     private String buildBaseLink(final SearchResultsRest data) {
+
         DiscoveryRestController methodOn = methodOn(DiscoveryRestController.class);
+
         UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
-                .getSearchObjects(data.getQuery(), data.getType(), data.getScope(), data.getConfigurationName(), null, null))
+                .getSearchObjects(data.getQuery(), data.getDsoType(), data.getScope(), data.getConfigurationName(), null, null))
                 .toUriComponentsBuilder();
 
         return addFilterParams(uriComponentsBuilder).build().toString();

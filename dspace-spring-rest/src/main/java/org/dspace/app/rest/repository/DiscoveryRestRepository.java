@@ -56,7 +56,6 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         //TODO Call DiscoveryConfigurationConverter on configuration to convert this API model to the REST model
 
         //TODO Return REST model
-        //TODO set "hasMore" property on facets
     }
 
     public SearchResultsRest getSearchObjects(final String query, final String dsoType, final String dsoScope, final String configurationName, final List<SearchFilter> searchFilters, final Pageable page) {
@@ -71,6 +70,8 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         try {
             discoverQuery = queryBuilder.buildQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page);
             searchResult = searchService.search(context, scopeObject, discoverQuery);
+
+            //TODO set "hasMore" property on facets
 
         } catch (InvalidRequestException e) {
             log.warn("Received an invalid request", e);

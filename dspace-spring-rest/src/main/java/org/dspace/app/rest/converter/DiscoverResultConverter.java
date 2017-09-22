@@ -2,7 +2,6 @@ package org.dspace.app.rest.converter;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -15,8 +14,6 @@ import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
