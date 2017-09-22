@@ -563,7 +563,9 @@ public class CommunityServiceImpl extends DSpaceObjectServiceImpl<Community> imp
 
         if (g != null)
         {
-            groupService.delete(context, g);
+            if(!Group.isCustom(g) && !g.isPermanent()){
+                groupService.delete(context, g);
+            }
         }
     }
 

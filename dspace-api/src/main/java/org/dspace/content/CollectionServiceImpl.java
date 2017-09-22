@@ -26,6 +26,7 @@ import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.xmlworkflow.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -757,24 +758,30 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         Group g = collection.getWorkflowStep1();
         if (g != null)
         {
-            collection.setWorkflowStep1(null);
-            groupService.delete(context, g);
+            if(!Group.isCustom(g) && !g.isPermanent()){
+                collection.setWorkflowStep1(null);
+                groupService.delete(context, g);
+            }
         }
 
         g = collection.getWorkflowStep2();
 
         if (g != null)
         {
-            collection.setWorkflowStep2(null);
-            groupService.delete(context, g);
+            if(!Group.isCustom(g) && !g.isPermanent()){
+                collection.setWorkflowStep2(null);
+                groupService.delete(context, g);
+            }
         }
 
         g = collection.getWorkflowStep3();
 
         if (g != null)
         {
-            collection.setWorkflowStep3(null);
-            groupService.delete(context, g);
+            if(!Group.isCustom(g) && !g.isPermanent()){
+                collection.setWorkflowStep3(null);
+                groupService.delete(context, g);
+            }
         }
 
         // Remove default administrators group
@@ -782,8 +789,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
-            collection.setAdmins(null);
-            groupService.delete(context, g);
+            if(!Group.isCustom(g) && !g.isPermanent()){
+                collection.setAdmins(null);
+                groupService.delete(context, g);
+            }
         }
 
         // Remove default submitters group
@@ -791,8 +800,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
 
         if (g != null)
         {
-            collection.setSubmitters(null);
-            groupService.delete(context, g);
+            if(!Group.isCustom(g) && !g.isPermanent()){
+                collection.setSubmitters(null);
+                groupService.delete(context, g);
+            }
         }
 
         Iterator<Community> owningCommunities = collection.getCommunities().iterator();
