@@ -497,17 +497,11 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
         org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
         if ( AuthorizeManager.isAdmin(context)) {
-            // run duplicate checker
-            item.checkForDuplicateItems(context);
-
-            DCValue[] dupItemIDs = item.getMetadata("dryad.duplicateItem");
-            if (dupItemIDs != null && dupItemIDs.length > 0) {
+            List<Item> dupItems = DryadWorkflowUtils.getDuplicateWorkflowItems(context, item, true);
+            if (dupItems.size() > 0) {
                 ReferenceSet duplicateItems = itemRef.addReferenceSet("embeddedView", null, "duplicateItems");
-                for (DCValue dupItemID : dupItemIDs) {
-                    Item dupItem = Item.find(context, Integer.valueOf(dupItemID.value));
-                    if (dupItem != null && !item.equals(dupItem)) {
-                        duplicateItems.addReference(dupItem);
-                    }
+                for (Item dupItem : dupItems) {
+                    duplicateItems.addReference(dupItem);
                 }
             }
         }
