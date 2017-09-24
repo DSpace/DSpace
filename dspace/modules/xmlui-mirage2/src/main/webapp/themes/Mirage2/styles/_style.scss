@@ -34,6 +34,11 @@
      margin-right: auto;
 }
 
+// utility class for redering text italic
+.italic {
+    font-style: italic;
+}
+
 // add back underlined links, because we like them
 a {
     text-decoration: underline;

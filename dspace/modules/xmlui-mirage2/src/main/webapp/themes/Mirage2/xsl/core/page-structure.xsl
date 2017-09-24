@@ -41,6 +41,10 @@
     <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
     <xsl:variable name="app_path" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
     <xsl:variable name="containerType" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='containerType']" />
+    <!--
+        vsim-project-masters-handle: the handle for the VSim Project Masters Collection
+    -->
+    <xsl:variable name="vsim-project-masters-handle" select="confman:getProperty('vsim.project.masters.handle')"/>
 
     <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
@@ -128,6 +132,12 @@
                                                     <a href="{$app_path}/pages/tour" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/TourLink.png" alt=" Tour "/></a>
                                                     <a href="{$app_path}/pages/download" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/DownloadLink.png" alt=" Download "/></a>
                                                     <a href="{$app_path}/discover" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/BrowseLink.png" alt=" Browse "/></a>
+                                            </p>
+                                        </xsl:when>
+                                        <!-- if this is the submission page, show the link to the project masters submission page -->
+                                        <xsl:when test="normalize-space($request-uri)='pages/add'">
+                                            <p class="text-center">
+                                                <a href="/xmlui/handle/{$vsim-project-masters-handle}/submit" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/SubmitLink.png" alt=" Submit a Project "/></a>
                                             </p>
                                         </xsl:when>
                                         <!-- if this is the tour page, show the tour carousel -->
