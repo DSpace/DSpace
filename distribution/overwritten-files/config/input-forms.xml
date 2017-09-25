@@ -736,10 +736,11 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>date</dc-element>
 					<dc-qualifier>exposure</dc-qualifier>
-					<label>Fecha de presentación</label>
+					<label>Fecha de presentación (*)</label>
 					<input-type>date</input-type>
 					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
 					<type-bind>Tesis,Objeto de conferencia, Audio</type-bind>
+					<required-on-group>BibliotecariosAndAnonymous</required-on-group>
 				</field>
 
 
