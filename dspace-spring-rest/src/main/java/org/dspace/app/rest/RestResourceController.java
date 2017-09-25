@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import static org.springframework.data.rest.webmvc.ControllerUtils.EMPTY_RESOURCE_LIST;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -16,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,15 +37,42 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.MethodParameter;
+import org.springframework.core.convert.ConversionException;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.support.QueryMethodParameterConversionException;
+import org.springframework.data.repository.support.RepositoryInvoker;
+import org.springframework.data.rest.core.mapping.ResourceMetadata;
+import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.RootResourceInformation;
+import org.springframework.data.rest.webmvc.support.DefaultedPageable;
+import org.springframework.data.util.ClassTypeInformation;
+import org.springframework.data.util.TypeInformation;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.core.AnnotationAttribute;
+import org.springframework.hateoas.core.MethodParameters;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,6 +91,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/{apiCategory}/{model}")
 @SuppressWarnings("rawtypes")
 public class RestResourceController implements InitializingBean {
+	private static final AnnotationAttribute PARAM_ANNOTATION = new AnnotationAttribute(Param.class);
+	private static final String NAME_NOT_FOUND = "Unable to detect parameter names for query method %s! Use @Param or compile with -parameters on JDK 8.";
+	@Autowired(required=true)
+	@Qualifier(value="mvcConversionService")
+	private ConversionService conversionService;
+	
 	@Autowired
 	DiscoverableEndpointsService discoverableEndpointsService;
 
@@ -257,8 +292,8 @@ public class RestResourceController implements InitializingBean {
 	@RequestMapping(method = RequestMethod.GET, value="/search/{searchMethod}")
 	@SuppressWarnings("unchecked")
 	<T extends RestModel> PagedResources<DSpaceResource<T>> executeSearchMethods(@PathVariable String apiCategory, 
-			@PathVariable String model, @PathVariable String searchMethod, DefaultedPageable page, Sort sort, PagedResourcesAssembler assembler, 
-			@RequestParam(required=false) String projection) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			@PathVariable String model, @PathVariable String searchMethod, Pageable pageable, Sort sort, PagedResourcesAssembler assembler, 
+			@RequestParam MultiValueMap<String, Object> parameters) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 			
 		Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethod).withSelfRel();
 		DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
@@ -275,9 +310,9 @@ public class RestResourceController implements InitializingBean {
 				}
 				if (StringUtils.equals(name, searchMethod)) {
 					searchMethodFound = true;
+					resources = ((Page<T>) executeQueryMethod(repository, parameters, method, pageable, sort, assembler)).map(repository::wrapResource);
+					break;
 				}
-				
-				resources = ((Page<T>) method.invoke(repository, page)).map(repository::wrapResource);
 			}
 		}
 		if (!searchMethodFound && searchEnabled) {
@@ -299,4 +334,110 @@ public class RestResourceController implements InitializingBean {
 		}
 		return false;
 	}
+	
+	/*
+	 * Adapted from org.springframework.data.rest.webmvc.RepositorySearchController.executeQueryMethod(RepositoryInvoker, MultiValueMap<String, Object>, Method, DefaultedPageable, Sort, PersistentEntityResourceAssembler)
+	 */
+	private Object executeQueryMethod(DSpaceRestRepository repository,
+			MultiValueMap<String, Object> parameters, Method method, Pageable pageable, Sort sort,
+			PagedResourcesAssembler assembler) {
+
+		MultiValueMap<String, Object> result = new LinkedMultiValueMap<String, Object>(parameters);
+		MethodParameters methodParameters = new MethodParameters(method, new AnnotationAttribute(Param.class));
+
+		for (Entry<String, List<Object>> entry : parameters.entrySet()) {
+
+			MethodParameter parameter = methodParameters.getParameter(entry.getKey());
+
+			if (parameter == null) {
+				continue;
+			}
+
+			result.put(parameter.getParameterName(), entry.getValue());
+		}
+
+		return invokeQueryMethod(repository, method, result, pageable, sort);
+	}
+	
+	/*
+	 * Adapted from org.springframework.data.repository.support.ReflectionRepositoryInvoker.invokeQueryMethod(Method, MultiValueMap<String, ? extends Object>, Pageable, Sort)
+	 */
+	public Object invokeQueryMethod(DSpaceRestRepository repository, Method method, MultiValueMap<String, ? extends Object> parameters, Pageable pageable,
+			Sort sort) {
+
+		Assert.notNull(method, "Method must not be null!");
+		Assert.notNull(parameters, "Parameters must not be null!");
+
+		ReflectionUtils.makeAccessible(method);
+
+		return ReflectionUtils.invokeMethod(method, repository, prepareParameters(method, parameters, pageable, sort));
+	}
+
+	/*
+	 * Taken from org.springframework.data.repository.support.ReflectionRepositoryInvoker.prepareParameters(Method, MultiValueMap<String, ? extends Object>, Pageable, Sort)
+	 */
+	private Object[] prepareParameters(Method method, MultiValueMap<String, ? extends Object> rawParameters,
+			Pageable pageable, Sort sort) {
+
+		List<MethodParameter> parameters = new MethodParameters(method, PARAM_ANNOTATION).getParameters();
+
+		if (parameters.isEmpty()) {
+			return new Object[0];
+		}
+
+		Object[] result = new Object[parameters.size()];
+		Sort sortToUse = pageable == null ? sort : pageable.getSort();
+
+		for (int i = 0; i < result.length; i++) {
+
+			MethodParameter param = parameters.get(i);
+			Class<?> targetType = param.getParameterType();
+
+			if (Pageable.class.isAssignableFrom(targetType)) {
+				result[i] = pageable;
+			} else if (Sort.class.isAssignableFrom(targetType)) {
+				result[i] = sortToUse;
+			} else {
+
+				String parameterName = param.getParameterName();
+
+				if (!StringUtils.isNotBlank(parameterName)) {
+					throw new IllegalArgumentException(String.format(NAME_NOT_FOUND, ClassUtils.getQualifiedMethodName(method)));
+				}
+
+				Object value = unwrapSingleElement(rawParameters.get(parameterName));
+
+				result[i] = targetType.isInstance(value) ? value : convert(value, param);
+			}
+		}
+
+		return result;
+	}
+	
+	/**
+	 * Unwraps the first item if the given source has exactly one element. Taken from
+	 * org.springframework.data.repository.support.ReflectionRepositoryInvoker.unwrapSingleElement(List<? extends Object>)
+	 * 
+	 * @param source can be {@literal null}.
+	 * @return
+	 */
+	private static Object unwrapSingleElement(List<? extends Object> source) {
+		return source == null ? null : source.size() == 1 ? source.get(0) : source;
+	}
+	
+	/**
+	 * Taken from org.springframework.data.repository.support.ReflectionRepositoryInvoker.convert(Object, MethodParameter)
+	 * @param value
+	 * @param parameter
+	 * @return
+	 */
+	private Object convert(Object value, MethodParameter parameter) {
+
+		try {
+			return conversionService.convert(value, TypeDescriptor.forObject(value), new TypeDescriptor(parameter));
+		} catch (ConversionException o_O) {
+			throw new QueryMethodParameterConversionException(value, parameter, o_O);
+		}
+	}
+	
 }
