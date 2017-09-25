@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
@@ -37,8 +38,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 	CommunityService cs = ContentServiceFactory.getInstance().getCommunityService();
 	@Autowired
 	CommunityConverter converter;
-	
-	
+
 	public CommunityRestRepository() {
 		System.out.println("Repository initialized by Spring");
 	}
@@ -65,7 +65,7 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 		try {
 			total = cs.countTotal(context);
 			it = cs.findAll(context, pageable.getPageSize(), pageable.getOffset());
-			for (Community c: it) {
+			for (Community c : it) {
 				communities.add(c);
 			}
 		} catch (SQLException e) {
@@ -74,12 +74,31 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 		Page<CommunityRest> page = new PageImpl<Community>(communities, pageable, total).map(converter);
 		return page;
 	}
-	
+
+	// TODO: Add methods in dspace api to support pagination of top level
+	// communities
+	@SearchRestMethod(name="top")
+	public Page<CommunityRest> findAllTop(Pageable pageable) {
+		List<Community> topCommunities = new ArrayList<Community>();
+		int total = 0;
+		try {
+			List<Community> it = cs.findAllTop(obtainContext());
+			total = it.size();
+			for (Community c : it) {
+				topCommunities.add(c);
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		Page<CommunityRest> page = new PageImpl<Community>(topCommunities, pageable, total).map(converter);
+		return page;
+	}
+
 	@Override
 	public Class<CommunityRest> getDomainClass() {
 		return CommunityRest.class;
 	}
-	
+
 	@Override
 	public CommunityResource wrapResource(CommunityRest community, String... rels) {
 		return new CommunityResource(community, utils, rels);

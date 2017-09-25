@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
+import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
+import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.RestModel;
@@ -213,6 +215,7 @@ public class RestResourceController implements InitializingBean {
 			resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
 		}
 		PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
+		result.add(linkTo(this.getClass(), apiCategory, model).slash("search").withRel("search"));
 		return result;
 	}
 
@@ -225,5 +228,75 @@ public class RestResourceController implements InitializingBean {
 		if (StringUtils.equals(utils.makeSingular(model), model)) {
 			throw new RepositoryNotFoundException(apiCategory, model);
 		}
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value="/search")
+	ResourceSupport listSearchMethods(@PathVariable String apiCategory, @PathVariable String model) {
+		ResourceSupport root = new ResourceSupport();
+		DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
+		boolean searchEnabled = false;
+		for (Method method : repository.getClass().getMethods()) {
+			SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+			if (ann != null) {
+				String name = ann.name();
+				if (name.isEmpty()) {
+					name = method.getName();
+				}
+				Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(name).withRel(name);
+				root.add(link);
+				searchEnabled = true;
+			}
+		}
+		if (!searchEnabled) {
+			throw new RepositorySearchNotFoundException(model);
+		}
+		return root;
+	}
+	
+	
+	@RequestMapping(method = RequestMethod.GET, value="/search/{searchMethod}")
+	@SuppressWarnings("unchecked")
+	<T extends RestModel> PagedResources<DSpaceResource<T>> executeSearchMethods(@PathVariable String apiCategory, 
+			@PathVariable String model, @PathVariable String searchMethod, DefaultedPageable page, Sort sort, PagedResourcesAssembler assembler, 
+			@RequestParam(required=false) String projection) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			
+		Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethod).withSelfRel();
+		DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
+		Page<DSpaceResource<T>> resources = null;
+		boolean searchEnabled = false;
+		boolean searchMethodFound = false;
+		for (Method method : repository.getClass().getMethods()) {
+			SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+			if (ann != null) {
+				searchEnabled = true;
+				String name = ann.name();
+				if (name.isEmpty()) {
+					name = method.getName();
+				}
+				if (StringUtils.equals(name, searchMethod)) {
+					searchMethodFound = true;
+				}
+				
+				resources = ((Page<T>) method.invoke(repository, page)).map(repository::wrapResource);
+			}
+		}
+		if (!searchMethodFound && searchEnabled) {
+			throw new RepositorySearchMethodNotFoundException(model, searchMethod);
+		}
+		if (!searchEnabled) {
+			throw new RepositorySearchNotFoundException(model);
+		}
+		PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
+		return result;
+	}
+	
+	private boolean haveSearchMethods(DSpaceRestRepository repository) {
+		for (Method method : repository.getClass().getMethods()) {
+			SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+			if (ann != null) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
