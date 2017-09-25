@@ -2,9 +2,7 @@ package org.dspace.app.rest.converter;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.dspace.app.rest.model.DSpaceObjectRest;
-import org.dspace.app.rest.model.SearchResultEntryRest;
-import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.model.*;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.authority.AuthorityValue;
 import org.dspace.authority.service.AuthorityValueService;
@@ -13,6 +11,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -43,9 +44,30 @@ public class DiscoverResultConverter {
 
         addSearchResults(searchResult, resultsRest);
 
+        addFacetValues(searchResult, resultsRest);
+
         resultsRest.setTotalNumberOfResults(searchResult.getTotalSearchResults());
 
         return resultsRest;
+    }
+
+    private void addFacetValues(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {
+        Map<String, List<DiscoverResult.FacetResult>> facetResults = searchResult.getFacetResults();
+        for (Map.Entry<String, List<DiscoverResult.FacetResult>> facetValues : MapUtils.emptyIfNull(facetResults).entrySet()) {
+            SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(facetValues.getKey());
+
+            for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues.getValue())) {
+                SearchFacetValueRest valueRest = new SearchFacetValueRest();
+                valueRest.setValue(value.getDisplayedValue());
+                valueRest.setAuthorityKey(value.getAuthorityKey());
+                valueRest.setSortValue(value.getSortValue());
+                valueRest.setCount(value.getCount());
+
+                facetEntry.addValue(valueRest);
+            }
+
+            resultsRest.addFacetEntry(facetEntry);
+        }
     }
 
     private void addSearchResults(final DiscoverResult searchResult, final SearchResultsRest resultsRest) {

@@ -1,7 +1,9 @@
 package org.dspace.app.rest.model.hateoas;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.utils.Utils;
@@ -36,8 +38,23 @@ public class SearchResultsResource extends HALResource {
     }
 
     private void addEmbeds(final SearchResultsRest data, final Pageable pageable, final Utils utils) {
+        embedSearchResults(data, pageable, utils);
+
+        embedFacetResults(data, utils);
+    }
+
+    private void embedFacetResults(final SearchResultsRest data, final Utils utils) {
+        List<SearchFacetEntryResource> facetResources = new LinkedList<>();
+        for (SearchFacetEntryRest searchFacetEntryRest : CollectionUtils.emptyIfNull(data.getFacets())) {
+            facetResources.add(new SearchFacetEntryResource(searchFacetEntryRest, data, utils));
+        }
+
+        embedResource("facets", facetResources);
+    }
+
+    private void embedSearchResults(final SearchResultsRest data, final Pageable pageable, final Utils utils) {
         List<SearchResultEntryResource> entryResources = new LinkedList<>();
-        for (SearchResultEntryRest searchResultEntry : data.getSearchResults()) {
+        for (SearchResultEntryRest searchResultEntry : CollectionUtils.emptyIfNull(data.getSearchResults())) {
             entryResources.add(new SearchResultEntryResource(searchResultEntry, utils));
         }
 
@@ -45,8 +62,6 @@ public class SearchResultsResource extends HALResource {
                 pageable, data.getTotalNumberOfResults());
 
         embedResource("searchResults", new EmbeddedPage(buildBaseLink(data), page, entryResources));
-
-        //TODO ADD FACETS
     }
 
     private void addLinks(final SearchResultsRest data) {

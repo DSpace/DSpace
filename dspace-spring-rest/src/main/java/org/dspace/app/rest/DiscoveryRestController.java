@@ -10,19 +10,13 @@ import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * TODO TOM UNIT TEST
@@ -93,12 +87,12 @@ public class DiscoveryRestController implements InitializingBean {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets/{name}")
-    public void getFacetValues(@PathVariable("name") String facetName,
-                               @RequestParam(name = "query", required = false) String query,
-                               @RequestParam(name = "dsoType", required = false) String dsoType,
-                               @RequestParam(name = "scope", required = false) String dsoScope,
-                               List<SearchFilter> searchFilters,
-                               Pageable page) {
+    public ResourceSupport getFacetValues(@PathVariable("name") String facetName,
+                                          @RequestParam(name = "query", required = false) String query,
+                                          @RequestParam(name = "dsoType", required = false) String dsoType,
+                                          @RequestParam(name = "scope", required = false) String dsoScope,
+                                          List<SearchFilter> searchFilters,
+                                          Pageable page) {
         if(log.isTraceEnabled()) {
             log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
                     + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
@@ -107,6 +101,8 @@ public class DiscoveryRestController implements InitializingBean {
         }
 
         //TODO
+
+        return null;
     }
 
 }
