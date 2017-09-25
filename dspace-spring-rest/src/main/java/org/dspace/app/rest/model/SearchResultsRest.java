@@ -25,7 +25,8 @@ public class SearchResultsRest extends BaseObjectRest<String> {
     @JsonIgnore
     List<SearchResultEntryRest> searchResults;
 
-    //TODO List<SearchFacetEntryRest> facets;
+    @JsonIgnore
+    List<SearchFacetEntryRest> facets;
 
     public String getCategory() {
         return CATEGORY;
@@ -121,6 +122,18 @@ public class SearchResultsRest extends BaseObjectRest<String> {
 
     public void setTotalNumberOfResults(long totalNumberOfResults) {
         this.totalNumberOfResults = totalNumberOfResults;
+    }
+
+    public void addFacetEntry(final SearchFacetEntryRest facetEntry) {
+        if(facets == null) {
+            facets = new LinkedList<>();
+        }
+
+        facets.add(facetEntry);
+    }
+
+    public List<SearchFacetEntryRest> getFacets() {
+        return facets;
     }
 
     public static class AppliedFilter {
