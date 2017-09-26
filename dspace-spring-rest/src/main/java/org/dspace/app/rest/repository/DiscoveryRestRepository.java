@@ -1,9 +1,14 @@
 package org.dspace.app.rest.repository;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverResultConverter;
+import org.dspace.app.rest.converter.DiscoverSearchSupportConverter;
 import org.dspace.app.rest.exception.InvalidRequestException;
+import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.model.SearchSupportRest;
+import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.utils.DiscoverQueryBuilder;
@@ -46,16 +51,19 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     @Autowired
     private DiscoverResultConverter discoverResultConverter;
 
+    @Autowired
+    private DiscoverConfigurationConverter discoverConfigurationConverter;
 
-    public void getSearchConfiguration(final String dsoScope, final String configurationName) {
+    @Autowired
+    private DiscoverSearchSupportConverter discoverSearchSupportConverter;
+
+    public SearchConfigurationRest getSearchConfiguration(final String dsoScope, final String configurationName) {
         Context context = obtainContext();
 
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
 
-        //TODO Call DiscoveryConfigurationConverter on configuration to convert this API model to the REST model
-
-        //TODO Return REST model
+        return discoverConfigurationConverter.convert(configuration);
     }
 
     public SearchResultsRest getSearchObjects(final String query, final String dsoType, final String dsoScope, final String configurationName, final List<SearchFilter> searchFilters, final Pageable page) {
@@ -94,5 +102,9 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         //TODO Call DiscoveryConfigurationConverter on configuration to convert this API model to the REST model
 
         //TODO Return REST model
+    }
+
+    public SearchSupportRest getSearchSupport() {
+        return discoverSearchSupportConverter.convert();
     }
 }
