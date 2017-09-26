@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -90,10 +92,29 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
-		Page<CommunityRest> page = new PageImpl<Community>(topCommunities, pageable, total).map(converter);
+		Page<CommunityRest> page = utils.getPage(topCommunities, pageable).map(converter);
 		return page;
 	}
 
+	// TODO: add method in dspace api to support direct query for subcommunities
+	// with pagination and authorization check
+	@SearchRestMethod(name="subCommunities")
+	public Page<CommunityRest> findSubCommunities(@Param(value="parent") UUID parentCommunity, Pageable pageable) {
+		Context context = obtainContext();
+		List<Community> subCommunities = new ArrayList<Community>();
+		try {
+			Community community = cs.find(context, parentCommunity);
+			if (community == null) {
+				throw new ResourceNotFoundException(CommunityRest.CATEGORY + "." + CommunityRest.NAME + " with id: " + parentCommunity + " not found");
+			}
+			subCommunities = community.getSubcommunities();
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		Page<CommunityRest> page = utils.getPage(subCommunities, pageable).map(converter);
+		return page;
+	}
+	
 	@Override
 	public Class<CommunityRest> getDomainClass() {
 		return CommunityRest.class;
