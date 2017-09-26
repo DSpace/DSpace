@@ -1185,28 +1185,6 @@ public class WorkflowManager
                     Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
                     Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_task"));
                     email.addArgument(title);
-                    email.addArgument(coll.getMetadata("name"));
-                    email.addArgument(submitter);
-
-                    ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
-                    switch (wi.getState())
-                    {
-                        case WFSTATE_STEP1POOL:
-                            message = messages.getString("org.dspace.workflow.WorkflowManager.step1");
-
-                            break;
-
-                        case WFSTATE_STEP2POOL:
-                            message = messages.getString("org.dspace.workflow.WorkflowManager.step2");
-
-                            break;
-
-                        case WFSTATE_STEP3POOL:
-                            message = messages.getString("org.dspace.workflow.WorkflowManager.step3");
-
-                            break;
-                    }
-
                     // Begin UMD customization
                     StringBuffer sb = new StringBuffer();
                     sb.append(coll.getMetadata("name"));
@@ -1225,6 +1203,24 @@ public class WorkflowManager
                     // End UMD customization
                     
                     email.addArgument(submitter);
+                    ResourceBundle messages = ResourceBundle.getBundle("Messages", supportedLocale);
+                    switch (wi.getState())
+                    {
+                        case WFSTATE_STEP1POOL:
+                            message = messages.getString("org.dspace.workflow.WorkflowManager.step1");
+
+                            break;
+
+                        case WFSTATE_STEP2POOL:
+                            message = messages.getString("org.dspace.workflow.WorkflowManager.step2");
+
+                            break;
+
+                        case WFSTATE_STEP3POOL:
+                            message = messages.getString("org.dspace.workflow.WorkflowManager.step3");
+
+                            break;
+                    }
                     email.addArgument(message);
                     email.addArgument(getMyDSpaceLink());
                     email.addRecipient(epa[i].getEmail());
