@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.app.rest.model.hateoas;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
@@ -32,7 +25,28 @@ public class SearchConfigurationResource extends HALResource{
 
     public SearchConfigurationResource(SearchConfigurationRest searchConfigurationRest){
         this.data = searchConfigurationRest;
+
+
+//        addLinks(data);
+
     }
+//    private void addLinks(final SearchConfigurationRest data) {
+//        //Create the self link using our Controller
+//        String baseLink = buildBaseLink(data);
+//
+//        Link link = new Link(baseLink, Link.REL_SELF);
+//        add(link);
+//    }
+//
+//    private String buildBaseLink(final SearchConfigurationRest data) {
+//        DiscoveryRestController methodOn = methodOn(DiscoveryRestController.class);
+//        UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
+//                .getSearchConfiguration(data.getScope(), data.getConfigurationName()))
+//                .toUriComponentsBuilder();
+//
+//        return uriComponentsBuilder.build().toString();
+//    }
+
     public SearchConfigurationRest getData(){
         return data;
     }
