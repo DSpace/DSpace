@@ -64,12 +64,7 @@ import org.apache.solr.handler.extraction.ExtractingParams;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.MetadataValue;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
@@ -77,23 +72,8 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
-import org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration;
-import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
-import org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration;
-import org.dspace.discovery.configuration.DiscoverySearchFilter;
-import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
-import org.dspace.discovery.configuration.DiscoverySortConfiguration;
-import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
-import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
+import org.dspace.core.*;
+import org.dspace.discovery.configuration.*;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.service.HandleService;
@@ -102,6 +82,17 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.util.MultiFormatDateParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
@@ -1946,7 +1937,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                     field,
                                     new DiscoverResult.FacetResult(filterValue,
                                             displayedValue, authorityValue,
-                                            sortValue, facetValue.getCount()));
+                                            sortValue, facetValue.getCount(), facetFieldConfig.getType()));
                         }
                     }
                 }
@@ -1979,7 +1970,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     //No need to show empty years
                     if (0 < count)
                     {
-                        result.addFacetResult(facetField, new DiscoverResult.FacetResult(filter, name, null, name, count));
+                        result.addFacetResult(facetField, new DiscoverResult.FacetResult(filter, name, null, name, count, DiscoveryConfigurationParameters.TYPE_DATE));
                     }
                 }
             }

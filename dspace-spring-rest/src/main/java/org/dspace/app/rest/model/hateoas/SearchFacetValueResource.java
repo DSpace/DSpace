@@ -47,9 +47,7 @@ public class SearchFacetValueResource extends HALResource {
     }
 
     private void addFilterForFacetValue(final UriComponentsBuilder baseLink) {
-        //TODO Date filters have a special format!
-        //TODO check that if we have an authority value, we use that one
-        baseLink.queryParam("f." + facetData.getName(), data.getValue() + ",equals");
+        baseLink.queryParam("f." + facetData.getName(), data.getFilterValue() + "," + data.getFilterType());
     }
 
     private UriComponentsBuilder buildBaseLink() {

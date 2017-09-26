@@ -33,4 +33,12 @@ public class SearchFilter {
     public boolean hasAuthorityOperator() {
         return StringUtils.equals(operator, "authority");
     }
+
+    public String toString() {
+        return "SearchFilter{" +
+                "name='" + name + '\'' +
+                ", operator='" + operator + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }
