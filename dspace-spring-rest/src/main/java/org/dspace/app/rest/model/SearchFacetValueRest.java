@@ -10,10 +10,12 @@ public class SearchFacetValueRest implements RestModel {
     public static final String NAME = "discover";
     public static final String CATEGORY = RestModel.DISCOVER;
 
-    private String value;
+    private String label;
+    private String filterValue;
     private long count;
     private String authorityKey;
     private String sortValue;
+    private String filterType;
 
     public String getCategory() {
         return CATEGORY;
@@ -27,12 +29,20 @@ public class SearchFacetValueRest implements RestModel {
         return DiscoveryRestController.class;
     }
 
-    public String getValue() {
-        return value;
+    public String getLabel() {
+        return label;
     }
 
-    public void setValue(final String value) {
-        this.value = value;
+    public void setLabel(final String label) {
+        this.label = label;
+    }
+
+    public String getFilterValue() {
+        return filterValue;
+    }
+
+    public void setFilterValue(final String filterValue) {
+        this.filterValue = filterValue;
     }
 
     public long getCount() {
@@ -57,5 +67,14 @@ public class SearchFacetValueRest implements RestModel {
 
     public String getSortValue() {
         return sortValue;
+    }
+
+    public String getFilterType() {
+        return filterType;
+    }
+
+    public void setFilterType(final String filterType) {
+
+        this.filterType = filterType;
     }
 }

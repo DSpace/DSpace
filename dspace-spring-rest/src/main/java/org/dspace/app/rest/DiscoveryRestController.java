@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * TODO TOM UNIT TEST
@@ -64,8 +65,9 @@ public class DiscoveryRestController implements InitializingBean {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
                     + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
                     + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
-                    + ", query: " + StringUtils.trimToEmpty(dsoType));
-            //TODO add filters and page info
+                    + ", query: " + StringUtils.trimToEmpty(dsoType)
+                    + ", filters: " + Objects.toString(searchFilters)
+                    + ", page: " + Objects.toString(page));
         }
 
         //Get the Search results in JSON format
@@ -96,8 +98,9 @@ public class DiscoveryRestController implements InitializingBean {
         if(log.isTraceEnabled()) {
             log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
                     + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
-                    + ", query: " + StringUtils.trimToEmpty(dsoType));
-            //TODO add filters and page info
+                    + ", query: " + StringUtils.trimToEmpty(dsoType)
+                    + ", filters: " + Objects.toString(searchFilters)
+                    + ", page: " + Objects.toString(page));
         }
 
         //TODO

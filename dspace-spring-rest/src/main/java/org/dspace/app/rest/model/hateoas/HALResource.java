@@ -14,7 +14,6 @@ public abstract class HALResource extends ResourceSupport {
 
     protected final Map<String, Object> embedded = new HashMap<String, Object>();
 
-
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty("_embedded")
     public Map<String, Object> getEmbeddedResources() {
