@@ -24,4 +24,5 @@ public abstract class HALResource extends ResourceSupport {
         embedded.put(relationship, resource);
     }
 
+
 }

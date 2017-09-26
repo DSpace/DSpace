@@ -37,6 +37,10 @@ public class SearchResultsResource extends HALResource {
 
     }
 
+    public SearchResultsRest getData(){
+        return data;
+    }
+
     private void addEmbeds(final SearchResultsRest data, final Pageable pageable, final Utils utils) {
         embedSearchResults(data, pageable, utils);
 

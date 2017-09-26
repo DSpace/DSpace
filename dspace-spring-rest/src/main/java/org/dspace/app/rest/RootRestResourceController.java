@@ -7,8 +7,10 @@
  */
 package org.dspace.app.rest;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.model.RootRest;
+import org.dspace.app.rest.model.hateoas.RootResource;
+import org.dspace.app.rest.repository.RootRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
@@ -32,20 +34,20 @@ public class RootRestResourceController {
 	@Autowired
 	DiscoverableEndpointsService discoverableEndpointsService;
 
+	@Autowired
+	HalLinkService halLinkService;
+
+	@Autowired
+	RootRestRepository rootRestRepository;
+
 	@RequestMapping(method = RequestMethod.GET)
-	public ResourceSupport listDefinedEndpoint(HttpServletRequest request) {
-		ResourceSupport root = new ResourceSupport();
-		String restURL = getRestURL(request);
+	public RootResource listDefinedEndpoint(HttpServletRequest request) {
 
-		for (Link l : discoverableEndpointsService.getDiscoverableEndpoints()) {
-			root.add(new Link(restURL + l.getHref(), l.getRel()));
-		}
 
-		return root;
-	}
+		RootRest rootRest = rootRestRepository.getRoot();
+		RootResource rootResource = new RootResource(rootRest);
+		halLinkService.addLinks(rootResource);
 
-	private String getRestURL(HttpServletRequest request) {
-		String url = request.getRequestURL().toString();
-		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath();
+		return rootResource;
 	}
 }
