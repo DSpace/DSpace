@@ -1738,6 +1738,26 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             solrQuery.setParam(FacetParams.FACET_OFFSET, String.valueOf(discoveryQuery.getFacetOffset()));
         }
 
+        List<DiscoverDateFacetField> discoverDateFacetFields = discoveryQuery.getDateFacetFields();
+        if(discoverDateFacetFields!=null && discoverDateFacetFields.size()>0){
+            for(DiscoverDateFacetField discoverDateFacetField : discoverDateFacetFields){
+                String dateType = discoverDateFacetField.getGap();
+                int dateStart= -discoverDateFacetField.getStart();
+                int dateEnd= discoverDateFacetField.getEnd();
+                solrQuery.setParam("facet.date", discoverDateFacetField.getField())
+                        .
+                        // EXAMPLE: NOW/MONTH+1MONTH
+                                setParam("facet.date.end",
+                                "NOW/" + dateType + "+"+dateEnd + dateType).setParam(
+                        "facet.date.gap", "+1" + dateType)
+                        .
+                        // EXAMPLE: NOW/MONTH-" + nbMonths + "MONTHS
+                                setParam("facet.date.start",
+                                "NOW/" + dateType + dateStart + dateType + "S")
+                        .setFacet(true);
+            }
+        }
+
         if(0 < discoveryQuery.getHitHighlightingFields().size())
         {
             solrQuery.setHighlight(true);
@@ -1896,6 +1916,20 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                                             sortValue, facetValue.getCount()));
                         }
                     }
+                }
+            }
+
+            if(solrQueryResponse.getFacetDates()!=null){
+                List<FacetField> facetDates = solrQueryResponse.getFacetDates();
+                for(FacetField facetField : facetDates){
+                    List<FacetField.Count> values =  facetField.getValues();
+                    String fieldName = facetField.getName();
+                    for(FacetField.Count value: values){
+                        value.getName();
+                        value.getCount();
+                        result.addFacetDateResult(fieldName, new DiscoverResult.FacetDateResult(value.getName(), value.getCount()));
+                    }
+
                 }
             }
 
