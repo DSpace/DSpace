@@ -20,7 +20,7 @@ import javax.persistence.*;
  * @author Pascal-Nicolas Becker
  */
 @Entity
-@Table(name = "Doi" )
+@Table(name = "doi" )
 public class DOI
         implements Identifier, ReloadableEntity<Integer>
 {
