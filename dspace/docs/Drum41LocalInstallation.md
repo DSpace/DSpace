@@ -532,7 +532,6 @@ $ ln -s /apps/drum/webapps/swordv2 /apps/servers/drum/tomcat411/webapps/swordv2
 
 ```
 $ mkdir /apps/drum/upload
-$ mkdir -p /apps/drum/stats/monthly
 ```
 
 ###Start DRUM 4.1 Tomcat Instance

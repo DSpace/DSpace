@@ -1,5 +1,0 @@
-select m.text_value as name,count(c2i.item_id) from collection2item c2i,collection c, metadatavalue m WHERE c2i.collection_id = c.collection_id AND c.collection_id = m.resource_id AND m.resource_type_id=3 AND m.metadata_field_id=64 GROUP BY name ORDER BY name;
-
-select email,firstname,lastname,count(item_id) from item,eperson WHERE eperson_id=submitter_id and in_archive GROUP BY email,firstname,lastname ORDER BY lastname;
-
-select count(item.item_id) AS "Items Submitted",substring(text_value from 1 for 4) AS "Year",substring(text_value from 6 for 2) AS "Month" from item,dcvalue where item.item_id = dcvalue.item_id and dc_type_id='11' and (submitter_id != '5' and submitter_id !='6') and in_archive group by substring (text_value from 1 for 4),substring(text_value from 6 for 2) order by substring(text_value from 1 for 4),substring(text_value from 6 for 2);

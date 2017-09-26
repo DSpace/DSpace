@@ -7,16 +7,6 @@
  */
 package org.dspace.content.crosswalk;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
-
-import java.text.SimpleDateFormat;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -31,6 +21,12 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.jdom.Element;
 import org.jdom.Namespace;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * METSRights Ingestion & Dissemination Crosswalk
@@ -50,7 +46,7 @@ import org.jdom.Namespace;
  * @author Tim Donohue
  * @version $Revision: 2108 $
  */
-public class METSRightsCrosswalk 
+public class METSRightsCrosswalk extends ContextAwareDisseminationCrosswalk
     implements IngestionCrosswalk, DisseminationCrosswalk
 {
     /** log4j category */
@@ -119,14 +115,14 @@ public class METSRightsCrosswalk
      * METSRights PermissionTypes.
      *
      * @param dso DSpace Object
+     * @param context Context Object
      * @return XML Element corresponding to the new <RightsDeclarationMD> translation
      * @throws CrosswalkException
      * @throws IOException
      * @throws SQLException
      * @throws AuthorizeException
      */
-    @Override
-    public Element disseminateElement(DSpaceObject dso)
+    public Element disseminateElement(Context context,DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -155,7 +151,6 @@ public class METSRightsCrosswalk
         // what those rights are -- too many types of content can be stored in DSpace
 
         //Get all policies on this DSpace Object
-        Context context = new Context();
         List<ResourcePolicy> policies = AuthorizeManager.getPolicies(context, dso);
 
         //For each DSpace policy
@@ -281,8 +276,30 @@ public class METSRightsCrosswalk
            
         }//end for each policy
 
-        context.complete();
         return rightsMD;
+    }
+    /**
+     * Actually Disseminate into METSRights schema.  This method locates all DSpace
+     * policies (permissions) for the provided object, and translates them into
+     * METSRights PermissionTypes.
+     *
+     * @param dso DSpace Object
+     * @return XML Element corresponding to the new <RightsDeclarationMD> translation
+     * @throws CrosswalkException
+     * @throws IOException
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @deprecated Do not use this method, please opt for "{@link #disseminateElement(Context context, DSpaceObject dso)}" instead, as this does not internally need to create a new Context
+     */
+    @Override
+    @Deprecated
+    public Element disseminateElement(DSpaceObject dso)
+            throws CrosswalkException,
+            IOException, SQLException, AuthorizeException {
+        Context context = getContext();
+        Element element = disseminateElement(context, dso);
+        handleContextCleanup();
+        return element;
     }
 
     @Override
@@ -667,4 +684,5 @@ public class METSRightsCrosswalk
         // return -1 to signify failure (as 0 = READ permissions)
         return -1;
     }
+
 }

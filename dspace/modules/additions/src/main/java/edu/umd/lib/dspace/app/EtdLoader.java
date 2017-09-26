@@ -8,6 +8,7 @@ package edu.umd.lib.dspace.app;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -300,36 +301,55 @@ public class EtdLoader
     {
 
         // Get the ORIGINAL bundle which contains public bitstreams
-        Bundle[] bundles = item.getBundles("ORIGINAL");
-        Bundle bundle = null;
+        Bundle originalBundle = getBundle(item, "ORIGINAL");
+        // Get the METADATA bundle 
+        Bundle metaBundle = getBundle(item, "METADATA");
 
-        if (bundles.length < 1)
-        {
-            bundle = item.createBundle("ORIGINAL");
-        }
-        else
-        {
-            bundle = bundles[0];
-        }
+        // Add the Proquest ETD metadata XML to the METADATA bundle 
+        String strFileName = (String) files.get(0);
+        ZipEntry ze = (ZipEntry) files.get(1);
+        createBitstream(context, metaBundle, strFileName, zip.getInputStream(ze));
 
+        // Add the content bitstreams to ORIGINAL bundle 
         // Loop through the files
         for (int i = 2; i < files.size(); i += 2)
         {
-            String strFileName = (String) files.get(i);
-            ZipEntry ze = (ZipEntry) files.get(i + 1);
+            strFileName = (String) files.get(i);
+            ze = (ZipEntry) files.get(i + 1);
 
-            log.debug("Adding bitstream for " + strFileName);
-
-            // Create the bitstream
-            Bitstream bs = bundle.createBitstream(zip.getInputStream(ze));
-            bs.setName(strFileName);
-
-            // Set the format
-            BitstreamFormat bf = FormatIdentifier.guessFormat(context, bs);
-            bs.setFormat(bf);
-
-            bs.update();
+            createBitstream(context, originalBundle, strFileName, zip.getInputStream(ze));
         }
+    }
+
+    public static Bundle getBundle(Item item, String type) throws Exception {
+      Bundle[] bundles = item.getBundles(type);
+      Bundle bundle = null;
+
+      if (bundles.length < 1)
+      {
+          bundle = item.createBundle(type);
+      }
+      else
+      {
+          bundle = bundles[0];
+      }
+      return bundle;
+    }
+
+    public static void createBitstream(Context context, Bundle bundle, String name, InputStream stream)
+      throws Exception {
+        log.debug("Adding bitstream for " + name);
+      
+        // Create the bitstream
+        Bitstream bs = bundle.createBitstream(stream);
+        bs.setName(name);
+
+        // Set the format
+        BitstreamFormat bf = FormatIdentifier.guessFormat(context, bs);
+        bs.setFormat(bf);
+
+        bs.update();
+
     }
 
     /***************************************************************** addDC */
@@ -492,11 +512,11 @@ public class EtdLoader
             scope.setBrowseIndex(bi);
             scope.setResultsPerPage(10);
 
-            String[] words = title.split(" ");
+            String[] words = title.trim().split(" ");
 
             StringBuilder searchTerm = new StringBuilder();
 
-            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT); wordCount++)
+            for (int wordCount = 0; (wordCount < MAX_WORD_COUNT && wordCount < words.length); wordCount++)
             {
                 searchTerm = searchTerm.append(words[wordCount]);
                 searchTerm = searchTerm.append(" ");

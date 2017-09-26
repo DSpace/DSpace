@@ -7,11 +7,7 @@
  */
 package org.dspace.authenticate;
 
-import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -19,6 +15,10 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
 
 /**
  * A stackable authentication method
@@ -128,7 +128,7 @@ public class PasswordAuthentication
 		// ensures they are password users
 		try
 		{
-			if (context.getCurrentUser().getPasswordHash() != null && !context.getCurrentUser().getPasswordHash().toString().equals(""))
+		if (context.getCurrentUser() != null && context.getCurrentUser().getPasswordHash()!=null && StringUtils.isNotBlank(context.getCurrentUser().getPasswordHash().toString()))
 			{
 				String groupName = ConfigurationManager.getProperty("authentication-password", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
@@ -149,7 +149,7 @@ public class PasswordAuthentication
 			}
 		}
 		catch (Exception e) {
-			// The user is not a password user, so we don't need to worry about them
+            log.error(LogManager.getHeader(context,"getSpecialGroups",""),e);
 		}
 		return new int[0];
     }

@@ -204,7 +204,6 @@
                     <map:reader name="HandleResolverReader" src="org.dspace.app.xmlui.aspect.handle.HandleResolverReader"/>
 
                     <map:reader name="EmbargoListDownloader" src="edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser.EmbargoListDownloader"/>
-                    <map:reader name="MonthlyStatisticsDownloader" src="edu.umd.lib.dspace.app.xmlui.aspect.artifactbrowser.MonthlyStatisticsDownloader"/>
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -440,28 +439,6 @@
                         <map:match pattern="embargo-list/csv">
                             <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
                                 <map:read type="EmbargoListDownloader"/>
-                            </map:match>
-
-                            <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
-                                <map:select type="AuthenticatedSelector">
-                                    <map:when test="eperson">
-                                        <map:transform type="RestrictedItem"/>
-                                        <map:serialize/>
-                                    </map:when>
-                                    <map:otherwise>
-                                        <map:act type="StartAuthentication">
-                                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
-                                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
-                                        </map:act>
-                                        <map:serialize/>
-                                    </map:otherwise>
-                                </map:select>
-                            </map:match>
-                        </map:match>
-
-                        <map:match pattern="monthly-statistics/*">
-                            <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
-                                <map:read type="MonthlyStatisticsDownloader"/>
                             </map:match>
 
                             <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">

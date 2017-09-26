@@ -319,7 +319,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
         java.util.List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
 
-        log.info("facets for scope, " + scope + ": " + (facets != null ? facets.size() : null));
+        log.debug("facets for scope, " + scope + ": " + (facets != null ? facets.size() : null));
 
 
 

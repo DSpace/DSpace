@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>modules</artifactId>
-        <version>5.6-drum-2</version>
+        <version>5.7-drum-0</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -178,7 +178,7 @@
                 <dependency>
                     <groupId>org.dspace.modules</groupId>
                     <artifactId>xmlui-mirage2</artifactId>
-                    <version>5.6-drum-2</version>
+                    <version>5.7-drum-0</version>
                     <type>war</type>
                 </dependency>
             </dependencies>
@@ -190,6 +190,14 @@
       <dependency>
          <groupId>org.dspace.modules</groupId>
          <artifactId>additions</artifactId>
+      </dependency>
+
+      <!-- Atmire Statistics Exporter Dependency -->
+      <dependency>
+          <groupId>com.atmire</groupId>
+          <artifactId>atmire-statistics-exporter-api</artifactId>
+          <version>1.0.0</version>
+          <type>jar</type>
       </dependency>
 
       <!-- DSpace XMLUI Languages -->

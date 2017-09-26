@@ -342,7 +342,7 @@ public class AuthorizeManager
                 }
 
                 if ((rp.getGroupID() != -1)
-                        && (Group.isMember(c, rp.getGroupID())))
+                        && (Group.isMember(c, e, rp.getGroupID())))
                 {
                     // group was set, and eperson is a member
                     // of that group

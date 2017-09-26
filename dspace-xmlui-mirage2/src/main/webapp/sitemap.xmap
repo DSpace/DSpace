@@ -85,6 +85,7 @@
             <map:transform type="IncludePageMeta">
                 <map:parameter name="theme.path" value="{global:theme-path}/"/>
                 <map:parameter name="theme.name" value="{global:theme-name}/"/>
+                <map:parameter name="curRequestURI" value="{1}"/>
             </map:transform>
 
             <!-- Debugging output (this is only called when ?XML is passed on querystring) -->
