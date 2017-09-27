@@ -17,6 +17,67 @@
     ::selection { @content; }
 }
 
+// vsim styles for front page content
+.vsim-featured-project {
+    background: none repeat scroll 0 0 #00a3e0;
+    opacity: 0.7;
+    margin: 0 auto;
+    margin-top: -50px;
+    text-align:left;
+    position: relative;
+    width:100%;
+    padding: 0 0 0 20px;
+}
+
+.vsim-featured-project-text {
+    background-color: $brand-primary;
+    color: #fff;
+}
+
+.vsim-featured-project-text a {
+    background-color: $brand-primary;
+    color: #fff;
+}
+
+.vsim-featured-project-text h3 {
+    margin-top: 13px;
+}
+
+.vsim-featured-project-thumbnail {
+    height: 273px;
+}
+
+.vsim-featured-project-thumbnail img{
+    width: 100%;
+}
+
+.vsim-featured-project-caption {
+}
+
+
+.thumbnail h1{
+  position:absolute;
+  top:50%;
+  left:0;
+  color:lightgrey;
+  width:100%;
+  text-align:center;
+  transform:translateY(-50%); /* doesn't work in IE9 and older I'm affraid */
+  margin:0;
+}
+
+
+.vsim-featured-project-caption h3 {
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+	position:absolute;
+	top:50%;
+	left:0;
+	width:100%;
+	transform:translateY(-50%); /* doesn't work in IE9 and older I'm affraid */
+	margin:0;
+}
 // tweak the carousel controls
 .carousel-control {
         opacity:100;

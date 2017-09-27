@@ -113,21 +113,27 @@
                                         <div class="col-xs-12 col-sm-12 col-md-9 main-content">
 
                                     <xsl:choose>
-                                        <!-- if this is the main home page, show the main hero block, the featured collection block, and the fancy buttons -->
+                                        <!-- if this is the main home page, show the main hero block, the featured project block, and the fancy buttons -->
                                         <xsl:when test="normalize-space($request-uri)=''">
                                             <h1 class="text-center">Let VSim facilitate real-time<br/>exploration in your classroom</h1>
-                                            <div class="container">
-                                            <div class="row-fluid">
-                                                <div class="span8">
-                                                <div class="hero-unit">
-                                                    <h1>Digital Karnak</h1>
-                                                    <p>This is a bit about the featured collection, Digital Karnak.</p>
+                                            <div class="container vsim-featured-project-container">
+                                                <div class="row-fluid">
+                                                    <div class="col-md-5 col-sm-5 col-lg-5 col-xs-5 vsim-featured-project-thumbnail">
+                                                        <img src="/xmlui/themes/Mirage2/images/DigitalKarnakHeroImage_Sept2017.jpg"/>
+                                                        <div class="vsim-featured-project">
+                                                            <h3 class="vsim-featured-project-caption">Featured Project</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-4 col-lg-4 col-xs-4 vsim-featured-project-text">
+                                                            <h3>Digital Karnak</h3>
+                                                            <p>The <a href="/xmlui/handle/20.500.11930/1023">Digital Karnak Project</a> aims to make the site of Karnak 
+                                                                more accessible to students and instructors in the English-speaking world. As part of this goal, a 3-D Virtual 
+                                                                Reality model of the temple was constructed, offering students a completely new way to view the temple: 
+                                                                reign-by-reign, following the complex patterns of royal construction, modification and destruction that are 
+                                                                now obscured by the latest building phases at the site.</p>
+                                                    </div>
                                                 </div>
-                                                </div>
-                                                <div class="span4">
-                                                insert digital karnak photo here
-                                                </div>
-                                            </div></div>
+                                            </div>
                                             <p class="text-center">
                                                     <a href="{$app_path}/pages/tour" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/TourLink.png" alt=" Tour "/></a>
                                                     <a href="{$app_path}/pages/download" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/DownloadLink.png" alt=" Download "/></a>
