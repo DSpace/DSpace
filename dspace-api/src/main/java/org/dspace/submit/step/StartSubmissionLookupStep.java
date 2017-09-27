@@ -126,6 +126,8 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
         String uuidSubmission = request.getParameter("suuid");
         String uuidLookup = request.getParameter("iuuid");
         String fuuidLookup = request.getParameter("fuuid");
+        String uuid_batch = request.getParameter("iuuid_batch");
+        
         boolean forceEmpty = Util.getBoolParameter(request, "forceEmpty");
         
         ItemSubmissionLookupDTO itemLookup = null;
@@ -192,6 +194,11 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             if (itemLookup != null)
             {
                 dto.add(itemLookup);
+                String[] uuids = StringUtils.split(uuid_batch, ";");
+                for(int i=0;i<uuids.length;i++){
+                	ItemSubmissionLookupDTO isld = submissionDTO.getLookupItem(uuids[i]);
+                	dto.add(isld);
+                }
             }
             else if (fuuidLookup != null && !fuuidLookup.isEmpty())
             {
