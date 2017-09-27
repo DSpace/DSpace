@@ -81,12 +81,29 @@
 // tweak the carousel controls
 .carousel-control {
         opacity:100;
-        top:95%
+        top:95%;
+        color: $brand-primary;
 }
+.carousel-control:hover, .carousel-control .active {
+    color: $brand-success;
+}
+
 .carousel-control.left, .carousel-control.right {
    background-image:none !important;
    filter:none !important;
 }
+.carousel-indicators {
+    color: $brand-primary;
+}
+
+.carousel-indicators li {
+    border-color: $brand-primary;
+}
+
+.carousel-indicators .active {
+    background-color: $brand-primary;
+}
+
 
 // utility class for centering divs
 .center {
