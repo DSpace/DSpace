@@ -250,7 +250,9 @@ public class RestResourceController implements InitializingBean {
 			resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
 		}
 		PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
-		result.add(linkTo(this.getClass(), apiCategory, model).slash("search").withRel("search"));
+		if (haveSearchMethods(repository)) {
+			result.add(linkTo(this.getClass(), apiCategory, model).slash("search").withRel("search"));
+		}
 		return result;
 	}
 
