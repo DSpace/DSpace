@@ -138,21 +138,50 @@ public class SubmissionConfigReader
     }
 
     /**
+     * Returns all the Item Submission process configs with pagination 
+     * 
+     * @param limit
+     *            max number of SubmissionConfig to return
+     * @param offset
+     *            number of SubmissionConfig to skip in the return
+     *            
+     * @return the list of SubmissionConfig 
+     * 
+     */
+    public List<SubmissionConfig> getAllSubmissionConfigs(Integer limit, Integer offset)
+    {
+    	int idx = 0;
+    	int count = 0;
+    	List<SubmissionConfig> subConfigs = new LinkedList<SubmissionConfig>();
+    	for (String key : submitDefns.keySet()) {
+    		if (offset == null || idx >= offset) {
+    			count++;
+    			subConfigs.add(getSubmissionConfigByName(key));
+    		}
+    		idx++;
+    		if (count >= limit) {
+    			break;
+    		}
+    	}
+    	return subConfigs;
+    }
+    
+    public int countSubmissionConfigs()
+    {
+    	return submitDefns.keySet().size();
+    }
+    /**
      * Returns the Item Submission process config used for a particular
      * collection, or the default if none is defined for the collection
      * 
      * @param collectionHandle
      *            collection's unique Handle
-     * @param isWorkflow
-     *            whether or not we are loading the submission process for a
-     *            workflow
      * @return the SubmissionConfig representing the item submission config
      * 
      * @throws ServletException
      *             if no default submission process configuration defined
      */
-    public SubmissionConfig getSubmissionConfig(String collectionHandle,
-            boolean isWorkflow) throws ServletException
+    public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle)
     {
         // get the name of the submission process config for this collection
         String submitName = collectionToSubmissionConfig
@@ -164,17 +193,28 @@ public class SubmissionConfigReader
         }
         if (submitName == null)
         {
-            throw new ServletException(
+            throw new IllegalStateException(
                     "No item submission process configuration designated as 'default' in 'submission-map' section of 'item-submission.xml'.");
         }
-
+        return getSubmissionConfigByName(submitName);
+    }
+    
+    /**
+     * Returns the Item Submission process config 
+     * 
+     * @param submitName
+     *            submission process unique name
+     * @return the SubmissionConfig representing the item submission config
+     * 
+     */
+    public SubmissionConfig getSubmissionConfigByName(String submitName) 
+    {
         log.debug("Loading submission process config named '" + submitName
                 + "'");
 
         // check mini-cache, and return if match
         if (lastSubmissionConfig != null
-                && lastSubmissionConfig.getSubmissionName().equals(submitName)
-                && lastSubmissionConfig.isWorkflow() == isWorkflow)
+                && lastSubmissionConfig.getSubmissionName().equals(submitName))
         {
             log.debug("Found submission process config '" + submitName
                     + "' in cache.");
@@ -187,7 +227,7 @@ public class SubmissionConfigReader
 
         if (steps == null)
         {
-            throw new ServletException(
+            throw new IllegalStateException(
                     "Missing the Item Submission process config '" + submitName
                             + "' (or unable to load) from 'item-submission.xml'.");
         }
@@ -195,8 +235,7 @@ public class SubmissionConfigReader
         log.debug("Submission process config '" + submitName
                 + "' not in cache. Reloading from scratch.");
 
-        lastSubmissionConfig = new SubmissionConfig(submitName, steps,
-                isWorkflow);
+        lastSubmissionConfig = new SubmissionConfig(submitName, steps);
 
         log.debug("Submission process config has "
                 + lastSubmissionConfig.getNumberOfSteps() + " steps listed.");
@@ -547,11 +586,18 @@ public class SubmissionConfigReader
             // process each child node of a <step> tag
             Node nfld = flds.item(k);
 
+            String tagName = nfld.getNodeName();
             if (!isEmptyTextNode(nfld))
             {
-                String tagName = nfld.getNodeName();
                 String value = getValue(nfld);
                 stepInfo.put(tagName, value);
+            }
+            
+            for (int idx = 0; idx < nfld.getAttributes().getLength(); idx++) {
+            	Node nAttr = nfld.getAttributes().item(idx);
+            	String attrName = nAttr.getNodeName();
+            	String attrValue = nAttr.getNodeValue();
+            	stepInfo.put(tagName+"."+attrName, attrValue);
             }
         }// end for each field
 
@@ -560,6 +606,12 @@ public class SubmissionConfigReader
         if (stepID != null && stepID.length() > 0)
         {
             stepInfo.put("id", stepID);
+        }
+
+        String mandatory = getAttribute(nStep, "mandatory");
+        if (mandatory != null && mandatory.length() > 0)
+        {
+            stepInfo.put("mandatory", mandatory);
         }
 
         // look for REQUIRED 'step' information

@@ -610,8 +610,7 @@ public class SubmissionInfo extends HashMap
             // reload the proper Submission process config
             // (by reading the XML config file)
             subInfo.submissionConfig = submissionConfigReader
-                    .getSubmissionConfig(subInfo.getCollectionHandle(), subInfo
-                            .isInWorkflow());
+                    .getSubmissionConfigByCollection(subInfo.getCollectionHandle());
 
             // cache this new submission process configuration
             saveSubmissionConfigToCache(request.getSession(),

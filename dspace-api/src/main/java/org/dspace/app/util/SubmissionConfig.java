@@ -37,9 +37,6 @@ public class SubmissionConfig implements Serializable
     /** the configuration classes for the steps in this submission process */
     private SubmissionStepConfig[] submissionSteps = null;
 
-    /** whether or not this submission process is being used in a workflow * */
-    private boolean isWorkflow = false;
-
     /** log4j logger */
     private static Logger log = Logger.getLogger(SubmissionConfig.class);
 
@@ -52,16 +49,10 @@ public class SubmissionConfig implements Serializable
      * @param steps
      *            the vector listing of step information to build
      *            SubmissionStepConfig objects for this submission process
-     * @param isWorkflowProcess
-     *            whether this submission process is being used in a workflow or
-     *            not. If it is a workflow process this may limit the steps that
-     *            are available for editing.
      */
-    public SubmissionConfig(String submissionName, List<Map<String, String>> steps,
-            boolean isWorkflowProcess)
+    public SubmissionConfig(String submissionName, List<Map<String, String>> steps)
     {
         this.submissionName = submissionName;
-        this.isWorkflow = isWorkflowProcess;
 
         // initialize a vector of SubmissionStepConfig objects
         List<SubmissionStepConfig> stepConfigs = new ArrayList<SubmissionStepConfig>();
@@ -72,22 +63,13 @@ public class SubmissionConfig implements Serializable
             Map<String, String> stepInfo = steps.get(stepNum);
             SubmissionStepConfig step = new SubmissionStepConfig(stepInfo);
 
-            // Only add this step to the process if either:
-            // (a) this is not a workflow process OR
-            // (b) this is a workflow process, and this step is editable in a
-            // workflow
-            if ((!this.isWorkflow)
-                    || ((this.isWorkflow) && step.isWorkflowEditable()))
-            {
-                // set the number of the step (starts at 0) and add it
-                step.setStepNumber(stepConfigs.size());
-                stepConfigs.add(step);
+            // set the number of the step (starts at 0) and add it
+            step.setStepNumber(stepNum);
+            stepConfigs.add(step);
 
-                log.debug("Added step '" + step.getProcessingClassName()
-                        + "' as step #" + step.getStepNumber()
-                        + " of submission process " + submissionName);
-
-            }
+            log.debug("Added step '" + step.getProcessingClassName()
+                    + "' as step #" + step.getStepNumber()
+                    + " of submission process " + submissionName);
         }
 
         // get steps as an array of Strings
@@ -113,17 +95,6 @@ public class SubmissionConfig implements Serializable
     public int getNumberOfSteps()
     {
         return submissionSteps.length;
-    }
-
-    /**
-     * Return whether or not this submission process is being used in a
-     * workflow!
-     * 
-     * @return true, if it's a workflow process. false, otherwise.
-     */
-    public boolean isWorkflow()
-    {
-        return isWorkflow;
     }
 
     /**

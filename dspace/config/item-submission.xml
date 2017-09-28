@@ -83,9 +83,7 @@
      <step id="collection">
        <heading></heading> <!--can specify heading, if you want it to appear in Progress Bar-->
 	   <processing-class>org.dspace.submit.step.SelectCollectionStep</processing-class>
-       <jspui-binding>org.dspace.app.webui.submit.step.JSPSelectCollectionStep</jspui-binding>
-       <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep</xmlui-binding>
-       <workflow-editable>false</workflow-editable>
+       <type>collection</type>
      </step>
      
 	 <!-- Uncomment this to make available the bibliographic import from external source - note ONLY for JSPUI -->     
@@ -211,18 +209,14 @@
       <step>
         <heading>submit.progressbar.describe</heading>
         <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.DescribeStep</xmlui-binding>
-        <workflow-editable>true</workflow-editable>
+        <type>input-form</type>
       </step>
 
        <!--Step 3 will be to Manage Item access.
        <step>
            <heading>submit.progressbar.access</heading>
            <processing-class>org.dspace.submit.step.AccessStep</processing-class>
-           <jspui-binding>org.dspace.app.webui.submit.step.JSPAccessStep</jspui-binding>
-           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.AccessStep</xmlui-binding>
-           <workflow-editable>true</workflow-editable>
+           <type>access</type>
        </step>
        -->
 
@@ -230,9 +224,7 @@
       <step>
         <heading>submit.progressbar.upload</heading>
         <processing-class>org.dspace.submit.step.UploadStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
-        <workflow-editable>true</workflow-editable>
+        <type>upload</type>
       </step>
       
 
@@ -241,20 +233,18 @@
        <step>
            <heading>submit.progressbar.upload</heading>
            <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
-           <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadWithEmbargoStep</jspui-binding>
-           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadWithEmbargoStep</xmlui-binding>
-           <workflow-editable>true</workflow-editable>
+           <type>uploadWithEmbargo</type>
        </step>
        -->
 
  	  <!--Step 5 will be to Verify/Review everything -->
- 	  <step>
+<!--  	  <step>
         <heading>submit.progressbar.verify</heading>
         <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
  	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
 		<workflow-editable>true</workflow-editable>
-      </step>
+      </step> -->
 
       <!--Step 6 will be to select a Creative Commons License-->
       <!-- Uncomment this step to allow the user to select a Creative Commons license -->
@@ -262,9 +252,7 @@
       <step>
         <heading>submit.progressbar.CClicense</heading>
         <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
+        <type>cclicense</type>
       </step>
       -->
 
@@ -272,13 +260,31 @@
       <step>
         <heading>submit.progressbar.license</heading>
         <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
+        <type>license</type>
+        <scope visibilityOutside="read-only">submission</scope>
       </step>
 
-
+	  <!--Step 8 will be to Check for potential duplicate -->
+       <step>
+           <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class>
+       </step>
      
+     <!-- Fake Steps to test parsing of all options -->
+     <!-- 
+       <step mandatory="false">
+		<heading>fake.submission.readonly</heading>
+        <processing-class>org.dspace.submit.step.SampleStep</processing-class>
+        <type>sample</type>
+        <scope visibility="read-only">submission</scope>
+       </step>
+       
+       <step mandatory="false">
+		<heading>fake.workflow.readonly</heading>
+        <processing-class>org.dspace.submit.step.SampleStep</processing-class>
+        <type>sample</type>
+        <scope visibility="read-only">workflow</scope>
+       </step> 
+     -->
    </submission-process>
 
  </submission-definitions>
