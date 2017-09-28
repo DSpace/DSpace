@@ -15,8 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
+import org.apache.tika.mime.MimeTypes;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
+import org.dspace.app.rest.utils.MultipartFileSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,36 +49,27 @@ public class BitstreamContentRestController {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
-		response.setHeader("ETag", bit.getCheckSum().getValue());
-//		response.setContentLengthLong(bit.getSizeBytes());
-        // Check for if-modified-since header
-        long modSince = request.getDateHeader("If-Modified-Since");
-// we should keep last modification date on the bitstream
-//            if (modSince != -1 && item.getLastModified().getTime() < modSince)
-//            {
-//                // Item has not been modified since requested date,
-//                // hence bitstream has not; return 304
-//                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-//                return;
-//            }
-
 
         // Pipe the bits
         InputStream is = bitstreamRestRepository.retrieve(uuid);
 
+        String mimetype = bit.getFormat().getMimetype();
+        //This should be improved somewhere else so we don't have to look for the correct mimetype here
+        if (mimetype.equals(MimeTypes.OCTET_STREAM)) {
+        	Tika tika = new Tika();
+        	mimetype = tika.detect(is);
+        	is.close();
+			is = bitstreamRestRepository.retrieve(uuid);
+		}
 
         //MultipartFileSender
-
 		try {
-			MultipartFileSender.fromBitstream(bit).with(request).with(response).with(is).serveResource();
+			MultipartFileSender.fromBitstream(bit).with(request).with(response).with(is).with(mimetype).serveResource();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			IOUtils.closeQuietly(is);
 		}
-
-//		is.close();
-
 
 	}
 

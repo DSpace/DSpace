@@ -1,7 +1,6 @@
-package org.dspace.app.rest;
+package org.dspace.app.rest.utils;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tika.Tika;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,7 @@ public class MultipartFileSender {
     InputStream inputStream;
     HttpServletRequest request;
     HttpServletResponse response;
+    String contentType;
 
     public MultipartFileSender() {
     }
@@ -66,6 +66,11 @@ public class MultipartFileSender {
         return this;
     }
 
+    public MultipartFileSender with(String mimetype) {
+        this.contentType = mimetype;
+        return this;
+    }
+
     public void serveResource() throws Exception {
         if (response == null || request == null) {
             return;
@@ -86,8 +91,6 @@ public class MultipartFileSender {
             return;
         }
         long lastModified = LocalDateTime.ofInstant(lastModifiedObj.toInstant(), ZoneId.of(ZoneOffset.systemDefault().getId())).toEpochSecond(ZoneOffset.UTC);
-        Tika tika = new Tika();
-        String contentType = tika.detect(inputStream);
 
         // Validate request headers for caching ---------------------------------------------------
 
