@@ -237,21 +237,20 @@
 
         <!-- DSpace dependencies -->
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-api</artifactId>
-            <exclusions>
-            	<exclusion>
-            		<groupId>com.fasterxml.jackson.core</groupId>
-            		<artifactId>jackson-core</artifactId>
-            	</exclusion>
-            </exclusions>
-        </dependency>
-
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-api</artifactId>
+        <exclusions>
+            <exclusion>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
         </dependency>
-        
+
         <!-- Apache Commons Collections 4.1 (used for MultiValuedMap to store metadata values for views) -->
         <!-- NOTE: Currently DSpace API / Services still used 3.2 and may need upgrading at some point -->
         <dependency>
@@ -259,68 +258,13 @@
             <artifactId>commons-collections4</artifactId>
         </dependency>
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.nimbusds</groupId>
-            <artifactId>nimbus-jose-jwt</artifactId>
-            <version>4.23</version>
-        </dependency>
-
-        <!-- TEST DEPENDENCIES -->
-        <dependency> <!-- Keep jmockit before junit -->
-            <groupId>org.jmockit</groupId>
-            <artifactId>jmockit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.databene</groupId>
-            <artifactId>contiperf</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-solr</artifactId>
-            <classifier>classes</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-icu</artifactId>
-            <version>${solr.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-smartcn</artifactId>
-            <version>${solr.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-stempel</artifactId>
-            <version>${solr.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
 
