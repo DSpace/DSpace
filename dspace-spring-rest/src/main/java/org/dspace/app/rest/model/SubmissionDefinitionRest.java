@@ -12,6 +12,7 @@ import java.util.List;
 import org.dspace.app.rest.RestResourceController;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The Submission Definition REST Resource
@@ -24,6 +25,9 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 	public static final String CATEGORY = RestModel.CONFIGURATION;
 
 	private String name;
+	
+	@JsonProperty(value="isDefault")
+	private boolean defaultConf;
 	
 	private List<SubmissionPanelRest> panels;
 
@@ -52,7 +56,15 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 	public String getType() {
 		return NAME;
 	}
-
+	
+	public void setDefaultConf(boolean isDefault) {
+		this.defaultConf = isDefault;
+	}
+	
+	public boolean isDefaultConf() {
+		return defaultConf;
+	}
+	
 	@Override
 	public Class getController() {
 		return RestResourceController.class;

@@ -14,6 +14,7 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.services.factory.DSpaceServicesFactory;
 
@@ -95,6 +96,14 @@ public class SubmissionConfigReader
         buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
     }
 
+    public void reload() throws ServletException
+    {
+    	collectionToSubmissionConfig = null;
+    	stepDefns = null;
+    	submitDefns = null;
+        buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
+    }
+    
     /**
      * Parse an XML encoded item submission configuration file.
      * <P>
@@ -135,6 +144,15 @@ public class SubmissionConfigReader
             throw new ServletException(
                     "Error creating Item Submission Configuration: " + e);
         }
+    }
+    
+    /**
+     * 
+     * @return the name of the default submission configuration
+     */
+    public String getDefaultSubmissionConfigName() 
+    {
+    	return collectionToSubmissionConfig.get(DEFAULT_COLLECTION);
     }
 
     /**
@@ -235,7 +253,8 @@ public class SubmissionConfigReader
         log.debug("Submission process config '" + submitName
                 + "' not in cache. Reloading from scratch.");
 
-        lastSubmissionConfig = new SubmissionConfig(submitName, steps);
+        lastSubmissionConfig = new SubmissionConfig(StringUtils.equals(getDefaultSubmissionConfigName(), submitName), 
+        		submitName, steps);
 
         log.debug("Submission process config has "
                 + lastSubmissionConfig.getNumberOfSteps() + " steps listed.");

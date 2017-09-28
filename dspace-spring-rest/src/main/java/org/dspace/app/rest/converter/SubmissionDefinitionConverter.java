@@ -32,6 +32,7 @@ public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionCon
 	public SubmissionDefinitionRest fromModel(SubmissionConfig obj) {
 		SubmissionDefinitionRest sd = new SubmissionDefinitionRest();
 		sd.setName(obj.getSubmissionName());
+		sd.setDefaultConf(obj.isDefaultConf());
 		List<SubmissionPanelRest> panels = new LinkedList<SubmissionPanelRest>();
 		for (int idx = 0; idx < obj.getNumberOfSteps(); idx++) {
 			SubmissionStepConfig step = obj.getStep(idx);

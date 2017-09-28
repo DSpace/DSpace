@@ -34,6 +34,8 @@ public class SubmissionConfig implements Serializable
     /** name of the item submission process */
     private String submissionName = null;
 
+    private boolean defaultConf = false;
+    
     /** the configuration classes for the steps in this submission process */
     private SubmissionStepConfig[] submissionSteps = null;
 
@@ -50,9 +52,10 @@ public class SubmissionConfig implements Serializable
      *            the vector listing of step information to build
      *            SubmissionStepConfig objects for this submission process
      */
-    public SubmissionConfig(String submissionName, List<Map<String, String>> steps)
+    public SubmissionConfig(boolean isDefault, String submissionName, List<Map<String, String>> steps)
     {
         this.submissionName = submissionName;
+        this.defaultConf = isDefault;
 
         // initialize a vector of SubmissionStepConfig objects
         List<SubmissionStepConfig> stepConfigs = new ArrayList<SubmissionStepConfig>();
@@ -87,6 +90,10 @@ public class SubmissionConfig implements Serializable
         return submissionName;
     }
 
+    public boolean isDefaultConf() {
+		return defaultConf;
+	}
+    
     /**
      * Return the number of steps in this submission process
      * 
