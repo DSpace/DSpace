@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.link;
 
 import org.dspace.app.rest.DiscoverableEndpointsService;
@@ -21,7 +28,7 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
 
     protected void addLinks(RootResource halResource, LinkedList<Link> list) {
         for(Link endpointLink : discoverableEndpointsService.getDiscoverableEndpoints()){
-            list.add(buildLink(endpointLink.getRel(), endpointLink.getRel()));
+            list.add(buildLink(endpointLink.getRel(), halResource.getData().getDspaceRest() + endpointLink.getHref()));
         }
     }
 

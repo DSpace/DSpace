@@ -40,20 +40,18 @@ public class RootConverterTest {
 
     @Test
     public void testReturnCorrectClass() throws Exception{
-        assertEquals(rootConverter.convert("").getClass(), RootRest.class);
+        assertEquals(rootConverter.convert().getClass(), RootRest.class);
     }
 
     @Test
     public void testCorrectPropertiesSetFromConfigurationService() throws Exception{
-        String restUrl = "rest";
-        RootRest rootRest = rootConverter.convert(restUrl);
+        RootRest rootRest = rootConverter.convert();
         assertEquals("dspaceurl", rootRest.getDspaceURL());
         assertEquals("dspacename", rootRest.getDspaceName());
-        assertEquals(restUrl, rootRest.getDspaceRest());
     }
 
     @Test
     public void testReturnNotNull() throws Exception{
-        assertNotNull(rootConverter.convert(""));
+        assertNotNull(rootConverter.convert());
     }
 }
