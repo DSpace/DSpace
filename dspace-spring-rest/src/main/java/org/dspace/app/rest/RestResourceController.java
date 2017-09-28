@@ -293,15 +293,16 @@ public class RestResourceController implements InitializingBean {
 	
 	@RequestMapping(method = RequestMethod.GET, value="/search/{searchMethod}")
 	@SuppressWarnings("unchecked")
-	<T extends RestModel> PagedResources<DSpaceResource<T>> executeSearchMethods(@PathVariable String apiCategory, 
+	<T extends RestModel> ResourceSupport executeSearchMethods(@PathVariable String apiCategory, 
 			@PathVariable String model, @PathVariable String searchMethod, Pageable pageable, Sort sort, PagedResourcesAssembler assembler, 
 			@RequestParam MultiValueMap<String, Object> parameters) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 			
 		Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethod).withSelfRel();
 		DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
-		Page<DSpaceResource<T>> resources = null;
+		Object searchResult = null;
 		boolean searchEnabled = false;
 		boolean searchMethodFound = false;
+		boolean returnPage = false;
 		for (Method method : repository.getClass().getMethods()) {
 			SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
 			if (ann != null) {
@@ -311,8 +312,9 @@ public class RestResourceController implements InitializingBean {
 					name = method.getName();
 				}
 				if (StringUtils.equals(name, searchMethod)) {
+					returnPage = method.getReturnType().isAssignableFrom(List.class);
 					searchMethodFound = true;
-					resources = ((Page<T>) executeQueryMethod(repository, parameters, method, pageable, sort, assembler)).map(repository::wrapResource);
+					searchResult = executeQueryMethod(repository, parameters, method, pageable, sort, assembler);
 					break;
 				}
 			}
@@ -323,7 +325,15 @@ public class RestResourceController implements InitializingBean {
 		if (!searchEnabled) {
 			throw new RepositorySearchNotFoundException(model);
 		}
-		PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
+		
+		ResourceSupport result = null;
+		if (returnPage) {
+			Page<DSpaceResource<T>> resources = ((Page<T>) searchResult).map(repository::wrapResource);
+			result = assembler.toResource(resources, link);
+		}
+		else {
+			result = repository.wrapResource((T) searchResult);
+		}
 		return result;
 	}
 	
