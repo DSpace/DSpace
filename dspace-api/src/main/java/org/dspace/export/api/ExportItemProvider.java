@@ -13,15 +13,53 @@ import java.io.OutputStream;
 import org.dspace.content.Item;
 
 /**
- * 
+ *
  * @author João Melo <jmelo@lyncode.com>
- * @version $Revision$
+ * 
  */
-public interface ExportItemProvider {
-	File getXSLT ();
-	String getId ();
-	String getImage ();
-	void export (Item item, OutputStream output) throws ExportItemException;
-	String getContentType();
-	String getFileExtension();
+public interface ExportItemProvider
+{
+    /**
+     * Get a valid stylesheet of an export provider. 
+     * 
+     * @return the XSLT file of the export provider.
+     */
+    public File getXSLT();
+
+    /**
+     * Get the string identifies of this export provider.
+     * 
+     * @return unique string that identifies this export provider.
+     */
+    public String getId();
+
+    /**
+     * Get the image of this export provider.
+     *
+     * @return the path of the image of this export provider.
+     */
+    public String getImage();
+
+    /**
+     * Export the item metadata based on the stylesheet of the export provider.
+     * 
+     * @param item that metadata should be export from.
+     * @param output to put the result in.
+     * @throws ExportItemException 
+     */
+    public void export(Item item, OutputStream output) throws ExportItemException;
+
+    /**
+     * Get the content type of this export provider.
+     *
+     * @return the content type of this export provider.
+     */
+    public String getContentType();
+
+    /**
+     * Get the file extension of this export provider.
+     *
+     * @return the file extension of this export provider.
+     */
+    public String getFileExtension();
 }
