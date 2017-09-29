@@ -9,14 +9,12 @@
 do $$
 begin
 	
-	ALTER TABLE CRIS_ORCID_HISTORY ADD COLUMN orcid varchar(255);
-	ALTER TABLE CRIS_ORCID_HISTORY DROP COLUMN entityid;
+	-- need mandatory to send affiliation (employment and education) to Orcid Registry
+	UPDATE CRIS_OU_PDEF SET MANDATORY = true WHERE SHORTNAME = 'city';
+	UPDATE CRIS_OU_PDEF SET MANDATORY = true WHERE SHORTNAME = 'iso-3166-country';
 	
-	DELETE FROM CRIS_ORCID_HISTORY;
 exception when others then
- 	
-	DELETE FROM CRIS_ORCID_HISTORY;
- 	
+ 
     raise notice 'The transaction is in an uncommittable state. '
                      'Transaction was rolled back';
  

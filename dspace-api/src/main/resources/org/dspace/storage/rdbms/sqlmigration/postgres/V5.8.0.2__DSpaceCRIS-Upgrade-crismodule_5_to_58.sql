@@ -10,11 +10,11 @@ do $$
 begin
 
 	-- delete scopes	
-	DELETE FROM JDYNA_VALUES WHERE id IN (SELECT value_id FROM CRIS_RP_PROP WHERE typo_id in (SELECT id from CRIS_RP_PDEF where SHORTNAME in ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-activities-update')));
-	DELETE FROM CRIS_RP_PROP WHERE typo_id IN (SELECT id from CRIS_RP_PDEF where SHORTNAME in ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-activities-update'));
-    DELETE FROM CRIS_RP_BOX2CON WHERE jdyna_containable_id  IN (SELECT ID FROM JDYNA_CONTAINABLE WHERE cris_rp_pdef_fk IN (SELECT id FROM CRIS_RP_PDEF WHERE SHORTNAME IN ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-activities-update')));
-	DELETE FROM JDYNA_CONTAINABLE WHERE cris_rp_pdef_fk IN (SELECT id FROM CRIS_RP_PDEF WHERE SHORTNAME IN ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-activities-update'));
-	DELETE FROM CRIS_RP_PDEF WHERE SHORTNAME IN ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-activities-update');
+	DELETE FROM JDYNA_VALUES WHERE id IN (SELECT value_id FROM CRIS_RP_PROP WHERE typo_id in (SELECT id from CRIS_RP_PDEF where SHORTNAME in ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-orcid-works-update')));
+	DELETE FROM CRIS_RP_PROP WHERE typo_id IN (SELECT id from CRIS_RP_PDEF where SHORTNAME in ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-orcid-works-update'));
+    DELETE FROM CRIS_RP_BOX2CON WHERE jdyna_containable_id  IN (SELECT ID FROM JDYNA_CONTAINABLE WHERE cris_rp_pdef_fk IN (SELECT id FROM CRIS_RP_PDEF WHERE SHORTNAME IN ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-orcid-works-update')));
+	DELETE FROM JDYNA_CONTAINABLE WHERE cris_rp_pdef_fk IN (SELECT id FROM CRIS_RP_PDEF WHERE SHORTNAME IN ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-orcid-works-update'));
+	DELETE FROM CRIS_RP_PDEF WHERE SHORTNAME IN ('system-orcid-token-orcid-works-create','system-orcid-token-funding-create','system-orcid-token-funding-update','system-orcid-token-orcid-works-update');
 
 	-- delete metadata configuration
 	DELETE FROM JDYNA_VALUES WHERE id IN (SELECT value_id FROM CRIS_RP_PROP WHERE typo_id in (SELECT id from CRIS_RP_PDEF where SHORTNAME in ('orcid-profile-pref-biography','orcid-profile-pref-email','orcid-profile-pref-fullName','orcid-profile-pref-preferredName')));
