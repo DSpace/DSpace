@@ -68,6 +68,7 @@ extends AbstractDSpaceRestRepository
 
 	@Override
 	public Iterable<T> findAll(Iterable<ID> ids) {
+
 		throw new RuntimeException("findAll MUST be paginated");
 	}
 
