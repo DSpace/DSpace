@@ -2964,7 +2964,7 @@ public class PushToORCID
                         {
                             sendOnlyGreatest = true;
                             // found if have a preferred nested to send
-                            if (rpno.getPreferred())
+                            if (rpno.getPreferred()!=null && rpno.getPreferred()==true)
                             {
                                 foundPreferred = true;
                                 break;
@@ -2983,7 +2983,7 @@ public class PushToORCID
                                 // greatest startdate and enddate null or
                                 // greater
                                 // then the others enddate
-                                if (rpno.getPreferred())
+                                if (rpno.getPreferred()!=null && rpno.getPreferred()==true)
                                 {
                                     prepareNestedObjectConfiguration(rpno,
                                             listMapMetadata);

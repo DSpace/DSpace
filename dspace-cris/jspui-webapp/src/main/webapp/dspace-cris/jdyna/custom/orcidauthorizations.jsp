@@ -216,10 +216,7 @@ j(document).ready(function() {
 											</c:if>
 											<c:if test="${showorcidworksupdate eq false && showmissedrepeaticon eq true}">
 												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworksupdate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showorcidworksupdate"/></span></li>
-											</c:if>
-											<c:if test="${showmissedrepeaticon eq true}">
-												<li><span class="bottomTooltip" data-toggle="popover" data-container="body" data-content="<fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingupdate.tooltip"/>"><fmt:message key="jsp.orcid.custom.box.label.authorization.showfundingupdate"/></span></li>
-											</c:if>											
+											</c:if>	
 									</ul>
 								</div>
 							</div>   
