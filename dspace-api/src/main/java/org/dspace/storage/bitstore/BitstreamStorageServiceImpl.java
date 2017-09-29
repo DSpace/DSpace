@@ -289,7 +289,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
 
 
                 // Since versioning allows for multiple bitstreams, check if the internal identifier isn't used on another place
-                if(0 < bitstreamService.findDuplicateInternalIdentifier(context, bitstream).size())
+                if(bitstreamService.findDuplicateInternalIdentifier(context, bitstream).isEmpty())
                 {
                     stores.get(bitstream.getStoreNumber()).remove(bitstream);
 
