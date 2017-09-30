@@ -283,7 +283,7 @@ public class RestResourceController implements InitializingBean {
 		
 		searchResult = repositoryUtils.executeQueryMethod(repository, parameters, searchMethod, pageable, sort, assembler);
 		
-		returnPage = searchMethod.getReturnType().isAssignableFrom(List.class);
+		returnPage = searchMethod.getReturnType().isAssignableFrom(Page.class);
 		ResourceSupport result = null;
 		if (returnPage) {
 			Page<DSpaceResource<T>> resources = ((Page<T>) searchResult).map(repository::wrapResource);
