@@ -11,10 +11,13 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.LinkRest;
+import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -60,17 +63,19 @@ public class Utils {
 	}
 
 	public Link linkToSingleResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).withRel(rel);
+		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data)
+				.withRel(rel);
 	}
 
 	public Link linkToSubResource(RestModel data, String rel) {
-		return linkToSubResource(data, rel, rel) ;
+		return linkToSubResource(data, rel, rel);
 	}
 
 	public Link linkToSubResource(RestModel data, String rel, String path) {
-		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).slash(path).withRel(rel);
+		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).slash(path)
+				.withRel(rel);
 	}
-	
+
 	public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {
 		String model = makeSingular(modelPlural);
 		try {
@@ -79,13 +84,14 @@ public class Utils {
 			throw new RepositoryNotFoundException(apiCategory, model);
 		}
 	}
-	
+
 	public String[] getRepositories() {
 		return applicationContext.getBeanNamesForType(DSpaceRestRepository.class);
 	}
-	
+
 	public static String makeSingular(String modelPlural) {
-		//The old dspace res package includes the evo inflection library which has a plural() function but no singular function
+		// The old dspace res package includes the evo inflection library which
+		// has a plural() function but no singular function
 		if (modelPlural.equals("communities")) {
 			return CommunityRest.NAME;
 		}
@@ -111,5 +117,27 @@ public class Utils {
 		} catch (NoSuchBeanDefinitionException e) {
 			throw new RepositoryNotFoundException(apiCategory, model);
 		}
+	}
+
+	/**
+	 * 
+	 * @param rel
+	 * @param domainClass
+	 * @return the LinkRest annotation corresponding to the specified rel in the
+	 *         domainClass. Null if not found
+	 */
+	public LinkRest getLinkRest(String rel, Class<RestModel> domainClass) {
+		LinkRest linkRest = null;
+		LinksRest linksAnnotation = domainClass.getDeclaredAnnotation(LinksRest.class);
+		if (linksAnnotation != null) {
+			LinkRest[] links = linksAnnotation.links();
+			for (LinkRest l : links) {
+				if (StringUtils.equals(rel, l.name())) {
+					linkRest = l;
+					break;
+				}
+			}
+		}
+		return linkRest;
 	}
 }
