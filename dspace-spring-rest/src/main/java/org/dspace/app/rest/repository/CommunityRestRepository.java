@@ -81,14 +81,9 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
 	// communities
 	@SearchRestMethod(name="top")
 	public Page<CommunityRest> findAllTop(Pageable pageable) {
-		List<Community> topCommunities = new ArrayList<Community>();
-		int total = 0;
+		List<Community> topCommunities = null;
 		try {
-			List<Community> it = cs.findAllTop(obtainContext());
-			total = it.size();
-			for (Community c : it) {
-				topCommunities.add(c);
-			}
+			topCommunities = cs.findAllTop(obtainContext());
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
