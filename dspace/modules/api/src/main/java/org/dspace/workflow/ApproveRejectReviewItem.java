@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
 import org.dspace.JournalUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
@@ -60,7 +61,8 @@ public class ApproveRejectReviewItem {
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("ItemImport\n", options);
+            myhelp.printHelp("dspace review-item\n", options);
+            System.exit(1);
         }
         Boolean approved;
 
@@ -93,7 +95,21 @@ public class ApproveRejectReviewItem {
         } else {
             System.out.println("No manuscript number or workflow ID was given. One of these must be provided to identify the correct item in the review stage.");
             System.exit(1);
-            return;
+        }
+    }
+
+    static void reviewItem(WorkflowItem workflowItem) {
+        Item item = workflowItem.getItem();
+        Manuscript manuscript = new Manuscript(item);
+        ManuscriptDatabaseStorageImpl manuscriptDatabaseStorage = new ManuscriptDatabaseStorageImpl();
+        try {
+            List<Manuscript> storedManuscripts = manuscriptDatabaseStorage.getManuscriptsMatchingManuscript(manuscript);
+            if (storedManuscripts != null && storedManuscripts.size() > 0) {
+                log.info("found stored manuscript " + storedManuscripts.get(0).getManuscriptId() + " with status " + storedManuscripts.get(0).getLiteralStatus());
+                reviewItem(statusIsApproved(storedManuscripts.get(0).getStatus()), workflowItem.getID());
+            }
+        } catch (Exception e) {
+            log.error("couldn't process review workflowitem " + workflowItem.getID() + ": " + e.getMessage());
         }
     }
 
