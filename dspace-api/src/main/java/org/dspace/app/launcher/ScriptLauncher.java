@@ -14,6 +14,8 @@ import org.dspace.services.RequestService;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.lang.reflect.Method;
 
@@ -262,10 +264,11 @@ public class ScriptLauncher
     private static void display()
     {
         Document doc = getConfig();
-        List<Element> commands = doc.getRootElement().getChildren("command");
+        ArrayList<Element> commands = new ArrayList<>();
+        commands.addAll(doc.getRootElement().getChildren("command"));
+        commands.sort((a, b) -> a.getChild("name").getValue().compareToIgnoreCase(b.getChild("name").getValue()));
         System.out.println("Usage: dspace [command-name] {parameters}");
-        for (Element command : commands)
-        {
+        for (Element command : commands) {
             String name = (command.getChild("name") == null) ? "null" : command.getChild("name").getValue();
             String description = (command.getChild("description") == null) ? "null" : command.getChild("description").getValue();
             System.out.println(" - " + name +
