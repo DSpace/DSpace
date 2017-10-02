@@ -12,10 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -214,7 +217,7 @@ public class AuthorizeManager
     /**
      * same authorize, returns boolean for those who don't want to deal with
      * catching exceptions.
-     * 
+     *
      * @param c
      *            DSpace context, containing current user
      * @param o
@@ -438,6 +441,60 @@ public class AuthorizeManager
         }
     }
 
+    public static boolean isSeniorCurator(Context c) throws SQLException
+    {
+        // if we're ignoring authorization, user is member of admin
+        if (c.ignoreAuthorization())
+        {
+            return true;
+        }
+
+        EPerson e = c.getCurrentUser();
+
+        if (e == null)
+        {
+            return false; // anonymous users can't be admins....
+        }
+        else
+        {
+            Group seniorCurator = Group.findByName(c, ConfigurationManager.getProperty("core.authorization.site-admin.group"));
+            if(seniorCurator==null)
+            {
+                return false;
+            }
+
+            return Group.isMember(c, seniorCurator.getID());
+        }
+    }
+
+    public static boolean isCuratorOrAdmin(Context context){
+        try{
+
+            boolean isSystemAdmin = isAdmin(context);
+            if(isSystemAdmin)
+            {
+                return true;
+            }
+            else
+            {
+                boolean isSeniorCurator = isSeniorCurator(context);
+                if(isSeniorCurator)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+        }catch (Exception e)
+        {
+
+        }
+        return false;
+    }
+
     ///////////////////////////////////////////////
     // policy manipulation methods
     ///////////////////////////////////////////////
@@ -467,6 +524,11 @@ public class AuthorizeManager
         rp.setEPerson(e);
 
         rp.update();
+
+        //In case the policies are changing for an item fire an item modify event
+        if(o instanceof Item){
+            c.addEvent(new Event(Event.MODIFY, Constants.ITEM, o.getID(), null));
+        }
     }
 
     /**
@@ -495,6 +557,11 @@ public class AuthorizeManager
         rp.setGroup(g);
 
         rp.update();
+
+        //In case the policies are changing for an item fire an item modify event
+        if(o instanceof Item){
+            c.addEvent(new Event(Event.MODIFY, Constants.ITEM, o.getID(), null));
+        }
     }
 
     /**
@@ -710,6 +777,11 @@ public class AuthorizeManager
             // and write out new policy
             drp.update();
         }
+
+        //In case the policies are changing for an item fire an item modify event
+        if(dest instanceof Item){
+            c.addEvent(new Event(Event.MODIFY, Constants.ITEM, dest.getID(), null));
+        }
     }
 
     /**
@@ -729,6 +801,11 @@ public class AuthorizeManager
     	 DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
                  + "resource_type_id= ? AND resource_id= ? ",
                  o.getType(), o.getID());
+
+        //In case the policies are changing for an item fire an item modify event
+        if(o instanceof Item){
+            c.addEvent(new Event(Event.MODIFY, Constants.ITEM, o.getID(), null));
+        }
     }
 
     /**
@@ -759,6 +836,11 @@ public class AuthorizeManager
                     "DELETE FROM resourcepolicy WHERE resource_type_id= ? AND "+
                     "resource_id= ? AND action_id= ? ",
                     dso.getType(), dso.getID(), actionID);
+        }
+
+        //In case the policies are changing for an item fire an item modify event
+        if(dso instanceof Item){
+            context.addEvent(new Event(Event.MODIFY, Constants.ITEM, dso.getID(), null));
         }
     }
 
