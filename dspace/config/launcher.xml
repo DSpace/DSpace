@@ -368,6 +368,7 @@
 
 	<command>
 		<name>doi-util</name>
+		<description>DOI utility</description>
 		<step>
 			<class>org.dspace.doi.Minter</class>
 		</step>
