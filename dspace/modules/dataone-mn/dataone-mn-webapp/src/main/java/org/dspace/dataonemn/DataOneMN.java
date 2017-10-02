@@ -218,7 +218,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 		}
 		else {
 		    response.sendError(HttpServletResponse.SC_NOT_FOUND,
-				       "Did you mean '/object' or '/object/http://dx.doi.org/...'");
+				       "Did you mean '/object' or '/object/https://doi.org/...'");
 		}		
 	    } else if (reqPath.startsWith("/meta/")) {
 		getSystemMetadata(reqPath, request.getQueryString(), response, objManager);

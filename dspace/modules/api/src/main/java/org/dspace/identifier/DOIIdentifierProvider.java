@@ -67,7 +67,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
     Minter perstMinter = null;
 
-    private String[] supportedPrefixes = new String[]{"info:doi/", "doi:" , "http://dx.doi.org/"};
+    private String[] supportedPrefixes = new String[]{"info:doi/", "doi:" , "http://dx.doi.org/", "https://doi.org/"};
 
     static {
         identifierMetadata.schema = MetadataSchema.DC_SCHEMA;
@@ -356,7 +356,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
      * Returns a fully-formatted DOI URL
      *
      * @param item the item to check for a DOI
-     * @return fully-formatted dx.doi.org url
+     * @return fully-formatted doi.org url
      */
 
     public static String getFullDOIURL(Item item) {
@@ -364,27 +364,37 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         if (item != null) {
             String itemDOI = getDoiValue(item);
             if (itemDOI != null) {
-                Matcher doimatcher = Pattern.compile("doi:(.+)").matcher(itemDOI);
-                if (doimatcher.find()) {
-                    doi_url = "http://dx.doi.org/" + doimatcher.group(1);
-                } else {
-                    doi_url = "http://dx.doi.org/" + itemDOI;
-                }
+                doi_url = getFullDOIURL(itemDOI);
             }
         }
         return doi_url;
     }
 
-    public DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException {
-        // convert http DOIs to short form
-        if (identifier.startsWith("http://dx.doi.org/")) {
-            identifier = "doi:" + identifier.substring("http://dx.doi.org/".length());
+    public static String getFullDOIURL(String itemDOI) {
+        String doi_url = "";
+        if (itemDOI != null) {
+            Matcher doimatcher = Pattern.compile("doi:(.+)").matcher(itemDOI);
+            if (doimatcher.find()) {
+                doi_url = "https://doi.org/" + doimatcher.group(1);
+            } else {
+                doi_url = "https://doi.org/" + itemDOI;
+            }
         }
-        // correct http DOIs to short form if a slash was removed by the browser/server
-        if (identifier.startsWith("http:/dx.doi.org/")) {
-            identifier = "doi:" + identifier.substring("http:/dx.doi.org/".length());
-        }
+        return doi_url;
+    }
 
+    public static String getShortDOI(String identifier) {
+        String result = identifier;
+        // convert http dois to short form
+        Matcher doimatcher = Pattern.compile("^.+doi\\.org/(.+)$").matcher(identifier);
+        if (doimatcher.find()) {
+            result = "doi:" + doimatcher.group(1);
+        }
+        return result;
+    }
+
+    public DSpaceObject resolve(Context context, String identifier, String... attributes) throws IdentifierNotFoundException, IdentifierNotResolvableException {
+        identifier = getShortDOI(identifier);
 
         if (identifier != null && identifier.startsWith("doi:")) {
             DOI dbDOI = perstMinter.getKnownDOI(identifier);

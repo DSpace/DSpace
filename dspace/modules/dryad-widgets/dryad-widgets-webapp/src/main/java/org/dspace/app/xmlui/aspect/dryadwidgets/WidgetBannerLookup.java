@@ -25,7 +25,7 @@ import org.dspace.core.ConfigurationManager;
  */
 public class WidgetBannerLookup extends AbstractLogEnabled {
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WidgetBannerLookup.class);
-    private final static String DOI_HTTP_PREFIX = "http://dx.doi.org/";
+    private final static String DOI_HTTP_PREFIX = "https://doi.org/";
     private final static String DOI_PREFIX = "doi:";
     private final static String PMID_PREFIX = "pmid:";
     // PMIDs are 1 to 8 digits: http://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html#pmid
@@ -33,7 +33,7 @@ public class WidgetBannerLookup extends AbstractLogEnabled {
     // DOI regex can be complex, we only need to differentiate from PMID, so simple "10."
     private static Pattern DOIPattern = Pattern.compile("10\\..+");
 
-    // With no "doi:" or "http://dx.doi.org" prefix, is the identifier a doi?
+    // With no "doi:" or "https://doi.org" prefix, is the identifier a doi?
     private Boolean rawPubIdIsDoi(String pubId) {
         Matcher m = DOIPattern.matcher(pubId);
         return m.matches();

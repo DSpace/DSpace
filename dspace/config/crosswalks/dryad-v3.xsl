@@ -93,7 +93,7 @@
 
 	<!-- package and file -->
 	<xsl:template mode="inner"
-		match="dim:field[@element='identifier'][starts-with(., 'doi:') or starts-with(., 'http://dx.doi')]">
+		match="dim:field[@element='identifier'][starts-with(., 'doi:') or contains(., 'doi.org')]">
 		<dcterms:identifier>
 		  <xsl:call-template name="normalize_doi" >
 		    <xsl:with-param name="node" select="."/>
@@ -150,7 +150,7 @@
 
 	<!-- publication -->
 	<xsl:template mode="inner-pub"
-		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi') or starts-with(., 'http://dx.doi')]">
+		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi') or contains(., 'doi.org')]">
 		<bibo:doi>
 		  <xsl:call-template name="normalize_doi" >
 		    <xsl:with-param name="node" select="."/>
@@ -160,7 +160,7 @@
 
 	<!-- package link to the publication DOI -->
 	<xsl:template mode="inner"
- 		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi') or starts-with(., 'http://dx.doi')]">
+ 		match="dim:field[@element='relation'][@qualifier='isreferencedby'][starts-with(., 'doi') or contains(., 'doi.org')]">
 		<dcterms:references>
 		  <xsl:call-template name="normalize_doi" >
 		    <xsl:with-param name="node" select="."/>
@@ -187,7 +187,7 @@
 
 	<!-- publication -->
 	<xsl:template mode="inner-pub"
-		match="dim:field[@element='identifier'][starts-with(., 'doi:') or starts-with(., 'http://dx.doi')]">
+		match="dim:field[@element='identifier'][starts-with(., 'doi:') or contains(., 'doi.org')]">
 		<dcterms:isReferencedBy>
 		  <xsl:call-template name="normalize_doi" >
 		    <xsl:with-param name="node" select="."/>
@@ -318,11 +318,11 @@
 	<xsl:template name="normalize_doi">
 	  <xsl:param name="node" select="NO DOI" />
 	  <xsl:choose>
-	    <xsl:when test="starts-with($node, 'http://dx.doi')">
+	    <xsl:when test="contains($node, 'doi.org')">
 	      <xsl:value-of select="$node" />
 	    </xsl:when>
 	    <xsl:otherwise>
-	      <xsl:text>http://dx.doi.org/</xsl:text>
+	      <xsl:text>https://doi.org/</xsl:text>
 	      <xsl:value-of select="substring-after($node, 'doi:')" />
 	    </xsl:otherwise>
 	  </xsl:choose>

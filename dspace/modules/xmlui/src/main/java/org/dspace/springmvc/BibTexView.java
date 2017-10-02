@@ -30,7 +30,7 @@ public class BibTexView implements View {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BibTexView.class);
     private static final String EOL = "\r\n";
-    private static final String DOI_URL = "http://dx.doi.org/";
+    private static final String DOI_URL = "https://doi.org/";
 
 
     public String getContentType() {

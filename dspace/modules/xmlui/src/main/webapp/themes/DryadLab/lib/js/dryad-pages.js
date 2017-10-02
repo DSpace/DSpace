@@ -612,7 +612,7 @@ function loadDryadLabModuleFeed() {
                 $entrySummary = $('<div class="dryadlab-module-summary">');
                 $entrySummary.append( moduleSummary );
                 $entryBlock.append($entrySummary);
-                var moduleDOIasURL = 'http://dx.doi.org/'+ moduleDOI.split(':').slice(-1);  // trim 'doi:' if found
+                var moduleDOIasURL = 'https://doi.org/'+ moduleDOI.split(':').slice(-1);  // trim 'doi:' if found
                 $entryBlock.append('<a href="'+ moduleDOIasURL +'" target="_blank">'+ moduleDOI +'</a>');
                 // place the complete HTML for this entry
                 $listHolder.append($entryListItem);

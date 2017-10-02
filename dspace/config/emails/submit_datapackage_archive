@@ -9,7 +9,7 @@
 # {3}  The doi's of the data files
 # {4}  The submitters full name
 # {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
-# {6}  The formatted dx.doi.org URL
+# {6}  The formatted doi.org URL
 # {7}  Journal
 #
 Subject: Dryad submission approved {1}

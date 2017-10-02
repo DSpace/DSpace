@@ -138,7 +138,7 @@
 					<xsl:for-each select="dspace:field[@element='fundingEntity']">
 						<xsl:variable name="awardNumber" select="substring-before(.,'@')"/>
 						<xsl:variable name="funderName" select="substring-after(.,'@')"/>
-						<xsl:variable name="funderID" select="substring-after(./@authority, 'http://dx.doi.org/')"/>
+						<xsl:variable name="funderID" select="substring-after(./@authority, 'doi.org/')"/>
 						<xsl:variable name="confidence" select="./@confidence"/>
 						<xsl:if test="$confidence='ACCEPTED'">
 							<fundingReference>

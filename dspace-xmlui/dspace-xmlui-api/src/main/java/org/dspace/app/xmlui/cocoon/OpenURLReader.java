@@ -185,12 +185,12 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 	 * Global identifiers will be any other valid dc.identifier present
 	 * within that field. Thus:
 	 * 
-	 * dc.identifier.uri http://dx.doi.org/10.1080/106351598260806
+	 * dc.identifier.uri https://doi.org/10.1080/106351598260806
 	 * dc.identifier.uri http://hdl.handle.net/10255/dryad.111
 	 * 
 	 * will lead to
 	 * 
-	 * rft.identifier=http%3A%2F%2Fdx.doi.org%2F10.1080%2F106351598260806
+	 * rft.identifier=https%3A%2F%2Fdoi.org%2F10.1080%2F106351598260806
 	 * rft.identifier=http%3A%2F%2Fhdl.handle.net%2F10255%2Fdryad.111
 	 * 
 	 * And Thus be resolvable as well

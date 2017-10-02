@@ -123,7 +123,7 @@ public class WorkflowEmailManager {
             email.addArgument(dataFilesDoi);          // {3}  The dois of the data files
             email.addArgument(submitter);             // {4}  The submitter's full name
             email.addArgument(manuscriptIdentifier);  // {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
-            email.addArgument(doi_url);               // {6}  The formatted dx.doi.org URL
+            email.addArgument(doi_url);               // {6}  The formatted doi.org URL
             email.addArgument(getJournalNameForItem(c, i)); // {7}  Journal
             email.send();
         }

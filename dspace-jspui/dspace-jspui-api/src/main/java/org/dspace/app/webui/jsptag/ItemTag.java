@@ -69,7 +69,7 @@ import org.dspace.core.Utils;
  * dc.title.* = All fields with Dublin Core element 'title' (any or no qualifier)
  * dc.identifier.uri(link) = DC identifier.uri, render as a link
  * dc.date.issued(date) = DC date.issued, render as a date
- * dc.identifier.doi(doi) = DC identifier.doi, render as link to http://dx.doi.org
+ * dc.identifier.doi(doi) = DC identifier.doi, render as link to https://doi.org
  * dc.identifier.hdl(handle) = DC identifier.hanlde, render as link to http://hdl.handle.net
  * dc.relation.isPartOf(resolver) = DC relation.isPartOf, render as link to the base url of the resolver 
  *                                  according to the specified urn in the metadata value (doi:xxxx, hdl:xxxxx, 
@@ -87,13 +87,13 @@ import org.dspace.core.Utils;
  * <PRE>
  * 
  * webui.resolver.1.urn = doi
- * webui.resolver.1.baseurl = http://dx.doi.org/
+ * webui.resolver.1.baseurl = https://doi.org/
  * webui.resolver.2.urn = hdl
  * webui.resolver.2.baseurl = http://hdl.handle.net/
  * 
  * </PRE>
  * 
- * For the doi and hdl urn defaults values are provided, respectively http://dx.doi.org/ and 
+ * For the doi and hdl urn defaults values are provided, respectively https://doi.org/ and
  * http://hdl.handle.net/ are used.<br> 
  * 
  * If a metadata value with style: "doi", "handle" or "resolver" matches a URL
@@ -178,7 +178,7 @@ public class ItemTag extends TagSupport
 {
     private static final String HANDLE_DEFAULT_BASEURL = "http://hdl.handle.net/";
 
-    private static final String DOI_DEFAULT_BASEURL = "http://dx.doi.org/";
+    private static final String DOI_DEFAULT_BASEURL = "https://doi.org/";
 
     /** Item to display */
     private transient Item item;

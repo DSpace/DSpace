@@ -40,9 +40,9 @@
         <xsl:variable name="my_doi"
                       select=".//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
         <xsl:variable name="my_full_doi"
-                      select=".//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'http://dx.doi')]"/>
+                      select=".//dim:field[@element='identifier'][not(@qualifier)][contains(., 'doi.org')]"/>
         <xsl:variable name="my_uri"
-                      select=".//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))][not(starts-with(., 'http://dx.doi'))]"/>
+                      select=".//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))][not(contains(., 'doi.org'))]"/>
 
         <!--<h1>Non doi test: <xsl:value-of select="$doi_redirect"/></h1> -->
 
@@ -107,7 +107,7 @@
                 <p>
                     <i18n:text>xmlui.DryadItemSummary.dryadPkgID</i18n:text>
                     <xsl:text>: </xsl:text>
-                    <xsl:value-of select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
+                    <xsl:value-of select="concat('https://doi.org/', substring-after($my_doi, 'doi:'))"/>
                 </p>
             </xsl:if>
             <xsl:if test="$treebase_url != ''">
@@ -293,7 +293,7 @@
                                                 <xsl:attribute name="href">http://www.delicious.com/save</xsl:attribute>
                                                 <xsl:attribute name="onclick">
                                                     <xsl:value-of
-                                                            select="concat($dfirstpart, $apos, 'http://dx.doi.org/', $pkgDOI, $apos, $dsecondpart,
+                                                            select="concat($dfirstpart, $apos, 'https://doi.org/', $pkgDOI, $apos, $dsecondpart,
 														$thistitle, $dthirdpart)"/>
                                                 </xsl:attribute>
                                                 <img src="//delicious.com/img/logo.png"
@@ -310,7 +310,7 @@
                                                 <xsl:attribute name="class">DiggThisButton DiggCompact</xsl:attribute>
                                                 <xsl:attribute name="href">
                                                     <xsl:value-of
-                                                            select="concat('http://digg.com/submit?url=http://dx.doi.org/', $pkgDOI,
+                                                            select="concat('http://digg.com/submit?url=https://doi.org/', $pkgDOI,
 														'&amp;title=', $thistitle)"/>
                                                 </xsl:attribute>
                                                 <!-- xsl:text is a work around for formatting issues -->
@@ -331,7 +331,7 @@
                                                 <xsl:attribute name="href">http://reddit.com/submit</xsl:attribute>
                                                 <xsl:attribute name="onclick">
                                                     <xsl:value-of
-                                                            select="concat($rfirstpart, $apos, 'http://dx.doi.org/', $pkgDOI, $apos, $rsecondpart,
+                                                            select="concat($rfirstpart, $apos, 'https://doi.org/', $pkgDOI, $apos, $rsecondpart,
 														$thistitle, $rthirdpart)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://reddit.com/static/spreddit7.gif"
@@ -347,7 +347,7 @@
                                                 <xsl:attribute name="data-count">none</xsl:attribute>
                                                 <xsl:attribute name="data-via">datadryad</xsl:attribute>
                                                 <xsl:attribute name="data-url">
-                                                    <xsl:value-of select="concat('http://dx.doi.org/', $pkgDOI)"/>
+                                                    <xsl:value-of select="concat('https://doi.org/', $pkgDOI)"/>
                                                 </xsl:attribute>
                                                 <xsl:text>Tweet</xsl:text>
                                             </xsl:element>
@@ -357,7 +357,7 @@
                                                 <xsl:attribute name="src">
                                                     <xsl:value-of
                                                             select="concat('http://www.facebook.com/plugins/like.php?href=',
-														encoder:encode(concat('http://dx.doi.org/', $pkgDOI)),
+														encoder:encode(concat('https://doi.org/', $pkgDOI)),
 														'&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=21')"/>
                                                 </xsl:attribute>
                                                 <xsl:attribute name="scrolling">no</xsl:attribute>
@@ -418,7 +418,7 @@
                                     <xsl:choose>
                                         <xsl:when test="$my_doi">
                                             <xsl:value-of
-                                                    select="concat('http://dx.doi.org/', substring-after($my_doi, 'doi:'))"/>
+                                                    select="concat('https://doi.org/', substring-after($my_doi, 'doi:'))"/>
                                         </xsl:when>
                                         <xsl:when test="$my_full_doi">
                                             <xsl:value-of select="$my_full_doi"/>
@@ -506,7 +506,7 @@
                                                 <xsl:attribute name="href">http://www.delicious.com/save</xsl:attribute>
                                                 <xsl:attribute name="onclick">
                                                     <xsl:value-of
-                                                            select="concat($dfirstpart, $apos, 'http://dx.doi.org/', $my_doi, $apos, $dsecondpart)"/>
+                                                            select="concat($dfirstpart, $apos, 'https://doi.org/', $my_doi, $apos, $dsecondpart)"/>
                                                 </xsl:attribute>
                                                 <img src="//delicious.com/img/logo.png"
                                                      height="16" width="16" alt="Delicious"
@@ -522,7 +522,7 @@
                                                 <xsl:attribute name="class">DiggThisButton DiggCompact</xsl:attribute>
                                                 <xsl:attribute name="href">
                                                     <xsl:value-of
-                                                            select="concat('http://digg.com/submit?url=http://dx.doi.org/', $my_doi,
+                                                            select="concat('http://digg.com/submit?url=https://doi.org/', $my_doi,
 												'&amp;title=', $thistitle)"/>
                                                 </xsl:attribute>
                                                 <!-- xsl:text is a work around for formatting issues -->
@@ -543,7 +543,7 @@
                                                 <xsl:attribute name="href">http://reddit.com/submit</xsl:attribute>
                                                 <xsl:attribute name="onclick">
                                                     <xsl:value-of
-                                                            select="concat($rfirstpart, $apos, 'http://dx.doi.org/', $my_doi, $apos, $rsecondpart,
+                                                            select="concat($rfirstpart, $apos, 'https://doi.org/', $my_doi, $apos, $rsecondpart,
 												$thistitle, $rthirdpart)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://reddit.com/static/spreddit7.gif"
@@ -559,7 +559,7 @@
                                                 <xsl:attribute name="data-count">none</xsl:attribute>
                                                 <xsl:attribute name="data-via">datadryad</xsl:attribute>
                                                 <xsl:attribute name="data-url">
-                                                    <xsl:value-of select="concat('http://dx.doi.org/', $my_doi)"/>
+                                                    <xsl:value-of select="concat('https://doi.org/', $my_doi)"/>
                                                 </xsl:attribute>
                                                 <xsl:text>Tweet</xsl:text>
                                             </xsl:element>
@@ -569,7 +569,7 @@
                                                 <xsl:attribute name="src">
                                                     <xsl:value-of
                                                             select="concat('http://www.facebook.com/plugins/like.php?href=',
-													encoder:encode(concat('http://dx.doi.org/', $my_doi)),
+													encoder:encode(concat('https://doi.org/', $my_doi)),
 												'&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=21')"/>
                                                 </xsl:attribute>
                                                 <xsl:attribute name="scrolling">no</xsl:attribute>
@@ -1239,7 +1239,7 @@
                     <xsl:choose>
                         <xsl:when test="contains($article-doi,'doi:')">
                             <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article-doi, 'doi:'))"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of
@@ -1456,10 +1456,10 @@
                         <a>
                             <xsl:attribute name="href">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                             </xsl:attribute>
                             <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                         </a>
                     </xsl:when>
                     <xsl:when test="$article_doi">
@@ -1467,10 +1467,10 @@
                         <a>
                             <xsl:attribute name="href">
                                 <xsl:value-of
-                                        select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                        select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                             </xsl:attribute>
                             <xsl:value-of
-                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                    select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                         </a>
                     </xsl:when>
                     <xsl:when test="$article_pmid">
@@ -1495,10 +1495,10 @@
                                 <a>
                                     <xsl:attribute name="href">
                                         <xsl:value-of
-                                                select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                                     </xsl:attribute>
                                     <xsl:value-of
-                                            select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                            select="concat('https://doi.org/', substring-after($article_doi, 'doi:'))"/>
                                 </a>
                             </xsl:if>
                         </span>

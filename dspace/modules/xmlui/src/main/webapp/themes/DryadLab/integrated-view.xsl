@@ -161,7 +161,7 @@
                 <xsl:variable name="my_doi"
                               select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'doi:')]"/>
                 <xsl:variable name="my_full_doi"
-                  select="//dim:field[@element='identifier'][not(@qualifier)][starts-with(., 'http://dx.doi')]"/>
+                  select="//dim:field[@element='identifier'][not(@qualifier)][contains(., 'doi.org')]"/>
                 <xsl:variable name="my_uri"
                               select="//dim:field[@element='identifier'][@qualifier='uri'][not(starts-with(., 'doi'))]"/>
                 <xsl:attribute name="href">
