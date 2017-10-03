@@ -5,16 +5,51 @@
         <div id="file.about.div.about" n="about" rend="primary">
 
             <head>About the VSim Repository and Archive</head>
+            <p>"Examination of the built environment is a fundamental line of humanistic inquiry 
+                that shapes our understanding of diverse cultures. It is impossible to consider 
+                the ancient Egyptians without immediately thinking of the pyramids or the vast 
+                religious complexes of the Nile river valley. The medieval pilgrimages and the 
+                modern disciplines that study them – history, literature, religion, musicology, 
+                and art – are inextricably tied to the monumental Romanesque cathedrals that 
+                blanket Europe. This link between humanities scholarship and the built 
+                environment is unquestionable, with an inexhaustible number of examples that 
+                illustrate how architecture and urban design reveal the aspirations and 
+                priorities of cultures across the ages."</p>
+            <p rend="text-right"><hi rend="italic">-- from the NEH-funded proposal for the VSim prototype</hi></p>
 
-			<p>VSim facilitates the real-time exploration and educational use of highly detailed, three-dimensional computer models. The National Endowment for the Humanities (HD-50958-10 and HK-50164-14) and UCLA’s Institute for Digital Research and Education funded the development of VSim and the VSim Repository and Archive.</p>
-			<p><hi rend="bold">Project Team (all affiliated with UCLA unless otherwise noted):</hi></p>
+            <p>VSim facilitates the real-time exploration and educational use of highly 
+                detailed, three-dimensional computer models. The National Endowment for the 
+                Humanities (HD-50958-10 and HK-50164-14) and UCLA’s Institute for Digital 
+                Research and Education funded the development of VSim and the VSim Repository 
+                and Archive. The online repository and archive for the dissemination of 3D 
+                content across grade levels and humanities disciplines was created in 
+                partnership with the UCLA Digital Library Program.</p>
+
+            <p>The long-term vision of the project is to build a thriving community of 
+                scholars and educators sharing their 3D content and leveraging existing and 
+                new academic modeling work for broad educational use through a project 
+                repository and archive focused on the real-time explorations of 
+                reconstruction of historic urban environments.</p>
+
+            <p>The repository and archive...</p>
+            <list>
+                <item>Provides access to academically generated content and software for working with 3D content that has been designed to support pedagogical applications.</item>
+                <item>Breaks down the barriers to instructional use of 3D content by providing a simple interface that easily repurposes the crowd-sourced computer models built for Google Earth and available in the Google/Trimble 3D Warehouse. </item>
+                <item>Supports teacher-centered presentations in a format that accommodates instructors at all technological comfort levels (i.e., instructors can choose to operate the simulation software in free flight mode or pre-program a narrative augmented with text and images akin to a PowerPoint presentation in 3D space.</item>
+                <item>Supports a range of opportunities for student-centered exploration of 3D environments and active hands-on learning exercises. Assignments could involve students building their own computer models with free software and interacting with them in VSim, exploring academically generated content, or building presentations about the environments using the narrative and embedded resource features.</item>
+            </list>
+
+    		<p><hi rend="bold">Project Team (all affiliated with UCLA unless otherwise noted):</hi></p>
 			<p>Principle Investigators: Lisa M. Snyder and Scott Friedman</p>
 			<p>Advisory Board: Diane Favro, Alyson Gill (University of Massachusetts Amherst), Steve Mintz (University of Texas at Austin), David Staley (Ohio State University), Elaine A. Sullivan (University of California, Santa Cruz)</p>
 			<p>Prototype Programmers: Eduardo Poyart, Jingyi (Franklin) Fang, and XinLi Cai</p>
 			<p>Usability Consultants: Elaine A. Sullivan and Joy Guey</p>
-			<p>Production Version Programmers: Cristina (Sam) Amin and David Stephan ... add others</p>
-			<p>Content Developers: Add as hired</p>
-			<p>Repository and Archive: Peter Broadwell (Project Manager), Hardy Pottinger (Lead Programmer), Lisa MacAulay ... add others</p>
+			<p>Production Version Programmers: Sam Amin, David Stephan, and Haoxiang Zhang</p>
+			<p>Content Developers: Francesca Albrezzi and Echo Theohar</p>
+            <p>Repository and Archive: Lisa MacAulay (Head of UCLA’s Digital Library Program), Kristian J. Allen (Digital Library Architect), Peter Broadwell (Project Manager), Hardy Pottinger (Lead Programmer), Anthony Vuong (Programmer)</p>
+
+            <p><hi rend="bold">Acknowledgements</hi></p>
+            <p>The VSim logo was derived from an image entitled 'food pyramid' by Simon Sim from the Noun Project.</p>
         </div>
     </body>
 
