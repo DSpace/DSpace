@@ -2,6 +2,7 @@ package org.dspace.workflow;
 
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
@@ -128,6 +129,29 @@ public class DryadWorkflowUtils {
             }
 
         }
+    }
+
+    public static ArrayList<Item> getDuplicateWorkflowItems(Context context, Item item, boolean includeArchived) {
+        ArrayList<Item> duplicateItems = new ArrayList<Item>();
+        item.checkForDuplicateItems(context);
+        DCValue[] dupItemIDs = item.getMetadata("dryad.duplicateItem");
+        if (dupItemIDs != null && dupItemIDs.length > 0) {
+            try {
+                for (DCValue dupItemID : dupItemIDs) {
+                    Item dupItem = Item.find(context, Integer.valueOf(dupItemID.value));
+                        if (dupItem != null && !item.equals(dupItem)) {
+                            WorkflowItem wfi = WorkflowItem.findByItemId(context, dupItem.getID());
+                            if (wfi != null || (includeArchived && dupItem.isArchived())) {
+                                duplicateItems.add(dupItem);
+                            }
+                        }
+                }
+            } catch (Exception e) {
+
+            }
+        }
+
+        return duplicateItems;
     }
 
     public static String createDataset(Context context, HttpServletRequest request, Item publication, boolean fromWorkflow) throws SQLException, AuthorizeException, IOException {
