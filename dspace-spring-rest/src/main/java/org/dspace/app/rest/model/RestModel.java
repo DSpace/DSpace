@@ -22,6 +22,7 @@ public interface RestModel extends Serializable {
 	public static final String EPERSON = "eperson";
 	public static final String DISCOVER = "discover";
 	public static final String CONFIGURATION = "configuration";
+	public static final String INTEGRATION = "integration";
 	
 	@JsonIgnore
 	public String getCategory();

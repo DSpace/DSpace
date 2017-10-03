@@ -16,5 +16,29 @@ package org.dspace.app.rest.model;
  *
  */
 public enum ScopeEnum {
-	SUBMISSION, WORKFLOW
+	SUBMISSION("submission"), WORKFLOW("workflow");
+	
+	private String text;
+
+	ScopeEnum(String text) {
+		this.text = text;
+	}
+
+	@Override
+	public String toString() {
+		return this.text;
+	}
+
+	public static ScopeEnum fromString(String text) {
+		if (text == null) {
+			return null;
+		}
+		for (ScopeEnum b : ScopeEnum.values()) {
+			if (b.text.equalsIgnoreCase(text)) {
+				return b;
+			}
+		}
+		throw new IllegalArgumentException("No scope enum with text " + text + " found");
+	}
+
 }
