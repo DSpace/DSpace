@@ -206,15 +206,23 @@
                                         <!-- VSIM-40 this is the sidebar we need to "turn off" for all home pages (main, collection and community) -->
                                         <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
 
+                                        <!-- SHOULD WE SHOW THE SIDEBAR? -->
                                         <xsl:choose>
-                                            <xsl:when test="string-length($request-uri)&gt;0 and not (starts-with($request-uri, 'pages/')) and not ($containerType='type:community' or $containerType='type:collection')">
+
+                                            <!-- if there is an admin panel, then this is an admin user, ALWAYS show the sidebar for an admin user -->
+                                            <xsl:when test="//dri:xref[@target='/xmlui/admin/panel']">
                                                 <xsl:apply-templates select="dri:options"/>
                                             </xsl:when>
 
+                                            <!-- if we're not on the home page, and not on a community or collection home page, or if this is an item page, show the sidebar -->
+                                            <xsl:when test="(string-length($request-uri)&gt;0 and not (starts-with($request-uri, 'pages/')) and not ($containerType='type:community' or $containerType='type:collection')) or $containerType='type:item'">
+                                                <xsl:apply-templates select="dri:options"/>
+                                            </xsl:when>
 
-
+                                            <!-- otherwise, don't show the sidebar -->
                                              <xsl:otherwise>
-                                            </xsl:otherwise>
+                                             </xsl:otherwise>
+
                                         </xsl:choose>
 
                                         </div>
