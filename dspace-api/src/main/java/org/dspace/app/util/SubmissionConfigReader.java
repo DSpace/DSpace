@@ -186,7 +186,7 @@ public class SubmissionConfigReader
     
     public int countSubmissionConfigs()
     {
-    	return submitDefns.keySet().size();
+    	return submitDefns.size();
     }
     /**
      * Returns the Item Submission process config used for a particular
