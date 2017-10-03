@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 /**
  * Class representing all DC inputs required for a submission, organized into pages
  *
@@ -20,24 +22,46 @@ import java.util.Map;
 
 public class DCInputSet
 {
+	/** true if it is the default configuration */
+	private boolean defaultConf;
     /** name of the input set  */
     private String formName = null; 
     /** the inputs ordered by page and row position */
     private DCInput[][] inputPages = null;
     
-        /** constructor
-         * @param formName form name
-         * @param pages pages
-         * @param listMap map
-         */
-    public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
+    /** the heading of each page */
+    private String[] headings;
+    
+    /** the mandatory flag for each page */
+    private boolean[] mandatoryFlags;
+    
+	/**
+	 * constructor
+	 * 
+	 * @param formName
+	 *            form name
+	 * @param headings
+	 * @param mandatoryFlags
+	 * @param pages
+	 *            pages
+	 * @param listMap
+	 *            map
+	 */
+	public DCInputSet(boolean defaultConf, String formName, List<String> headingsList, List<Boolean> mandatoryFlagsList,
+			List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
     {
+		this.defaultConf = defaultConf;
         this.formName = formName;
         inputPages = new DCInput[pages.size()][];
+        headings = new String[pages.size()];
+        mandatoryFlags = new boolean[pages.size()];
         for ( int i = 0; i < inputPages.length; i++ )
         {
             List<Map<String, String>> page = pages.get(i);
-            inputPages[i] = new DCInput[page.size()];
+			inputPages[i] = new DCInput[page.size()];
+			headings[i] = headingsList.get(i);
+			mandatoryFlags[i] = BooleanUtils.toBooleanDefaultIfNull(mandatoryFlagsList.get(i), true);
+            
             for ( int j = 0; j < inputPages[i].length; j++ )
             {
                 inputPages[i][j] = new DCInput(page.get(j), listMap);
@@ -196,4 +220,16 @@ public class DCInputSet
 
         return true;
     }
+
+	public boolean isPageMandatory(int idx) {
+		return mandatoryFlags[idx];
+	}
+
+	public String getPageHeading(int idx) {
+		return headings[idx];
+	}
+
+	public boolean isDefaultConf() {
+		return defaultConf;
+	}
 }

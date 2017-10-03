@@ -15,6 +15,8 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.content.MetadataSchema;
 
 /**
@@ -66,6 +68,18 @@ public class DCInputsReader
     private Map<String, List<List<Map<String, String>>>> formDefns  = null;
 
     /**
+     * Reference to the forms page headings, computed from the forms
+     * definition file
+     */
+    private Map<String, List<String>> formPageHeadings  = null;
+
+    /**
+     * Reference to the forms mandatory flags, computed from the forms
+     * definition file
+     */
+    private Map<String, List<Boolean>> formMandatoryFlags = null;
+    
+    /**
      * Reference to the value-pairs map, computed from the forms definition file
      */
     private Map<String, List<String>> valuePairs = null;    // Holds display/storage pairs
@@ -110,7 +124,9 @@ public class DCInputsReader
         whichForms = new HashMap<String, String>();
         formDefns  = new HashMap<String, List<List<Map<String, String>>>>();
         valuePairs = new HashMap<String, List<String>>();
-
+        formMandatoryFlags = new HashMap<String, List<Boolean>>();
+        formPageHeadings = new HashMap<String, List<String>>();
+        
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
         try
@@ -193,7 +209,8 @@ public class DCInputsReader
         {
             throw new DCInputsReaderException("Missing the " + formName  + " form");
         }
-        lastInputSet = new DCInputSet(formName, pages, valuePairs);
+		lastInputSet = new DCInputSet(StringUtils.equals(whichForms.get(DEFAULT_COLLECTION), formName), formName,
+				formPageHeadings.get(formName), formMandatoryFlags.get(formName), pages, valuePairs);
         return lastInputSet;
     }
     
@@ -365,7 +382,11 @@ public class DCInputsReader
                     throw new SAXException("form element has no name attribute");
                 }
                 List<List<Map<String, String>>> pages = new ArrayList<List<Map<String, String>>>(); // the form contains pages
+                List<String> pageHeadings = new ArrayList<String>();
+                List<Boolean> mandatoryFlags = new ArrayList<Boolean>();
                 formDefns.put(formName, pages);
+                formPageHeadings.put(formName, pageHeadings);
+                formMandatoryFlags.put(formName, mandatoryFlags);
                 NodeList pl = nd.getChildNodes();
                 int lenpg = pl.getLength();
                 for (int j = 0; j < lenpg; j++)
@@ -379,6 +400,8 @@ public class DCInputsReader
                         {
                             throw new SAXException("Form " + formName + " has no identified pages");
                         }
+                        pageHeadings.add(getAttribute(npg, "heading"));
+                        mandatoryFlags.add(BooleanUtils.toBoolean(getAttribute(npg, "mandatory")));
                         List<Map<String, String>> page = new ArrayList<Map<String, String>>();
                         pages.add(page);
                         NodeList flds = npg.getChildNodes();

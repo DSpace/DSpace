@@ -13,8 +13,11 @@
  <!ELEMENT form (page)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
  <!ELEMENT page (field)+ >
- <!ATTLIST page number NMTOKEN #REQUIRED>
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, type-bind?, input-type, hint, required?, vocabulary?, visibility?) >
+ <!ATTLIST page 
+ 				number NMTOKEN #REQUIRED
+ 				heading NMTOKEN #IMPLIED
+ 				mandatory NMTOKEN #IMPLIED>
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -27,6 +30,7 @@
   
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>
+ <!ELEMENT regex (#PCDATA) >
 
  <!ELEMENT form-value-pairs (value-pairs)* >
  <!ELEMENT value-pairs (pair)+ >
