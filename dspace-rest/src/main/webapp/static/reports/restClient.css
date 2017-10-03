@@ -89,3 +89,15 @@ fieldset.catdiv div {
 .toobig::before {
 	content: "*";
 }
+#exlimit {
+  font-style: italic;
+}
+
+.red {
+  color: red;
+}
+
+/*GUCODE[twb27:do not show current user in GUCode]*/
+#currentUser {
+  display: none; 
+}
