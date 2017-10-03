@@ -413,6 +413,10 @@ public class ItemDataset {
                     System.out.println("dataset exists");
                     cont = false;
                 }
+                else if(!itemIsAvailable(context, item)){
+                    System.out.println("dataset creation not allowed");
+                    cont = false;
+                }
                 else{
                     try{
                         Thread.sleep(sleep);
