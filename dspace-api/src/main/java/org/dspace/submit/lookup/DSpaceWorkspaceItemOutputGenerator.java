@@ -332,7 +332,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
     protected DCInput getDCInput(String formName, String schema, String element,
             String qualifier) throws DCInputsReaderException
     {
-        DCInputSet dcinputset = new DCInputsReader().getInputs(formName);
+        DCInputSet dcinputset = new DCInputsReader().getInputsByCollectionHandle(formName);
         for (int idx = 0; idx < dcinputset.getNumberPages(); idx++)
         {
             for (DCInput dcinput : dcinputset.getPageRows(idx, true, true))

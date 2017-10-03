@@ -117,7 +117,7 @@ public class RequiredMetadata extends AbstractCurationTask
         if (reqList == null)
         {
             reqList = new ArrayList<String>();
-            DCInputSet inputs = reader.getInputs(handle);
+            DCInputSet inputs = reader.getInputsByCollectionHandle(handle);
             for (int i = 0; i < inputs.getNumberPages(); i++)
             {
                 for (DCInput input : inputs.getPageRows(i, true, true))

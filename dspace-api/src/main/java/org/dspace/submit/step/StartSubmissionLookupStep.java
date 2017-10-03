@@ -174,7 +174,7 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
             DCInputSet inputSet = null;
             try
             {
-                inputSet = new DCInputsReader().getInputs(col.getHandle());
+                inputSet = new DCInputsReader().getInputsByCollectionHandle(col.getHandle());
             }
             catch (Exception e)
             {

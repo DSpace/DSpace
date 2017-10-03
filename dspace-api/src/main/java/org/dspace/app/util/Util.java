@@ -489,7 +489,7 @@ public class Util {
         // Read the input form file for the specific collection
         DCInputsReader inputsReader = new DCInputsReader(formFileName);
 
-        DCInputSet inputSet = inputsReader.getInputs(col_handle);
+        DCInputSet inputSet = inputsReader.getInputsByCollectionHandle(col_handle);
 
         // Replace the values of Metadatum[] with the correct ones in case of
         // controlled vocabularies

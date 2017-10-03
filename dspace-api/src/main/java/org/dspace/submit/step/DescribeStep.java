@@ -152,7 +152,7 @@ public class DescribeStep extends AbstractProcessingStep
         DCInput[] inputs = null;
         try
         {
-            inputs = inputsReader.getInputs(c.getHandle()).getPageRows(
+            inputs = inputsReader.getInputsByCollectionHandle(c.getHandle()).getPageRows(
                     currentPage - 1,
                     subInfo.getSubmissionItem().hasMultipleTitles(),
                     subInfo.getSubmissionItem().isPublishedBefore());

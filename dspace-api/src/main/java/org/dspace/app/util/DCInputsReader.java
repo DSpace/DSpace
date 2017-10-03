@@ -155,7 +155,7 @@ public class DCInputsReader
      * @throws DCInputsReaderException
      *             if no default set defined
      */
-    public DCInputSet getInputs(String collectionHandle)
+    public DCInputSet getInputsByCollectionHandle(String collectionHandle)
         throws DCInputsReaderException
     {
         String formName = whichForms.get(collectionHandle);
@@ -167,6 +167,21 @@ public class DCInputsReader
         {
             throw new DCInputsReaderException("No form designated as default");
         }
+        return getInputsByFormName(formName);
+    }
+        
+    /**
+     * Returns the set of DC inputs used for a particular input form
+     *
+     * @param formName
+     *            input form unique name
+     * @return DC input set
+     * @throws DCInputsReaderException
+     *             if not found
+     */
+    public DCInputSet getInputsByFormName(String formName)
+        throws DCInputsReaderException
+    {
         // check mini-cache, and return if match
         if ( lastInputSet != null && lastInputSet.getFormName().equals( formName ) )
         {
@@ -191,10 +206,49 @@ public class DCInputsReader
     public int getNumberInputPages(String collectionHandle)
         throws DCInputsReaderException
     {
-        return getInputs(collectionHandle).getNumberPages();
+        return getInputsByCollectionHandle(collectionHandle).getNumberPages();
     }
     
     /**
+	 * 
+	 * @return the number of defined input forms
+	 */
+	public int countInputs() {
+		return formDefns.size();
+	}
+
+
+	/**
+	 * Returns all the Input forms with pagination 
+	 * 
+	 * @param limit
+	 *            max number of Input Forms to return
+	 * @param offset
+	 *            number of Input form to skip in the return
+	 *            
+	 * @return the list of input forms
+	 * @throws DCInputsReaderException 
+	 * 
+	 */
+	public List<DCInputSet> getAllInputs(Integer limit, Integer offset) throws DCInputsReaderException {
+		int idx = 0;
+		int count = 0;
+		List<DCInputSet> subConfigs = new LinkedList<DCInputSet>();
+		for (String key : formDefns.keySet()) {
+			if (offset == null || idx >= offset) {
+				count++;
+				subConfigs.add(getInputsByFormName(key));
+			}
+			idx++;
+			if (count >= limit) {
+				break;
+			}
+		}
+		return subConfigs;
+	}
+
+
+	/**
      * Process the top level child nodes in the passed top-level node. These
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
