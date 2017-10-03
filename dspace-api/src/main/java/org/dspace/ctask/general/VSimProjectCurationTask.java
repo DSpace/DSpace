@@ -17,7 +17,6 @@ We need to add them to fields we can use to also recall the values in this scrip
 */
 
 // TODO: make this whole thing Idempotent (see below for notes, around line 109)
-// TODO:
 
 package org.dspace.ctask.general;
 
@@ -38,6 +37,11 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.core.Constants;
 import org.dspace.curate.Curator;
+
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
+
 import org.apache.log4j.Logger;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
@@ -63,19 +67,18 @@ import java.io.IOException;
  */
 public class VSimProjectCurationTask extends AbstractCurationTask
 {
-    /** log4j category */
+/** log4j category */
     private static final Logger log = Logger.getLogger(VSimProjectCurationTask.class);
 
     protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
     protected CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
     protected HandleService handleService = HandleServiceFactory.getInstance().getHandleService();
+    protected GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
     protected int status = Curator.CURATE_UNSET;
     protected String result = null;
 
     private static final int digitsPerLevel = 2;
     private static final int directoryLevels = 3;
-
-    // TODO: We need a few DSpace group objects for AuthZ purposes: Admins, ContentCreators, Anonymous; keep them handy
 
     /**
      * Perform the curation task upon passed DSO
@@ -204,10 +207,18 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               // snag the projectCommunityhandle, we'll need it
               String projectCommunityHandle = projectCommunity.getHandle();
 
-              // TODO: set the logo for the community, if possible, use projectCommunity.setLogo(Bitstream logo)
-              // TODO: example: https://github.com/DSpace/DSpace/blob/269af71afb602808a14edf822ad658c3895e0a37/dspace-api/src/main/java/org/dspace/content/packager/AbstractMETSIngester.java#L994-L1010
-              // TODO: before we can do that, we need to find the Bitstream logo on this Project master item
-              // TODO: set the admins for this community, use setAdmins(Group admins) <- we need a Group object that matches the Content Creators group
+              // set the logo for the community, if possible, use projectCommunity.setLogo(Bitstream logo)
+
+              // We need a DSpace group object for AuthZ purposes, for ContentCreators, to keep handy
+              Group ContentCreatorsGroupObj = groupService.findByName(Curator.curationContext(), "Content Creators");
+              Group AnonymousGroupObj = groupService.findByName(Curator.curationContext(), "Anonymous");
+
+              // create the Administrators group we need
+              Group projectCommunityAdminGroupObj = communityService.createAdministrators(Curator.curationContext(), projectCommunity);
+
+              // add the ContentCreatorsGroupObj to the group we just created
+              groupService.addMember(Curator.curationContext(), projectCommunityAdminGroupObj, ContentCreatorsGroupObj);
+              groupService.update(Curator.curationContext(), projectCommunityAdminGroupObj);
 
               // add a link to the top level community as metadata for this project master Item (use vsim.relation.community)
               itemService.addMetadata(Curator.curationContext(), item, "vsim", "relation", "community", Item.ANY, projectCommunityHandle);
@@ -221,6 +232,17 @@ public class VSimProjectCurationTask extends AbstractCurationTask
                 collectionService.addMetadata(Curator.curationContext(), projectCollModels, MetadataSchema.DC_SCHEMA, "description", "tableofcontents", null, "Collection sidebar for Models: " + mvDcTitle.get(0).getValue());
                 collectionService.addMetadata(Curator.curationContext(), projectCollModels, MetadataSchema.DC_SCHEMA, "rights", null, null, mvDcRights.get(0).getValue());
               }
+
+              // create the Administrators and Submitters groups we need
+              Group projectCollModelsAdminGroupObj = collectionService.createAdministrators(Curator.curationContext(), projectCollModels);
+              Group projectCollModelsSubmittersGroupObj = collectionService.createSubmitters(Curator.curationContext(), projectCollModels);
+
+              // add the ContentCreatorsGroupObj to the groups we just created
+              groupService.addMember(Curator.curationContext(), projectCollModelsAdminGroupObj, ContentCreatorsGroupObj);
+              groupService.addMember(Curator.curationContext(), projectCollModelsSubmittersGroupObj, ContentCreatorsGroupObj);
+              groupService.update(Curator.curationContext(), projectCollModelsAdminGroupObj);
+              groupService.update(Curator.curationContext(), projectCollModelsSubmittersGroupObj);
+
               // write this collection
               collectionService.update(Curator.curationContext(), projectCollModels);
               // add a link to this collection to the item
@@ -236,6 +258,17 @@ public class VSimProjectCurationTask extends AbstractCurationTask
                 collectionService.addMetadata(Curator.curationContext(), projectCollArchives, MetadataSchema.DC_SCHEMA, "description", "tableofcontents", null, "Collection sidebar for Archives: " + mvDcTitle.get(0).getValue());
                 collectionService.addMetadata(Curator.curationContext(), projectCollArchives, MetadataSchema.DC_SCHEMA, "rights", null, null, mvDcRights.get(0).getValue());
               }
+
+              // create the Administrators and Submitters groups we need
+              Group projectCollArchivesAdminGroupObj = collectionService.createAdministrators(Curator.curationContext(), projectCollArchives);
+              Group projectCollArchivesSubmittersGroupObj = collectionService.createSubmitters(Curator.curationContext(), projectCollArchives);
+
+              // add the ContentCreatorsGroupObj to the groups we just created
+              groupService.addMember(Curator.curationContext(), projectCollArchivesAdminGroupObj, ContentCreatorsGroupObj);
+              groupService.addMember(Curator.curationContext(), projectCollArchivesSubmittersGroupObj, ContentCreatorsGroupObj);
+              groupService.update(Curator.curationContext(), projectCollArchivesAdminGroupObj);
+              groupService.update(Curator.curationContext(), projectCollArchivesSubmittersGroupObj);
+
               // write this collection
               collectionService.update(Curator.curationContext(), projectCollArchives);
               // add a link to this collection to the item
@@ -251,6 +284,17 @@ public class VSimProjectCurationTask extends AbstractCurationTask
                 collectionService.addMetadata(Curator.curationContext(), projectCollSubmissions, MetadataSchema.DC_SCHEMA, "description", "tableofcontents", null, "Collection sidebar for Submissions: " + mvDcTitle.get(0).getValue());
                 collectionService.addMetadata(Curator.curationContext(), projectCollSubmissions, MetadataSchema.DC_SCHEMA, "rights", null, null, mvDcRights.get(0).getValue());
               }
+
+              // create the Administrators and Submitters groups we need
+              Group projectCollSubmissionsAdminGroupObj = collectionService.createAdministrators(Curator.curationContext(), projectCollSubmissions);
+              Group projectCollSubmissionsSubmittersGroupObj = collectionService.createSubmitters(Curator.curationContext(), projectCollSubmissions);
+
+              // add the ContentCreatorsGroupObj to the admin group we just created, and the AnonymousGroupObj to the submitters group we just created
+              groupService.addMember(Curator.curationContext(), projectCollSubmissionsAdminGroupObj, ContentCreatorsGroupObj);
+              groupService.addMember(Curator.curationContext(), projectCollSubmissionsSubmittersGroupObj, AnonymousGroupObj);
+              groupService.update(Curator.curationContext(), projectCollSubmissionsAdminGroupObj);
+              groupService.update(Curator.curationContext(), projectCollSubmissionsSubmittersGroupObj);
+
               // write this collection
               collectionService.update(Curator.curationContext(), projectCollSubmissions);
               // add a link to this collection to the item
