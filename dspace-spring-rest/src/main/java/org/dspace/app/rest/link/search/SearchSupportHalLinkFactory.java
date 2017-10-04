@@ -33,6 +33,7 @@ public class SearchSupportHalLinkFactory extends HalLinkFactory<SearchSupportRes
         list.add(buildLink(Link.REL_SELF, getMethodOn()
                 .getSearchSupport(null, null)));
         list.add(buildLink("configuration", getMethodOn().getSearchConfiguration(null, null)));
+        list.add(buildLink("facets", getMethodOn().getFacetsConfiguration(null, null)));
     }
 
     protected Class<SearchSupportResource> getResourceClass() {

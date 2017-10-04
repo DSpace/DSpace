@@ -10,9 +10,11 @@ package org.dspace.app.rest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkService;
+import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.SearchSupportRest;
+import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
 import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
@@ -111,14 +113,17 @@ public class DiscoveryRestController implements InitializingBean {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets")
-    public void getFacetsConfiguration(@RequestParam(name = "scope", required = false) String dsoScope,
+    public FacetConfigurationResource getFacetsConfiguration(@RequestParam(name = "scope", required = false) String dsoScope,
                                        @RequestParam(name = "configuration", required = false) String configurationName) {
         if(log.isTraceEnabled()) {
             log.trace("Retrieving facet configuration for scope " + StringUtils.trimToEmpty(dsoScope)
                     + " and configuration name " + StringUtils.trimToEmpty(configurationName));
         }
 
-        discoveryRestRepository.getFacetsConfiguration(dsoScope, configurationName);
+        FacetConfigurationRest facetConfigurationRest = discoveryRestRepository.getFacetsConfiguration(dsoScope, configurationName);
+        FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(facetConfigurationRest);
+        halLinkService.addLinks(facetConfigurationResource);
+        return facetConfigurationResource;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets/{name}")

@@ -9,9 +9,11 @@ package org.dspace.app.rest.repository;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
+import org.dspace.app.rest.converter.DiscoverFacetConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverResultConverter;
 import org.dspace.app.rest.converter.DiscoverSearchSupportConverter;
 import org.dspace.app.rest.exception.InvalidRequestException;
+import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.SearchSupportRest;
@@ -62,6 +64,9 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
     private DiscoverConfigurationConverter discoverConfigurationConverter;
 
     @Autowired
+    private DiscoverFacetConfigurationConverter discoverFacetConfigurationConverter;
+
+    @Autowired
     private DiscoverSearchSupportConverter discoverSearchSupportConverter;
 
     public SearchConfigurationRest getSearchConfiguration(final String dsoScope, final String configurationName) {
@@ -99,13 +104,15 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         return discoverResultConverter.convert(context, discoverQuery, configurationName, dsoScope, searchFilters, page, searchResult, configuration);
     }
 
-    public void getFacetsConfiguration(final String dsoScope, final String configurationName) {
+    public FacetConfigurationRest getFacetsConfiguration(final String dsoScope, final String configurationName) {
         //TODO
         Context context = obtainContext();
 
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
 
+
+        return discoverFacetConfigurationConverter.convert(configuration);
         //TODO Call DiscoveryConfigurationConverter on configuration to convert this API model to the REST model
 
         //TODO Return REST model
