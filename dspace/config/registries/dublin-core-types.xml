@@ -100,39 +100,11 @@
     <scope_note>A person, organization, or service responsible for the content of the resource.  Catch-all for unspecified contributors.</scope_note>
   </dc-type>
 
-  <dc-type>
-	<schema>dc</schema>
-    <element>contributor</element>
-    <qualifier>advisor</qualifier>
-    <scope_note>Use primarily for thesis advisor.</scope_note>
-  </dc-type>
-
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
     <element>contributor</element>
     <qualifier>author</qualifier>
-    <scope_note></scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>contributor</element>
-    <qualifier>editor</qualifier>
-    <scope_note></scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>contributor</element>
-    <qualifier>illustrator</qualifier>
-    <scope_note></scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>contributor</element>
-    <qualifier>other</qualifier>
     <scope_note></scope_note>
   </dc-type>
 
@@ -180,33 +152,12 @@
     <scope_note>Date or date range item became available to the public.</scope_note>
   </dc-type>
 
-  <dc-type>
-	<schema>dc</schema>
-    <element>date</element>
-    <qualifier>copyright</qualifier>
-    <scope_note>Date of copyright.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>date</element>
-    <qualifier>created</qualifier>
-    <scope_note>Date of creation or manufacture of intellectual content if different from date.issued.</scope_note>
-  </dc-type>
-
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
     <element>date</element>
     <qualifier>issued</qualifier>
     <scope_note>Date of publication or distribution.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>date</element>
-    <qualifier>submitted</qualifier>
-    <scope_note>Recommend for theses/dissertations.</scope_note>
   </dc-type>
 
   <dc-type>
@@ -315,28 +266,6 @@
     contractual arrangements for the item.</scope_note>
   </dc-type>
 
-  <dc-type>
-	<schema>dc</schema>
-    <element>description</element>
-    <qualifier>statementofresponsibility</qualifier>
-    <scope_note>To preserve statement of responsibility from MARC records.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>description</element>
-    <qualifier>tableofcontents</qualifier>
-    <scope_note>A table of contents for a given item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>description</element>
-    <qualifier>uri</qualifier>
-    <scope_note>Uniform Resource Identifier pointing to description of
-    this item.</scope_note>
-  </dc-type>
-
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
@@ -353,27 +282,12 @@
     <scope_note>Size or duration.</scope_note>
   </dc-type>
 
-  <dc-type>
-	<schema>dc</schema>
-    <element>format</element>
-    <qualifier>medium</qualifier>
-    <scope_note>Physical medium.</scope_note>
-  </dc-type>
-
   <!-- Used by system: do not remove -->
   <dc-type>
 	<schema>dc</schema>
     <element>format</element>
     <qualifier>mimetype</qualifier>
     <scope_note>Registered MIME type identifiers.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>language</element>
-    <!-- unqualified -->
-    <scope_note>Catch-all for non-ISO forms of the language of the
-    item, accommodating harvested values.</scope_note>
   </dc-type>
 
   <!-- Used by system: do not remove -->
@@ -390,13 +304,6 @@
     <element>publisher</element>
     <!-- unqualified -->
     <scope_note>Entity responsible for publication, distribution, or imprint.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <!-- unqualified -->
-    <scope_note>Catch-all for references to other related items.</scope_note>
   </dc-type>
 
   <dc-type>
@@ -466,27 +373,6 @@
 
   <dc-type>
 	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>replaces</qualifier>
-    <scope_note>References preceeding item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>isreplacedby</qualifier>
-    <scope_note>References succeeding item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>relation</element>
-    <qualifier>uri</qualifier>
-    <scope_note>References Uniform Resource Identifier for related item.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
     <element>rights</element>
     <!-- unqualified -->
     <scope_note>Terms governing use and reproduction.</scope_note>
@@ -519,49 +405,6 @@
     <element>subject</element>
     <!-- unqualified -->
     <scope_note>Uncontrolled index term.</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>subject</element>
-    <qualifier>classification</qualifier>
-    <scope_note>Catch-all for value from local classification system;
-    global classification systems will receive specific qualifier</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>subject</element>
-    <qualifier>ddc</qualifier>
-    <scope_note>Dewey Decimal Classification Number</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>subject</element>
-    <qualifier>lcc</qualifier>
-    <scope_note>Library of Congress Classification Number</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>subject</element>
-    <qualifier>lcsh</qualifier>
-    <scope_note>Library of Congress Subject Headings</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>subject</element>
-    <qualifier>mesh</qualifier>
-    <scope_note>MEdical Subject Headings</scope_note>
-  </dc-type>
-
-  <dc-type>
-	<schema>dc</schema>
-    <element>subject</element>
-    <qualifier>other</qualifier>
-    <scope_note>Local controlled vocabulary; global vocabularies will receive specific qualifier.</scope_note>
   </dc-type>
 
   <!-- Used by system: do not remove -->
@@ -619,28 +462,8 @@
 
     <dc-type>
         <schema>dc</schema>
-        <element>workflow</element>
-        <qualifier>submitted</qualifier>
-        <scope_note>Boolean used in the submission process only.</scope_note>
-    </dc-type>
-    <dc-type>
-        <schema>dc</schema>
-        <element>workflow</element>
-        <qualifier>selectjournal</qualifier>
-        <scope_note>Boolean used in the submission process only.</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dc</schema>
         <element>type</element>
         <qualifier>embargo</qualifier>
-    </dc-type>
-
-    <dc-type>
-        <schema>dc</schema>
-        <element>submit</element>
-        <qualifier>showEmbargo</qualifier>
-        <scope_note>Boolean used in the submission process only.</scope_note>
     </dc-type>
 
     <dc-type>
@@ -648,13 +471,6 @@
         <element>identifier</element>
         <qualifier>manuscriptNumber</qualifier>
         <scope_note>Manuscript number</scope_note>
-    </dc-type>
-
-    <dc-type>
-        <schema>dc</schema>
-        <element>identifier</element>
-        <qualifier>externalresourceXml</qualifier>
-        <scope_note>External source xml value</scope_note>
     </dc-type>
 
     <dc-type>

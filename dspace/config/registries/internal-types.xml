@@ -26,12 +26,6 @@
 
     <dc-type>
         <schema>internal</schema>
-        <element>workflow</element>
-        <qualifier>selectjournal</qualifier>
-    </dc-type>
-
-    <dc-type>
-        <schema>internal</schema>
         <element>submit</element>
         <qualifier>showEmbargo</qualifier>
     </dc-type>
