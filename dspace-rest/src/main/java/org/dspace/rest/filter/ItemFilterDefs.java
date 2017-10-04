@@ -4,7 +4,6 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- * GUDOE[[twb27:custom module]]
  */
 package org.dspace.rest.filter;
 
