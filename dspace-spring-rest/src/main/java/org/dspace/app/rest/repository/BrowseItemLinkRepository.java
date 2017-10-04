@@ -7,11 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.UUID;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.model.BrowseIndexRest;
@@ -50,7 +45,10 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 	ItemRestRepository itemRestRepository;
 
 	@Autowired
-	ScopeResolver scopeResolver;
+	CollectionService collectionService;
+
+	@Autowired
+	CommunityService communityService;
 
 	public Page<ItemRest> listBrowseItems(HttpServletRequest request, String browseName, Pageable pageable, String projection)
 			throws BrowseException, SQLException {

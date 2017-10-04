@@ -7,20 +7,12 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.UUID;
-import java.util.function.Consumer;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.converter.BrowseEntryConverter;
 import org.dspace.app.rest.converter.BrowseIndexConverter;
 import org.dspace.app.rest.model.BrowseEntryRest;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.hateoas.BrowseEntryResource;
-import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.browse.*;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.service.CollectionService;
@@ -35,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -54,7 +47,10 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 	BrowseIndexConverter bixConverter;
 
 	@Autowired
-	ScopeResolver scopeResolver;
+	CollectionService collectionService;
+
+	@Autowired
+	CommunityService communityService;
 
 	// FIXME It will be nice to drive arguments binding by annotation as in normal spring controller methods
 	public Page<BrowseEntryRest> listBrowseEntries(HttpServletRequest request, String browseName,
