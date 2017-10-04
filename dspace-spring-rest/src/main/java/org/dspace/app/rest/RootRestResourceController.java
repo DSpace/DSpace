@@ -43,11 +43,16 @@ public class RootRestResourceController {
 	@RequestMapping(method = RequestMethod.GET)
 	public RootResource listDefinedEndpoint(HttpServletRequest request) {
 
+		String restUrl = getRestURL(request);
 
-		RootRest rootRest = rootRestRepository.getRoot();
+		RootRest rootRest = rootRestRepository.getRoot(restUrl);
 		RootResource rootResource = new RootResource(rootRest);
 		halLinkService.addLinks(rootResource);
 
 		return rootResource;
+	}
+	private String getRestURL(HttpServletRequest request) {
+		String url = request.getRequestURL().toString();
+		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath();
 	}
 }
