@@ -7,6 +7,14 @@
  */
 package org.dspace.servicemanager.spring;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.dspace.kernel.config.SpringLoader;
 import org.dspace.servicemanager.DSpaceServiceManager;
 import org.dspace.servicemanager.ServiceManagerSystem;
@@ -19,8 +27,6 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.*;
 
 /**
  * This is the Spring implementation of the service manager.

@@ -7,20 +7,19 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.app.rest.converter.MetadataSchemaConverter;
 import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.hateoas.MetadataSchemaResource;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * This is the repository responsible to manage MetadataSchema Rest object
