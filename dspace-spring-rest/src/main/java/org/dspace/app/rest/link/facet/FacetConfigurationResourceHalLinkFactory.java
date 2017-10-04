@@ -30,7 +30,6 @@ public class FacetConfigurationResourceHalLinkFactory extends HalLinkFactory<Fac
 
             list.add(buildLink(Link.REL_SELF, getMethodOn()
                     .getFacetsConfiguration(data.getScope(), data.getConfigurationName())));
-//            list.add(buildLink("objects", getMethodOn().getSearchObjects(null, null, null, null, null, null)));
         }
     }
 

@@ -69,6 +69,7 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
                         .append(this.getController(), ((FacetConfigurationRest) object).getController())
                         .append(this.getScope(), ((FacetConfigurationRest) object).getScope())
                         .append(this.getConfigurationName(), ((FacetConfigurationRest) object).getConfigurationName())
+                        .append(this.getSidebarFacets(), ((FacetConfigurationRest) object).getSidebarFacets())
                         .isEquals());
     }
     @Override
@@ -79,6 +80,7 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
                 .append(this.getController())
                 .append(this.getScope())
                 .append(this.getConfigurationName())
+                .append(this.getSidebarFacets())
                 .toHashCode();
     }
 
