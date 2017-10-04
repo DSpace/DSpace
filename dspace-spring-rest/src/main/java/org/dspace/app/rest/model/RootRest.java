@@ -19,6 +19,7 @@ public class RootRest implements RestModel {
     public static final String CATEGORY = RestModel.ROOT;
     private String dspaceURL;
     private String dspaceName;
+    private String dspaceRest;
 
     public String getCategory() {
         return CATEGORY;
@@ -47,6 +48,8 @@ public class RootRest implements RestModel {
         this.dspaceName = dspaceName;
     }
 
+    public String getDspaceRest(){ return dspaceRest;}
+    public void setDspaceRest(String dspaceRest) {this.dspaceRest = dspaceRest;}
     @Override
     public boolean equals(Object object){
         return (object instanceof RootRest &&
@@ -55,6 +58,7 @@ public class RootRest implements RestModel {
                         .append(this.getController(), ((RootRest) object).getController())
                         .append(this.getDspaceURL(), ((RootRest) object).getDspaceURL())
                         .append(this.getDspaceName(), ((RootRest) object).getDspaceName())
+                        .append(this.getDspaceRest(), ((RootRest) object).getDspaceRest())
                         .isEquals());
     }
     @Override
@@ -63,8 +67,9 @@ public class RootRest implements RestModel {
                 .append(this.getCategory())
                 .append(this.getType())
                 .append(this.getController())
+                .append(this.getDspaceName())
                 .append(this.getDspaceURL())
-                .append(this.getDspaceURL())
+                .append(this.getDspaceRest())
                 .toHashCode();
     }
 }
