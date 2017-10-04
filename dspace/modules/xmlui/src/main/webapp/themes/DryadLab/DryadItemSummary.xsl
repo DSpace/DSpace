@@ -407,33 +407,6 @@
                                     <tr>
                                         <td>
                                             <xsl:element name="a">
-                                                <xsl:variable name="dfirstpart">
-                                                    window.open('http://www.delicious.com/save?v=5&amp;noui&amp;jump=close&amp;url='+encodeURIComponent(
-                                                </xsl:variable>
-                                                <xsl:variable name="dsecondpart">)+'&amp;title=
-                                                </xsl:variable>
-                                                <xsl:variable name="dthirdpart">
-                                                    ',
-                                                    'delicious','toolbar=no,width=550,height=550'); return
-                                                    false;
-                                                </xsl:variable>
-                                                <xsl:attribute name="href">http://www.delicious.com/save</xsl:attribute>
-                                                <xsl:attribute name="onclick">
-                                                    <xsl:value-of
-                                                            select="concat($dfirstpart, $apos, 'https://doi.org/', $pkgDOI, $apos, $dsecondpart,
-														$thistitle, $dthirdpart)"/>
-                                                </xsl:attribute>
-                                                <img src="//delicious.com/img/logo.png"
-                                                     height="16" width="16" alt="Delicious"
-                                                     style="border: 1px solid #ccc;"/>
-                                            </xsl:element>
-                                            <!-- xsl:text is a workaround for formatting issues -->
-                                            <script type="text/javascript" src="/themes/Dryad/lib/delicious.js">
-                                                <xsl:text> </xsl:text>
-                                            </script>
-                                        </td>
-                                        <td>
-                                            <xsl:element name="a">
                                                 <xsl:attribute name="class">DiggThisButton DiggCompact</xsl:attribute>
                                                 <xsl:attribute name="href">
                                                     <xsl:value-of
@@ -807,29 +780,6 @@
                                 <!-- for building JavaScript -->
                                 <table style="width: 100%;">
                                     <tr>
-                                        <td>
-                                            <xsl:element name="a">
-                                                <xsl:variable name="dfirstpart">
-                                                    window.open('http://www.delicious.com/save?v=5&amp;noui&amp;jump=close&amp;url='+encodeURIComponent(
-                                                </xsl:variable>
-                                                <xsl:variable name="dsecondpart">)+'&amp;title='+encodeURIComponent(document.title),
-                                                    'delicious','toolbar=no,width=550,height=550'); return
-                                                    false;
-                                                </xsl:variable>
-                                                <xsl:attribute name="href">http://www.delicious.com/save</xsl:attribute>
-                                                <xsl:attribute name="onclick">
-                                                    <xsl:value-of
-                                                            select="concat($dfirstpart, $apos, 'https://doi.org/', $my_doi, $apos, $dsecondpart)"/>
-                                                </xsl:attribute>
-                                                <img src="//delicious.com/img/logo.png"
-                                                     height="16" width="16" alt="Delicious"
-                                                     style="border: 1px solid #ccc;"/>
-                                            </xsl:element>
-                                            <!-- xsl:text is a workaround for formatting issues -->
-                                            <script type="text/javascript" src="/themes/Dryad/lib/delicious.js">
-                                                <xsl:text> </xsl:text>
-                                            </script>
-                                        </td>
                                         <td>
                                             <xsl:element name="a">
                                                 <xsl:attribute name="class">DiggThisButton DiggCompact</xsl:attribute>
