@@ -28,7 +28,7 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
 
     protected void addLinks(RootResource halResource, LinkedList<Link> list) {
         for(Link endpointLink : discoverableEndpointsService.getDiscoverableEndpoints()){
-            list.add(buildLink(endpointLink.getRel(), endpointLink.getRel()));
+            list.add(buildLink(endpointLink.getRel(), halResource.getData().getDspaceRest() + endpointLink.getHref()));
         }
     }
 
