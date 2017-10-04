@@ -20,6 +20,7 @@
   </dc-type>
 
     <!--DRYAD ONLY-->
+    <!-- Used by system: do not remove -->
     <dc-type>
         <schema>workflow</schema>
         <element>step</element>
