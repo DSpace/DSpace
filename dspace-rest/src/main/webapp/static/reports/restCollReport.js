@@ -216,6 +216,7 @@ var CollReport = function() {
         }
             
         var cid = tr.attr("cid");
+        if (cid == undefined) return;
         $.ajax({
             url: "/rest/filtered-collections/"+cid,
             data: {
@@ -293,6 +294,7 @@ var CollReport = function() {
                 }
 
     this.updateRow = function(cid, offset) {
+        if (cid == undefined) return;
         var tr = $("tr[cid="+cid+"]");
         $.ajax({
             url: "/rest/filtered-collections/"+cid,
@@ -393,6 +395,7 @@ var CollReport = function() {
     
                 
     this.drawItemTable = function(cid, filter, offset) {
+        if (cid == undefined) return;
         self = this;
         self.spinner.spin($("h1")[0]);
         $("#itemtable").replaceWith($('<table id="itemtable" class="sortable"></table>'));
