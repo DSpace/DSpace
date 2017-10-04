@@ -512,6 +512,34 @@ public class Collection extends DSpaceObject
     }
 
     /**
+     * Get the items in this collection. The order is indeterminate.
+     * Provides the ability to use limit and offset, for efficient paging.
+     * @param limit Max number of results in set
+     * @param offset Number of results to jump ahead by. 100 = 100th result is first, not 100th page.
+     * @return an iterator over the items in the collection.
+     * @throws SQLException
+     */
+    public ItemIterator getItemsIncludingWithdrawn(Integer limit, Integer offset) throws SQLException
+    {
+        List<Serializable> params = new ArrayList<Serializable>();
+        StringBuffer myQuery = new StringBuffer(
+            "SELECT item.* " + 
+            "FROM item, collection2item " + 
+            "WHERE item.item_id = collection2item.item_id " +
+              "AND collection2item.collection_id = ? "
+        );
+
+        params.add(getID());
+        DatabaseManager.applyOffsetAndLimit(myQuery, params, offset, limit);
+
+        TableRowIterator rows = DatabaseManager.query(ourContext,
+                myQuery.toString(), params.toArray());
+
+        return new ItemIterator(ourContext, rows);
+    }
+
+    
+    /**
      * Get all the items in this collection. The order is indeterminate.
      *
      * @return an iterator over the items in the collection.
@@ -545,14 +573,14 @@ public class Collection extends DSpaceObject
     public String getHandle()
     {
         if(handle == null) {
-        	try {
-				handle = HandleManager.findHandle(this.ourContext, this);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			}
+            try {
+                handle = HandleManager.findHandle(this.ourContext, this);
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                //e.printStackTrace();
+            }
         }
-    	return handle;
+        return handle;
     }
 
     /**
@@ -607,7 +635,7 @@ public class Collection extends DSpaceObject
          * and trim strings to eliminate excess
          * whitespace.
          */
-		if(value == null)
+        if(value == null)
         {
             clearMetadata(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
             modifiedMetadata = true;
@@ -873,7 +901,7 @@ public class Collection extends DSpaceObject
      */
     public void removeSubmitters() throws SQLException, AuthorizeException
     {
-    	// Check authorisation - Must be an Admin to delete Submitters Group
+        // Check authorisation - Must be an Admin to delete Submitters Group
         AuthorizeUtil.authorizeManageSubmittersGroup(ourContext, this);
 
         // just return if there is no administrative group.
@@ -1292,39 +1320,39 @@ public class Collection extends DSpaceObject
 
         try
         {
-        	while (items.hasNext())
-        	{
-        		Item item = items.next();
-        		IndexBrowse ib = new IndexBrowse(ourContext);
+            while (items.hasNext())
+            {
+                Item item = items.next();
+                IndexBrowse ib = new IndexBrowse(ourContext);
 
-        		if (item.isOwningCollection(this))
-        		{
-        			// the collection to be deleted is the owning collection, thus remove
-        			// the item from all collections it belongs to
-        			Collection[] collections = item.getCollections();
-        			for (int i=0; i< collections.length; i++)
-        			{
-        				//notify Browse of removing item.
-        				ib.itemRemoved(item);
-        				// Browse.itemRemoved(ourContext, itemId);
-        				collections[i].removeItem(item);
-        			}
+                if (item.isOwningCollection(this))
+                {
+                    // the collection to be deleted is the owning collection, thus remove
+                    // the item from all collections it belongs to
+                    Collection[] collections = item.getCollections();
+                    for (int i=0; i< collections.length; i++)
+                    {
+                        //notify Browse of removing item.
+                        ib.itemRemoved(item);
+                        // Browse.itemRemoved(ourContext, itemId);
+                        collections[i].removeItem(item);
+                    }
 
-        		}
-        		// the item was only mapped to this collection, so just remove it
-        		else
-        		{
-        			//notify Browse of removing item mapping.
-        			ib.indexItem(item);
-        			// Browse.itemChanged(ourContext, item);
-        			removeItem(item);
-        		}
-        	}
+                }
+                // the item was only mapped to this collection, so just remove it
+                else
+                {
+                    //notify Browse of removing item mapping.
+                    ib.indexItem(item);
+                    // Browse.itemChanged(ourContext, item);
+                    removeItem(item);
+                }
+            }
         }
         catch (BrowseException e)
         {
-        	log.error("caught exception: ", e);
-        	throw new IOException(e.getMessage(), e);
+            log.error("caught exception: ", e);
+            throw new IOException(e.getMessage(), e);
         }
         finally
         {
@@ -1377,14 +1405,14 @@ public class Collection extends DSpaceObject
         //  get rid of the content count cache if it exists
         try
         {
-        	ItemCounter ic = new ItemCounter(ourContext);
-        	ic.remove(this);
+            ItemCounter ic = new ItemCounter(ourContext);
+            ic.remove(this);
         }
         catch (ItemCountException e)
         {
-        	// FIXME: upside down exception handling due to lack of good
-        	// exception framework
-        	throw new IllegalStateException(e.getMessage(), e);
+            // FIXME: upside down exception handling due to lack of good
+            // exception framework
+            throw new IllegalStateException(e.getMessage(), e);
         }
 
         // Remove any Handle
@@ -1691,7 +1719,7 @@ public class Collection extends DSpaceObject
 
     }
 
-	/**
+    /**
      * counts items in this collection
      *
      * @return  total items
@@ -1736,6 +1764,51 @@ public class Collection extends DSpaceObject
         return itemcount;
      }
 
+    /**
+      * counts items in this collection including withdrawn and private items
+      *
+      * @return  total items
+      */
+      public int countAllItems()
+         throws SQLException
+      {
+          int itemcount = 0;
+          PreparedStatement statement = null;
+          ResultSet rs = null;
+
+          try
+          {
+              String query = "SELECT count(*) FROM collection2item, item WHERE "
+                     + "collection2item.collection_id =  ? "
+                     + "AND collection2item.item_id = item.item_id ";
+
+             statement = ourContext.getDBConnection().prepareStatement(query);
+             statement.setInt(1,getID());
+
+             rs = statement.executeQuery();
+             if (rs != null)
+             {
+                 rs.next();
+                 itemcount = rs.getInt(1);
+             }
+          }
+          finally
+          {
+              if (rs != null)
+              {
+                  try { rs.close(); } catch (SQLException sqle) { }
+              }
+
+              if (statement != null)
+              {
+                  try { statement.close(); } catch (SQLException sqle) { }
+              }
+          }
+
+         return itemcount;
+      }
+ 
+     
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
         DSpaceObject adminObject = null;
