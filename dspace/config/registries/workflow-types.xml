@@ -20,7 +20,14 @@
   </dc-type>
 
     <!--DRYAD ONLY-->
-  <dc-type>
+    <dc-type>
+        <schema>workflow</schema>
+        <element>step</element>
+        <qualifier>finishedUsers</qualifier>
+        <scope_note>Contains the userIds of the users who are performed a step</scope_note>
+    </dc-type>
+
+    <dc-type>
 	<schema>workflow</schema>
     <element>step</element>
     <qualifier>reviewerKey</qualifier>
