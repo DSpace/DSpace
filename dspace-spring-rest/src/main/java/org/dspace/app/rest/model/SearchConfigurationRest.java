@@ -1,18 +1,7 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.codec.binary.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -72,33 +61,6 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
     public List<SortOption> getSortOptions(){
         return sortOptions;
     }
-
-    @Override
-    public boolean equals(Object object){
-        return (object instanceof SearchConfigurationRest &&
-                new EqualsBuilder().append(this.getCategory(), ((SearchConfigurationRest) object).getCategory())
-                        .append(this.getType(), ((SearchConfigurationRest) object).getType())
-                        .append(this.getController(), ((SearchConfigurationRest) object).getController())
-                        .append(this.getScope(), ((SearchConfigurationRest) object).getScope())
-                        .append(this.getConfigurationName(), ((SearchConfigurationRest) object).getConfigurationName())
-                        .append(this.getFilters(), ((SearchConfigurationRest) object).getFilters())
-                        .append(this.getSortOptions(), ((SearchConfigurationRest) object).getSortOptions())
-                        .isEquals());
-    }
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(this.getCategory())
-                .append(this.getType())
-                .append(this.getController())
-                .append(this.getScope())
-                .append(this.getConfigurationName())
-                .append(this.getFilters())
-                .append(this.getSortOptions())
-                .toHashCode();
-    }
-
-
     public static class Filter{
         private String filter;
         private List<Operator> operators = new LinkedList<>();
@@ -132,20 +94,6 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
             operators.add(new Operator(OPERATOR_CONTAINS));
             operators.add(new Operator(OPERATOR_NOTCONTAINS));
         }
-        @Override
-        public boolean equals(Object object){
-            return (object instanceof SearchConfigurationRest.Filter &&
-                    new EqualsBuilder().append(this.filter, ((Filter) object).filter)
-                            .append(this.getOperators(), ((Filter) object).getOperators())
-                            .isEquals());
-        }
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder(17, 37)
-                    .append(filter)
-                    .append(operators)
-                    .toHashCode();
-        }
         public static class Operator{
             private String operator;
             public Operator(String operator){
@@ -153,17 +101,6 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
             }
             public String getOperator(){
                 return operator;
-            }
-            @Override
-            public boolean equals(Object object){
-                return (object instanceof SearchConfigurationRest.Filter.Operator &&
-                        new EqualsBuilder().append(this.getOperator(), ((Operator) object).getOperator()).isEquals());
-            }
-            @Override
-            public int hashCode() {
-                return new HashCodeBuilder(17, 37)
-                        .append(operator)
-                        .toHashCode();
             }
         }
     }
@@ -186,20 +123,6 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         }
         public String getMetadata(){
             return metadata;
-        }
-        @Override
-        public boolean equals(Object object){
-            return (object instanceof SearchConfigurationRest.SortOption &&
-                    new EqualsBuilder().append(this.getName(), ((SortOption) object).getName())
-                            .append(this.getMetadata(), ((SortOption) object).getMetadata())
-                            .isEquals());
-        }
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder(17, 37)
-                    .append(name)
-                    .append(metadata)
-                    .toHashCode();
         }
     }
 }
