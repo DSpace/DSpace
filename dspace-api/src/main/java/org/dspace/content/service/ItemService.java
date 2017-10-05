@@ -529,6 +529,16 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public int countItems(Context context, Collection collection) throws SQLException;
 
     /**
+     * counts all items in the given collection including withdrawn items
+     *
+     * @param context DSpace context object
+     * @param collection Collection
+     * @return total items
+     * @throws SQLException if database error
+     */
+    public int countAllItems(Context context, Collection collection) throws SQLException;
+    
+    /**
      * Find all Items modified since a Date.
      *
      * @param context context
@@ -549,6 +559,16 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      */
     public int countItems(Context context, Community community) throws SQLException;
 
+    /**
+     * counts all items in the given community including withdrawn
+     *
+     * @param context DSpace context object
+     * @param community Community
+     * @return total items
+     * @throws SQLException if database error
+     */
+    public int countAllItems(Context context, Community community) throws SQLException;
+    
     /**
      * counts all items 
      *
