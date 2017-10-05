@@ -64,6 +64,7 @@ public class DSpaceConfigurationServiceTest {
     /**
      * A generic method to test that variable replacement is happening properly.
      */
+    @Test
     public void testVariableReplacement() {
 
         Map<String,Object> l = new HashMap<String,Object>();
