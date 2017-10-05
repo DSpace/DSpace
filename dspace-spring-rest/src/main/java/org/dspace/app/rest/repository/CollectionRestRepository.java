@@ -85,13 +85,13 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 		return page;
 	}
 
-	@SearchRestMethod(name="authorized-by-community")
-	public Page<CollectionRest> findAuthorizedByCommunity(@Param(value="community") UUID community, Pageable pageable) {
+	@SearchRestMethod(name="findAuthorizedByCommunity")
+	public Page<CollectionRest> findAuthorizedByCommunity(@Param(value="uuid") UUID communityUuid, Pageable pageable) {
 		Context context = obtainContext();
 		List<Collection> it = null;
 		List<Collection> collections = new ArrayList<Collection>();
 		try {
-			Community com = communityService.find(context, community);
+			Community com = communityService.find(context, communityUuid);
 			it = cs.findAuthorized(context, com, Constants.ADD);
 			for (Collection c: it) {
 				collections.add(c);
@@ -103,7 +103,7 @@ public class CollectionRestRepository extends DSpaceRestRepository<CollectionRes
 		return page;
 	}
 
-	@SearchRestMethod(name="authorized-all")
+	@SearchRestMethod(name="findAuthorized")
 	public Page<CollectionRest> findAuthorized(Pageable pageable) {
 		Context context = obtainContext();
 		List<Collection> it = null;
