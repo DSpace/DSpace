@@ -227,7 +227,7 @@ public class FilteredCollectionsResource extends Resource {
         }
         catch (ContextException e)
         {
-            processException(String.format("Could not read collection %d.  %s", collection_id, e.getMessage()), context);
+            processException(String.format("Could not read collection %s.  %s", collection_id, e.getMessage()), context);
         } finally {
             processFinally(context);
         }
