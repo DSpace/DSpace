@@ -274,7 +274,7 @@ public class VersionedDOIIdentifierProvider extends DOIIdentifierProvider
 
             if (version.getVersionNumber() > 1)
             {
-                identifier.concat(String.valueOf(DOT).concat(String.valueOf(version.getVersionNumber())));
+                identifier = identifier.concat(String.valueOf(DOT).concat(String.valueOf(version.getVersionNumber())));
             }
 
             doi.setDoi(identifier);

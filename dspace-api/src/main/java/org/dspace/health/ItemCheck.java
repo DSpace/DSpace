@@ -166,7 +166,7 @@ public class ItemCheck extends Check {
         List<Bitstream> bitstreamOrphans = bitstreamService.getNotReferencedBitstreams(context);
         for (Bitstream orphan : bitstreamOrphans) {
             UUID id = orphan.getID();
-            list_str += String.format("%d, ", id);
+            list_str += String.format("%s, ", id);
         }
         ret.append(String.format(
                 "Orphan bitstreams:       %d [%s]\n", bitstreamOrphans.size(), list_str));

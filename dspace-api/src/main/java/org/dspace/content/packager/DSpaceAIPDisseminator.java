@@ -483,6 +483,7 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
                 {
                     parentHandle = parents.get(0).getHandle();
                 }
+                break;
            case Constants.SITE:
                 break;
         }

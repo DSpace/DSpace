@@ -1508,10 +1508,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             // for all the SimpleDateFormat
             case 1:
                 t = "0" + t;
+                // fall through
             case 2:
                 t = "0" + t;
+                // fall through
             case 3:
                 t = "0" + t;
+                // fall through
             case 4:
                 dfArr = new SimpleDateFormat[]{new SimpleDateFormat("yyyy")};
                 break;
