@@ -22,10 +22,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class SelectableMetadata {
 	private String metadata;
 	private String label;
-	@JsonIgnore
 	private AuthorityRest authority;
 
-	public String getMetatadata() {
+	public String getMetadata() {
 		return metadata;
 	}
 
