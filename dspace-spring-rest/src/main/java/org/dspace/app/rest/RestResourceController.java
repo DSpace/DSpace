@@ -26,6 +26,7 @@ import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
+import org.dspace.app.rest.model.QueryObject;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
@@ -47,6 +48,7 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -130,26 +132,34 @@ public class RestResourceController implements InitializingBean {
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}/{rel}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable Integer id, @PathVariable String rel, Pageable page,
-			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
-		return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection);
+			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection, @RequestBody(required = false) QueryObject data) {
+		return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection, data);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}/{rel}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable String id, @PathVariable String rel, Pageable page,
-			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
-		return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection);
+			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection, @RequestBody(required = false) QueryObject data) {
+		return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection, data);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/{rel}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable UUID uuid, @PathVariable String rel, Pageable page,
-			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
-		return findRelInternal(request, apiCategory, model, uuid, rel, page, assembler, projection);
+			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection, @RequestBody(required = false) QueryObject data) {
+		return findRelInternal(request, apiCategory, model, uuid, rel, page, assembler, projection, data);
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}/{rel}/{relid:[A-z0-9]+}")
+	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable String id, @PathVariable String rel, @PathVariable String relid,
+			Pageable page, PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
+		//return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);
+		return null;
+	}
+	
 	private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request, String apiCategory,
-			String model, ID uuid, String rel, Pageable page, PagedResourcesAssembler assembler, String projection) {
+			String model, ID uuid, String rel, Pageable page, PagedResourcesAssembler assembler, String projection, QueryObject data) {
 		checkModelPluralForm(apiCategory, model);
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 		Class<RestModel> domainClass = repository.getDomainClass();
@@ -162,12 +172,19 @@ public class RestResourceController implements InitializingBean {
 			
 			if (linkMethod == null) {
 				// TODO custom exception
-				throw new RuntimeException("Method for relation " + rel + " not found: " + linkRest.name());
+				throw new RuntimeException("Method for relation " + rel + " not found: " + linkRest.name() + ":" + linkRest.method());
 			}
 			else {
 				try {
-					Page<? extends Serializable> pageResult = (Page<? extends RestModel>) linkMethod
+					Page<? extends Serializable> pageResult = null;
+					if(data==null) {
+						pageResult = (Page<? extends RestModel>) linkMethod
 							.invoke(linkRepository, request, uuid, page, projection);
+					}
+					else {
+						pageResult = (Page<? extends RestModel>) linkMethod
+								.invoke(linkRepository, request, uuid, page, projection, data);
+					}
 					Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(uuid)
 							.slash(rel).withSelfRel();
 					PagedResources<? extends ResourceSupport> result = assembler

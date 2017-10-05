@@ -9,11 +9,16 @@ package org.dspace.app.rest.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.content.Collection;
+import org.dspace.content.authority.Choice;
+import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
@@ -92,5 +97,19 @@ public class AuthorityUtils {
 		} else {
 			return schema + separator + element + separator + qualifier;
 		}
+	}
+
+	public List<AuthorityEntryRest> query(String name, String query, Collection collection, int start, int limit, Locale locale) {
+		List<AuthorityEntryRest> result = new ArrayList<AuthorityEntryRest>();
+		String metadata = cas.getChoiceMetadatabyAuthorityName(name);
+		String[] tokens = tokenize(metadata);
+		Choices choice = cas.getMatches(standardize(tokens[0], tokens[1], tokens[2], "_"), query, collection, start, limit, locale.toString());
+		for(Choice value : choice.values) {
+			AuthorityEntryRest rr = new AuthorityEntryRest();
+			rr.setValue(value.value);
+			rr.setCount(choice.total);
+			result.add(rr);
+		}
+		return result;
 	}
 }

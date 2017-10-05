@@ -8,7 +8,6 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
@@ -21,7 +20,8 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(AuthorityRest.NAME)
 public class AuthorityResource extends DSpaceResource<AuthorityRest> {
-	public AuthorityResource(AuthorityRest sd, Utils utils, String... rels) {
+	public AuthorityResource(AuthorityRest sd, Utils utils, String... rels) {		
 		super(sd, utils, rels);
+		add(utils.linkToSubResource(sd, AuthorityRest.ENTRIES));
 	}
 }
