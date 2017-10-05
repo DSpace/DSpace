@@ -9,6 +9,7 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**

@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
+import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
@@ -95,6 +96,9 @@ public class Utils {
 		// has a plural() function but no singular function
 		if (modelPlural.equals("communities")) {
 			return CommunityRest.NAME;
+		}
+		if (modelPlural.equals("authorities")) {
+			return AuthorityRest.NAME;
 		}
 		return modelPlural.replaceAll("s$", "");
 	}

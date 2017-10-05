@@ -176,4 +176,7 @@ public interface ChoiceAuthorityService
      * @return List of variants
      */
     public List<String> getVariants(MetadataValue metadataValue);
+
+	public String getChoiceMetadatabyAuthorityName(String name);
+    
 }

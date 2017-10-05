@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.Collection;
@@ -59,6 +60,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     // map of field key to closed value
     protected Map<String,Boolean> closed = new HashMap<String,Boolean>();
 
+    // map of authority name to field key
+    protected Map<String,String> authorities = new HashMap<String,String>();
+    
     @Autowired(required = true)
     protected ConfigurationService configurationService;
     @Autowired(required = true)
@@ -229,7 +233,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 
     protected String makeFieldKey(String schema, String element, String qualifier)
     {
-        if (qualifier == null)
+        if (StringUtils.isBlank(qualifier))
         {
             return schema + "_" + element;
         }
@@ -278,8 +282,16 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		        log.warn("Skipping invalid configuration for "+key+" because named plugin not found: "+authorityName);
 		        continue;
 		    }
-		    controller.put(fkey, ma);
-		    authorityNames.add(authorityName);
+		    if(!authorities.containsKey(authorityName)) {
+		    	controller.put(fkey, ma);
+		    	authorityNames.add(authorityName);
+		    	authorities.put(authorityName, fkey);
+		    }
+		    else {
+		    	log.warn("Skipping invalid configuration for "+key+" because plugin is alredy in use: "+authorityName +" used by " + authorities.get(authorityName));
+		        continue;		    	
+		    }
+		    
 		    log.debug("Choice Control: For field="+fkey+", Plugin="+ma);
 		}
 	}
@@ -341,5 +353,13 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 
         return closed;
     }
+
+	@Override
+	public String getChoiceMetadatabyAuthorityName(String name) {
+		if(authorities.containsKey(name)) {
+			return authorities.get(name);
+		}
+		return null;
+	}
 
 }
