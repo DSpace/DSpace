@@ -25,7 +25,6 @@ public class InputFormInputTypeRest {
 	private String type;
 	private String regex;
 	private AuthorityRest authority;
-	private List<SelectableMetadata> selectableMetadata;
 
 	public String getType() {
 		return type;
@@ -49,13 +48,5 @@ public class InputFormInputTypeRest {
 
 	public void setAuthority(AuthorityRest authority) {
 		this.authority = authority;
-	}
-
-	public List<SelectableMetadata> getSelectableMetadata() {
-		return selectableMetadata;
-	}
-
-	public void setSelectableMetadata(List<SelectableMetadata> selectableMetadata) {
-		this.selectableMetadata = selectableMetadata;
 	}
 }

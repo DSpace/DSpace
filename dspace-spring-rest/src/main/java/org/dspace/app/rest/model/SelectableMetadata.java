@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * The SelectableMetadata REST Resource. It is not addressable directly, only
  * used as inline object in the InputForm resource
@@ -14,17 +18,19 @@ package org.dspace.app.rest.model;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@JsonInclude(value = Include.NON_NULL)
 public class SelectableMetadata {
-	private MetadataFieldRest field;
+	private String metadata;
 	private String label;
+	@JsonIgnore
 	private AuthorityRest authority;
 
-	public MetadataFieldRest getField() {
-		return field;
+	public String getMetatadata() {
+		return metadata;
 	}
 
-	public void setField(MetadataFieldRest field) {
-		this.field = field;
+	public void setMetadata(String key) {
+		this.metadata = key;
 	}
 
 	public String getLabel() {

@@ -9,7 +9,9 @@ package org.dspace.content.authority;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -45,6 +47,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 {
     private Logger log = Logger.getLogger(ChoiceAuthorityServiceImpl.class);
 
+    // names of the configured authority plugins
+    private Set<String> authorityNames = new HashSet<String>();
+    
     // map of field key to authority plugin
     protected Map<String,ChoiceAuthority> controller = new HashMap<String,ChoiceAuthority>();
 
@@ -88,6 +93,15 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
         return makeFieldKey(schema, element, qualifier);
     }
 
+    @Override
+    public Set<String> getChoiceAuthoritiesNames() 
+    {
+    	if (authorityNames.isEmpty()) {
+    		loadChoiceAuthorityConfigurations();
+    	}
+    	return authorityNames;
+    }
+    
     @Override
     public Choices getMatches(String schema, String element, String qualifier,
                   String query, Collection collection, int start, int limit, String locale)
@@ -184,6 +198,34 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
         }
         return null;
     }
+    
+    @Override
+    public boolean isHierarchical(String schema, String element, String qualifier) {
+    	String fieldKey = makeFieldKey(schema, element, qualifier);
+		ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
+        if (ma == null)
+        {
+            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+        }
+        return ma.isHierarchical();
+    }
+    
+    @Override
+    public boolean isScrollable(String schema, String element, String qualifier) {
+    	String fieldKey = makeFieldKey(schema, element, qualifier);
+		ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
+        if (ma == null)
+        {
+            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+        }
+        return ma.isScrollable();
+    }
+    
+    @Override
+    public String getChoiceAuthorityName(String schema, String element, String qualifier) {
+		return configurationService.getProperty(
+				CHOICES_PLUGIN_PREFIX + schema + "." + element + (qualifier != null ? "." + qualifier : ""));
+    }
 
     protected String makeFieldKey(String schema, String element, String qualifier)
     {
@@ -206,36 +248,41 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
         // If empty, load from configuration
         if(controller.isEmpty())
         {
-            // Get all configuration keys starting with a given prefix
-            List<String> propKeys = configurationService.getPropertyKeys(CHOICES_PLUGIN_PREFIX);
-            Iterator<String> keyIterator = propKeys.iterator();
-            while(keyIterator.hasNext())
-            {
-                String key = keyIterator.next();
-                String fkey = config2fkey(key.substring(CHOICES_PLUGIN_PREFIX.length()));
-                if (fkey == null)
-                {
-                    log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
-                    continue;
-                }
-
-                // XXX FIXME maybe add sanity check, call
-                // MetadataField.findByElement to make sure it's a real field.
-                ChoiceAuthority ma = (ChoiceAuthority)
-                    pluginService.getNamedPlugin(ChoiceAuthority.class, configurationService.getProperty(key));
-                if (ma == null)
-                {
-                    log.warn("Skipping invalid configuration for "+key+" because named plugin not found: "+configurationService.getProperty(key));
-                    continue;
-                }
-                controller.put(fkey, ma);
-
-                log.debug("Choice Control: For field="+fkey+", Plugin="+ma);
-            }
+            loadChoiceAuthorityConfigurations();
         }
 
         return controller;
     }
+
+	private void loadChoiceAuthorityConfigurations() {
+		// Get all configuration keys starting with a given prefix
+		List<String> propKeys = configurationService.getPropertyKeys(CHOICES_PLUGIN_PREFIX);
+		Iterator<String> keyIterator = propKeys.iterator();
+		while(keyIterator.hasNext())
+		{
+		    String key = keyIterator.next();
+		    String fkey = config2fkey(key.substring(CHOICES_PLUGIN_PREFIX.length()));
+		    if (fkey == null)
+		    {
+		        log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
+		        continue;
+		    }
+
+		    // XXX FIXME maybe add sanity check, call
+		    // MetadataField.findByElement to make sure it's a real field.
+		    String authorityName = configurationService.getProperty(key);
+			ChoiceAuthority ma = (ChoiceAuthority)
+		        pluginService.getNamedPlugin(ChoiceAuthority.class, authorityName);
+		    if (ma == null)
+		    {
+		        log.warn("Skipping invalid configuration for "+key+" because named plugin not found: "+authorityName);
+		        continue;
+		    }
+		    controller.put(fkey, ma);
+		    authorityNames.add(authorityName);
+		    log.debug("Choice Control: For field="+fkey+", Plugin="+ma);
+		}
+	}
 
     /**
      * Return map of key to presentation

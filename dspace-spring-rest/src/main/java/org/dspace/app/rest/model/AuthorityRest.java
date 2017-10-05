@@ -23,8 +23,6 @@ public class AuthorityRest extends BaseObjectRest<String> {
 
 	private String name;
 
-	private List<MetadataFieldRest> metadata;
-	
 	private boolean scrollable;
 	
 	private boolean hierarchical;
@@ -42,14 +40,6 @@ public class AuthorityRest extends BaseObjectRest<String> {
 		return name;
 	}
 
-	public List<MetadataFieldRest> getMetadata() {
-		return metadata;
-	}
-	
-	public void setMetadata(List<MetadataFieldRest> metadata) {
-		this.metadata = metadata;
-	}
-	
 	public boolean isScrollable() {
 		return scrollable;
 	}

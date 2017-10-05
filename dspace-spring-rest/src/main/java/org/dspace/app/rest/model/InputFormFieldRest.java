@@ -8,6 +8,8 @@
 
 package org.dspace.app.rest.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -28,7 +30,16 @@ public class InputFormFieldRest {
 	private InputFormInputTypeRest input;
 	private ScopeEnum scope;
 	private SubmissionVisibilityRest visibility;
+	private List<SelectableMetadata> selectableMetadata;
 
+	public List<SelectableMetadata> getSelectableMetadata() {
+		return selectableMetadata;
+	}
+
+	public void setSelectableMetadata(List<SelectableMetadata> selectableMetadata) {
+		this.selectableMetadata = selectableMetadata;
+	}
+	
 	public String getLabel() {
 		return label;
 	}

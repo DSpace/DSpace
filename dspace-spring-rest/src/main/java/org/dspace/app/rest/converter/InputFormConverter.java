@@ -13,19 +13,19 @@ import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.InputFormFieldRest;
 import org.dspace.app.rest.model.InputFormInputTypeRest;
 import org.dspace.app.rest.model.InputFormPageRest;
 import org.dspace.app.rest.model.InputFormRest;
-import org.dspace.app.rest.model.MetadataFieldRest;
-import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SelectableMetadata;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
+import org.dspace.app.rest.utils.AuthorityUtils;
+import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,7 +36,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRest> {
-
+	@Autowired
+	private Utils utils;
+	
+	@Autowired
+	private AuthorityUtils authorityUtils;
+	
 	@Override
 	public InputFormRest fromModel(DCInputSet obj) {
 		InputFormRest sd = new InputFormRest();
@@ -68,6 +73,8 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 
 	private InputFormFieldRest getField(DCInput dcinput) {
 		InputFormFieldRest inputField = new InputFormFieldRest();
+		List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
+		inputField.setSelectableMetadata(selectableMetadata);
 		inputField.setLabel(dcinput.getLabel());
 		inputField.setHints(dcinput.getHints());
 		inputField.setMandatoryMessage(dcinput.getWarning());
@@ -81,45 +88,27 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 		InputFormInputTypeRest inputRest = new InputFormInputTypeRest();
 		inputRest.setType(dcinput.getInputType());
 		inputRest.setRegex(dcinput.getRegex());
+		
 		if (!StringUtils.equalsIgnoreCase(inputRest.getType(), "qualdrop_value")) {
 			// value-pair and vocabulary are a special kind of authorities
-			// TODO we need a lazy loading reference here
-			AuthorityRest authority = new AuthorityRest();
-			inputRest.setAuthority(getAuthority(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+			SelectableMetadata selMd = new SelectableMetadata();
+			selMd.setAuthority(authorityUtils.getAuthority(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+			selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+			selectableMetadata.add(selMd);
+			
 		} else {
 			inputRest.setType("onebox");
-			// TODO how to get a full schema representation here?
-			// it should be enough to put the ID so that the schema can be
-			// retrieved by the REST client from the cache, with another call or
-			// embedded automatically by the HAL wrapper
-			MetadataSchemaRest schema = new MetadataSchemaRest();
-			schema.setPrefix(dcinput.getSchema());
-			List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
-			List pairs = dcinput.getPairs();
+			List<String> pairs = dcinput.getPairs();
 			for (int idx = 0; idx < pairs.size(); idx += 2) {
 				SelectableMetadata selMd = new SelectableMetadata();
 				selMd.setLabel((String) pairs.get(idx));
-				// TODO again we need a lazy loading reference here
-				MetadataFieldRest field = new MetadataFieldRest();
-				field.setSchema(schema);
-				field.setElement(dcinput.getElement());
-				field.setQualifier((String) pairs.get(idx + 1));
-				selMd.setField(field);
-				// TODO we need a lazy loading reference here
-				AuthorityRest authority = new AuthorityRest();
-				selMd.setAuthority(getAuthority(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+				selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx+1)));
+				selMd.setAuthority(authorityUtils.getAuthority(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx+1)));
 				selectableMetadata.add(selMd);
 			}
-			inputRest.setSelectableMetadata(selectableMetadata);
 		}
-
 		inputField.setInput(inputRest);
 		return inputField;
-	}
-
-	private AuthorityRest getAuthority(String schema, String element, String qualifier) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
