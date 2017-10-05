@@ -147,6 +147,18 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
     /**
+     * Get all the items in this collection. The order is indeterminate.
+     *
+     * @param context DSpace context object
+     * @param collection Collection (parent)
+     * @return an iterator over the items in the collection.
+     * @param limit limited number of items
+     * @param offset offset value
+     * @throws SQLException if database error
+     */
+    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException;
+
+    /**
      * See whether this Item is contained by a given Collection.
      * @param item Item
      * @param collection Collection (parent

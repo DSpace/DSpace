@@ -238,6 +238,11 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     }
 
     @Override
+    public Iterator<Item> findAllByCollection(Context context, Collection collection, Integer limit, Integer offset) throws SQLException {
+        return itemDAO.findAllByCollection(context, collection, limit, offset);
+    }
+
+    @Override
     public Iterator<Item> findInArchiveOrWithdrawnDiscoverableModifiedSince(Context context, Date since)
             throws SQLException
     {
