@@ -40,9 +40,9 @@ public class DateUtils
         // http://www.openarchives.org/OAI/openarchivesprotocol.html#DatestampsResponses
         SimpleDateFormat sdf = new SimpleDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'");
-        // We indicate that the returned date is in Zulu time (UTC) so we have
+        // We indicate that the returned date is in UTC so we have
         // to set the time zone of sdf correctly
-        sdf.setTimeZone(TimeZone.getTimeZone("ZULU"));
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         String ret = sdf.format(date);
         return ret;
     }
@@ -57,7 +57,7 @@ public class DateUtils
         // First try to parse as a full UTC date/time, e.g. 2008-01-01T00:00:00Z
         SimpleDateFormat format = new SimpleDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'");
-        format.setTimeZone(TimeZone.getTimeZone("ZULU"));
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date ret;
         try
         {
@@ -113,7 +113,7 @@ public class DateUtils
     {
         SimpleDateFormat format = new SimpleDateFormat(
                 "yyyy-MM-dd'T'HH:mm:ss'Z'");
-        format.setTimeZone(TimeZone.getTimeZone("ZULU"));
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date ret;
         try
         {
