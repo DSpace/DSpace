@@ -261,6 +261,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
                     }
 
                     pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(pkg));
+                    pageMeta.addMetadata("authors", "item").addContent(DryadWorkflowUtils.getAuthors(item));
                     pageMeta.addMetadata("title", "package").addContent(
                             pkgTitle.endsWith(".") ? pkgTitle + " " : pkgTitle
                                     + ". ");
