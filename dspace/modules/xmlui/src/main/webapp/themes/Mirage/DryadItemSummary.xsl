@@ -93,7 +93,18 @@
                 <xsl:value-of select="$title"/>
             </p>
             <p class="pub-authors">
-                <xsl:call-template name="make-author-string"/>
+                <xsl:choose>
+                    <xsl:when test="$meta[@element='author'][@qualifier='item']">
+                        <xsl:call-template name="make-author-string">
+                            <xsl:with-param name="authorType" select="'item'"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="make-author-string">
+                            <xsl:with-param name="authorType" select="'package'"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
             </p>
             <xsl:if test=".//dim:field[@element='date' and @qualifier='accessioned']">
                 <p>
@@ -178,7 +189,9 @@
                         <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
                     </p>
                     <div class="citation-sample">
-                        <xsl:call-template name="make-author-string"/>
+                        <xsl:call-template name="make-author-string">
+                            <xsl:with-param name="authorType" select="'package'"/>
+                        </xsl:call-template>
                         <xsl:call-template name="package-citation">
                             <xsl:with-param name="package_doi">
                                 <xsl:call-template name="package-doi">
@@ -409,7 +422,9 @@
                             <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
                         </p>
                         <div class="citation-sample">
-                            <xsl:call-template name="make-author-string"/>
+                            <xsl:call-template name="make-author-string">
+                                <xsl:with-param name="authorType" select="'package'"/>
+                            </xsl:call-template>
                             <xsl:call-template name="package-citation">
                                 <xsl:with-param name="date" select=".//dim:field[@element='date'][@qualifier='issued']"/>
                                 <xsl:with-param name="title" select=".//dim:field[@element='title']"/>
@@ -1372,14 +1387,15 @@
 
 
     <xsl:template name="make-author-string">
+        <xsl:param name="authorType"/>
         <xsl:variable name="authors">
             <!-- the authors@packages node is packed by DryadWorkflowUtils.getAuthors()-->
             <!-- format is @Doe J@#0000-0000-0000-0000#,@Smith L@#0000-0000-0000-0000#,-->
             <!-- comma-delimited, with each name offset by @ and orcid offset by #, tailing comma-->
             <!-- if this metadata is not available, construct it from the component dc metadata fields.-->
             <xsl:choose>
-                <xsl:when test="$meta[@element='authors'][@qualifier='package']">
-                    <xsl:value-of select="$meta[@element='authors'][@qualifier='package']"/>
+                <xsl:when test="$meta[@element='authors'][@qualifier=$authorType]">
+                    <xsl:value-of select="$meta[@element='authors'][@qualifier=$authorType]"/>
                 </xsl:when>
                 <xsl:when test=".//dim:field[@element='contributor'][@qualifier='author']">
                     <xsl:for-each select=".//dim:field[@element='contributor'][@qualifier='author']">
