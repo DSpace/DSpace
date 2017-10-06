@@ -45,14 +45,9 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 	public Page<AuthorityEntryRest> listAuthorityEntries(HttpServletRequest request, String name, 
 			Pageable pageable, String projection) {
 		Context context = obtainContext();
-		List<AuthorityEntryRest> authorities = authorityUtils.query(name, "", null, pageable.getOffset(), pageable.getPageSize(), context.getCurrentLocale());
+		String query = request.getParameter("query");
+		List<AuthorityEntryRest> authorities = authorityUtils.query(name, query, null, pageable.getOffset(), pageable.getPageSize(), context.getCurrentLocale());
 		return new PageImpl<AuthorityEntryRest>(authorities, pageable, authorities.size());
 	}
 	
-	public Page<AuthorityEntryRest> listAuthorityEntries(HttpServletRequest request, String name, 
-			Pageable pageable, String projection, QueryObject query) {
-		Context context = obtainContext();
-		List<AuthorityEntryRest> authorities = authorityUtils.query(name, query.getQuery(), null, pageable.getOffset(), pageable.getPageSize(), context.getCurrentLocale());
-		return new PageImpl<AuthorityEntryRest>(authorities, pageable, authorities.size());
-	}
 }
