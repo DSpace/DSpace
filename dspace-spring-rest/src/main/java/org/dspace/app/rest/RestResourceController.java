@@ -148,6 +148,14 @@ public class RestResourceController implements InitializingBean {
 		return findRelInternal(request, apiCategory, model, uuid, rel, page, assembler, projection);
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}/{rel}/{relid:[A-z0-9]+}")
+	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable String id, @PathVariable String rel, @PathVariable String relid,
+			Pageable page, PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
+		//return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);
+		return null;
+	}
+	
 	private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request, String apiCategory,
 			String model, ID uuid, String rel, Pageable page, PagedResourcesAssembler assembler, String projection) {
 		checkModelPluralForm(apiCategory, model);

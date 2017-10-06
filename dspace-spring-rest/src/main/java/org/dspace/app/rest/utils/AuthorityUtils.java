@@ -7,9 +7,11 @@
  */
 package org.dspace.app.rest.utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -38,27 +40,23 @@ public class AuthorityUtils {
 
 	public AuthorityRest getAuthority(String schema, String element, String qualifier) {
 		AuthorityRest authorityRest = new AuthorityRest();
-		if (mas.isAuthorityControlled(standardize(schema, element, qualifier, "_"))) {
-			authorityRest.setName(cas.getChoiceAuthorityName(schema, element, qualifier));
-			authorityRest.setHierarchical(cas.isHierarchical(schema, element, qualifier));
-			authorityRest.setScrollable(cas.isScrollable(schema, element, qualifier));
-		}
+		authorityRest.setName(cas.getChoiceAuthorityName(schema, element, qualifier));
+		authorityRest.setHierarchical(cas.isHierarchical(schema, element, qualifier));
+		authorityRest.setScrollable(cas.isScrollable(schema, element, qualifier));
 		return authorityRest;
 	}
 
-	public AuthorityRest getAuthority(String name) {		
+	public AuthorityRest getAuthority(String name) {
 		String metadata = cas.getChoiceMetadatabyAuthorityName(name);
-		if(StringUtils.isNotBlank(metadata)) {
+		if (StringUtils.isNotBlank(metadata)) {
 			String[] tokens = tokenize(metadata);
 			String schema = tokens[0];
 			String element = tokens[1];
 			String qualifier = tokens[2];
 			AuthorityRest authorityRest = new AuthorityRest();
-			if (mas.isAuthorityControlled(standardize(schema, element, qualifier, "_"))) {
-				authorityRest.setName(name);
-				authorityRest.setHierarchical(cas.isHierarchical(schema, element, qualifier));
-				authorityRest.setScrollable(cas.isScrollable(schema, element, qualifier));
-			}
+			authorityRest.setName(name);
+			authorityRest.setHierarchical(cas.isHierarchical(schema, element, qualifier));
+			authorityRest.setScrollable(cas.isScrollable(schema, element, qualifier));
 			return authorityRest;
 		}
 		return null;
@@ -99,16 +97,22 @@ public class AuthorityUtils {
 		}
 	}
 
-	public List<AuthorityEntryRest> query(String name, String query, Collection collection, int start, int limit, Locale locale) {
+	public List<AuthorityEntryRest> query(String metadata, String query, Collection collection, int start, int limit,
+			Locale locale) {
 		List<AuthorityEntryRest> result = new ArrayList<AuthorityEntryRest>();
-		String metadata = cas.getChoiceMetadatabyAuthorityName(name);
-		String[] tokens = tokenize(metadata);
-		Choices choice = cas.getMatches(standardize(tokens[0], tokens[1], tokens[2], "_"), query, collection, start, limit, locale.toString());
-		for(Choice value : choice.values) {
-			AuthorityEntryRest rr = new AuthorityEntryRest();
-			rr.setValue(value.value);
-			rr.setCount(choice.total);
-			result.add(rr);
+		if(StringUtils.isNotBlank(metadata)) {
+			String[] tokens = tokenize(metadata);
+			Choices choice = cas.getMatches(standardize(tokens[0], tokens[1], tokens[2], "_"), query, collection, start,
+					limit, locale.toString());
+			for (Choice value : choice.values) {
+				AuthorityEntryRest rr = new AuthorityEntryRest();
+				rr.setId(value.authority);
+				rr.setValue(value.value);
+				//TODO
+				rr.setCount(0);
+				rr.setExtraInformation(value.extras);
+				result.add(rr);
+			}
 		}
 		return result;
 	}

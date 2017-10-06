@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.rest.model.AuthorityRest;

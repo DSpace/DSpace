@@ -7,16 +7,19 @@
  */
 package org.dspace.content.authority;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-
+import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputSet;
+import org.dspace.app.util.DCInputsReader;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
@@ -294,6 +297,37 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		    
 		    log.debug("Choice Control: For field="+fkey+", Plugin="+ma);
 		}
+		try {
+			DCInputsReader dcInputsReader = new DCInputsReader();
+			for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
+				int pages = dcinputSet.getNumberPages();
+				for (int pageNum = 0; pageNum < pages; pageNum++) {
+					DCInput[] dcinputs = dcinputSet.getPageRows(pageNum, true, true);
+					for (DCInput dcinput : dcinputs) {
+						if (dcinput.getPairsType() != null
+								&& StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+							String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
+									dcinput.getQualifier());
+							String authorityName = "inputForm" + fieldKey;
+							ChoiceAuthority ca = controller.get(authorityName);
+							if (ca == null) {
+								ca = null; // TODO creare wrapper
+								controller.put(fieldKey, ca);
+								authorityNames.add(authorityName);
+							} else {
+								// TODO cast to wrapper
+								// .add (formName, ca)
+							}
+						} else if (StringUtils.isNotBlank(dcinput.getVocabulary())) {
+							// TODO come sopra sostituendo vocabulary con
+							// pairname
+						}
+					}
+				}
+			}
+		} catch (DCInputsReaderException e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		}
 	}
 
     /**
@@ -356,6 +390,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 
 	@Override
 	public String getChoiceMetadatabyAuthorityName(String name) {
+		if(authorities.isEmpty()) {
+			loadChoiceAuthorityConfigurations();
+		}
 		if(authorities.containsKey(name)) {
 			return authorities.get(name);
 		}
