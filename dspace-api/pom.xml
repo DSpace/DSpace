@@ -271,8 +271,6 @@
                         </configuration>
                     </plugin>
 
-
-
                     <!-- Run Integration Testing! This plugin just kicks off the tests (when enabled). -->
                     <plugin>
                         <artifactId>maven-failsafe-plugin</artifactId>
