@@ -19,6 +19,7 @@ import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.util.DSpaceContextListener;
+import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
@@ -94,29 +95,29 @@ public class Application extends SpringBootServletInitializer {
                 servletContext.setInitParameter("dspace.dir", configuration.getDspaceHome());
 
                 // start the kernel when the webapp starts
-                try {
-                    this.kernelImpl = DSpaceKernelInit.getKernel(null);
-                    if (!this.kernelImpl.isRunning()) {
-                        this.kernelImpl.start(getProvidedHome(configuration.getDspaceHome())); // init the kernel
-                    }
-
-                    //Set the DSpace Kernel Application context as a parent of the Spring Boot context so that
-                    //we can auto-wire all DSpace Kernel services
-                    springBootApplicationContext.setParent(kernelImpl.getServiceManager().getApplicationContext());
-
-                    //Add a listener for Spring Boot application shutdown so that we can nicely cleanup the DSpace kernel.
-                    springBootApplicationContext.addApplicationListener(new DSpaceKernelDestroyer(kernelImpl));
-
-                } catch (Exception e) {
-                    // failed to start so destroy it and log and throw an exception
+                if (DSpaceKernelManager.getDefaultKernel() == null) {
                     try {
-                        this.kernelImpl.destroy();
-                    } catch (Exception e1) {
-                        // nothing
+                        this.kernelImpl = DSpaceKernelInit.getKernel(null);
+                        if (!this.kernelImpl.isRunning()) {
+                            this.kernelImpl.start(getProvidedHome(configuration.getDspaceHome())); // init the kernel
+                        }
+                        //Set the DSpace Kernel Application context as a parent of the Spring Boot context so that
+                        //we can auto-wire all DSpace Kernel services
+                        springBootApplicationContext.setParent(kernelImpl.getServiceManager().getApplicationContext());
+
+                        //Add a listener for Spring Boot application shutdown so that we can nicely cleanup the DSpace kernel.
+                        springBootApplicationContext.addApplicationListener(new DSpaceKernelDestroyer(kernelImpl));
+                    } catch (Exception e) {
+                        // failed to start so destroy it and log and throw an exception
+                        try {
+                            this.kernelImpl.destroy();
+                        } catch (Exception e1) {
+                            // nothing
+                        }
+                        String message = "Failure during ServletContext initialisation: " + e.getMessage();
+                        log.error(message + ":" + e.getMessage(), e);
+                        throw new RuntimeException(message, e);
                     }
-                    String message = "Failure during ServletContext initialisation: " + e.getMessage();
-                    log.error(message + ":" + e.getMessage(), e);
-                    throw new RuntimeException(message, e);
                 }
             }
 
