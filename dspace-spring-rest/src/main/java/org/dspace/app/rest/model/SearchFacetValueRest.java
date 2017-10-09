@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.DiscoveryRestController;
 
 /**
@@ -18,10 +19,14 @@ public class SearchFacetValueRest implements RestModel {
     public static final String CATEGORY = RestModel.DISCOVER;
 
     private String label;
+    @JsonIgnore
     private String filterValue;
     private long count;
+    @JsonIgnore
     private String authorityKey;
+    @JsonIgnore
     private String sortValue;
+    @JsonIgnore
     private String filterType;
 
     public String getCategory() {
