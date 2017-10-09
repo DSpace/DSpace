@@ -28,10 +28,19 @@
         <scope_note>Contains the userIds of the users who are performed a step</scope_note>
     </dc-type>
 
-    <dc-type>
+    <!--DRYAD ONLY-->
+    <!-- Used by system: do not remove -->
+  <dc-type>
 	<schema>workflow</schema>
     <element>step</element>
     <qualifier>reviewerKey</qualifier>
+  </dc-type>
+
+    <!-- Used by system: do not remove -->
+  <dc-type>
+	<schema>workflow</schema>
+    <element>step</element>
+    <qualifier>approved</qualifier>
   </dc-type>
 
   <dc-type>
@@ -63,5 +72,13 @@
       <element>review</element>
       <qualifier>mailUsers</qualifier>
   </dc-type>
+
+    <!-- Used by system: do not remove -->
+    <dc-type>
+      <schema>workflow</schema>
+      <element>genbank</element>
+      <qualifier>token</qualifier>
+  </dc-type>
+
 
 </dspace-dc-types>
