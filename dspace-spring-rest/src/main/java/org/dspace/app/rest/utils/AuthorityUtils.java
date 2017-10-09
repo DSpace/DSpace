@@ -39,11 +39,7 @@ public class AuthorityUtils {
 	private MetadataAuthorityService mas = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
 
 	public AuthorityRest getAuthority(String schema, String element, String qualifier) {
-		AuthorityRest authorityRest = new AuthorityRest();
-		authorityRest.setName(cas.getChoiceAuthorityName(schema, element, qualifier));
-		authorityRest.setHierarchical(cas.isHierarchical(schema, element, qualifier));
-		authorityRest.setScrollable(cas.isScrollable(schema, element, qualifier));
-		return authorityRest;
+		return buildAuthorityRest(cas.getChoiceAuthorityName(schema, element, qualifier), schema, element, qualifier);
 	}
 
 	public AuthorityRest getAuthority(String name) {
@@ -53,13 +49,18 @@ public class AuthorityUtils {
 			String schema = tokens[0];
 			String element = tokens[1];
 			String qualifier = tokens[2];
-			AuthorityRest authorityRest = new AuthorityRest();
-			authorityRest.setName(name);
-			authorityRest.setHierarchical(cas.isHierarchical(schema, element, qualifier));
-			authorityRest.setScrollable(cas.isScrollable(schema, element, qualifier));
-			return authorityRest;
+			return buildAuthorityRest(name, schema, element, qualifier);
 		}
 		return null;
+	}
+
+	private AuthorityRest buildAuthorityRest(String name, String schema, String element, String qualifier) {
+		AuthorityRest authorityRest = new AuthorityRest();
+		authorityRest.setName(name);
+		authorityRest.setHierarchical(cas.isHierarchical(schema, element, qualifier));
+		authorityRest.setScrollable(cas.isScrollable(schema, element, qualifier));
+		authorityRest.setIdentifier(cas.hasIdentifier(schema, element, qualifier));
+		return authorityRest;
 	}
 
 	public List<AuthorityRest> getAuthorities() {
@@ -105,15 +106,39 @@ public class AuthorityUtils {
 			Choices choice = cas.getMatches(standardize(tokens[0], tokens[1], tokens[2], "_"), query, collection, start,
 					limit, locale.toString());
 			for (Choice value : choice.values) {
-				AuthorityEntryRest rr = new AuthorityEntryRest();
-				rr.setId(value.authority);
-				rr.setValue(value.value);
-				//TODO
-				rr.setCount(0);
-				rr.setExtraInformation(value.extras);
+				AuthorityEntryRest rr = buildEntry(value);
 				result.add(rr);
 			}
 		}
 		return result;
+	}
+
+	public AuthorityEntryRest get(String metadata, String authKey, String currentLocale) {
+		Choice value = cas.getChoice(metadata, authKey, currentLocale);
+		AuthorityEntryRest rr = buildEntry(value);
+		return rr;
+	}
+	
+	private AuthorityEntryRest buildEntry(Choice value) {
+		AuthorityEntryRest rr = new AuthorityEntryRest();
+		rr.setId(value.authority);
+		rr.setValue(value.value);
+		rr.setDisplay(value.label);
+		//TODO
+		rr.setCount(0);
+		rr.setOtherInformation(value.extras);		
+		return rr;
+	}
+
+	public boolean isChoice(String schema, String element, String qualifier) {		
+		return cas.isChoicesConfigured(standardize(schema, element, qualifier, "_"));
+	}
+
+	public String getAuthorityName(String schema, String element, String qualifier) {
+		return cas.getChoiceAuthorityName(schema, element, qualifier);
+	}
+
+	public boolean isClosed(String schema, String element, String qualifier) {
+		return cas.isClosed(standardize(schema, element, qualifier, "_"));
 	}
 }

@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -22,7 +21,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class SelectableMetadata {
 	private String metadata;
 	private String label;
-	private AuthorityRest authority;
+	private String authority;
+	private Boolean closed;
 
 	public String getMetadata() {
 		return metadata;
@@ -40,11 +40,19 @@ public class SelectableMetadata {
 		this.label = label;
 	}
 
-	public void setAuthority(AuthorityRest authority) {
+	public void setAuthority(String authority) {
 		this.authority = authority;
 	}
 	
-	public AuthorityRest getAuthority() {
+	public String getAuthority() {
 		return authority;
+	}
+
+	public Boolean isClosed() {
+		return closed;
+	}
+
+	public void setClosed(Boolean closed) {
+		this.closed = closed;
 	}
 }

@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.util.List;
-
 import org.dspace.app.rest.RestResourceController;
 
 /**
@@ -18,19 +16,23 @@ import org.dspace.app.rest.RestResourceController;
  *
  */
 @LinksRest(links = {
-		@LinkRest(name = AuthorityRest.ENTRIES, linkClass = AuthorityEntryRest.class, method = "listAuthorityEntries", optional = true) 
+		@LinkRest(name = AuthorityRest.ENTRIES, linkClass = AuthorityEntryRest.class, method = "listAuthorityEntries", optional = true),
+		@LinkRest(name = AuthorityRest.ENTRY, linkClass = AuthorityEntryRest.class, method = "listAuthorityEntry", optional = true)
 })
 public class AuthorityRest extends BaseObjectRest<String> {
 
 	public static final String NAME = "authority";
 	public static final String CATEGORY = RestModel.INTEGRATION;
 	public static final String ENTRIES = "entries";
+	public static final String ENTRY = "entry";
 	
 	private String name;
 
 	private boolean scrollable;
 
 	private boolean hierarchical;
+	
+	private boolean identifier;
 
 	@Override
 	public String getId() {
@@ -74,5 +76,13 @@ public class AuthorityRest extends BaseObjectRest<String> {
 	@Override
 	public String getCategory() {
 		return CATEGORY;
+	}
+
+	public boolean hasIdentifier() {		
+		return identifier;
+	}
+
+	public void setIdentifier(boolean identifier) {
+		this.identifier = identifier;
 	}
 }

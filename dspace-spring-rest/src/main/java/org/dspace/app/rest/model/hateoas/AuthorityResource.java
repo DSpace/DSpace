@@ -22,6 +22,9 @@ import org.dspace.app.rest.utils.Utils;
 public class AuthorityResource extends DSpaceResource<AuthorityRest> {
 	public AuthorityResource(AuthorityRest sd, Utils utils, String... rels) {		
 		super(sd, utils, rels);
-		add(utils.linkToSubResource(sd, AuthorityRest.ENTRIES));
+		if(sd.hasIdentifier()) {
+			add(utils.linkToSubResource(sd, AuthorityRest.ENTRY));	
+		}		
+		add(utils.linkToSubResource(sd, AuthorityRest.ENTRIES));	
 	}
 }

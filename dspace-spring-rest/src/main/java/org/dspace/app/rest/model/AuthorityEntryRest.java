@@ -10,8 +10,6 @@ package org.dspace.app.rest.model;
 import java.io.Serializable;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * The Authority Entry REST Resource
  * 
@@ -21,9 +19,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class AuthorityEntryRest implements Serializable {
 	public static final String NAME = "authorityEntry";
 	private String id;
+	private String display;
 	private String value;
 	private long count;
-	private Map<String, Serializable> extraInformation;
+	private Map<String, String> otherInformation;
 	private AuthorityEntryRest parent;
 
 	
@@ -33,11 +32,12 @@ public class AuthorityEntryRest implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getValue() {
-		return value;
+	
+	public String getDisplay() {
+		return display;
 	}
-	public void setValue(String value) {
-		this.value = value;
+	public void setDisplay(String value) {
+		this.display = value;
 	}
 	public long getCount() {
 		return count;
@@ -45,11 +45,11 @@ public class AuthorityEntryRest implements Serializable {
 	public void setCount(long count) {
 		this.count = count;
 	}
-	public Map<String, Serializable> getExtraInformation() {
-		return extraInformation;
+	public Map<String, String> getOtherInformation() {
+		return otherInformation;
 	}
-	public void setExtraInformation(Map<String, Serializable> extraInformation) {
-		this.extraInformation = extraInformation;
+	public void setOtherInformation(Map<String, String> otherInformation) {
+		this.otherInformation = otherInformation;
 	}
 	public AuthorityEntryRest getParent() {
 		return parent;
@@ -59,6 +59,12 @@ public class AuthorityEntryRest implements Serializable {
 	}
 	public static String getName() {
 		return NAME;
+	}
+	public String getValue() {
+		return value;
+	}
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 }

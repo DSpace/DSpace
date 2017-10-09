@@ -152,10 +152,35 @@ public class RestResourceController implements InitializingBean {
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable String id, @PathVariable String rel, @PathVariable String relid,
 			Pageable page, PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
-		//return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);
-		return null;
+		return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);		
 	}
 	
+	private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request, String apiCategory, String model,
+			String id, String rel, String relid, Pageable page, PagedResourcesAssembler assembler, String projection) {
+		checkModelPluralForm(apiCategory, model);
+		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		Class<RestModel> domainClass = repository.getDomainClass();
+		
+		LinkRest linkRest = utils.getLinkRest(rel, domainClass);
+		if (linkRest != null) {
+			LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
+			Method linkMethod = repositoryUtils.getLinkMethod("getKey", linkRepository);
+			
+			try {
+				Page<? extends Serializable> pageResult = (Page<? extends RestModel>) linkMethod
+						.invoke(linkRepository, request, id, relid, page, projection);
+				Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(id)
+						.slash(rel).withSelfRel();
+				PagedResources<? extends ResourceSupport> result = assembler
+						.toResource(pageResult.map(linkRepository::wrapResource), link);
+				return result;
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+		}
+		return null;
+	}
+
 	private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request, String apiCategory,
 			String model, ID uuid, String rel, Pageable page, PagedResourcesAssembler assembler, String projection) {
 		checkModelPluralForm(apiCategory, model);

@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.QueryObject;
 import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
@@ -66,6 +65,16 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 		}
 		List<AuthorityEntryRest> authorities = authorityUtils.query(metadata, query, collection, pageable.getOffset(), pageable.getPageSize(), context.getCurrentLocale());
 		return new PageImpl<AuthorityEntryRest>(authorities, pageable, authorities.size());
+	}
+	
+	
+	public AuthorityEntryRest listAuthorityEntry(HttpServletRequest request, String name, 
+			Pageable pageable, String projection) {
+		Context context = obtainContext();		
+		String metadata = request.getParameter("metadata");
+		String authKey = request.getParameter("key");
+		authorityUtils.get(metadata, authKey, context.getCurrentLocale().toString());
+		return null;
 	}
 	
 }

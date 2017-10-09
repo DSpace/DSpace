@@ -305,22 +305,31 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 					DCInput[] dcinputs = dcinputSet.getPageRows(pageNum, true, true);
 					for (DCInput dcinput : dcinputs) {
 						if (dcinput.getPairsType() != null
-								&& StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+								&& !StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
 							String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
 									dcinput.getQualifier());
 							String authorityName = "inputForm" + fieldKey;
 							ChoiceAuthority ca = controller.get(authorityName);
 							if (ca == null) {
-								ca = null; // TODO creare wrapper
-								controller.put(fieldKey, ca);
-								authorityNames.add(authorityName);
+								ca = new InputFormSelfRegisterWrapperAuthority();								
 							} else {
-								// TODO cast to wrapper
-								// .add (formName, ca)
-							}
+								ca = (InputFormSelfRegisterWrapperAuthority)ca;								
+							}							
+							controller.put(fieldKey, ca);
+							authorityNames.add(authorityName);
+							
 						} else if (StringUtils.isNotBlank(dcinput.getVocabulary())) {
-							// TODO come sopra sostituendo vocabulary con
-							// pairname
+							String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
+									dcinput.getQualifier());
+							String authorityName = dcinput.getVocabulary();
+							ChoiceAuthority ca = controller.get(authorityName);
+							if (ca == null) {
+								ca = new InputFormSelfRegisterWrapperAuthority();								
+							} else {
+								ca = (InputFormSelfRegisterWrapperAuthority)ca;								
+							}							
+							controller.put(fieldKey, ca);
+							authorityNames.add(authorityName);
 						}
 					}
 				}
@@ -399,4 +408,18 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		return null;
 	}
 
+	@Override
+	public Choice getChoice(String fieldKey, String authKey, String locale) {
+		ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
+		if (ma == null) {
+			throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+		}
+		return ma.getChoice(fieldKey, authKey, locale);
+	}
+
+	@Override
+	public boolean hasIdentifier(String schema, String element, String qualifier) {
+		ChoiceAuthority ma = getChoiceAuthorityMap().get(makeFieldKey(schema, element, qualifier));
+		return ma.hasIdentifier();
+	}
 }

@@ -74,6 +74,7 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 	private InputFormFieldRest getField(DCInput dcinput) {
 		InputFormFieldRest inputField = new InputFormFieldRest();
 		List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
+		
 		inputField.setSelectableMetadata(selectableMetadata);
 		inputField.setLabel(dcinput.getLabel());
 		inputField.setHints(dcinput.getHints());
@@ -91,19 +92,28 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 		
 		if (!StringUtils.equalsIgnoreCase(inputRest.getType(), "qualdrop_value")) {
 			// value-pair and vocabulary are a special kind of authorities
+
 			SelectableMetadata selMd = new SelectableMetadata();
-			selMd.setAuthority(authorityUtils.getAuthority(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+			if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+				selMd.setAuthority(
+						authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+				selMd.setClosed(authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+			}
 			selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
 			selectableMetadata.add(selMd);
-			
+
 		} else {
 			inputRest.setType("onebox");
 			List<String> pairs = dcinput.getPairs();
 			for (int idx = 0; idx < pairs.size(); idx += 2) {
 				SelectableMetadata selMd = new SelectableMetadata();
 				selMd.setLabel((String) pairs.get(idx));
-				selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx+1)));
-				selMd.setAuthority(authorityUtils.getAuthority(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx+1)));
+				selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1)));
+				if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+					selMd.setAuthority(
+							authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1)));
+					selMd.setClosed(authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+				}
 				selectableMetadata.add(selMd);
 			}
 		}

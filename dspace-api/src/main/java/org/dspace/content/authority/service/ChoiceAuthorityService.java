@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
+import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
 
@@ -178,5 +179,8 @@ public interface ChoiceAuthorityService
     public List<String> getVariants(MetadataValue metadataValue);
 
 	public String getChoiceMetadatabyAuthorityName(String name);
-    
+	
+	public Choice getChoice(String fieldKey, String authKey, String locale);
+ 
+	public boolean hasIdentifier(String schema, String element, String qualifier);
 }
