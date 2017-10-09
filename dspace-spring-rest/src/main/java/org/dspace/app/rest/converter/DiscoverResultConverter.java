@@ -38,9 +38,6 @@ public class DiscoverResultConverter {
     @Autowired
     private List<DSpaceObjectConverter> converters;
 
-    @Autowired
-    private AuthorityValueService authorityValueService;
-
 
     public SearchResultsRest convert(final Context context, final DiscoverQuery discoverQuery, final String configurationName, final String scope,
                                      final List<SearchFilter> searchFilters, final Pageable page, final DiscoverResult searchResult, final DiscoveryConfiguration configuration) {
@@ -138,28 +135,10 @@ public class DiscoverResultConverter {
             Sort.Order order = page.getSort().iterator().next();
             resultsRest.setSort(order.getProperty(), order.getDirection().name());
         }
-
+        SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
 
-            resultsRest.addAppliedFilter(convertSearchFilter(context, searchFilter));
+            resultsRest.addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));
         }
-    }
-
-    private SearchResultsRest.AppliedFilter convertSearchFilter(Context context, SearchFilter searchFilter) {
-        AuthorityValue authorityValue = null;
-        if(searchFilter.hasAuthorityOperator()) {
-            authorityValue = authorityValueService.findByUID(context, searchFilter.getValue());
-        }
-
-        SearchResultsRest.AppliedFilter appliedFilter;
-        if (authorityValue == null) {
-            appliedFilter = new SearchResultsRest.AppliedFilter(searchFilter.getName(), searchFilter.getOperator(),
-                    searchFilter.getValue(), searchFilter.getValue());
-        } else {
-            appliedFilter = new SearchResultsRest.AppliedFilter(searchFilter.getName(), searchFilter.getOperator(),
-                    searchFilter.getValue(), authorityValue.getValue());
-        }
-
-        return appliedFilter;
     }
 }
