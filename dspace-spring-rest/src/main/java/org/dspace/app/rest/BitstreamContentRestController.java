@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.tika.Tika;
-import org.apache.tika.mime.MimeTypes;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.repository.BitstreamRestRepository;
 import org.dspace.app.rest.utils.MultipartFileSender;
@@ -38,10 +36,7 @@ public class BitstreamContentRestController {
 	@Autowired
 	private BitstreamRestRepository bitstreamRestRepository;
 
-	private int buffer = 20480;
-
-
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
 	public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
 											 HttpServletRequest request) throws IOException {
 		BitstreamRest bit = bitstreamRestRepository.findOne(uuid);
@@ -53,24 +48,26 @@ public class BitstreamContentRestController {
         // Pipe the bits
         InputStream is = bitstreamRestRepository.retrieve(uuid);
 
+		long lastModified = bitstreamRestRepository.getLastModified(uuid);
+
         String mimetype = bit.getFormat().getMimetype();
-        //This should be improved somewhere else so we don't have to look for the correct mimetype here
-        if (mimetype.equals(MimeTypes.OCTET_STREAM)) {
-        	Tika tika = new Tika();
-        	mimetype = tika.detect(is);
-        	is.close();
-			is = bitstreamRestRepository.retrieve(uuid);
-		}
+
+        //TODO LOG DOWNLOAD if no range or if last chunk
+
+
 
         //MultipartFileSender
 		try {
-			MultipartFileSender.fromBitstream(bit).with(request).with(response).with(is).with(mimetype).serveResource();
+			MultipartFileSender.fromBitstream(bit).with(request).with(response).withInputStream(is).withMimetype(mimetype).withLastModified(lastModified).serveResource();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			IOUtils.closeQuietly(is);
 		}
 
+
+
 	}
+
 
 }
