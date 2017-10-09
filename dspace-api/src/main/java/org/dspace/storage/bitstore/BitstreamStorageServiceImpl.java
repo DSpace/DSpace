@@ -339,6 +339,17 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         }
     }
 
+    public String getLastModified(Bitstream bitstream) {
+        Map wantedMetadata = new HashMap();
+        wantedMetadata.put("modified", null);
+        try {
+            wantedMetadata = stores.get(incoming).about(bitstream, wantedMetadata);
+        } catch (IOException e) {
+            log.error(e);
+        }
+        return wantedMetadata.get("modified").toString();
+    }
+
     /**
      *
      * @param context

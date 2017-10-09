@@ -110,4 +110,15 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 		context.abort();
 		return is;
 	}
+
+	public long getLastModified(UUID id) {
+		Bitstream bit = null;
+		Context context = obtainContext();
+		try {
+			bit = bs.find(context, id);
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		return Long.valueOf(bs.getLastModified(bit));
+	}
 }

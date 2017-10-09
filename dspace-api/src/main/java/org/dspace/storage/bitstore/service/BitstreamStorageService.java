@@ -190,4 +190,7 @@ public interface BitstreamStorageService {
      */
     public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) throws IOException, SQLException, AuthorizeException;
 
+
+    public String getLastModified(Bitstream bitstream);
+
 }
