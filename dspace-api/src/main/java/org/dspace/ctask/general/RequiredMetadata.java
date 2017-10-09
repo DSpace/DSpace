@@ -118,9 +118,7 @@ public class RequiredMetadata extends AbstractCurationTask
         {
             reqList = new ArrayList<String>();
             DCInputSet inputs = reader.getInputsByCollectionHandle(handle);
-            for (int i = 0; i < inputs.getNumberPages(); i++)
-            {
-                for (DCInput input : inputs.getPageRows(i, true, true))
+                for (DCInput input : inputs.getFields())
                 {
                     if (input.isRequired())
                     {
@@ -136,7 +134,6 @@ public class RequiredMetadata extends AbstractCurationTask
                         reqList.add(sb.toString());
                     }
                 }
-            }
             reqMap.put(inputs.getFormName(), reqList);
         }
         return reqList;

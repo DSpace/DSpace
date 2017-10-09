@@ -22,9 +22,10 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@RelNameDSpaceResource(SubmissionDefinitionRest.NAME)
-public class SubmissionDefinitionResource extends DSpaceResource<SubmissionDefinitionRest> {
-	public SubmissionDefinitionResource(SubmissionDefinitionRest sd, Utils utils, String... rels) {
+@RelNameDSpaceResource(SubmissionPanelRest.NAME)
+public class SubmissionPanelResource extends DSpaceResource<SubmissionPanelRest> {
+	public SubmissionPanelResource(SubmissionPanelRest sd, Utils utils, String... rels) {
 		super(sd, utils, rels);
+		add(utils.linkToSingleResource(sd, InputFormRest.CATEGORY));	
 	}
 }

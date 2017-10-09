@@ -12,8 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.InputFormConverter;
+import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.InputFormRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.hateoas.InputFormResource;
@@ -39,7 +42,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component(InputFormRest.CATEGORY + "." + InputFormRest.NAME)
-public class InputFormRestRepository extends DSpaceRestRepository<InputFormRest, String> {
+public class InputFormRestRepository extends DSpaceRestRepository<InputFormRest, String> implements LinkRestRepository<InputFormRest> {
 	private DCInputsReader inputReader;
 
 	private CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
@@ -88,6 +91,11 @@ public class InputFormRestRepository extends DSpaceRestRepository<InputFormRest,
 		return converter.convert(inputConfig);
 	}
 
+	public InputFormRest getInputForm(HttpServletRequest request, String name, 
+			Pageable pageable, String projection) {
+		return findOne(name);
+	}
+	
 	@Override
 	public Class<InputFormRest> getDomainClass() {
 		return InputFormRest.class;

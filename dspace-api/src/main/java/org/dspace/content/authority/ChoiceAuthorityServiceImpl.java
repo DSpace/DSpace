@@ -212,7 +212,8 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null)
         {
-            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+//            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+        	return false;
         }
         return ma.isHierarchical();
     }
@@ -223,7 +224,8 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
         if (ma == null)
         {
-            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+//            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+            return false;
         }
         return ma.isScrollable();
     }
@@ -300,9 +302,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		try {
 			DCInputsReader dcInputsReader = new DCInputsReader();
 			for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
-				int pages = dcinputSet.getNumberPages();
-				for (int pageNum = 0; pageNum < pages; pageNum++) {
-					DCInput[] dcinputs = dcinputSet.getPageRows(pageNum, true, true);
+					DCInput[] dcinputs = dcinputSet.getFields();
 					for (DCInput dcinput : dcinputs) {
 						if (dcinput.getPairsType() != null
 								&& !StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
@@ -332,7 +332,6 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 							authorityNames.add(authorityName);
 						}
 					}
-				}
 			}
 		} catch (DCInputsReaderException e) {
 			throw new IllegalStateException(e.getMessage(), e);
@@ -420,6 +419,9 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 	@Override
 	public boolean hasIdentifier(String schema, String element, String qualifier) {
 		ChoiceAuthority ma = getChoiceAuthorityMap().get(makeFieldKey(schema, element, qualifier));
+		if(ma == null) {
+			return false;
+		}
 		return ma.hasIdentifier();
 	}
 }

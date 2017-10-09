@@ -51,7 +51,7 @@ public class AuthorityUtils {
 			String qualifier = tokens[2];
 			return buildAuthorityRest(name, schema, element, qualifier);
 		}
-		return null;
+		return new AuthorityRest();
 	}
 
 	private AuthorityRest buildAuthorityRest(String name, String schema, String element, String qualifier) {

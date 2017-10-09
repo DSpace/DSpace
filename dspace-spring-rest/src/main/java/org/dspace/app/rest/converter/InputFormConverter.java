@@ -46,23 +46,16 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 	public InputFormRest fromModel(DCInputSet obj) {
 		InputFormRest sd = new InputFormRest();
 		sd.setName(obj.getFormName());
-		sd.setDefaultConf(obj.isDefaultConf());
 		List<InputFormPageRest> pages = new LinkedList<InputFormPageRest>();
-		for (int idx = 0; idx < obj.getNumberPages(); idx++) {
-			DCInput[] step = obj.getPageRows(idx, true, true);
-			boolean mandatory = obj.isPageMandatory(idx);
-			String heading = obj.getPageHeading(idx);
-			InputFormPageRest sp = getPage(step, mandatory, heading);
+			DCInput[] step = obj.getFields();
+			InputFormPageRest sp = getPage(step);
 			pages.add(sp);
-		}
 		sd.setPages(pages);
 		return sd;
 	}
 
-	private InputFormPageRest getPage(DCInput[] page, boolean mandatory, String heading) {
+	private InputFormPageRest getPage(DCInput[] page) {
 		InputFormPageRest ifPage = new InputFormPageRest();
-		ifPage.setMandatory(mandatory);
-		ifPage.setHeader(heading);
 		List<InputFormFieldRest> fields = new LinkedList<InputFormFieldRest>();
 		for (DCInput dcinput : page) {
 			fields.add(getField(dcinput));

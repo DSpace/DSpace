@@ -499,12 +499,12 @@ public class Util {
         if (inputSet != null)
         {
 
-            int pageNums = inputSet.getNumberPages();
+            int fieldsNums = inputSet.getNumberFields();
 
-            for (int p = 0; p < pageNums; p++)
+            for (int p = 0; p < fieldsNums; p++)
             {
 
-                DCInput[] inputs = inputSet.getPageRows(p, false, false);
+                DCInput[] inputs = inputSet.getFields();
 
                 if (inputs != null)
                 {

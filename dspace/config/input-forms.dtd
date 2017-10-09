@@ -1,22 +1,12 @@
 <!-- DSpace Custom Submit input form definition language -->
 
 
- <!ELEMENT input-forms (form-map, form-definitions, form-value-pairs) >
-
- <!ELEMENT form-map (name-map)* >
- <!ELEMENT name-map EMPTY >
- <!ATTLIST name-map 
-           collection-handle CDATA #REQUIRED
-           form-name NMTOKEN #REQUIRED>
+ <!ELEMENT input-forms (form-definitions, form-value-pairs) >
 
  <!ELEMENT form-definitions (form)+ >
- <!ELEMENT form (page)+ >
+ <!ELEMENT form (field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
- <!ELEMENT page (field)+ >
- <!ATTLIST page 
- 				number NMTOKEN #REQUIRED
- 				heading NMTOKEN #IMPLIED
- 				mandatory NMTOKEN #IMPLIED>
+ 
  <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >

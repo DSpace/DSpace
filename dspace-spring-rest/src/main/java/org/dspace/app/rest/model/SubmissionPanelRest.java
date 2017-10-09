@@ -8,6 +8,8 @@
 
 package org.dspace.app.rest.model;
 
+import org.dspace.app.rest.RestResourceController;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -19,8 +21,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value=Include.NON_NULL)
-public class SubmissionPanelRest {
+@LinksRest(links = {
+		@LinkRest(name = InputFormRest.NAME, linkClass = InputFormRest.class, method = "getInputForm", optional = true)
+})
+public class SubmissionPanelRest extends BaseObjectRest<String> {
+	public static final String NAME = "panel";	
 	private String header;
+	private String id;
 	private boolean mandatory;
 	private String type;
 	private ScopeEnum scope;
@@ -66,5 +73,23 @@ public class SubmissionPanelRest {
 		if (visibility != null && (visibility.getMain() != null || visibility.getOther() != null)) {
 			this.visibility = visibility;
 		}
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@Override
+	public String getCategory() {
+		return SubmissionDefinitionRest.CATEGORY;
+	}
+
+	@Override
+	public Class getController() {
+		return RestResourceController.class;
 	}
 }

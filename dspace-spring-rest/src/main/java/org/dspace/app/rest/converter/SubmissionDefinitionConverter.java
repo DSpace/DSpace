@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.dspace.app.rest.model.AuthorityRest;
+import org.dspace.app.rest.model.InputFormRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionPanelRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
@@ -50,6 +52,7 @@ public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionCon
 		sp.setMandatory(step.isMandatory());
 		sp.setHeader(step.getHeading());
 		sp.setType(step.getType());
+		sp.setId(step.getId());
 		sp.setVisibility(new SubmissionVisibilityRest(VisibilityEnum.fromString(step.getVisibility()),
 				VisibilityEnum.fromString(step.getVisibilityOutside())));
 		return sp;

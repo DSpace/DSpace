@@ -86,6 +86,29 @@
        <type>collection</type>
      </step>
      
+      <step id="traditionalpageone">      	
+        <heading>submit.progressbar.describe.stepone</heading>
+        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+        <type>input-form</type>
+        <mandatory>true</mandatory>
+      </step>
+      <step id="traditionalpagetwo">      	
+        <heading>submit.progressbar.describe.steptwo</heading>
+        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+        <type>input-form</type>
+        <mandatory>true</mandatory>
+      </step>
+      <step id="upload">
+        <heading>submit.progressbar.upload</heading>
+        <processing-class>org.dspace.submit.step.UploadStep</processing-class>
+        <type>upload</type>
+      </step>
+       <step id="license">
+        <heading>submit.progressbar.license</heading>
+        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
+        <type>license</type>
+        <scope visibilityOutside="read-only">submission</scope>
+      </step>    
 	 <!-- Uncomment this to make available the bibliographic import from external source - note ONLY for JSPUI -->     
 	 <!-- <step id="collection">
        <heading></heading> can specify heading, if you want it to appear in Progress Bar
@@ -206,12 +229,8 @@
        </step>
         -->
       <!--Step 2 will be to Describe the item.-->
-      <step>
-        <heading>submit.progressbar.describe</heading>
-        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
-        <type>input-form</type>
-      </step>
-
+      <step id="traditionalpageone"/>      	
+      <step id="traditionalpagetwo"/>      	
        <!--Step 3 will be to Manage Item access.
        <step>
            <heading>submit.progressbar.access</heading>
@@ -221,11 +240,7 @@
        -->
 
       <!--Step 4 will be to Upload the item -->
-      <step>
-        <heading>submit.progressbar.upload</heading>
-        <processing-class>org.dspace.submit.step.UploadStep</processing-class>
-        <type>upload</type>
-      </step>
+      <step id="upload"/>
       
 
        <!-- Step 4 Upload Item with Embargo Features
@@ -257,17 +272,12 @@
       -->
 
       <!--Step 7 will be to Sign off on the License-->
-      <step>
-        <heading>submit.progressbar.license</heading>
-        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
-        <type>license</type>
-        <scope visibilityOutside="read-only">submission</scope>
-      </step>
+      <step id="license"/>
 
 	  <!--Step 8 will be to Check for potential duplicate -->
-       <step>
+<!--        <step>
            <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class>
-       </step>
+       </step> -->
      
      <!-- Fake Steps to test parsing of all options -->
      <!-- 

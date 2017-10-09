@@ -73,8 +73,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 		Context context = obtainContext();		
 		String metadata = request.getParameter("metadata");
 		String authKey = request.getParameter("key");
-		authorityUtils.get(metadata, authKey, context.getCurrentLocale().toString());
-		return null;
+		return authorityUtils.get(metadata, authKey, context.getCurrentLocale().toString());
 	}
 	
 }

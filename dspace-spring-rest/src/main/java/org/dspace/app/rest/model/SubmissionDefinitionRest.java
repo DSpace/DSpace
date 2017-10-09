@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

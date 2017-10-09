@@ -7,11 +7,8 @@
  */
 package org.dspace.app.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.BooleanUtils;
 
 /**
  * Class representing all DC inputs required for a submission, organized into pages
@@ -22,18 +19,10 @@ import org.apache.commons.lang3.BooleanUtils;
 
 public class DCInputSet
 {
-	/** true if it is the default configuration */
-	private boolean defaultConf;
     /** name of the input set  */
     private String formName = null; 
-    /** the inputs ordered by page and row position */
-    private DCInput[][] inputPages = null;
-    
-    /** the heading of each page */
-    private String[] headings;
-    
-    /** the mandatory flag for each page */
-    private boolean[] mandatoryFlags;
+    /** the inputs ordered by row position */
+    private DCInput[] inputs = null;
     
 	/**
 	 * constructor
@@ -42,30 +31,21 @@ public class DCInputSet
 	 *            form name
 	 * @param headings
 	 * @param mandatoryFlags
-	 * @param pages
-	 *            pages
+	 * @param fields
+	 *            fields
 	 * @param listMap
 	 *            map
 	 */
-	public DCInputSet(boolean defaultConf, String formName, List<String> headingsList, List<Boolean> mandatoryFlagsList,
-			List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
+	public DCInputSet(String formName,
+			List<Map<String, String>> fields, Map<String, List<String>> listMap)
     {
-		this.defaultConf = defaultConf;
         this.formName = formName;
-        inputPages = new DCInput[pages.size()][];
-        headings = new String[pages.size()];
-        mandatoryFlags = new boolean[pages.size()];
-        for ( int i = 0; i < inputPages.length; i++ )
+        this.inputs = new DCInput[fields.size()];
+        for ( int i = 0; i < inputs.length; i++ )
         {
-            List<Map<String, String>> page = pages.get(i);
-			inputPages[i] = new DCInput[page.size()];
-			headings[i] = headingsList.get(i);
-			mandatoryFlags[i] = BooleanUtils.toBooleanDefaultIfNull(mandatoryFlagsList.get(i), true);
+            Map<String, String> field = fields.get(i);
+            inputs[i] = new DCInput(field, listMap);
             
-            for ( int j = 0; j < inputPages[i].length; j++ )
-            {
-                inputPages[i][j] = new DCInput(page.get(j), listMap);
-            }
         }
     }
     
@@ -79,43 +59,23 @@ public class DCInputSet
     }
     
     /**
-     * Return the number of pages in this  input set
+     * Return the number of fields in this  input set
      * @return number of pages
      */
-    public int getNumberPages()
+    public int getNumberFields()
     {
-        return inputPages.length;
+        return inputs.length;
     }
     
     /**
-     * Get all the rows for a page from the form definition
+     * Get all the fields
      *
-     * @param  pageNum    desired page within set
-     * @param  addTitleAlternative flag to add the additional title row
-     * @param  addPublishedBefore  flag to add the additional published info
-     *
-     * @return  an array containing the page's displayable rows
+     * @return  an array containing the fields
      */
     
-    public DCInput[] getPageRows(int pageNum, boolean addTitleAlternative,
-                                   boolean addPublishedBefore)
+    public DCInput[] getFields()
     {
-        List<DCInput> filteredInputs = new ArrayList<DCInput>();
-        if ( pageNum < inputPages.length )
-        {
-            for (int i = 0; i < inputPages[pageNum].length; i++ )
-            {
-                DCInput input = inputPages[pageNum][i];
-                if (doField(input, addTitleAlternative, addPublishedBefore))
-                {
-                    filteredInputs.add(input);
-                }
-            }
-        }
-
-        // Convert list into an array
-        DCInput[] inputArray = new DCInput[filteredInputs.size()];
-        return filteredInputs.toArray(inputArray);
+    	return inputs;
     }
     
     /**
@@ -149,18 +109,15 @@ public class DCInputSet
      */
     public boolean isFieldPresent(String fieldName)
     {
-        for (int i = 0; i < inputPages.length; i++)
+        for (int i = 0; i < inputs.length; i++)
         {
-            DCInput[] pageInputs = inputPages[i];
-            for (int row = 0; row < pageInputs.length; row++)
-            {
-                String fullName = pageInputs[row].getElement() + "." + 
-                                    pageInputs[row].getQualifier();
+            DCInput field = inputs[i];
+                String fullName = field.getElement() + "." + 
+                		field.getQualifier();
                 if (fullName.equals(fieldName))
                 {
                     return true;
                 }
-            }
         }
         return false;
     }
@@ -179,20 +136,17 @@ public class DCInputSet
          if (documentType == null) {
              documentType = "";
          }
-         for (int i = 0; i < inputPages.length; i++)
+         for (int i = 0; i < inputs.length; i++)
          {
-             DCInput[] pageInputs = inputPages[i];
-             for (int row = 0; row < pageInputs.length; row++)
-             {
-                 String fullName = pageInputs[row].getElement() + "." + 
-                                     pageInputs[row].getQualifier();
+             DCInput field = inputs[i];
+                 String fullName = field.getElement() + "." + 
+                		 field.getQualifier();
                  if (fullName.equals(fieldName) )
                  {
-                     if (pageInputs[row].isAllowedFor(documentType)) {
+                     if (field.isAllowedFor(documentType)) {
                          return true;
                      }
                  }
-             }
          }
          return false;
      }
@@ -221,15 +175,4 @@ public class DCInputSet
         return true;
     }
 
-	public boolean isPageMandatory(int idx) {
-		return mandatoryFlags[idx];
-	}
-
-	public String getPageHeading(int idx) {
-		return headings[idx];
-	}
-
-	public boolean isDefaultConf() {
-		return defaultConf;
-	}
 }
