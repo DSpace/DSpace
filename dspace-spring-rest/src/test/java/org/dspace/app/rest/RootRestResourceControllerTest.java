@@ -30,17 +30,17 @@ public class RootRestResourceControllerTest extends AbstractControllerIntegratio
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 //Check that all required root links are present and that they are absolute
-                .andExpect(jsonPath("$._links.bitstreamformats.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.bitstreams.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.browses.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.collections.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.communities.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.epersons.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.groups.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.items.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.metadatafields.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.metadataschemas.href", startsWith("http://localhost/api")))
-                .andExpect(jsonPath("$._links.sites.href", startsWith("http://localhost/api")))
+                .andExpect(jsonPath("$._links.bitstreamformats.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.bitstreams.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.browses.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.collections.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.communities.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.epersons.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.groups.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.items.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.metadatafields.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.metadataschemas.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.sites.href", startsWith(REST_SERVER_URL)))
                 ;
     }
 

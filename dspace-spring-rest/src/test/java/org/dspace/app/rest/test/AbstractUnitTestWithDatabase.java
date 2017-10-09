@@ -13,6 +13,8 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -39,6 +41,11 @@ public class AbstractUnitTestWithDatabase extends AbstractDSpaceTest {
      * EPerson mock object to use in the tests.
      */
     protected EPerson eperson;
+
+    /**
+     * The test Parent Community
+     */
+    protected Community parentCommunity = null;
 
     /**
      * This method will be run before the first test as per @BeforeClass. It will
@@ -134,8 +141,21 @@ public class AbstractUnitTestWithDatabase extends AbstractDSpaceTest {
     {
         // Cleanup our global context object
         try {
+            context.commit();
+            parentCommunity = context.reloadEntity(parentCommunity);
+            eperson = context.reloadEntity(eperson);
+
+            context.turnOffAuthorisationSystem();
+            if(parentCommunity != null) {
+                ContentServiceFactory.getInstance().getCommunityService().delete(context, parentCommunity);
+            }
+            if(eperson != null) {
+                EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
+            }
+            
+            parentCommunity = null;
             cleanupContext(context);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
