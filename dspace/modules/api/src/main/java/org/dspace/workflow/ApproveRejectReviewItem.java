@@ -331,7 +331,7 @@ public class ApproveRejectReviewItem {
                 SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
                 String dateString = dateIso.format(manuscript.getPublicationDate());
                 String oldValue = dataPackage.getPublicationDate();
-                if (!oldValue.equals(dateString)) {
+                if (!dateString.equals(oldValue)) {
                     dataPackage.setPublicationDate(dateString);
                     message.append(" " + PUBLICATION_DATE + " was updated from " + oldValue + ".");
                 }
