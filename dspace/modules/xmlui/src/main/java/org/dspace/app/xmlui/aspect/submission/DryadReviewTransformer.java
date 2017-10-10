@@ -6,6 +6,8 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadJournalConcept;
+import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -139,13 +141,24 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             HandleUtil.buildHandleTrail(collection, pageMeta, contextPath);
             pageMeta.addTrail().addContent(T_workflow_trail);
 
-            Item dataPackage = DryadWorkflowUtils.getDataPackage(context, wfItem.getItem());
-            if (dataPackage != null) {
-                //We have a data package, indicating that we are viewing a data file
+            if (DryadWorkflowUtils.isDataPackage(wfItem)) {
+                Item dataPackage = wfItem.getItem();
                 //Add the review key to the page meta so we can use that
                 DCValue[] reviewerKeys = dataPackage.getMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "step", "reviewerKey", Item.ANY);
                 if (0 < reviewerKeys.length)
                     pageMeta.addMetadata("identifier", "reviewerKey").addContent(reviewerKeys[0].value);
+
+                String pubName = dataPackage.getSingleMetadataValue("prism.publicationName");
+                DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(pubName);
+                if (journalConcept != null) {
+                    if (!"".equals(journalConcept.getCoverImage())) {
+                        pageMeta.addMetadata("journal", "cover").addContent(journalConcept.getCoverImage());
+                    }
+                    if (!"".equals(journalConcept.getWebsite())) {
+                        pageMeta.addMetadata("journal", "website").addContent(journalConcept.getWebsite());
+                    }
+                }
+
             }
         }
     }
