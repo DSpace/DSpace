@@ -181,22 +181,13 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
                 showfull = null;
 
 
-            DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
             ReferenceSet referenceSet = null;
 
             if (showfull == null) {
                 referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_SUMMARY_VIEW);
-                if (vals != null && vals[0] != null)
-                    referenceSet.setHead(vals[0].value);
-                else
-                    referenceSet.setHead(T_workflow_head);
                 div.addPara().addButton("submit_full_item_info").setValue(T_showfull);
             } else {
                 referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_DETAIL_VIEW);
-                if (vals != null && vals[0] != null)
-                    referenceSet.setHead(vals[0].value);
-                else
-                    referenceSet.setHead(T_workflow_head);
                 div.addPara().addButton("submit_simple_item_info").setValue(T_showsimple);
 
                 div.addHidden("submit_full_item_info").setValue("true");
