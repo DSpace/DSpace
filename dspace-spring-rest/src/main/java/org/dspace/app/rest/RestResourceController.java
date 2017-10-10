@@ -19,28 +19,33 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
+import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
+import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
 import org.dspace.app.rest.model.LinkRest;
-import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
+import org.dspace.app.rest.utils.RestRepositoryUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -66,6 +71,9 @@ public class RestResourceController implements InitializingBean {
 	@Autowired
 	Utils utils;
 
+	@Autowired
+	RestRepositoryUtils repositoryUtils;
+
 	@Override
 	public void afterPropertiesSet() {
 		List<Link> links = new ArrayList<Link>();
@@ -81,7 +89,7 @@ public class RestResourceController implements InitializingBean {
 		}
 		discoverableEndpointsService.register(this, links);
 	}
-	
+
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}")
 	@SuppressWarnings("unchecked")
 	public DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
@@ -120,63 +128,62 @@ public class RestResourceController implements InitializingBean {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}/{rel}")
-	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory, @PathVariable String model, @PathVariable Integer id,
-			@PathVariable String rel, Pageable page, PagedResourcesAssembler assembler,
-			@RequestParam(required = false) String projection) {
+	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable Integer id, @PathVariable String rel, Pageable page,
+			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
 		return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection);
 	}
-	
+
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}/{rel}")
-	public ResourceSupport findRel(HttpServletRequest request,  @PathVariable String apiCategory, @PathVariable String model, @PathVariable String id,
-			@PathVariable String rel, Pageable page, PagedResourcesAssembler assembler,
-			@RequestParam(required = false) String projection) {
+	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable String id, @PathVariable String rel, Pageable page,
+			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
 		return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/{rel}")
-	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory, @PathVariable String model, @PathVariable UUID uuid,
-			@PathVariable String rel, Pageable page, PagedResourcesAssembler assembler,
-			@RequestParam(required = false) String projection) {
+	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable UUID uuid, @PathVariable String rel, Pageable page,
+			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
 		return findRelInternal(request, apiCategory, model, uuid, rel, page, assembler, projection);
 	}
 
-	private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request, String apiCategory, String model, ID uuid,
-			String rel, Pageable page, PagedResourcesAssembler assembler, String projection) {
+	private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request, String apiCategory,
+			String model, ID uuid, String rel, Pageable page, PagedResourcesAssembler assembler, String projection) {
 		checkModelPluralForm(apiCategory, model);
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		Class<RestModel> domainClass = repository.getDomainClass();
 		
-		LinksRest linksAnnotation = repository.getDomainClass().getDeclaredAnnotation(LinksRest.class);
-		if (linksAnnotation != null) {
-			LinkRest[] links = linksAnnotation.links();
-			for (LinkRest l : links) {
-				if (StringUtils.equals(rel, l.name())) {
-					LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, rel);
-					Method[] methods = linkRepository.getClass().getMethods();
-					for (Method m : methods) { 
-						if (StringUtils.equals(m.getName(), l.method())) {
-							try {
-								Page<? extends Serializable> pageResult = (Page<? extends RestModel>) m.invoke(linkRepository, request, uuid, page, projection);
-								Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(uuid).slash(rel).withSelfRel();
-								PagedResources<? extends ResourceSupport> result = assembler.toResource(pageResult.map(linkRepository::wrapResource), link);
-								return result;
-							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-								throw new RuntimeException(e.getMessage(), e);
-							}
-						}
-					}
-					// TODO custom exception
-					throw new RuntimeException("Method for relation " + rel + " not found: " + l.name());
+		LinkRest linkRest = utils.getLinkRest(rel, domainClass);
+
+		if (linkRest != null) {
+			LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
+			Method linkMethod = repositoryUtils.getLinkMethod(linkRest.method(), linkRepository);
+			
+			if (linkMethod == null) {
+				// TODO custom exception
+				throw new RuntimeException("Method for relation " + rel + " not found: " + linkRest.name());
+			}
+			else {
+				try {
+					Page<? extends Serializable> pageResult = (Page<? extends RestModel>) linkMethod
+							.invoke(linkRepository, request, uuid, page, projection);
+					Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(uuid)
+							.slash(rel).withSelfRel();
+					PagedResources<? extends ResourceSupport> result = assembler
+							.toResource(pageResult.map(linkRepository::wrapResource), link);
+					return result;
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					throw new RuntimeException(e.getMessage(), e);
 				}
 			}
 		}
-		
 		RestModel modelObject = repository.findOne(uuid);
 		DSpaceResource result = repository.wrapResource(modelObject, rel);
 		if (result.getLink(rel) == null) {
-			//TODO create a custom exception
-			throw new ResourceNotFoundException(rel + "undefined for "+ model);
-		}
-		else if (result.getEmbedded().get(rel) instanceof EmbeddedPage){
+			// TODO create a custom exception
+			throw new ResourceNotFoundException(rel + "undefined for " + model);
+		} else if (result.getEmbedded().get(rel) instanceof EmbeddedPage) {
 			// this is a very inefficient scenario. We have an embedded list
 			// already fully retrieved that we need to limit with pagination
 			// parameter. BTW change the default sorting is not implemented at
@@ -185,14 +192,15 @@ public class RestResourceController implements InitializingBean {
 			// link repository so to fall in the previous block code
 			EmbeddedPage ep = (EmbeddedPage) result.getEmbedded().get(rel);
 			List<? extends RestModel> fullList = ep.getFullList();
-			if (fullList == null || fullList.size() == 0) return null;
+			if (fullList == null || fullList.size() == 0)
+				return null;
 			int start = page.getOffset();
 			int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
-			DSpaceRestRepository<RestModel, ?> resourceRepository = utils.getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
+			DSpaceRestRepository<RestModel, ?> resourceRepository = utils
+					.getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
 			PageImpl<RestModel> pageResult = new PageImpl(fullList.subList(start, end), page, fullList.size());
-			return assembler.toResource(pageResult	.map(resourceRepository::wrapResource));
-		}
-		else {
+			return assembler.toResource(pageResult.map(resourceRepository::wrapResource));
+		} else {
 			ResourceSupport resu = (ResourceSupport) result.getEmbedded().get(rel);
 			return resu;
 		}
@@ -204,7 +212,8 @@ public class RestResourceController implements InitializingBean {
 			@PathVariable String model, Pageable page, PagedResourcesAssembler assembler,
 			@RequestParam(required = false) String projection) {
 		DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
-		Link link = linkTo(methodOn(this.getClass(), apiCategory, English.plural(model)).findAll(apiCategory, model, page, assembler, projection)).withSelfRel();
+		Link link = linkTo(methodOn(this.getClass(), apiCategory, English.plural(model)).findAll(apiCategory, model,
+				page, assembler, projection)).withSelfRel();
 
 		Page<DSpaceResource<T>> resources;
 		try {
@@ -213,17 +222,75 @@ public class RestResourceController implements InitializingBean {
 			resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
 		}
 		PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
+		if (repositoryUtils.haveSearchMethods(repository)) {
+			result.add(linkTo(this.getClass(), apiCategory, model).slash("search").withRel("search"));
+		}
 		return result;
 	}
 
 	/**
-	 * Check that the model is specified in its plural form, otherwise throw a RepositoryNotFound exception
-	 *  
+	 * Check that the model is specified in its plural form, otherwise throw a
+	 * RepositoryNotFound exception
+	 * 
 	 * @param model
 	 */
 	private void checkModelPluralForm(String apiCategory, String model) {
 		if (StringUtils.equals(utils.makeSingular(model), model)) {
 			throw new RepositoryNotFoundException(apiCategory, model);
 		}
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/search")
+	public ResourceSupport listSearchMethods(@PathVariable String apiCategory, @PathVariable String model) {
+		ResourceSupport root = new ResourceSupport();
+		DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
+
+		List<String> searchMethods = repositoryUtils.listSearchMethods(repository);
+
+		if (CollectionUtils.isEmpty(searchMethods)) {
+			throw new RepositorySearchNotFoundException(model);
+		}
+
+		for (String name : searchMethods) {
+			Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(name).withRel(name);
+			root.add(link);
+		}
+		return root;
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/search/{searchMethodName}")
+	@SuppressWarnings("unchecked")
+	public <T extends RestModel> ResourceSupport executeSearchMethods(@PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable String searchMethodName, Pageable pageable, Sort sort,
+			PagedResourcesAssembler assembler, @RequestParam MultiValueMap<String, Object> parameters)
+			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+
+		Link link = linkTo(this.getClass(), apiCategory, model).slash("search").slash(searchMethodName).withSelfRel();
+		DSpaceRestRepository repository = utils.getResourceRepository(apiCategory, model);
+		boolean returnPage = false;
+		Object searchResult = null;
+		
+		Method searchMethod = repositoryUtils.getSearchMethod(searchMethodName, repository);
+		
+		if (searchMethod == null) {
+			if (repositoryUtils.haveSearchMethods(repository)) {
+				throw new RepositorySearchMethodNotFoundException(model, searchMethodName);	
+			}
+			else {
+				throw new RepositorySearchNotFoundException(model);	
+			}
+		}
+		
+		searchResult = repositoryUtils.executeQueryMethod(repository, parameters, searchMethod, pageable, sort, assembler);
+		
+		returnPage = searchMethod.getReturnType().isAssignableFrom(Page.class);
+		ResourceSupport result = null;
+		if (returnPage) {
+			Page<DSpaceResource<T>> resources = ((Page<T>) searchResult).map(repository::wrapResource);
+			result = assembler.toResource(resources, link);
+		} else {
+			result = repository.wrapResource((T) searchResult);
+		}
+		return result;
 	}
 }
