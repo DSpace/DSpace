@@ -71,9 +71,9 @@ public class ExcelBulkChanges implements IBulkChanges
                             "Invalid excel file[main_entities sheet] - unexpected header column "
                                     + column + " -> " + cellContent
                                     + " expected " + HEADER_COLUMNS[column]);
-        		}
-        		column++;
-        	}        	
+        		}        		
+        	}    
+            column++;
         }
         
         if (mainHeaders.size() < HEADER_COLUMNS.length)
@@ -102,9 +102,9 @@ public class ExcelBulkChanges implements IBulkChanges
                                         + column + " -> " + cellContent
                                         + " expected "
                                         + HEADER_NESTED_COLUMNS[column]);
-	        		}
-	        		column++;
-	        	}	        	
+	        		}	        		
+	        	}
+                column++;
 	        }
 	        
             if (nestedHeaders.size() < HEADER_NESTED_COLUMNS.length)

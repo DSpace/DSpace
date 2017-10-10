@@ -722,7 +722,7 @@ public class ImportExportUtils {
                         remove = checkNestedRemoval(bulkChange, ntps);
                     }
                     
-                    if(remove) {
+                    if(!remove) {
                         break;
                     }
                     

@@ -10,6 +10,10 @@ package org.dspace.app.cris.importexport;
 import java.util.List;
 
 import jxl.Cell;
+import jxl.CellFeatures;
+import jxl.CellType;
+import jxl.LabelCell;
+import jxl.format.CellFormat;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,8 +62,9 @@ public class ExcelBulkChange implements IBulkChange {
 		int index = -1;
 		if(this.header.contains(field)) {
 			index = this.header.indexOf(field);
+			return new ExcelBulkField(row[index]);
 		}
-		return new ExcelBulkField(row[index]);
+		return new ExcelBulkField(new EmptyCell());
 	}
 
 	@Override
@@ -67,8 +72,9 @@ public class ExcelBulkChange implements IBulkChange {
 		int index = -1;
 		if(this.header.contains(field)) {
 			index = this.header.indexOf(field);
-		}
-		return new ExcelBulkFieldLink(row[index]); 
+			return new ExcelBulkFieldLink(row[index]);
+		}		
+		return new ExcelBulkFieldLink(new EmptyCell());
 	}
 
     @Override
@@ -78,8 +84,9 @@ public class ExcelBulkChange implements IBulkChange {
         if (this.header.contains(field))
         {
             index = this.header.indexOf(field);
-        }
-        return new ExcelBulkFieldPointer(row[index]);
+            return new ExcelBulkFieldPointer(row[index]);
+        }        
+        return new ExcelBulkFieldPointer(new EmptyCell());
     }
 
     @Override
@@ -95,7 +102,52 @@ public class ExcelBulkChange implements IBulkChange {
         if (this.header.contains(field))
         {
             index = this.header.indexOf(field);
+            return new ExcelBulkFieldFile(row[index]);
         }
-        return new ExcelBulkFieldFile(row[index]);
+        return new ExcelBulkFieldFile(new EmptyCell());
+    }
+    
+    class EmptyCell implements LabelCell {
+
+		@Override
+		public int getRow() {
+			return -1;
+		}
+
+		@Override
+		public int getColumn() {
+			return -1;
+		}
+
+		@Override
+		public CellType getType() {
+			return CellType.EMPTY;
+		}
+
+		@Override
+		public boolean isHidden() {
+			return true;
+		}
+
+		@Override
+		public String getContents() {
+			return "";
+		}
+
+		@Override
+		public CellFormat getCellFormat() {
+			return null;
+		}
+
+		@Override
+		public CellFeatures getCellFeatures() {
+			return null;
+		}
+
+		@Override
+		public String getString() {
+			return "";
+		}
+    	
     }
 }
