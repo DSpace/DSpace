@@ -8,6 +8,8 @@
 
 package org.dspace.app.rest.model;
 
+import java.io.Serializable;
+
 import org.dspace.app.rest.RestResourceController;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,10 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value=Include.NON_NULL)
-@LinksRest(links = {
-		@LinkRest(name = InputFormRest.NAME, linkClass = InputFormRest.class, method = "getInputForm", optional = true)
-})
-public class SubmissionPanelRest extends BaseObjectRest<String> {
+public class SubmissionPanelRest implements RestModel {
 	public static final String NAME = "panel";	
 	private String header;
 	private String id;
@@ -92,4 +91,5 @@ public class SubmissionPanelRest extends BaseObjectRest<String> {
 	public Class getController() {
 		return RestResourceController.class;
 	}
+
 }

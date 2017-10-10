@@ -91,11 +91,6 @@ public class InputFormRestRepository extends DSpaceRestRepository<InputFormRest,
 		return converter.convert(inputConfig);
 	}
 
-	public InputFormRest getInputForm(HttpServletRequest request, String name, 
-			Pageable pageable, String projection) {
-		return findOne(name);
-	}
-	
 	@Override
 	public Class<InputFormRest> getDomainClass() {
 		return InputFormRest.class;

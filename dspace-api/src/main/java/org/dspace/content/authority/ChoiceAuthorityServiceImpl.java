@@ -311,11 +311,14 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 							String authorityName = "inputForm" + fieldKey;
 							ChoiceAuthority ca = controller.get(authorityName);
 							if (ca == null) {
-								ca = new InputFormSelfRegisterWrapperAuthority();								
+								InputFormSelfRegisterWrapperAuthority ifa = new InputFormSelfRegisterWrapperAuthority();
+								//TODO ifa.getDelegates().put(null, ca);
+								controller.put(fieldKey, ifa);
 							} else {
-								ca = (InputFormSelfRegisterWrapperAuthority)ca;								
+								ca = (InputFormSelfRegisterWrapperAuthority)ca;
+								controller.put(fieldKey, ca);
 							}							
-							controller.put(fieldKey, ca);
+							
 							authorityNames.add(authorityName);
 							
 						} else if (StringUtils.isNotBlank(dcinput.getVocabulary())) {
@@ -323,11 +326,6 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 									dcinput.getQualifier());
 							String authorityName = dcinput.getVocabulary();
 							ChoiceAuthority ca = controller.get(authorityName);
-							if (ca == null) {
-								ca = new InputFormSelfRegisterWrapperAuthority();								
-							} else {
-								ca = (InputFormSelfRegisterWrapperAuthority)ca;								
-							}							
 							controller.put(fieldKey, ca);
 							authorityNames.add(authorityName);
 						}

@@ -47,4 +47,12 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority
     	String formName = null; //Utils.getInputFormName(collection);
     	return delegates.get(formName).getLabel(field, key, locale);
     }
+
+	public Map<String, ChoiceAuthority> getDelegates() {
+		return delegates;
+	}
+
+	public void setDelegates(Map<String, ChoiceAuthority> delegates) {
+		this.delegates = delegates;
+	}
 }
