@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -14,6 +15,8 @@ import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.SQLException;
 
 /**
  * This is the base class for any Rest Repository. It provides utility method to
@@ -23,19 +26,26 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public abstract class AbstractDSpaceRestRepository {
+
+	/**
+	 * log4j category
+	 */
+	private static final Logger log = Logger.getLogger(AbstractDSpaceRestRepository.class);
+
 	@Autowired
 	protected Utils utils;
 
 	protected RequestService requestService = new DSpace().getRequestService();
 
+
+
 	protected Context obtainContext() {
 		Request currentRequest = requestService.getCurrentRequest();
-		Context context = (Context) currentRequest.getAttribute(ContextUtil.DSPACE_CONTEXT);
-		if (context != null && context.isValid()) {
-			return context;
+		try {
+			return ContextUtil.obtainContext(currentRequest.getServletRequest());
+		} catch (SQLException e) {
+			log.error("Unable to obtain context object", e);
+			return null;
 		}
-		context = new Context();
-		currentRequest.setAttribute(ContextUtil.DSPACE_CONTEXT, context);
-		return context;
 	}
 }
