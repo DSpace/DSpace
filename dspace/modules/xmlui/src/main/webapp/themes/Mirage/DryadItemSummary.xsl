@@ -94,7 +94,7 @@
             </p>
             <p class="pub-authors">
                 <xsl:choose>
-                    <xsl:when test="$meta[@element='author'][@qualifier='item']">
+                    <xsl:when test="$meta[@element='authors'][@qualifier='item']">
                         <xsl:call-template name="make-author-string">
                             <xsl:with-param name="authorType" select="'item'"/>
                         </xsl:call-template>
