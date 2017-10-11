@@ -2,6 +2,7 @@ package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.parameter.SearchFilter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -81,4 +82,26 @@ public abstract class ResultsRest extends BaseObjectRest<String>{
     public void setSort(final String property, final String direction) {
         sort = new SearchResultsRest.Sorting(property, direction);
     }
+
+
+    public String getConfigurationName() {
+        return configurationName;
+    }
+
+    public void setConfigurationName(final String configurationName) {
+        this.configurationName = configurationName;
+    }
+
+    private String configurationName;
+
+    public void setSearchFilters(final List<SearchFilter> searchFilters){
+        this.searchFilters = searchFilters;
+    }
+
+    public List<SearchFilter> getSearchFilters(){
+        return searchFilters;
+    }
+
+    @JsonIgnore
+    private List<SearchFilter> searchFilters;
 }

@@ -36,4 +36,9 @@ public class ItemResourceHalLinkFactory extends HalLinkFactory<ItemResource, Dis
     protected Class<ItemResource> getResourceClass() {
         return null;
     }
+
+    protected String getSelfLink(ItemResource halResource) {
+        return null;
+    }
+
 }

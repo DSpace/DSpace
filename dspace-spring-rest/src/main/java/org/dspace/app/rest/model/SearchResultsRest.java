@@ -20,7 +20,6 @@ public class SearchResultsRest extends ResultsRest {
 
 
 
-    private String configurationName;
     private long totalNumberOfResults;
 
     @JsonIgnore
@@ -46,13 +45,6 @@ public class SearchResultsRest extends ResultsRest {
         searchResults.add(searchResultEntry);
     }
 
-    public String getConfigurationName() {
-        return configurationName;
-    }
-
-    public void setConfigurationName(final String configurationName) {
-        this.configurationName = configurationName;
-    }
 
     public long getTotalNumberOfResults() {
         return totalNumberOfResults;

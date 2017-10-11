@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.link;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -36,5 +37,13 @@ public class HalLinkService {
         }
 
         halResource.add(links);
+    }
+    public String getBaseLink(HALResource halResource){
+        for(HalLinkFactory halLinkFactory : halLinkFactoryLinkedList){
+            if(halLinkFactory.supports(halResource.getClass())){
+                return halLinkFactory.getSelfLink(halResource);
+            }
+        }
+        return null;
     }
 }

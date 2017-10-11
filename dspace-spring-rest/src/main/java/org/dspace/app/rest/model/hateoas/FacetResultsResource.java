@@ -1,11 +1,15 @@
 package org.dspace.app.rest.model.hateoas;
 
+import com.amazonaws.util.StringUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.DiscoveryRestController;
+import org.dspace.app.rest.link.facet.FacetResultsResourceHalLinkFactory;
 import org.dspace.app.rest.model.*;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.content.Collection;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,32 +32,25 @@ public class FacetResultsResource extends HALResource{
     @JsonUnwrapped
     private EmbeddedPage embeddedPage;
 
-
+    @JsonIgnore
+    private String baseLinkString;
     public FacetResultsResource(FacetResultsRest facetResultsRest, Pageable page, Utils utils){
         this.data = facetResultsRest;
         addEmbeds(facetResultsRest, page, utils);
     }
 
-    private void addEmbeds(final FacetResultsRest data, final Pageable page, final Utils utils) {
-        List<SearchFacetValueResource> list = buildEntryList(data);
+    public void addEmbeds(final FacetResultsRest data, final Pageable page, final Utils utils) {
+        List<SearchFacetValueResource> list = buildEntryList(data, utils);
         Page<SearchFacetValueResource> pageImpl = new PageImpl<>(list, page, -1);
-        embeddedPage = new EmbeddedPage(buildBaseLink(data), pageImpl, list);
-        embedResource("values", embeddedPage.getPageContent());
+        if(!StringUtils.isNullOrEmpty(baseLinkString)){
+            embeddedPage = new EmbeddedPage(baseLinkString, pageImpl, list);
+            embedResource("values", embeddedPage.getPageContent());
+        }
     }
-    private static List<SearchFacetValueResource> buildEntryList(final FacetResultsRest data) {
-//        LinkedList<FacetResultEntryResource> list = new LinkedList<>();
-//        for(SearchFacetValueRest searchFacetValueRest : data.getFacetResultList()){
-//            FacetResultEntryRest facetResultEntryRest = new FacetResultEntryRest();
-//            facetResultEntryRest.setName(searchFacetValueRest.getLabel());
-//            facetResultEntryRest.setCount(searchFacetValueRest.getCount());
-//            FacetResultEntryResource facetResultEntryResource = new FacetResultEntryResource(facetResultEntryRest);
-//            list.add(facetResultEntryResource);
-//        }
-//        return list;
-
+    private static List<SearchFacetValueResource> buildEntryList(final FacetResultsRest data, Utils utils) {
         LinkedList<SearchFacetValueResource> list = new LinkedList<>();
         for(SearchFacetValueRest searchFacetValueRest : data.getFacetResultList()){
-            SearchFacetValueResource searchFacetValueResource = new SearchFacetValueResource(searchFacetValueRest, );
+            SearchFacetValueResource searchFacetValueResource = new SearchFacetValueResource(searchFacetValueRest, null, data, utils);
             list.add(searchFacetValueResource);
         }
         return list;
@@ -61,25 +58,7 @@ public class FacetResultsResource extends HALResource{
     public FacetResultsRest getData(){
         return data;
     }
-    private String buildBaseLink(final FacetResultsRest data) {
-
-        //TODO MOVE -> factory
-        DiscoveryRestController methodOn = methodOn(DiscoveryRestController.class);
-
-        UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
-                .getFacetValues(data.getName(), data.getQuery(), data.getDsoType(), data.getScope(), null, null))
-                .toUriComponentsBuilder();
-
-        return addFilterParams(uriComponentsBuilder).build().toString();
-    }
-
-    private UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder) {
-        if (data.getAppliedFilters() != null) {
-            for (SearchResultsRest.AppliedFilter filter : data.getAppliedFilters()) {
-                uriComponentsBuilder.queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());
-            }
-        }
-
-        return uriComponentsBuilder;
+    public void setBaseLinkString(String baseLinkString){
+        this.baseLinkString = baseLinkString;
     }
 }

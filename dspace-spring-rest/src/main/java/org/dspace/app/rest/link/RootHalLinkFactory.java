@@ -39,4 +39,8 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
     protected Class<RootResource> getResourceClass() {
         return RootResource.class;
     }
+
+    protected String getSelfLink(RootResource halResource) {
+        return null;
+    }
 }

@@ -10,9 +10,7 @@ package org.dspace.app.rest.model.hateoas;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.model.SearchFacetEntryRest;
-import org.dspace.app.rest.model.SearchFacetValueRest;
-import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.model.*;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.hateoas.Link;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,9 +30,9 @@ public class SearchFacetValueResource extends HALResource {
     private SearchFacetEntryRest facetData;
 
     @JsonIgnore
-    private SearchResultsRest searchData;
+    private ResultsRest searchData;
 
-    public SearchFacetValueResource(final SearchFacetValueRest data, final SearchFacetEntryRest facetData, final SearchResultsRest searchData, final Utils utils) {
+    public SearchFacetValueResource(final SearchFacetValueRest data, final SearchFacetEntryRest facetData, final ResultsRest searchData, final Utils utils) {
         this.data = data;
         this.facetData = facetData;
         this.searchData = searchData;
@@ -49,12 +47,18 @@ public class SearchFacetValueResource extends HALResource {
         //add search filter for current facet value
         addFilterForFacetValue(baseLink);
 
-        Link link = new Link(baseLink.build().toString(), "narrow");
+        Link link = new Link(baseLink.build().toString(), "search");
         add(link);
     }
 
     private void addFilterForFacetValue(final UriComponentsBuilder baseLink) {
-        baseLink.queryParam("f." + facetData.getName(), data.getFilterValue() + "," + data.getFilterType());
+        //TODO ugly
+        if(facetData!=null){
+            baseLink.queryParam("f." + facetData.getName(), data.getFilterValue() + "," + data.getFilterType());
+        }
+        else{
+            baseLink.queryParam("f." + ((FacetResultsRest) searchData).getName(), data.getLabel() + "," + "equals");
+        }
     }
 
     private UriComponentsBuilder buildBaseLink() {

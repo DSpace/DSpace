@@ -40,6 +40,10 @@ public class SearchSupportHalLinkFactory extends HalLinkFactory<SearchSupportRes
         return SearchSupportResource.class;
     }
 
+    protected String getSelfLink(SearchSupportResource halResource) {
+        return null;
+    }
+
 
     protected Class<DiscoveryRestController> getControllerClass() {
         return DiscoveryRestController.class;
