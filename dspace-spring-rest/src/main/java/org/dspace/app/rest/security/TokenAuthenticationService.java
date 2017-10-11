@@ -4,6 +4,7 @@ import com.nimbusds.jose.JOSEException;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -32,8 +33,9 @@ public class TokenAuthenticationService {
     public void addAuthentication(HttpServletRequest request, HttpServletResponse response, String email) {
         try {
             EPerson ePerson = ePersonService.findByEmail(ContextUtil.obtainContext(request), email);
-            List<Group> groups = authenticationService.getSpecialGroups(ContextUtil.obtainContext(request), request);
-            String token = jwtTokenHandler.createTokenForEPerson(ePerson, groups);
+            Context context = ContextUtil.obtainContext(request);
+            List<Group> groups = authenticationService.getSpecialGroups(context, request);
+            String token = jwtTokenHandler.createTokenForEPerson(context, ePerson, groups);
             Cookie cookie = new Cookie("access_token", token);
             response.addCookie(cookie);
         } catch (JOSEException e) {
