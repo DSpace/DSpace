@@ -42,8 +42,8 @@
     <xsl:variable name="isModal" select="dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='modal']/text()='true'"/>
 
     <!--the max thumbnail height & width from dspace.cfg, needed for item view and item list pages-->
-    <xsl:variable name="thumbnail.maxheight" select="confman:getIntProperty('thumbnail.maxheight', 80)"/>
-    <xsl:variable name="thumbnail.maxwidth" select="confman:getIntProperty('thumbnail.maxwidth', 80)"/>
+    <xsl:variable name="thumbnail.maxheight" select="confman:getIntProperty('thumbnail.maxheight', 150)"/>
+    <xsl:variable name="thumbnail.maxwidth" select="confman:getIntProperty('thumbnail.maxwidth', 150)"/>
     <!-- item details url -->
     <xsl:variable name="ds_item_view_toggle_url" select="//dri:p[contains(@rend , 'item-view-toggle') and
         (preceding-sibling::dri:referenceSet[@type = 'summaryView'] or following-sibling::dri:referenceSet[@type = 'summaryView'])]/dri:xref/@target"/>
@@ -61,6 +61,16 @@
         <xsl:text>/</xsl:text>
         <xsl:value-of select="$pagemeta/dri:metadata[@element='request'][@qualifier='URI']"/>
     </xsl:variable>
+
+    <!--
+        Base URI of the site. Composed of scheme, server name and port.
+    -->
+    <xsl:variable name="base-uri">
+        <xsl:value-of select="$pagemeta/dri:metadata[@element='request'][@qualifier='scheme']"/>
+        <xsl:text>://</xsl:text>
+        <xsl:value-of select="$pagemeta/dri:metadata[@element='request'][@qualifier='serverName']"/>
+    </xsl:variable>
+
 
     <xsl:variable name="SFXLink">
         <xsl:if test="$pagemeta/dri:metadata[@element='sfx'][@qualifier='server']">
