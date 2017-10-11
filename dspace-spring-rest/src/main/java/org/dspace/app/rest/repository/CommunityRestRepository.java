@@ -17,7 +17,6 @@ import org.dspace.app.rest.converter.CommunityConverter;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.hateoas.CommunityResource;
 import org.dspace.content.Community;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,10 @@ import org.springframework.stereotype.Component;
 
 @Component(CommunityRest.CATEGORY + "." + CommunityRest.NAME)
 public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest, UUID> {
-	CommunityService cs = ContentServiceFactory.getInstance().getCommunityService();
+
+	@Autowired
+	CommunityService cs;
+
 	@Autowired
 	CommunityConverter converter;
 

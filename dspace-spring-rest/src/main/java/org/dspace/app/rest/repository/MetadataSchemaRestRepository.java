@@ -14,7 +14,6 @@ import org.dspace.app.rest.converter.MetadataSchemaConverter;
 import org.dspace.app.rest.model.MetadataSchemaRest;
 import org.dspace.app.rest.model.hateoas.MetadataSchemaResource;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.MetadataSchemaService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,10 @@ import org.springframework.stereotype.Component;
  */
 @Component(MetadataSchemaRest.CATEGORY + "." + MetadataSchemaRest.NAME)
 public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataSchemaRest, Integer> {
-	MetadataSchemaService metaScemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+
+	@Autowired
+	MetadataSchemaService metaScemaService;
+
 	@Autowired
 	MetadataSchemaConverter converter;
 

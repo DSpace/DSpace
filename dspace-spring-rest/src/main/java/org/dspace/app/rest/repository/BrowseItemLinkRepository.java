@@ -10,7 +10,6 @@ package org.dspace.app.rest.repository;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +24,6 @@ import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
@@ -56,9 +54,11 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 	@Autowired
 	ItemRestRepository itemRestRepository;
 
-	CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
-	
-	CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+	@Autowired
+	CollectionService collectionService;
+
+	@Autowired
+	CommunityService communityService;
 
 	public Page<ItemRest> listBrowseItems(HttpServletRequest request, String browseName, Pageable pageable, String projection)
 			throws BrowseException, SQLException {

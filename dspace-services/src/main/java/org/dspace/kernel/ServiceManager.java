@@ -10,6 +10,8 @@ package org.dspace.kernel;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.ConfigurableApplicationContext;
+
 /**
  * Allows for non-specific access to the core services.
  * No dependency on the underlying mechanism is exposed.
@@ -17,6 +19,11 @@ import java.util.Map;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public interface ServiceManager {
+
+    /**
+     * Get the application context
+     */
+    public ConfigurableApplicationContext getApplicationContext();
 
     /**
      * Allows developers to get the desired service singleton by the provided type. <br>

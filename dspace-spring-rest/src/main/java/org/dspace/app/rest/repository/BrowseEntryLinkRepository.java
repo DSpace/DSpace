@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.function.Consumer;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +26,6 @@ import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.core.Context;
@@ -56,9 +54,11 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 	@Autowired
 	BrowseIndexConverter bixConverter;
 
-	CollectionService collectionService = ContentServiceFactory.getInstance().getCollectionService();
+	@Autowired
+	CollectionService collectionService;
 
-	CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
+	@Autowired
+	CommunityService communityService;
 
 	// FIXME It will be nice to drive arguments binding by annotation as in normal spring controller methods
 	public Page<BrowseEntryRest> listBrowseEntries(HttpServletRequest request, String browseName,
@@ -67,7 +67,7 @@ public class BrowseEntryLinkRepository extends AbstractDSpaceRestRepository
 		// argument
 		String scope = null;
 		if (request != null) {
-			request.getParameter("scope");
+			scope = request.getParameter("scope");
 		}
 
 		Context context = obtainContext();

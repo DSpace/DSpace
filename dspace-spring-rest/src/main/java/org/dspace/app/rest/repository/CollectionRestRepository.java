@@ -16,7 +16,6 @@ import org.dspace.app.rest.converter.CollectionConverter;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.hateoas.CollectionResource;
 import org.dspace.content.Collection;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,10 @@ import org.springframework.stereotype.Component;
 
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME)
 public class CollectionRestRepository extends DSpaceRestRepository<CollectionRest, UUID> {
-	CollectionService cs = ContentServiceFactory.getInstance().getCollectionService();
+
+	@Autowired
+	CollectionService cs;
+
 	@Autowired
 	CollectionConverter converter;
 	

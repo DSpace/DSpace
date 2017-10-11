@@ -17,7 +17,6 @@ import org.dspace.app.rest.converter.ItemConverter;
 import org.dspace.app.rest.model.ItemRest;
 import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.content.Item;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,10 @@ import org.springframework.stereotype.Component;
 
 @Component(ItemRest.CATEGORY + "." + ItemRest.NAME)
 public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
-	ItemService is = ContentServiceFactory.getInstance().getItemService();
+
+	@Autowired
+	ItemService is;
+
 	@Autowired
 	ItemConverter converter;
 	

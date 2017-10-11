@@ -7,7 +7,13 @@
  */
 package org.dspace.servicemanager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -24,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * This is the core service manager which ties together the other
@@ -299,6 +306,11 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
             }
         }
         return service;
+    }
+
+    @Override
+    public ConfigurableApplicationContext getApplicationContext() {
+        return primaryServiceManager.getApplicationContext();
     }
 
     public <T> List<T> getServicesByType(Class<T> type) {

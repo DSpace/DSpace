@@ -20,7 +20,6 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.hateoas.BitstreamResource;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,10 @@ import org.springframework.stereotype.Component;
 
 @Component(BitstreamRest.CATEGORY + "." + BitstreamRest.NAME)
 public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest, UUID> {
-	BitstreamService bs = ContentServiceFactory.getInstance().getBitstreamService();
+
+	@Autowired
+	BitstreamService bs;
+
 	@Autowired
 	BitstreamConverter converter;
 	

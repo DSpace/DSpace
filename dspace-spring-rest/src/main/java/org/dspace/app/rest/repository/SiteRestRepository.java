@@ -16,7 +16,6 @@ import org.dspace.app.rest.converter.SiteConverter;
 import org.dspace.app.rest.model.SiteRest;
 import org.dspace.app.rest.model.hateoas.SiteResource;
 import org.dspace.content.Site;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.SiteService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,10 @@ import org.springframework.stereotype.Component;
 
 @Component(SiteRest.CATEGORY + "." + SiteRest.NAME)
 public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
-	SiteService sitesv = ContentServiceFactory.getInstance().getSiteService();
+
+	@Autowired
+	SiteService sitesv;
+
 	@Autowired
 	SiteConverter converter;
 	
