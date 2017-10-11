@@ -94,6 +94,7 @@ public class HarvestConsumer implements Consumer
                         log.debug("Deleted collection '" + id + "' and the associated harvested_collection.");
                     }
                 }
+                break;
             default:
                 log.warn("consume() got unrecognized event: " + event.toString());
         }

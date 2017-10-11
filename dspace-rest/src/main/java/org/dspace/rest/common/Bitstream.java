@@ -71,7 +71,7 @@ public class Bitstream extends DSpaceObject {
         }
 
         //A logo bitstream might not have a bundle...
-        if (bitstream.getBundles() != null & bitstream.getBundles().size() >= 0)
+        if (bitstream.getBundles() != null && !bitstream.getBundles().isEmpty())
         {
             if (bitstreamService.getParentObject(context, bitstream).getType() == Constants.ITEM)
             {

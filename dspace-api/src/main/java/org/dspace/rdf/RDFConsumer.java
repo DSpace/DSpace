@@ -74,6 +74,7 @@ public class RDFConsumer implements Consumer
             case (Constants.BITSTREAM) :
             {
                 this.consumeBitstream(ctx, event);
+                return;
             }
             case (Constants.BUNDLE) :
             {

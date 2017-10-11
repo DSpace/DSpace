@@ -142,7 +142,7 @@ public abstract class AbstractMETSDisseminator
      * change whenever Zip is regenerated (even if compressed files are unchanged)
      * 1036368000 seconds * 1000 = Nov 4, 2002 GMT (the date DSpace 1.0 was released)
      */
-    protected static final int DEFAULT_MODIFIED_DATE = 1036368000 * 1000;
+    protected static final long DEFAULT_MODIFIED_DATE = 1036368000L * 1000;
 
     /**
      * Suffix for Template objects (e.g. Item Templates)
