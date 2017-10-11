@@ -2,6 +2,7 @@ package org.dspace.app.rest.converter;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.FacetResultsRest;
+import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
@@ -35,21 +36,17 @@ public class DiscoverFacetResultsConverter {
                 if(valueCount >= MAX_RESULTS){
                     break;
                 }
-                SearchFacetValueRest valueRest = buildSearchFacetValueRestFromFacetResult(value);
-                facetResultsRest.addToFacetResultList(valueRest);
+                SearchFacetValueRest searchFacetValueRest = buildSearchFacetValueRestFromFacetResult(value);
+                facetResultsRest.addToFacetResultList(searchFacetValueRest);
                 valueCount++;
             }
     }
 
     private SearchFacetValueRest buildSearchFacetValueRestFromFacetResult(DiscoverResult.FacetResult value) {
-        SearchFacetValueRest valueRest = new SearchFacetValueRest();
-        valueRest.setLabel(value.getDisplayedValue());
-        valueRest.setFilterValue(value.getAsFilterQuery());
-        valueRest.setFilterType(value.getFilterType());
-        valueRest.setAuthorityKey(value.getAuthorityKey());
-        valueRest.setSortValue(value.getSortValue());
-        valueRest.setCount(value.getCount());
-        return valueRest;
+        SearchFacetValueRest searchFacetValueRest = new SearchFacetValueRest();
+        searchFacetValueRest.setLabel(value.getDisplayedValue());
+        searchFacetValueRest.setCount(value.getCount());
+        return searchFacetValueRest;
     }
 
     private void setRequestInformation(Context context, String facetName, DiscoverQuery discoverQuery, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, FacetResultsRest facetResultsRest, Pageable page) {
@@ -68,6 +65,7 @@ public class DiscoverFacetResultsConverter {
             SearchResultsRest.Sorting sort = new SearchResultsRest.Sorting(sort2.name());
             facetResultsRest.setSort(sort);
         }
+        facetResultsRest.setSearchFilters(searchFilters);
         SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new SearchFilterToAppliedFilterConverter();
         for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
             facetResultsRest.addAppliedFilter(searchFilterToAppliedFilterConverter.convertSearchFilter(context, searchFilter));

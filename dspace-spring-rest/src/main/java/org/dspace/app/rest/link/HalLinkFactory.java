@@ -70,4 +70,6 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
 
     protected abstract Class<RESOURCE> getResourceClass();
 
+    protected abstract String getSelfLink(RESOURCE halResource);
+
 }

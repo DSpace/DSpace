@@ -36,4 +36,9 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
     protected Class<DSpaceResource> getResourceClass() {
         return null;
     }
+
+    protected String getSelfLink(DSpaceResource halResource) {
+        return null;
+    }
+
 }

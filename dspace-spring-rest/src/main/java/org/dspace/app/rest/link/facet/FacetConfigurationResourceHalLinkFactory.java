@@ -37,6 +37,10 @@ public class FacetConfigurationResourceHalLinkFactory extends HalLinkFactory<Fac
         return FacetConfigurationResource.class;
     }
 
+    protected String getSelfLink(FacetConfigurationResource halResource) {
+        return null;
+    }
+
 
     protected Class<DiscoveryRestController> getControllerClass() {
         return DiscoveryRestController.class;
