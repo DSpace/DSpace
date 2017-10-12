@@ -74,7 +74,6 @@
                             </systemPropertyVariables>
                         </configuration>
                     </plugin>
-                    
                 </plugins>
             </build>
         </profile>

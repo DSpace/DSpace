@@ -771,18 +771,6 @@
             </modules>
         </profile>
 
-        <profile>
-            <id>dspace-reports</id>
-            <activation>
-                <file>
-                    <exists>dspace-reports/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>dspace-reports</module>
-            </modules>
-        </profile>
-
         <!--
          The 'release' profile is used by the 'maven-release-plugin' (see above)
          to actually perform a DSpace software release to Maven central.
