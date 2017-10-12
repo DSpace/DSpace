@@ -9,6 +9,7 @@ import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.RESTModelException;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
@@ -482,7 +483,7 @@ public class JournalUtils {
         return items;
     }
 
-    public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript, StringBuilder resultString) {
+    public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript, StringBuilder resultString) throws RESTModelException {
         String crossRefURL = null;
         if (resultString == null) {
             resultString = new StringBuilder();
@@ -530,6 +531,8 @@ public class JournalUtils {
             log.debug("No matches returned for URL " + crossRefURL);
         } catch (FileNotFoundException e) {
             log.debug("CrossRef does not have data for URL " + crossRefURL);
+        } catch (RESTModelException e) {
+            throw e;
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder();
             for (StackTraceElement element : e.getStackTrace()) {
@@ -582,12 +585,11 @@ public class JournalUtils {
         return numMatched;
     }
 
-    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) {
+    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) throws RESTModelException {
         // manuscripts should only be returned if the crossref match is of type "journal-article"
         if (jsonNode.path("type") != null) {
             if (!"journal-article".equals(jsonNode.path("type").textValue())) {
-                log.error("crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
-                return null;
+                throw new RESTModelException("crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
             }
         }
 
