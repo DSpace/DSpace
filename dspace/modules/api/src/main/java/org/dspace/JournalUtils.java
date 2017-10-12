@@ -550,7 +550,7 @@ public class JournalUtils {
                 return null;
             }
             if (!queryManuscript.getJournalISSN().equals(matchedManuscript.getJournalISSN())) {
-                return null;
+                throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
             }
         }
         return matchedManuscript;
