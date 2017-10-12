@@ -12,31 +12,33 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.InputFormRest;
 import org.dspace.app.rest.model.SubmissionPanelRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * SubmissionDefinition Rest HAL Resource. The HAL Resource wraps the REST Resource
+ * SubmissionPanel Rest HAL Resource. The HAL Resource wraps the REST Resource
  * adding support for the links and embedded resources
  * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
 @RelNameDSpaceResource(SubmissionPanelRest.NAME)
-public class SubmissionPanelResource extends ResourceSupport {
-	public SubmissionPanelResource(SubmissionPanelRest sd, String... rels) {
-		InputFormRest ifr = new InputFormRest();
-		RestResourceController methodOn = methodOn(RestResourceController.class, ifr.getCategory(), ifr.getType());
-		UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
-				.findRel(null, ifr.getCategory(), English.plural(ifr.getType()), sd.getId(), InputFormRest.NAME, null, null, null))
-				.toUriComponentsBuilder();
-		Link link = new Link(uriComponentsBuilder.build().toString(), InputFormRest.NAME);
-		add(link);
+public class SubmissionPanelResource extends DSpaceResource<SubmissionPanelRest> {
+
+	public SubmissionPanelResource(SubmissionPanelRest sd, Utils utils, String... rels) {
+		super(sd, utils, rels);	
+		if("input-form".equals(sd.getPanelType())) {
+			RestResourceController methodOn = methodOn(RestResourceController.class, InputFormRest.CATEGORY, InputFormRest.NAME);
+			UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
+					.findRel(null, InputFormRest.CATEGORY, English.plural(InputFormRest.NAME), sd.getId(), "", null, null, null))
+					.toUriComponentsBuilder();
+			String uribuilder = uriComponentsBuilder.build().toString();
+			Link link = new Link(uribuilder.substring(0, uribuilder.lastIndexOf("/")), InputFormRest.NAME);
+			add(link);	
+		}		
 	}
 }

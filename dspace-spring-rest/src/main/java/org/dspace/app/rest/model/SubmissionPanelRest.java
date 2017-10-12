@@ -8,10 +8,9 @@
 
 package org.dspace.app.rest.model;
 
-import java.io.Serializable;
-
 import org.dspace.app.rest.RestResourceController;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -23,15 +22,15 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value=Include.NON_NULL)
-public class SubmissionPanelRest implements RestModel {
+public class SubmissionPanelRest extends BaseObjectRest<String> {
+	
 	public static final String NAME = "panel";	
 	private String header;
-	private String id;
 	private boolean mandatory;
-	private String type;
+	private String panelType;
 	private ScopeEnum scope;
 	private SubmissionVisibilityRest visibility;
-
+	
 	public String getHeader() {
 		return header;
 	}
@@ -49,11 +48,7 @@ public class SubmissionPanelRest implements RestModel {
 	}
 
 	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
+		return "panel";
 	}
 
 	public ScopeEnum getScope() {
@@ -74,14 +69,6 @@ public class SubmissionPanelRest implements RestModel {
 		}
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	@Override
 	public String getCategory() {
 		return SubmissionDefinitionRest.CATEGORY;
@@ -90,6 +77,14 @@ public class SubmissionPanelRest implements RestModel {
 	@Override
 	public Class getController() {
 		return RestResourceController.class;
+	}
+
+	public String getPanelType() {
+		return panelType;
+	}
+
+	public void setPanelType(String panelType) {
+		this.panelType = panelType;
 	}
 
 }

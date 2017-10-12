@@ -11,14 +11,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.app.rest.model.InputFormRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionPanelRest;
-import org.dspace.app.rest.model.SubmissionVisibilityRest;
-import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,6 +27,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionConfig, SubmissionDefinitionRest> {
 
+	@Autowired
+	private SubmissionPanelConverter panelConverter;
+	
 	@Override
 	public SubmissionDefinitionRest fromModel(SubmissionConfig obj) {
 		SubmissionDefinitionRest sd = new SubmissionDefinitionRest();
@@ -39,23 +39,12 @@ public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionCon
 		for (int idx = 0; idx < obj.getNumberOfSteps(); idx++) {
 			SubmissionStepConfig step = obj.getStep(idx);
 			if (step.isVisible()) {
-				SubmissionPanelRest sp = getPanel(step);
+				SubmissionPanelRest sp = panelConverter.convert(step);				
 				panels.add(sp);
 			}
 		}
 		sd.setPanels(panels);
 		return sd;
-	}
-
-	private SubmissionPanelRest getPanel(SubmissionStepConfig step) {
-		SubmissionPanelRest sp = new SubmissionPanelRest();
-		sp.setMandatory(step.isMandatory());
-		sp.setHeader(step.getHeading());
-		sp.setType(step.getType());
-		sp.setId(step.getId());
-		sp.setVisibility(new SubmissionVisibilityRest(VisibilityEnum.fromString(step.getVisibility()),
-				VisibilityEnum.fromString(step.getVisibilityOutside())));
-		return sp;
 	}
 
 	@Override

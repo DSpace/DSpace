@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -19,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+
+
 public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 	public static final String NAME = "submission-definition";
 	public static final String CATEGORY = RestModel.CONFIGURATION;
@@ -47,6 +50,8 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 		this.panels = panels;
 	}
 	
+	@LinkRest(linkClass = SubmissionPanelRest.class)
+	@JsonIgnore
 	public List<SubmissionPanelRest> getPanels() {
 		return panels;
 	}
