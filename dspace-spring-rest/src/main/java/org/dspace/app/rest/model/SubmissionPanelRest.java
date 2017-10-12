@@ -19,12 +19,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  * as inline object in the SubmissionDefinition resource
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
 @JsonInclude(value=Include.NON_NULL)
 public class SubmissionPanelRest extends BaseObjectRest<String> {
 	
-	public static final String NAME = "panel";	
+	public static final String NAME = "submission-panel";	
 	private String header;
 	private boolean mandatory;
 	private String panelType;
@@ -48,7 +49,7 @@ public class SubmissionPanelRest extends BaseObjectRest<String> {
 	}
 
 	public String getType() {
-		return "panel";
+		return "submission-panel";
 	}
 
 	public ScopeEnum getScope() {
