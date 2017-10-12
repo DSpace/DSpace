@@ -583,6 +583,14 @@ public class JournalUtils {
     }
 
     public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) {
+        // manuscripts should only be returned if the crossref match is of type "journal-article"
+        if (jsonNode.path("type") != null) {
+            if (!"journal-article".equals(jsonNode.path("type").textValue())) {
+                log.error("crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
+                return null;
+            }
+        }
+
         Manuscript manuscript = new Manuscript();
         if (jsonNode.path("DOI") != null) {
             manuscript.setPublicationDOI(jsonNode.path("DOI").textValue());
