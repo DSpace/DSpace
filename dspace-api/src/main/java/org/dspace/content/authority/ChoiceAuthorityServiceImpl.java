@@ -312,7 +312,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 							ChoiceAuthority ca = controller.get(authorityName);
 							if (ca == null) {
 								InputFormSelfRegisterWrapperAuthority ifa = new InputFormSelfRegisterWrapperAuthority();
-								//TODO ifa.getDelegates().put(null, ca);
+								ifa.getDelegates().put(authorityName, ca);
 								controller.put(fieldKey, ifa);
 							} else {
 								ca = (InputFormSelfRegisterWrapperAuthority)ca;
@@ -321,14 +321,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 							
 							authorityNames.add(authorityName);
 							
-						} else if (StringUtils.isNotBlank(dcinput.getVocabulary())) {
-							String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
-									dcinput.getQualifier());
-							String authorityName = dcinput.getVocabulary();
-							ChoiceAuthority ca = controller.get(authorityName);
-							controller.put(fieldKey, ca);
-							authorityNames.add(authorityName);
-						}
+						} 
 					}
 			}
 		} catch (DCInputsReaderException e) {
