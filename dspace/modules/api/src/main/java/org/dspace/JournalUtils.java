@@ -549,6 +549,9 @@ public class JournalUtils {
             if (!compareTitleToManuscript(queryManuscript.getTitle(), matchedManuscript, 0.5, resultString)) {
                 return null;
             }
+            if (!queryManuscript.getJournalISSN().equals(matchedManuscript.getJournalISSN())) {
+                return null;
+            }
         }
         return matchedManuscript;
     }
