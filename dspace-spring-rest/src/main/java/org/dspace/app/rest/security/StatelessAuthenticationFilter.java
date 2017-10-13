@@ -32,7 +32,6 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
 
         Cookie cookie = WebUtils.getCookie(req,"access_token");
 
-
         if (cookie == null ) {
             chain.doFilter(req, res);
             return;
@@ -48,9 +47,9 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
 
         if (token != null) {
             // parse the token.
-            EPerson eperson = tokenAuthenticationService.getAuthentication(token);
+            EPerson eperson = tokenAuthenticationService.getAuthentication(token, request);
             if (eperson != null) {
-                return new UsernamePasswordAuthenticationToken(eperson, null, new ArrayList<>());
+                return new UsernamePasswordAuthenticationToken(eperson.getEmail(), null, new ArrayList<>());
             }
             return null;
         }

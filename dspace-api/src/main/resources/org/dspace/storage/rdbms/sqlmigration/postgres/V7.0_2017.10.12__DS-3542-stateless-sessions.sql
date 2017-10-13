@@ -1,0 +1,1 @@
+alter table eperson add session_salt varchar(16);

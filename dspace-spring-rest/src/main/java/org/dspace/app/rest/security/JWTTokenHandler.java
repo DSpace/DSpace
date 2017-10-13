@@ -15,6 +15,7 @@ import org.dspace.eperson.service.EPersonService;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
+import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
@@ -27,14 +28,22 @@ public class JWTTokenHandler {
     private static String jwtKey = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest";
     private AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+    public static final String EPERSON_ID = "eid";
+    public static final String SPECIAL_GROUPS = "sg";
 
-    public EPerson parseEPersonFromToken(String token) throws JOSEException, ParseException, SQLException {
+    public EPerson parseEPersonFromToken(String token, HttpServletRequest request) throws JOSEException, ParseException, SQLException {
 
         SignedJWT signedJWT = SignedJWT.parse(token);
         Context context = new Context();
-        EPerson ePerson = ePersonService.find(context, UUID.fromString(signedJWT.getJWTClaimsSet().getClaim("EPersonID").toString()));
-        JWSVerifier verifier = new MACVerifier(jwtKey + ePerson.getJwtSalt());
-        if (signedJWT.verify(verifier)) {
+        EPerson ePerson = ePersonService.find(context, UUID.fromString(signedJWT.getJWTClaimsSet().getClaim(EPERSON_ID).toString()));
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+        JWSVerifier verifier = new MACVerifier(jwtKey + ePerson.getSessionSalt() + ipAddress);
+
+        //If token is valid and not expired return eperson in token
+        if (signedJWT.verify(verifier) && new Date().getTime() < signedJWT.getJWTClaimsSet().getExpirationTime().getTime()) {
             return ePerson;
         } else {
             return null;
@@ -42,13 +51,17 @@ public class JWTTokenHandler {
     }
 
 
-    public String createTokenForEPerson(Context context, EPerson ePerson, List<Group> groups) throws JOSEException {
+    public String createTokenForEPerson(Context context, HttpServletRequest request, EPerson ePerson, List<Group> groups) throws JOSEException {
         StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
         String salt = stringKeyGenerator.generateKey();
-        JWSSigner signer = new MACSigner(jwtKey + salt);
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+        JWSSigner signer = new MACSigner(jwtKey + salt + ipAddress);
 
-        List<Integer> groupIds = groups.stream().map(Group::getLegacyId).collect(Collectors.toList());
-        ePerson.setJwtSalt(salt);
+        List<String> groupIds = groups.stream().map(group -> group.getID().toString()).collect(Collectors.toList());
+        ePerson.setSessionSalt(salt);
         try {
             context.commit();
         } catch (SQLException e) {
@@ -56,8 +69,9 @@ public class JWTTokenHandler {
         }
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .claim("EPersonID", ePerson.getID().toString())
-                .claim("special_groups", groupIds)
+                .claim(EPERSON_ID, ePerson.getID().toString())
+                .claim(SPECIAL_GROUPS, groupIds)
+                //TODO Expiration time configurable in config
                 .expirationTime(new Date(new Date().getTime() + 60 * 1000))
                 .build();
 

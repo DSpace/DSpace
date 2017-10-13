@@ -65,8 +65,8 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column(name="salt", length = 32)
     private String salt;
 
-    @Column(name="jwt_salt", length = 16)
-    private String jwtSalt;
+    @Column(name="session_salt", length = 16)
+    private String sessionSalt;
 
     @Column(name="digest_algorithm", length = 16)
     private String digestAlgorithm;
@@ -437,11 +437,11 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
         return ePersonService;
     }
 
-    public String getJwtSalt() {
-        return jwtSalt;
+    public String getSessionSalt() {
+        return sessionSalt;
     }
 
-    public void setJwtSalt(String jwtSalt) {
-        this.jwtSalt = jwtSalt;
+    public void setSessionSalt(String sessionSalt) {
+        this.sessionSalt = sessionSalt;
     }
 }

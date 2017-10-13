@@ -35,7 +35,8 @@ public class TokenAuthenticationService {
             EPerson ePerson = ePersonService.findByEmail(ContextUtil.obtainContext(request), email);
             Context context = ContextUtil.obtainContext(request);
             List<Group> groups = authenticationService.getSpecialGroups(context, request);
-            String token = jwtTokenHandler.createTokenForEPerson(context, ePerson, groups);
+            String token = jwtTokenHandler.createTokenForEPerson(context, request, ePerson, groups);
+            //TODO token is saved in a cookie, but might be better to save it in http header
             Cookie cookie = new Cookie("access_token", token);
             response.addCookie(cookie);
         } catch (JOSEException e) {
@@ -46,9 +47,10 @@ public class TokenAuthenticationService {
 
     }
 
-    public EPerson getAuthentication(String token) {
+    public EPerson getAuthentication(String token, HttpServletRequest request) {
         try {
-            return jwtTokenHandler.parseEPersonFromToken(token);
+            EPerson ePerson = jwtTokenHandler.parseEPersonFromToken(token, request);
+            return ePerson;
         } catch (JOSEException e) {
             e.printStackTrace();
         } catch (ParseException e) {

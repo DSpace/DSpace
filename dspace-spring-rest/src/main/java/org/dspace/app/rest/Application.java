@@ -7,12 +7,6 @@
  */
 package org.dspace.app.rest;
 
-import java.io.File;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.servlet.Filter;
-
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
 import org.dspace.app.rest.utils.ApplicationConfig;
@@ -41,6 +35,13 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.servlet.Filter;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import java.io.File;
 
 /**
  * Define the Spring Boot Application settings itself. This class takes the place
@@ -126,7 +127,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    public RequestContextListener requestContextListener() {
+    public RequestContextListener requestContextListener(){
         return new RequestContextListener();
     }
 
