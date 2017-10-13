@@ -20,7 +20,7 @@
  
  <!ELEMENT step (heading?, processing-class, type, scope?) >
  <!ATTLIST step 
- 		   id NMTOKEN #IMPLIED
+ 		   id NMTOKEN #REQUIRED
  		   mandatory NMTOKEN #IMPLIED>
  
  <!ELEMENT heading (#PCDATA) >

@@ -40,63 +40,19 @@
  <!--																	   -->
  <!-- The following properties are OPTIONAL for each <step>:			   -->
  <!-- <heading> -    References the message key, from the 				   -->
- <!--			     Messages.properties file (JSP-UI) or messages.xml     -->
- <!--                (XML-UI) which will be used as this step's heading in -->
- <!--			     the progress-bar.  If unspecified, the step does not  -->
- <!--			     show up in the Progress Bar.  Keys in the <heading>   -->
- <!--				 are prefixed as follows in the appropriate 		   -->
- <!--				 "messages" file:							           -->
- <!--						XML-UI:  "xmlui.Submission." prefix			   -->
- <!--						JSP-UI:  "jsp." prefix			   			   -->
- <!-- <jspui-binding> - JSP-UI binding step class which will generate the JSP-->
- <!--                 based user interface for this step.  The class must  -->
- <!--                 extend 'org.dspace.app.webui.submit.JSPStep'.        -->
- <!--                 This property should reference the full path of the  -->
- <!--                 class.  It is only necessary if you are using the    -->
- <!--                 DSpace JSP-UI, and the step requires user interaction-->
- <!-- <xmlui-binding> - XML-UI binding step class which will generate the  -->
- <!--                 Manakin XML (DRI) structure for this step.  The class-->
- <!--                 must extend                                          -->
- <!--                 'org.dspace.app.xmlui.aspect.submission.StepTransformer'.-->
- <!--                 This property should reference the full path of the  -->
- <!--                 class.  It is only necessary if you are using the    -->
- <!--                 DSpace XML-UI, and the step requires user interaction-->
- <!-- <workflow-editable> - whether or not this step will appear during the-->
- <!--				 "Edit Metadata" workflow approval process.  This field-->
- <!--				 defaults to TRUE (which means it can be edited during -->
- <!--				 the "Edit Metadata" workflow stage)				   -->
- <!--                                                                      -->
+ <!--			     Messages.properties 
  <!--                                                                      -->
  <step-definitions>
-     <!-- The "collection" step is a "special step" which is *REQUIRED* to be-->
-     <!-- in this section!  In DSpace, all submitted items must be           -->
-     <!-- immediately assigned to a collection. This step ensures that a     -->
-     <!-- collection is always selected.  If a user is already submitting    -->
-     <!-- from within a Collection (by clicking the "Submit to This          -->
-     <!-- Collection" button) then this step will be automatically skipped.  -->
-     <!-- In all other cases, this step ensures that the user *first* selects-->
-     <!-- a collection!                                                      -->
-     <!-- Since this is a "special step", it is *automatically* added at the -->
-     <!-- beginning of each 'submission-process' (therefore it should not be -->
-     <!-- referenced by any of the below 'submission-process' tags).  Also as-->
-     <!-- a special step, it is currently NEVER editable in a workflow.      -->                              
-     <step id="collection">
-       <heading></heading> <!--can specify heading, if you want it to appear in Progress Bar-->
-	   <processing-class>org.dspace.submit.step.SelectCollectionStep</processing-class>
-       <type>collection</type>
-     </step>
      
-      <step id="traditionalpageone">      	
+      <step id="traditionalpageone" mandatory="true">      	
         <heading>submit.progressbar.describe.stepone</heading>
         <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
         <type>input-form</type>
-        <mandatory>true</mandatory>
       </step>
-      <step id="traditionalpagetwo">      	
+      <step id="traditionalpagetwo" mandatory="true">      	
         <heading>submit.progressbar.describe.steptwo</heading>
         <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
         <type>input-form</type>
-        <mandatory>true</mandatory>
       </step>
       <step id="upload">
         <heading>submit.progressbar.upload</heading>
@@ -109,176 +65,41 @@
         <type>license</type>
         <scope visibilityOutside="read-only">submission</scope>
       </step>    
-	 <!-- Uncomment this to make available the bibliographic import from external source - note ONLY for JSPUI -->     
-	 <!-- <step id="collection">
-       <heading></heading> can specify heading, if you want it to appear in Progress Bar
-	   <processing-class>org.dspace.submit.step.StartSubmissionLookupStep</processing-class>
-       <jspui-binding>org.dspace.app.webui.submit.step.JSPStartSubmissionLookupStep</jspui-binding>
-       <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.SelectCollectionStep</xmlui-binding>
-       <workflow-editable>false</workflow-editable>
-     </step> -->
-   
-     <!-- The "complete" step is a "special step" which is *REQUIRED* to be-->
-     <!-- in this section!  In DSpace, when a submission is completed,       -->
-     <!-- a workflow is automatically kicked off (if one exists)             -->
-     <!-- This "complete" step performs all backend processing that occurs   -->
-     <!-- immediately upon completing the submission.                        -->
-     <!-- Since this is a "special step", it is *automatically* added at the -->
-     <!-- end of each 'submission-process' (therefore it should not be       -->
-     <!-- referenced by any of the below 'submission-process' tags).  Also as-->
-     <!-- a special step, it is currently NEVER editable in a workflow.      -->                               
-     <step id="complete">
-       <heading>submit.progressbar.complete</heading>
-       <processing-class>org.dspace.submit.step.CompleteStep</processing-class>
-       <jspui-binding>org.dspace.app.webui.submit.step.JSPCompleteStep</jspui-binding>
-       <workflow-editable>false</workflow-editable>
-     </step>
-   
-     <!-- This is the Sample Step which utilizes the JSPSampleStep class-->
-     <step id="sample">
-       <heading>Sample</heading>
-       <processing-class>org.dspace.submit.step.SampleStep</processing-class>
-       <jspui-binding>org.dspace.app.webui.submit.step.JSPSampleStep</jspui-binding>
-       <workflow-editable>true</workflow-editable>
-     </step>
- </step-definitions>
 
- <!-- The submission-definitions map lays out the detailed definition of   -->
- <!-- all the Item Submission Processes (and the ordering of their steps). -->
- <!-- Each separate "submission-process" has a unique name as an attribute,-->
- <!-- which matches one of the names in the process-map. One named         -->
- <!-- "submit-process" has the name "traditional"; as this name suggests,  -->
- <!-- it is the default item submission process, which gets used when      -->
- <!-- the specified collection has no correspondingly named submit-process.-->
- <!--                                                                      -->
- <!-- Each submit-process contains an ordered set of steps; each step      -->
- <!-- defines one "step" occurring during the process of submitting an     -->
- <!-- item.  A step can either be referenced by 'id' (in which case it must-->
- <!-- be defined in <step-definitions> above), or defined completely here. -->
- <!--                                                                      -->
- <!-- If the step is not referred to by 'id', then the <step> REQUIRES the -->
- <!-- following properties are defined:                                    --> 
- <!-- <processing-class> - The class which will process all information for-->
- <!--             this step. The class must implement the                  -->
- <!--             'org.dspace.app.webui.submit.JSPStep' interface AND      -->
- <!--             extend 'org.dspace.submit.AbstractProcessingStep'        -->
- <!--             (or one of the org.dspace.submit.step.* classes)         -->
- <!--             This property should reference the full path of the class-->
- <!--			  (e.g. org.dspace.app.webui.submit.MyCustomJSPStep)       -->
- <!--                                                                      -->
- <!-- The following properties are OPTIONAL for each <step>:			   -->
- <!-- <heading> -    References the message key, from the 				   -->
- <!--			     Messages.properties file (JSP-UI) or messages.xml     -->
- <!--                (XML-UI) which will be used as this step's heading in -->
- <!--			     the progress-bar.  If unspecified, the step does not  -->
- <!--			     show up in the Progress Bar.  Keys in the <heading>   -->
- <!--				 are prefixed as follows in the appropriate 		   -->
- <!--				 "messages" file:							           -->
- <!--						XML-UI:  "xmlui.Submission." prefix			   -->
- <!--						JSP-UI:  "jsp." prefix			   			   -->
- <!-- <jspui-binding> - JSP-UI binding step class which will generate the JSP-->
- <!--                 based user interface for this step.  The class must  -->
- <!--                 extend 'org.dspace.app.webui.submit.JSPStep'.        -->
- <!--                 This property should reference the full path of the  -->
- <!--                 class.  It is only necessary if you are using the    -->
- <!--                 DSpace JSP-UI, and the step requires user interaction-->
- <!-- <xmlui-binding> - XML-UI binding step class which will generate the  -->
- <!--                 Manakin XML (DRI) structure for this step.  The class-->
- <!--                 must extend                                          -->
- <!--                 'org.dspace.app.xmlui.aspect.submission.StepTransformer'.-->
- <!--                 This property should reference the full path of the  -->
- <!--                 class.  It is only necessary if you are using the    -->
- <!--                 DSpace XML-UI, and the step requires user interaction-->
- <!-- <workflow-editable> - whether or not this step will appear during the-->
- <!--				 "Edit Metadata" workflow approval process.  This field-->
- <!--				 defaults to TRUE (which means it can be edited during -->
- <!--				 the "Edit Metadata" workflow stage).  Set to either   -->
- <!--				 "true" or "false".				                       -->
- <!--                                                                      -->
- <submission-definitions>
-   
-   <!--This "traditional" process defines the DEFAULT item submission process-->
-   <submission-process name="traditional">
-     
-     <!--Uncommment to display the SAMPLE step as your first step-->
-     <!--<step id="sample"/>-->
-
-	 <!-- Step 1. Since DSpace 4.0, the initial questions has been disabled. Metadata are shown exactly as 
-	 	  required in input-forms and items are assumed to have always multiple-files attached.
-	      If re-enable the initial questions step you should comment out this step-->
-	 <step>
-		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
-	 </step>
-          
-     <!--Disabled by default Since DSpace 4.0: Step 1 will be to gather initial information
-	  <step>
-	    <heading>submit.progressbar.initial-questions</heading>
-		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
-		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
-	    <workflow-editable>true</workflow-editable>
-	  </step> -->
-
-       <!-- Find publications based on ID/DOI/Title/Author to pre-fill the submission. XMLUI ONLY.
-            For JSPUI version, see JSPUIStartSubmissionLookupStep under <step-definitions> above.
-       <step>
-           <heading>submit.progressbar.lookup</heading>
-           <processing-class>org.dspace.submit.step.XMLUIStartSubmissionLookupStep</processing-class>
-           <xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.StartSubmissionLookupStep</xmlui-binding>
-           <workflow-editable>true</workflow-editable>
-       </step>
-        -->
-      <!--Step 2 will be to Describe the item.-->
-      <step id="traditionalpageone"/>      	
-      <step id="traditionalpagetwo"/>      	
-       <!--Step 3 will be to Manage Item access.
-       <step>
-           <heading>submit.progressbar.access</heading>
-           <processing-class>org.dspace.submit.step.AccessStep</processing-class>
-           <type>access</type>
-       </step>
-       -->
-
-      <!--Step 4 will be to Upload the item -->
-      <step id="upload"/>
-      
-
-       <!-- Step 4 Upload Item with Embargo Features
+       <!-- Step Upload Item with Embargo Features
             to enable this step, please make sure to comment-out the previous step "UploadStep"  
-       <step>
+       <step id="upload-with-embargo">
            <heading>submit.progressbar.upload</heading>
            <processing-class>org.dspace.submit.step.UploadWithEmbargoStep</processing-class>
            <type>uploadWithEmbargo</type>
        </step>
        -->
 
- 	  <!--Step 5 will be to Verify/Review everything -->
-<!--  	  <step>
-        <heading>submit.progressbar.verify</heading>
-        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
- 	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
-		<workflow-editable>true</workflow-editable>
-      </step> -->
 
-      <!--Step 6 will be to select a Creative Commons License-->
+      <!--Step will be to select a Creative Commons License-->
       <!-- Uncomment this step to allow the user to select a Creative Commons license -->
        <!--
-      <step>
+      <step id="creative-commons">      	
         <heading>submit.progressbar.CClicense</heading>
         <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
         <type>cclicense</type>
       </step>
       -->
-
-      <!--Step 7 will be to Sign off on the License-->
-      <step id="license"/>
-
-	  <!--Step 8 will be to Check for potential duplicate -->
-<!--        <step>
+      	  
+	  <!--Step will be to Check for potential duplicate -->
+	  <!--  <step id="detect-duplicate">
+	  		<heading>submit.progressbar.detect.duplicate</heading>
            <processing-class>org.dspace.submit.step.DetectPotentialDuplicate</processing-class>
+           <type>duplicate</type>
        </step> -->
-     
+
+ 	  <!--Step will be to Verify/Review everything -->
+	  <!--  <step id="verify">
+        <heading>submit.progressbar.verify</heading>
+        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+		<type>verify</type>
+      </step> -->
+           
      <!-- Fake Steps to test parsing of all options -->
      <!-- 
        <step mandatory="false">
@@ -295,6 +116,50 @@
         <scope visibility="read-only">workflow</scope>
        </step> 
      -->
+   
+     <!-- This is the Sample Step which utilizes the JSPSampleStep class-->
+     <step id="sample">
+       <heading>Sample</heading>
+       <processing-class>org.dspace.submit.step.SampleStep</processing-class>
+       <type>sample</type>
+     </step>
+ </step-definitions>
+
+ <!-- The submission-definitions map lays out the detailed definition of   -->
+ <!-- all the Item Submission Processes (and the ordering of their steps). -->
+ <!-- Each separate "submission-process" has a unique name as an attribute,-->
+ <!-- which matches one of the names in the process-map. One named         -->
+ <!-- "submit-process" has the name "traditional"; as this name suggests,  -->
+ <!-- it is the default item submission process, which gets used when      -->
+ <!-- the specified collection has no correspondingly named submit-process.-->
+ <!--                                                                      -->
+ <!-- Each submit-process contains an ordered set of steps; each step      -->
+ <!-- defines one "step" occurring during the process of submitting an     -->
+ <!-- item.  A step MUST be referenced by 'id' (it must-->
+ <!-- be defined in <step-definitions> above). -->
+ <!--                                                                      --> 
+ <!--                                                                      -->
+ <submission-definitions>
+   
+   <!--This "traditional" process defines the DEFAULT item submission process-->
+   <submission-process name="traditional">
+     
+      <!--Uncommment to display the SAMPLE step as your first step-->
+      <!--<step id="sample"/>-->
+          
+      <!--Step - will be to Describe the item.-->
+      <step id="traditionalpageone"/>      	
+      <step id="traditionalpagetwo"/>      	
+
+      <!--Step - will be to Upload the item -->
+      <step id="upload"/>
+      <!-- <step id="upload-with-embargo"/> -->      
+      <!-- <step id="detect-duplicate"/> -->
+
+      <!--Step - will be to Sign off on the License-->
+      <step id="license"/>
+      <!-- <step id="creative-commons"/> -->
+	  <!-- <step id="verify"/> -->
    </submission-process>
 
  </submission-definitions>
