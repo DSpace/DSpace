@@ -40,4 +40,5 @@ META-INF/
 ##Mac noise
 .DS_Store
 
+##Ignore JRebel project configuration
 rebel.xml
