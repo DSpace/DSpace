@@ -436,23 +436,6 @@ public class SubmissionConfigReader
                     "step-definition section has no steps! A step with id='collection' is required in 'item-submission.xml'!");
         }
 
-        // Sanity check to see that the required "collection" step is defined
-        if (!stepDefns.containsKey(SubmissionStepConfig.SELECT_COLLECTION_STEP))
-        {
-            throw new ServletException(
-                    "The step-definition section is REQUIRED to have a step with id='"
-                            + SubmissionStepConfig.SELECT_COLLECTION_STEP
-                            + "' in 'item-submission.xml'!  This step is used to ensure that a new item submission is assigned to a collection.");
-        }
-
-        // Sanity check to see that the required "complete" step is defined
-        if (!stepDefns.containsKey(SubmissionStepConfig.COMPLETE_STEP))
-        {
-            throw new ServletException(
-                    "The step-definition section is REQUIRED to have a step with id='"
-                            + SubmissionStepConfig.COMPLETE_STEP
-                            + "' in 'item-submission.xml'!  This step is used to perform all processing necessary at the completion of the submission (e.g. starting workflow).");
-        }
     }
 
     /**
@@ -559,23 +542,6 @@ public class SubmissionConfigReader
                             "Item Submission process config named "
                                     + submitName + " has no steps defined in 'item-submission.xml'");
                 }
-
-                // ALL Item Submission processes MUST BEGIN with selecting a
-                // Collection. So, automatically insert in the "collection" step
-                // (from the 'step-definition' section)
-                // Note: we already did a sanity check that this "collection"
-                // step exists.
-                steps.add(0, stepDefns
-                        .get(SubmissionStepConfig.SELECT_COLLECTION_STEP));
-
-                // ALL Item Submission processes MUST END with the
-                // "Complete" processing step.
-                // So, automatically append in the "complete" step
-                // (from the 'step-definition' section)
-                // Note: we already did a sanity check that this "complete"
-                // step exists.
-                steps.add(stepDefns
-                        .get(SubmissionStepConfig.COMPLETE_STEP));
 
             }
         }
