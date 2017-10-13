@@ -7,11 +7,9 @@
  */
 package org.dspace.app.rest.utils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -21,9 +19,9 @@ import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.content.Collection;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.factory.ContentAuthorityServiceFactory;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,8 +33,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthorityUtils {
 
-	private ChoiceAuthorityService cas = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
-	private MetadataAuthorityService mas = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
+	public static final String PRESENTATION_TYPE_LOOKUP = "lookup";
+
+	public static final String PRESENTATION_TYPE_SUGGEST = "suggest";
+	
+	@Autowired
+	private ChoiceAuthorityService cas;
 
 	public AuthorityRest getAuthority(String schema, String element, String qualifier) {
 		return buildAuthorityRest(cas.getChoiceAuthorityName(schema, element, qualifier), schema, element, qualifier);
@@ -140,5 +142,9 @@ public class AuthorityUtils {
 
 	public boolean isClosed(String schema, String element, String qualifier) {
 		return cas.isClosed(standardize(schema, element, qualifier, "_"));
+	}
+
+	public String getPresentation(String schema, String element, String qualifier) {		
+		return cas.getPresentation(standardize(schema, element, qualifier, "_"));
 	}
 }

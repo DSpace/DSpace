@@ -36,6 +36,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRest> {
+	
+	private static final String INPUT_TYPE_ONEBOX = "onebox";
+	private static final String INPUT_TYPE_NAME = "name";
+	private static final String INPUT_TYPE_LOOKUP = "lookup";
+	private static final String INPUT_TYPE_LOOKUP_NAME = "lookup-name";
+
 	@Autowired
 	private Utils utils;
 	
@@ -80,23 +86,28 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 		inputField.setRepeatable(dcinput.isRepeatable());
 
 		InputFormInputTypeRest inputRest = new InputFormInputTypeRest();
-		inputRest.setType(dcinput.getInputType());
+		
 		inputRest.setRegex(dcinput.getRegex());
 		
 		if (!StringUtils.equalsIgnoreCase(inputRest.getType(), "qualdrop_value")) {
 			// value-pair and vocabulary are a special kind of authorities
-
+			String inputType = dcinput.getInputType();
+			
 			SelectableMetadata selMd = new SelectableMetadata();
 			if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
+				inputRest.setType(getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
 				selMd.setAuthority(
 						authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
 				selMd.setClosed(authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+			}
+			else {
+				inputRest.setType(inputType);		
 			}
 			selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
 			selectableMetadata.add(selMd);
 
 		} else {
-			inputRest.setType("onebox");
+			inputRest.setType(INPUT_TYPE_ONEBOX);
 			List<String> pairs = dcinput.getPairs();
 			for (int idx = 0; idx < pairs.size(); idx += 2) {
 				SelectableMetadata selMd = new SelectableMetadata();
@@ -112,6 +123,27 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 		}
 		inputField.setInput(inputRest);
 		return inputField;
+	}
+
+	private String getPresentation(String schema, String element, String qualifier, String inputType) 
+	{
+		String presentation = authorityUtils.getPresentation(schema, element, qualifier);
+		if(StringUtils.isNotBlank(presentation)) {
+			if(INPUT_TYPE_ONEBOX.equals(inputType)) {
+				if(AuthorityUtils.PRESENTATION_TYPE_SUGGEST.equals(presentation)) {
+					return INPUT_TYPE_ONEBOX;
+				}
+				else if(AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation)) {
+					return INPUT_TYPE_LOOKUP;
+				}
+			}
+			else if(INPUT_TYPE_NAME.equals(inputType)) {
+				if(AuthorityUtils.PRESENTATION_TYPE_LOOKUP.equals(presentation)) {
+					return INPUT_TYPE_LOOKUP_NAME;
+				}
+			}
+		}
+		return inputType;
 	}
 
 	@Override
