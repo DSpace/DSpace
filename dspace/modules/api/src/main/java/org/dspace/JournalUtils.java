@@ -519,11 +519,11 @@ public class JournalUtils {
                 JsonNode bestItem = itemsNode.get(0);
                 float score = bestItem.path("score").floatValue();
                 if (score > 3.0) {
-                    matchedManuscript = manuscriptFromCrossRefJSON(bestItem, queryManuscript.getJournalConcept());
+                    matchedManuscript = manuscriptFromCrossRefJSON(bestItem);
                 }
             } else {
                 itemsNode = rootNode.path("message");
-                matchedManuscript = manuscriptFromCrossRefJSON(itemsNode, queryManuscript.getJournalConcept());
+                matchedManuscript = manuscriptFromCrossRefJSON(itemsNode);
             }
         } catch (JsonParseException e) {
             log.debug("Couldn't find JSON matching URL " + crossRefURL);
@@ -545,12 +545,12 @@ public class JournalUtils {
 
         // sanity check:
         if (matchedManuscript != null) {
+            if (!queryManuscript.getJournalISSN().equals(matchedManuscript.getJournalISSN())) {
+                throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
+            }
             // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
             if (!compareTitleToManuscript(queryManuscript.getTitle(), matchedManuscript, 0.5, resultString)) {
                 return null;
-            }
-            if (!queryManuscript.getJournalISSN().equals(matchedManuscript.getJournalISSN())) {
-                throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
             }
         }
         return matchedManuscript;
@@ -588,7 +588,7 @@ public class JournalUtils {
         return numMatched;
     }
 
-    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) throws RESTModelException {
+    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode) throws RESTModelException {
         // manuscripts should only be returned if the crossref match is of type "journal-article"
         if (jsonNode.path("type") != null) {
             if (!"journal-article".equals(jsonNode.path("type").textValue())) {
@@ -638,9 +638,17 @@ public class JournalUtils {
         if (jsonNode.path("issue") != null) {
             manuscript.setJournalNumber(jsonNode.path("issue").textValue());
         }
-
-        if (dryadJournalConcept != null) {
-            manuscript.setJournalConcept(dryadJournalConcept);
+        if (jsonNode.path("ISSN") != null && jsonNode.path("ISSN").isArray()) {
+            for (JsonNode issnNode : jsonNode.path("ISSN")) {
+                DryadJournalConcept dryadJournalConcept = getJournalConceptByISSN(issnNode.textValue());
+                if (dryadJournalConcept != null) {
+                    manuscript.setJournalConcept(dryadJournalConcept);
+                    break;
+                }
+            }
+        }
+        if (manuscript.getJournalConcept() == null) {
+            throw new RESTModelException("couldn't find journal concept");
         }
         manuscript.setStatus(Manuscript.STATUS_PUBLISHED);
         return manuscript;
