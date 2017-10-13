@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class InputFormRest extends BaseObjectRest<String> {
 	public static final String NAME = "input-form";
+	public static final String NAME_LINK_ON_PANEL = RestModel.CONFIGURATION;
 	public static final String CATEGORY = RestModel.CONFIGURATION;
 
 	private String name;

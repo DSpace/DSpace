@@ -32,12 +32,12 @@ public class SubmissionPanelResource extends DSpaceResource<SubmissionPanelRest>
 	public SubmissionPanelResource(SubmissionPanelRest sd, Utils utils, String... rels) {
 		super(sd, utils, rels);	
 		if("input-form".equals(sd.getPanelType())) {
-			RestResourceController methodOn = methodOn(RestResourceController.class, InputFormRest.CATEGORY, InputFormRest.NAME);
+			RestResourceController methodOn = methodOn(RestResourceController.class, InputFormRest.CATEGORY, InputFormRest.NAME);			
 			UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
 					.findRel(null, InputFormRest.CATEGORY, English.plural(InputFormRest.NAME), sd.getId(), "", null, null, null))
 					.toUriComponentsBuilder();
 			String uribuilder = uriComponentsBuilder.build().toString();
-			Link link = new Link(uribuilder.substring(0, uribuilder.lastIndexOf("/")), InputFormRest.NAME);
+			Link link = new Link(uribuilder.substring(0, uribuilder.lastIndexOf("/")), InputFormRest.NAME_LINK_ON_PANEL);
 			add(link);	
 		}		
 	}
