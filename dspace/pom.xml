@@ -27,7 +27,7 @@
 
     <profiles>
 
-        <!-- Build Profile. This builds all Overlay modules for DSpace -->   
+        <!-- Build Profile. This builds all Overlay modules for DSpace -->
         <profile>
             <id>build</id>
             <activation>
@@ -39,7 +39,7 @@
             <!-- Build all Overlay submodules -->
             <modules>
                 <module>modules</module>
-            </modules> 
+            </modules>
         </profile>
 
         <!--
@@ -86,8 +86,8 @@
             </build>
         </profile>
 
-        <!-- This profile simply determines whether we are creating 
-             zip / tarball distributions to upload to SourceFore or similar. 
+        <!-- This profile simply determines whether we are creating
+             zip / tarball distributions to upload to SourceFore or similar.
              By running "mvn package -Ddistributions=true" you'll
              SKIP normal build & assembly (see above profiles) and
              INSTEAD just run the "distributions" profile below. -->
@@ -103,7 +103,7 @@
             <properties>
                 <distributions>false</distributions>
             </properties>
-        </profile> 
+        </profile>
 
 
         <!--
