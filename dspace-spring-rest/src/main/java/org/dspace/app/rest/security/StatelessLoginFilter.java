@@ -46,6 +46,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
 
+        //TODO every time we log in a new token and salt is created, might need to change this
         tokenAuthenticationService.addAuthentication(req, res, auth.getName());
 
     }

@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -25,22 +26,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.headers().cacheControl();
 
         http
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .exceptionHandling().and()
                 .anonymous().and()
                 .servletApi().and()
                 .csrf().disable()
                 .authorizeRequests()
 
-                .antMatchers(HttpMethod.GET, "/").permitAll()
-                .antMatchers(HttpMethod.POST, "/").permitAll()
-                .antMatchers(HttpMethod.POST, "/api").permitAll()
-                .antMatchers(HttpMethod.GET, "/api").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/login").permitAll()
+
+                .antMatchers(HttpMethod.POST, "/login").permitAll()
+                .antMatchers(HttpMethod.GET, "/status").authenticated()
 
 
-                .anyRequest().authenticated().and()
+                .and()
 
-                .addFilterBefore(new StatelessLoginFilter("/api/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new StatelessLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 
                 // Custom Token based authentication based on the header previously given to the client
                 .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager()),  UsernamePasswordAuthenticationFilter.class);
