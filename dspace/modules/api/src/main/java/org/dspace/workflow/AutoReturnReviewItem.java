@@ -168,6 +168,9 @@ public class AutoReturnReviewItem {
     }
 
     private static void setOlderThanDate() {
+        if (olderThan < 1) {
+            olderThan = 2;
+        }
         Calendar calendar = new GregorianCalendar();
         calendar.roll(Calendar.YEAR, -olderThan);
 
