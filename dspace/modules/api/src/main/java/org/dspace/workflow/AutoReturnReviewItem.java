@@ -76,6 +76,7 @@ public class AutoReturnReviewItem {
                 }
             }
         } else if (line.hasOption('a')) {
+            System.out.println("purging items older than " + olderThanDate.toString());
             purgeOldItems();
         } else {
             System.out.println("No option was provided.");
