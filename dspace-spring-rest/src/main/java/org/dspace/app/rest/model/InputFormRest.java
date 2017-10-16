@@ -20,14 +20,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 public class InputFormRest extends BaseObjectRest<String> {
-	public static final String NAME = "input-form";
+	public static final String NAME = "submission-form";
 	public static final String NAME_LINK_ON_PANEL = RestModel.CONFIGURATION;
 	public static final String CATEGORY = RestModel.CONFIGURATION;
 
 	private String name;
-	
-	@JsonProperty(value="isDefault")
-	private boolean defaultConf;
 	
 	private List<InputFormPageRest> pages;
 
@@ -55,14 +52,6 @@ public class InputFormRest extends BaseObjectRest<String> {
 	@Override
 	public String getType() {
 		return NAME;
-	}
-	
-	public void setDefaultConf(boolean isDefault) {
-		this.defaultConf = isDefault;
-	}
-	
-	public boolean isDefaultConf() {
-		return defaultConf;
 	}
 	
 	@Override
