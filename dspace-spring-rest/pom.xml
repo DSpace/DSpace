@@ -252,6 +252,10 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.1</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
 
         <!-- TEST DEPENDENCIES -->
         <dependency> <!-- Keep jmockit before junit -->

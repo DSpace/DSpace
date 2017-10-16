@@ -81,7 +81,7 @@ public class AbstractDSpaceTest
             if (!kernelImpl.isRunning())
             {
                 // NOTE: the "dspace.dir" system property MUST be specified via Maven
-                kernelImpl.start(System.getProperty("dspace.dir")); // init the kernel
+                kernelImpl.start(getDspaceDir()); // init the kernel
             }
 
             // Initialize mock Util class (allows Util.getSourceVersion() to work in Unit tests)
@@ -110,5 +110,9 @@ public class AbstractDSpaceTest
             kernelImpl.destroy();
         }
         kernelImpl = null;
+    }
+    public static String getDspaceDir(){
+        return System.getProperty("dspace.dir");
+
     }
 }

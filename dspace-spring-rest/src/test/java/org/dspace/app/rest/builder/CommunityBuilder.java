@@ -1,27 +1,24 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.builder;
 
-import java.sql.SQLException;
-
 import org.dspace.content.Community;
-import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.CommunityService;
+import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
-import org.dspace.discovery.IndexingService;
 import org.dspace.discovery.SearchServiceException;
-import org.dspace.services.factory.DSpaceServicesFactory;
 
 /**
- * TODO TOM UNIT TEST
+ * Builder to construct Community objects
  */
-public class CommunityBuilder {
-
-    protected CommunityService communityService = ContentServiceFactory.getInstance().getCommunityService();
-    protected IndexingService indexingService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
+public class CommunityBuilder extends AbstractBuilder<Community> {
 
     private Community community;
-    private Context context;
 
     public CommunityBuilder createCommunity(final Context context) {
         return createSubCommunity(context, null);
@@ -40,24 +37,25 @@ public class CommunityBuilder {
     }
 
     public CommunityBuilder withName(final String communityName) {
-        try {
-            communityService.setMetadataSingleValue(context, community, MetadataSchema.DC_SCHEMA, "title", null, Item.ANY, communityName);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return this;
+        return setMetadataSingleValue(community, MetadataSchema.DC_SCHEMA, "title", null, communityName);
     }
 
+    @Override
     public Community build() {
-        context.dispatchEvents();
         try {
+            communityService.update(context, community);
+            context.dispatchEvents();
+
             indexingService.commit();
-        } catch (SearchServiceException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
         return community;
     }
 
+    @Override
+    protected DSpaceObjectService<Community> getDsoService() {
+        return communityService;
+    }
 }
