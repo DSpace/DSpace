@@ -60,7 +60,7 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 			try {
 				collection = cs.find(context, UUID.fromString(uuidCollectìon));
 			} catch (SQLException e) {
-				new RuntimeException(e);
+				throw new RuntimeException(e);
 			}
 		}
 		List<AuthorityEntryRest> authorities = authorityUtils.query(metadata, query, collection, pageable.getOffset(), pageable.getPageSize(), context.getCurrentLocale());
