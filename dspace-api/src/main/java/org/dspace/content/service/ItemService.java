@@ -105,7 +105,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Iterator<Item> findBySubmitterDateSorted(Context context, EPerson eperson, Integer limit) throws SQLException;
 
     /**
-     * Get all the items in this collection. The order is indeterminate.
+     * Get all the archived items in this collection. The order is indeterminate.
      *
      * @param context DSpace context object
      * @param collection Collection (parent)
@@ -115,7 +115,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Iterator<Item> findByCollection(Context context, Collection collection) throws SQLException;
 
     /**
-     * Get all the items in this collection. The order is indeterminate.
+     * Get all the archived items in this collection. The order is indeterminate.
      *
      * @param context DSpace context object
      * @param collection Collection (parent)
@@ -137,7 +137,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
             throws SQLException;
 
     /**
-     * Get all the items in this collection. The order is indeterminate.
+     * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
      *
      * @param context DSpace context object
      * @param collection Collection (parent)
@@ -147,7 +147,7 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     public Iterator<Item> findAllByCollection(Context context, Collection collection) throws SQLException;
 
     /**
-     * Get all the items in this collection. The order is indeterminate.
+     * Get all the items (including private and withdrawn) in this collection. The order is indeterminate.
      *
      * @param context DSpace context object
      * @param collection Collection (parent)
