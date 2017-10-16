@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * Integration test for the {@link RootRestResourceController}
  */
-public class RootRestResourceControllerTest extends AbstractControllerIntegrationTest {
+public class RootRestResourceControllerIT extends AbstractControllerIntegrationTest {
 
     @Test
     public void listDefinedEndpoint() throws Exception {

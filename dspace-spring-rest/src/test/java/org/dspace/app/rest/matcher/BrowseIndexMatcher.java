@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.matcher;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
@@ -8,8 +15,13 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
-public class BrowseIndexMatchers {
-    public BrowseIndexMatchers() {
+/**
+ * Utility class to construct a Matcher for a browse index
+ */
+public class BrowseIndexMatcher {
+
+    public BrowseIndexMatcher() {
+
     }
 
     public static Matcher<? super Object> subjectBrowseIndex(final String order) {

@@ -47,7 +47,7 @@ import org.springframework.web.context.WebApplicationContext;
         TransactionalTestExecutionListener.class})
 @DirtiesContext
 @WebAppConfiguration
-public class AbstractControllerIntegrationTest extends AbstractUnitTestWithDatabase {
+public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     public static final String REST_SERVER_URL = "http://localhost/api/";
 

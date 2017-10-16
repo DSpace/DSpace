@@ -28,9 +28,9 @@ import org.junit.BeforeClass;
 /**
  * Abstract Test class that will initialize the in-memory database
  */
-public class AbstractUnitTestWithDatabase extends AbstractDSpaceTest {
+public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrationTest {
     /** log4j category */
-    private static final Logger log = Logger.getLogger(AbstractUnitTestWithDatabase.class);
+    private static final Logger log = Logger.getLogger(AbstractIntegrationTestWithDatabase.class);
 
     /**
      * Context mock object to use in the tests.
@@ -54,7 +54,7 @@ public class AbstractUnitTestWithDatabase extends AbstractDSpaceTest {
      * NOTE: Per JUnit, "The @BeforeClass methods of superclasses will be run before those the current class."
      * http://junit.org/apidocs/org/junit/BeforeClass.html
      * <p>
-     * This method builds on the initialization in AbstractDSpaceTest, and
+     * This method builds on the initialization in AbstractDSpaceIntegrationTest, and
      * initializes the in-memory database for tests that need it.
      */
     @BeforeClass
@@ -152,7 +152,7 @@ public class AbstractUnitTestWithDatabase extends AbstractDSpaceTest {
             if(eperson != null) {
                 EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
             }
-            
+
             parentCommunity = null;
             cleanupContext(context);
         } catch (Exception e) {

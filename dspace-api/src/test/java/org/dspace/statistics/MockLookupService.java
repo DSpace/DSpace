@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
+import org.dspace.AbstractDSpaceTest;
 
 /**
  * Mock service to mock the location Lookup Service used by the SOLR statistics logger
@@ -20,7 +21,7 @@ public class MockLookupService extends LookupService {
 
     public MockLookupService() throws IOException {
         //Just give our super class a file so that he's happy. We'll mock all responses anyway.
-        super(System.getProperty("dspace.dir") + File.separator + "config" + File.separator + "dspace.cfg");
+        super(AbstractDSpaceTest.getDspaceDir() + File.separator + "config" + File.separator + "dspace.cfg");
     }
 
     @Override

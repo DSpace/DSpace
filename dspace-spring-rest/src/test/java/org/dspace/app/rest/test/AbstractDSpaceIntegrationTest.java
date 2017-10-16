@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.AfterClass;
@@ -24,10 +25,11 @@ import org.junit.BeforeClass;
 /**
  * Abstract Test class copied from DSpace API
  */
-public class AbstractDSpaceTest
+public class AbstractDSpaceIntegrationTest
 {
+
     /** log4j category */
-    private static final Logger log = Logger.getLogger(AbstractDSpaceTest.class);
+    private static final Logger log = Logger.getLogger(AbstractDSpaceIntegrationTest.class);
 
     /**
      * Test properties. These configure our general test environment
@@ -57,7 +59,7 @@ public class AbstractDSpaceTest
 
             //load the properties of the tests
             testProps = new Properties();
-            URL properties = AbstractDSpaceTest.class.getClassLoader()
+            URL properties = AbstractDSpaceIntegrationTest.class.getClassLoader()
                     .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
@@ -66,8 +68,9 @@ public class AbstractDSpaceTest
             if (!kernelImpl.isRunning())
             {
                 // NOTE: the "dspace.dir" system property MUST be specified via Maven
-                kernelImpl.start(System.getProperty("dspace.dir")); // init the kernel
+                kernelImpl.start(getDspaceDir()); // init the kernel
             }
+            AbstractBuilder.init();
         }
         catch (IOException ex)
         {
@@ -75,7 +78,6 @@ public class AbstractDSpaceTest
             fail("Error initializing tests: " + ex.getMessage());
         }
     }
-
 
     /**
      * This method will be run after all tests finish as per @AfterClass. It
@@ -87,11 +89,18 @@ public class AbstractDSpaceTest
         testProps.clear();
         testProps = null;
 
+        AbstractBuilder.destroy();
+
         //Also clear out the kernel & nullify (so JUnit will clean it up)
         if (kernelImpl != null) {
             kernelImpl.destroy();
         }
         kernelImpl = null;
+    }
+
+    public static String getDspaceDir(){
+        return System.getProperty("dspace.dir");
+
     }
 }
 

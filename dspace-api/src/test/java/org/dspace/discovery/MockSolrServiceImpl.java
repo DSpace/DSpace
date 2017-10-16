@@ -7,8 +7,6 @@
  */
 package org.dspace.discovery;
 
-import org.dspace.solr.MockSolrServer;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +14,12 @@ import org.springframework.stereotype.Service;
  * Mock SOLR service for the Search Core
  */
 @Service
-public class MockSolrServiceImpl extends SolrServiceImpl implements InitializingBean, DisposableBean {
+public class MockSolrServiceImpl extends SolrServiceImpl implements InitializingBean {
 
-    private MockSolrServer mockSolrServer;
-
+    @Override
     public void afterPropertiesSet() throws Exception {
-        mockSolrServer = new MockSolrServer("search");
-        solr = mockSolrServer.getSolrServer();
+        //We don't use SOLR in the tests of this module
+        solr = null;
     }
 
-    public void destroy() throws Exception {
-        mockSolrServer.destroy();
-    }
 }
