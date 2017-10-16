@@ -1538,19 +1538,11 @@
         contextPath = request.getContextPath();
 		lcl = request.getLocale();
 		String keyCollectionName = StringUtils.deleteWhitespace(collectionName.toLowerCase());
-		String info1Key = "jsp.submit.edit-metadata.info1." + keyCollectionName;
-		String info2Key = "jsp.submit.edit-metadata.info2." + keyCollectionName;
-		String messageInfo1 = I18nUtil.getMessage(info1Key, lcl, false);
-		String messageInfo2 = I18nUtil.getMessage(info2Key, lcl, false);
+		String infoKey = "jsp.submit.edit-metadata.info"+pageNum+"." + keyCollectionName;
+		String messageInfo = I18nUtil.getMessage(infoKey, lcl, false);
+		String anchorKey = "jsp.submit.edit-metadata.describe"+pageNum+"." + keyCollectionName;
+		String anchorHelp = I18nUtil.getMessage("jsp.submit.edit-metadata.describe"+pageNum+"."+keyCollectionName, lcl, false);
 		
-		String anchorHelp2 = I18nUtil.getMessage("jsp.submit.edit-metadata.describe2."+keyCollectionName, lcl, false);
-		String anchorHelp3 = I18nUtil.getMessage("jsp.submit.edit-metadata.describe3."+keyCollectionName, lcl, false);
-		if(("jsp.submit.edit-metadata.describe2."+keyCollectionName).equals(anchorHelp2)) {
-		    anchorHelp2 = "#describe2";
-		}
-		if(("jsp.submit.edit-metadata.describe3."+keyCollectionName).equals(anchorHelp3)) {
-		    anchorHelp3 = "#describe3";
-		}
 %>
 
   <form action="<%= request.getContextPath() %>/submit#<%= si.getJumpToField()%>" method="post" name="edit_metadata" id="edit_metadata" onkeydown="return disableEnterKey(event);">
@@ -1558,39 +1550,38 @@
         <jsp:include page="/submit/progressbar.jsp"></jsp:include>
 
     <h1><fmt:message key="jsp.submit.edit-metadata.heading"/>
-<%
-     //figure out which help page to display
-     if (pageNum <= 1)
-     {
-%>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + anchorHelp2%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup>
-<%
-     }
-     else
-     {
-%>
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + anchorHelp3%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup>
-<%
-     }
-%>
+  	<%
+		if(!anchorKey.equals(anchorHelp)) {
+	%>  
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + anchorHelp%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup>
+	<% } else { %>
+		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\")%>"><fmt:message key="jsp.submit.edit-metadata.help"/></dspace:popup>
+	<% } %>	
     </h1>
 
-<%
-     //figure out which help page to display
-     if (pageNum <= 1)
-     {
-%>
-        <p><fmt:message key="jsp.submit.edit-metadata.info1"><fmt:param><%= messageInfo1%></fmt:param></fmt:message></p>
-<%
-     }
-     else
-     {
-%>
-        <p><fmt:message key="jsp.submit.edit-metadata.info2"><fmt:param><%= messageInfo2%></fmt:param></fmt:message></p>
-    
-<%
-     }
- 
+	<%
+	if(!infoKey.equals(messageInfo)) {
+	%>    
+	    <p><fmt:message key="jsp.submit.edit-metadata.info1"><fmt:param><%= messageInfo%></fmt:param></fmt:message></p>
+	<%       
+	}
+	else {
+	     //figure out which help page to display
+	     if (pageNum <= 1)
+	     {
+	%>
+	        <p><fmt:message key="jsp.submit.edit-metadata.info1"/></p>
+	<%
+	     }
+	     else
+	     {
+	%>
+	        <p><fmt:message key="jsp.submit.edit-metadata.info2"/></p>
+	    
+	<%
+	     }
+	 }
+	 
 	 int pageIdx = pageNum - 1;
      DCInput[] inputs = inputSet.getPageRows(pageIdx, si.getSubmissionItem().hasMultipleTitles(),
 
