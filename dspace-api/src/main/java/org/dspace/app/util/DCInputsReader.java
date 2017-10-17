@@ -52,7 +52,7 @@ public class DCInputsReader
     public static final String DEFAULT_COLLECTION = "default";
 
     /** Name of the form definition XML file  */
-    static final String FORM_DEF_FILE = "input-forms.xml";
+    static final String FORM_DEF_FILE = "submission-forms.xml";
 
     /** Keyname for storing dropdown value-pair set name */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
