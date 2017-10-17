@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 public class AutoReturnReviewItem {
     private static Date olderThanDate;
     private static Integer olderThan = ConfigurationManager.getIntProperty("autoreturnreview.olderthan");
+    private static boolean testMode = false;
 
     private static final Logger log = Logger.getLogger(AutoReturnReviewItem.class);
 
@@ -41,11 +42,16 @@ public class AutoReturnReviewItem {
 
         options.addOption("i", "wfitemid", true, "The workflow item id");
         options.addOption("a", "all", false, "Process all review items");
+        options.addOption("t", "test", false, "test mode");
         options.addOption("h", "help", false, "help");
 
         setOlderThanDate();
 
         CommandLine line = parser.parse(options, args);
+        if (line.hasOption('t')) {
+            testMode = true;
+            System.out.println("Test Mode: no items will be purged.");
+        }
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
@@ -118,22 +124,24 @@ public class AutoReturnReviewItem {
                     log.debug("Item " + item.getID() + " not found or not in review");
                 } else {
                     if (itemIsOldItemInReview(item)) {
-                        context.turnOffAuthorisationSystem();
-                        String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
                         log.info("returning item " + item.getID());
-                        EPerson ePerson = EPerson.findByEmail(context, ConfigurationManager.getProperty("system.curator.account"));
-                        //Also return all the data files
-                        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, wfi.getItem());
-                        for (Item dataFile : dataFiles) {
-                            try {
-                                WorkflowManager.rejectWorkflowItem(context, WorkflowItem.findByItemId(context, dataFile.getID()), ePerson, null, reason, false);
-                            } catch (Exception e) {
-                                throw new IOException(e);
+                        if (!testMode) {
+                            context.turnOffAuthorisationSystem();
+                            String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
+                            EPerson ePerson = EPerson.findByEmail(context, ConfigurationManager.getProperty("system.curator.account"));
+                            //Also return all the data files
+                            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, wfi.getItem());
+                            for (Item dataFile : dataFiles) {
+                                try {
+                                    WorkflowManager.rejectWorkflowItem(context, WorkflowItem.findByItemId(context, dataFile.getID()), ePerson, null, reason, false);
+                                } catch (Exception e) {
+                                    throw new IOException(e);
+                                }
                             }
-                        }
-                        WorkflowManager.rejectWorkflowItem(context, wfi, ePerson, null, reason, true);
+                            WorkflowManager.rejectWorkflowItem(context, wfi, ePerson, null, reason, true);
 
-                        context.restoreAuthSystemState();
+                            context.restoreAuthSystemState();
+                        }
                     }
                 }
             }
