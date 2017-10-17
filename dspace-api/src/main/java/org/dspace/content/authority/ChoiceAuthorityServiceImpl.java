@@ -302,27 +302,40 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		try {
 			DCInputsReader dcInputsReader = new DCInputsReader();
 			for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {
-					DCInput[] dcinputs = dcinputSet.getFields();
-					for (DCInput dcinput : dcinputs) {
-						if (dcinput.getPairsType() != null
-								&& !StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
+				DCInput[] dcinputs = dcinputSet.getFields();
+				for (DCInput dcinput : dcinputs) {
+					if (StringUtils.isNotBlank(dcinput.getPairsType())
+							|| StringUtils.isNotBlank(dcinput.getVocabulary())) {
+						String authorityName = dcinput.getPairsType();
+						if(StringUtils.isBlank(authorityName)) {
+							authorityName = dcinput.getVocabulary();
+						}
+						if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
 							String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
 									dcinput.getQualifier());
-							String authorityName = "inputForm" + fieldKey;
 							ChoiceAuthority ca = controller.get(authorityName);
 							if (ca == null) {
 								InputFormSelfRegisterWrapperAuthority ifa = new InputFormSelfRegisterWrapperAuthority();
-								ifa.getDelegates().put(authorityName, ca);
+								ChoiceAuthority ma = (ChoiceAuthority)pluginService.getNamedPlugin(ChoiceAuthority.class, authorityName);
+								if (ma == null) {
+									log.warn("Skipping invalid configuration for " + fieldKey
+											+ " because named plugin not found: " + authorityName);
+									continue;
+								}
+								ifa.setDelegate(ma);
 								controller.put(fieldKey, ifa);
 							} else {
-								ca = (InputFormSelfRegisterWrapperAuthority)ca;
+								ca = (InputFormSelfRegisterWrapperAuthority) ca;
 								controller.put(fieldKey, ca);
-							}							
-							
-							authorityNames.add(authorityName);
-							
-						} 
+							}
+							if (!authorities.containsKey(authorityName)) {
+								authorityNames.add(authorityName);
+								authorities.put(authorityName, fieldKey);
+							}
+
+						}
 					}
+				}
 			}
 		} catch (DCInputsReaderException e) {
 			throw new IllegalStateException(e.getMessage(), e);
