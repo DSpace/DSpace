@@ -50,7 +50,9 @@ public class AutoReturnReviewItem {
         CommandLine line = parser.parse(options, args);
         if (line.hasOption('t')) {
             testMode = true;
-            System.out.println("Test Mode: no items will be purged.");
+            System.out.println("-----------------------------------" +
+                               "Test Mode: no items will be purged." +
+                               "-----------------------------------");
         }
         if (line.hasOption('h'))
         {
@@ -82,7 +84,7 @@ public class AutoReturnReviewItem {
                 }
             }
         } else if (line.hasOption('a')) {
-            System.out.println("purging items older than " + olderThanDate.toString());
+            System.out.println("*** Purging all items older than " + olderThanDate.toString());
             purgeOldItems();
         } else {
             System.out.println("No option was provided.");
