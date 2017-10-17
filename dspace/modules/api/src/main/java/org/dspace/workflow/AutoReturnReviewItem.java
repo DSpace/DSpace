@@ -50,8 +50,8 @@ public class AutoReturnReviewItem {
         CommandLine line = parser.parse(options, args);
         if (line.hasOption('t')) {
             testMode = true;
-            System.out.println("-----------------------------------" +
-                               "Test Mode: no items will be purged." +
+            System.out.println("-----------------------------------\n" +
+                               "Test Mode: no items will be purged.\n" +
                                "-----------------------------------");
         }
         if (line.hasOption('h'))
@@ -117,7 +117,9 @@ public class AutoReturnReviewItem {
         try {
             if (wfi != null) {
                 // make sure that this item is updated according to the ApproveReject mechanism:
-                ApproveRejectReviewItem.reviewItem(wfi);
+                if (!testMode) {
+                    ApproveRejectReviewItem.reviewItem(wfi);
+                }
                 claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
                 //Check for a valid task
                 // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
@@ -126,8 +128,10 @@ public class AutoReturnReviewItem {
                     log.debug("Item " + item.getID() + " not found or not in review");
                 } else {
                     if (itemIsOldItemInReview(item)) {
-                        log.info("returning item " + item.getID());
-                        if (!testMode) {
+                        if (testMode) {
+                            log.info("TEST: return item " + item.getID());
+                        } else {
+                            log.info("returning item " + item.getID());
                             context.turnOffAuthorisationSystem();
                             String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
                             EPerson ePerson = EPerson.findByEmail(context, ConfigurationManager.getProperty("system.curator.account"));
