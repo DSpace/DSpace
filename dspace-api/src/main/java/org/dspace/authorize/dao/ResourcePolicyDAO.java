@@ -32,6 +32,8 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
     public List<ResourcePolicy> findByDsoAndType(Context context, DSpaceObject dSpaceObject, String type)
         throws SQLException;
 
+    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson) throws SQLException;
+
     public List<ResourcePolicy> findByGroup(Context context, Group group) throws SQLException;
 
     public List<ResourcePolicy> findByDSoAndAction(Context context, DSpaceObject dso, int actionId) throws SQLException;
@@ -64,6 +66,8 @@ public interface ResourcePolicyDAO extends GenericDAO<ResourcePolicy> {
     public void deleteByDsoGroupPolicies(Context context, DSpaceObject dso, Group group) throws SQLException;
 
     public void deleteByDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson) throws SQLException;
+
+    public void deleteAllEPersonPolicies(Context context, EPerson ePerson) throws SQLException;
 
     public void deleteByDsoAndTypeNotEqualsTo(Context c, DSpaceObject o, String type) throws SQLException;
 }

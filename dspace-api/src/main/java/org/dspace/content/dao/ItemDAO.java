@@ -46,6 +46,9 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item> {
 
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson) throws SQLException;
 
+    public Iterator<Item> findBySubmitter(Context context, EPerson eperson, boolean retrieveAllItems)
+        throws SQLException;
+
     public Iterator<Item> findBySubmitter(Context context, EPerson eperson, MetadataField metadataField, int limit)
         throws SQLException;
 

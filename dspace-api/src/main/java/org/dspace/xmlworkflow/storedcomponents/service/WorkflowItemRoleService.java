@@ -33,5 +33,7 @@ public interface WorkflowItemRoleService extends DSpaceCRUDService<WorkflowItemR
 
     public void deleteForWorkflowItem(Context context, XmlWorkflowItem wfi) throws SQLException, AuthorizeException;
 
+    public void deleteByEPerson(Context context, EPerson ePerson) throws SQLException, AuthorizeException;
+
     public List<WorkflowItemRole> findByEPerson(Context context, EPerson ePerson) throws SQLException;
 }

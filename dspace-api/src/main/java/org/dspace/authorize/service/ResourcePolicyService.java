@@ -38,6 +38,8 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public List<ResourcePolicy> find(Context context, Group group) throws SQLException;
 
+    public List<ResourcePolicy> find(Context c, EPerson ePerson) throws SQLException;
+
     public List<ResourcePolicy> find(Context c, EPerson e, List<Group> groups, int action, int type_id)
         throws SQLException;
 
@@ -70,6 +72,8 @@ public interface ResourcePolicyService extends DSpaceCRUDService<ResourcePolicy>
 
     public void removeDsoEPersonPolicies(Context context, DSpaceObject dso, EPerson ePerson)
         throws SQLException, AuthorizeException;
+
+    public void removeAllEPersonPolicies(Context context, EPerson ePerson) throws SQLException, AuthorizeException;
 
     public void removeGroupPolicies(Context c, Group group) throws SQLException;
 

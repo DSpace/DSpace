@@ -7,8 +7,11 @@
  */
 package org.dspace.eperson;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
@@ -259,16 +262,27 @@ public class EPersonCLITool {
         }
 
         try {
-            ePersonService.delete(context, eperson);
-            context.complete();
-            System.out.printf("Deleted EPerson %s\n", eperson.getID().toString());
-        } catch (SQLException ex) {
-            System.err.println(ex.getMessage());
-            return 1;
-        } catch (AuthorizeException ex) {
-            System.err.println(ex.getMessage());
-            return 1;
-        } catch (IOException ex) {
+            List<String> tableList = ePersonService.getDeleteConstraints(context, eperson);
+            if (!tableList.isEmpty()) {
+                System.out.printf("This EPerson with ID: %s is referring to this tables:%n ",
+                        eperson.getID().toString());
+                tableList.forEach((s) -> {
+                    System.out.println(s);
+                });
+            }
+            System.out.printf("Are you sure you want to delete this EPerson with ID: %s? (y or n): ",
+                    eperson.getID().toString());
+            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+            System.out.flush();
+            String s = input.readLine();
+            if (s != null && s.trim().toLowerCase().startsWith("y")) {
+                ePersonService.delete(context, eperson);
+                context.complete();
+                System.out.printf("%nDeleted EPerson with ID: %s", eperson.getID().toString());
+            } else {
+                System.out.printf("%nAbort Deletetion of EPerson with ID: %s %n", eperson.getID().toString());
+            }
+        } catch (SQLException | AuthorizeException | IOException ex) {
             System.err.println(ex.getMessage());
             return 1;
         }

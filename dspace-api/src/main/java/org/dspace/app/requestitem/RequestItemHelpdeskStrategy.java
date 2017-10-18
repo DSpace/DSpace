@@ -74,8 +74,7 @@ public class RequestItemHelpdeskStrategy extends RequestItemSubmitterStrategy {
             return new RequestItemAuthor(helpdeskEPerson);
         } else {
             String helpdeskName = I18nUtil.getMessage(
-                "org.dspace.app.requestitem.RequestItemHelpdeskStrategy.helpdeskname",
-                context);
+                "org.dspace.app.requestitem.helpdeskname", context);
             return new RequestItemAuthor(helpdeskName, helpDeskEmail);
         }
     }

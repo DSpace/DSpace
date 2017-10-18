@@ -77,22 +77,25 @@ public class ClaimAction extends UserSelectionAction {
     public void alertUsersOnActivation(Context c, XmlWorkflowItem wfi, RoleMembers roleMembers)
         throws IOException, SQLException {
         try {
+            EPerson ep = wfi.getSubmitter();
+            String submitterName = null;
+            if (ep != null) {
+                submitterName = ep.getFullName();
+            }
             XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService();
             xmlWorkflowService.alertUsersOnTaskActivation(c, wfi, "submit_task", roleMembers.getAllUniqueMembers(c),
-                                                          //The arguments
-                                                          wfi.getItem().getName(),
-                                                          wfi.getCollection().getName(),
-                                                          wfi.getSubmitter().getFullName(),
-                                                          //TODO: message
-                                                          "New task available.",
-                                                          xmlWorkflowService.getMyDSpaceLink()
+                    //The arguments
+                    wfi.getItem().getName(),
+                    wfi.getCollection().getName(),
+                    submitterName,
+                    //TODO: message
+                    "New task available.",
+                    xmlWorkflowService.getMyDSpaceLink()
             );
         } catch (MessagingException e) {
             log.info(LogManager.getHeader(c, "error emailing user(s) for claimed task",
-                                          "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
+                    "step: " + getParent().getStep().getId() + " workflowitem: " + wfi.getID()));
         }
-
-
     }
 
     @Override
