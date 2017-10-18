@@ -37,5 +37,7 @@ public interface PoolTaskService extends DSpaceCRUDService<PoolTask> {
     public void deleteByWorkflowItem(Context context, XmlWorkflowItem xmlWorkflowItem)
         throws SQLException, AuthorizeException;
 
+    public void deleteByEperson(Context context, EPerson ePerson) throws SQLException, AuthorizeException, IOException;
+
     public List<PoolTask> findByEPerson(Context context, EPerson ePerson) throws SQLException;
 }

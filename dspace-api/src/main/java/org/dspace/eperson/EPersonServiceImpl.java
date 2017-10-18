@@ -7,9 +7,11 @@
  */
 package org.dspace.eperson;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -21,11 +23,16 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObjectServiceImpl;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -34,13 +41,36 @@ import org.dspace.eperson.dao.EPersonDAO;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.dao.VersionDAO;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.versioning.service.VersioningService;
 import org.dspace.workflow.WorkflowService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
+import org.dspace.workflowbasic.BasicWorkflowItem;
+import org.dspace.workflowbasic.BasicWorkflowServiceImpl;
+import org.dspace.workflowbasic.factory.BasicWorkflowServiceFactory;
+import org.dspace.workflowbasic.service.BasicWorkflowItemService;
+import org.dspace.workflowbasic.service.BasicWorkflowService;
+import org.dspace.workflowbasic.service.TaskListItemService;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.factory.XmlWorkflowServiceFactory;
+import org.dspace.xmlworkflow.service.WorkflowRequirementsService;
+import org.dspace.xmlworkflow.service.XmlWorkflowService;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
+import org.dspace.xmlworkflow.storedcomponents.service.XmlWorkflowItemService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Service implementation for the EPerson object.
- * This class is responsible for all business logic calls for the EPerson object and is autowired by spring.
+ * Service implementation for the EPerson object. This class is responsible for
+ * all business logic calls for the EPerson object and is autowired by spring.
  * This class should never be accessed directly.
  *
  * @author kevinvandevelde at atmire.com
@@ -61,6 +91,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
     protected ItemService itemService;
     @Autowired(required = true)
     protected SubscribeService subscribeService;
+    @Autowired(required = true)
+    protected VersionDAO versionDAO;
 
     protected EPersonServiceImpl() {
         super();
@@ -129,7 +161,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
                 query = null;
             }
             return ePersonDAO.search(context, query, Arrays.asList(firstNameField, lastNameField),
-                                     Arrays.asList(firstNameField, lastNameField), offset, limit);
+                    Arrays.asList(firstNameField, lastNameField), offset, limit);
         }
     }
 
@@ -179,45 +211,192 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // authorized?
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                "You must be an admin to create an EPerson");
+                    "You must be an admin to create an EPerson");
         }
 
         // Create a table row
         EPerson e = ePersonDAO.create(context, new EPerson());
 
         log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
-            + e.getID()));
+                + e.getID()));
 
         context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(),
-                                   null, getIdentifiers(context, e)));
+                null, getIdentifiers(context, e)));
 
         return e;
     }
 
     @Override
     public void delete(Context context, EPerson ePerson) throws SQLException, AuthorizeException {
+        try {
+            delete(context, ePerson, true);
+        } catch (AuthorizeException ex) {
+            log.error("This AuthorizeException: " + ex + " occured while deleting Eperson with the ID: " +
+                      ePerson.getID());
+            throw new AuthorizeException(ex.getMessage());
+        } catch (IOException ex) {
+            log.error("This IOException: " + ex + " occured while deleting Eperson with the ID: " + ePerson.getID());
+            throw new AuthorizeException(new EPersonDeletionException());
+        }
+    }
+
+    /**
+     * Deletes an EPerson. The argument cascade defines whether all references
+     * on an EPerson should be deleted as well (by either deleting the
+     * referencing object - e.g. WorkspaceItem, ResourcePolicy - or by setting
+     * the foreign key null - e.g. archived Items). If cascade is set to false
+     * and the EPerson is referenced somewhere, this leads to an
+     * AuthorizeException. EPersons may be referenced by Items, ResourcePolicies
+     * and workflow tasks.
+     *
+     * @param context DSpace context
+     * @param ePerson The EPerson to delete.
+     * @param cascade Whether to delete references on the EPerson (cascade =
+     * true) or to abort the deletion (cascade = false) if the EPerson is
+     * referenced within DSpace.
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void delete(Context context, EPerson ePerson, boolean cascade)
+            throws SQLException, AuthorizeException, IOException {
         // authorized?
         if (!authorizeService.isAdmin(context)) {
             throw new AuthorizeException(
-                "You must be an admin to delete an EPerson");
+                    "You must be an admin to delete an EPerson");
         }
-
         // check for presence of eperson in tables that
         // have constraints on eperson_id
         List<String> constraintList = getDeleteConstraints(context, ePerson);
-
-        // if eperson exists in tables that have constraints
-        // on eperson, throw an exception
         if (constraintList.size() > 0) {
-            throw new AuthorizeException(new EPersonDeletionException(constraintList));
-        }
+            // Check if the constraints we found should be deleted
+            if (cascade) {
+                boolean isBasicFramework = WorkflowServiceFactory.getInstance().getWorkflowService()
+                                           instanceof BasicWorkflowService;
+                boolean isXmlFramework = WorkflowServiceFactory.getInstance().getWorkflowService()
+                                         instanceof XmlWorkflowService;
+                Iterator<String> constraintsIterator = constraintList.iterator();
 
+                while (constraintsIterator.hasNext()) {
+                    String tableName = constraintsIterator.next();
+                    if (StringUtils.equals(tableName, "item") || StringUtils.equals(tableName, "workspaceitem")) {
+                        Iterator<Item> itemIterator = itemService.findBySubmitter(context, ePerson, true);
+
+                        VersionHistoryService versionHistoryService = VersionServiceFactory.getInstance()
+                                                                      .getVersionHistoryService();
+                        VersioningService versioningService = VersionServiceFactory.getInstance().getVersionService();
+
+                        while (itemIterator.hasNext()) {
+                            Item item = itemIterator.next();
+
+                            VersionHistory versionHistory = versionHistoryService.findByItem(context, item);
+                            if (null != versionHistory) {
+                                for (Version version : versioningService.getVersionsByHistory(context,
+                                                                                              versionHistory)) {
+                                    version.setePerson(null);
+                                    versionDAO.save(context, version);
+                                }
+                            }
+                            WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance()
+                                                                        .getWorkspaceItemService();
+                            WorkspaceItem wsi = workspaceItemService.findByItem(context, item);
+
+                            if (null != wsi) {
+                                workspaceItemService.deleteAll(context, wsi);
+                            } else {
+                                // we can do that as dc.provenance still contains
+                                // information about who submitted and who
+                                // archived an item.
+                                item.setSubmitter(null);
+                                itemService.update(context, item);
+                            }
+                        }
+                    } else if (StringUtils.equals(tableName, "cwf_claimtask") && isXmlFramework) {
+                         // Unclaim all XmlWorkflow tasks
+                        XmlWorkflowItemService xmlWorkflowItemService = XmlWorkflowServiceFactory
+                                                                        .getInstance().getXmlWorkflowItemService();
+                        ClaimedTaskService claimedTaskService = XmlWorkflowServiceFactory
+                                                                .getInstance().getClaimedTaskService();
+                        XmlWorkflowService xmlWorkflowService = XmlWorkflowServiceFactory
+                                                                .getInstance().getXmlWorkflowService();
+                        WorkflowRequirementsService workflowRequirementsService = XmlWorkflowServiceFactory
+                                                                       .getInstance().getWorkflowRequirementsService();
+
+                        List<XmlWorkflowItem> xmlWorkflowItems = xmlWorkflowItemService
+                                                                 .findBySubmitter(context, ePerson);
+
+                        for (XmlWorkflowItem xmlWorkflowItem : xmlWorkflowItems) {
+                            ClaimedTask pooledTask = claimedTaskService
+                                                     .findByWorkflowIdAndEPerson(context, xmlWorkflowItem, ePerson);
+                            xmlWorkflowService.deleteClaimedTask(context, xmlWorkflowItem, pooledTask);
+
+                            try {
+                                workflowRequirementsService.removeClaimedUser(context, xmlWorkflowItem,
+                                                                              ePerson, pooledTask.getStepID());
+                            } catch (WorkflowConfigurationException ex) {
+                                log.error("This WorkflowConfigurationException: " + ex +
+                                          " occured while deleting Eperson with the ID: " + ePerson.getID());
+                                throw new AuthorizeException(new EPersonDeletionException(Collections
+                                                                                          .singletonList(tableName)));
+                            }
+                        }
+                    } else if (StringUtils.equals(tableName, "workflowitem") && isBasicFramework) {
+                        // Remove basicWorkflow workflowitem and unclaim them
+                        BasicWorkflowItemService basicWorkflowItemService = BasicWorkflowServiceFactory.getInstance()
+                                                                            .getBasicWorkflowItemService();
+                        BasicWorkflowService basicWorkflowService = BasicWorkflowServiceFactory.getInstance()
+                                                                    .getBasicWorkflowService();
+                        TaskListItemService taskListItemService = BasicWorkflowServiceFactory.getInstance()
+                                                                  .getTaskListItemService();
+                        List<BasicWorkflowItem> workflowItems = basicWorkflowItemService.findByOwner(context, ePerson);
+                        for (BasicWorkflowItem workflowItem : workflowItems) {
+                            int state = workflowItem.getState();
+                            // unclaim tasks that are in the pool.
+                            if (state == BasicWorkflowServiceImpl.WFSTATE_STEP1
+                                    || state == BasicWorkflowServiceImpl.WFSTATE_STEP2
+                                    || state == BasicWorkflowServiceImpl.WFSTATE_STEP3) {
+                                log.info(LogManager.getHeader(context, "unclaim_workflow",
+                                        "workflow_id=" + workflowItem.getID() + ", claiming EPerson is deleted"));
+                                basicWorkflowService.unclaim(context, workflowItem, context.getCurrentUser());
+                                // remove the EPerson from the list of persons that can (re-)claim the task
+                                // while we are doing it below, we must do this here as well as the previously
+                                // unclaimed tasks was put back into pool and we do not know the order the tables
+                                // are checked.
+                                taskListItemService.deleteByWorkflowItemAndEPerson(context, workflowItem, ePerson);
+                            }
+                        }
+                    } else if (StringUtils.equals(tableName, "resourcepolicy")) {
+                        // we delete the EPerson, it won't need any rights anymore.
+                        authorizeService.removeAllEPersonPolicies(context, ePerson);
+                    } else if (StringUtils.equals(tableName, "tasklistitem") && isBasicFramework) {
+                        // remove EPerson from the list of EPersons that may claim some specific workflow tasks.
+                        TaskListItemService taskListItemService = BasicWorkflowServiceFactory.getInstance()
+                                                                  .getTaskListItemService();
+                        taskListItemService.deleteByEPerson(context, ePerson);
+                    } else if (StringUtils.equals(tableName, "cwf_pooltask") && isXmlFramework) {
+                        PoolTaskService poolTaskService = XmlWorkflowServiceFactory.getInstance().getPoolTaskService();
+                        poolTaskService.deleteByEperson(context, ePerson);
+                    } else if (StringUtils.equals(tableName, "cwf_workflowitemrole") && isXmlFramework) {
+                        WorkflowItemRoleService workflowItemRoleService = XmlWorkflowServiceFactory.getInstance()
+                                                                          .getWorkflowItemRoleService();
+                        workflowItemRoleService.deleteByEPerson(context, ePerson);
+                    } else {
+                        log.warn("EPerson is referenced in table '" + tableName
+                                + "'. Deletion of EPerson " + ePerson.getID() + " may fail "
+                                + "if the database does not handle this "
+                                + "reference.");
+                    }
+                }
+            } else {
+                throw new AuthorizeException(new EPersonDeletionException(constraintList));
+            }
+        }
         context.addEvent(new Event(Event.DELETE, Constants.EPERSON, ePerson.getID(), ePerson.getEmail(),
-                                   getIdentifiers(context, ePerson)));
+                getIdentifiers(context, ePerson)));
 
         // XXX FIXME: This sidesteps the object model code so it won't
         // generate  REMOVE events on the affected Groups.
-
         // Remove any group memberships first
         // Remove any group memberships first
         Iterator<Group> groups = ePerson.getGroups().iterator();
@@ -234,7 +413,7 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         ePersonDAO.delete(context, ePerson);
 
         log.info(LogManager.getHeader(context, "delete_eperson",
-                                      "eperson_id=" + ePerson.getID()));
+                "eperson_id=" + ePerson.getID()));
     }
 
     @Override
@@ -268,8 +447,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         PasswordHash hash = null;
         try {
             hash = new PasswordHash(ePerson.getDigestAlgorithm(),
-                                    ePerson.getSalt(),
-                                    ePerson.getPassword());
+                    ePerson.getSalt(),
+                    ePerson.getPassword());
         } catch (DecoderException ex) {
             log.error("Problem decoding stored salt or hash:  " + ex.getMessage());
         }
@@ -281,9 +460,9 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         PasswordHash myHash;
         try {
             myHash = new PasswordHash(
-                ePerson.getDigestAlgorithm(),
-                ePerson.getSalt(),
-                ePerson.getPassword());
+                    ePerson.getDigestAlgorithm(),
+                    ePerson.getSalt(),
+                    ePerson.getPassword());
         } catch (DecoderException ex) {
             log.error(ex.getMessage());
             return false;
@@ -312,8 +491,8 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         // Check authorisation - if you're not the eperson
         // see if the authorization system says you can
         if (!context.ignoreAuthorization()
-            && ((context.getCurrentUser() == null) || (ePerson.getID() != context
-            .getCurrentUser().getID()))) {
+                && ((context.getCurrentUser() == null) || (ePerson.getID() != context
+                .getCurrentUser().getID()))) {
             authorizeService.authorizeAction(context, ePerson, Constants.WRITE);
         }
 
@@ -322,11 +501,11 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         ePersonDAO.save(context, ePerson);
 
         log.info(LogManager.getHeader(context, "update_eperson",
-                                      "eperson_id=" + ePerson.getID()));
+                "eperson_id=" + ePerson.getID()));
 
         if (ePerson.isModified()) {
             context.addEvent(new Event(Event.MODIFY, Constants.EPERSON,
-                                       ePerson.getID(), null, getIdentifiers(context, ePerson)));
+                    ePerson.getID(), null, getIdentifiers(context, ePerson)));
             ePerson.clearModified();
         }
         if (ePerson.isMetadataModified()) {
@@ -339,9 +518,20 @@ public class EPersonServiceImpl extends DSpaceObjectServiceImpl<EPerson> impleme
         List<String> tableList = new ArrayList<String>();
 
         // check for eperson in item table
-        Iterator<Item> itemsBySubmitter = itemService.findBySubmitter(context, ePerson);
+        Iterator<Item> itemsBySubmitter = itemService.findBySubmitter(context, ePerson, true);
         if (itemsBySubmitter.hasNext()) {
             tableList.add("item");
+        }
+
+        WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+        List<WorkspaceItem> workspaceBySubmitter = workspaceItemService.findByEPerson(context, ePerson);
+        if (workspaceBySubmitter.size() > 0) {
+            tableList.add("workspaceitem");
+        }
+
+        ResourcePolicyService resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
+        if (resourcePolicyService.find(context, ePerson).size() > 0) {
+            tableList.add("resourcepolicy");
         }
 
         WorkflowService workflowService = WorkflowServiceFactory.getInstance().getWorkflowService();

@@ -34,6 +34,7 @@ public class AcceptEditRejectAction extends ProcessingAction {
 
     public static final int MAIN_PAGE = 0;
     public static final int REJECT_PAGE = 1;
+    public static final int SUBMITTER_IS_DELETED_PAGE = 2;
 
     //TODO: rename to AcceptAndEditMetadataAction
 
@@ -52,6 +53,8 @@ public class AcceptEditRejectAction extends ProcessingAction {
                 return processMainPage(c, wfi, step, request);
             case REJECT_PAGE:
                 return processRejectPage(c, wfi, step, request);
+            case SUBMITTER_IS_DELETED_PAGE:
+                return processSubmitterIsDeletedPage(c, wfi, request);
             default:
                 return new ActionResult(ActionResult.TYPE.TYPE_CANCEL);
         }
@@ -96,6 +99,23 @@ public class AcceptEditRejectAction extends ProcessingAction {
             //Cancel, go back to the main task page
             request.setAttribute("page", MAIN_PAGE);
 
+            return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
+        }
+    }
+
+    public ActionResult processSubmitterIsDeletedPage(Context c, XmlWorkflowItem wfi, HttpServletRequest request)
+        throws SQLException, AuthorizeException, IOException {
+        if (request.getParameter("submit_delete") != null) {
+            XmlWorkflowServiceFactory.getInstance().getXmlWorkflowService()
+                    .deleteWorkflowByWorkflowItem(c, wfi, c.getCurrentUser());
+            // Delete and send user back to myDspace page
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        } else if (request.getParameter("submit_keep_it") != null) {
+            // Do nothing, just send it back to myDspace page
+            return new ActionResult(ActionResult.TYPE.TYPE_SUBMISSION_PAGE);
+        } else {
+            //Cancel, go back to the main task page
+            request.setAttribute("page", MAIN_PAGE);
             return new ActionResult(ActionResult.TYPE.TYPE_PAGE);
         }
     }

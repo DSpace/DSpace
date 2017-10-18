@@ -51,7 +51,9 @@ public class ItemRepositoryBuilder {
         doc.addField("item.id", item.getId());
         doc.addField("item.public", item.isPublic());
         doc.addField("item.lastmodified", item.getLastModifiedDate());
-        doc.addField("item.submitter", item.getSubmitter());
+        if (item.getSubmitter() != null) {
+            doc.addField("item.submitter", item.getSubmitter());
+        }
         doc.addField("item.handle", item.getHandle());
         doc.addField("item.deleted", item.isDeleted());
 

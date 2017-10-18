@@ -61,6 +61,16 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
     }
 
     @Override
+    public List<ResourcePolicy> findByEPerson(Context context, EPerson ePerson) throws SQLException {
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
+        Root<ResourcePolicy> resourcePolicyRoot = criteriaQuery.from(ResourcePolicy.class);
+        criteriaQuery.select(resourcePolicyRoot);
+        criteriaQuery.where(criteriaBuilder.equal(resourcePolicyRoot.get(ResourcePolicy_.eperson), ePerson));
+        return list(context, criteriaQuery, false, ResourcePolicy.class, -1, -1);
+    }
+
+    @Override
     public List<ResourcePolicy> findByGroup(Context context, Group group) throws SQLException {
         CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
         CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, ResourcePolicy.class);
@@ -187,6 +197,15 @@ public class ResourcePolicyDAOImpl extends AbstractHibernateDAO<ResourcePolicy> 
         String queryString = "delete from ResourcePolicy where dSpaceObject= :dso AND eperson= :eperson";
         Query query = createQuery(context, queryString);
         query.setParameter("dso", dso);
+        query.setParameter("eperson", ePerson);
+        query.executeUpdate();
+
+    }
+
+    @Override
+    public void deleteAllEPersonPolicies(Context context, EPerson ePerson) throws SQLException {
+        String queryString = "delete from ResourcePolicy where eperson= :eperson";
+        Query query = createQuery(context, queryString);
         query.setParameter("eperson", ePerson);
         query.executeUpdate();
 
