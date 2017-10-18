@@ -310,34 +310,39 @@ public class PublicationUpdater extends HttpServlet {
 
         // look for this item in crossref:
         StringBuilder resultString = new StringBuilder();
-        Manuscript matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript, resultString);
-        LOGGER.debug("crossref lookup for item " + item.getID() + " returned " + resultString);
-        if (matchedManuscript != null) {
-            String score = matchedManuscript.optionalProperties.get("crossref-score");
-            if (!"".equals(queryManuscript.getPublicationDOI())){
-                LOGGER.debug("matching with given publication DOI " + queryManuscript.getPublicationDOI());
-                StringBuilder provenance = new StringBuilder("Associated publication for doi " + queryManuscript.getPublicationDOI() + " was found: \"" + matchedManuscript.getTitle() + "\".");
-                if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
-                    message = provenance;
-                }
-            } else {
-                LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" matched a title \"" + matchedManuscript.getTitle() + "\" with score " + score);
-                LOGGER.debug("matched publication DOI is " + matchedManuscript.getPublicationDOI());
-                // does the matched manuscript have the same authors?
-                StringBuilder authormatches = new StringBuilder();
-                if (matchedManuscript.getAuthorList().size() == JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
-                    LOGGER.debug("same authors");
-                    // update the item's metadata
-                    StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");
+        Manuscript matchedManuscript = null;
+        try {
+            matchedManuscript = JournalUtils.getCrossRefManuscriptMatchingManuscript(queryManuscript, resultString);
+            LOGGER.debug("crossref lookup for item " + item.getID() + " returned " + resultString);
+            if (matchedManuscript != null) {
+                String score = matchedManuscript.optionalProperties.get("crossref-score");
+                if (!"".equals(queryManuscript.getPublicationDOI())){
+                    LOGGER.debug("matching with given publication DOI " + queryManuscript.getPublicationDOI());
+                    StringBuilder provenance = new StringBuilder("Associated publication for doi " + queryManuscript.getPublicationDOI() + " was found: \"" + matchedManuscript.getTitle() + "\".");
                     if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
                         message = provenance;
                     }
                 } else {
-                    LOGGER.debug("different authors: " + authormatches);
+                    LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" matched a title \"" + matchedManuscript.getTitle() + "\" with score " + score);
+                    LOGGER.debug("matched publication DOI is " + matchedManuscript.getPublicationDOI());
+                    // does the matched manuscript have the same authors?
+                    StringBuilder authormatches = new StringBuilder();
+                    if (matchedManuscript.getAuthorList().size() == JournalUtils.compareItemAuthorsToManuscript(item, matchedManuscript, authormatches)) {
+                        LOGGER.debug("same authors");
+                        // update the item's metadata
+                        StringBuilder provenance = new StringBuilder("Associated publication (match score " + score + ") was found: \"" + matchedManuscript.getTitle() + "\".");
+                        if (updateItemMetadataFromManuscript(item, matchedManuscript, context, provenance)) {
+                            message = provenance;
+                        }
+                    } else {
+                        LOGGER.debug("different authors: " + authormatches);
+                    }
                 }
+            } else {
+                LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" didn't match anything in crossref");
             }
-        } else {
-            LOGGER.debug("Item \"" + queryManuscript.getTitle() + "\" didn't match anything in crossref");
+        } catch (RESTModelException e) {
+            LOGGER.debug("crossref match wasn't valid: " + e.getMessage());
         }
         return message;
     }

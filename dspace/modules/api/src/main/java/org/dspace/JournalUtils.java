@@ -9,6 +9,7 @@ import org.datadryad.api.DryadJournalConcept;
 import org.datadryad.rest.converters.ManuscriptToLegacyXMLConverter;
 import org.datadryad.rest.models.Author;
 import org.datadryad.rest.models.Manuscript;
+import org.datadryad.rest.models.RESTModelException;
 import org.datadryad.rest.storage.StorageException;
 import org.datadryad.rest.storage.StoragePath;
 import org.datadryad.rest.storage.rdbms.ManuscriptDatabaseStorageImpl;
@@ -482,7 +483,7 @@ public class JournalUtils {
         return items;
     }
 
-    public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript, StringBuilder resultString) {
+    public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript, StringBuilder resultString) throws RESTModelException {
         String crossRefURL = null;
         if (resultString == null) {
             resultString = new StringBuilder();
@@ -518,11 +519,11 @@ public class JournalUtils {
                 JsonNode bestItem = itemsNode.get(0);
                 float score = bestItem.path("score").floatValue();
                 if (score > 3.0) {
-                    matchedManuscript = manuscriptFromCrossRefJSON(bestItem, queryManuscript.getJournalConcept());
+                    matchedManuscript = manuscriptFromCrossRefJSON(bestItem);
                 }
             } else {
                 itemsNode = rootNode.path("message");
-                matchedManuscript = manuscriptFromCrossRefJSON(itemsNode, queryManuscript.getJournalConcept());
+                matchedManuscript = manuscriptFromCrossRefJSON(itemsNode);
             }
         } catch (JsonParseException e) {
             log.debug("Couldn't find JSON matching URL " + crossRefURL);
@@ -530,6 +531,8 @@ public class JournalUtils {
             log.debug("No matches returned for URL " + crossRefURL);
         } catch (FileNotFoundException e) {
             log.debug("CrossRef does not have data for URL " + crossRefURL);
+        } catch (RESTModelException e) {
+            throw e;
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder();
             for (StackTraceElement element : e.getStackTrace()) {
@@ -542,6 +545,9 @@ public class JournalUtils {
 
         // sanity check:
         if (matchedManuscript != null) {
+            if (!queryManuscript.getJournalISSN().equals(matchedManuscript.getJournalISSN())) {
+                throw new RESTModelException("publication DOI listed for item does not belong to the correct journal");
+            }
             // for now, scores greater than 0.5 seem to be a match. Keep an eye on this.
             if (!compareTitleToManuscript(queryManuscript.getTitle(), matchedManuscript, 0.5, resultString)) {
                 return null;
@@ -582,7 +588,14 @@ public class JournalUtils {
         return numMatched;
     }
 
-    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode, DryadJournalConcept dryadJournalConcept) {
+    public static Manuscript manuscriptFromCrossRefJSON(JsonNode jsonNode) throws RESTModelException {
+        // manuscripts should only be returned if the crossref match is of type "journal-article"
+        if (jsonNode.path("type") != null) {
+            if (!"journal-article".equals(jsonNode.path("type").textValue())) {
+                throw new RESTModelException("crossref result is not of type journal-article: " + jsonNode.path("type").textValue());
+            }
+        }
+
         Manuscript manuscript = new Manuscript();
         if (jsonNode.path("DOI") != null) {
             manuscript.setPublicationDOI(jsonNode.path("DOI").textValue());
@@ -625,9 +638,17 @@ public class JournalUtils {
         if (jsonNode.path("issue") != null) {
             manuscript.setJournalNumber(jsonNode.path("issue").textValue());
         }
-
-        if (dryadJournalConcept != null) {
-            manuscript.setJournalConcept(dryadJournalConcept);
+        if (jsonNode.path("ISSN") != null && jsonNode.path("ISSN").isArray()) {
+            for (JsonNode issnNode : jsonNode.path("ISSN")) {
+                DryadJournalConcept dryadJournalConcept = getJournalConceptByISSN(issnNode.textValue());
+                if (dryadJournalConcept != null) {
+                    manuscript.setJournalConcept(dryadJournalConcept);
+                    break;
+                }
+            }
+        }
+        if (manuscript.getJournalConcept() == null) {
+            throw new RESTModelException("couldn't find journal concept");
         }
         manuscript.setStatus(Manuscript.STATUS_PUBLISHED);
         return manuscript;
