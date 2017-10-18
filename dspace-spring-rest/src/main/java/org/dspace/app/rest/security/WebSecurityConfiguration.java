@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
 @EnableWebSecurity
@@ -21,9 +22,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private EPersonRestAuthenticationProvider ePersonRestAuthenticationProvider;
 
+    @Autowired
+    private CustomLogoutHandler customLogoutHandler;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.headers().cacheControl();
+
 
         http
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -31,12 +36,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anonymous().and()
                 .servletApi().and()
                 .csrf().disable()
+
+                .logout().addLogoutHandler(customLogoutHandler).logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/status").permitAll()
+                .and()
                 .authorizeRequests()
 
-
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.GET, "/status").authenticated()
-
+                .antMatchers(HttpMethod.GET, "/status").permitAll()
 
                 .and()
 

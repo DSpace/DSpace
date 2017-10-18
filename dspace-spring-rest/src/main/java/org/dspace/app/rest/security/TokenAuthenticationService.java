@@ -9,6 +9,8 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,8 @@ import java.text.ParseException;
 import java.util.List;
 
 public class TokenAuthenticationService {
+
+    private static final Logger log = LoggerFactory.getLogger(TokenAuthenticationService.class);
 
 
     private JWTTokenHandler jwtTokenHandler;
@@ -40,9 +44,9 @@ public class TokenAuthenticationService {
             Cookie cookie = new Cookie("access_token", token);
             response.addCookie(cookie);
         } catch (JOSEException e) {
-            e.printStackTrace();
+            log.error("JOSE Exception", e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("SQL error when adding authentication", e);
         }
 
     }
@@ -52,11 +56,11 @@ public class TokenAuthenticationService {
             EPerson ePerson = jwtTokenHandler.parseEPersonFromToken(token, request);
             return ePerson;
         } catch (JOSEException e) {
-            e.printStackTrace();
+            log.error("Jose error", e);
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("Error parsing EPerson from token", e);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("SQL error while retrieving EPerson from token", e);
         }
         return null;
     }
