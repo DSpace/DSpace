@@ -7,22 +7,17 @@
  */
 package org.dspace.services.sessions.model;
 
-import java.io.Serializable;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import org.dspace.services.model.Session;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
-
-import org.dspace.services.model.Session;
+import java.io.Serializable;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.*;
 
 /**
  * Represents a users session (login session) in the system.  Can hold 
@@ -57,7 +52,8 @@ public final class SessionImpl implements Session {
         if (request == null) {
             throw new IllegalArgumentException("Cannot create a session without an http request");
         }
-        this.httpSession = request.getSession(); // establish the session
+        //TODO this has to be removed
+//        this.httpSession = request.getSession(); // establish the session
         setKeyAttribute(HOST_IP, request.getRemoteAddr());
         setKeyAttribute(HOST_NAME, request.getRemoteHost());
     }
@@ -184,9 +180,9 @@ public final class SessionImpl implements Session {
         boolean wasSet = false;
         if (! isInvalidated()) {
             if (isBlank(value)) {
-                this.httpSession.removeAttribute(key);
+//                this.httpSession.removeAttribute(key);
             } else {
-                this.httpSession.setAttribute(key, value);
+//                this.httpSession.setAttribute(key, value);
                 wasSet = true;
             }
         }
@@ -208,7 +204,7 @@ public final class SessionImpl implements Session {
         }
         String value = null;
         if (! isInvalidated()) {
-            value = (String) this.httpSession.getAttribute(key);
+//            value = (String) this.httpSession.getAttribute(key);
         }
         return value;
     }
@@ -224,7 +220,7 @@ public final class SessionImpl implements Session {
             throw new IllegalArgumentException("session attribute key cannot be null");
         }
         if (! isInvalidated()) {
-            this.httpSession.removeAttribute(key);
+//            this.httpSession.removeAttribute(key);
         }
     }
 
@@ -311,14 +307,14 @@ public final class SessionImpl implements Session {
     @Override
     public Map<String, String> getAttributes() {
         Map<String, String> map = new HashMap<String, String>();
-        if (! isInvalidated()) {
-            Enumeration<String> names = this.httpSession.getAttributeNames();
-            while (names.hasMoreElements()) {
-                String key = names.nextElement();
-                String value = (String) this.httpSession.getAttribute(key);
-                map.put(key, value);
-            }
-        }
+//        if (! isInvalidated()) {
+//            Enumeration<String> names = this.httpSession.getAttributeNames();
+//            while (names.hasMoreElements()) {
+//                String key = names.nextElement();
+//                String value = (String) this.httpSession.getAttribute(key);
+//                map.put(key, value);
+//            }
+//        }
         return map;
     }
 

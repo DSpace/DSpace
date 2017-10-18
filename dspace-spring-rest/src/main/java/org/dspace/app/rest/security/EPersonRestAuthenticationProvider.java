@@ -5,16 +5,14 @@ import org.dspace.authenticate.factory.AuthenticateServiceFactory;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.eperson.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,25 +29,6 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     @Autowired
     private HttpServletRequest request;
 
-
-//    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-//        String email = authentication.getName();
-//        Context context = new Context();
-//        EPerson ePerson = null;
-//        try {
-//            ePerson = ePersonService.findByEmail(context, email);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        if (ePerson != null) {
-//            String password = authentication.getCredentials().toString();
-//            if (ePersonService.checkPassword(context, ePerson, password)) {
-//                return new UsernamePasswordAuthenticationToken(ePerson.getEmail(), password, new ArrayList<>());
-//            }
-//        }
-//        return null;
-//    }
-
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Context context = null;
@@ -59,23 +38,22 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             String name = authentication.getName();
             String password = authentication.getCredentials().toString();
             HttpServletRequest httpServletRequest = request;
-            List<SimpleGrantedAuthority> grantedAuthorities = new ArrayList<>();
+            List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
 
             int implicitStatus = authenticationService.authenticateImplicit(context, null, null, null, httpServletRequest);
 
             if (implicitStatus == AuthenticationMethod.SUCCESS) {
                 log.info(LogManager.getHeader(context, "login", "type=implicit"));
-                addSpecialGroupsToGrantedAuthorityList(context, httpServletRequest, grantedAuthorities);
-                return new UsernamePasswordAuthenticationToken(name, password, grantedAuthorities);
+                return new DSpaceAuthentication(name, password, grantedAuthorities);
             } else {
                 int authenticateResult = authenticationService.authenticate(context, name, password, null, httpServletRequest);
                 if (AuthenticationMethod.SUCCESS == authenticateResult) {
-                    addSpecialGroupsToGrantedAuthorityList(context, httpServletRequest, grantedAuthorities);
+
                     log.info(LogManager
                             .getHeader(context, "login", "type=explicit"));
 
-                    return new UsernamePasswordAuthenticationToken(name, password, grantedAuthorities);
+                    return new DSpaceAuthentication(name, password, grantedAuthorities);
                 } else {
                     log.info(LogManager.getHeader(context, "failed_login", "email="
                             + name + ", result="
@@ -101,15 +79,9 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         return null;
     }
 
-    protected void addSpecialGroupsToGrantedAuthorityList(Context context, HttpServletRequest httpServletRequest, List<SimpleGrantedAuthority> grantedAuthorities) throws SQLException {
-        List<Group> groups = authenticationService.getSpecialGroups(context, httpServletRequest);
-        for (Group group : groups) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(group.getName()));
-        }
-    }
 
 
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
+        return authentication.equals(DSpaceAuthentication.class);
     }
 }

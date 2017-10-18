@@ -5,13 +5,13 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import org.dspace.authenticate.factory.AuthenticateServiceFactory;
-import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
@@ -25,8 +25,10 @@ import java.util.stream.Collectors;
 
 public class JWTTokenHandler {
 
-    private static String jwtKey = "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest";
-    private AuthenticationService authenticationService = AuthenticateServiceFactory.getInstance().getAuthenticationService();
+    private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
+
+    //TODO configurable through config files
+    private static String jwtKey = "thisisatestsecretkeyforjwttokens";
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     public static final String EPERSON_ID = "eid";
     public static final String SPECIAL_GROUPS = "sg";
@@ -44,8 +46,10 @@ public class JWTTokenHandler {
 
         //If token is valid and not expired return eperson in token
         if (signedJWT.verify(verifier) && new Date().getTime() < signedJWT.getJWTClaimsSet().getExpirationTime().getTime()) {
+            log.info("Received valid token for username: " + ePerson.getEmail());
             return ePerson;
         } else {
+            log.info("Someone tried to use an expired or non-valid token");
             return null;
         }
     }
@@ -65,14 +69,14 @@ public class JWTTokenHandler {
         try {
             context.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error while committing salt to eperson", e);
         }
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .claim(EPERSON_ID, ePerson.getID().toString())
                 .claim(SPECIAL_GROUPS, groupIds)
                 //TODO Expiration time configurable in config
-                .expirationTime(new Date(new Date().getTime() + 60 * 1000))
+                .expirationTime(new Date(new Date().getTime() + 5 * 60 * 1000))
                 .build();
 
         SignedJWT signedJWT = new SignedJWT(

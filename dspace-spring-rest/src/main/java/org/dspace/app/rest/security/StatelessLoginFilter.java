@@ -1,7 +1,6 @@
 package org.dspace.app.rest.security;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -32,7 +31,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
             String password = req.getParameter("password");
 
             return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
+                    new DSpaceAuthentication(
                             email,
                             password,
                             new ArrayList<>())
