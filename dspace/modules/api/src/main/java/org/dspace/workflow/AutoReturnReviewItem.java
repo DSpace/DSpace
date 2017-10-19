@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 public class AutoReturnReviewItem {
     private static Date olderThanDate;
     private static Integer olderThan = ConfigurationManager.getIntProperty("autoreturnreview.olderthan");
+    private static boolean testMode = false;
 
     private static final Logger log = Logger.getLogger(AutoReturnReviewItem.class);
 
@@ -41,11 +42,18 @@ public class AutoReturnReviewItem {
 
         options.addOption("i", "wfitemid", true, "The workflow item id");
         options.addOption("a", "all", false, "Process all review items");
+        options.addOption("t", "test", false, "test mode");
         options.addOption("h", "help", false, "help");
 
         setOlderThanDate();
 
         CommandLine line = parser.parse(options, args);
+        if (line.hasOption('t')) {
+            testMode = true;
+            System.out.println("-----------------------------------\n" +
+                               "Test Mode: no items will be purged.\n" +
+                               "-----------------------------------");
+        }
         if (line.hasOption('h'))
         {
             HelpFormatter myhelp = new HelpFormatter();
@@ -76,6 +84,7 @@ public class AutoReturnReviewItem {
                 }
             }
         } else if (line.hasOption('a')) {
+            System.out.println("*** Purging all items older than " + olderThanDate.toString());
             purgeOldItems();
         } else {
             System.out.println("No option was provided.");
@@ -108,7 +117,9 @@ public class AutoReturnReviewItem {
         try {
             if (wfi != null) {
                 // make sure that this item is updated according to the ApproveReject mechanism:
-                ApproveRejectReviewItem.reviewItem(wfi);
+                if (!testMode) {
+                    ApproveRejectReviewItem.reviewItem(wfi);
+                }
                 claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
                 //Check for a valid task
                 // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
@@ -117,22 +128,26 @@ public class AutoReturnReviewItem {
                     log.debug("Item " + item.getID() + " not found or not in review");
                 } else {
                     if (itemIsOldItemInReview(item)) {
-                        context.turnOffAuthorisationSystem();
-                        String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
-                        log.info("returning item " + item.getID());
-                        EPerson ePerson = EPerson.findByEmail(context, ConfigurationManager.getProperty("system.curator.account"));
-                        //Also return all the data files
-                        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, wfi.getItem());
-                        for (Item dataFile : dataFiles) {
-                            try {
-                                WorkflowManager.rejectWorkflowItem(context, WorkflowItem.findByItemId(context, dataFile.getID()), ePerson, null, reason, false);
-                            } catch (Exception e) {
-                                throw new IOException(e);
+                        if (testMode) {
+                            log.info("TEST: return item " + item.getID());
+                        } else {
+                            log.info("returning item " + item.getID());
+                            context.turnOffAuthorisationSystem();
+                            String reason = "Since this submission has been in review for more than " + olderThan + " years, we assume it is no longer needed. Feel free to delete it from your workspace.";
+                            EPerson ePerson = EPerson.findByEmail(context, ConfigurationManager.getProperty("system.curator.account"));
+                            //Also return all the data files
+                            Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, wfi.getItem());
+                            for (Item dataFile : dataFiles) {
+                                try {
+                                    WorkflowManager.rejectWorkflowItem(context, WorkflowItem.findByItemId(context, dataFile.getID()), ePerson, null, reason, false);
+                                } catch (Exception e) {
+                                    throw new IOException(e);
+                                }
                             }
-                        }
-                        WorkflowManager.rejectWorkflowItem(context, wfi, ePerson, null, reason, true);
+                            WorkflowManager.rejectWorkflowItem(context, wfi, ePerson, null, reason, true);
 
-                        context.restoreAuthSystemState();
+                            context.restoreAuthSystemState();
+                        }
                     }
                 }
             }
@@ -168,6 +183,9 @@ public class AutoReturnReviewItem {
     }
 
     private static void setOlderThanDate() {
+        if (olderThan < 1) {
+            olderThan = 2;
+        }
         Calendar calendar = new GregorianCalendar();
         calendar.roll(Calendar.YEAR, -olderThan);
 
