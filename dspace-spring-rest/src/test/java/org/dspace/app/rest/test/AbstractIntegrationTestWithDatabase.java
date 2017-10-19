@@ -141,7 +141,9 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     {
         // Cleanup our global context object
         try {
-            context.commit();
+            if(context == null || !context.isValid()){
+                context = new Context();
+            }
             parentCommunity = context.reloadEntity(parentCommunity);
             eperson = context.reloadEntity(eperson);
 

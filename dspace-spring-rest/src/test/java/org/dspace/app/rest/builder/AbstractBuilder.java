@@ -143,10 +143,12 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
 
     public abstract T build();
 
-    public void delete(Context context, T dso) throws SQLException, IOException, AuthorizeException {
-        T attachedDso = context.reloadEntity(dso);
+    public void delete(T dso) throws SQLException, IOException, AuthorizeException {
+        Context c = new Context();
+        c.turnOffAuthorisationSystem();
+        T attachedDso = c.reloadEntity(dso);
         if(attachedDso != null) {
-            getDsoService().delete(context, attachedDso);
+            getDsoService().delete(c, attachedDso);
         }
     }
 }
