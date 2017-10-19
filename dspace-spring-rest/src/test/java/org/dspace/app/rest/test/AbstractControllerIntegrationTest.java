@@ -9,6 +9,7 @@ package org.dspace.app.rest.test;
 
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +55,6 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
             MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);
 
-    protected MockMvc mockMvc = null;
 
     protected HttpMessageConverter mappingJackson2HttpMessageConverter;
 
@@ -74,21 +74,14 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                 this.mappingJackson2HttpMessageConverter);
     }
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        if(mockMvc == null) {
-            mockMvc = webAppContextSetup(webApplicationContext)
-                    //Add all filter implementations
-                    .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]))
-                    .build();
-        }
-    }
+    public MockMvc getClient() throws SQLException {
+        if(context!=null && context.isValid())
+            context.commit();
 
-    @After
-    public void destroy() {
-        super.destroy();
-        mockMvc = null;
+        return webAppContextSetup(webApplicationContext)
+                //Add all filter implementations
+                .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]))
+                .build();
     }
 
 }

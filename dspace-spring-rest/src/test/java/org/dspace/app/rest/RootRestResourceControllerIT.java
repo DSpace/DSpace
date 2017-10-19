@@ -24,7 +24,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
     public void listDefinedEndpoint() throws Exception {
 
         //When we call the root endpoint
-        mockMvc.perform(get("/api"))
+        getClient().perform(get("/api"))
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
