@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
-import org.dspace.app.rest.model.SubmissionPanelRest;
+import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +28,18 @@ import org.springframework.stereotype.Component;
 public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionConfig, SubmissionDefinitionRest> {
 
 	@Autowired
-	private SubmissionPanelConverter panelConverter;
+	private SubmissionSectionConverter panelConverter;
 	
 	@Override
 	public SubmissionDefinitionRest fromModel(SubmissionConfig obj) {
 		SubmissionDefinitionRest sd = new SubmissionDefinitionRest();
 		sd.setName(obj.getSubmissionName());
 		sd.setDefaultConf(obj.isDefaultConf());
-		List<SubmissionPanelRest> panels = new LinkedList<SubmissionPanelRest>();
+		List<SubmissionSectionRest> panels = new LinkedList<SubmissionSectionRest>();
 		for (int idx = 0; idx < obj.getNumberOfSteps(); idx++) {
 			SubmissionStepConfig step = obj.getStep(idx);
 			if (step.isVisible()) {
-				SubmissionPanelRest sp = panelConverter.convert(step);				
+				SubmissionSectionRest sp = panelConverter.convert(step);				
 				panels.add(sp);
 			}
 		}

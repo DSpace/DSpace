@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value = Include.NON_NULL)
-public class InputFormInputTypeRest {
+public class SubmissionFormInputTypeRest {
 	private String type;
 	private String regex;
 	private AuthorityRest authority;

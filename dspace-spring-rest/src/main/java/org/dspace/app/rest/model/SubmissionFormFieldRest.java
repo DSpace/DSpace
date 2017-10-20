@@ -21,13 +21,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value = Include.NON_NULL)
-public class InputFormFieldRest {
+public class SubmissionFormFieldRest {
 	private String label;
 	private boolean mandatory;
 	private boolean repeatable;
 	private String mandatoryMessage;
 	private String hints;
-	private InputFormInputTypeRest input;
+	private SubmissionFormInputTypeRest input;
 	private ScopeEnum scope;
 	private SubmissionVisibilityRest visibility;
 	private List<SelectableMetadata> selectableMetadata;
@@ -80,11 +80,11 @@ public class InputFormFieldRest {
 		this.hints = hints;
 	}
 
-	public InputFormInputTypeRest getInput() {
+	public SubmissionFormInputTypeRest getInput() {
 		return input;
 	}
 
-	public void setInput(InputFormInputTypeRest input) {
+	public void setInput(SubmissionFormInputTypeRest input) {
 		this.input = input;
 	}
 

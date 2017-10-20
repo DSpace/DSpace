@@ -8,7 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.dspace.app.rest.model.SubmissionPanelRest;
+import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.util.SubmissionStepConfig;
@@ -21,14 +21,14 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class SubmissionPanelConverter extends DSpaceConverter<SubmissionStepConfig, SubmissionPanelRest> {
+public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepConfig, SubmissionSectionRest> {
 
 	@Override
-	public SubmissionPanelRest fromModel(SubmissionStepConfig step) {
-		SubmissionPanelRest sp = new SubmissionPanelRest();
+	public SubmissionSectionRest fromModel(SubmissionStepConfig step) {
+		SubmissionSectionRest sp = new SubmissionSectionRest();
 		sp.setMandatory(step.isMandatory());
 		sp.setHeader(step.getHeading());
-		sp.setPanelType(step.getType());
+		sp.setSectionType(step.getType());
 		sp.setId(step.getId());
 		sp.setVisibility(new SubmissionVisibilityRest(VisibilityEnum.fromString(step.getVisibility()),
 				VisibilityEnum.fromString(step.getVisibilityOutside())));	
@@ -36,7 +36,7 @@ public class SubmissionPanelConverter extends DSpaceConverter<SubmissionStepConf
 	}
 
 	@Override
-	public SubmissionStepConfig toModel(SubmissionPanelRest obj) {
+	public SubmissionStepConfig toModel(SubmissionSectionRest obj) {
 		throw new NotImplementedException();
 	}
 }

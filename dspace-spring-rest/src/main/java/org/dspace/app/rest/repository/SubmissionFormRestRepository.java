@@ -10,9 +10,9 @@ package org.dspace.app.rest.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.app.rest.converter.InputFormConverter;
-import org.dspace.app.rest.model.InputFormRest;
-import org.dspace.app.rest.model.hateoas.InputFormResource;
+import org.dspace.app.rest.converter.SubmissionFormConverter;
+import org.dspace.app.rest.model.SubmissionFormRest;
+import org.dspace.app.rest.model.hateoas.SubmissionFormResource;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
@@ -29,20 +29,20 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@Component(InputFormRest.CATEGORY + "." + InputFormRest.NAME)
-public class InputFormRestRepository extends DSpaceRestRepository<InputFormRest, String> implements LinkRestRepository<InputFormRest> {
+@Component(SubmissionFormRest.CATEGORY + "." + SubmissionFormRest.NAME)
+public class SubmissionFormRestRepository extends DSpaceRestRepository<SubmissionFormRest, String> implements LinkRestRepository<SubmissionFormRest> {
 
 	private DCInputsReader inputReader;
 
 	@Autowired
-	private InputFormConverter converter;
+	private SubmissionFormConverter converter;
 
-	public InputFormRestRepository() throws DCInputsReaderException {
+	public SubmissionFormRestRepository() throws DCInputsReaderException {
 		inputReader = new DCInputsReader();
 	}
 
 	@Override
-	public InputFormRest findOne(Context context, String submitName) {
+	public SubmissionFormRest findOne(Context context, String submitName) {
 		DCInputSet inputConfig;
 		try {
 			inputConfig = inputReader.getInputsByFormName(submitName);
@@ -56,7 +56,7 @@ public class InputFormRestRepository extends DSpaceRestRepository<InputFormRest,
 	}
 
 	@Override
-	public Page<InputFormRest> findAll(Context context, Pageable pageable) {
+	public Page<SubmissionFormRest> findAll(Context context, Pageable pageable) {
 		List<DCInputSet> subConfs = new ArrayList<DCInputSet>();
 		int total = inputReader.countInputs();
 		try {
@@ -64,17 +64,17 @@ public class InputFormRestRepository extends DSpaceRestRepository<InputFormRest,
 		} catch (DCInputsReaderException e) {
 			throw new IllegalStateException(e.getMessage(), e);
 		}
-		Page<InputFormRest> page = new PageImpl<DCInputSet>(subConfs, pageable, total).map(converter);
+		Page<SubmissionFormRest> page = new PageImpl<DCInputSet>(subConfs, pageable, total).map(converter);
 		return page;
 	}
 
 	@Override
-	public Class<InputFormRest> getDomainClass() {
-		return InputFormRest.class;
+	public Class<SubmissionFormRest> getDomainClass() {
+		return SubmissionFormRest.class;
 	}
 
 	@Override
-	public InputFormResource wrapResource(InputFormRest sd, String... rels) {
-		return new InputFormResource(sd, utils, rels);
+	public SubmissionFormResource wrapResource(SubmissionFormRest sd, String... rels) {
+		return new SubmissionFormResource(sd, utils, rels);
 	}
 }

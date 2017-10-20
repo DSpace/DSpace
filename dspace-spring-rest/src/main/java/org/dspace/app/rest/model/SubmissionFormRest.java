@@ -19,14 +19,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class InputFormRest extends BaseObjectRest<String> {
+public class SubmissionFormRest extends BaseObjectRest<String> {
 	public static final String NAME = "submission-form";
 	public static final String NAME_LINK_ON_PANEL = RestModel.CONFIGURATION;
 	public static final String CATEGORY = RestModel.CONFIGURATION;
 
 	private String name;
 	
-	private List<InputFormPageRest> pages;
+	private List<SubmissionFormPageRest> pages;
 
 	@Override
 	public String getId() {
@@ -41,11 +41,11 @@ public class InputFormRest extends BaseObjectRest<String> {
 		return name;
 	}
 	
-	public void setPages(List<InputFormPageRest> pages) {
+	public void setPages(List<SubmissionFormPageRest> pages) {
 		this.pages = pages;
 	}
 	
-	public List<InputFormPageRest> getPages() {
+	public List<SubmissionFormPageRest> getPages() {
 		return pages;
 	}
 	

@@ -7,20 +7,13 @@
  */
 package org.dspace.app.rest.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.converter.AuthorityEntryRestConverter;
+import org.dspace.app.rest.converter.AuthorityRestConverter;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
-import org.dspace.content.Collection;
 import org.dspace.content.authority.Choice;
-import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
-import org.dspace.content.authority.service.MetadataAuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,104 +29,21 @@ public class AuthorityUtils {
 	public static final String PRESENTATION_TYPE_LOOKUP = "lookup";
 
 	public static final String PRESENTATION_TYPE_SUGGEST = "suggest";
-	
+
+	public static final String RESERVED_KEYMAP_PARENT = "parent";
+
 	@Autowired
 	private ChoiceAuthorityService cas;
-
-	public AuthorityRest getAuthority(String schema, String element, String qualifier) {
-		return buildAuthorityRest(cas.getChoiceAuthorityName(schema, element, qualifier), schema, element, qualifier);
-	}
-
-	public AuthorityRest getAuthority(String name) {
-		String metadata = cas.getChoiceMetadatabyAuthorityName(name);
-		if (StringUtils.isNotBlank(metadata)) {
-			String[] tokens = tokenize(metadata);
-			String schema = tokens[0];
-			String element = tokens[1];
-			String qualifier = tokens[2];
-			return buildAuthorityRest(name, schema, element, qualifier);
-		}
-		return new AuthorityRest();
-	}
-
-	private AuthorityRest buildAuthorityRest(String name, String schema, String element, String qualifier) {
-		AuthorityRest authorityRest = new AuthorityRest();
-		authorityRest.setName(name);
-		authorityRest.setHierarchical(cas.isHierarchical(schema, element, qualifier));
-		authorityRest.setScrollable(cas.isScrollable(schema, element, qualifier));
-		authorityRest.setIdentifier(cas.hasIdentifier(schema, element, qualifier));
-		return authorityRest;
-	}
-
-	public List<AuthorityRest> getAuthorities() {
-		Set<String> names = cas.getChoiceAuthoritiesNames();
-		List<AuthorityRest> authorities = new ArrayList<AuthorityRest>();
-		for (String name : names) {
-			authorities.add(getAuthority(name));
-		}
-		return authorities;
-	}
-
-	private String[] tokenize(String metadata) {
-		String separator = metadata.contains("_") ? "_" : ".";
-		StringTokenizer dcf = new StringTokenizer(metadata, separator);
-
-		String[] tokens = { "", "", "" };
-		int i = 0;
-		while (dcf.hasMoreTokens()) {
-			tokens[i] = dcf.nextToken().trim();
-			i++;
-		}
-		// Tokens contains:
-		// schema = tokens[0];
-		// element = tokens[1];
-		// qualifier = tokens[2];
-		return tokens;
-
-	}
-
-	private String standardize(String schema, String element, String qualifier, String separator) {
-		if (StringUtils.isBlank(qualifier)) {
-			return schema + separator + element;
-		} else {
-			return schema + separator + element + separator + qualifier;
-		}
-	}
-
-	public List<AuthorityEntryRest> query(String metadata, String query, Collection collection, int start, int limit,
-			Locale locale) {
-		List<AuthorityEntryRest> result = new ArrayList<AuthorityEntryRest>();
-		if(StringUtils.isNotBlank(metadata)) {
-			String[] tokens = tokenize(metadata);
-			Choices choice = cas.getMatches(standardize(tokens[0], tokens[1], tokens[2], "_"), query, collection, start,
-					limit, locale.toString());
-			for (Choice value : choice.values) {
-				AuthorityEntryRest rr = buildEntry(value);
-				result.add(rr);
-			}
-		}
-		return result;
-	}
-
-	public AuthorityEntryRest get(String metadata, String authKey, String currentLocale) {
-		Choice value = cas.getChoice(metadata, authKey, currentLocale);
-		AuthorityEntryRest rr = buildEntry(value);
-		return rr;
-	}
 	
-	private AuthorityEntryRest buildEntry(Choice value) {
-		AuthorityEntryRest rr = new AuthorityEntryRest();
-		rr.setId(value.authority);
-		rr.setValue(value.value);
-		rr.setDisplay(value.label);
-		//TODO
-		rr.setCount(0);
-		rr.setOtherInformation(value.extras);		
-		return rr;
-	}
-
+	@Autowired
+	private AuthorityEntryRestConverter entryConverter;
+	
+	@Autowired
+	private AuthorityRestConverter authorityConverter;
+	
+	
 	public boolean isChoice(String schema, String element, String qualifier) {		
-		return cas.isChoicesConfigured(standardize(schema, element, qualifier, "_"));
+		return cas.isChoicesConfigured(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
 	}
 
 	public String getAuthorityName(String schema, String element, String qualifier) {
@@ -141,10 +51,36 @@ public class AuthorityUtils {
 	}
 
 	public boolean isClosed(String schema, String element, String qualifier) {
-		return cas.isClosed(standardize(schema, element, qualifier, "_"));
+		return cas.isClosed(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
 	}
 
 	public String getPresentation(String schema, String element, String qualifier) {		
-		return cas.getPresentation(standardize(schema, element, qualifier, "_"));
+		return cas.getPresentation(org.dspace.core.Utils.standardize(schema, element, qualifier, "_"));
+	}
+	
+	/**
+	 * TODO the authorityName MUST be a part of Choice model
+	 * 
+	 * @param choice
+	 * @param authorityName
+	 * @return
+	 */
+	public AuthorityEntryRest convertEntry(Choice choice, String authorityName) {
+		AuthorityEntryRest entry = entryConverter.convert(choice);
+		entry.setAuthorityName(authorityName);		
+		return entry;
+	}
+	
+	/**
+	 * TODO the authorityName MUST be a part of ChoiceAuthority model
+	 * 
+	 * @param source
+	 * @param name
+	 * @return
+	 */
+	public AuthorityRest convertAuthority(ChoiceAuthority source, String authorityName) {
+		AuthorityRest result = authorityConverter.convert(source);
+		result.setName(authorityName);
+		return result;
 	}
 }

@@ -13,10 +13,10 @@ import java.util.List;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.app.rest.model.InputFormFieldRest;
-import org.dspace.app.rest.model.InputFormInputTypeRest;
-import org.dspace.app.rest.model.InputFormPageRest;
-import org.dspace.app.rest.model.InputFormRest;
+import org.dspace.app.rest.model.SubmissionFormFieldRest;
+import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
+import org.dspace.app.rest.model.SubmissionFormPageRest;
+import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.ScopeEnum;
 import org.dspace.app.rest.model.SelectableMetadata;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  */
 @Component
-public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRest> {
+public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, SubmissionFormRest> {
 	
 	private static final String INPUT_TYPE_ONEBOX = "onebox";
 	private static final String INPUT_TYPE_NAME = "name";
@@ -49,20 +49,20 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 	private AuthorityUtils authorityUtils;
 	
 	@Override
-	public InputFormRest fromModel(DCInputSet obj) {
-		InputFormRest sd = new InputFormRest();
+	public SubmissionFormRest fromModel(DCInputSet obj) {
+		SubmissionFormRest sd = new SubmissionFormRest();
 		sd.setName(obj.getFormName());
-		List<InputFormPageRest> pages = new LinkedList<InputFormPageRest>();
+		List<SubmissionFormPageRest> pages = new LinkedList<SubmissionFormPageRest>();
 			DCInput[] step = obj.getFields();
-			InputFormPageRest sp = getPage(step);
+			SubmissionFormPageRest sp = getPage(step);
 			pages.add(sp);
 		sd.setPages(pages);
 		return sd;
 	}
 
-	private InputFormPageRest getPage(DCInput[] page) {
-		InputFormPageRest ifPage = new InputFormPageRest();
-		List<InputFormFieldRest> fields = new LinkedList<InputFormFieldRest>();
+	private SubmissionFormPageRest getPage(DCInput[] page) {
+		SubmissionFormPageRest ifPage = new SubmissionFormPageRest();
+		List<SubmissionFormFieldRest> fields = new LinkedList<SubmissionFormFieldRest>();
 		for (DCInput dcinput : page) {
 			fields.add(getField(dcinput));
 		}
@@ -70,11 +70,10 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 		return ifPage;
 	}
 
-	private InputFormFieldRest getField(DCInput dcinput) {
-		InputFormFieldRest inputField = new InputFormFieldRest();
+	private SubmissionFormFieldRest getField(DCInput dcinput) {
+		SubmissionFormFieldRest inputField = new SubmissionFormFieldRest();
 		List<SelectableMetadata> selectableMetadata = new ArrayList<SelectableMetadata>();
 		
-		inputField.setSelectableMetadata(selectableMetadata);
 		inputField.setLabel(dcinput.getLabel());
 		inputField.setHints(dcinput.getHints());
 		inputField.setMandatoryMessage(dcinput.getWarning());
@@ -85,11 +84,11 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 						VisibilityEnum.fromString(dcinput.isReadOnly("workflow")?"read-only":null)));
 		inputField.setRepeatable(dcinput.isRepeatable());
 
-		InputFormInputTypeRest inputRest = new InputFormInputTypeRest();
+		SubmissionFormInputTypeRest inputRest = new SubmissionFormInputTypeRest();
 		
 		inputRest.setRegex(dcinput.getRegex());
 		
-		if (!StringUtils.equalsIgnoreCase(inputRest.getType(), "qualdrop_value")) {
+		if (!StringUtils.equalsIgnoreCase(dcinput.getInputType(), "qualdrop_value")) {
 			// value-pair and vocabulary are a special kind of authorities
 			String inputType = dcinput.getInputType();
 			
@@ -98,7 +97,7 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 				inputRest.setType(getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
 				selMd.setAuthority(
 						authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
-				selMd.setClosed(authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+				selMd.setClosed(authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));				
 			}
 			else {
 				inputRest.setType(inputType);		
@@ -120,8 +119,9 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 				}
 				selectableMetadata.add(selMd);
 			}
-		}
+		}	
 		inputField.setInput(inputRest);
+		inputField.setSelectableMetadata(selectableMetadata);
 		return inputField;
 	}
 
@@ -147,7 +147,7 @@ public class InputFormConverter extends DSpaceConverter<DCInputSet, InputFormRes
 	}
 
 	@Override
-	public DCInputSet toModel(InputFormRest obj) {
+	public DCInputSet toModel(SubmissionFormRest obj) {
 		throw new NotImplementedException();
 	}
 }

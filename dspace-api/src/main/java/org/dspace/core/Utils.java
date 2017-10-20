@@ -16,14 +16,28 @@ import java.math.BigInteger;
 import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
-import com.coverity.security.Escape;
-import org.apache.commons.collections.CollectionUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputSet;
+import org.dspace.app.util.DCInputsReader;
+import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.content.Collection;
+
+import com.coverity.security.Escape;
 
 /**
  * Utility functions for DSpace.
@@ -411,7 +425,50 @@ public final class Utils
         return result.substring(0, rl-2) + ":" + result.substring(rl-2);
     }
 
-    public static <E> Collection<E> emptyIfNull(Collection<E> collection) {
+    public static <E> java.util.Collection<E> emptyIfNull(java.util.Collection<E> collection) {
         return collection == null ? Collections.<E>emptyList() : collection;
     }
+    
+	public static String getInputFormNameByCollectionAndField(Collection collection, String field) throws DCInputsReaderException {
+		DCInputsReader dcInputsReader = new DCInputsReader();
+		List<DCInputSet> inputSets = dcInputsReader.getInputsByCollectionHandle(collection.getHandle());
+		for (DCInputSet inputSet : inputSets) {
+			String[] tokenized = tokenize(field);
+			String element = tokenized[1];
+			String qualifier = tokenized[2];
+			if(StringUtils.isBlank(qualifier)) {
+				qualifier = null;
+			}
+			if (inputSet.isFieldPresent(element+"."+qualifier)) {
+				return inputSet.getFormName();
+			}
+		}
+		throw new DCInputsReaderException("No field configuration found!");
+	}
+	
+	public static String[] tokenize(String metadata) {
+		String separator = metadata.contains("_") ? "_" : ".";
+		StringTokenizer dcf = new StringTokenizer(metadata, separator);
+
+		String[] tokens = { "", "", "" };
+		int i = 0;
+		while (dcf.hasMoreTokens()) {
+			tokens[i] = dcf.nextToken().trim();
+			i++;
+		}
+		// Tokens contains:
+		// schema = tokens[0];
+		// element = tokens[1];
+		// qualifier = tokens[2];
+		return tokens;
+
+	}
+	
+	public static String standardize(String schema, String element, String qualifier, String separator) {
+		if (StringUtils.isBlank(qualifier)) {
+			return schema + separator + element;
+		} else {
+			return schema + separator + element + separator + qualifier;
+		}
+	}
 }

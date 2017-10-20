@@ -31,7 +31,7 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 	@JsonProperty(value="isDefault")
 	private boolean defaultConf;
 	
-	private List<SubmissionPanelRest> panels;
+	private List<SubmissionSectionRest> panels;
 
 	@Override
 	public String getId() {
@@ -46,13 +46,13 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 		return name;
 	}
 	
-	public void setPanels(List<SubmissionPanelRest> panels) {
+	public void setPanels(List<SubmissionSectionRest> panels) {
 		this.panels = panels;
 	}
 	
-	@LinkRest(name=SubmissionPanelRest.NAME, linkClass = SubmissionPanelRest.class)
+	@LinkRest(name=SubmissionSectionRest.NAME, linkClass = SubmissionSectionRest.class)
 	@JsonIgnore
-	public List<SubmissionPanelRest> getPanels() {
+	public List<SubmissionSectionRest> getPanels() {
 		return panels;
 	}
 	

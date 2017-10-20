@@ -7,8 +7,11 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serializable;
 import java.util.Map;
+
+import org.dspace.app.rest.RestResourceController;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The Authority Entry REST Resource
@@ -16,15 +19,15 @@ import java.util.Map;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class AuthorityEntryRest implements Serializable {
+public class AuthorityEntryRest implements RestModel {
 	public static final String NAME = "authorityEntry";
 	private String id;
 	private String display;
 	private String value;
-	private long count;
 	private Map<String, String> otherInformation;
-	private AuthorityEntryRest parent;
 
+	@JsonIgnore
+	private String authorityName;
 	
 	public String getId() {
 		return id;
@@ -32,18 +35,11 @@ public class AuthorityEntryRest implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
 	public String getDisplay() {
 		return display;
 	}
 	public void setDisplay(String value) {
 		this.display = value;
-	}
-	public long getCount() {
-		return count;
-	}
-	public void setCount(long count) {
-		this.count = count;
 	}
 	public Map<String, String> getOtherInformation() {
 		return otherInformation;
@@ -51,20 +47,32 @@ public class AuthorityEntryRest implements Serializable {
 	public void setOtherInformation(Map<String, String> otherInformation) {
 		this.otherInformation = otherInformation;
 	}
-	public AuthorityEntryRest getParent() {
-		return parent;
-	}
-	public void setParent(AuthorityEntryRest parent) {
-		this.parent = parent;
-	}
-	public static String getName() {
-		return NAME;
-	}
 	public String getValue() {
 		return value;
 	}
 	public void setValue(String value) {
 		this.value = value;
+	}
+	public static String getName() {
+		return NAME;
+	}
+	public String getAuthorityName() {
+		return authorityName;
+	}
+	public void setAuthorityName(String authorityName) {
+		this.authorityName = authorityName;
+	}
+	@Override
+	public String getCategory() {
+		return AuthorityRest.CATEGORY;
+	}
+	@Override
+	public String getType() {
+		return AuthorityRest.NAME;
+	}
+	@Override
+	public Class getController() {
+		return RestResourceController.class;
 	}
 
 }

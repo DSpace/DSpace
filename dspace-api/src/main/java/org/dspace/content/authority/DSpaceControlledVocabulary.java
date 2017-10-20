@@ -7,27 +7,26 @@
  */
 package org.dspace.content.authority;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.io.File;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.dspace.content.Collection;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.xml.sax.InputSource;
-
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
+import org.dspace.content.Collection;
 import org.dspace.core.SelfNamedPlugin;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * ChoiceAuthority source that reads the JSPUI-style hierarchical vocabularies
@@ -63,6 +62,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     private static Logger log = Logger.getLogger(DSpaceControlledVocabulary.class);
     protected static String xpathTemplate = "//node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')]";
     protected static String idTemplate = "//node[@id = '%s']";
+    protected static String idParentTemplate = "//node[@id = '%s']/parent::isComposedBy";
     protected static String pluginNames[] = null;
 
     protected String vocabularyName = null;
@@ -177,29 +177,12 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
             String[] authorities = new String[results.getLength()];
             String[] values = new String[results.getLength()];
             String[] labels = new String[results.getLength()];
+            String[] parent = new String[results.getLength()];
+            String[] notes = new String[results.getLength()];
             for (int i = 0; i < results.getLength(); i++)
             {
                 Node node = results.item(i);
-                String hierarchy = this.buildString(node);
-                if (this.suggestHierarchy)
-                {
-                    labels[i] = hierarchy;
-                }
-                else
-                {
-                    labels[i] = node.getAttributes().getNamedItem("label").getNodeValue();
-                }
-                if (this.storeHierarchy)
-                {
-                    values[i] = hierarchy;
-                }
-                else
-                {
-                    values[i] = node.getAttributes().getNamedItem("label").getNodeValue();
-                }
-                Node idAttr = node.getAttributes().getNamedItem("id");
-                if (null != idAttr) // 'id' is optional
-                    authorities[i] = idAttr.getNodeValue();
+                readNode(authorities, values, labels, parent, notes, i, node);
             }
             int resultCount = labels.length - start;
             if ((limit > 0) && (resultCount > limit)) // limit = 0 means no limit
@@ -211,6 +194,12 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
                 {
                     choices[i] = new Choice(authorities[start + i], values[start
                             + i], labels[start + i]);
+                    if(StringUtils.isNotBlank(parent[i])) {
+                    	choices[i].extras.put("parent", parent[i]);
+                    }
+                    if(StringUtils.isNotBlank(notes[i])) {
+                    	choices[i].extras.put("note", notes[i]);
+                    }
                 }
             }
     	} catch(XPathExpressionException e) {
@@ -218,6 +207,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	}
     	return new Choices(choices, 0, choices.length, Choices.CF_AMBIGUOUS, false);
     }
+
 
     @Override
     public Choices getBestMatch(String field, String text, Collection collection, String locale)
@@ -240,4 +230,96 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     		return("");
     	}
     }
+    
+    @Override
+    public boolean isHierarchical() {
+		return true;
+	}
+    
+	@Override
+	public Choice getChoice(String fieldKey, String authKey, String locale) {
+		init();
+		log.debug("Getting matches for '" + authKey + "'");
+		String xpathExpression = String.format(idTemplate, authKey);
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		try {
+			Node node = (Node) xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
+			if (node != null) {
+				String[] authorities = new String[1];
+				String[] values = new String[1];
+				String[] labels = new String[1];
+				String[] parent = new String[1];
+				String[] note = new String[1];
+				readNode(authorities, values, labels, parent, note, 0, node);
+
+				if (values.length > 0) {
+					Choice choice = new Choice(authorities[0], values[0], labels[0]);
+					if (StringUtils.isNotBlank(parent[0])) {
+						choice.extras.put("parent", parent[0]);
+					}
+                    if(StringUtils.isNotBlank(note[0])) {
+                    	choice.extras.put("note", note[0]);
+                    }
+					return choice;
+				}
+			}
+		} catch (XPathExpressionException e) {
+			log.warn(e.getMessage(), e);
+		}
+		return new Choice("", "", "");
+	}
+
+	
+	private void readNode(String[] authorities, String[] values, String[] labels, String[] parent, String[] notes, int i, Node node) {
+		String hierarchy = this.buildString(node);
+		if (this.suggestHierarchy)
+		{
+		    labels[i] = hierarchy;
+		}
+		else
+		{
+		    labels[i] = node.getAttributes().getNamedItem("label").getNodeValue();
+		}
+		if (this.storeHierarchy)
+		{
+		    values[i] = hierarchy;
+		}
+		else
+		{
+		    values[i] = node.getAttributes().getNamedItem("label").getNodeValue();
+		}
+		
+		NodeList childNodes = node.getChildNodes();
+        for (int ci = 0; ci < childNodes.getLength(); ci++)
+        {
+            Node firstChild = childNodes.item(ci);
+            if(firstChild!=null && "hasNote".equals(firstChild.getNodeName())) {
+            	String nodeValue = firstChild.getTextContent();
+            	if(StringUtils.isNotBlank(nodeValue)) {
+            		notes[i] = nodeValue;
+            	}
+            }
+		}
+		Node idAttr = node.getAttributes().getNamedItem("id");
+		if (null != idAttr) { // 'id' is optional
+		    authorities[i] = idAttr.getNodeValue();
+			if(isHierarchical()) {
+				Node parentN = node.getParentNode();
+				if(parentN != null) {
+					parentN = parentN.getParentNode();
+					if (parentN != null) {
+						Node parentIdAttr = parentN.getAttributes().getNamedItem("id");
+						if (null != parentIdAttr) {
+							parent[i] = parentIdAttr.getNodeValue();
+						}
+					}
+				}
+			}
+		}
+		else {
+			authorities[i] = null;
+			parent[i] = null;
+		}
+	}
+
 }

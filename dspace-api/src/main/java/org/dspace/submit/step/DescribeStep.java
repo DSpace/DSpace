@@ -24,8 +24,11 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -62,7 +65,8 @@ public class DescribeStep extends AbstractProcessingStep
 
     /** hash of all submission forms details */
     private static DCInputsReader inputsReader = null;
-
+    private static SubmissionConfigReader submissionConfigReader = null;
+    
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
      * additional user interaction may be required)
@@ -93,6 +97,7 @@ public class DescribeStep extends AbstractProcessingStep
     {
         //load the DCInputsReader
         getInputsReader();
+        submissionConfigReader = new SubmissionConfigReader();
         metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
         choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
     }
@@ -152,7 +157,13 @@ public class DescribeStep extends AbstractProcessingStep
         DCInput[] inputs = null;
         try
         {
-            inputs = inputsReader.getInputsByCollectionHandle(c.getHandle()).getFields();
+            List<DCInputSet> inputsByCollectionHandle = inputsReader.getInputsByCollectionHandle(c.getHandle());
+            for(DCInputSet iset : inputsByCollectionHandle) {
+            	SubmissionStepConfig step = submissionConfigReader.getStepConfig(iset.getFormName());
+            	if(step.getStepNumber()==currentPage) {
+            		inputs = iset.getFields();            		
+            	}
+            }
         }
         catch (DCInputsReaderException e)
         {

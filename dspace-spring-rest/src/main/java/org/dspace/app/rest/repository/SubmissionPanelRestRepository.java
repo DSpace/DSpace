@@ -12,10 +12,10 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
-import org.dspace.app.rest.converter.SubmissionPanelConverter;
+import org.dspace.app.rest.converter.SubmissionSectionConverter;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
-import org.dspace.app.rest.model.SubmissionPanelRest;
-import org.dspace.app.rest.model.hateoas.SubmissionPanelResource;
+import org.dspace.app.rest.model.SubmissionSectionRest;
+import org.dspace.app.rest.model.hateoas.SubmissionSectionResource;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionStepConfig;
@@ -32,20 +32,20 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-@Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionPanelRest.NAME)
-public class SubmissionPanelRestRepository extends DSpaceRestRepository<SubmissionPanelRest, String> {
+@Component(SubmissionDefinitionRest.CATEGORY + "." + SubmissionSectionRest.NAME)
+public class SubmissionPanelRestRepository extends DSpaceRestRepository<SubmissionSectionRest, String> {
 
 	private SubmissionConfigReader submissionConfigReader;
 
 	@Autowired
-	private SubmissionPanelConverter converter;
+	private SubmissionSectionConverter converter;
 	
 	public SubmissionPanelRestRepository() throws ServletException {
 		submissionConfigReader = new SubmissionConfigReader();
 	}
 	
 	@Override
-	public SubmissionPanelRest findOne(Context context, String id) {
+	public SubmissionSectionRest findOne(Context context, String id) {
 		try {
 			SubmissionStepConfig step = submissionConfigReader.getStepConfig(id);
 			return converter.convert(step);
@@ -56,7 +56,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
 	}
 
 	@Override
-	public Page<SubmissionPanelRest> findAll(Context context, Pageable pageable) {
+	public Page<SubmissionSectionRest> findAll(Context context, Pageable pageable) {
 		List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
 		subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
 		int total = 0;
@@ -68,18 +68,18 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
 				stepConfs.add(step);
 			}
 		}
-		Page<SubmissionPanelRest> page = new PageImpl<SubmissionStepConfig>(stepConfs, pageable, total).map(converter);
+		Page<SubmissionSectionRest> page = new PageImpl<SubmissionStepConfig>(stepConfs, pageable, total).map(converter);
 		return page;
 	}
 
 	@Override
-	public Class<SubmissionPanelRest> getDomainClass() {
-		return SubmissionPanelRest.class;
+	public Class<SubmissionSectionRest> getDomainClass() {
+		return SubmissionSectionRest.class;
 	}
 
 	@Override
-	public SubmissionPanelResource wrapResource(SubmissionPanelRest model, String... rels) {
-		return new SubmissionPanelResource(model, utils, rels);
+	public SubmissionSectionResource wrapResource(SubmissionSectionRest model, String... rels) {
+		return new SubmissionSectionResource(model, utils, rels);
 	}
 
 }

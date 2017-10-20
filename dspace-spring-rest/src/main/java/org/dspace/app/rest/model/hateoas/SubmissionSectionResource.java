@@ -12,8 +12,8 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.app.rest.model.InputFormRest;
-import org.dspace.app.rest.model.SubmissionPanelRest;
+import org.dspace.app.rest.model.SubmissionFormRest;
+import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.hateoas.Link;
@@ -26,18 +26,18 @@ import org.springframework.web.util.UriComponentsBuilder;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-@RelNameDSpaceResource(SubmissionPanelRest.NAME)
-public class SubmissionPanelResource extends DSpaceResource<SubmissionPanelRest> {
+@RelNameDSpaceResource(SubmissionSectionRest.NAME)
+public class SubmissionSectionResource extends DSpaceResource<SubmissionSectionRest> {
 
-	public SubmissionPanelResource(SubmissionPanelRest sd, Utils utils, String... rels) {
+	public SubmissionSectionResource(SubmissionSectionRest sd, Utils utils, String... rels) {
 		super(sd, utils, rels);	
-		if("input-form".equals(sd.getPanelType())) {
-			RestResourceController methodOn = methodOn(RestResourceController.class, InputFormRest.CATEGORY, InputFormRest.NAME);			
+		if("input-form".equals(sd.getSectionType())) {
+			RestResourceController methodOn = methodOn(RestResourceController.class, SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME);			
 			UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
-					.findRel(null, InputFormRest.CATEGORY, English.plural(InputFormRest.NAME), sd.getId(), "", null, null, null))
+					.findRel(null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME), sd.getId(), "", null, null, null))
 					.toUriComponentsBuilder();
 			String uribuilder = uriComponentsBuilder.build().toString();
-			Link link = new Link(uribuilder.substring(0, uribuilder.lastIndexOf("/")), InputFormRest.NAME_LINK_ON_PANEL);
+			Link link = new Link(uribuilder.substring(0, uribuilder.lastIndexOf("/")), SubmissionFormRest.NAME_LINK_ON_PANEL);
 			add(link);	
 		}		
 	}

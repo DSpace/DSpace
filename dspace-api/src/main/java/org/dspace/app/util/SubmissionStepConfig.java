@@ -30,6 +30,9 @@ import java.io.Serializable;
  */
 public class SubmissionStepConfig implements Serializable
 {
+	
+	public static final String INPUT_FORM_STEP_NAME = "input-form";
+	
     /*
      * The identifier for the Select Collection step
      */

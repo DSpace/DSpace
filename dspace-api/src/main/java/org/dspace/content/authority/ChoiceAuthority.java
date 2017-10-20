@@ -75,15 +75,15 @@ public interface ChoiceAuthority
      */
     public String getLabel(String field, String key, String locale);
 
-    default public boolean isHierarchical() {
+    default boolean isHierarchical() {
 		return false;
 	}
 	
-    default public boolean isScrollable() {
+    default boolean isScrollable() {
 		return false;
 	}
 
-    default public boolean hasIdentifier() {
+    default boolean hasIdentifier() {
 		return true;
 	}
     
@@ -94,4 +94,5 @@ public interface ChoiceAuthority
 		result.value = getLabel(fieldKey, authKey, locale);
 		return result;
 	}
+	
 }

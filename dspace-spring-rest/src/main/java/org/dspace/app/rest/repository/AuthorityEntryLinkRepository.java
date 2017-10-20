@@ -8,18 +8,22 @@
 package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.rest.converter.AuthorityEntryRestConverter;
 import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.hateoas.AuthorityEntryResource;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.content.Collection;
-import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.authority.Choice;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,16 +44,20 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 		implements LinkRestRepository<AuthorityEntryRest> {
 
 	@Autowired
+	private ChoiceAuthorityService cas;
+	
+	@Autowired
+	private CollectionService cs;
+	
+	@Autowired
 	private AuthorityUtils authorityUtils;
-
-	CollectionService cs = ContentServiceFactory.getInstance().getCollectionService();
 	
 	@Override
 	public ResourceSupport wrapResource(AuthorityEntryRest model, String... rels) {
 		return new AuthorityEntryResource(model);
 	}
 
-	public Page<AuthorityEntryRest> listAuthorityEntries(HttpServletRequest request, String name, 
+	public Page<AuthorityEntryRest> query(HttpServletRequest request, String name, 
 			Pageable pageable, String projection) {
 		Context context = obtainContext();
 		String query = request.getParameter("query");
@@ -62,18 +70,17 @@ public class AuthorityEntryLinkRepository extends AbstractDSpaceRestRepository
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
+		}		
+		List<AuthorityEntryRest> results = new ArrayList<AuthorityEntryRest>();
+		if(StringUtils.isNotBlank(metadata)) {
+			String[] tokens = org.dspace.core.Utils.tokenize(metadata);
+			String fieldKey = org.dspace.core.Utils.standardize(tokens[0], tokens[1], tokens[2], "_");
+			Choices choices = cas.getMatches(fieldKey, query, collection, pageable.getOffset(), pageable.getPageSize(), context.getCurrentLocale().toString());
+			for (Choice value : choices.values) {				
+				results.add(authorityUtils.convertEntry(value, name));
+			}
 		}
-		List<AuthorityEntryRest> authorities = authorityUtils.query(metadata, query, collection, pageable.getOffset(), pageable.getPageSize(), context.getCurrentLocale());
-		return new PageImpl<AuthorityEntryRest>(authorities, pageable, authorities.size());
-	}
-	
-	
-	public AuthorityEntryRest listAuthorityEntry(HttpServletRequest request, String name, 
-			Pageable pageable, String projection) {
-		Context context = obtainContext();		
-		String metadata = request.getParameter("metadata");
-		String authKey = request.getParameter("key");
-		return authorityUtils.get(metadata, authKey, context.getCurrentLocale().toString());
+		return new PageImpl<AuthorityEntryRest>(results, pageable, results.size());
 	}
 	
 }

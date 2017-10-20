@@ -154,23 +154,54 @@ public class DCInputsReader
      *             if no default set defined
      * @throws ServletException 
      */
-    public DCInputSet getInputsByCollectionHandle(String collectionHandle)
+    public List<DCInputSet> getInputsByCollectionHandle(String collectionHandle)
         throws DCInputsReaderException
     {
     	SubmissionConfig config;
 		try {
-			config = new SubmissionConfigReader().getSubmissionConfigByName(collectionHandle);
+			config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
 			String formName = config.getSubmissionName();
 	        if (formName == null)
 	        {
 	            throw new DCInputsReaderException("No form designated as default");
 	        }
-	        return getInputsByFormName(formName);
+	        List<DCInputSet> results = new ArrayList<DCInputSet>();
+	        for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
+				SubmissionStepConfig step = config.getStep(idx);
+				if(SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
+					results.add(getInputsByFormName(step.getId()));
+				}
+	        }
+	        return results;
 		} catch (ServletException e) {
 			throw new DCInputsReaderException("No form designated as default");
 		}
     }
-        
+       
+    public List<DCInputSet> getInputsBySubmissionName(String name)
+            throws DCInputsReaderException
+        {
+        	SubmissionConfig config;
+    		try {
+    			config = new SubmissionConfigReader().getSubmissionConfigByName(name);
+    			String formName = config.getSubmissionName();
+    	        if (formName == null)
+    	        {
+    	            throw new DCInputsReaderException("No form designated as default");
+    	        }
+    	        List<DCInputSet> results = new ArrayList<DCInputSet>();
+    	        for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
+    				SubmissionStepConfig step = config.getStep(idx);
+    				if(SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
+    					results.add(getInputsByFormName(step.getId()));
+    				}
+    	        }
+    	        return results;
+    		} catch (ServletException e) {
+    			throw new DCInputsReaderException("No form designated as default");
+    		}
+        }
+    
     /**
      * Returns the set of DC inputs used for a particular input form
      *

@@ -164,16 +164,16 @@ public class RestResourceController implements InitializingBean {
 		LinkRest linkRest = utils.getLinkRest(rel, domainClass);
 		if (linkRest != null) {
 			LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
-			Method linkMethod = repositoryUtils.getLinkMethod("getKey", linkRepository);
+			Method linkMethod = repositoryUtils.getLinkMethod("getResource", linkRepository);
 			
 			try {
-				Page<? extends Serializable> pageResult = (Page<? extends RestModel>) linkMethod
-						.invoke(linkRepository, request, id, relid, page, projection);
+				Object object = linkMethod.invoke(linkRepository, request, id, relid, page, projection);
 				Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(id)
 						.slash(rel).withSelfRel();
-				PagedResources<? extends ResourceSupport> result = assembler
-						.toResource(pageResult.map(linkRepository::wrapResource), link);
-				return result;
+				List result = new ArrayList();
+				result.add(object);
+				PageImpl<RestModel> pageResult = new PageImpl(result, page, 1);
+				return assembler.toResource(pageResult.map(linkRepository::wrapResource),link);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}

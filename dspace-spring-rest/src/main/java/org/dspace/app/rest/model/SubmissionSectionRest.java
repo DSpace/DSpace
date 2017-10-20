@@ -23,12 +23,12 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value=Include.NON_NULL)
-public class SubmissionPanelRest extends BaseObjectRest<String> {
+public class SubmissionSectionRest extends BaseObjectRest<String> {
 	
-	public static final String NAME = "submission-panel";	
+	public static final String NAME = "submission-section";	
 	private String header;
 	private boolean mandatory;
-	private String panelType;
+	private String sectionType;
 	private ScopeEnum scope;
 	private SubmissionVisibilityRest visibility;
 	
@@ -49,7 +49,7 @@ public class SubmissionPanelRest extends BaseObjectRest<String> {
 	}
 
 	public String getType() {
-		return "submission-panel";
+		return NAME;
 	}
 
 	public ScopeEnum getScope() {
@@ -80,12 +80,12 @@ public class SubmissionPanelRest extends BaseObjectRest<String> {
 		return RestResourceController.class;
 	}
 
-	public String getPanelType() {
-		return panelType;
+	public String getSectionType() {
+		return sectionType;
 	}
 
-	public void setPanelType(String panelType) {
-		this.panelType = panelType;
+	public void setSectionType(String panelType) {
+		this.sectionType = panelType;
 	}
 
 }

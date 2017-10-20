@@ -16,15 +16,15 @@ import org.dspace.app.rest.RestResourceController;
  *
  */
 @LinksRest(links = {
-		@LinkRest(name = AuthorityRest.ENTRIES, linkClass = AuthorityEntryRest.class, method = "listAuthorityEntries", optional = true),
-		@LinkRest(name = AuthorityRest.ENTRY, linkClass = AuthorityEntryRest.class, method = "listAuthorityEntry", optional = true)
+	@LinkRest(name = AuthorityRest.ENTRIES, linkClass = AuthorityEntryRest.class, method = "query", optional = true),
+	@LinkRest(name = AuthorityRest.ENTRY, linkClass = AuthorityEntryRest.class, method = "getResource", optional = true)	
 })
 public class AuthorityRest extends BaseObjectRest<String> {
 
 	public static final String NAME = "authority";
 	public static final String CATEGORY = RestModel.INTEGRATION;
 	public static final String ENTRIES = "entries";
-	public static final String ENTRY = "entry";
+	public static final String ENTRY = "entryValues";
 	
 	private String name;
 

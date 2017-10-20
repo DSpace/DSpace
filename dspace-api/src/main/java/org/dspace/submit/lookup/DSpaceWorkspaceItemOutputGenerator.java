@@ -332,7 +332,8 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
     protected DCInput getDCInput(String formName, String schema, String element,
             String qualifier) throws DCInputsReaderException
     {
-        DCInputSet dcinputset = new DCInputsReader().getInputsByCollectionHandle(formName);
+        List<DCInputSet> dcinputsets = new DCInputsReader().getInputsBySubmissionName(formName);
+        for(DCInputSet dcinputset : dcinputsets) {
             for (DCInput dcinput : dcinputset.getFields())
             {
                 if (dcinput.getSchema().equals(schema)
@@ -344,6 +345,7 @@ public class DSpaceWorkspaceItemOutputGenerator implements OutputGenerator
                     return dcinput;
                 }
             }
+        }
         return null;
     }
 

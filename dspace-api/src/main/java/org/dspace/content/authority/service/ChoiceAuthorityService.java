@@ -37,6 +37,7 @@ import org.dspace.content.authority.Choices;
  */
 public interface ChoiceAuthorityService
 {
+	
 	/**
 	 * 
 	 * @return the names of all the defined choice authorities
@@ -53,30 +54,6 @@ public interface ChoiceAuthorityService
 	 * 
 	 */
 	public String getChoiceAuthorityName(String schema, String element, String qualifier);
-
-    /**
-     *  Wrapper that calls isHierachical method of the plugin corresponding to
-     *  the metadata field defined by schema,element,qualifier.
-     *
-     * @see org.dspace.content.authority.ChoiceAuthority#isHierachical()
-     * @param schema schema of metadata field
-     * @param element element of metadata field
-     * @param qualifier qualifier of metadata field
-     * @return true if the authority structure is hierachical
-     */
-    public boolean isHierarchical(String schema, String element, String qualifier);
-
-    /**
-     *  Wrapper that calls isScrollable method of the plugin corresponding to
-     *  the metadata field defined by schema,element,qualifier.
-     *
-     * @see org.dspace.content.authority.ChoiceAuthority#isScrollable()
-     * @param schema schema of metadata field
-     * @param element element of metadata field
-     * @param qualifier qualifier of metadata field
-     * @return true if the authority can be scrolled other than searched
-     */
-    public boolean isScrollable(String schema, String element, String qualifier);
 	
     /**
      *  Wrapper that calls getMatches method of the plugin corresponding to
@@ -181,6 +158,7 @@ public interface ChoiceAuthorityService
 	public String getChoiceMetadatabyAuthorityName(String name);
 	
 	public Choice getChoice(String fieldKey, String authKey, String locale);
- 
-	public boolean hasIdentifier(String schema, String element, String qualifier);
+	
+	public ChoiceAuthority getChoiceAuthorityByAuthorityName(String authorityName);
+	
 }

@@ -206,32 +206,17 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
         return null;
     }
     
-    @Override
-    public boolean isHierarchical(String schema, String element, String qualifier) {
-    	String fieldKey = makeFieldKey(schema, element, qualifier);
-		ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
-        if (ma == null)
-        {
-//            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
-        	return false;
-        }
-        return ma.isHierarchical();
-    }
-    
-    @Override
-    public boolean isScrollable(String schema, String element, String qualifier) {
-    	String fieldKey = makeFieldKey(schema, element, qualifier);
-		ChoiceAuthority ma = getChoiceAuthorityMap().get(fieldKey);
-        if (ma == null)
-        {
-//            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
-            return false;
-        }
-        return ma.isScrollable();
-    }
     
     @Override
     public String getChoiceAuthorityName(String schema, String element, String qualifier) {
+    	String makeFieldKey = makeFieldKey(schema, element, qualifier);
+		if(getChoiceAuthorityMap().containsKey(makeFieldKey)) {			
+    		for(String key : this.authorities.keySet()) {
+    			if(this.authorities.get(key).equals(makeFieldKey)) {
+    				return key;
+    			}
+    		}
+    	}
 		return configurationService.getProperty(
 				CHOICES_PLUGIN_PREFIX + schema + "." + element + (qualifier != null ? "." + qualifier : ""));
     }
@@ -316,18 +301,20 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 							ChoiceAuthority ca = controller.get(authorityName);
 							if (ca == null) {
 								InputFormSelfRegisterWrapperAuthority ifa = new InputFormSelfRegisterWrapperAuthority();
+								if(controller.containsKey(fieldKey)) {
+									ifa = (InputFormSelfRegisterWrapperAuthority)controller.get(fieldKey);
+								}
+								
 								ChoiceAuthority ma = (ChoiceAuthority)pluginService.getNamedPlugin(ChoiceAuthority.class, authorityName);
 								if (ma == null) {
 									log.warn("Skipping invalid configuration for " + fieldKey
 											+ " because named plugin not found: " + authorityName);
 									continue;
 								}
-								ifa.setDelegate(ma);
+								ifa.getDelegates().put(dcinputSet.getFormName(), ma);
 								controller.put(fieldKey, ifa);
-							} else {
-								ca = (InputFormSelfRegisterWrapperAuthority) ca;
-								controller.put(fieldKey, ca);
-							}
+							} 
+							
 							if (!authorities.containsKey(authorityName)) {
 								authorityNames.add(authorityName);
 								authorities.put(authorityName, fieldKey);
@@ -421,11 +408,15 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 	}
 
 	@Override
-	public boolean hasIdentifier(String schema, String element, String qualifier) {
-		ChoiceAuthority ma = getChoiceAuthorityMap().get(makeFieldKey(schema, element, qualifier));
-		if(ma == null) {
-			return false;
-		}
-		return ma.hasIdentifier();
+	public ChoiceAuthority getChoiceAuthorityByAuthorityName(String authorityName) {
+		ChoiceAuthority ma = (ChoiceAuthority)
+		        pluginService.getNamedPlugin(ChoiceAuthority.class, authorityName);
+        if (ma == null)
+        {
+            throw new IllegalArgumentException(
+                    "No choices plugin was configured for authorityName \"" + authorityName
+                            + "\".");
+        }
+        return ma;
 	}
 }

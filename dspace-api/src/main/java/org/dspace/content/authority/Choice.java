@@ -7,6 +7,7 @@
  */
 package org.dspace.content.authority;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ public class Choice
     /**  The canonical text value to insert into MetadataValue's text field */
     public String value = null;
 
-    public Map<String, String> extras = null;
+    public Map<String, String> extras = new HashMap<String, String>();
 
     public Choice()
     {

@@ -25,10 +25,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value=Include.NON_NULL)
-public class InputFormPageRest {
+public class SubmissionFormPageRest {
 	private String header;
 	private boolean mandatory;
-	private List<InputFormFieldRest> fields;
+	private List<SubmissionFormFieldRest> fields;
 
 	public String getHeader() {
 		return header;
@@ -46,18 +46,18 @@ public class InputFormPageRest {
 		this.mandatory = mandatory;
 	}
 
-	public List<InputFormFieldRest> getFields() {
+	public List<SubmissionFormFieldRest> getFields() {
 		return fields;
 	}
 	
-	public void setFields(List<InputFormFieldRest> fields) {
+	public void setFields(List<SubmissionFormFieldRest> fields) {
 		this.fields = fields;
 	}
 
 	@JsonIgnore
 	public ScopeEnum getScope() {
 		ScopeEnum scope = fields.get(0).getScope();
-		for (InputFormFieldRest field : fields) {
+		for (SubmissionFormFieldRest field : fields) {
 			if (!Objects.equals(field.getScope(), scope)) {
 				return null;
 			}
@@ -69,7 +69,7 @@ public class InputFormPageRest {
 	@JsonIgnore
 	public SubmissionVisibilityRest getVisibility() {
 		SubmissionVisibilityRest visibility = fields.get(0).getVisibility();
-		for (InputFormFieldRest field : fields) {
+		for (SubmissionFormFieldRest field : fields) {
 			if (!Objects.equals(field.getVisibility(), visibility)) {
 				return null;
 			}
