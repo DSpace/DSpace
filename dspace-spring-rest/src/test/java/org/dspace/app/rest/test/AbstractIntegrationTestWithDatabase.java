@@ -156,7 +156,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
             }
 
             parentCommunity = null;
-            cleanupContext(context);
+            cleanupContext();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -166,13 +166,15 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      *  Utility method to cleanup a created Context object (to save memory).
      *  This can also be used by individual tests to cleanup context objects they create.
      */
-    protected void cleanupContext(Context c) throws SQLException {
-        // If context still valid, abort it
-        if(c!=null && c.isValid())
-            c.complete();
+    protected void cleanupContext() throws SQLException {
+        // If context still valid, flush all database changes and close it
+        if(context != null && context.isValid()) {
+            context.complete();
+        }
 
         // Cleanup Context object by setting it to null
-        if(c!=null)
-            c = null;
+        if(context !=null) {
+            context = null;
+        }
     }
 }

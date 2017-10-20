@@ -193,6 +193,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                         BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
                         )));
     }
+
     @Test
     public void findBrowseBySubjectItems() throws Exception{
         context.turnOffAuthorisationSystem();
@@ -266,6 +267,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 )));
 
     }
+
     @Test
     public void findBrowseByTitleItems() throws Exception {
         context.turnOffAuthorisationSystem();
@@ -367,5 +369,115 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** CLEANUP **
         new GroupBuilder().delete(internalGroup);
+    }
+
+    @Test
+    public void testPaginationBrowseByDateIssuedItems() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+
+        //2. 7 public items that are readable by Anonymous
+        Item item1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Item 1")
+                .withIssueDate("2017-10-17")
+                .build();
+
+        Item item2 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Item 2")
+                .withIssueDate("2016-02-13")
+                .build();
+
+        Item item3 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Item 3")
+                .withIssueDate("2016-02-12")
+                .build();
+
+        Item item4 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Item 4")
+                .withIssueDate("2016-02-11")
+                .build();
+
+        Item item5 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Item 5")
+                .withIssueDate("2016-02-10")
+                .build();
+
+        Item item6 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Item 6")
+                .withIssueDate("2016-01-13")
+                .build();
+
+        Item item7 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Item 7")
+                .withIssueDate("2016-01-12")
+                .build();
+
+        //** WHEN **
+        //An anonymous user browses the items in the Browse by date issued endpoint
+        //sorted ascending by tile with a page size of 5
+        getClient().perform(get("/api/discover/browses/dateissued/items")
+                .param("sort", "title,asc")
+                .param("size", "5"))
+
+        //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+
+                //We expect only the first five items to be present
+                .andExpect(jsonPath("$.page.size", is(5)))
+                .andExpect(jsonPath("$.page.totalElements", is(7)))
+                .andExpect(jsonPath("$.page.totalPages", is(2)))
+                .andExpect(jsonPath("$.page.number", is(0)))
+
+                //Verify that the title and date of the items match and that they are sorted ascending
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item1,
+                                "Item 1", "2017-10-17"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item2,
+                                        "Item 2", "2016-02-13"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item3,
+                                        "Item 3", "2016-02-12"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item4,
+                                        "Item 4", "2016-02-11"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item5,
+                                        "Item 5", "2016-02-10")
+                        )));
+
+        //The next page gives us the last two items
+        getClient().perform(get("/api/discover/browses/dateissued/items")
+                .param("sort", "title,asc")
+                .param("size", "5")
+                .param("page", "1"))
+
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //We expect the content type to be "application/hal+json;charset=UTF-8"
+                .andExpect(content().contentType(contentType))
+
+                //We expect only the first five items to be present
+                .andExpect(jsonPath("$.page.size", is(5)))
+                .andExpect(jsonPath("$.page.totalElements", is(7)))
+                .andExpect(jsonPath("$.page.totalPages", is(2)))
+                .andExpect(jsonPath("$.page.number", is(1)))
+
+                //Verify that the title and date of the items match and that they are sorted ascending
+                .andExpect(jsonPath("$._embedded.items",
+                        contains(ItemMatcher.matchItemWithTitleAndDateIssued(item6,
+                                "Item 6", "2016-01-13"),
+                                ItemMatcher.matchItemWithTitleAndDateIssued(item7,
+                                        "Item 7", "2016-01-12")
+                        )));
     }
 }

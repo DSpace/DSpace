@@ -6,4 +6,7 @@
     <logger name="org.hibernate" level="WARN"/>
     <logger name="net.sf.ehcache" level="INFO"/>
     <logger name="org.apache.solr" level="WARN"/>
+
+    <!-- Set this to DEBUG to see the JSON output of each request made in an IT test -->
+    <logger name="org.springframework.test.web.servlet.result" level="INFO"/>
 </configuration>

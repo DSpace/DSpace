@@ -18,9 +18,7 @@ import javax.servlet.Filter;
 import org.apache.commons.io.Charsets;
 import org.dspace.app.rest.Application;
 import org.dspace.app.rest.utils.ApplicationConfig;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +34,7 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
@@ -75,10 +74,13 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     }
 
     public MockMvc getClient() throws SQLException {
-        if(context!=null && context.isValid())
+        if(context != null && context.isValid()) {
             context.commit();
+        }
 
         return webAppContextSetup(webApplicationContext)
+                //Always log the repsonse to debug
+                .alwaysDo(MockMvcResultHandlers.log())
                 //Add all filter implementations
                 .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]))
                 .build();
