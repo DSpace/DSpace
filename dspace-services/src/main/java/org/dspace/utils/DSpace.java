@@ -7,9 +7,9 @@
  */
 package org.dspace.utils;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.kernel.ServiceManager;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
@@ -43,19 +43,7 @@ public final class DSpace {
      * @throws IllegalStateException if the kernel is not already running
      */
     public DSpace() {
-        this(null);
-    }
-
-    /**
-     * Construct a DSpace helper object which uses the a specific named 
-     * instance of the kernel.
-     *
-     * @param kernelName the name of the kernel to use (null to use the default kernel)
-     * @throws IllegalStateException if the kernel is not already running or no kernel exists with this name
-     */
-    public DSpace(String kernelName) {
-        DSpaceKernel kernel = new DSpaceKernelManager().getKernel(kernelName);
-        this.kernel = kernel;
+        kernel = DSpaceKernel.getInstance();
     }
 
     public ServiceManager getServiceManager() {

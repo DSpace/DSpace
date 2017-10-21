@@ -11,8 +11,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,9 +30,6 @@ public abstract class DSpaceAbstractKernelTest extends DSpaceAbstractTest {
     @BeforeClass
     public static void initKernel() {
         _initializeKernel();
-        assertNotNull(kernelImpl);
-        assertTrue(kernelImpl.isRunning());
-        assertNotNull(kernel);
     }
 
     @AfterClass

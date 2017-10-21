@@ -440,31 +440,6 @@ public final class CachingServiceImpl implements CachingService, InitializedServ
         return sb.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.services.CachingService#resetCaches()
-     */
-    public void resetCaches() {
-        log.debug("resetCaches()");
-
-        List<Cache> allCaches = getCaches();
-        for (Cache cache : allCaches) {
-            cache.clear();
-        }
-
-        if (getCacheProvider() != null) {
-            try {
-                getCacheProvider().resetCaches();
-            } catch (Exception e) {
-                log.warn("Failure in provider ("+getCacheProvider()+"): " + e.getMessage());
-            }
-        }
-
-        System.runFinalization(); // force the JVM to try to clean up any remaining objects
-        // DO NOT CALL System.gc() here or I will have you shot -AZ
-
-        log.info("doReset(): Memory Recovery to: " + Runtime.getRuntime().freeMemory());
-    }
-
     /**
      * Return all caches from the CacheManager.
      * 

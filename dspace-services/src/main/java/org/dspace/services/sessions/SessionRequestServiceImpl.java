@@ -45,13 +45,6 @@ public final class SessionRequestServiceImpl implements SessionService, RequestS
 
     private static Logger log = LoggerFactory.getLogger(SessionRequestServiceImpl.class);
 
-    private ConfigurationService configurationService;
-    @Autowired
-    @Required
-    public void setConfigurationService(ConfigurationService configurationService) {
-        this.configurationService = configurationService;
-    }
-
     /**
      * map for holding onto the request interceptors which is classloader safe.
      */

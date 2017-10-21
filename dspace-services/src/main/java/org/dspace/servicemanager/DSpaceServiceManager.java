@@ -150,31 +150,6 @@ public final class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Checks to see if a listener should be notified
-     * @param implementedTypes the types implemented by the service changing
-     * @param serviceChangeListener the listener
-     * @return true if it should be notified, false otherwise
-     */
-    private boolean checkNotifyServiceChange(List<Class<?>> implementedTypes,
-            ServiceChangeListener serviceChangeListener) {
-        boolean notify = false;
-        Class<?>[] notifyTypes = serviceChangeListener.notifyForTypes();
-        if (notifyTypes == null || notifyTypes.length == 0) {
-            notify = true;
-        } else {
-            for (Class<?> notifyType : notifyTypes) {
-                for (Class<?> implementedType : implementedTypes) {
-                    if (notifyType.equals(implementedType)) {
-                        notify = true;
-                        break;
-                    }
-                }
-            }
-        }
-        return notify;
-    }
-
-    /**
      * Shut down all service managers, including this one.
      */
     @Override

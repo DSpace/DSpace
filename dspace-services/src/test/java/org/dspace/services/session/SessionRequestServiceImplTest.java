@@ -42,7 +42,6 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     @After
     public void after() {
         sessionRequestService.clear();
-        cachingService.resetCaches();
         sessionRequestService = null;
         cachingService = null;
     }

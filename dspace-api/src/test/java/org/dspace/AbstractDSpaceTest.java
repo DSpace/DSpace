@@ -14,7 +14,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MockUtil;
-import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.AfterClass;
 import static org.junit.Assert.fail;
@@ -53,7 +53,12 @@ public class AbstractDSpaceTest
      * DSpace Kernel. Must be started to initialize ConfigurationService and
      * any other services.
      */
-    protected static DSpaceKernelImpl kernelImpl;
+    protected static DSpaceKernel kernel;
+    /**
+     * use kernel
+     */
+    @Deprecated
+    protected static DSpaceKernel kernelImpl;
 
     /**
      * This method will be run before the first test as per @BeforeClass. It will
@@ -77,11 +82,12 @@ public class AbstractDSpaceTest
             testProps.load(properties.openStream());
 
             // Initialise the service manager kernel
-            kernelImpl = DSpaceKernelInit.getKernel(null);
-            if (!kernelImpl.isRunning())
+            kernel = DSpaceKernelInit.getKernel();
+            kernelImpl = kernel;
+            if (!kernel.isRunning())
             {
                 // NOTE: the "dspace.dir" system property MUST be specified via Maven
-                kernelImpl.start(System.getProperty("dspace.dir")); // init the kernel
+                kernel.start(System.getProperty("dspace.dir")); // init the kernel
             }
 
             // Initialize mock Util class (allows Util.getSourceVersion() to work in Unit tests)
@@ -106,9 +112,9 @@ public class AbstractDSpaceTest
         testProps = null;
 
         //Also clear out the kernel & nullify (so JUnit will clean it up)
-        if (kernelImpl != null) {
-            kernelImpl.destroy();
+        if (kernel != null) {
+            kernel.destroy();
         }
-        kernelImpl = null;
+        kernel = null;
     }
 }

@@ -7,29 +7,19 @@
  */
 package org.dspace.handle;
 
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import net.handle.hdllib.Encoder;
-import net.handle.hdllib.HandleException;
-import net.handle.hdllib.HandleStorage;
-import net.handle.hdllib.HandleValue;
-import net.handle.hdllib.ScanCallback;
-import net.handle.hdllib.Util;
+import net.handle.hdllib.*;
 import net.handle.util.StreamTable;
-
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.handle.factory.HandleServiceFactory;
 import org.dspace.handle.service.HandleService;
-import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Extension to the CNRI Handle Server that translates requests to resolve
@@ -54,7 +44,7 @@ public class HandlePlugin implements HandleStorage
     private static Logger log = Logger.getLogger(HandlePlugin.class);
 
     /** The DSpace service manager kernel **/
-    private static transient DSpaceKernelImpl kernelImpl;
+    private static transient DSpaceKernel kernel;
 
     /** References to DSpace Services **/
     protected HandleService handleService;
@@ -84,17 +74,17 @@ public class HandlePlugin implements HandleStorage
         // Initialise the service manager kernel
         try
         {
-            kernelImpl = DSpaceKernelInit.getKernel(null);
-            if (!kernelImpl.isRunning())
+            kernel = DSpaceKernelInit.getKernel();
+            if (!kernel.isRunning())
             {
-                kernelImpl.start();
+                kernel.start();
             }
         } catch (Exception e)
         {
             // Failed to start so destroy it and log and throw an exception
             try
             {
-                kernelImpl.destroy();
+                kernel.destroy();
             }
             catch (Exception e1)
             {
@@ -208,10 +198,10 @@ public class HandlePlugin implements HandleStorage
         }
 
         // Destroy the DSpace kernel if it is still alive
-        if (kernelImpl != null)
+        if (kernel != null)
         {
-            kernelImpl.destroy();
-            kernelImpl = null;
+            kernel.destroy();
+            kernel = null;
         }
     }
 

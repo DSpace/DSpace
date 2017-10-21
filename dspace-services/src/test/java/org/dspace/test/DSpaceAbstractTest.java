@@ -7,9 +7,8 @@
  */
 package org.dspace.test;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.ServiceManager;
-import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
 
@@ -20,7 +19,6 @@ import org.dspace.services.RequestService;
  */
 public abstract class DSpaceAbstractTest {
 
-    protected static DSpaceKernelImpl kernelImpl;
     /**
      * The current kernel for testing
      */
@@ -44,9 +42,8 @@ public abstract class DSpaceAbstractTest {
      * do not run this after each individual test
      */
     public static void _initializeKernel() {
-        kernelImpl = DSpaceKernelInit.getKernel(null);
-        kernelImpl.start(); // init the kernel
-        kernel = kernelImpl.getManagedBean();
+        kernel = DSpaceKernelInit.getKernel();
+        kernel.start(); // init the kernel
     }
 
     /**
@@ -55,17 +52,11 @@ public abstract class DSpaceAbstractTest {
      * do not run this after each individual test
      */
     public static void _destroyKernel() {
-        if (kernelImpl != null) {
+        if (kernel != null) {
             // cleanup the kernel
-            try {
-                kernelImpl.stop();
-            } catch (Exception e) {
-                // keep going
-            }
-            kernelImpl.destroy();
+            kernel.destroy();
         }
         // must null things out or JUnit will not clean them up
-        kernelImpl = null;
         kernel = null;
     }
 

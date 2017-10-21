@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.kernel.ServiceManager;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.services.RequestService;
 import org.dspace.services.SessionService;
 import org.slf4j.Logger;

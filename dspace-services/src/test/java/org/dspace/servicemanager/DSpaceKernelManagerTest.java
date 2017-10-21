@@ -9,7 +9,6 @@ package org.dspace.servicemanager;
 
 import static org.junit.Assert.*;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.junit.After;
 import org.junit.Before;
@@ -23,39 +22,33 @@ import org.junit.Test;
  */
 public class DSpaceKernelManagerTest {
 
-    DSpaceKernelManager kernelManager;
-    DSpaceKernelImpl kernelImpl;
+    private DSpaceKernelManager kernelManager;
+    private DSpaceKernel kernel;
 
     @Before
     public void init() {
-        kernelImpl = DSpaceKernelInit.getKernel(null);
-        kernelImpl.start(); // init the kernel
+        kernel = DSpaceKernelInit.getKernel();
+        kernel.start(); // init the kernel
         kernelManager = new DSpaceKernelManager();
     }
 
     @After
     public void destroy() {
-        if (kernelImpl != null) {
+        if (kernel != null) {
             // cleanup the kernel
-            kernelImpl.stop();
-            kernelImpl.destroy();
+            kernel.destroy();
         }
-        kernelImpl = null;
-        kernelManager = null;
     }
 
     /**
      * Test method for {@link org.dspace.kernel.DSpaceKernelManager#getKernel()}.
      */
     @Test
-    public void testGetKernel() {
+    public void shouldAlwaysReturnSameKernelInstance() {
         DSpaceKernel kernel = kernelManager.getKernel();
         assertNotNull(kernel);
-        DSpaceKernel k2 = kernelManager.getKernel();
-        assertNotNull(k2);
-        assertEquals(kernel, k2);
-        
-        kernel = k2 = null;
+        DSpaceKernel secondKernel = kernelManager.getKernel();
+        assertNotNull(secondKernel);
+        assertEquals(kernel, secondKernel);
     }
-
 }

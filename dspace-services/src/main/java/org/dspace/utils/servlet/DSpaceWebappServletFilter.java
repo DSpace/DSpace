@@ -17,8 +17,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.services.RequestService;
 
 

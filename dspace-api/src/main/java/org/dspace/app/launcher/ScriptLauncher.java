@@ -7,12 +7,12 @@
  */
 package org.dspace.app.launcher;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.TreeMap;
-import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.servicemanager.DSpaceKernel;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.services.RequestService;
 import org.jdom.Document;
@@ -28,7 +28,7 @@ import org.jdom.input.SAXBuilder;
 public class ScriptLauncher
 {
     /** The service manager kernel */
-    private static transient DSpaceKernelImpl kernelImpl;
+    private static transient DSpaceKernel kernel;
 
     /**
      * Execute the DSpace script launcher
@@ -38,22 +38,21 @@ public class ScriptLauncher
      * @throws FileNotFoundException if file doesn't exist
      */
     public static void main(String[] args)
-            throws FileNotFoundException, IOException
+            throws IOException
     {
         // Initialise the service manager kernel
-        try
-        {
-            kernelImpl = DSpaceKernelInit.getKernel(null);
-            if (!kernelImpl.isRunning())
+        try {
+            kernel = DSpaceKernelInit.getKernel();
+            if (!kernel.isRunning())
             {
-                kernelImpl.start();
+                kernel.start();
             }
         } catch (Exception e)
         {
             // Failed to start so destroy it and log and throw an exception
             try
             {
-                kernelImpl.destroy();
+                kernel.destroy();
             }
             catch (Exception e1)
             {
@@ -81,10 +80,10 @@ public class ScriptLauncher
         status = runOneCommand(commandConfigs, args);
 
         // Destroy the service kernel if it is still alive
-        if (kernelImpl != null)
+        if (kernel != null)
         {
-            kernelImpl.destroy();
-            kernelImpl = null;
+            kernel.destroy();
+            kernel = null;
         }
 
         System.exit(status);
@@ -201,7 +200,7 @@ public class ScriptLauncher
             }
 
             // Establish the request service startup
-            RequestService requestService = kernelImpl.getServiceManager().getServiceByName(
+            RequestService requestService = kernel.getServiceManager().getServiceByName(
                     RequestService.class.getName(), RequestService.class);
             if (requestService == null)
             {
@@ -257,7 +256,7 @@ public class ScriptLauncher
     protected static Document getConfig()
     {
         // Load the launcher configuration file
-        String config = kernelImpl.getConfigurationService().getProperty("dspace.dir") +
+        String config = kernel.getConfigurationService().getProperty("dspace.dir") +
                         System.getProperty("file.separator") + "config" +
                         System.getProperty("file.separator") + "launcher.xml";
         SAXBuilder saxBuilder = new SAXBuilder();
