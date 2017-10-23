@@ -50,7 +50,7 @@ public class SubmissionDefinitionRest extends BaseObjectRest<String> {
 		this.panels = panels;
 	}
 	
-	@LinkRest(name=SubmissionSectionRest.NAME, linkClass = SubmissionSectionRest.class)
+	@LinkRest(name=SubmissionSectionRest.ATTRIBUTE_NAME, linkClass = SubmissionSectionRest.class)
 	@JsonIgnore
 	public List<SubmissionSectionRest> getPanels() {
 		return panels;

@@ -25,7 +25,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(value=Include.NON_NULL)
 public class SubmissionSectionRest extends BaseObjectRest<String> {
 	
-	public static final String NAME = "submission-section";	
+	public static final String NAME = "submission-section";
+	public static final String ATTRIBUTE_NAME = "sections";
+	
 	private String header;
 	private boolean mandatory;
 	private String sectionType;
