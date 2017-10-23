@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  */
 public class SubmissionFormRest extends BaseObjectRest<String> {
-	public static final String NAME = "submission-form";
+	public static final String NAME = "submissionform";
 	public static final String NAME_LINK_ON_PANEL = RestModel.CONFIGURATION;
 	public static final String CATEGORY = RestModel.CONFIGURATION;
 

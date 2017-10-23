@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public class SubmissionDefinitionRest extends BaseObjectRest<String> {
-	public static final String NAME = "submission-definition";
+	public static final String NAME = "submissiondefinition";
 	public static final String CATEGORY = RestModel.CONFIGURATION;
 
 	private String name;
