@@ -37,16 +37,17 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             context = new Context();
             String name = authentication.getName();
             String password = authentication.getCredentials().toString();
+            HttpServletRequest httpServletRequest = request;
             List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
 
-            int implicitStatus = authenticationService.authenticateImplicit(context, null, null, null, request);
+            int implicitStatus = authenticationService.authenticateImplicit(context, null, null, null, httpServletRequest);
 
             if (implicitStatus == AuthenticationMethod.SUCCESS) {
                 log.info(LogManager.getHeader(context, "login", "type=implicit"));
                 return new DSpaceAuthentication(name, password, grantedAuthorities);
             } else {
-                int authenticateResult = authenticationService.authenticate(context, name, password, null, request);
+                int authenticateResult = authenticationService.authenticate(context, name, password, null, httpServletRequest);
                 if (AuthenticationMethod.SUCCESS == authenticateResult) {
 
                     log.info(LogManager
