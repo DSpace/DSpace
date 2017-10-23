@@ -419,7 +419,7 @@ public class DCInput
 
 	/**
 	 * The closed attribute of the vocabulary tag for this field as set in 
-	 * input-forms.xml
+	 * submission-forms.xml
 	 * 
 	 * {@code 
 	 * <field>

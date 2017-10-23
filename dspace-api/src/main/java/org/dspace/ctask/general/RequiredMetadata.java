@@ -27,7 +27,7 @@ import org.dspace.curate.Suspendable;
 
 /**
  * RequiredMetadata task compares item metadata with fields 
- * marked as required in input-forms.xml. The task succeeds if all
+ * marked as required in submission-forms.xml. The task succeeds if all
  * required fields are present in the item metadata, otherwise it fails.
  * Primarily a curation task demonstrator.
  *

@@ -445,7 +445,7 @@ public class Util {
     /**
      * Get a list of all the respective "displayed-value(s)" from the given
      * "stored-value(s)" for a specific metadata field of a DSpace Item, by
-     * reading input-forms.xml
+     * reading submission-forms.xml
      * 
      * @param item
      *            The Dspace Item

@@ -47,12 +47,12 @@
 		<step id="traditionalpageone" mandatory="true">
 			<heading>submit.progressbar.describe.stepone</heading>
 			<processing-class>org.dspace.submit.step.DescribeStep</processing-class>
-			<type>input-form</type>
+			<type>submission-form</type>
 		</step>
 		<step id="traditionalpagetwo" mandatory="true">
 			<heading>submit.progressbar.describe.steptwo</heading>
 			<processing-class>org.dspace.submit.step.DescribeStep</processing-class>
-			<type>input-form</type>
+			<type>submission-form</type>
 		</step>
 		<step id="upload">
 			<heading>submit.progressbar.upload</heading>

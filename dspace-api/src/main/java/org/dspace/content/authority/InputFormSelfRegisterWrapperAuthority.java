@@ -17,7 +17,7 @@ import org.dspace.core.Utils;
 
 /**
  * This authority is registered automatically by the ChoiceAuthorityService for
- * all the metadata that use a value-pair or a vocabulary in the input-form.xml
+ * all the metadata that use a value-pair or a vocabulary in the submission-form.xml
  * 
  * It keeps a map of form-name vs ChoiceAuthority to delegate the execution of
  * the method to the specific ChoiceAuthority configured for the collection when

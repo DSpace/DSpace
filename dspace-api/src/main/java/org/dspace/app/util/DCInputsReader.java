@@ -23,7 +23,7 @@ import org.dspace.content.MetadataSchema;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
- * form definitions file, input-forms.xml, from the configuration directory.
+ * form definitions file, submission-forms.xml, from the configuration directory.
  * A forms definition details the page and field layout of the metadata
  * collection pages used by the submission process. Each forms definition
  * starts with a unique name that gets associated with that form set.
