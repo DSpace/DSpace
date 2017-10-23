@@ -25,13 +25,14 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
         Cookie cookie = WebUtils.getCookie(httpServletRequest,"access_token");
-        EPerson ePerson = tokenAuthenticationService.getAuthentication(cookie.getValue(), httpServletRequest);
         Context context = null;
         try {
             context = ContextUtil.obtainContext(httpServletRequest);
         } catch (SQLException e) {
             log.error("Unable to obtain context", e);
         }
+        EPerson ePerson = tokenAuthenticationService.getAuthentication(cookie.getValue(), httpServletRequest, context);
+
         ePerson.setSessionSalt("");
         try {
             context.commit();

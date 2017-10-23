@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
@@ -28,8 +29,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.headers().cacheControl();
-
-
         http
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .exceptionHandling().and()
@@ -37,16 +36,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .servletApi().and()
                 .csrf().disable()
 
-                .logout().addLogoutHandler(customLogoutHandler).logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/status").permitAll()
+                .logout().addLogoutHandler(customLogoutHandler).logoutRequestMatcher(new AntPathRequestMatcher("/api/logout")).logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()).permitAll()
                 .and()
                 .authorizeRequests()
 
-                .antMatchers(HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.GET, "/status").permitAll()
+                .antMatchers( "/api/login").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/status").permitAll()
 
                 .and()
 
-                .addFilterBefore(new StatelessLoginFilter("/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new StatelessLoginFilter("/api/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 
                 // Custom Token based authentication based on the header previously given to the client
                 .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager()),  UsernamePasswordAuthenticationFilter.class);

@@ -10,6 +10,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.keygen.KeyGenerators;
@@ -28,20 +29,22 @@ public class JWTTokenHandler {
     private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
 
     //TODO configurable through config files
-    private static String jwtKey = "thisisatestsecretkeyforjwttokens";
+    private String jwtKey;
     private EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
     public static final String EPERSON_ID = "eid";
     public static final String SPECIAL_GROUPS = "sg";
 
-    public EPerson parseEPersonFromToken(String token, HttpServletRequest request) throws JOSEException, ParseException, SQLException {
+
+    public JWTTokenHandler() {
+        jwtKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("jwt.secret", "defaultjwtkeysecret");
+        System.out.println(jwtKey);
+    }
+
+    public EPerson parseEPersonFromToken(String token, HttpServletRequest request, Context context) throws JOSEException, ParseException, SQLException {
 
         SignedJWT signedJWT = SignedJWT.parse(token);
-        Context context = new Context();
         EPerson ePerson = ePersonService.find(context, UUID.fromString(signedJWT.getJWTClaimsSet().getClaim(EPERSON_ID).toString()));
-        String ipAddress = request.getHeader("X-FORWARDED-FOR");
-        if (ipAddress == null) {
-            ipAddress = request.getRemoteAddr();
-        }
+        String ipAddress = getIpAddress(request);
         JWSVerifier verifier = new MACVerifier(jwtKey + ePerson.getSessionSalt() + ipAddress);
 
         //If token is valid and not expired return eperson in token
@@ -58,10 +61,7 @@ public class JWTTokenHandler {
     public String createTokenForEPerson(Context context, HttpServletRequest request, EPerson ePerson, List<Group> groups) throws JOSEException {
         StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
         String salt = stringKeyGenerator.generateKey();
-        String ipAddress = request.getHeader("X-FORWARDED-FOR");
-        if (ipAddress == null) {
-            ipAddress = request.getRemoteAddr();
-        }
+        String ipAddress = getIpAddress(request);
         JWSSigner signer = new MACSigner(jwtKey + salt + ipAddress);
 
         List<String> groupIds = groups.stream().map(group -> group.getID().toString()).collect(Collectors.toList());
@@ -85,6 +85,15 @@ public class JWTTokenHandler {
         signedJWT.sign(signer);
 
         return signedJWT.serialize();
+    }
+
+
+    public String getIpAddress(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-FORWARDED-FOR");
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+        return ipAddress;
     }
 
 }
