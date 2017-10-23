@@ -339,6 +339,14 @@ public class DescribeStep extends AbstractSubmissionStep
         MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
         DCInput[] inputs = inputSet.getPageRows(getPage()-1, submission.hasMultipleTitles(), submission.isPublishedBefore());
 
+	// Fetch the document type (dc.type)
+	Item item = submission.getItem();
+        String documentType = "";
+        if( (item.getMetadataByMetadataString("dc.type") != null) && (item.getMetadataByMetadataString("dc.type").length >0) )
+        {
+            documentType = item.getMetadataByMetadataString("dc.type")[0].value;
+        }
+        
         for (DCInput input : inputs)
         {
             // If the input is invisible in this scope, then skip it.
@@ -354,6 +362,12 @@ public class DescribeStep extends AbstractSubmissionStep
             	continue;
             }
 
+            // Omit fields not allowed for this document type
+            if(!input.isAllowedFor(documentType))
+            {
+                continue;
+            }
+            
             String inputType = input.getInputType();
             String pairsName = input.getPairsType();
             Metadatum[] values;
