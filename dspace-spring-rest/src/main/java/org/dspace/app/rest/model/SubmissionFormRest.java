@@ -26,7 +26,7 @@ public class SubmissionFormRest extends BaseObjectRest<String> {
 
 	private String name;
 	
-	private List<SubmissionFormPageRest> pages;
+	private List<SubmissionFormFieldRest> fields;
 
 	@Override
 	public String getId() {
@@ -39,14 +39,6 @@ public class SubmissionFormRest extends BaseObjectRest<String> {
 	
 	public String getName() {
 		return name;
-	}
-	
-	public void setPages(List<SubmissionFormPageRest> pages) {
-		this.pages = pages;
-	}
-	
-	public List<SubmissionFormPageRest> getPages() {
-		return pages;
 	}
 	
 	@Override
@@ -62,5 +54,13 @@ public class SubmissionFormRest extends BaseObjectRest<String> {
 	@Override
 	public String getCategory() {
 		return CATEGORY;
+	}
+
+	public List<SubmissionFormFieldRest> getFields() {
+		return fields;
+	}
+
+	public void setFields(List<SubmissionFormFieldRest> fields) {
+		this.fields = fields;
 	}
 }

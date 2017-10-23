@@ -16,6 +16,7 @@ import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
+import org.dspace.app.util.SubmissionStepConfig;
 import org.springframework.hateoas.Link;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -31,7 +32,7 @@ public class SubmissionSectionResource extends DSpaceResource<SubmissionSectionR
 
 	public SubmissionSectionResource(SubmissionSectionRest sd, Utils utils, String... rels) {
 		super(sd, utils, rels);	
-		if("input-form".equals(sd.getSectionType())) {
+		if(SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(sd.getSectionType())) {
 			RestResourceController methodOn = methodOn(RestResourceController.class, SubmissionFormRest.CATEGORY, SubmissionFormRest.NAME);			
 			UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
 					.findRel(null, SubmissionFormRest.CATEGORY, English.plural(SubmissionFormRest.NAME), sd.getId(), "", null, null, null))
