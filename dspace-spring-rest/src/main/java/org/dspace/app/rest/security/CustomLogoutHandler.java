@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.security;
 
 import org.dspace.app.rest.utils.ContextUtil;
@@ -22,23 +29,23 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     private TokenAuthenticationService tokenAuthenticationService = new TokenAuthenticationService();
 
-
+    /**
+     * This method removes the session salt from an eperson, this way the token won't be verified anymore
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @param authentication
+     */
     public void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
         Cookie cookie = WebUtils.getCookie(httpServletRequest,"access_token");
-        Context context = null;
         try {
-            context = ContextUtil.obtainContext(httpServletRequest);
+            Context context = ContextUtil.obtainContext(httpServletRequest);
+            EPerson ePerson = tokenAuthenticationService.getAuthentication(cookie.getValue(), httpServletRequest, context);
+            ePerson.setSessionSalt("");
+            context.commit();
         } catch (SQLException e) {
             log.error("Unable to obtain context", e);
         }
-        EPerson ePerson = tokenAuthenticationService.getAuthentication(cookie.getValue(), httpServletRequest, context);
 
-        ePerson.setSessionSalt("");
-        try {
-            context.commit();
-        } catch (SQLException e) {
-            log.error("Unable to commit change to session salt", e);
-        }
     }
 
 

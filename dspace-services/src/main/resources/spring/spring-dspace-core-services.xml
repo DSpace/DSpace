@@ -54,7 +54,7 @@
     <!-- CACHING end beans -->
 
     <!-- SESSION - session and request services (implemented as a single bean) -->
-    <bean id="org.dspace.services.SessionService" class="org.dspace.services.sessions.StatelessRequestServiceImpl" />
+    <bean id="org.dspace.services.SessionService" class="org.dspace.services.sessions.SessionRequestServiceImpl" />
     <alias alias="org.dspace.services.RequestService" name="org.dspace.services.SessionService" />
     <!-- SESSION end beans -->
     

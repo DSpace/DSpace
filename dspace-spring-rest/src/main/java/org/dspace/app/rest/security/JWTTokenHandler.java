@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.security;
 
 import com.nimbusds.jose.*;
@@ -40,6 +47,16 @@ public class JWTTokenHandler {
         System.out.println(jwtKey);
     }
 
+    /**
+     * Retrieve EPerson from a jwt
+     * @param token
+     * @param request
+     * @param context
+     * @return
+     * @throws JOSEException
+     * @throws ParseException
+     * @throws SQLException
+     */
     public EPerson parseEPersonFromToken(String token, HttpServletRequest request, Context context) throws JOSEException, ParseException, SQLException {
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -58,6 +75,15 @@ public class JWTTokenHandler {
     }
 
 
+    /**
+     * Create a jwt with the EPerson details in it
+     * @param context
+     * @param request
+     * @param ePerson
+     * @param groups
+     * @return
+     * @throws JOSEException
+     */
     public String createTokenForEPerson(Context context, HttpServletRequest request, EPerson ePerson, List<Group> groups) throws JOSEException {
         StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
         String salt = stringKeyGenerator.generateKey();
