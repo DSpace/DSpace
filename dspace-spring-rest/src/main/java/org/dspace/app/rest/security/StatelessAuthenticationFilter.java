@@ -67,7 +67,7 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
             } catch (SQLException e) {
                 log.error("Unable to obtain context from request", e);
             }
-            EPerson eperson = tokenAuthenticationService.getAuthentication(token, request);
+            EPerson eperson = tokenAuthenticationService.getAuthentication(token, request, context);
             boolean isAdmin = false;
             try {
                 isAdmin = authorizeService.isAdmin(context, eperson);
