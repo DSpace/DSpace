@@ -20,7 +20,8 @@
  <!ELEMENT dc-qualifier (#PCDATA) >
  <!ELEMENT language (#PCDATA)>
  <!ELEMENT type-bind (#PCDATA) >
- 
+ <!ELEMENT readonly (#PCDATA) >
+
  <!ELEMENT repeatable (#PCDATA) >
  <!ELEMENT label (#PCDATA) >
  <!ELEMENT input-type (#PCDATA)>
