@@ -17,8 +17,12 @@ import javax.servlet.jsp.JspException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
@@ -61,52 +65,128 @@ public class ValuePairsDisplayStrategy extends ASimpleDisplayStrategy
         try
         {
             Context obtainContext = UIUtil.obtainContext(hrq);
-            Map<String, List<String>> mappedValuePairs = dcInputsReader
-                    .getMappedValuePairs();
-            List<String> pairsnames = new ArrayList<String>();
-            if (mappedValuePairs != null)
+            Collection collection = Collection.find(obtainContext, colIdx);
+            if (collection != null)
             {
-                for (String key : mappedValuePairs.keySet())
+                result = getResult(colIdx, field, metadataArray, result,
+                        obtainContext, collection);
+            }
+            else
+            {
+                Item item = Item.find(obtainContext, itemid);
+                collection = item.getParentObject();
+                result = getResult(colIdx, field, metadataArray, result,
+                        obtainContext, collection);
+            }
+
+            // workaround, a sort of fuzzy match search in all valuepairs (possible wrong result due to the same stored value in many valuepairs)
+            if (StringUtils.isBlank(result))
+            {
+                Map<String, List<String>> mappedValuePairs = dcInputsReader
+                        .getMappedValuePairs();
+                List<String> pairsnames = new ArrayList<String>();
+                if (mappedValuePairs != null)
                 {
-                    List<String> values = mappedValuePairs.get(key);
-                    for (String vv : values)
+                    for (String key : mappedValuePairs.keySet())
                     {
-                        if (StringUtils.equals(field, vv))
+                        List<String> values = mappedValuePairs.get(key);
+                        for (String vv : values)
                         {
-                            pairsnames.add(key);
+                            if (StringUtils.equals(field, vv))
+                            {
+                                pairsnames.add(key);
+                            }
+                        }
+                    }
+                }
+
+                for (String pairsname : pairsnames)
+                {
+                    ChoiceAuthority choice = (ChoiceAuthority) PluginManager
+                            .getNamedPlugin(ChoiceAuthority.class, pairsname);
+
+                    int ii = 0;
+                    for (Metadatum r : metadataArray)
+                    {
+                        if (ii > 0)
+                        {
+                            result += " ";
+                        }
+                        Choices choices = choice.getBestMatch(field, r.value,
+                                colIdx,
+                                obtainContext.getCurrentLocale().toString());
+                        if (choices != null)
+                        {
+                            for (Choice ch : choices.values)
+                            {
+                                result += ch.label;
+                            }
                         }
                     }
                 }
             }
 
-            for (String pairsname : pairsnames)
-            {
-                ChoiceAuthority choice = (ChoiceAuthority) PluginManager
-                        .getNamedPlugin(ChoiceAuthority.class, pairsname);
-
-                int ii = 0;                
-                for (Metadatum r : metadataArray)
-                {
-                    if (ii > 0)
-                    {
-                        result += " ";
-                    }
-                    Choices choices = choice.getBestMatch(field, r.value,
-                            colIdx,
-                            obtainContext.getCurrentLocale().toString());
-                    if (choices != null)
-                    {
-                        for (Choice ch : choices.values)
-                        {
-                            result += ch.label;
-                        }
-                    }
-                }
-            }
         }
-        catch (SQLException e)
+        catch (SQLException | DCInputsReaderException e)
         {
             throw new JspException(e);
+        }
+        return result;
+    }
+
+    private String getResult(int colIdx, String field,
+            Metadatum[] metadataArray, String result, Context obtainContext,
+            Collection collection) throws DCInputsReaderException
+    {
+        DCInputSet dcInputSet = dcInputsReader
+                .getInputs(collection.getHandle());
+        for (int i = 0; i < dcInputSet.getNumberPages(); i++)
+        {
+            DCInput[] dcInput = dcInputSet.getPageRows(i, false, false);
+            for (DCInput myInput : dcInput)
+            {
+                String key = myInput.getPairsType();
+                if (StringUtils.isNotBlank(key))
+                {
+                    String inputField = myInput.getSchema() + "."
+                            + myInput.getElement();
+                    if (StringUtils.isNotBlank(myInput.getQualifier()))
+                    {
+                        inputField += "." + myInput.getQualifier();
+                    }
+
+                    if (inputField.equals(field))
+                    {
+                        ChoiceAuthority choice = (ChoiceAuthority) PluginManager
+                                .getNamedPlugin(ChoiceAuthority.class, key);
+
+                        int ii = 0;
+                        for (Metadatum r : metadataArray)
+                        {
+                            if (ii > 0)
+                            {
+                                result += " ";
+                            }
+                            Choices choices = choice.getBestMatch(field,
+                                    r.value, colIdx, obtainContext
+                                            .getCurrentLocale().toString());
+                            if (choices != null)
+                            {
+                                int iii = 0;
+                                for (Choice ch : choices.values)
+                                {
+                                    result += ch.label;
+                                    if (iii > 0)
+                                    {
+                                        result += " ";
+                                    }
+                                    iii++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         return result;
     }
