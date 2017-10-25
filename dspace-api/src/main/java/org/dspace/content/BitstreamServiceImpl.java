@@ -20,6 +20,8 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.storage.bitstore.service.BitstreamStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Service implementation for the Bitstream object.
@@ -50,6 +50,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     protected ItemService itemService;
 
 
+    @Autowired(required = true)
+    protected GroupService groupService;
     @Autowired(required = true)
     protected AuthorizeService authorizeService;
     @Autowired(required = true)
@@ -79,7 +81,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
             return null;
         }
 
-                // not null, return Bitstream
+        // not null, return Bitstream
         if (log.isDebugEnabled())
         {
             log.debug(LogManager.getHeader(context, "find_bitstream",
@@ -156,7 +158,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
      */
     @Override
     public Bitstream register(Context context,
-    		int assetstore, String bitstreamPath)
+                              int assetstore, String bitstreamPath)
             throws IOException, SQLException, AuthorizeException {
         // Store the bits
         Bitstream bitstream = bitstreamDAO.create(context, new Bitstream());
@@ -164,8 +166,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
                 context, bitstream, assetstore, bitstreamPath);
 
         log.info(LogManager.getHeader(context,
-            "create_bitstream",
-            "bitstream_id=" + bitstream.getID()));
+                "create_bitstream",
+                "bitstream_id=" + bitstream.getID()));
 
         // Set the format to "unknown"
         setFormat(context, bitstream, null);
@@ -204,7 +206,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
 
     @Override
     public void setFormat(Context context, Bitstream bitstream, BitstreamFormat bitstreamFormat) throws SQLException {
-                // FIXME: Would be better if this didn't throw an SQLException,
+        // FIXME: Would be better if this didn't throw an SQLException,
         // but we need to find the unknown format!
         if (bitstreamFormat == null)
         {
@@ -452,5 +454,21 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     @Override
     public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
         return bitstreamDAO.getNotReferencedBitstreams(context);
+    }
+
+    @Override
+    public Iterator<Bitstream> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException{
+        //Looks if the context.currentUser() is admin or not
+        if(authorizeService.isAdmin(context)){
+            return findAll(context, pageSize, pageOffset);
+        }
+        Set<Group> groups = new HashSet<>();
+        if(context.getCurrentUser() == null){
+            groups.add(groupService.findByName(context, Group.ANONYMOUS));
+        }
+        else{
+            groups.addAll(groupService.allMemberGroupsSet(context, context.getCurrentUser()));
+        }
+        return bitstreamDAO.findAllAuthorized(context, pageSize, pageOffset, context.getCurrentUser(), Constants.READ, groups);
     }
 }

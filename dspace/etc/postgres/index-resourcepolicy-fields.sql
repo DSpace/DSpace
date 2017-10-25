@@ -1,0 +1,1 @@
+CREATE INDEX idx_resourcepolicy ON resourcepolicy(start_date, end_date, action_id);

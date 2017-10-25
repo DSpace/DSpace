@@ -10,11 +10,7 @@ package org.dspace.content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -41,6 +37,7 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedItem;
 import org.dspace.harvest.service.HarvestedItemService;
@@ -68,6 +65,8 @@ public class ItemServiceImpl extends DSpaceObjectServiceImpl<Item> implements It
     @Autowired(required = true)
     protected ItemDAO itemDAO;
 
+    @Autowired
+    protected GroupService groupService;
     @Autowired(required = true)
     protected CommunityService communityService;
     @Autowired(required = true)
@@ -1279,5 +1278,21 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
 
         return false;
+    }
+
+    @Override
+    public Iterator<Item> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException{
+        //Looks if the context.currentUser() is admin or not
+        if(authorizeService.isAdmin(context)){
+            return findAll(context, pageSize, pageOffset);
+        }
+        Set<Group> groups = new HashSet<>();
+        if(context.getCurrentUser() == null){
+            groups.add(groupService.findByName(context, Group.ANONYMOUS));
+        }
+        else{
+            groups.addAll(groupService.allMemberGroupsSet(context, context.getCurrentUser()));
+        }
+        return itemDAO.findAllAuthorized(context, pageSize, pageOffset, context.getCurrentUser(), Constants.READ, groups);
     }
 }

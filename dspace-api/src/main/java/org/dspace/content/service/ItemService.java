@@ -592,4 +592,6 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
      * @throws SQLException if database error
      */
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
+
+    Iterator<Item> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException;
 }
