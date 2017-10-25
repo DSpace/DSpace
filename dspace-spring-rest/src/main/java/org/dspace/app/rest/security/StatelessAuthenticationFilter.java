@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.RequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
 
     @Autowired
     private EPersonRestAuthenticationProvider authenticationProvider;
+
+    @Autowired
+    private RequestService requestService;
 
     public StatelessAuthenticationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -77,7 +81,13 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
 
             EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, context);
             if (eperson != null) {
+                //Pass the eperson ID to the request service
+                requestService.setCurrentUserId(eperson.getID());
+
+                //Get the Spring authorities for this eperson
                 List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context, eperson);
+
+                //Return the Spring authentication object
                 return new DSpaceAuthentication(eperson.getEmail(), authorities);
             } else {
                 return null;

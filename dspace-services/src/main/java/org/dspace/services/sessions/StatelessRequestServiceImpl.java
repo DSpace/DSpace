@@ -7,12 +7,12 @@
  */
 package org.dspace.services.sessions;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
-import org.dspace.services.SessionService;
 import org.dspace.services.model.Request;
 import org.dspace.services.model.RequestInterceptor;
 import org.dspace.services.model.RequestInterceptor.RequestInterruptionException;
@@ -37,15 +37,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * This depends on having something (a filter typically) which is
  * placing the current requests into a request storage cache.
  * <p>
- * TODO use a HttpSessionListener to keep track of all sessions?
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
+ * @author Atmire
  */
-public final class StatelessRequestServiceImpl implements SessionService, RequestService, InitializedService, ShutdownService {
+public final class StatelessRequestServiceImpl implements RequestService, InitializedService, ShutdownService {
 
     private static Logger log = LoggerFactory.getLogger(StatelessRequestServiceImpl.class);
 
     private ConfigurationService configurationService;
+
     @Autowired
     @Required
     public void setConfigurationService(ConfigurationService configurationService) {
@@ -186,38 +187,26 @@ public final class StatelessRequestServiceImpl implements SessionService, Reques
         this.interceptorsMap.put(key, interceptor);
     }
 
-    /**
-     * Makes a session from the existing HTTP session stuff in the
-     * current request, or creates a new session of non-HTTP related
-     * sessions.
-     *
-     * @return the new session object which is placed into the request
-     * @throws IllegalStateException if not session can be created
-     */
-    public Session getCurrentSession() {
-
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.dspace.services.SessionService#getCurrentSessionId()
-     */
-    public String getCurrentSessionId() {
-
-
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.dspace.services.SessionService#getCurrentUserId()
+    /** (non-Javadoc)
+     * @see org.dspace.services.RequestService#getCurrentUserId()
      */
     public String getCurrentUserId() {
-        String userId = null;
-//        Session session = getCurrentSession();
-//        if (session != null) {
-//            userId = session.getUserId();
-//        }
-        return userId;
+        Request currentRequest = getCurrentRequest();
+        if(currentRequest == null) {
+            return null;
+        } else {
+            return ObjectUtils.toString(currentRequest.getAttribute(AUTHENTICATED_EPERSON));
+        }
+    }
+
+    /** (non-Javadoc)
+     * @see org.dspace.services.RequestService#setCurrentUserId()
+     */
+    public void setCurrentUserId(UUID epersonId) {
+        Request currentRequest = getCurrentRequest();
+        if(currentRequest != null) {
+            getCurrentRequest().setAttribute(AUTHENTICATED_EPERSON, epersonId);
+        }
     }
 
     /* (non-Javadoc)
