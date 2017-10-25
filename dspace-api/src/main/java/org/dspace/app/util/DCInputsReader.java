@@ -19,7 +19,9 @@ import javax.xml.parsers.*;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.Collection;
 import org.dspace.content.MetadataSchema;
+import org.dspace.core.Utils;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
@@ -713,4 +715,21 @@ public class DCInputsReader
         // Didn't find a text node
         return null;
     }
+    
+	public String getInputFormNameByCollectionAndField(Collection collection, String field) throws DCInputsReaderException {
+		List<DCInputSet> inputSets = getInputsByCollectionHandle(collection.getHandle());
+		for (DCInputSet inputSet : inputSets) {
+			String[] tokenized = Utils.tokenize(field);
+			String schema = tokenized[0];
+			String element = tokenized[1];
+			String qualifier = tokenized[2];
+			if(StringUtils.isBlank(qualifier)) {
+				qualifier = null;
+			}
+			if (inputSet.isFieldPresent(schema+"."+element+"."+qualifier)) {
+				return inputSet.getFormName();
+			}
+		}
+		throw new DCInputsReaderException("No field configuration found!");
+	}
 }

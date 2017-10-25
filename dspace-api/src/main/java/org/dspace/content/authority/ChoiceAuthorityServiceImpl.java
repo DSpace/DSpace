@@ -284,6 +284,10 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		    
 		    log.debug("Choice Control: For field="+fkey+", Plugin="+ma);
 		}
+		autoRegisterChoiceAuthorityFromInputReader();
+	}
+
+	private void autoRegisterChoiceAuthorityFromInputReader() {
 		try {
 			DCInputsReader dcInputsReader = new DCInputsReader();
 			for (DCInputSet dcinputSet : dcInputsReader.getAllInputs(Integer.MAX_VALUE, 0)) {

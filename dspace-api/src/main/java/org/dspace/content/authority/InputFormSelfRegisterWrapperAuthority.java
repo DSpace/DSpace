@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
 import org.dspace.core.Utils;
@@ -28,17 +30,34 @@ import org.dspace.core.Utils;
  */
 public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
 	
+	private static Logger log = Logger.getLogger(InputFormSelfRegisterWrapperAuthority.class);
+	
 	private Map<String, ChoiceAuthority> delegates = new HashMap<String, ChoiceAuthority>();
 
+	private static DCInputsReader dci = null;
+	
+	private void init() {
+        try
+        {
+            if (dci == null)
+            {
+                dci = new DCInputsReader();
+            }
+        }
+        catch (DCInputsReaderException e)
+        {
+            log.error("Failed reading DCInputs initialization: ",e);
+        }
+	}
 	@Override
 	public Choices getMatches(String field, String query, Collection collection, int start, int limit, String locale) {
 		String formName;
 		try {
-			formName = Utils.getInputFormNameByCollectionAndField(collection, field);
+			init();
+			formName = dci.getInputFormNameByCollectionAndField(collection, field);
 			return delegates.get(formName).getMatches(field, query, collection, start, limit, locale);
 		} catch (DCInputsReaderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return null;
 	}
@@ -47,11 +66,11 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
 	public Choices getBestMatch(String field, String text, Collection collection, String locale) {
 		String formName;
 		try {
-			formName = Utils.getInputFormNameByCollectionAndField(collection, field);
+			init();
+			formName = dci.getInputFormNameByCollectionAndField(collection, field);
 			return delegates.get(formName).getBestMatch(field, text, collection, locale);
 		} catch (DCInputsReaderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 		return null;
 	}

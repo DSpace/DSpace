@@ -85,7 +85,7 @@ public class DCInputSet
      */
     public boolean isDefinedMultTitles()
     {
-        return isFieldPresent("title.alternative");
+        return isFieldPresent("dc.title.alternative");
     }
     
     /**
@@ -95,9 +95,9 @@ public class DCInputSet
      */
     public boolean isDefinedPubBefore()
     {
-        return ( isFieldPresent("date.issued") && 
-                 isFieldPresent("identifier.citation") &&
-                 isFieldPresent("publisher.null") );
+        return ( isFieldPresent("dc.date.issued") && 
+                 isFieldPresent("dc.identifier.citation") &&
+                 isFieldPresent("dc.publisher.null") );
     }
     
     /**
@@ -112,8 +112,7 @@ public class DCInputSet
         for (int i = 0; i < inputs.length; i++)
         {
             DCInput field = inputs[i];
-                String fullName = field.getElement() + "." + 
-                		field.getQualifier();
+                String fullName = field.getFieldName();
                 if (fullName.equals(fieldName))
                 {
                     return true;
@@ -139,8 +138,7 @@ public class DCInputSet
          for (int i = 0; i < inputs.length; i++)
          {
              DCInput field = inputs[i];
-                 String fullName = field.getElement() + "." + 
-                		 field.getQualifier();
+                 String fullName = field.getFieldName();
                  if (fullName.equals(fieldName) )
                  {
                      if (field.isAllowedFor(documentType)) {
@@ -154,20 +152,20 @@ public class DCInputSet
     protected boolean doField(DCInput dcf, boolean addTitleAlternative,
                                    boolean addPublishedBefore)
     {
-        String rowName = dcf.getElement() + "." + dcf.getQualifier();
-        if ( rowName.equals("title.alternative") && ! addTitleAlternative )
+        String rowName = dcf.getFieldName();
+        if ( rowName.equals("dc.title.alternative") && ! addTitleAlternative )
         {
             return false;
         }
-        if (rowName.equals("date.issued") && ! addPublishedBefore )
+        if (rowName.equals("dc.date.issued") && ! addPublishedBefore )
         {
             return false;
         }
-        if (rowName.equals("publisher.null") && ! addPublishedBefore )
+        if (rowName.equals("dc.publisher.null") && ! addPublishedBefore )
         {
             return false;
         }
-        if (rowName.equals("identifier.citation") && ! addPublishedBefore )
+        if (rowName.equals("dc.identifier.citation") && ! addPublishedBefore )
         {
             return false;
         }

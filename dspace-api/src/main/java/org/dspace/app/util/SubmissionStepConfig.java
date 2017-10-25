@@ -105,7 +105,7 @@ public class SubmissionStepConfig implements Serializable
         type = stepMap.get("type");
         scope = stepMap.get("scope");
         visibility = stepMap.get("scope.visibility");
-        visibilityOutside = stepMap.get("scope.visibilityOustside");
+        visibilityOutside = stepMap.get("scope.visibilityOutside");
     }
 
     /**

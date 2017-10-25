@@ -453,5 +453,10 @@ public class DCInput
 	public String getRegex() {
 		return regex;
 	}
+
+	public String getFieldName() {
+		return this.getSchema() +"."+ this.getElement() + "." + 
+        		this.getQualifier();
+	}
 	
 }

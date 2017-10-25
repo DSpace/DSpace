@@ -429,23 +429,6 @@ public final class Utils
         return collection == null ? Collections.<E>emptyList() : collection;
     }
     
-	public static String getInputFormNameByCollectionAndField(Collection collection, String field) throws DCInputsReaderException {
-		DCInputsReader dcInputsReader = new DCInputsReader();
-		List<DCInputSet> inputSets = dcInputsReader.getInputsByCollectionHandle(collection.getHandle());
-		for (DCInputSet inputSet : inputSets) {
-			String[] tokenized = tokenize(field);
-			String element = tokenized[1];
-			String qualifier = tokenized[2];
-			if(StringUtils.isBlank(qualifier)) {
-				qualifier = null;
-			}
-			if (inputSet.isFieldPresent(element+"."+qualifier)) {
-				return inputSet.getFormName();
-			}
-		}
-		throw new DCInputsReaderException("No field configuration found!");
-	}
-	
 	public static String[] tokenize(String metadata) {
 		String separator = metadata.contains("_") ? "_" : ".";
 		StringTokenizer dcf = new StringTokenizer(metadata, separator);
