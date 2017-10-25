@@ -8,6 +8,7 @@
 package org.dspace.versioning;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.*;
 import org.dspace.content.service.BitstreamService;
@@ -21,7 +22,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
-import org.dspace.authorize.ResourcePolicy;
 
 /**
  *
@@ -104,12 +104,7 @@ public abstract class AbstractVersionProvider {
 
 
     protected Bitstream createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException, IOException {
-        Bitstream newBitstream = bitstreamStorageService.clone(context, nativeBitstream);
-	    List<MetadataValue> bitstreamMeta = bitstreamService.getMetadata(nativeBitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-	    for (MetadataValue value : bitstreamMeta) {
-		    bitstreamService.addMetadata(context, newBitstream, value.getMetadataField(), value.getLanguage(), value.getValue(), value.getAuthority(), value.getConfidence());
-	    }
-	    return newBitstream;
+     return bitstreamStorageService.clone(context, nativeBitstream);
     }
 
     public void setIgnoredMetadataFields(Set<String> ignoredMetadataFields) {
