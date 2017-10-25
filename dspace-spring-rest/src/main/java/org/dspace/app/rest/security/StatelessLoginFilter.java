@@ -7,39 +7,50 @@
  */
 package org.dspace.app.rest.security;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private AuthenticationManager authenticationManager;
-    private TokenAuthenticationService tokenAuthenticationService;
+
+    @Autowired
+    private RestAuthenticationService restAuthenticationService;
 
     public StatelessLoginFilter(String url, AuthenticationManager authenticationManager) {
         super(new AntPathRequestMatcher(url));
         this.authenticationManager = authenticationManager;
-        this.tokenAuthenticationService = new TokenAuthenticationService();
+    }
+
+    @Override
+    protected void initFilterBean() throws ServletException {
+        //Initialise the auto-wire dependencies
+        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this,
+                getFilterConfig().getServletContext());
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
-            String email = req.getParameter("email");
+            String user = req.getParameter("user");
             String password = req.getParameter("password");
 
             return authenticationManager.authenticate(
                     new DSpaceAuthentication(
-                            email,
+                            user,
                             password,
                             new ArrayList<>())
             );
@@ -53,7 +64,6 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             Authentication auth) throws IOException, ServletException {
 
         //TODO every time we log in a new token and salt is created, might need to change this
-        tokenAuthenticationService.addAuthentication(req, res, auth.getName());
-
+        restAuthenticationService.addAuthenticationDataForUser(req, res, auth.getName());
     }
 }

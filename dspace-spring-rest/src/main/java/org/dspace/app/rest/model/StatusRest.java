@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest;
+package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.util.Util;
@@ -17,7 +17,7 @@ import org.dspace.eperson.EPerson;
  * Find out your authentication status.
  *
  */
-public class Status
+public class StatusRest
 {
     private boolean okay;
     private boolean authenticated;
@@ -26,7 +26,7 @@ public class Status
     private String sourceVersion;
     private String apiVersion;
 
-    public Status() {
+    public StatusRest() {
         setOkay(true);
 
         setSourceVersion(Util.getSourceVersion());
@@ -36,7 +36,7 @@ public class Status
         setAuthenticated(false);
     }
 
-    public Status(String email, String fullname) {
+    public StatusRest(String email, String fullname) {
         setOkay(true);
         setAuthenticated(true);
         setEmail(email);
@@ -46,7 +46,7 @@ public class Status
         setApiVersion(version[0]); // major version
     }
 
-    public Status(EPerson eperson) {
+    public StatusRest(EPerson eperson) {
         setOkay(true);
         setSourceVersion(Util.getSourceVersion());
         String[] version = Util.getSourceVersion().split("\\.");
