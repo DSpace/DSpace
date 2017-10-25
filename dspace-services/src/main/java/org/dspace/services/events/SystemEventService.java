@@ -15,7 +15,6 @@ import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.services.CachingService;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
-import org.dspace.services.SessionService;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.Event;
@@ -47,17 +46,15 @@ public final class SystemEventService implements EventService, ShutdownService {
     private Map<String, EventListener> listenersMap = new ConcurrentHashMap<String, EventListener>();
 
     private final RequestService requestService;
-    private final SessionService sessionService;
     private final CachingService cachingService;
     private EventRequestInterceptor requestInterceptor;
 
     @Autowired(required=true)
-    public SystemEventService(RequestService requestService, SessionService sessionService, CachingService cachingService) {
-        if (requestService == null || cachingService == null || sessionService == null) {
+    public SystemEventService(RequestService requestService, CachingService cachingService) {
+        if (requestService == null || cachingService == null) {
             throw new IllegalArgumentException("requestService, cachingService, and all inputs must not be null");
         }
         this.requestService = requestService;
-        this.sessionService = sessionService;
         this.cachingService = cachingService;
 
         // register interceptor
@@ -222,7 +219,7 @@ public final class SystemEventService implements EventService, ShutdownService {
         }
         if (event.getUserId() == null || "".equals(event.getUserId()) ) {
             // set to the current user
-            String userId = this.sessionService.getCurrentUserId();
+            String userId = this.requestService.getCurrentUserId();
             event.setUserId(userId);
         }
         if (event.getScopes() == null) {

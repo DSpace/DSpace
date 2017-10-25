@@ -23,6 +23,7 @@ import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.RequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
     @Autowired
     private AuthorizeService authorizeService;
+
+    @Autowired
+    private RequestService requestService;
 
     @Autowired
     private HttpServletRequest request;
@@ -97,6 +101,9 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     private Authentication createAuthenticationToken(final String password, final Context context) {
         EPerson ePerson = context.getCurrentUser();
         if(ePerson != null && StringUtils.isNotBlank(ePerson.getEmail())) {
+            //Pass the eperson ID to the request service
+            requestService.setCurrentUserId(ePerson.getID());
+
             return new DSpaceAuthentication(ePerson.getEmail(), password, getGrantedAuthorities(context, ePerson));
 
         } else {

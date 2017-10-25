@@ -9,14 +9,13 @@ package org.dspace.services.session;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
 
 import org.dspace.services.CachingService;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
 import org.dspace.services.model.Session;
 import org.dspace.services.model.CacheConfig.CacheScope;
-import org.dspace.services.sessions.SessionRequestServiceImpl;
+import org.dspace.services.sessions.StatelessRequestServiceImpl;
 import org.dspace.test.DSpaceAbstractKernelTest;
 import org.junit.After;
 import org.junit.Before;
@@ -28,14 +27,14 @@ import org.junit.Test;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
+public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
 
-    private SessionRequestServiceImpl sessionRequestService; 
+    private StatelessRequestServiceImpl sessionRequestService;
     private CachingService cachingService; 
 
     @Before
     public void before() {
-        sessionRequestService = getService(SessionRequestServiceImpl.class);
+        sessionRequestService = getService(StatelessRequestServiceImpl.class);
         cachingService = getService(CachingService.class);
     }
 
@@ -48,7 +47,7 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#startRequest()}.
+     * Test method for {@link org.dspace.services.sessions.StatelessRequestServiceImpl#startRequest()}.
      */
     @Test
     public void testStartRequest() {
@@ -59,7 +58,7 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#endRequest(java.lang.Exception)}.
+     * Test method for {@link org.dspace.services.sessions.StatelessRequestServiceImpl#endRequest(java.lang.Exception)}.
      */
     @Test
     public void testEndRequest() {
@@ -71,7 +70,7 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#registerRequestInterceptor(org.dspace.services.model.RequestInterceptor)}.
+     * Test method for {@link org.dspace.services.sessions.StatelessRequestServiceImpl#registerRequestInterceptor(org.dspace.services.model.RequestInterceptor)}.
      */
     @Test
     public void testRegisterRequestListener() {
@@ -111,25 +110,7 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#getCurrentSession()}.
-     */
-    @Test
-    public void testGetCurrentSession() {
-        Session current = sessionRequestService.getCurrentSession();
-        assertNull(current);
-    }
-
-    /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#getCurrentSessionId()}.
-     */
-    @Test
-    public void testGetCurrentSessionId() {
-        String current = sessionRequestService.getCurrentSessionId();
-        assertNull(current);
-    }
-
-    /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#getCurrentUserId()}.
+     * Test method for {@link org.dspace.services.sessions.StatelessRequestServiceImpl#getCurrentUserId()}.
      */
     @Test
     public void testGetCurrentUserId() {
@@ -138,7 +119,7 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#getCurrentRequestId()}.
+     * Test method for {@link org.dspace.services.sessions.StatelessRequestServiceImpl#getCurrentRequestId()}.
      */
     @Test
     public void testGetCurrentRequestId() {

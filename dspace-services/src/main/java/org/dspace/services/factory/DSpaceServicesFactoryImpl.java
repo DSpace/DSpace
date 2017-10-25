@@ -33,9 +33,6 @@ public class DSpaceServicesFactoryImpl extends DSpaceServicesFactory {
     private RequestService requestService;
 
     @Autowired(required = true)
-    private SessionService sessionService;
-
-    @Autowired(required = true)
     private ServiceManager serviceManager;
 
     @Override
@@ -61,11 +58,6 @@ public class DSpaceServicesFactoryImpl extends DSpaceServicesFactory {
     @Override
     public RequestService getRequestService() {
         return requestService;
-    }
-
-    @Override
-    public SessionService getSessionService() {
-        return sessionService;
     }
 
     @Override

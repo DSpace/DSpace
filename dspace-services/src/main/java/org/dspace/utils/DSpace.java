@@ -13,7 +13,6 @@ import org.dspace.kernel.ServiceManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
-import org.dspace.services.SessionService;
 
 
 /**
@@ -73,10 +72,6 @@ public final class DSpace {
 
     public EventService getEventService() {
         return getServiceManager().getServiceByName(EventService.class.getName(), EventService.class);
-    }
-    
-    public SessionService getSessionService() {
-        return getServiceManager().getServiceByName(SessionService.class.getName(), SessionService.class);
     }
 
     public RequestService getRequestService() {
