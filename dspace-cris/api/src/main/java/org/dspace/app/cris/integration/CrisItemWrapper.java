@@ -38,7 +38,7 @@ public final class CrisItemWrapper implements MethodInterceptor, ItemWrapperInte
     		return getTypeText(invocation);
     	}
 
-        if (invocation.getMethod().getName().equals("getMetadata"))
+        if (invocation.getMethod().getName().equals("getMetadata") || invocation.getMethod().getName().equals("getMetadataWithoutPlaceholder"))
         {
             String schema = ""; 
             String element = "";
