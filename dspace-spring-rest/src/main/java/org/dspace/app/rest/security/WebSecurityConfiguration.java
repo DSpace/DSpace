@@ -17,7 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -26,6 +26,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    public static final String ADMIN_GRANT = "ADMIN";
+    public static final String EPERSON_GRANT = "EPERSON";
+    public static final String ANONYMOUS_GRANT = "ANONYMOUS";
 
     @Autowired
     private EPersonRestAuthenticationProvider ePersonRestAuthenticationProvider;
@@ -37,32 +41,48 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.headers().cacheControl();
         http
+                //Tell Spring to not create Sessions
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .exceptionHandling().and()
-                .anonymous().and()
+                //Return the login URL when having an access denied error
+                .exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/api/login")).and()
+                //Anonymous requests should have the "ANONYMOUS" security grant
+                .anonymous().authorities(ANONYMOUS_GRANT).and()
+                //Wire up the HttpServletRequest with the current SecurityContext values
                 .servletApi().and()
+                //Disable CSRF as our API can be used by clients on an other domain
                 .csrf().disable()
 
-                .logout().addLogoutHandler(customLogoutHandler).logoutRequestMatcher(new AntPathRequestMatcher("/api/logout")).logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()).permitAll()
+                //Logout configuration
+                .logout()
+                        //On logout, clear the "session" salt
+                        .addLogoutHandler(customLogoutHandler)
+                        //Configure the logout entry point
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
+                        //When logout is successful, return OK (200) status
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                        //Everyone can call this endpoint
+                        .permitAll()
                 .and()
+
+                //Configure the URL patterns with their authentication requirements
                 .authorizeRequests()
-
-                .antMatchers( "/api/login").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/status").permitAll()
-
+                    //Allow GET and POST by anyone on the login endpoint
+                    .antMatchers( "/api/login").permitAll()
+                    //Everyone can call GET on the status endpoint
+                    .antMatchers(HttpMethod.GET, "/api/status").permitAll()
                 .and()
 
-                .addFilterBefore(new StatelessLoginFilter("/api/login", authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                //Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
+                .addFilter(new StatelessLoginFilter("/api/login", authenticationManager()))
+                //TODO see comment at org.dspace.app.rest.AuthenticationRestController.shibbolethLogin()
+                .addFilter(new StatelessLoginFilter("/shibboleth-login", authenticationManager()))
 
-                // Custom Token based authentication based on the header previously given to the client
-                .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager()),  UsernamePasswordAuthenticationFilter.class);
-
-
+                // Add a custom Token based authentication filter based on the token previously given to the client before each URL
+                .addFilter(new StatelessAuthenticationFilter(authenticationManager()));
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        //Add the in-memory user with and ADMIN role. This user can be used to create the initial users.
         auth.authenticationProvider(ePersonRestAuthenticationProvider);
     }
 

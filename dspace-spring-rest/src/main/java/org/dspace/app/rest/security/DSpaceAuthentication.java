@@ -7,11 +7,11 @@
  */
 package org.dspace.app.rest.security;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-
 import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 public class DSpaceAuthentication implements Authentication {
 
@@ -24,6 +24,10 @@ public class DSpaceAuthentication implements Authentication {
         this.username = username;
         this.password = password;
         this.authorities = authorities;
+    }
+
+    public DSpaceAuthentication (String username, List<GrantedAuthority> authorities) {
+        this(username, null, authorities);
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
