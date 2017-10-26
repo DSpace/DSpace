@@ -191,11 +191,15 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
             bundle.unsetPrimaryBitstreamID();
         }
 
-        // Check if we our bitstream is part of a single bundle:
-        // If so delete it, if not then remove the link between bundle & bitstream
-        if(bitstream.getBundles().size() == 1)
+        // Check if our bitstream is part of a single or no bundle. 
+        // Bitstream.getBundles() may be empty (the delete() method clears 
+        // the bundles). We should not delete the bitstream, if it is used
+        // in another bundle, instead we just remove the link between bitstream
+        // and this bundle.
+        if(bitstream.getBundles().size() <= 1)
         {
-            // We don't need to remove the link between bundle & bitstream, this will be handled in the delete() method.
+            // We don't need to remove the link between bundle & bitstream, 
+            // this will be handled in the delete() method.
             bitstreamService.delete(context, bitstream);
         }else{
             bundle.removeBitstream(bitstream);
@@ -435,7 +439,7 @@ public class BundleServiceImpl extends DSpaceObjectServiceImpl<Bundle> implement
         for (Bitstream bitstream : bitstreams) {
             removeBitstream(context, bundle, bitstream);
         }
-
+        
         List<Item> items = new LinkedList<>(bundle.getItems());
         bundle.getItems().clear();
         for (Item item : items) {
