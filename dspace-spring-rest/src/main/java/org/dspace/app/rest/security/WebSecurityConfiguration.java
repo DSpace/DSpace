@@ -50,6 +50,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 //Wire up the HttpServletRequest with the current SecurityContext values
                 .servletApi().and()
                 //Disable CSRF as our API can be used by clients on an other domain
+                //TODO This might be a good reason to switch from using cookies to using HTTP headers
                 .csrf().disable()
 
                 //Logout configuration
