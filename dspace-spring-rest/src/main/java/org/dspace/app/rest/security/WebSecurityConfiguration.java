@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.security;
 
+import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,6 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
@@ -33,6 +35,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private EPersonRestAuthenticationProvider ePersonRestAuthenticationProvider;
+
+    @Autowired
+    private RestAuthenticationService restAuthenticationService;
+
+    @Autowired
+    private RequestService requestService;
 
     @Autowired
     private CustomLogoutHandler customLogoutHandler;
@@ -74,12 +82,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
 
                 //Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
-                .addFilter(new StatelessLoginFilter("/api/login", authenticationManager()))
+                .addFilterBefore(new StatelessLoginFilter("/api/login", authenticationManager(), restAuthenticationService), LogoutFilter.class)
                 //TODO see comment at org.dspace.app.rest.AuthenticationRestController.shibbolethLogin()
-                .addFilter(new StatelessLoginFilter("/shibboleth-login", authenticationManager()))
+                .addFilterBefore(new StatelessLoginFilter("/shibboleth-login", authenticationManager(), restAuthenticationService), LogoutFilter.class)
 
                 // Add a custom Token based authentication filter based on the token previously given to the client before each URL
-                .addFilter(new StatelessAuthenticationFilter(authenticationManager()));
+                .addFilterBefore(new StatelessAuthenticationFilter(authenticationManager(), restAuthenticationService,
+                        ePersonRestAuthenticationProvider, requestService), StatelessLoginFilter.class);
     }
 
     @Override
