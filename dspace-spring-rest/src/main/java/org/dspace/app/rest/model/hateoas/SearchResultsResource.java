@@ -7,6 +7,12 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.DiscoveryRestController;
@@ -16,14 +22,7 @@ import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.hateoas.Link;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * TODO TOM UNIT TEST
@@ -34,14 +33,13 @@ public class SearchResultsResource extends HALResource {
     @JsonUnwrapped
     private final SearchResultsRest data;
 
+    @JsonUnwrapped
+    private EmbeddedPage embeddedSearchResults;
+
     public SearchResultsResource(final SearchResultsRest data, final Pageable page, final Utils utils) {
         this.data = data;
 
-
-        addLinks(data);
-
         addEmbeds(data, page, utils);
-
     }
 
     public SearchResultsRest getData(){
@@ -72,15 +70,8 @@ public class SearchResultsResource extends HALResource {
         PageImpl<SearchResultEntryResource> page = new PageImpl<SearchResultEntryResource>(entryResources,
                 pageable, data.getTotalNumberOfResults());
 
-        embedResource("searchResults", new EmbeddedPage(buildBaseLink(data), page, entryResources));
-    }
-
-    private void addLinks(final SearchResultsRest data) {
-        //Create the self link using our Controller
-        String baseLink = buildBaseLink(data);
-
-        Link link = new Link(baseLink, Link.REL_SELF);
-        add(link);
+        embeddedSearchResults = new EmbeddedPage(buildBaseLink(data), page, entryResources);
+        embedResource("searchResults", entryResources);
     }
 
     private String buildBaseLink(final SearchResultsRest data) {

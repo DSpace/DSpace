@@ -8,10 +8,8 @@ import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
-import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +17,12 @@ import org.springframework.stereotype.Component;
 public class DiscoverFacetResultsConverter {
 
 
-    public FacetResultsRest convert(Context context, String facetName, DiscoverQuery discoverQuery, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, Pageable page){
+    public FacetResultsRest convert(Context context, String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, Pageable page){
         FacetResultsRest facetResultsRest = new FacetResultsRest();
 
         addToFacetResultList(facetName, searchResult, facetResultsRest, page);
 
-        setRequestInformation(context, facetName, discoverQuery, dsoScope, searchFilters, searchResult, configuration, facetResultsRest, page);
+        setRequestInformation(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration, facetResultsRest, page);
 
         return facetResultsRest;
     }
@@ -50,11 +48,11 @@ public class DiscoverFacetResultsConverter {
         return searchFacetValueRest;
     }
 
-    private void setRequestInformation(Context context, String facetName, DiscoverQuery discoverQuery, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, FacetResultsRest facetResultsRest, Pageable page) {
+    private void setRequestInformation(Context context, String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, FacetResultsRest facetResultsRest, Pageable page) {
         facetResultsRest.setName(facetName);
-        facetResultsRest.setQuery(discoverQuery.getQuery());
+        facetResultsRest.setQuery(query);
         facetResultsRest.setScope(dsoScope);
-        facetResultsRest.setQuery(discoverQuery.getQuery());
+        facetResultsRest.setDsoType(dsoType);
         facetResultsRest.setPage(page);
 
         if(!searchResult.getFacetResult(facetName).isEmpty()){
@@ -66,11 +64,7 @@ public class DiscoverFacetResultsConverter {
             facetResultsRest.setHasMore(true);
         }
 
-        if(!discoverQuery.getFacetFields().isEmpty()){
-            DiscoveryConfigurationParameters.SORT sort2 = discoverQuery.getFacetFields().get(0).getSortOrder();
-            SearchResultsRest.Sorting sort = new SearchResultsRest.Sorting(sort2.name());
-            facetResultsRest.setSort(sort);
-        }
+        facetResultsRest.setSort(SearchResultsRest.Sorting.fromPage(page));
 
         facetResultsRest.setSearchFilters(searchFilters);
         SearchFilterToAppliedFilterConverter searchFilterToAppliedFilterConverter = new SearchFilterToAppliedFilterConverter();

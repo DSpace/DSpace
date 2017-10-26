@@ -7,17 +7,20 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import org.dspace.app.rest.model.*;
+import org.dspace.app.rest.model.DSpaceObjectRest;
+import org.dspace.app.rest.model.SearchFacetEntryRest;
+import org.dspace.app.rest.model.SearchFacetValueRest;
+import org.dspace.app.rest.model.SearchResultEntryRest;
+import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.parameter.SearchFilter;
-import org.dspace.authority.AuthorityValue;
-import org.dspace.authority.service.AuthorityValueService;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
@@ -25,9 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * TODO TOM UNIT TEST
@@ -39,12 +39,12 @@ public class DiscoverResultConverter {
     private List<DSpaceObjectConverter> converters;
 
 
-    public SearchResultsRest convert(final Context context, final DiscoverQuery discoverQuery, final String configurationName, final String scope,
+    public SearchResultsRest convert(final Context context, final String query, final String dsoType, final String configurationName, final String scope,
                                      final List<SearchFilter> searchFilters, final Pageable page, final DiscoverResult searchResult, final DiscoveryConfiguration configuration) {
 
         SearchResultsRest resultsRest = new SearchResultsRest();
 
-        setRequestInformation(context, discoverQuery, configurationName, scope, searchFilters, page, resultsRest);
+        setRequestInformation(context, query, dsoType, configurationName, scope, searchFilters, page, resultsRest);
 
         addSearchResults(searchResult, resultsRest);
 
@@ -120,14 +120,11 @@ public class DiscoverResultConverter {
         return null;
     }
 
-    private void setRequestInformation(final Context context, final DiscoverQuery discoverQuery, final String configurationName, final String scope,
+    private void setRequestInformation(final Context context, final String query, final String dsoType, final String configurationName, final String scope,
                                        final List<SearchFilter> searchFilters, final Pageable page, final SearchResultsRest resultsRest) {
-        resultsRest.setQuery(discoverQuery.getQuery());
+        resultsRest.setQuery(query);
         resultsRest.setConfigurationName(configurationName);
-
-        if(discoverQuery.getDSpaceObjectFilter() >= 0) {
-            resultsRest.setDsoType(Constants.typeText[discoverQuery.getDSpaceObjectFilter()]);
-        }
+        resultsRest.setDsoType(dsoType);
 
         resultsRest.setScope(scope);
 
