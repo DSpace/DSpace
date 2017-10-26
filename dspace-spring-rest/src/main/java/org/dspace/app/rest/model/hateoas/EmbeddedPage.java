@@ -22,11 +22,17 @@ public class EmbeddedPage {
 	private Page page;
 	private List fullList;
 	private UriComponentsBuilder self;
+	private boolean totalElementsIsKnown;
 	
 	public EmbeddedPage(String self, Page page, List fullList) {
+		this(self, page, fullList, true);
+	}
+
+	public EmbeddedPage(String self, Page page, List fullList, boolean totalElementsIsKnown) {
 		this.page = page;
 		this.fullList = fullList;
 		this.self = UriComponentsBuilder.fromUriString(self);
+		this.totalElementsIsKnown = totalElementsIsKnown;
 	}
 
 	@JsonProperty(value = "_embedded")
@@ -39,8 +45,10 @@ public class EmbeddedPage {
 		Map<String, Long> pageInfo = new HashMap<String, Long>();
 		pageInfo.put("number", (long) page.getNumber());
 		pageInfo.put("size", (long) page.getSize() != 0?page.getSize():page.getTotalElements());
-		pageInfo.put("totalPages", (long) page.getTotalPages());
-		pageInfo.put("totalElements", page.getTotalElements());
+		if(totalElementsIsKnown) {
+			pageInfo.put("totalPages", (long) page.getTotalPages());
+			pageInfo.put("totalElements", page.getTotalElements());
+		}
 		return pageInfo;
 	}
 	
@@ -54,7 +62,7 @@ public class EmbeddedPage {
 		else {
 			links.put("self", self.toUriString());
 		}
-		if (!page.isLast()) {
+		if (!page.isLast() && totalElementsIsKnown) {
 			links.put("last", _link(page.getTotalPages()-1));
 		}
 		if (page.hasPrevious()) {

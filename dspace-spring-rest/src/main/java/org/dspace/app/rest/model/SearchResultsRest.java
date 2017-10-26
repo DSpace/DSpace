@@ -7,18 +7,15 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.DiscoveryRestController;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * TODO TOM UNIT TEST
  */
-public class SearchResultsRest extends ResultsRest {
-
-
+public class SearchResultsRest extends DiscoveryResultsRest {
 
     private long totalNumberOfResults;
 

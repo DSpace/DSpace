@@ -1,13 +1,13 @@
 package org.dspace.app.rest.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.parameter.SearchFilter;
 
-import java.util.LinkedList;
-import java.util.List;
-
-public abstract class ResultsRest extends BaseObjectRest<String>{
+public abstract class DiscoveryResultsRest extends BaseObjectRest<String>{
 
     @JsonIgnore
     public static final String NAME = "discover";
