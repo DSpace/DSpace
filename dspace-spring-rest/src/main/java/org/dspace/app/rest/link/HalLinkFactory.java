@@ -7,17 +7,16 @@
  */
 package org.dspace.app.rest.link;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Created by raf on 25/09/2017.
@@ -26,7 +25,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
 
     public boolean supports(Class clazz) {
-        if(Objects.equals(clazz, getResourceClass())){
+        if(getResourceClass().isAssignableFrom(clazz)){
             return true;
         }
         return false;

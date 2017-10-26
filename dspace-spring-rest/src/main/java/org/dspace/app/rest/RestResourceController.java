@@ -26,6 +26,7 @@ import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
+import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
@@ -73,6 +74,9 @@ public class RestResourceController implements InitializingBean {
 
 	@Autowired
 	RestRepositoryUtils repositoryUtils;
+
+	@Autowired
+	HalLinkService linkService;
 
 	@Override
 	public void afterPropertiesSet() {
@@ -124,6 +128,7 @@ public class RestResourceController implements InitializingBean {
 			throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
 		}
 		DSpaceResource result = repository.wrapResource(modelObject);
+		linkService.addLinks(result);
 		return result;
 	}
 
@@ -213,6 +218,8 @@ public class RestResourceController implements InitializingBean {
 		}
 		RestModel modelObject = repository.findOne(uuid);
 		DSpaceResource result = repository.wrapResource(modelObject, rel);
+		linkService.addLinks(result);
+
 		if (result.getLink(rel) == null) {
 			// TODO create a custom exception
 			throw new ResourceNotFoundException(rel + "undefined for " + model);
@@ -251,6 +258,7 @@ public class RestResourceController implements InitializingBean {
 		Page<DSpaceResource<T>> resources;
 		try {
 			resources = repository.findAll(page).map(repository::wrapResource);
+			resources.forEach(linkService::addLinks);
 		} catch (PaginationException pe) {
 			resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
 		}
@@ -320,6 +328,7 @@ public class RestResourceController implements InitializingBean {
 		ResourceSupport result = null;
 		if (returnPage) {
 			Page<DSpaceResource<T>> resources = ((Page<T>) searchResult).map(repository::wrapResource);
+			resources.forEach(linkService::addLinks);
 			result = assembler.toResource(resources, link);
 		} else {
 			result = repository.wrapResource((T) searchResult);
