@@ -84,6 +84,9 @@ public abstract class Field extends AbstractWingElement implements
     /** The name of the disabled attribute */
     public static final String A_DISABLED = "disabled";
 
+    /** The name of the readonly attribute */
+    public static final String A_READONLY = "readonly";
+
     /** The name of the required attribute */
     public static final String A_REQUIRED = "required";
     
@@ -129,6 +132,9 @@ public abstract class Field extends AbstractWingElement implements
 
     /** Whether this field is disabled */
     protected boolean disabled;
+
+    /** Whether this field is readonly */
+    protected boolean readonly;
 
     /** Whether this field is required */
     protected boolean required;
@@ -194,6 +200,7 @@ public abstract class Field extends AbstractWingElement implements
         this.name = name;
         this.type = type;
         this.disabled = false;
+        this.readonly = false;
         this.required = false;
         this.rend = rend;
     }
@@ -239,6 +246,27 @@ public abstract class Field extends AbstractWingElement implements
     public void setDisabled(boolean disabled)
     {
         this.disabled = disabled;
+    }
+
+    /**
+     * Set this field to be readonly.
+     *
+     */
+    public void setReadonly()
+    {
+        this.readonly = true;
+    }
+
+    /**
+     * Set this field to either be readonly or enabled as determined by the
+     * readonly parameter.
+     *
+     * @param readonly
+     *            Determine if the field is readonly or not.
+     */
+    public void setReadonly(boolean readonly)
+    {
+        this.readonly = readonly;
     }
 
     /**
@@ -531,6 +559,10 @@ public abstract class Field extends AbstractWingElement implements
         {
             attributes.put(A_DISABLED, this.disabled);
         }
+        if (this.readonly)
+        {
+            attributes.put(A_READONLY, this.readonly);
+        }
         if (this.required)
         {
             attributes.put(A_REQUIRED, this.required);
@@ -564,6 +596,12 @@ public abstract class Field extends AbstractWingElement implements
         
         for (Field field : fields)
         {
+            if(this.disabled){
+                field.setDisabled();
+            }
+            if(this.readonly){
+                field.setReadonly();
+            }
             field.toSAX(contentHandler, lexicalHandler, namespaces);
         }
 
