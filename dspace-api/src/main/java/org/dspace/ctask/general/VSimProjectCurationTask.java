@@ -37,6 +37,7 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.core.Constants;
 import org.dspace.curate.Curator;
+import org.dspace.curate.Distributive;
 
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.Group;
@@ -65,6 +66,7 @@ import java.io.IOException;
  *
  * @author hardyoyo
  */
+@Distributive
 public class VSimProjectCurationTask extends AbstractCurationTask
 {
 /** log4j category */
@@ -88,9 +90,16 @@ public class VSimProjectCurationTask extends AbstractCurationTask
      * @throws SQLException if SQL error
      */
 
-    @Override
-    public int perform(DSpaceObject dso) throws IOException
-    {
+     @Override
+     public int perform(DSpaceObject dso) throws IOException
+     {
+          distribute(dso);
+          return Curator.CURATE_SUCCESS;
+     }
+
+     @Override
+     protected void performItem(Item item) throws IOException
+     {
 
     int status = Curator.CURATE_SKIP;
 
@@ -106,16 +115,12 @@ public class VSimProjectCurationTask extends AbstractCurationTask
       }
 
 
-    // If this dso is an ITEM, proceed
     vsimInit:
-		if (dso.getType() == Constants.ITEM)
-        {
+
           try {
 
           DSpaceObject projectMastersDSO = handleService.resolveToObject(Curator.curationContext(), projectMasterCollectionHandle);
           Collection projectMastersCollection = (Collection) projectMastersDSO;
-
-          Item item = (Item)dso;
 
           // *ONLY* KEEP GOING IF THIS ITEM IS A PROJECT MASTER, OTHERWISE *STOP*!!
           if (!itemService.isIn(item, projectMastersCollection)) {
@@ -130,6 +135,7 @@ public class VSimProjectCurationTask extends AbstractCurationTask
 
 
               String itemId = item.getHandle();
+              log.info("VSimProjectCurationTask: processing master item at handle: " + itemId);
               List<MetadataValue> mvDcTitle = itemService.getMetadata(item, "dc", "title", Item.ANY, Item.ANY);
               List<MetadataValue> mvDcDescriptionAbstract = itemService.getMetadata(item, "dc", "description", "abstract", Item.ANY);
               List<MetadataValue> mvDcDescription = itemService.getMetadata(item, "dc", "description", Item.ANY, Item.ANY);
@@ -167,9 +173,10 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               // -- disabled for now, hjp, the below is not fully cooked, it's just a start, do all of the above
               // if ( CollectionUtils.isNotEmpty(mvVsimRelationCommunity) ){
                 // create a new top level community for this project
+                log.info("VSimProjectCurationTask: creating new projectCommunity based on master item at handle: " + itemId);
                 Community projectCommunity = communityService.create(null, Curator.curationContext());
               //} else {
-                // grab the linked projectCommunity by its handle
+                // grab the linked projectCommunity by its handle  NOTE: due to VSIM-82, this won't ever work, the projectCommunity handle won't point to the projectCommunity
                 //Community projectCommunity = communityService.create(null, Curator.curationContext());
               //}
 
@@ -207,12 +214,11 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               // snag the projectCommunityhandle, we'll need it
               String projectCommunityHandle = projectCommunity.getHandle();
 
-              // set the logo for the community, if possible, use projectCommunity.setLogo(Bitstream logo)
-
               // We need a DSpace group object for AuthZ purposes, for ContentCreators, to keep handy
               Group ContentCreatorsGroupObj = groupService.findByName(Curator.curationContext(), "Content Creators");
               Group AnonymousGroupObj = groupService.findByName(Curator.curationContext(), "Anonymous");
 
+              log.info("VSimProjectCurationTask: creating Administrators group for projectCommunity: " + projectCommunityHandle);
               // create the Administrators group we need
               Group projectCommunityAdminGroupObj = communityService.createAdministrators(Curator.curationContext(), projectCommunity);
 
@@ -226,12 +232,18 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               // if there is no link to the project models collection in this item's metadata, create a models collection in this project's TLC and add a link to the models collection as metadata for this project master item
               Collection projectCollModels = collectionService.create(Curator.curationContext(), projectCommunity);
               if ( CollectionUtils.isNotEmpty(mvDcTitle) ) {
+                log.info("VSimProjectCurationTask: adding links to projectCollModels at handle: " + projectCollModels.getHandle());
                 collectionService.addMetadata(Curator.curationContext(), projectCollModels, MetadataSchema.DC_SCHEMA, "title", null, null, mvDcTitle.get(0).getValue() + ": VSim Files");
                 collectionService.addMetadata(Curator.curationContext(), projectCollModels, MetadataSchema.DC_SCHEMA, "description", null, null, "Files specific to VSim, including 3D models, narratives, and embedded resources (e.g., .vsim, .nar, .ere). For the " + mvDcTitle.get(0).getValue() + " project.");
                 collectionService.addMetadata(Curator.curationContext(), projectCollModels, MetadataSchema.DC_SCHEMA, "description", "abstract", null, "Files specific to VSim, including 3D models, narratives, and embedded resources (e.g., .vsim, .nar, .ere). For the " + mvDcTitle.get(0).getValue() + " project.");
                 collectionService.addMetadata(Curator.curationContext(), projectCollModels, MetadataSchema.DC_SCHEMA, "description", "tableofcontents", null, "Collection sidebar for Models: " + mvDcTitle.get(0).getValue());
                 collectionService.addMetadata(Curator.curationContext(), projectCollModels, MetadataSchema.DC_SCHEMA, "rights", null, null, mvDcRights.get(0).getValue());
+                // ADD A LINK TO BACK TO THE PROJECT MASTER ITEM
+                collectionService.addMetadata(Curator.curationContext(), projectCollModels, "vsim", "relation", "projectMaster", null, itemId);
+
               }
+
+              log.info("VSimProjectCurationTask: creating Administators and Submitters groups for projectCollModels at handle: " + projectCollModels.getHandle());
 
               // create the Administrators and Submitters groups we need
               Group projectCollModelsAdminGroupObj = collectionService.createAdministrators(Curator.curationContext(), projectCollModels);
@@ -244,6 +256,7 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               groupService.update(Curator.curationContext(), projectCollModelsSubmittersGroupObj);
 
               // write this collection
+              log.info("VSimProjectCurationTask: writing changes to projectCollModels at handle: " + projectCollModels.getHandle());
               collectionService.update(Curator.curationContext(), projectCollModels);
               // add a link to this collection to the item
               itemService.addMetadata(Curator.curationContext(), item, "vsim", "relation", "models", Item.ANY, projectCollModels.getHandle() );
@@ -252,12 +265,17 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               // if there is no link to the project archives collection in this item's metadata, create an archives collection in this project's TLC and add a link to the archives collection as metadata for this project master item
               Collection projectCollArchives = collectionService.create(Curator.curationContext(), projectCommunity);
               if ( CollectionUtils.isNotEmpty(mvDcTitle) ) {
+                log.info("VSimProjectCurationTask: adding links to projectCollArchives at handle: " + projectCollArchives.getHandle());
                 collectionService.addMetadata(Curator.curationContext(), projectCollArchives, MetadataSchema.DC_SCHEMA, "title", null, null, mvDcTitle.get(0).getValue() + ": Project Archive");
                 collectionService.addMetadata(Curator.curationContext(), projectCollArchives, MetadataSchema.DC_SCHEMA, "description", null, null, "Multimedia files related to the project that provide context for the 3D model (e.g., .pdf, .jpg, .ppt, .csv, etc.). For the " + mvDcTitle.get(0).getValue() + " project.");
                 collectionService.addMetadata(Curator.curationContext(), projectCollArchives, MetadataSchema.DC_SCHEMA, "description", "abstract", null, "Multimedia files related to the project that provide context for the 3D model (e.g., .pdf, .jpg, .ppt, .csv, etc.). For the " + mvDcTitle.get(0).getValue() + " project.");
                 collectionService.addMetadata(Curator.curationContext(), projectCollArchives, MetadataSchema.DC_SCHEMA, "description", "tableofcontents", null, "Collection sidebar for Archives: " + mvDcTitle.get(0).getValue());
                 collectionService.addMetadata(Curator.curationContext(), projectCollArchives, MetadataSchema.DC_SCHEMA, "rights", null, null, mvDcRights.get(0).getValue());
+                // ADD A LINK TO BACK TO THE PROJECT MASTER ITEM
+                collectionService.addMetadata(Curator.curationContext(), projectCollArchives, "vsim", "relation", "projectMaster", null, itemId);
               }
+
+              log.info("VSimProjectCurationTask: creating Administators and Submitters groups for projectCollArchives at handle: " + projectCollArchives.getHandle());
 
               // create the Administrators and Submitters groups we need
               Group projectCollArchivesAdminGroupObj = collectionService.createAdministrators(Curator.curationContext(), projectCollArchives);
@@ -270,6 +288,7 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               groupService.update(Curator.curationContext(), projectCollArchivesSubmittersGroupObj);
 
               // write this collection
+              log.info("VSimProjectCurationTask: writing changes to projectCollArchives at handle: " + projectCollArchives.getHandle());
               collectionService.update(Curator.curationContext(), projectCollArchives);
               // add a link to this collection to the item
               itemService.addMetadata(Curator.curationContext(), item, "vsim", "relation", "archives", Item.ANY, projectCollArchives.getHandle() );
@@ -278,12 +297,17 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               // if there is no link to the project submissions collection in this item's metadata, create a submissions collection in this project's TLC and add a link to the submissions collection as metadata for this project master item
               Collection projectCollSubmissions = collectionService.create(Curator.curationContext(), projectCommunity);
               if ( CollectionUtils.isNotEmpty(mvDcTitle) ) {
+                log.info("VSimProjectCurationTask: adding links to projectCollSubmissions at handle: " + projectCollSubmissions.getHandle());
                 collectionService.addMetadata(Curator.curationContext(), projectCollSubmissions, MetadataSchema.DC_SCHEMA, "title", null, null, mvDcTitle.get(0).getValue() + ": User Submissions");
                 collectionService.addMetadata(Curator.curationContext(), projectCollSubmissions, MetadataSchema.DC_SCHEMA, "description", null, null, "Multimedia files submitted by users for sharing within the educational and research communities (e.g., narratives created for use in the classroom, or imagery and texts related to the 3D model that are in the public domain). For the " + mvDcTitle.get(0).getValue() + " project.");
                 collectionService.addMetadata(Curator.curationContext(), projectCollSubmissions, MetadataSchema.DC_SCHEMA, "description", "abstract", null, "Multimedia files submitted by users for sharing within the educational and research communities (e.g., narratives created for use in the classroom, or imagery and texts related to the 3D model that are in the public domain). For the " + mvDcTitle.get(0).getValue() + " project.");
                 collectionService.addMetadata(Curator.curationContext(), projectCollSubmissions, MetadataSchema.DC_SCHEMA, "description", "tableofcontents", null, "Collection sidebar for Submissions: " + mvDcTitle.get(0).getValue());
                 collectionService.addMetadata(Curator.curationContext(), projectCollSubmissions, MetadataSchema.DC_SCHEMA, "rights", null, null, mvDcRights.get(0).getValue());
+                // ADD A LINK TO BACK TO THE PROJECT MASTER ITEM
+                collectionService.addMetadata(Curator.curationContext(), projectCollSubmissions, "vsim", "relation", "projectMaster", null, itemId);
               }
+
+              log.info("VSimProjectCurationTask: creating Administators and Submitters groups for projectCollSubmissions at handle: " + projectCollSubmissions.getHandle());
 
               // create the Administrators and Submitters groups we need
               Group projectCollSubmissionsAdminGroupObj = collectionService.createAdministrators(Curator.curationContext(), projectCollSubmissions);
@@ -296,6 +320,7 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               groupService.update(Curator.curationContext(), projectCollSubmissionsSubmittersGroupObj);
 
               // write this collection
+              log.info("VSimProjectCurationTask: writing changes to projectCollSubmissions at handle: " + projectCollSubmissions.getHandle());
               collectionService.update(Curator.curationContext(), projectCollSubmissions);
               // add a link to this collection to the item
               itemService.addMetadata(Curator.curationContext(), item, "vsim", "relation", "submissions", Item.ANY, projectCollSubmissions.getHandle() );
@@ -316,6 +341,8 @@ public class VSimProjectCurationTask extends AbstractCurationTask
               // Loop through each bistream, find the logo, get the path, send that path to the addlogo method for all generated communities and collections
               // NOTE: this bakes in the assumption that this bitstream lives on the same server, and thus has a file path that this curation script can reference, which is not guaranteed
               // by DSpace. Still, good enough for now, as this assumption works for our current implementation.
+
+              log.info("VSimProjectCurationTask: adding logos for collections based on master item at handle: " + itemId);
 
               for (Bitstream bitstream : projectMasterBitstreams) {
                   String fileNameWithOutExt = FilenameUtils.removeExtension(bitstream.getName());
@@ -365,9 +392,6 @@ public class VSimProjectCurationTask extends AbstractCurationTask
 
               // END: ADD LOGO to Community and Collections ///////////////////////////////////////////////////////////////////////////////
 
-
-
-
               // set the success flag and add a line to the result report
               // KEEP THIS AT THE END OF THE SCRIPT
 
@@ -385,9 +409,7 @@ public class VSimProjectCurationTask extends AbstractCurationTask
 
               setResult(result);
               report(result);
-		}
 
-        return status;
     }
 
     /**
