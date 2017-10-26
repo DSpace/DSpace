@@ -2,14 +2,19 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
 
+import java.io.File;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.servlet.Filter;
+
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
-import org.dspace.app.rest.parameter.resolver.SearchFilterResolver;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.dspace.app.util.DSpaceContextListener;
 import org.dspace.kernel.DSpaceKernel;
@@ -28,11 +33,12 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.hateoas.RelProvider;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -59,15 +65,11 @@ import java.io.File;
  */
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {
+
     private static final Logger log = LoggerFactory.getLogger(Application.class);
 
     @Autowired
     private ApplicationConfig configuration;
-
-    @Value("${dspace.dir}")
-    private String dspaceHome;
-
-    private transient DSpaceKernelImpl kernelImpl;
 
     /**
      * Override the default SpringBootServletInitializer.configure() method,
@@ -84,6 +86,9 @@ public class Application extends SpringBootServletInitializer {
      */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Application.class)
+                .initializers(new DSpaceKernelInitializer());
+    }
 
         // start the kernel when the webapp starts
         try {
@@ -112,14 +117,7 @@ public class Application extends SpringBootServletInitializer {
 
     @Bean
     public ServletContextInitializer contextInitializer() {
-        return new ServletContextInitializer() {
-
-            @Override
-            public void onStartup(ServletContext servletContext)
-                    throws ServletException {
-                servletContext.setInitParameter("dspace.dir", configuration.getDspaceHome());
-            }
-        };
+        return servletContext -> servletContext.setInitParameter("dspace.dir", configuration.getDspaceHome());
     }
 
     /**
@@ -171,7 +169,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    public WebMvcConfigurer webMvcConfigurer() {
+    public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
@@ -180,41 +178,10 @@ public class Application extends SpringBootServletInitializer {
                     registry.addMapping("/api/**").allowedOrigins(corsAllowedOrigins);
                 }
             }
-
-            @Override
-            public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-                argumentResolvers.add(new SearchFilterResolver());
-            }
         };
     }
 
-    /**
-     * Find DSpace's "home" directory.
-     * Initially look for JNDI Resource called "java:/comp/env/dspace.dir".
-     * If not found, look for "dspace.dir" initial context parameter.
-     */
-    private String getProvidedHome(String dspaceHome) {
-        String providedHome = null;
-        try {
-            Context ctx = new InitialContext();
-            providedHome = (String) ctx.lookup("java:/comp/env/" + DSpaceConfigurationService.DSPACE_HOME);
-        } catch (Exception e) {
-            // do nothing
-        }
-
-        if (providedHome == null) {
-            if (dspaceHome != null && !dspaceHome.equals("") &&
-                    !dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")) {
-                File test = new File(dspaceHome);
-                if (test.exists() && new File(test, DSpaceConfigurationService.DSPACE_CONFIG_PATH).exists()) {
-                    providedHome = dspaceHome;
-                }
-            }
-            return providedHome;
-        }
-        return providedHome;
-    }
-
+    /** Utility class that will destroy the DSpace Kernel on Spring Boot shutdown */
     private class DSpaceKernelDestroyer implements ApplicationListener<ContextClosedEvent> {
         private DSpaceKernelImpl kernelImpl;
 
@@ -227,6 +194,69 @@ public class Application extends SpringBootServletInitializer {
                 this.kernelImpl.destroy();
                 this.kernelImpl = null;
             }
+        }
+    }
+
+    /** Utility class that will initialize the DSpace Kernel on Spring Boot startup */
+    private class DSpaceKernelInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+        private transient DSpaceKernelImpl kernelImpl;
+
+        public void initialize(final ConfigurableApplicationContext applicationContext) {
+
+            String dspaceHome = applicationContext.getEnvironment().getProperty("dspace.dir");
+
+            // start the kernel when the webapp starts
+            try {
+                this.kernelImpl = DSpaceKernelInit.getKernel(null);
+                if (!this.kernelImpl.isRunning()) {
+                    this.kernelImpl.start(getProvidedHome(dspaceHome)); // init the kernel
+                }
+
+                //Set the DSpace Kernel Application context as a parent of the Spring Boot context so that
+                //we can auto-wire all DSpace Kernel services
+                applicationContext.setParent(kernelImpl.getServiceManager().getApplicationContext());
+
+                //Add a listener for Spring Boot application shutdown so that we can nicely cleanup the DSpace kernel.
+                applicationContext.addApplicationListener(new DSpaceKernelDestroyer(kernelImpl));
+
+            } catch (Exception e) {
+                // failed to start so destroy it and log and throw an exception
+                try {
+                    this.kernelImpl.destroy();
+                } catch (Exception e1) {
+                    // nothing
+                }
+                String message = "Failure during ServletContext initialisation: " + e.getMessage();
+                log.error(message + ":" + e.getMessage(), e);
+                throw new RuntimeException(message, e);
+            }
+        }
+
+        /**
+         * Find DSpace's "home" directory.
+         * Initially look for JNDI Resource called "java:/comp/env/dspace.dir".
+         * If not found, look for "dspace.dir" initial context parameter.
+         */
+        private String getProvidedHome(String dspaceHome) {
+            String providedHome = null;
+            try {
+                Context ctx = new InitialContext();
+                providedHome = (String) ctx.lookup("java:/comp/env/" + DSpaceConfigurationService.DSPACE_HOME);
+            } catch (Exception e) {
+                // do nothing
+            }
+
+            if (providedHome == null) {
+                if (dspaceHome != null && !dspaceHome.equals("") &&
+                        !dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")) {
+                    File test = new File(dspaceHome);
+                    if (test.exists() && new File(test, DSpaceConfigurationService.DSPACE_CONFIG_PATH).exists()) {
+                        providedHome = dspaceHome;
+                    }
+                }
+            }
+            return providedHome;
         }
     }
 }

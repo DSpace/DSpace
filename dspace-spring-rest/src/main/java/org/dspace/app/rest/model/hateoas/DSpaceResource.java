@@ -7,6 +7,16 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
@@ -19,16 +29,6 @@ import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
-
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A base class for DSpace Rest HAL Resource. The HAL Resource wraps the REST
@@ -99,7 +99,6 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource {
 							Link linkToSubResource = utils.linkToSubResource(data, name);	
 							// no method is specified to retrieve the linked object(s) so check if it is already here
 							if (StringUtils.isBlank(linkAnnotation.method())) {
-
 								Object linkedObject = readMethod.invoke(data);
 								Object wrapObject = linkedObject;
 								if (linkedObject instanceof RestModel) {
@@ -168,8 +167,6 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource {
 							}
 						}
 						else if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {
-							Link linkToSubResource = utils.linkToSubResource(data, name);
-							this.add(linkToSubResource);
 							RestModel linkedObject = (RestModel) readMethod.invoke(data);
 							if (linkedObject != null) {
 								embedded.put(name,
@@ -188,15 +185,9 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource {
 					| InvocationTargetException e) {
 				throw new RuntimeException(e.getMessage(), e);
 			}
-			this.add(utils.linkToSingleResource(data, Link.REL_SELF));
 		}
 	}
 
-	@Override
-	public void add(Link link) {
-		System.out.println("Chiamato "+link.getRel());
-		super.add(link);
-	}
 	public Map<String, Object> getEmbedded() {
 		return embedded;
 	}
