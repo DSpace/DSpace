@@ -7,30 +7,38 @@
  */
 package org.dspace.app.rest;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.link.HalLinkService;
-import org.dspace.app.rest.model.*;
-import org.dspace.app.rest.model.hateoas.*;
+import org.dspace.app.rest.model.FacetConfigurationRest;
+import org.dspace.app.rest.model.FacetResultsRest;
+import org.dspace.app.rest.model.SearchConfigurationRest;
+import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.model.SearchSupportRest;
+import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
+import org.dspace.app.rest.model.hateoas.FacetResultsResource;
+import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
+import org.dspace.app.rest.model.hateoas.SearchResultsResource;
+import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.repository.DiscoveryRestRepository;
 import org.dspace.app.rest.utils.ScopeResolver;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
-import java.util.*;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 /**
  * TODO TOM UNIT TEST
@@ -140,11 +148,11 @@ public class DiscoveryRestController implements InitializingBean {
         //TODO
         FacetResultsRest facetResultsRest = discoveryRestRepository.getFacetObjects(facetName, query, dsoType, dsoScope, searchFilters, page);
 
-        FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest, page, utils);
+        FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest, utils);
 
         //TODO make prettier
         facetResultsResource.setBaseLinkString(halLinkService.getBaseLink(facetResultsResource));
-        facetResultsResource.addEmbeds(facetResultsRest, page, utils);
+        facetResultsResource.addEmbeds(facetResultsRest, utils);
 //        halLinkService.addLinks(facetResultsResource);
 
         return facetResultsResource;

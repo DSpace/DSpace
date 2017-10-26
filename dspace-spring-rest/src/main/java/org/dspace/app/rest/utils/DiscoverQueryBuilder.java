@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -71,7 +70,10 @@ public class DiscoverQueryBuilder {
         DiscoverQuery queryArgs = buildCommonDiscoverQuery(context, discoveryConfiguration, query, searchFilters, dsoType);
 
         //When all search criteria are set, configure facet results
-        addFacetingForFacets(context, scope, queryArgs, discoveryConfiguration, facetName);
+        addFacetingForFacets(context, scope, queryArgs, discoveryConfiguration, facetName, page);
+
+        //We don' want any search results, we only want facet values
+        queryArgs.setMaxResults(0);
 
         //Configure pagination
         configurePaginationForFacets(page, queryArgs);
@@ -81,12 +83,11 @@ public class DiscoverQueryBuilder {
 
     private void configurePaginationForFacets(Pageable page, DiscoverQuery queryArgs) {
         if (page != null) {
-            queryArgs.setMaxResults(0);
             queryArgs.setFacetOffset(page.getOffset());
         }
     }
 
-    private DiscoverQuery addFacetingForFacets(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoveryConfiguration discoveryConfiguration, String facetName) {
+    private DiscoverQuery addFacetingForFacets(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoveryConfiguration discoveryConfiguration, String facetName, Pageable page) {
         List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
         if (facets != null) {
             queryArgs.setFacetMinCount(1);
@@ -95,7 +96,7 @@ public class DiscoverQueryBuilder {
             for (DiscoverySearchFilterFacet facet : facets) {
                 if(StringUtils.equals(facet.getIndexFieldName(), facetName)){
 
-                    fillFacetIntoQueryArgs(context, scope, queryArgs, facet);
+                    fillFacetIntoQueryArgs(context, scope, queryArgs, facet, page.getPageSize());
                 }
             }
         }
@@ -103,7 +104,7 @@ public class DiscoverQueryBuilder {
         return queryArgs;
     }
 
-    private void fillFacetIntoQueryArgs(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoverySearchFilterFacet facet) {
+    private void fillFacetIntoQueryArgs(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoverySearchFilterFacet facet, final int pageSize) {
         if (facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)) {
             try {
                 FacetYearRange facetYearRange = searchService.getFacetYearRange(context, scope, facet, queryArgs.getFilterQueries());
@@ -116,9 +117,8 @@ public class DiscoverQueryBuilder {
 
         } else {
 
-            int facetLimit = facet.getFacetLimit();
             //Add one to our facet limit to make sure that if we have more then the shown facets that we show our "show more" url
-            facetLimit++;
+            int facetLimit = pageSize + 1;
             //This should take care of the sorting for us
             queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit, facet.getSortOrderSidebar()));
         }
@@ -260,7 +260,7 @@ public class DiscoverQueryBuilder {
 
             /** enable faceting of search results */
             for (DiscoverySearchFilterFacet facet : facets) {
-                fillFacetIntoQueryArgs(context, scope, queryArgs, facet);
+                fillFacetIntoQueryArgs(context, scope, queryArgs, facet, facet.getFacetLimit());
             }
         }
 

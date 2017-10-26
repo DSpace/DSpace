@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.model.ResultsRest;
+import org.dspace.app.rest.model.DiscoveryResultsRest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.SearchResultsRest;
@@ -34,9 +34,9 @@ public class SearchFacetEntryResource extends HALResource {
     private SearchFacetEntryRest facetData;
 
     @JsonIgnore
-    private ResultsRest searchData;
+    private DiscoveryResultsRest searchData;
 
-    public SearchFacetEntryResource(final SearchFacetEntryRest facetData, final ResultsRest searchData, final Utils utils) {
+    public SearchFacetEntryResource(final SearchFacetEntryRest facetData, final DiscoveryResultsRest searchData, final Utils utils) {
         this.facetData = facetData;
         this.searchData = searchData;
 

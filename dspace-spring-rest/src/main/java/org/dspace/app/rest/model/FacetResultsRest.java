@@ -1,25 +1,32 @@
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.discovery.DiscoverResult;
-import org.springframework.data.domain.Pageable;
-
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.domain.Pageable;
 
-public class FacetResultsRest extends ResultsRest {
 
+public class FacetResultsRest extends DiscoveryResultsRest {
 
     @JsonIgnore
     private LinkedList<SearchFacetValueRest> facetResultList = new LinkedList<>();
 
+    private String type;
+    private String name;
+    private boolean hasMore;
+
+    @JsonIgnore
+    private Pageable page;
+
     public void addToFacetResultList(SearchFacetValueRest facetResult){
         facetResultList.add(facetResult);
     }
+
     public List<SearchFacetValueRest> getFacetResultList(){
         return facetResultList;
     }
+
     public Pageable getPage() {
         return page;
     }
@@ -36,24 +43,20 @@ public class FacetResultsRest extends ResultsRest {
         this.name = name;
     }
 
-    public String type;
-
     public String getType(){
         return type;
     }
+
     public void setType(String type){
         this.type = type;
     }
-    private Pageable page;
-    private String name;
-    private boolean hasMore;
 
     public boolean isHasMore(){
         return hasMore;
     }
+
     public void setHasMore(boolean hasMore){
         this.hasMore = hasMore;
     }
-
 
 }
