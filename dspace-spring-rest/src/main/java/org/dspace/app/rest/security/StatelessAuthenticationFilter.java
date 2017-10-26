@@ -22,36 +22,30 @@ import org.dspace.eperson.EPerson;
 import org.dspace.services.RequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
 
     private static final Logger log = LoggerFactory.getLogger(StatelessAuthenticationFilter.class);
 
-    @Autowired
     private RestAuthenticationService restAuthenticationService;
 
-    @Autowired
     private EPersonRestAuthenticationProvider authenticationProvider;
 
-    @Autowired
     private RequestService requestService;
 
-    public StatelessAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public StatelessAuthenticationFilter(AuthenticationManager authenticationManager,
+                                         RestAuthenticationService restAuthenticationService,
+                                         EPersonRestAuthenticationProvider authenticationProvider,
+                                         RequestService requestService) {
         super(authenticationManager);
-    }
-
-    @Override
-    protected void initFilterBean() throws ServletException {
-        //Initialise the auto-wire dependencies
-        SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this,
-                getFilterConfig().getServletContext());
+        this.requestService = requestService;
+        this.restAuthenticationService = restAuthenticationService;
+        this.authenticationProvider = authenticationProvider;
     }
 
     @Override
@@ -83,6 +77,11 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
             if (eperson != null) {
                 //Pass the eperson ID to the request service
                 requestService.setCurrentUserId(eperson.getID());
+
+                //Set the current user of the context
+                context.setCurrentUser(eperson);
+
+                //TODO FREDERIC also restore the special group IDs on the context object
 
                 //Get the Spring authorities for this eperson
                 List<GrantedAuthority> authorities = authenticationProvider.getGrantedAuthorities(context, eperson);

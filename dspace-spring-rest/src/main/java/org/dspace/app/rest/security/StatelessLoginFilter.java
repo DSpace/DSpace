@@ -15,7 +15,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -27,12 +26,12 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
     private AuthenticationManager authenticationManager;
 
-    @Autowired
     private RestAuthenticationService restAuthenticationService;
 
-    public StatelessLoginFilter(String url, AuthenticationManager authenticationManager) {
+    public StatelessLoginFilter(String url, AuthenticationManager authenticationManager, RestAuthenticationService restAuthenticationService) {
         super(new AntPathRequestMatcher(url));
         this.authenticationManager = authenticationManager;
+        this.restAuthenticationService = restAuthenticationService;
     }
 
     @Override
