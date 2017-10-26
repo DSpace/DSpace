@@ -11,12 +11,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 /**
  * TODO TOM UNIT TEST
  */
 public class SearchResultsRest extends DiscoveryResultsRest {
 
+    @JsonIgnore
     private long totalNumberOfResults;
 
     @JsonIgnore
@@ -137,6 +140,17 @@ public class SearchResultsRest extends DiscoveryResultsRest {
 
         public void setOrder(final String order) {
             this.order = order;
+        }
+
+        public static Sorting fromPage(final Pageable page) {
+            if (page != null) {
+                Sort sort = page.getSort();
+                if (sort != null && sort.iterator().hasNext()) {
+                    Sort.Order order = sort.iterator().next();
+                    return new Sorting(order.getProperty(), order.getDirection().name());
+                }
+            }
+            return null;
         }
     }
 }

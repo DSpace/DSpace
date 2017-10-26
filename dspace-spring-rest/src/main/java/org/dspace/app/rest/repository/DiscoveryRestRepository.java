@@ -88,29 +88,22 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             discoverQuery = queryBuilder.buildQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page);
             searchResult = searchService.search(context, scopeObject, discoverQuery);
 
-            //TODO set "hasMore" property on facets
-
         } catch (InvalidRequestException e) {
             log.warn("Received an invalid request", e);
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
         }
 
-        return discoverResultConverter.convert(context, discoverQuery, configurationName, dsoScope, searchFilters, page, searchResult, configuration);
+        return discoverResultConverter.convert(context, query, dsoType, configurationName, dsoScope, searchFilters, page, searchResult, configuration);
     }
 
     public FacetConfigurationRest getFacetsConfiguration(final String dsoScope, final String configurationName) {
-        //TODO
         Context context = obtainContext();
 
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
 
-
         return discoverFacetConfigurationConverter.convert(configuration);
-        //TODO Call DiscoveryConfigurationConverter on configuration to convert this API model to the REST model
-
-        //TODO Return REST model
     }
 
     public SearchSupportRest getSearchSupport() {
@@ -137,7 +130,8 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             log.error("Error while searching with Discovery", e);
             //TODO TOM handle search exception
         }
-        FacetResultsRest facetResultsRest = discoverFacetResultsConverter.convert(context, facetName, discoverQuery, dsoScope, searchFilters, searchResult, configuration, page);
+
+        FacetResultsRest facetResultsRest = discoverFacetResultsConverter.convert(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration, page);
         return facetResultsRest;
     }
 }
