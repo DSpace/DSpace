@@ -21,8 +21,8 @@ public class FacetResultsHalLinkFactory extends DiscoveryRestHalLinkFactory<Face
         FacetResultsRest data = halResource.getContent();
 
         if(data != null && pageable != null){
-            PageImpl page = new PageImpl<>(list, data.getPage(),
-                    list.size() + (data.isHasMore() ? 1 : 0));
+            PageImpl page = new PageImpl<>(data.getFacetResultList(), data.getPage(),
+                    data.getFacetResultList().size() + (data.isHasMore() ? 1 : 0));
 
             halResource.setPageHeader(new EmbeddedPageHeader(buildFacetBaseLink(data), page, false));
         }

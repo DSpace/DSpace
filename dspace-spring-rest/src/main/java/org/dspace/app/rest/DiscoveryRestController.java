@@ -148,7 +148,7 @@ public class DiscoveryRestController implements InitializingBean {
 
         FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest);
 
-        halLinkService.addLinks(facetResultsResource);
+        halLinkService.addLinks(facetResultsResource, page);
         return facetResultsResource;
     }
 
