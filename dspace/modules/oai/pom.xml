@@ -76,6 +76,12 @@
         <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>validation-api</artifactId>
+            		<groupId>javax.validation</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.dspace</groupId>
