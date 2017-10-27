@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.dspace.app.rest.model.hateoas.HALResource;
-import org.dspace.app.rest.utils.URLUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
@@ -29,8 +28,9 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
     public boolean supports(Class clazz) {
         if(getResourceClass().isAssignableFrom(clazz)){
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     public List<Link> getLinksFor(HALResource halResource, Pageable pageable) {
@@ -56,13 +56,13 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
     }
 
     protected Link buildLink(String rel, String href) {
-        Link link = new Link(URLUtils.decode(href), rel);
+        Link link = new Link(href, rel);
 
         return link;
     }
 
-    protected CONTROLLER getMethodOn() {
-        return methodOn(getControllerClass());
+    protected CONTROLLER getMethodOn(Object... parameters) {
+        return methodOn(getControllerClass(), parameters);
     }
 
     protected <C> C getMethodOn(Class<C> clazz) {

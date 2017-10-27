@@ -35,19 +35,19 @@ public class SearchConfigurationResourceTest {
     @Test
     public void testConstructorWithNullDataIsNull() throws Exception{
         SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(null);
-        assertNull(searchConfigurationResource.getData());
+        assertNull(searchConfigurationResource.getContent());
     }
 
     @Test
     public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception{
         SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(searchConfigurationRest);
         assertNotNull(searchConfigurationResource);
-        assertNotNull(searchConfigurationResource.getData());
+        assertNotNull(searchConfigurationResource.getContent());
     }
 
     @Test
     public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception{
         SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(searchConfigurationRest);
-        assertEquals(searchConfigurationRest, searchConfigurationResource.getData());
+        assertEquals(searchConfigurationRest, searchConfigurationResource.getContent());
     }
 }

@@ -32,20 +32,20 @@ public class FacetConfigurationResourceTest {
     @Test
     public void testConstructorWithNullDataIsNull() throws Exception{
         FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(null);
-        assertNull(facetConfigurationResource.getData());
+        assertNull(facetConfigurationResource.getContent());
     }
 
     @Test
     public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception{
         FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(facetConfigurationRest);
         assertNotNull(facetConfigurationResource);
-        assertNotNull(facetConfigurationResource.getData());
+        assertNotNull(facetConfigurationResource.getContent());
     }
 
     @Test
     public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception{
         FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(facetConfigurationRest);
-        assertEquals(facetConfigurationRest, facetConfigurationResource.getData());
+        assertEquals(facetConfigurationRest, facetConfigurationResource.getContent());
     }
 
 }

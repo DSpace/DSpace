@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * TODO TOM UNIT TEST
@@ -59,9 +58,6 @@ public class DiscoveryRestController implements InitializingBean {
     private DiscoveryRestRepository discoveryRestRepository;
 
     @Autowired
-    private RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-    @Autowired
     private HalLinkService halLinkService;
 
     @Override
@@ -78,6 +74,7 @@ public class DiscoveryRestController implements InitializingBean {
         halLinkService.addLinks(searchSupportResource);
         return searchSupportResource;
     }
+
     @RequestMapping(method = RequestMethod.GET, value = "/search")
     public SearchConfigurationResource getSearchConfiguration(@RequestParam(name = "scope", required = false) String dsoScope,
                                                               @RequestParam(name = "configuration", required = false) String configurationName) {

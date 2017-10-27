@@ -23,7 +23,7 @@ public class SearchFacetValueHalLinkFactory extends DiscoveryRestHalLinkFactory<
         if(halResource.getSearchData() != null && halResource.getFacetData() != null && halResource.getValueData() != null){
 
             UriComponentsBuilder builder = buildSearchBaseLink(halResource.getSearchData());
-            builder = addFilterParams(builder, halResource.getSearchData());
+
             addFilterForFacetValue(builder, halResource.getSearchData(), halResource.getFacetData(), halResource.getValueData());
 
             list.add(buildLink("search", builder.build().toUriString()));

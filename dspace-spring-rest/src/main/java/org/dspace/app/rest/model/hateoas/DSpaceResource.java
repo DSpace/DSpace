@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.LinkRest;
@@ -39,12 +38,10 @@ import org.springframework.hateoas.Link;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceResource<T extends RestModel> extends HALResource {
-	@JsonUnwrapped
-	private final T data;
+public abstract class DSpaceResource<T extends RestModel> extends HALResource<T> {
 
 	public DSpaceResource(T data, Utils utils, String... rels) {
-		this.data = data;
+		super(data);
 
 		if (data != null) {
 			try {
@@ -192,7 +189,9 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource {
 		return embedded;
 	}
 
-	public T getData() {
-		return data;
+	//Trick to make Java Understand that our content extends RestModel
+	@Override
+	public T getContent() {
+		return super.getContent();
 	}
 }

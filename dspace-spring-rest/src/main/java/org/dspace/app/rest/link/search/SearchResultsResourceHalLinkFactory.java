@@ -27,7 +27,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 public class SearchResultsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchResultsResource> {
 
     protected void addLinks(SearchResultsResource halResource, Pageable pageable, LinkedList<Link> list) {
-        SearchResultsRest data = halResource.getData();
+        SearchResultsRest data = halResource.getContent();
 
         if(data != null && pageable != null){
             PageImpl<SearchResultEntryResource> page = new PageImpl<SearchResultEntryResource>(halResource.getEntryResources(),

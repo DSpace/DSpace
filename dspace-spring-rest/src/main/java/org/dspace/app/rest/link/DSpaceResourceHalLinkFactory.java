@@ -34,7 +34,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
     private Utils utils;
 
     protected void addLinks(DSpaceResource halResource, Pageable page, LinkedList<Link> list) {
-        RestModel data = halResource.getData();
+        RestModel data = halResource.getContent();
 
         try {
             for (PropertyDescriptor pd : Introspector.getBeanInfo(data.getClass()).getPropertyDescriptors()) {
