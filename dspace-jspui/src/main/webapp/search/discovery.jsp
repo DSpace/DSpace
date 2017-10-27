@@ -94,9 +94,11 @@
     String sortedBy = qArgs.getSortField();
     String order = qArgs.getSortOrder().toString();
     String sortIdx = null;
+    SortOption sortOption = null;
     if (sortedBy != null && sortedBy.startsWith("bi_sort_"))
     {
        sortIdx = sortedBy.substring(8,sortedBy.length()-5);
+       sortOption = SortOption.getSortOption(Integer.valueOf(sortIdx));
     }
     String ascSelected = (SortOption.ASCENDING.equalsIgnoreCase(order)   ? "selected=\"selected\"" : "");
     String descSelected = (SortOption.DESCENDING.equalsIgnoreCase(order) ? "selected=\"selected\"" : "");
@@ -686,10 +688,10 @@ else if( qResults != null)
 		</label>
 			<input id="export-submit-button" class="btn btn-default" type="submit" name="submit_export" value="<fmt:message key="exportcitation.option.submitexport" />" disabled/>
 		</div>	
-		<dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" radioButton="false" inputName="item_id"/>
+		<dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" radioButton="false" inputName="item_id" order="<%= order %>" sortOption="<%= sortOption %>"/>
 		</form>
 <% } else { %>
-	<dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" />
+	<dspace:itemlist items="<%= items %>" authorLimit="<%= etAl %>" order="<%= order %>" sortOption="<%= sortOption %>"/>
 <% } %>
    
     </div>
