@@ -26,6 +26,15 @@ import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.*;
+
+// TODO: remove
 import edu.sdsc.grid.io.FileFactory;
 import edu.sdsc.grid.io.GeneralFile;
 import edu.sdsc.grid.io.GeneralFileOutputStream;
@@ -103,112 +112,181 @@ public class BitstreamStorageManager
 
     private static final int directoryLevels = 3;
 
-	/**
-	 * This prefix string marks registered bitstreams in internal_id
-	 */
-	private static final String REGISTERED_FLAG = "-R";
+    /**
+     * This prefix string marks registered bitstreams in internal_id
+     */
+    private static final String REGISTERED_FLAG = "-R";
 
+    /** Amazon S3 configuration */
+    private static final String CSA = "MD5";
+    private static boolean s3Enabled = false;
+    private static String awsAccessKey;
+    private static String awsSecretKey;
+    private static String awsRegionName;
+    private static String s3BucketName = null;
+    // (Optional) subfolder within bucket where objects are stored 
+    private static String s3Subfolder = null;
+
+    /** S3 service */
+    private static AmazonS3 s3Service = null;
+
+
+    
     /* Read in the asset stores from the config. */
     static
     {
         List<Object> stores = new ArrayList<Object>();
 
-		// 'assetstore.dir' is always store number 0
-		String sAssetstoreDir = ConfigurationManager
-				.getProperty("assetstore.dir");
- 
-		// see if conventional assetstore or srb
-		if (sAssetstoreDir != null) {
-			stores.add(sAssetstoreDir); // conventional (non-srb)
-		} else if (ConfigurationManager.getProperty("srb.host") != null) {
-			stores.add(new SRBAccount( // srb
-					ConfigurationManager.getProperty("srb.host"),
-					ConfigurationManager.getIntProperty("srb.port"),
-					ConfigurationManager.getProperty("srb.username"),
-					ConfigurationManager.getProperty("srb.password"),
-					ConfigurationManager.getProperty("srb.homedirectory"),
-					ConfigurationManager.getProperty("srb.mdasdomainname"),
-					ConfigurationManager
-							.getProperty("srb.defaultstorageresource"),
-					ConfigurationManager.getProperty("srb.mcatzone")));
-		} else {
-			log.error("No default assetstore");
-		}
+        // 'assetstore.dir' is always store number 0
+        String sAssetstoreDir = ConfigurationManager
+            .getProperty("assetstore.dir");
+        
+        if (sAssetstoreDir != null) {
+            stores.add(sAssetstoreDir);
+        } else {
+            log.error("No default assetstore");
+        }
 
-		// read in assetstores .1, .2, ....
-		for (int i = 1;; i++) { // i == 0 is default above
-			sAssetstoreDir = ConfigurationManager.getProperty("assetstore.dir."
-					+ i);
+        // AWS S3 configuration
+        awsAccessKey = ConfigurationManager.getProperty("aws.accessKey");
+        if (awsAccessKey != null && awsAccessKey.length() > 0) {
+            s3Enabled = true;
+            log.info("Amazon S3 configuration found (assetstore 1)");
+            awsSecretKey = ConfigurationManager.getProperty("aws.secretKey");
+            awsRegionName = ConfigurationManager.getProperty("aws.regionName");
+            s3BucketName = ConfigurationManager.getProperty("aws.s3.bucketName");
+            s3Subfolder = ConfigurationManager.getProperty("aws.s3.subfolder");
+            try {
+                initS3();
+            } catch (Exception e) {
+                log.error("Unable to initializes S3 storage");
+            }
+        }
+        // Add a reserved entry to the list of stores regardless of whether S3 is configured
+        stores.add("AWS S3 (assetstore 1)");
+        
+        // read in assetstores .2, .3, ....
+        for (int i = 2;; i++) { // i == 0 is default above, i == 1 is reserved for S3
+            sAssetstoreDir = ConfigurationManager.getProperty("assetstore.dir." + i);
+            
+            if (sAssetstoreDir != null) { 		// conventional (non-srb)
+                stores.add(sAssetstoreDir);
+            } else {
+                break; // must be at the end of the assetstores
+            }
+        }
 
-			// see if 'i' conventional assetstore or srb
-			if (sAssetstoreDir != null) { 		// conventional (non-srb)
-				stores.add(sAssetstoreDir);
-			} else if (ConfigurationManager.getProperty("srb.host." + i)
-					!= null) { // srb
-				stores.add(new SRBAccount(
-						ConfigurationManager.getProperty("srb.host." + i),
-						ConfigurationManager.getIntProperty("srb.port." + i),
-						ConfigurationManager.getProperty("srb.username." + i),
-						ConfigurationManager.getProperty("srb.password." + i),
-						ConfigurationManager
-								.getProperty("srb.homedirectory." + i),
-						ConfigurationManager
-								.getProperty("srb.mdasdomainname." + i),
-						ConfigurationManager
-								.getProperty("srb.defaultstorageresource." + i),
-						ConfigurationManager.getProperty("srb.mcatzone." + i)));
-			} else {
-				break; // must be at the end of the assetstores
-			}
-		}
-
-		// convert list to array
-		// the elements (objects) in the list are class
-		//   (1) String - conventional non-srb assetstore
-		//   (2) SRBAccount - srb assetstore
-		assetStores = new GeneralFile[stores.size()];
-		for (int i = 0; i < stores.size(); i++) {
-			Object o = stores.get(i);
-			if (o == null) { // I don't know if this can occur
-				log.error("Problem with assetstore " + i);
-			}
-			if (o instanceof String) {
-				assetStores[i] = new LocalFile((String) o);
-			} else if (o instanceof SRBAccount) {
-				SRBFileSystem srbFileSystem = null;
-				try {
-					srbFileSystem = new SRBFileSystem((SRBAccount) o);
-				} catch (NullPointerException e) {
-					log.error("No SRBAccount for assetstore " + i);
-				} catch (IOException e) {
-					log.error("Problem getting SRBFileSystem for assetstore"
-							+ i);
-				}
-				if (srbFileSystem == null) {
-					log.error("SRB FileSystem is null for assetstore " + i);
-				}
-				String sSRBAssetstore = null;
-				if (i == 0) { // the zero (default) assetstore has no suffix
-					sSRBAssetstore = ConfigurationManager
-							.getProperty("srb.parentdir");
-				} else {
-					sSRBAssetstore = ConfigurationManager
-							.getProperty("srb.parentdir." + i);
-				}
-				if (sSRBAssetstore == null) {
-					log.error("srb.parentdir is undefined for assetstore " + i);
-				}
-				assetStores[i] = new SRBFile(srbFileSystem, sSRBAssetstore);
-			} else {
-				log.error("Unexpected " + o.getClass().toString()
-						+ " with assetstore " + i);
-			}
-		}
+        // convert list to array
+        assetStores = new GeneralFile[stores.size()];
+        for (int i = 0; i < stores.size(); i++) {
+            Object o = stores.get(i);
+            if (i == 1) {
+                // do nothing, since S3 is configured elsewhere
+                continue;
+            }
+            if (o == null) { // I don't know if this can occur
+                log.error("Problem with assetstore " + i);
+            }
+            if (o instanceof String) {
+                assetStores[i] = new LocalFile((String) o);
+            }
+        }
 
         // Read asset store to put new files in. Default is 0.
         incoming = ConfigurationManager.getIntProperty("assetstore.incoming");
     }
+  
+    
+    /**
+     * Initialize the asset store
+     * S3 Requires:
+     *  - access key
+     *  - secret key
+     *  - bucket name
+     */
+    private static void initS3() throws IOException {
+        if (getAwsAccessKey() == null || getAwsAccessKey().length() == 0 ||
+            getAwsSecretKey() == null || getAwsSecretKey().length() == 0) {
+            log.warn("Empty S3 access or secret");
+        }
 
+        // init client
+        AWSCredentials awsCredentials = new BasicAWSCredentials(getAwsAccessKey(), getAwsSecretKey());
+        s3Service = new AmazonS3Client(awsCredentials);
+
+        // bucket name
+        if (s3BucketName == null || s3BucketName.length() == 0) {
+            s3BucketName = "dspace-asset-" + ConfigurationManager.getProperty("dspace.hostname");
+            log.warn("S3 BucketName is not configured, setting default: " + s3BucketName);
+        }
+
+        try {
+            if (! s3Service.doesBucketExist(s3BucketName)) {
+                s3Service.createBucket(s3BucketName);
+                log.info("Creating new S3 Bucket: " + s3BucketName);
+            }
+        }
+        catch (Exception e)
+            {
+                log.error(e);
+                throw new IOException(e);
+            }
+
+        // region
+        if (awsRegionName != null && awsRegionName.length() > 0) {
+            try {
+                Regions regions = Regions.fromName(awsRegionName);
+                Region region = Region.getRegion(regions);
+                s3Service.setRegion(region);
+                log.info("S3 Region set to: " + region.getName());
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid aws_region: " + awsRegionName);
+            }
+        }
+
+        log.info("AWS S3 Assetstore ready to go! bucket:" + s3BucketName);
+    }
+
+    public static String getAwsAccessKey() {
+        return awsAccessKey;
+    }
+    
+    public static void setAwsAccessKey(String awsAccessKey) {
+        BitstreamStorageManager.awsAccessKey = awsAccessKey;
+    }
+
+    public static String getAwsSecretKey() {
+        return awsSecretKey;
+    }
+    
+    public static void setAwsSecretKey(String awsSecretKey) {
+        BitstreamStorageManager.awsSecretKey = awsSecretKey;
+    }
+
+    public static String getAwsRegionName() {
+        return awsRegionName;
+    }
+    
+    public static void setAwsRegionName(String awsRegionName) {
+        BitstreamStorageManager.awsRegionName = awsRegionName;
+    }
+    
+    public static String getS3BucketName() {
+        return s3BucketName;
+    }
+    
+    public static void setS3BucketName(String s3BucketName) {
+        BitstreamStorageManager.s3BucketName = s3BucketName;
+    }
+    
+    public static String getS3Subfolder() {
+        return s3Subfolder;
+    }
+    
+    public static void setS3Subfolder(String s3Subfolder) {
+        BitstreamStorageManager.s3Subfolder = s3Subfolder;
+    }
+    
     /**
      * Store a stream of bits.
      * 

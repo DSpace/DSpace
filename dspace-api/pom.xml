@@ -305,6 +305,21 @@
             <artifactId>joda-time</artifactId>
             <version>1.6.2</version>
         </dependency>
-    </dependencies>
-
+	<!-- Amazon AWS S3 -->
+        <dependency>
+	  <groupId>com.amazonaws</groupId>
+	  <artifactId>aws-java-sdk-s3</artifactId>
+	  <version>1.10.50</version>
+	  <exclusions>
+	    <exclusion>
+	      <groupId>joda-time</groupId>
+	      <artifactId>joda-time</artifactId>
+	    </exclusion>
+	    <exclusion>
+	      <groupId>com.fasterxml.jackson.core</groupId>
+	      <artifactId>jackson-databind</artifactId>
+	    </exclusion>
+	  </exclusions>
+        </dependency>
+      </dependencies>
 </project>
