@@ -40,7 +40,7 @@ public class CurationHelper {
         // ...so we will hard code a default, allowing us to continue using this code with VSim, even though
         // it's difficult to configure. Maybe someday we'll figure out something better.
 		if (taskConfig == null || "".equals(taskConfig)) {
-            taskConfig = "vsiminit";
+            taskConfig = "vsiminit,vsimitem";
 		}
 
         // since we've guaranteed there is a value in taskConfig, we can assume it's safe to split it into the taskNamesList
