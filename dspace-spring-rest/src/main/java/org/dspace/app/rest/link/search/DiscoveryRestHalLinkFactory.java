@@ -3,6 +3,7 @@ package org.dspace.app.rest.link.search;
 import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.DiscoveryResultsRest;
+import org.dspace.app.rest.model.FacetResultsRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -13,14 +14,14 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
 
     protected UriComponentsBuilder buildSearchBaseLink(final DiscoveryResultsRest data) {
         UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                .getSearchObjects(data.getScope(), data.getConfigurationName(), data.getScope(), data.getConfigurationName(), null, null));
+                .getSearchObjects(data.getQuery(), data.getDsoType(), data.getScope(), data.getConfigurationName(), null, null));
 
         return addFilterParams(uriBuilder, data);
     }
 
-    protected UriComponentsBuilder buildFacetBaseLink(final DiscoveryResultsRest data) {
+    protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) {
         UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                .getFacetValues(data.getScope(), data.getConfigurationName(), data.getScope(), data.getConfigurationName(), null, null));
+                .getFacetValues(data.getName(), data.getQuery(), data.getDsoType(), data.getScope(), null, null));
 
         return addFilterParams(uriBuilder, data);
     }

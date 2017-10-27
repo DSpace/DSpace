@@ -7,16 +7,11 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import static org.junit.Assert.*;
+
 import org.dspace.app.rest.model.RootRest;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by raf on 26/09/2017.
@@ -39,19 +34,19 @@ public class RootResourceTest {
     @Test
     public void testConstructorWithNullDataIsNull() throws Exception{
         RootResource rootResource = new RootResource(null);
-        assertNull(rootResource.getData());
+        assertNull(rootResource.getContent());
     }
 
     @Test
     public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception{
         RootResource rootResource = new RootResource(rootRest);
         assertNotNull(rootResource);
-        assertNotNull(rootResource.getData());
+        assertNotNull(rootResource.getContent());
     }
 
     @Test
     public void testConstructorAndGetterWithProperDataAndProperDataReturned() throws Exception{
         RootResource rootResource = new RootResource(rootRest);
-        assertEquals(rootRest, rootResource.getData());
+        assertEquals(rootRest, rootResource.getContent());
     }
 }

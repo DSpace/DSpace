@@ -7,44 +7,29 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.collections4.CollectionUtils;
-import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.utils.Utils;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * TODO TOM UNIT TEST
  */
 @RelNameDSpaceResource(SearchResultsRest.NAME)
-public class SearchResultsResource extends HALResource {
-
-    @JsonUnwrapped
-    private final SearchResultsRest data;
+public class SearchResultsResource extends HALResource<SearchResultsRest> {
 
     @JsonIgnore
     private List<SearchResultEntryResource> entryResources;
 
     public SearchResultsResource(final SearchResultsRest data, final Utils utils) {
-        this.data = data;
+        super(data);
 
         addEmbeds(data, utils);
-    }
-
-    public SearchResultsRest getData(){
-        return data;
     }
 
     public List<SearchResultEntryResource> getEntryResources() {

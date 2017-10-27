@@ -7,17 +7,19 @@
  */
 package org.dspace.app.rest.link;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by raf on 25/09/2017.
@@ -27,15 +29,16 @@ import java.util.Map;
 public class HalLinkService {
 
     @Autowired
-    List<HalLinkFactory> halLinkFactoryLinkedList;
+    private List<HalLinkFactory> halLinkFactories;
+
+    private Map<String, List<HalLinkFactory>> cachedMappings = new ConcurrentHashMap<>();
 
     public void addLinks(HALResource halResource, Pageable pageable){
         LinkedList<Link> links = new LinkedList<>();
 
-        for(HalLinkFactory halLinkFactory : halLinkFactoryLinkedList){
-            if(halLinkFactory.supports(halResource.getClass())){
-                links.addAll(halLinkFactory.getLinksFor(halResource, pageable));
-            }
+        List<HalLinkFactory> supportedFactories = getSupportedFactories(halResource);
+        for(HalLinkFactory halLinkFactory : supportedFactories){
+           links.addAll(halLinkFactory.getLinksFor(halResource, pageable));
         }
 
         halResource.add(links);
@@ -59,8 +62,28 @@ public class HalLinkService {
         }
     }
 
-    public void addLinks(HALResource halResource) {
+    private List<HalLinkFactory> getSupportedFactories(HALResource halResource) {
+        List<HalLinkFactory> factories = cachedMappings.get(getKey(halResource));
+
+        if(factories == null) {
+            //Go over all factories and collect the ones that support the current resource
+            factories = halLinkFactories.stream()
+                    .filter(halLinkFactory -> halLinkFactory.supports(halResource.getClass()))
+                    .collect(Collectors.toList());
+
+            cachedMappings.put(getKey(halResource), factories);
+        }
+
+        return factories;
+    }
+
+    private String getKey(final HALResource halResource) {
+        return halResource.getClass().getCanonicalName();
+    }
+
+    public HALResource addLinks(HALResource halResource) {
         addLinks(halResource, null);
+        return halResource;
     }
 
 }

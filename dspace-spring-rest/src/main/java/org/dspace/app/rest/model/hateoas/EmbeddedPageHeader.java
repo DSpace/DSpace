@@ -58,7 +58,7 @@ public class EmbeddedPageHeader {
             links.put("self", _link(page.getNumber()));
         }
         else {
-            links.put("self", self.toUriString());
+            links.put("self", self.build().toUriString());
         }
         if (!page.isLast() && totalElementsIsKnown) {
             links.put("last", _link(page.getTotalPages()-1));

@@ -16,7 +16,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by raf on 26/09/2017.
@@ -29,7 +28,7 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
 
     protected void addLinks(RootResource halResource, Pageable page, LinkedList<Link> list) {
         for(Link endpointLink : discoverableEndpointsService.getDiscoverableEndpoints()){
-            list.add(buildLink(endpointLink.getRel(), halResource.getData().getDspaceRest() + endpointLink.getHref()));
+            list.add(buildLink(endpointLink.getRel(), halResource.getContent().getDspaceRest() + endpointLink.getHref()));
         }
     }
 

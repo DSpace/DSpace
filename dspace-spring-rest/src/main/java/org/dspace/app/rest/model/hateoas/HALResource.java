@@ -7,20 +7,23 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import org.springframework.hateoas.ResourceSupport;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.hateoas.Resource;
 
 /**
  * TODO TOM UNIT TEST
  */
-public abstract class HALResource extends ResourceSupport {
+public abstract class HALResource<T> extends Resource<T> {
+
+    public HALResource(T content) {
+        super(content);
+    }
 
     protected final Map<String, Object> embedded = new HashMap<String, Object>();
 

@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.dspace.app.rest.model.DSpaceObjectRest;
 import org.dspace.app.rest.model.SearchResultEntryRest;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -16,21 +15,14 @@ import org.dspace.app.rest.utils.Utils;
 /**
  * TODO TOM UNIT TEST
  */
-public class SearchResultEntryResource extends HALResource {
+public class SearchResultEntryResource extends HALResource<SearchResultEntryRest> {
 
     public static final String DSPACE_OBJECT_LINK = "dspaceObject";
 
-    @JsonUnwrapped
-    private SearchResultEntryRest data;
-
     public SearchResultEntryResource(final SearchResultEntryRest data, final Utils utils) {
-        this.data = data;
+        super(data);
 
         addEmbeds(data, utils);
-    }
-
-    public SearchResultEntryRest getData() {
-        return data;
     }
 
     private void addEmbeds(final SearchResultEntryRest data, final Utils utils) {

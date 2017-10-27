@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * Created by tom on 27/10/2017.
@@ -19,7 +18,7 @@ public class FacetResultsHalLinkFactory extends DiscoveryRestHalLinkFactory<Face
 
     @Override
     protected void addLinks(FacetResultsResource halResource, Pageable pageable, LinkedList<Link> list) {
-        FacetResultsRest data = halResource.getData();
+        FacetResultsRest data = halResource.getContent();
 
         if(data != null && pageable != null){
             PageImpl page = new PageImpl<>(list, data.getPage(),

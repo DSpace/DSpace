@@ -7,45 +7,32 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import org.apache.commons.collections4.CollectionUtils;
-import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.model.DiscoveryResultsRest;
-import org.dspace.app.rest.model.SearchFacetEntryRest;
-import org.dspace.app.rest.model.SearchFacetValueRest;
-import org.dspace.app.rest.model.SearchResultsRest;
-import org.dspace.app.rest.utils.URLUtils;
-import org.dspace.app.rest.utils.Utils;
-import org.springframework.hateoas.Link;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.collections4.CollectionUtils;
+import org.dspace.app.rest.model.DiscoveryResultsRest;
+import org.dspace.app.rest.model.SearchFacetEntryRest;
+import org.dspace.app.rest.model.SearchFacetValueRest;
 
 /**
  * TODO TOM UNIT TEST
  */
-public class SearchFacetEntryResource extends HALResource {
-
-    @JsonUnwrapped
-    private SearchFacetEntryRest facetData;
+public class SearchFacetEntryResource extends HALResource<SearchFacetEntryRest> {
 
     @JsonIgnore
     private DiscoveryResultsRest searchData;
 
     public SearchFacetEntryResource(final SearchFacetEntryRest facetData, final DiscoveryResultsRest searchData) {
-        this.facetData = facetData;
+        super(facetData);
         this.searchData = searchData;
 
         addEmbeds();
     }
 
     public SearchFacetEntryRest getFacetData() {
-        return facetData;
+        return getContent();
     }
 
     public DiscoveryResultsRest getSearchData() {
@@ -55,8 +42,8 @@ public class SearchFacetEntryResource extends HALResource {
     private void addEmbeds() {
         List<SearchFacetValueResource> valueResourceList = new LinkedList<>();
 
-        for (SearchFacetValueRest valueRest : CollectionUtils.emptyIfNull(facetData.getValues())) {
-            SearchFacetValueResource valueResource = new SearchFacetValueResource(valueRest, facetData, searchData);
+        for (SearchFacetValueRest valueRest : CollectionUtils.emptyIfNull(getContent().getValues())) {
+            SearchFacetValueResource valueResource = new SearchFacetValueResource(valueRest, getContent(), searchData);
             valueResourceList.add(valueResource);
         }
 

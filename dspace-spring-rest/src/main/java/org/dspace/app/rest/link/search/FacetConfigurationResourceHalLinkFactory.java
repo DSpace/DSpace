@@ -5,29 +5,27 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.link.facet;
-
-import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.link.HalLinkFactory;
-import org.dspace.app.rest.model.FacetConfigurationRest;
-import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
-import org.springframework.hateoas.Link;
-import org.springframework.stereotype.Component;
+package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
+
+import org.dspace.app.rest.model.FacetConfigurationRest;
+import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.stereotype.Component;
 
 
 /**
  * Created by raf on 25/09/2017.
  */
 @Component
-public class FacetConfigurationResourceHalLinkFactory extends HalLinkFactory<FacetConfigurationResource, DiscoveryRestController> {
+public class FacetConfigurationResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetConfigurationResource> {
 
-    protected void addLinks(FacetConfigurationResource halResource, LinkedList<Link> list) {
-        FacetConfigurationRest data = halResource.getData();
+    protected void addLinks(FacetConfigurationResource halResource, Pageable page, LinkedList<Link> list) {
+        FacetConfigurationRest data = halResource.getContent();
 
         if(data != null){
-
             list.add(buildLink(Link.REL_SELF, getMethodOn()
                     .getFacetsConfiguration(data.getScope(), data.getConfigurationName())));
         }
@@ -35,15 +33,6 @@ public class FacetConfigurationResourceHalLinkFactory extends HalLinkFactory<Fac
 
     protected Class<FacetConfigurationResource> getResourceClass() {
         return FacetConfigurationResource.class;
-    }
-
-    protected String getSelfLink(FacetConfigurationResource halResource) {
-        return null;
-    }
-
-
-    protected Class<DiscoveryRestController> getControllerClass() {
-        return DiscoveryRestController.class;
     }
 
 }

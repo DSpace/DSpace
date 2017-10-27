@@ -9,7 +9,7 @@ package org.dspace.app.rest.repository;
 
 import java.io.Serializable;
 
-import org.springframework.hateoas.ResourceSupport;
+import org.dspace.app.rest.model.hateoas.HALResource;
 
 /**
  * This is the interface for Link Repositories.
@@ -18,7 +18,7 @@ import org.springframework.hateoas.ResourceSupport;
  *
  */
 public interface LinkRestRepository<L extends Serializable> {
-	public abstract ResourceSupport wrapResource(L model, String... rels);
+	public abstract HALResource wrapResource(L model, String... rels);
 
 	public default boolean isEmbeddableRelation(Object data, String name) {
 		return true;
