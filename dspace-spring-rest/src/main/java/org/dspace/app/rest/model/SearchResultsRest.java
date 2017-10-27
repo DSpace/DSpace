@@ -15,7 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to create a container for the information used in the SearchResultsResource
  */
 public class SearchResultsRest extends DiscoveryResultsRest {
 

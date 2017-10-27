@@ -30,7 +30,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to create a SearchResultsRest object from the given parameters
  */
 @Component
 public class DiscoverResultConverter {

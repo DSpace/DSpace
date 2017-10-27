@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to create a container for the information used in the SearchFacetEntryResource
  */
 public class SearchFacetEntryRest implements RestModel {
 

@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to test the SearchConfigurationRest
  */
 public class SearchConfigurationRestTest {
 

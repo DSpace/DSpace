@@ -17,7 +17,9 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * Created by raf on 25/09/2017.
+ * This class' purpose is to add the links to the FacetConfigurationResource. This function and class will be called and used
+ * when the HalLinkService addLinks methods is called as it'll iterate over all the different factories and check whether
+ * these are allowed to create links for said resource or not.
  */
 @Component
 public class FacetConfigurationResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetConfigurationResource> {

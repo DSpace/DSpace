@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
@@ -11,7 +18,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by tom on 27/10/2017.
+ * This factory provides a means to add links to the FacetResultsResource class. This method will be called when the
+ * addLinks method on the HalLinkService is called if the Resource given is valid
  */
 @Component
 public class FacetResultsHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetResultsResource> {

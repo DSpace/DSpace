@@ -10,7 +10,7 @@ package org.dspace.app.rest.model.hateoas;
 import org.dspace.app.rest.model.SearchSupportRest;
 
 /**
- * Created by raf on 25/09/2017.
+ * This class' purpose is to wrap the SearchSupportRest into a HAL resource
  */
 @RelNameDSpaceResource(SearchSupportRest.NAME)
 public class SearchSupportResource extends HALResource<SearchSupportRest> {

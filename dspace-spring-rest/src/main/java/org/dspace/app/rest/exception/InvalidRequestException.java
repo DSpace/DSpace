@@ -8,7 +8,7 @@
 package org.dspace.app.rest.exception;
 
 /**
- * Created by tom on 19/09/2017.
+ * This class provides an exception for when the given request is invalid
  */
 public class InvalidRequestException extends Exception {
     public InvalidRequestException(String message) {

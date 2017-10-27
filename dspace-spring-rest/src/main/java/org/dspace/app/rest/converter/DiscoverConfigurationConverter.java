@@ -18,7 +18,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * Created by raf on 22/09/2017.
+ * This class' purpose is to create a SearchConfigurationRest object from the DiscoveryConfiguration to be given
+ * to the convert method.
  *
  */
 @Component

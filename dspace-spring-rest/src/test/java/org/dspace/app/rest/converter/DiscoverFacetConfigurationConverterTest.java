@@ -8,12 +8,8 @@
 package org.dspace.app.rest.converter;
 
 
-import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
 import org.dspace.app.rest.model.FacetConfigurationRest;
-import org.dspace.app.rest.model.SearchConfigurationRest;
-import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
 import org.dspace.discovery.configuration.*;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -22,15 +18,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.*;
 
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by raf on 26/09/2017.
+ *  This class has the purpose to test the DiscoverFacetConfigurationConverter
  */
 @RunWith(MockitoJUnitRunner.class)
 public class DiscoverFacetConfigurationConverterTest{

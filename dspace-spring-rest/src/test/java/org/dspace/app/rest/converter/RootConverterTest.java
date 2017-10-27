@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to test the RootConvertor class.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class RootConverterTest {

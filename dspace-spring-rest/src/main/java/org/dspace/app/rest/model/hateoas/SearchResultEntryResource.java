@@ -13,7 +13,7 @@ import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.utils.Utils;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to create a container for the information, links and embeds for the search results entries
  */
 public class SearchResultEntryResource extends HALResource<SearchResultEntryRest> {
 

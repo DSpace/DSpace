@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.link.facet;
+package org.dspace.app.rest.link.search;
 
 import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
@@ -20,7 +20,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to test the FacetConfigurationResourceHalLinkFactory
  */
 public class FacetConfigurationResourceHalLinkFactoryTest{
 

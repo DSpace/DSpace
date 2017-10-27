@@ -18,7 +18,7 @@ import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.utils.Utils;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to create a container with a list of the SearchResultEntryResources
  */
 @RelNameDSpaceResource(SearchResultsRest.NAME)
 public class SearchResultsResource extends HALResource<SearchResultsRest> {

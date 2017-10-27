@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to serve as a middle ground between the conversion to the RootRest and the controller
  */
 @Component
 public class RootRestRepository {

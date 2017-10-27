@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.link;
 
+import java.util.LinkedList;
+
 import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.RootRestResourceController;
 import org.dspace.app.rest.model.hateoas.RootResource;
@@ -15,10 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedList;
-
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to add the links to the root REST endpoint to the next endpoints.
  */
 @Component
 public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestResourceController> {
@@ -40,7 +40,4 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
         return RootResource.class;
     }
 
-    protected String getSelfLink(RootResource halResource) {
-        return null;
-    }
 }

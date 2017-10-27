@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * Created by raf on 25/09/2017.
+ * This class' purpose is to build the links that go together with the SearchConfigurationResource. To be added on the /search endpoint.
  */
 @Component
 public class SearchConfigurationResourceHalLinkFactory extends HalLinkFactory<SearchConfigurationResource, DiscoveryRestController> {

@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by raf on 22/09/2017.
+ * This class' purpose is to store the information that'll be shown on the /search endpoint.
  */
 public class SearchConfigurationRest extends BaseObjectRest<String> {
 

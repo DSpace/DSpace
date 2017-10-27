@@ -32,8 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by tom on 19/09/2017.
- * TODO TOM UNIT TEST
+ * This class builds the queries for the /search and /facet endpoints.
  */
 @Component
 public class DiscoverQueryBuilder {

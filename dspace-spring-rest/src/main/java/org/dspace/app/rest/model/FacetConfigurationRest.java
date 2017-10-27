@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by raf on 22/09/2017.
+ * This class' purpose is to give information about the FacetConfiguration to be displayed on the /facets endpoint
  */
 public class FacetConfigurationRest extends BaseObjectRest<String> {
 
@@ -30,6 +30,7 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
     @JsonIgnore
     private String configurationName;
 
+    @JsonIgnore
     private LinkedList<SidebarFacet> sidebarFacets = new LinkedList<>();
 
     public String getCategory() {

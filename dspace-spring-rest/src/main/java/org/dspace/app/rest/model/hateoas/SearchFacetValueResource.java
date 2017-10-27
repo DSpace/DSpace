@@ -13,7 +13,7 @@ import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to create a container for the information, links and embeds for the facet values on various endpoints
  */
 public class SearchFacetValueResource extends HALResource<SearchFacetValueRest> {
 
@@ -37,6 +37,7 @@ public class SearchFacetValueResource extends HALResource<SearchFacetValueRest> 
         return searchData;
     }
 
+    @JsonIgnore
     public SearchFacetValueRest getValueData() {
         return getContent();
     }

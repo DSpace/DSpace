@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to test the SearchConfigurationResourceHalLinkFactory
  */
 public class SearchConfigurationResourceHalLinkFactoryTest{
 

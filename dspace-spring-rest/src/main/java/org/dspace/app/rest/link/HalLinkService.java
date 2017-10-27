@@ -22,7 +22,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by raf on 25/09/2017.
+ * This service will try to add links to the given HAL resource by iterating over all the configured factories
+ * The links will only be added if the factories are allowed to do so by checking the resource's type.
  */
 @Component
 @ComponentScan

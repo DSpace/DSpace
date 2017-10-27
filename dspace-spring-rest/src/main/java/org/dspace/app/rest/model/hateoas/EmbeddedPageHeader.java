@@ -16,7 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Created by tom on 27/10/2017.
+ * This class constructs the page element in the HalResource on the endpoints.
  */
 public class EmbeddedPageHeader {
 

@@ -11,7 +11,7 @@ import org.dspace.app.rest.model.SearchSupportRest;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to create a SearchSupportRest object to return
  */
 @Component
 public class DiscoverSearchSupportConverter {
