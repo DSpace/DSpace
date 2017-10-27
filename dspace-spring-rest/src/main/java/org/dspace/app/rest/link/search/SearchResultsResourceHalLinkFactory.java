@@ -7,49 +7,40 @@
  */
 package org.dspace.app.rest.link.search;
 
-import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.SearchResultsRest;
-import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.model.hateoas.EmbeddedPageHeader;
+import org.dspace.app.rest.model.hateoas.SearchResultEntryResource;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Created by raf on 25/09/2017.
  */
 @Component
-public class SearchResultsResourceHalLinkFactory extends HalLinkFactory<SearchResultsResource, DiscoveryRestController> {
+public class SearchResultsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchResultsResource> {
 
-    protected void addLinks(SearchResultsResource halResource, LinkedList<Link> list) {
+    protected void addLinks(SearchResultsResource halResource, Pageable pageable, LinkedList<Link> list) {
         SearchResultsRest data = halResource.getData();
 
-        if(data != null){
+        if(data != null && pageable != null){
+            PageImpl<SearchResultEntryResource> page = new PageImpl<SearchResultEntryResource>(halResource.getEntryResources(),
+                    pageable, data.getTotalNumberOfResults());
 
-            list.add(buildLink(Link.REL_SELF, getMethodOn()
-                            .getSearchObjects(data.getScope(), data.getConfigurationName(), data.getScope(), data.getConfigurationName(), null, null)));
-
+            halResource.setPageHeader(new EmbeddedPageHeader(buildSearchBaseLink(data), page));
         }
     }
 
+    @Override
     protected Class<SearchResultsResource> getResourceClass() {
         return SearchResultsResource.class;
     }
 
-    protected String getSelfLink(SearchResultsResource halResource) {
-        return null;
-    }
-
-
-    protected Class<DiscoveryRestController> getControllerClass() {
-        return DiscoveryRestController.class;
-    }
 
 }

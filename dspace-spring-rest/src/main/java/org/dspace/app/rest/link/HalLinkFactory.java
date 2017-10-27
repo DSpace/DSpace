@@ -14,6 +14,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.dspace.app.rest.model.hateoas.HALResource;
+import org.dspace.app.rest.utils.URLUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,11 +33,11 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
         return false;
     }
 
-    public List<Link> getLinksFor(HALResource halResource) {
+    public List<Link> getLinksFor(HALResource halResource, Pageable pageable) {
         LinkedList<Link> list = new LinkedList<>();
 
         if(halResource != null && supports(halResource.getClass())){
-            addLinks((RESOURCE) halResource, list);
+            addLinks((RESOURCE) halResource, pageable, list);
         }
 
         return list;
@@ -43,14 +45,18 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
 
 
     protected  <T> Link buildLink(String rel, T data) {
-        UriComponentsBuilder uriComponentsBuilder = linkTo(data)
-                .toUriComponentsBuilder();
+        UriComponentsBuilder uriComponentsBuilder = uriBuilder(data);
 
-        return buildLink(rel, uriComponentsBuilder.build().toString());
+        return buildLink(rel, uriComponentsBuilder.build().toUriString());
+    }
+
+    protected <T> UriComponentsBuilder uriBuilder(T data) {
+        return linkTo(data)
+                    .toUriComponentsBuilder();
     }
 
     protected Link buildLink(String rel, String href) {
-        Link link = new Link(href, rel);
+        Link link = new Link(URLUtils.decode(href), rel);
 
         return link;
     }
@@ -63,12 +69,10 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
         return methodOn(clazz);
     }
 
-    protected abstract void addLinks(RESOURCE halResource, LinkedList<Link> list);
+    protected abstract void addLinks(RESOURCE halResource, Pageable pageable, LinkedList<Link> list);
 
     protected abstract Class<CONTROLLER> getControllerClass();
 
     protected abstract Class<RESOURCE> getResourceClass();
-
-    protected abstract String getSelfLink(RESOURCE halResource);
 
 }

@@ -13,6 +13,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.DiscoveryRestController;
@@ -33,67 +34,45 @@ public class SearchResultsResource extends HALResource {
     @JsonUnwrapped
     private final SearchResultsRest data;
 
-    @JsonUnwrapped
-    private EmbeddedPage embeddedSearchResults;
+    @JsonIgnore
+    private List<SearchResultEntryResource> entryResources;
 
-    public SearchResultsResource(final SearchResultsRest data, final Pageable page, final Utils utils) {
+    public SearchResultsResource(final SearchResultsRest data, final Utils utils) {
         this.data = data;
 
-        addEmbeds(data, page, utils);
+        addEmbeds(data, utils);
     }
 
     public SearchResultsRest getData(){
         return data;
     }
 
-    private void addEmbeds(final SearchResultsRest data, final Pageable pageable, final Utils utils) {
-        embedSearchResults(data, pageable, utils);
-
-        embedFacetResults(data, utils);
+    public List<SearchResultEntryResource> getEntryResources() {
+        return entryResources;
     }
 
-    private void embedFacetResults(final SearchResultsRest data, final Utils utils) {
+    private void addEmbeds(final SearchResultsRest data, final Utils utils) {
+        embedSearchResults(data, utils);
+
+        embedFacetResults(data);
+    }
+
+    private void embedFacetResults(final SearchResultsRest data) {
         List<SearchFacetEntryResource> facetResources = new LinkedList<>();
         for (SearchFacetEntryRest searchFacetEntryRest : CollectionUtils.emptyIfNull(data.getFacets())) {
-            facetResources.add(new SearchFacetEntryResource(searchFacetEntryRest, data, utils));
+            facetResources.add(new SearchFacetEntryResource(searchFacetEntryRest, data));
         }
 
         embedResource("facets", facetResources);
     }
 
-    private void embedSearchResults(final SearchResultsRest data, final Pageable pageable, final Utils utils) {
-        List<SearchResultEntryResource> entryResources = new LinkedList<>();
+    private void embedSearchResults(final SearchResultsRest data, final Utils utils) {
+        entryResources = new LinkedList<>();
         for (SearchResultEntryRest searchResultEntry : CollectionUtils.emptyIfNull(data.getSearchResults())) {
             entryResources.add(new SearchResultEntryResource(searchResultEntry, utils));
         }
 
-        PageImpl<SearchResultEntryResource> page = new PageImpl<SearchResultEntryResource>(entryResources,
-                pageable, data.getTotalNumberOfResults());
-
-        embeddedSearchResults = new EmbeddedPage(buildBaseLink(data), page, entryResources);
         embedResource("searchResults", entryResources);
-    }
-
-    private String buildBaseLink(final SearchResultsRest data) {
-
-        DiscoveryRestController methodOn = methodOn(DiscoveryRestController.class);
-
-        UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
-                .getSearchObjects(data.getQuery(), data.getDsoType(), data.getScope(), data.getConfigurationName(), null, null))
-                .toUriComponentsBuilder();
-
-        return addFilterParams(uriComponentsBuilder).build().toString();
-    }
-
-    private UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder) {
-        if (data.getAppliedFilters() != null) {
-            for (SearchResultsRest.AppliedFilter filter : data.getAppliedFilters()) {
-                //TODO Make sure the filter format is defined in only one place
-                uriComponentsBuilder.queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());
-            }
-        }
-
-        return uriComponentsBuilder;
     }
 
 }
