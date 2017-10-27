@@ -21,7 +21,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
 
     protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) {
         UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                .getFacetValues(data.getName(), data.getQuery(), data.getDsoType(), data.getScope(), null, null));
+                .getFacetValues(data.getFacetEntry().getName(), data.getQuery(), data.getDsoType(), data.getScope(), null, null));
 
         return addFilterParams(uriBuilder, data);
     }

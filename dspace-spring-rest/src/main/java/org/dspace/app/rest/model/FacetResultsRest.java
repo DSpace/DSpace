@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.springframework.data.domain.Pageable;
 
 
@@ -12,9 +13,8 @@ public class FacetResultsRest extends DiscoveryResultsRest {
     @JsonIgnore
     private LinkedList<SearchFacetValueRest> facetResultList = new LinkedList<>();
 
-    private String type;
-    private String name;
-    private boolean hasMore;
+    @JsonUnwrapped
+    private SearchFacetEntryRest facetEntry;
 
     @JsonIgnore
     private Pageable page;
@@ -35,28 +35,11 @@ public class FacetResultsRest extends DiscoveryResultsRest {
         this.page = page;
     }
 
-    public String getName() {
-        return name;
+    public SearchFacetEntryRest getFacetEntry() {
+        return facetEntry;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFacetEntry(final SearchFacetEntryRest facetEntry) {
+        this.facetEntry = facetEntry;
     }
-
-    public String getType(){
-        return type;
-    }
-
-    public void setType(String type){
-        this.type = type;
-    }
-
-    public boolean isHasMore(){
-        return hasMore;
-    }
-
-    public void setHasMore(boolean hasMore){
-        this.hasMore = hasMore;
-    }
-
 }

@@ -38,6 +38,7 @@ public class DiscoverResultConverter {
     @Autowired
     private List<DSpaceObjectConverter> converters;
 
+    private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
     public SearchResultsRest convert(final Context context, final String query, final String dsoType, final String configurationName, final String scope,
                                      final List<SearchFilter> searchFilters, final Pageable page, final DiscoverResult searchResult, final DiscoveryConfiguration configuration) {
@@ -68,13 +69,7 @@ public class DiscoverResultConverter {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are
                 //more results available.
                 if(valueCount < field.getFacetLimit()) {
-                    SearchFacetValueRest valueRest = new SearchFacetValueRest();
-                    valueRest.setLabel(value.getDisplayedValue());
-                    valueRest.setFilterValue(value.getAsFilterQuery());
-                    valueRest.setFilterType(value.getFilterType());
-                    valueRest.setAuthorityKey(value.getAuthorityKey());
-                    valueRest.setSortValue(value.getSortValue());
-                    valueRest.setCount(value.getCount());
+                    SearchFacetValueRest valueRest = facetValueConverter.convert(value);
 
                     facetEntry.addValue(valueRest);
                 } else {
