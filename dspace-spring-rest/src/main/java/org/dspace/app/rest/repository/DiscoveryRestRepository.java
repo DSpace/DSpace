@@ -32,7 +32,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to return a REST object to the controller class. This repository handles all the information lookup
+ * that has to be done for the endpoint
  */
 @Component(SearchResultsRest.CATEGORY + "." + SearchResultsRest.NAME)
 public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {

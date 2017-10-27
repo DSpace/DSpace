@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.RootRestResourceController;
 
 /**
- * Created by raf on 26/09/2017.
+ * The purpose of this class is to show the representation of information on the home/root page of the REST API
  */
 public class RootRest implements RestModel {
     public static final String NAME = "root";

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Created by raf on 25/09/2017.
+ * This is the factory that will be called to add the links to the hal resources.
  */
 @Component
 public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {

@@ -25,7 +25,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by raf on 25/09/2017.
+ * This class' purpose is to provide a means to add links to the HalResources
  */
 @Component
 public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource, RestResourceController> {

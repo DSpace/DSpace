@@ -10,7 +10,7 @@ package org.dspace.app.rest.model.hateoas;
 import org.dspace.app.rest.model.RootRest;
 
 /**
- * Created by raf on 26/09/2017.
+ * The purpose of this class is to wrap the information of the RootRest into a HAL resource
  */
 public class RootResource extends HALResource<RootRest> {
 

@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * TODO TOM UNIT TEST
+ * The controller for the api/discover endpoint
  */
 @RestController
 @RequestMapping("/api/"+ SearchResultsRest.CATEGORY)

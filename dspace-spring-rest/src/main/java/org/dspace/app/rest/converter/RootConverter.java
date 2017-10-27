@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class converts the restUrl and constructs a RootRest instance to return
  */
 @Component
 public class RootConverter {

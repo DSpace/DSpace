@@ -21,7 +21,8 @@ import java.util.LinkedList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 /**
- * Created by raf on 25/09/2017.
+ * This class will add links to the SearchResultsResource. This method will be called when calling the higher up
+ * addLinks in the HalLinkService
  */
 @Component
 public class SearchResultsResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchResultsResource> {

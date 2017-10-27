@@ -14,7 +14,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
+/**
+ * This class' purpose is to test the FacetConfigurationRest class
+ */
 public class FacetConfigurationResourceTest {
     private FacetConfigurationRest facetConfigurationRest;
 
@@ -23,16 +25,9 @@ public class FacetConfigurationResourceTest {
         facetConfigurationRest = new FacetConfigurationRest();
     }
 
-    @Test
-    public void testConstructorWithNullStillMakesObject() throws Exception{
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullThrowsException() throws Exception{
         FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(null);
-        assertNotNull(facetConfigurationResource);
-    }
-
-    @Test
-    public void testConstructorWithNullDataIsNull() throws Exception{
-        FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(null);
-        assertNull(facetConfigurationResource.getContent());
     }
 
     @Test

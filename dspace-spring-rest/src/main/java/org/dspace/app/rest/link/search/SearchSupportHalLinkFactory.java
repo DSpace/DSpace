@@ -17,7 +17,9 @@ import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
 /**
- * Created by raf on 25/09/2017.
+ * This class' purpose is to create the links for the SearchSupportResource. This method and class will be called
+ * when the addLinks method of the HalLinkService is called as it'll iterate over all the possible factories
+ * and check whether these are allowed to create links for the given resource or not.
  */
 @Component
 public class SearchSupportHalLinkFactory extends HalLinkFactory<SearchSupportResource, DiscoveryRestController> {

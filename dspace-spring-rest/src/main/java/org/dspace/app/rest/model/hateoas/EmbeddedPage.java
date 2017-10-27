@@ -13,6 +13,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
 
+/**
+ *
+ */
 public class EmbeddedPage extends EmbeddedPageHeader {
 
 	private List fullList;

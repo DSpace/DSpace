@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.link.search;
 
 import org.dspace.app.rest.DiscoveryRestController;
@@ -8,7 +15,7 @@ import org.dspace.app.rest.model.SearchResultsRest;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Created by tom on 26/10/2017.
+ * This factory provides a means to add links to the DiscoveryRest
  */
 public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, DiscoveryRestController> {
 

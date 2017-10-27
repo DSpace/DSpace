@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.DiscoveryRestController;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to create a container for the information used in the SearchFacetValueResource
  */
 public class SearchFacetValueRest implements RestModel {
 

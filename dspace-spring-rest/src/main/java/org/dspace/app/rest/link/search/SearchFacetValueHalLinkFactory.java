@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
@@ -11,7 +18,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Created by tom on 26/10/2017.
+ * This factory provides a means to add links to the SearchFacetValueResource. This method and class will be called from the
+ * HalLinkService addLinks method if the given resource is eligible.
  */
 @Component
 public class SearchFacetValueHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchFacetValueResource> {

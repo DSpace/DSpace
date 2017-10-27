@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.link.search;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -15,7 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
- * Created by tom on 26/10/2017.
+ * This factory provides a means to add links to the SearchFacetEntryResource. This class and addLinks method will be called
+ * from the HalLinkService addLinks method is called if the HalResource given is eligible
  */
 @Component
 public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchFacetEntryResource> {

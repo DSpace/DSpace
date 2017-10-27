@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.springframework.hateoas.Resource;
 
 /**
- * TODO TOM UNIT TEST
+ * The abstract, generic class for the HalResources
  */
 public abstract class HALResource<T> extends Resource<T> {
 

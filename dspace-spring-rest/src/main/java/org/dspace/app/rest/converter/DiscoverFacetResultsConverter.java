@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.converter;
 
 import java.util.List;
@@ -14,6 +21,9 @@ import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class' purpose is to construct a FacetResultsRest object from a number of parameters in the convert method
+ */
 @Component
 public class DiscoverFacetResultsConverter {
 

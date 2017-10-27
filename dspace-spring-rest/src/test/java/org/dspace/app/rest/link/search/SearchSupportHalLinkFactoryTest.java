@@ -16,7 +16,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to test the SearchSupportHalLinkFactory class
  */
 public class SearchSupportHalLinkFactoryTest {
     SearchSupportHalLinkFactory searchSupportHalLinkFactory;

@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * This class' purpose is to convert an object of the type DiscoveryConfiguration into a FacetConfigurationRest object
+ */
 @Component
 public class DiscoverFacetConfigurationConverter {
     public FacetConfigurationRest convert(DiscoveryConfiguration configuration){

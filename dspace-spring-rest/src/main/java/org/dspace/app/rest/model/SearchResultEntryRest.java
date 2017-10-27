@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO TOM UNIT TEST
+ * This class' purpose is to create a container for the information in the SearchResultEntryResource
  */
 public class SearchResultEntryRest implements RestModel {
 

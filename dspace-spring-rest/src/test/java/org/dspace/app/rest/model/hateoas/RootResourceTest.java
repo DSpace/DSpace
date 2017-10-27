@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to test the RootResource class
  */
 public class RootResourceTest {
 
@@ -25,17 +25,11 @@ public class RootResourceTest {
         rootRest = new RootRest();
     }
 
-    @Test
-    public void testConstructorWithNullStillMakesObject() throws Exception{
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullThrowsException() throws Exception{
         RootResource rootResource = new RootResource(null);
-        assertNotNull(rootResource);
     }
 
-    @Test
-    public void testConstructorWithNullDataIsNull() throws Exception{
-        RootResource rootResource = new RootResource(null);
-        assertNull(rootResource.getContent());
-    }
 
     @Test
     public void testConstructorAndGetterWithProperDataAndObjectNotNull() throws Exception{

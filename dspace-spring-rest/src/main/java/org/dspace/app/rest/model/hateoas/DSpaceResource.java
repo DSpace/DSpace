@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.LinkRest;
@@ -190,6 +191,7 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 	}
 
 	//Trick to make Java Understand that our content extends RestModel
+	@JsonUnwrapped
 	@Override
 	public T getContent() {
 		return super.getContent();

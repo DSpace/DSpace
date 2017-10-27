@@ -8,7 +8,7 @@
 package org.dspace.app.rest.exception;
 
 /**
- * Created by tom on 19/09/2017.
+ * This class creates an Exception to be used when the given DSpaceObjectType is invalid
  */
 public class InvalidDSpaceObjectTypeException extends InvalidRequestException {
     public InvalidDSpaceObjectTypeException(String message) {

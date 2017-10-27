@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
- * Created by raf on 26/09/2017.
+ * This class' purpose is to test the SearchConfigurationResource
  */
 public class SearchConfigurationResourceTest {
     private SearchConfigurationRest searchConfigurationRest;
@@ -26,16 +26,9 @@ public class SearchConfigurationResourceTest {
         searchConfigurationRest = new SearchConfigurationRest();
     }
 
-    @Test
-    public void testConstructorWithNullStillMakesObject() throws Exception{
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithNullThrowsException() throws Exception{
         SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(null);
-        assertNotNull(searchConfigurationResource);
-    }
-
-    @Test
-    public void testConstructorWithNullDataIsNull() throws Exception{
-        SearchConfigurationResource searchConfigurationResource = new SearchConfigurationResource(null);
-        assertNull(searchConfigurationResource.getContent());
     }
 
     @Test

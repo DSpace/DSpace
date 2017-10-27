@@ -8,7 +8,7 @@
 package org.dspace.app.rest.exception;
 
 /**
- * Created by tom on 19/09/2017.
+ * This class makes an Exception to be used when a certain sorting is invalid
  */
 public class InvalidSortingException extends InvalidRequestException {
     public InvalidSortingException(String message) {
