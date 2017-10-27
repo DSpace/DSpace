@@ -2,8 +2,6 @@ package org.dspace.app.rest.link.search;
 
 import java.util.LinkedList;
 
-import org.dspace.app.rest.model.DiscoveryResultsRest;
-import org.dspace.app.rest.model.FacetResultsRest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.hateoas.SearchFacetValueResource;
@@ -24,7 +22,7 @@ public class SearchFacetValueHalLinkFactory extends DiscoveryRestHalLinkFactory<
 
             UriComponentsBuilder builder = buildSearchBaseLink(halResource.getSearchData());
 
-            addFilterForFacetValue(builder, halResource.getSearchData(), halResource.getFacetData(), halResource.getValueData());
+            addFilterForFacetValue(builder, halResource.getFacetData(), halResource.getValueData());
 
             list.add(buildLink("search", builder.build().toUriString()));
 
@@ -36,14 +34,8 @@ public class SearchFacetValueHalLinkFactory extends DiscoveryRestHalLinkFactory<
         return SearchFacetValueResource.class;
     }
 
-    private void addFilterForFacetValue(final UriComponentsBuilder baseLink, DiscoveryResultsRest searchData,
+    private void addFilterForFacetValue(final UriComponentsBuilder baseLink,
                                         SearchFacetEntryRest facetData, SearchFacetValueRest valueData) {
-        //TODO ugly
-        if(facetData!=null){
-            baseLink.queryParam("f." + facetData.getName(), valueData.getFilterValue() + "," + valueData.getFilterType());
-        }
-        else{
-            baseLink.queryParam("f." + ((FacetResultsRest) searchData).getName(), valueData.getLabel() + "," + "equals");
-        }
+        baseLink.queryParam("f." + facetData.getName(), valueData.getFilterValue() + "," + valueData.getFilterType());
     }
 }

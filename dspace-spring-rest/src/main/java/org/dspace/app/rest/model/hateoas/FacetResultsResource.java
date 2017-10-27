@@ -22,7 +22,7 @@ public class FacetResultsResource extends HALResource<FacetResultsRest>{
     private static List<SearchFacetValueResource> buildEntryList(FacetResultsRest data) {
         LinkedList<SearchFacetValueResource> list = new LinkedList<>();
         for(SearchFacetValueRest searchFacetValueRest : data.getFacetResultList()){
-            SearchFacetValueResource searchFacetValueResource = new SearchFacetValueResource(searchFacetValueRest, null, data);
+            SearchFacetValueResource searchFacetValueResource = new SearchFacetValueResource(searchFacetValueRest, data.getFacetEntry(), data);
             list.add(searchFacetValueResource);
         }
         return list;
