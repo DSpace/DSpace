@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.link;
 
+import org.springframework.data.domain.Pageable;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -32,7 +33,7 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
     @Autowired
     private Utils utils;
 
-    protected void addLinks(DSpaceResource halResource, LinkedList<Link> list) {
+    protected void addLinks(DSpaceResource halResource, Pageable page, LinkedList<Link> list) {
         RestModel data = halResource.getData();
 
         try {
@@ -72,10 +73,6 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
 
     protected Class<DSpaceResource> getResourceClass() {
         return DSpaceResource.class;
-    }
-
-    protected String getSelfLink(DSpaceResource halResource) {
-        return utils.linkToSingleResource(halResource.getData(), Link.REL_SELF).getHref();
     }
 
 }

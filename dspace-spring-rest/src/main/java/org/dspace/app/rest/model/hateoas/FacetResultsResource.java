@@ -17,32 +17,21 @@ public class FacetResultsResource extends HALResource{
     @JsonUnwrapped
     private final FacetResultsRest data;
 
-    @JsonUnwrapped
-    private EmbeddedPage embeddedPage;
-
-    @JsonIgnore
-    private String baseLinkString;
-
-    public FacetResultsResource(FacetResultsRest facetResultsRest, Utils utils){
+    public FacetResultsResource(FacetResultsRest facetResultsRest){
         this.data = facetResultsRest;
-        addEmbeds(facetResultsRest, utils);
+        addEmbeds(facetResultsRest);
     }
 
-    public void addEmbeds(final FacetResultsRest data, final Utils utils) {
-        List<SearchFacetValueResource> list = buildEntryList(data, utils);
-
-        if(StringUtils.isNotBlank(baseLinkString)){
-            Page<SearchFacetValueResource> pageImpl = new PageImpl<>(list, data.getPage(), list.size() + (data.isHasMore() ? 1 : 0));
-            embeddedPage = new EmbeddedPage(baseLinkString, pageImpl, list, false);
-        }
+    public void addEmbeds(FacetResultsRest data) {
+        List<SearchFacetValueResource> list = buildEntryList(data);
 
         embedResource("values", list);
     }
 
-    private static List<SearchFacetValueResource> buildEntryList(final FacetResultsRest data, Utils utils) {
+    private static List<SearchFacetValueResource> buildEntryList(FacetResultsRest data) {
         LinkedList<SearchFacetValueResource> list = new LinkedList<>();
         for(SearchFacetValueRest searchFacetValueRest : data.getFacetResultList()){
-            SearchFacetValueResource searchFacetValueResource = new SearchFacetValueResource(searchFacetValueRest, null, data, utils);
+            SearchFacetValueResource searchFacetValueResource = new SearchFacetValueResource(searchFacetValueRest, null, data);
             list.add(searchFacetValueResource);
         }
         return list;
@@ -52,7 +41,4 @@ public class FacetResultsResource extends HALResource{
         return data;
     }
 
-    public void setBaseLinkString(String baseLinkString){
-        this.baseLinkString = baseLinkString;
-    }
 }

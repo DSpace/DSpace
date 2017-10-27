@@ -11,6 +11,7 @@ import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ import java.util.LinkedList;
 @Component
 public class SearchConfigurationResourceHalLinkFactory extends HalLinkFactory<SearchConfigurationResource, DiscoveryRestController> {
 
-    protected void addLinks(SearchConfigurationResource halResource, LinkedList<Link> list) {
+    protected void addLinks(SearchConfigurationResource halResource, Pageable pageable, LinkedList<Link> list) {
         SearchConfigurationRest data = halResource.getData();
 
         if(data != null){
@@ -37,11 +38,6 @@ public class SearchConfigurationResourceHalLinkFactory extends HalLinkFactory<Se
     protected Class<SearchConfigurationResource> getResourceClass() {
         return SearchConfigurationResource.class;
     }
-
-    protected String getSelfLink(SearchConfigurationResource halResource) {
-        return null;
-    }
-
 
     protected Class<DiscoveryRestController> getControllerClass() {
         return DiscoveryRestController.class;

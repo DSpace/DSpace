@@ -11,6 +11,7 @@ import org.dspace.app.rest.DiscoverableEndpointsService;
 import org.dspace.app.rest.RootRestResourceController;
 import org.dspace.app.rest.model.hateoas.RootResource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class RootHalLinkFactory extends HalLinkFactory<RootResource, RootRestRes
     @Autowired
     DiscoverableEndpointsService discoverableEndpointsService;
 
-    protected void addLinks(RootResource halResource, LinkedList<Link> list) {
+    protected void addLinks(RootResource halResource, Pageable page, LinkedList<Link> list) {
         for(Link endpointLink : discoverableEndpointsService.getDiscoverableEndpoints()){
             list.add(buildLink(endpointLink.getRel(), halResource.getData().getDspaceRest() + endpointLink.getHref()));
         }

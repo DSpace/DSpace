@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.DiscoveryResultsRest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchFacetValueRest;
 import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.utils.URLUtils;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.hateoas.Link;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -36,54 +37,29 @@ public class SearchFacetEntryResource extends HALResource {
     @JsonIgnore
     private DiscoveryResultsRest searchData;
 
-    public SearchFacetEntryResource(final SearchFacetEntryRest facetData, final DiscoveryResultsRest searchData, final Utils utils) {
+    public SearchFacetEntryResource(final SearchFacetEntryRest facetData, final DiscoveryResultsRest searchData) {
         this.facetData = facetData;
         this.searchData = searchData;
 
-        addLinks();
-
-        addEmbeds(utils);
+        addEmbeds();
     }
 
-    private void addEmbeds(final Utils utils) {
+    public SearchFacetEntryRest getFacetData() {
+        return facetData;
+    }
+
+    public DiscoveryResultsRest getSearchData() {
+        return searchData;
+    }
+
+    private void addEmbeds() {
         List<SearchFacetValueResource> valueResourceList = new LinkedList<>();
 
         for (SearchFacetValueRest valueRest : CollectionUtils.emptyIfNull(facetData.getValues())) {
-            SearchFacetValueResource valueResource = new SearchFacetValueResource(valueRest, facetData, searchData, utils);
+            SearchFacetValueResource valueResource = new SearchFacetValueResource(valueRest, facetData, searchData);
             valueResourceList.add(valueResource);
         }
 
         embedResource("values", valueResourceList);
-    }
-
-    private void addLinks() {
-        //Create the self link using our Controller
-        String baseLink = buildBaseLink();
-
-        Link link = new Link(baseLink, Link.REL_SELF);
-        add(link);
-    }
-
-    private String buildBaseLink() {
-
-        DiscoveryRestController methodOn = methodOn(DiscoveryRestController.class);
-
-        UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
-                .getFacetValues(facetData.getName(), searchData.getQuery(), searchData.getDsoType(), searchData.getScope(), null, null))
-                .toUriComponentsBuilder();
-
-        return addFilterParams(uriComponentsBuilder).build().toString();
-    }
-
-
-    private UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder) {
-        if (searchData.getAppliedFilters() != null) {
-            for (SearchResultsRest.AppliedFilter filter : searchData.getAppliedFilters()) {
-                //TODO Make sure the filter format is defined in only one place
-                uriComponentsBuilder.queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());
-            }
-        }
-
-        return uriComponentsBuilder;
     }
 }

@@ -26,9 +26,11 @@ public class SearchResultEntryResource extends HALResource {
     public SearchResultEntryResource(final SearchResultEntryRest data, final Utils utils) {
         this.data = data;
 
-        addLinks(data, utils);
-
         addEmbeds(data, utils);
+    }
+
+    public SearchResultEntryRest getData() {
+        return data;
     }
 
     private void addEmbeds(final SearchResultEntryRest data, final Utils utils) {
@@ -41,11 +43,4 @@ public class SearchResultEntryResource extends HALResource {
         }
 
     }
-
-    private void addLinks(final SearchResultEntryRest data, final Utils utils) {
-        if(data.getDspaceObject() != null) {
-            add(utils.linkToSingleResource(data.getDspaceObject(), DSPACE_OBJECT_LINK));
-        }
-    }
-
 }

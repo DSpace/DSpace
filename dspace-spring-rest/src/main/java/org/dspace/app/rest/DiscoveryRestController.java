@@ -113,7 +113,9 @@ public class DiscoveryRestController implements InitializingBean {
         SearchResultsRest searchResultsRest = discoveryRestRepository.getSearchObjects(query, dsoType, dsoScope, configurationName, searchFilters, page);
 
         //Convert the Search JSON results to paginated HAL resources
-        return new SearchResultsResource(searchResultsRest, page, utils);
+        SearchResultsResource searchResultsResource = new SearchResultsResource(searchResultsRest, utils);
+        halLinkService.addLinks(searchResultsResource, page);
+        return searchResultsResource;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets")
@@ -145,16 +147,11 @@ public class DiscoveryRestController implements InitializingBean {
                     + ", page: " + Objects.toString(page));
         }
 
-        //TODO
         FacetResultsRest facetResultsRest = discoveryRestRepository.getFacetObjects(facetName, query, dsoType, dsoScope, searchFilters, page);
 
-        FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest, utils);
+        FacetResultsResource facetResultsResource = new FacetResultsResource(facetResultsRest);
 
-        //TODO make prettier
-        facetResultsResource.setBaseLinkString(halLinkService.getBaseLink(facetResultsResource));
-        facetResultsResource.addEmbeds(facetResultsRest, utils);
-//        halLinkService.addLinks(facetResultsResource);
-
+        halLinkService.addLinks(facetResultsResource);
         return facetResultsResource;
     }
 
