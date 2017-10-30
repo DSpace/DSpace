@@ -7,7 +7,6 @@
  */
 package org.dspace.app.webui.components.signposting;
 
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class IdentifierItemHome implements ItemSignPostingProcessor
     /** log4j category */
     private static Logger log = Logger.getLogger(IdentifierItemHome.class);
 
-    private String relation = "identifier";
+    private String relation = "cite-as";
 
     private String metadataField;
 

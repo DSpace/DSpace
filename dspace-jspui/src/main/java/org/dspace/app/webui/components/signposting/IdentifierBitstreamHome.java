@@ -7,8 +7,6 @@
  */
 package org.dspace.app.webui.components.signposting;
 
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -35,7 +33,7 @@ public class IdentifierBitstreamHome implements BitstreamSignPostingProcessor
     /** log4j category */
     private static Logger log = Logger.getLogger(IdentifierBitstreamHome.class);
 
-    private String relation = "identifier";
+    private String relation = "cite-as";
 
     private String metadataField;
 
