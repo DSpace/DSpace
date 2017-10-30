@@ -156,7 +156,6 @@
                        <div>
                            <h4 class="text-right"><xsl:text>Related Files</xsl:text></h4>
                             <hr/>
-                            <xsl:call-template name="itemSummaryView-DIM-project-community"/>
                             <xsl:call-template name="itemSummaryView-DIM-project-models"/>
                             <xsl:call-template name="itemSummaryView-DIM-project-archives"/>
                             <xsl:call-template name="itemSummaryView-DIM-project-submissions"/>
