@@ -10,6 +10,7 @@ package org.dspace.util;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
@@ -18,6 +19,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -148,5 +150,90 @@ public class ItemUtils
             item.delete();
 
         }
+    }
+
+
+    /**
+     * Utility method for pattern-matching metadata elements.  This
+     * method will return <code>true</code> if the given schema,
+     * element, qualifier and language match the schema, element,
+     * qualifier and language of the <code>Metadatum</code> object passed
+     * in.  Any or all of the element, qualifier and language passed
+     * in can be the <code>Item.ANY</code> wildcard.
+     *
+     * @param schema
+     *            the schema for the metadata field. <em>Must</em> match
+     *            the <code>name</code> of an existing metadata schema.
+     * @param element
+     *            the element to match, or <code>Item.ANY</code>
+     * @param qualifier
+     *            the qualifier to match, or <code>Item.ANY</code>
+     * @param language
+     *            the language to match, or <code>Item.ANY</code>
+     * @param dcv
+     *            the Dublin Core value
+     * @return <code>true</code> if there is a match
+     */
+    public static boolean match(String schema, String element, String qualifier,
+                          String language, Metadatum dcv)
+    {
+    
+    	if (StringUtils.isBlank(element) || StringUtils.isBlank(schema)) {
+    		return false;
+    	}
+    
+    	// We will attempt to disprove a match - if we can't we have a match
+    	if (!element.equals(Item.ANY) && !element.equals(dcv.element)) {
+    		// Elements do not match, no wildcard
+    		return false;
+    	}
+    	
+        if (qualifier == null)
+        {
+            // Value must be unqualified
+            if (dcv.qualifier != null)
+            {
+                // Value is qualified, so no match
+                return false;
+            }
+        }
+        else if (!qualifier.equals(Item.ANY))
+        {
+            // Not a wildcard, so qualifier must match exactly
+            if (!qualifier.equals(dcv.qualifier))
+            {
+                return false;
+            }
+        }
+    
+        if (language == null)
+        {
+            // Value must be null language to match
+            if (dcv.language != null)
+            {
+                // Value is qualified, so no match
+                return false;
+            }
+        }
+        else if (!language.equals(Item.ANY))
+        {
+            // Not a wildcard, so language must match exactly
+            if (!language.equals(dcv.language))
+            {
+                return false;
+            }
+        }
+    
+        if (!schema.equals(Item.ANY))
+        {
+            if (dcv.schema != null && !dcv.schema.equals(schema))
+            {
+                // The namespace doesn't match
+                return false;
+            }
+        }
+    
+        // If we get this far, we have a match
+        return true;
     }
 }
