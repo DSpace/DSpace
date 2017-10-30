@@ -28,6 +28,8 @@ import org.dspace.core.Utils;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
+import org.apache.commons.io.FileUtils;
+
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
@@ -265,6 +267,21 @@ public class BitstreamStorageManager
     public static void setS3Subfolder(String s3Subfolder) {
         BitstreamStorageManager.s3Subfolder = s3Subfolder;
     }
+
+    /**
+     * Utility Method: Prefix the key with a subfolder, if this instance assets
+     * are stored within subfolder
+     * @param id
+     *     DSpace bitstream internal ID
+     * @return full key prefixed with a subfolder, if applicable
+     */
+    public static String getFullS3Key(String id) {
+        if (s3Subfolder != null && s3Subfolder.length() > 0) {
+            return s3Subfolder + "/" + id;
+        } else {
+            return id;
+        }
+    }
     
     /**
      * Store a stream of bits.
@@ -345,11 +362,28 @@ public class BitstreamStorageManager
         String storedLocation;
         
         if(incoming == S3_ASSETSTORE) {
-            // TODO:
-            // Store bitstream in Amazon S3
-            // set checksum and file size in DB
-            // add filename to location
-            storedLocation = "Amazon S3 " + getS3BucketName() ;
+            String key = getFullS3Key(id);
+            //Copy input stream to temp file, and send the file to S3 with some metadata
+            File scratchFile = File.createTempFile(id, "s3bs");
+            try {
+                FileUtils.copyInputStreamToFile(is, scratchFile);
+                Long contentLength = Long.valueOf(scratchFile.length());
+                PutObjectRequest putObjectRequest = new PutObjectRequest(s3BucketName, key, scratchFile);
+                PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
+
+                bitstream.setColumn("checksum", putObjectResult.getETag());
+                bitstream.setColumn("checksum_algorithm", CSA);
+                bitstream.setColumn("size_bytes", contentLength);
+                scratchFile.delete();
+                storedLocation = "Amazon S3 " + getS3BucketName() + ":" + key;
+            } catch(Exception e) {
+                log.error("put(" + id +", is)", e);
+                throw new IOException(e);
+            } finally {
+                if (scratchFile.exists()) {
+                    scratchFile.delete();
+                }
+            }
         } else {
             // Store bitstream in a local filesystem
             // Where on the file system will this new bitstream go?
@@ -420,13 +454,18 @@ public class BitstreamStorageManager
 	public static int register(Context context, int assetstore,
 				String bitstreamPath) throws SQLException, IOException {
 
+                // Don't allow bitstreams to be registered in an Amazon S3 Assetstore
+                if(assetstore == S3_ASSETSTORE) {
+                    throw new IOException("Registration of bitstreams in Amazon S3 is not supported.");
+                }
+            
 		// mark this bitstream as a registered bitstream
 		String sInternalId = REGISTERED_FLAG + bitstreamPath;
 
 		// Create a deleted bitstream row, using a separate DB connection
 		TableRow bitstream;
 		Context tempContext = null;
-
+                
 		try {
 			tempContext = new Context();
 
@@ -532,11 +571,28 @@ public class BitstreamStorageManager
     public static InputStream retrieve(Context context, int id)
             throws SQLException, IOException
     {
+        InputStream resultInputStream = null;
         TableRow bitstream = DatabaseManager.find(context, "bitstream", id);
-
-        File file = getFile(bitstream);
-
-        return (file != null) ? new FileInputStream(file) : null;
+        int storeNumber = bitstream.getIntColumn("store_number");
+        String sInternalId = bitstream.getStringColumn("internal_id");
+        
+        if(storeNumber == S3_ASSETSTORE) {
+            String key = getFullS3Key(sInternalId + "");
+            log.debug("retrieving item " + key + " from Amazon S3 bucket " + s3BucketName);
+            try {
+                S3Object object = s3Service.getObject(new GetObjectRequest(s3BucketName, key));
+                resultInputStream = (object != null) ? object.getObjectContent() : null;
+            } catch (Exception e) {
+                log.error("get("+key+")", e);
+                throw new IOException(e);
+            }
+        } else {
+            // retrieve from local file storage
+            File file = getFile(bitstream);
+            resultInputStream = (file != null) ? new FileInputStream(file) : null;
+        }
+        
+        return resultInputStream;
     }
 
     /**
@@ -790,7 +846,7 @@ public class BitstreamStorageManager
         // Get the store to use
         int storeNumber = bitstream.getIntColumn("store_number");
         if(storeNumber == S3_ASSETSTORE) {
-            return null;
+            throw new IOException("Bitstreams in Amazon S3 cannot be retrieved with getFile()");
         }
 
         // Default to zero ('assetstore.dir') for backwards compatibility
