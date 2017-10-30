@@ -1288,7 +1288,7 @@ prevent the generation of resource policy entry values with null dspace_object a
         }
         Set<Group> groups = new HashSet<>();
         if(context.getCurrentUser() == null){
-            groups.add(groupService.findByName(context, Group.ANONYMOUS));
+            groups.addAll(groupService.search(context, Group.ANONYMOUS));
         }
         else{
             groups.addAll(groupService.allMemberGroupsSet(context, context.getCurrentUser()));

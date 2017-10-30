@@ -67,7 +67,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 		int total = 0;
 		try {
 			total = is.countTotal(context);
-			it = is.findAll(context, pageable.getPageSize(), pageable.getOffset());
+			it = is.findAllAuthorized(context, pageable.getPageSize(), pageable.getOffset());
 			while (it.hasNext()) {
 				Item i = it.next();
 				items.add(i);

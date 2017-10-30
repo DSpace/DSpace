@@ -293,7 +293,8 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
                 " FROM Item i" +
                 " JOIN i.resourcePolicies r" +
                 " WHERE i.inArchive = true" +
-                " AND (r.epersonGroup.id IN (:groupIdList) OR r.eperson.id = :currentUserId" +
+                " AND i.discoverable = true" +
+                " AND (r.epersonGroup.id IN (:groupIdList) OR r.eperson.id = :currentUserId)" +
                 " AND (r.actionId = :actionId)" +
                 " AND (r.startDate IS NULL or r.startDate <= :currentDate)" +
                 " AND (r.endDate IS NULL or r.endDate >= :currentDate)");
@@ -309,14 +310,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
             query.setParameter("currentUserId", currentUser.getID());
         }
         query.setParameter("actionId", action);
-        SimpleDateFormat dateFormatUtc = new SimpleDateFormat("yyyy-MMM-dd");
-        dateFormatUtc.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date currentDate = null;
-        try{
-            currentDate = dateFormatUtc.parse(dateFormatUtc.format(new Date()));
-        } catch(ParseException e){
-            log.error(e,e);
-        }
+        Date currentDate = new Date();
         query.setParameter("currentDate", currentDate);
         query.setFirstResult(pageOffset);
         query.setMaxResults(pageSize);

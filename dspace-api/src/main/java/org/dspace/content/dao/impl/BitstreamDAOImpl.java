@@ -189,14 +189,7 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
             query.setParameter("currentUserId", currentUser.getID());
         }
         query.setParameter("actionId", action);
-        SimpleDateFormat dateFormatUtc = new SimpleDateFormat("yyyy-MMM-dd");
-        dateFormatUtc.setTimeZone(TimeZone.getTimeZone("UTC"));
-        Date currentDate = null;
-        try{
-            currentDate = dateFormatUtc.parse(dateFormatUtc.format(new Date()));
-        } catch(ParseException e){
-            log.error(e,e);
-        }
+        Date currentDate = new Date();
         query.setParameter("currentDate", currentDate);
         query.setFirstResult(pageOffset);
         query.setMaxResults(pageSize);
