@@ -38,15 +38,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 
-// TODO: remove
-import edu.sdsc.grid.io.FileFactory;
-import edu.sdsc.grid.io.GeneralFile;
-import edu.sdsc.grid.io.GeneralFileOutputStream;
-import edu.sdsc.grid.io.local.LocalFile;
-import edu.sdsc.grid.io.srb.SRBAccount;
-import edu.sdsc.grid.io.srb.SRBFile;
-import edu.sdsc.grid.io.srb.SRBFileSystem;
-
 /**
  * Stores, retrieves and deletes bitstreams.
  *
