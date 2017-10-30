@@ -140,9 +140,17 @@
                     <xsl:call-template name="itemSummaryView-collections"/>
                </div>
                <div class="col-sm-4">
-                   <div>
-                        <xsl:call-template name="itemSummaryView-DIM-file-section"/>
-                   </div>
+
+                  <!-- hide the download links on project master pages, show them on all other item pages -->
+                  <xsl:choose>
+                      <xsl:when test="dim:field[@element='type'][not(@qualifier)] = 'VSimProjectMaster'">
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <div>
+                             <xsl:call-template name="itemSummaryView-DIM-file-section"/>
+                        </div>
+                      </xsl:otherwise>
+                  </xsl:choose>
 
                    <xsl:if test="count(dim:field[@mdschema='vsim' and @element='relation']) &gt; 1">
                        <div>
@@ -261,7 +269,7 @@
         <xsl:if test="dim:field[@element='description' and @qualifier='abstract']">
             <div class="simple-item-view-description item-page-field-wrapper table">
                 <h4>
-                    
+
                     <!-- conditionally show either "item" or "project" based on whether this is an ordinary item or a project master -->
                     <xsl:choose>
                         <xsl:when test="dim:field[@element='type'][not(@qualifier)] = 'VSimProjectMaster'">
@@ -298,8 +306,8 @@
         <xsl:if test="dim:field[@element='description'][not(@qualifierier)]">
             <div class="simple-item-view-description item-page-field-wrapper table">
                 <h4>
-                    
-                    <!-- TODO: conditionally show either "item" or "project" based on whether this is an ordinary item or a project master -->
+
+                    <!-- conditionally show either "item" or "project" based on whether this is an ordinary item or a project master -->
                     <xsl:choose>
                         <xsl:when test="dim:field[@element='type'][not(@qualifier)] = 'VSimProjectMaster'">
                             <xsl:text>Project Description</xsl:text>
