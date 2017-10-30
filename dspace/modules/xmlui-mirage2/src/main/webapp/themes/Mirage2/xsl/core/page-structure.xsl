@@ -138,7 +138,7 @@
                                             <p class="text-center">
                                                     <a href="{$app_path}/pages/tour" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/TourLink.png" alt=" Tour "/></a>
                                                     <a href="{$app_path}/pages/download" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/DownloadLink.png" alt=" Download "/></a>
-                                                    <a href="{$app_path}/discover" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/BrowseLink.png" alt=" Browse "/></a>
+                                                    <a href="{$app_path}/discover?filtertype_1=type&amp;filter_relational_operator_1=equals&amp;filter_1=VSimProjectMaster&amp;submit_apply_filter=&amp;query=&amp;rpp=10&amp;sort_by=dc.title_sort&amp;order=asc" class="btn btn-large"><img src="/xmlui/themes/Mirage2/images/BrowseLink.png" alt=" Browse "/></a>
                                             </p>
                                         </xsl:when>
                                         <!-- if this is the submission page, show the link to the project masters submission page -->
@@ -534,7 +534,7 @@
                             </xsl:choose>
 
                             <!-- small navigation buttons for sm and xs screens, keep scrolling down for the full-sized buttons -->
-                            <li><a class="btn" role="button" href="{$app_path}/discover">browse</a></li>
+                            <li><a class="btn" role="button" href="{$app_path}/discover?filtertype_1=type&amp;filter_relational_operator_1=equals&amp;filter_1=VSimProjectMaster&amp;submit_apply_filter=&amp;query=&amp;rpp=10&amp;sort_by=dc.title_sort&amp;order=asc">browse</a></li>
                             <li><a class="btn" role="button" href="{$app_path}/pages/add">submit project</a></li>
                             <li><a class="btn" role="button" href="{$app_path}/pages/download">download</a></li>
 
@@ -590,7 +590,7 @@
                             </xsl:choose>
 
                                     <li>
-                                        <a class="btn" href="{$app_path}/discover">
+                                        <a class="btn" href="{$app_path}/discover?filtertype_1=type&amp;filter_relational_operator_1=equals&amp;filter_1=VSimProjectMaster&amp;submit_apply_filter=&amp;query=&amp;rpp=10&amp;sort_by=dc.title_sort&amp;order=asc">
                                             Browse
                                         </a>
                                     </li>
