@@ -588,13 +588,13 @@ public class SubmissionConfigReader
 
         // check for ID attribute & save to step info
         String stepID = getAttribute(nStep, "id");
-        if (stepID != null && stepID.length() > 0)
+        if (StringUtils.isNotBlank(stepID))
         {
             stepInfo.put("id", stepID);
         }
 
         String mandatory = getAttribute(nStep, "mandatory");
-        if (mandatory != null && mandatory.length() > 0)
+        if (StringUtils.isNotBlank(mandatory))
         {
             stepInfo.put("mandatory", mandatory);
         }
