@@ -23,6 +23,7 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
+import org.dspace.core.Utils;
 import org.dspace.core.service.PluginService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +52,6 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 {
     private Logger log = Logger.getLogger(ChoiceAuthorityServiceImpl.class);
 
-    // names of the configured authority plugins
-    private Set<String> authorityNames = new HashSet<String>();
-    
     // map of field key to authority plugin
     protected Map<String,ChoiceAuthority> controller = new HashMap<String,ChoiceAuthority>();
 
@@ -103,10 +101,10 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
     @Override
     public Set<String> getChoiceAuthoritiesNames() 
     {
-    	if (authorityNames.isEmpty()) {
+    	if (authorities.keySet().isEmpty()) {
     		loadChoiceAuthorityConfigurations();
     	}
-    	return authorityNames;
+    	return authorities.keySet();
     }
     
     @Override
@@ -223,14 +221,7 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 
     protected String makeFieldKey(String schema, String element, String qualifier)
     {
-        if (StringUtils.isBlank(qualifier))
-        {
-            return schema + "_" + element;
-        }
-        else
-        {
-            return schema + "_" + element + "_" + qualifier;
-        }
+        return Utils.standardize(schema, element, qualifier, "_");
     }
 
     /**
@@ -274,7 +265,6 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 		    }
 		    if(!authorities.containsKey(authorityName)) {
 		    	controller.put(fkey, ma);
-		    	authorityNames.add(authorityName);
 		    	authorities.put(authorityName, fkey);
 		    }
 		    else {
@@ -320,7 +310,6 @@ public final class ChoiceAuthorityServiceImpl implements ChoiceAuthorityService
 							} 
 							
 							if (!authorities.containsKey(authorityName)) {
-								authorityNames.add(authorityName);
 								authorities.put(authorityName, fieldKey);
 							}
 
