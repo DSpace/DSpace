@@ -204,4 +204,6 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
 
     Iterator<Bitstream> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException;
+
+    int countTotalAuthorized(Context context) throws SQLException;
 }

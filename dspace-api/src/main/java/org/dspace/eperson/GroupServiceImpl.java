@@ -754,4 +754,9 @@ public class GroupServiceImpl extends DSpaceObjectServiceImpl<Group> implements 
     public List<Group> findByMetadataField(final Context context, final String searchValue, final MetadataField metadataField) throws SQLException {
         return groupDAO.findByMetadataField(context, searchValue, metadataField);
     }
+
+    @Override
+    public List<Group> getAllParentGroups(Context context, UUID groupUuid) throws SQLException{
+        return groupDAO.getAllParentGroups(context, groupUuid);
+    }
 }

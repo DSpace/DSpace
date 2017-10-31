@@ -56,4 +56,6 @@ public interface BitstreamDAO extends DSpaceObjectLegacySupportDAO<Bitstream> {
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
 
     Iterator<Bitstream> findAllAuthorized(Context context, int pageSize, int pageOffset, EPerson currentUser, int action, Set<Group> groups) throws SQLException;
+
+    int countTotalAuthorized(Context context, EPerson currentUser, int action, Set<Group> groups) throws SQLException;
 }

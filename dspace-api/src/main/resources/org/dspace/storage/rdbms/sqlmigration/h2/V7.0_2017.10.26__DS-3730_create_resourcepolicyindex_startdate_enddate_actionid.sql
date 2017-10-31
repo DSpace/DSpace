@@ -11,4 +11,14 @@
 --------------------------------------------------------------------
 
 
-CREATE INDEX idx_resourcepolicy ON resourcepolicy(start_date, end_date, action_id);
+DROP INDEX IF EXISTS resourcepolicy_idx_start_date;
+
+CREATE INDEX resourcepolicy_idx_start_date ON resourcepolicy(start_date);
+
+DROP INDEX IF EXISTS resourcepolicy_idx_end_date;
+
+CREATE INDEX resourcepolicy_idx_end_date ON resourcepolicy(end_date);
+
+DROP INDEX IF EXISTS resourcepolicy_idx_action_id;
+
+CREATE INDEX resourcepolicy_idx_action_id ON resourcepolicy(action_id);

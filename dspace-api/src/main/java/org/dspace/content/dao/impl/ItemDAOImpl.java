@@ -316,4 +316,32 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setMaxResults(pageSize);
         return iterate(query);
     }
+
+    @Override
+    public int countTotalAuthorized(Context context, EPerson currentUser, int action, Set<Group> groups) throws SQLException{
+        Query query = createQuery(context, "SELECT count(*) " +
+                " FROM Item i" +
+                " JOIN i.resourcePolicies r" +
+                " WHERE i.inArchive = true" +
+                " AND i.discoverable = true" +
+                " AND (r.epersonGroup.id IN (:groupIdList) OR r.eperson.id = :currentUserId)" +
+                " AND (r.actionId = :actionId)" +
+                " AND (r.startDate IS NULL or r.startDate <= :currentDate)" +
+                " AND (r.endDate IS NULL or r.endDate >= :currentDate)");
+        LinkedList<UUID> list = new LinkedList<>();
+        for(Group group: groups){
+            list.add(group.getID());
+        }
+        query.setParameter("groupIdList", list);
+        if(currentUser == null){
+            query.setParameter("currentUserId", null);
+        }
+        else{
+            query.setParameter("currentUserId", currentUser.getID());
+        }
+        query.setParameter("actionId", action);
+        Date currentDate = new Date();
+        query.setParameter("currentDate", currentDate);
+        return count(query);
+    }
 }

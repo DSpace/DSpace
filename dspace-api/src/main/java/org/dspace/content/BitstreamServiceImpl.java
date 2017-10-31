@@ -462,13 +462,26 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         if(authorizeService.isAdmin(context)){
             return findAll(context, pageSize, pageOffset);
         }
+        Set<Group> groups = getGroups(context);
+        return bitstreamDAO.findAllAuthorized(context, pageSize, pageOffset, context.getCurrentUser(), Constants.READ, groups);
+    }
+
+    @Override
+    public int countTotalAuthorized(Context context) throws SQLException{
+        Set<Group> groups = getGroups(context);
+        return bitstreamDAO.countTotalAuthorized(context, context.getCurrentUser(), Constants.READ, groups);
+    }
+
+    private Set<Group> getGroups(Context context) throws SQLException {
         Set<Group> groups = new HashSet<>();
         if(context.getCurrentUser() == null){
-            groups.addAll(groupService.search(context, Group.ANONYMOUS));
+            Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+            groups.add(anonGroup);
+            groups.addAll(groupService.getAllParentGroups(context, anonGroup.getID()));
         }
         else{
             groups.addAll(groupService.allMemberGroupsSet(context, context.getCurrentUser()));
         }
-        return bitstreamDAO.findAllAuthorized(context, pageSize, pageOffset, context.getCurrentUser(), Constants.READ, groups);
+        return groups;
     }
 }

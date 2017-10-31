@@ -23,6 +23,8 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.elasticsearch.common.joda.time.DateTime;
+import org.elasticsearch.common.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,18 +74,14 @@ public class ItemServiceImplTest extends AbstractUnitTest{
     @Test
     public void testFindAllAuthorizedDoesntIncludePrivateItem() throws SQLException, IOException, AuthorizeException, IllegalAccessException, ParseException {
         Item item = createItem();
-        item.setDiscoverable(false);
+        authorizeService.removeAllPolicies(context, item);
         itemService.update(context, item);
         context.restoreAuthSystemState();
         UUID id = item.getID();
-        List<Group> anonGroups = groupService.search(context, Group.ANONYMOUS);
-        for(Group group: anonGroups){
-            ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, item, group, context.getCurrentUser(), Constants.READ, ResourcePolicy.TYPE_CUSTOM);
-            String dateString = "2020-04-01";
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date startDate = formatter.parse(dateString);
-            resourcePolicy.setStartDate(startDate);
-        }
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, item, group, context.getCurrentUser(), Constants.READ, ResourcePolicy.TYPE_CUSTOM);
+        Date startDate = DateTime.now(DateTimeZone.UTC).plus(1314873000).toDate();
+        resourcePolicy.setStartDate(startDate);
         context.restoreAuthSystemState();
         Iterator<Item> foundItems = itemService.findAllAuthorized(context, 20, 0);
         List<UUID> uuidList = new LinkedList<>();
@@ -97,6 +95,7 @@ public class ItemServiceImplTest extends AbstractUnitTest{
     @Test
     public void testFindAllAuthorizedDoesIncludePublicItems() throws SQLException, IOException, AuthorizeException, IllegalAccessException, ParseException{
         Item item = createItem();
+        authorizeService.removeAllPolicies(context, item);
         context.restoreAuthSystemState();
         UUID id = item.getID();
         Iterator<Item> foundItems = itemService.findAllAuthorized(context, 20, 0);
@@ -112,16 +111,13 @@ public class ItemServiceImplTest extends AbstractUnitTest{
     public void testFindAllAuthorizedDoesIncludeItemsForWhichEmbargoDateHasPassed() throws SQLException, IOException, AuthorizeException, IllegalAccessException, ParseException{
 
         Item item = createItem();
+        authorizeService.removeAllPolicies(context, item);
         context.restoreAuthSystemState();
         UUID id = item.getID();
-        List<Group> anonGroups = groupService.search(context, Group.ANONYMOUS);
-        for(Group group: anonGroups){
-            ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, item, group, context.getCurrentUser(), Constants.READ, "open-access");
-            String dateString = "2000-04-01";
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date startDate = formatter.parse(dateString);
-            resourcePolicy.setStartDate(startDate);
-        }
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, item, group, context.getCurrentUser(), Constants.READ, "open-access");
+        Date startDate = DateTime.now(DateTimeZone.UTC).minus(1314873000).toDate();
+        resourcePolicy.setStartDate(startDate);
         Iterator<Item> foundItems = itemService.findAllAuthorized(context, 20, 0);
         List<UUID> uuidList = new LinkedList<>();
         while(foundItems.hasNext()){

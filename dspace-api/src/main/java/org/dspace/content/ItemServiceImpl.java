@@ -1286,13 +1286,29 @@ prevent the generation of resource policy entry values with null dspace_object a
         if(authorizeService.isAdmin(context)){
             return findAll(context, pageSize, pageOffset);
         }
+        Set<Group> groups = getGroups(context);
+        return itemDAO.findAllAuthorized(context, pageSize, pageOffset, context.getCurrentUser(), Constants.READ, groups);
+    }
+
+    @Override
+    public int countTotalAuthorized(Context context) throws SQLException{
+        Set<Group> groups = getGroups(context);
+        if(authorizeService.isAdmin(context)){
+            return countTotal(context);
+        }
+        return itemDAO.countTotalAuthorized(context, context.getCurrentUser(), Constants.READ, groups);
+    }
+
+    private Set<Group> getGroups(Context context) throws SQLException {
         Set<Group> groups = new HashSet<>();
         if(context.getCurrentUser() == null){
-            groups.addAll(groupService.search(context, Group.ANONYMOUS));
+            Group anonGroup = groupService.findByName(context, Group.ANONYMOUS);
+            groups.add(anonGroup);
+            groups.addAll(groupService.getAllParentGroups(context, anonGroup.getID()));
         }
         else{
             groups.addAll(groupService.allMemberGroupsSet(context, context.getCurrentUser()));
         }
-        return itemDAO.findAllAuthorized(context, pageSize, pageOffset, context.getCurrentUser(), Constants.READ, groups);
+        return groups;
     }
 }

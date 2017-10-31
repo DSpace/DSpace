@@ -22,6 +22,8 @@ import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.GroupService;
+import org.elasticsearch.common.joda.time.DateTime;
+import org.elasticsearch.common.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,14 +63,10 @@ public class BitstreamServiceImplTest extends AbstractUnitTest {
         Bitstream bitstream = createBitstream();
         context.restoreAuthSystemState();
         UUID id = bitstream.getID();
-        List<Group> anonGroups = groupService.search(context, Group.ANONYMOUS);
-        for(Group group: anonGroups){
-            ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, bitstream, group, context.getCurrentUser(), Constants.READ, "open-access");
-            String dateString = "2020-04-01";
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date startDate = formatter.parse(dateString);
-            resourcePolicy.setStartDate(startDate);
-        }
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, bitstream, group, context.getCurrentUser(), Constants.READ, "open-access");
+        Date startDate = DateTime.now(DateTimeZone.UTC).plus(1314873000).toDate();
+        resourcePolicy.setStartDate(startDate);
         Iterator<Bitstream> foundBitstreams = bitstreamService.findAllAuthorized(context, 20, 0);
         List<UUID> uuidList = new LinkedList<>();
         while(foundBitstreams.hasNext()){
@@ -83,10 +81,8 @@ public class BitstreamServiceImplTest extends AbstractUnitTest {
         Bitstream bitstream = createBitstream();
         context.restoreAuthSystemState();
         UUID id = bitstream.getID();
-        List<Group> anonGroups = groupService.search(context, Group.ANONYMOUS);
-        for(Group group: anonGroups){
-            ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, bitstream, group, null, Constants.READ, ResourcePolicy.TYPE_CUSTOM);
-        }
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, bitstream, group, null, Constants.READ, ResourcePolicy.TYPE_CUSTOM);
         Iterator<Bitstream> foundBitstreams = bitstreamService.findAllAuthorized(context, 20, 0);
         List<UUID> uuidList = new LinkedList<>();
         while(foundBitstreams.hasNext()){
@@ -101,14 +97,10 @@ public class BitstreamServiceImplTest extends AbstractUnitTest {
         Bitstream bitstream = createBitstream();
         context.restoreAuthSystemState();
         UUID id = bitstream.getID();
-        List<Group> anonGroups = groupService.search(context, Group.ANONYMOUS);
-        for(Group group: anonGroups){
-            ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, bitstream, group, context.getCurrentUser(), Constants.READ, "open-access");
-            String dateString = "2000-04-01";
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            Date startDate = formatter.parse(dateString);
-            resourcePolicy.setStartDate(startDate);
-        }
+        Group group = groupService.findByName(context, Group.ANONYMOUS);
+        ResourcePolicy resourcePolicy = authorizeService.createResourcePolicy(context, bitstream, group, context.getCurrentUser(), Constants.READ, "open-access");
+        Date startDate = DateTime.now(DateTimeZone.UTC).minus(1314873000).toDate();
+        resourcePolicy.setStartDate(startDate);
         Iterator<Bitstream> foundBitstreams = bitstreamService.findAllAuthorized(context, 20, 0);
         List<UUID> uuidList = new LinkedList<>();
         while(foundBitstreams.hasNext()){

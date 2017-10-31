@@ -10,6 +10,7 @@ package org.dspace.content.service;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
@@ -17,10 +18,7 @@ import org.dspace.eperson.Group;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Service interface class for the Item object.
@@ -594,4 +592,6 @@ public interface ItemService extends DSpaceObjectService<Item>, DSpaceObjectLega
     boolean isInProgressSubmission(Context context, Item item) throws SQLException;
 
     Iterator<Item> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException;
+
+    int countTotalAuthorized(Context context) throws SQLException;
 }

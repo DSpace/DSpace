@@ -116,4 +116,6 @@ public interface ItemDAO extends DSpaceObjectLegacySupportDAO<Item>
     int countItems(Context context, boolean includeArchived, boolean includeWithdrawn) throws SQLException;
 
     Iterator<Item> findAllAuthorized(Context context, int pageSize, int pageOffset, EPerson currentUser, int action, Set<Group> groups) throws SQLException;
+
+    int countTotalAuthorized(Context context, EPerson currentUser, int action, Set<Group> groups) throws SQLException;
 }
