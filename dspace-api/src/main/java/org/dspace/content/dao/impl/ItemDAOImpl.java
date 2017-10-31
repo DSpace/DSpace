@@ -342,6 +342,7 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("actionId", action);
         Date currentDate = new Date();
         query.setParameter("currentDate", currentDate);
+        query.setCacheable(true);
         return count(query);
     }
 }

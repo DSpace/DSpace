@@ -219,6 +219,7 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
         query.setParameter("actionId", action);
         Date currentDate = new Date();
         query.setParameter("currentDate", currentDate);
+        query.setCacheable(true);
         return count(query);
     }
 }

@@ -204,6 +204,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
                         "JOIN gc.child child " +
                         "WHERE child.id = :groupId ");
         query.setParameter("groupId", groupUuid);
+        query.setCacheable(true);
         return query.list();
     }
 }
