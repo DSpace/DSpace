@@ -68,7 +68,6 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 		Iterator<Bitstream> it = null;
 		int total = 0;
 		try {
-			//TODO IMPLEMENT
 			total = bs.countTotalAuthorized(context);
 			it = bs.findAllAuthorized(context, pageable.getPageSize(), pageable.getOffset());
 			while(it.hasNext()) {
