@@ -122,7 +122,22 @@
                     </form>
                 </div>
             </xsl:if>
-            <xsl:apply-templates/>
+
+					 <!-- VSIM-76: explicitly specify all navigation option blocks, including the facets at the top -->
+					 <xsl:apply-templates select="dri:list[@id = 'aspect.discovery.Navigation.list.discovery']" />
+
+					 <!-- only show the browse navigtation option block if this is an admin user -->
+					 <xsl:choose>
+						 <xsl:when test="//dri:xref[@target='/xmlui/admin/panel']">
+	               <xsl:apply-templates select="dri:list[@id = 'aspect.viewArtifacts.Navigation.list.browse']" />
+						 </xsl:when>
+				   </xsl:choose>
+
+           <xsl:apply-templates select="dri:list[@id = 'aspect.viewArtifacts.Navigation.list.context']" />
+           <xsl:apply-templates select="dri:list[@id = 'aspect.viewArtifacts.Navigation.list.administrative']" />
+           <xsl:apply-templates select="dri:list[@id = 'aspect.statistics.Navigation.list.statistics']" />
+           <xsl:apply-templates select="dri:list[@id = 'aspect.statistics.Navigation.list.reportingSuite']"/>
+
             <!-- DS-984 Add RSS Links to Options Box -->
             <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']) != 0">
                 <div>
