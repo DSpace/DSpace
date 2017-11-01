@@ -56,7 +56,7 @@
                                     <requireJavaVersion>
                                         <version>${java.version}</version>
                                     </requireJavaVersion>
-                                </rules>    
+                                </rules>
                             </configuration>
                         </execution>
                         <!-- Make sure that we do not have conflicting dependencies-->
@@ -139,7 +139,7 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-surefire-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                        <argLine>${test.argLine}</argLine>
+                        <argLine>${test.argLine} ${surefireJacoco}</argLine>
                         <!-- tests whose name starts by Abstract will be ignored -->
                         <excludes>
                             <exclude>**/Abstract*</exclude>
@@ -159,7 +159,7 @@
                     <configuration>
                         <!-- Allow for the ability to pass JVM memory flags for Unit Tests. Since
                              maven-failsafe-plugin forks a new JVM, it ignores MAVEN_OPTS.-->
-                        <argLine>${test.argLine}</argLine>
+                        <argLine>${test.argLine} ${failsafeJacoco}</argLine>
                         <excludes>
                             <exclude>**/Abstract*</exclude>
                         </excludes>
@@ -245,6 +245,16 @@
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>1.6</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.9</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.eluder.coveralls</groupId>
+                    <artifactId>coveralls-maven-plugin</artifactId>
+                    <version>4.3.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -276,10 +286,10 @@
                     <includes>
                         <include>src/**</include>
                     </includes>
-                    <!--Use all default exclusions for IDE files & Maven files, see: 
+                    <!--Use all default exclusions for IDE files & Maven files, see:
                         http://code.google.com/p/maven-license-plugin/wiki/Configuration#Default_excludes -->
                     <useDefaultExcludes>true</useDefaultExcludes>
-                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes> 
+                    <!-- Add some default DSpace exclusions not covered by <useDefaultExcludes>
                          Individual Maven projects may choose to override these defaults. -->
                     <excludes>
                         <exclude>**/src/test/resources/**</exclude>
@@ -294,8 +304,8 @@
                         <exclude>**/readme*</exclude>
                         <exclude>**/.gitignore</exclude>
                     </excludes>
-                    <mapping> 
-                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin: 
+                    <mapping>
+                        <!-- Custom DSpace file extensions which are not recognized by maven-release-plugin:
                              *.xmap, *.xslt, *.wsdd, *.wsdl, *.ttl, *.LICENSE -->
                         <xmap>XML_STYLE</xmap>
                         <xslt>XML_STYLE</xslt>
@@ -303,7 +313,7 @@
                         <wsdl>XML_STYLE</wsdl>
                         <ttl>SCRIPT_STYLE</ttl>
                         <LICENSE>TEXT</LICENSE>
-                    </mapping>  
+                    </mapping>
                     <encoding>UTF-8</encoding>
                     <!-- maven-license-plugin recommends a strict check (e.g. check spaces/tabs too) -->
                     <strictCheck>true</strictCheck>
@@ -318,6 +328,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Enforce our version of Java, Maven, dependencies, etc. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -325,7 +336,7 @@
             </plugin>
         </plugins>
     </build>
-   
+
     <profiles>
         <!-- Skip Unit Tests by default, but allow override on command line
            by setting property "-Dmaven.test.skip=false" -->
@@ -360,8 +371,8 @@
         </profile>
 
         <!-- Allow for passing extra memory to Unit/Integration tests.
-             By default this gives unit tests 512MB of memory (when tests are enabled), 
-             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since 
+             By default this gives unit tests 512MB of memory (when tests are enabled),
+             unless tweaked on commandline (e.g. "-Dtest.argLine=-Xmx512m"). Since
              m-surefire-p and m-failsafe-p both fork a new JVM for testing, they ignores MAVEN_OPTS. -->
         <profile>
             <id>test-argLine</id>
@@ -376,8 +387,8 @@
         </profile>
 
         <!-- This profile ensures that we ONLY generate the Unit Test Environment,
-             if the testEnvironment.xml file is found AND we are not skipping Unit 
-             Tests (see also skiptests profile). That way the Test Environment is 
+             if the testEnvironment.xml file is found AND we are not skipping Unit
+             Tests (see also skiptests profile). That way the Test Environment is
              also NOT built when running a 'mvn package' on a "binary" release. -->
         <profile>
             <id>generate-test-env</id>
@@ -419,7 +430,69 @@
             </build>
         </profile>
 
-        <!-- 
+        <profile>
+            <id>measure-test-coverage</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>maven.test.skip</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Report unit test code coverage -->
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <!--
+                                Prepares the property pointing to the JaCoCo runtime agent which
+                                is passed as VM argument when Maven the Surefire plugin is executed.
+                            -->
+                            <execution>
+                                <id>pre-unit-test</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Sets the path to the file which contains the execution data. -->
+                                    <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+                                    <!--
+                                        Sets the name of the property containing the settings
+                                        for JaCoCo runtime agent.
+                                    -->
+                                    <propertyName>surefireJacoco</propertyName>
+                                </configuration>
+                            </execution>
+
+                            <!--
+                                Prepares the property pointing to the JaCoCo runtime agent which
+                                is passed as VM argument when Maven the Failsafe plugin is executed.
+                            -->
+                            <execution>
+                                <id>pre-integration-test</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Sets the path to the file which contains the execution data. -->
+                                    <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+                                    <!--
+                                        Sets the name of the property containing the settings
+                                        for JaCoCo runtime agent.
+                                    -->
+                                    <propertyName>failsafeJacoco</propertyName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--
              Generate a list of all THIRD PARTY open source licenses for all DSpace dependencies.
              This list is automatically written to the [src]/LICENSES_THIRD_PARTY file.
              Third party tools whose licenses are unknown by Maven are maintained in
@@ -766,7 +839,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- Sign any new releases via GPG. 
+                    <!-- Sign any new releases via GPG.
                          NOTE: you may optionall specify the "gpg.passphrase" in your settings.xml -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -902,7 +975,7 @@
                 <version>[6.0.0,7.0.0)</version>
                 <type>war</type>
             </dependency>
-         
+
             <!-- DSpace third Party Dependencies -->
             <dependency>
                 <groupId>org.hibernate</groupId>
