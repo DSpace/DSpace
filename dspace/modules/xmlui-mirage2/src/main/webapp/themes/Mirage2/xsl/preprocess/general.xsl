@@ -131,6 +131,16 @@
     </pageMeta>
     </xsl:template>
 
+    <!-- breadcrumb surgery, see VSIM-84 for details, remove any mention of the Ancillary Community -->
+    <xsl:template match="dri:trail[. = 'Ancillary Community']">
+    </xsl:template>
+
+    <!-- breadcrumb surgery, see VSIM-84 for details, change link from the Project Masters collection to the Discovery canned search -->
+    <xsl:template match="dri:trail[. = 'Project Masters']">
+    <trail target="/xmlui/discover?filtertype_1=type&amp;filter_relational_operator_1=equals&amp;filter_1=VSimProjectMaster&amp;submit_apply_filter=&amp;query=&amp;rpp=10&amp;sort_by=dc.title_sort&amp;order=asc">Projects</trail>
+    </xsl:template>
+
+
     <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static'][text()='static/js/choice-support.js']"/>
     <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static'][text()='static/js/vocabulary-support.js']"/>
     <xsl:template match="dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static'][text()='static/js/accessFormUtil.js']"/>
