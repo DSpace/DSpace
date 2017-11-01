@@ -2,7 +2,6 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <body>
 <div id="file.news.div.news" n="news" rend="primary">
-<head>VSim Repository and Archive</head>
 <p><hi rend="bold">Explore. Interact. Understand.</hi></p>
 <p><hi rend="bold">VSim</hi> is a simple-to-use interface for exploring computer models of historic sites and environments. Designed to support both teacher-centered presentations and student-centered assignments, this NEH-funded software is perfect for classroom use.</p>
 <p>The VSim interface is flexible, and can fit into any classroom. It includes two critical features for teaching and learning: the <hi rend="bold">narrative</hi> function allows users to create linear presentations (think PowerPoint or Prezi within a three-dimensional world), and the <hi rend="bold">embedded resource</hi> function allows users to annotate the virtual space and embed links to primary and secondary resources within the modeled environment.</p>

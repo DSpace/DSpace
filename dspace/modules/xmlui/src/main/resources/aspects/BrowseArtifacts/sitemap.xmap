@@ -45,9 +45,6 @@ collections / items / and bitstreams.
             <map:transform type="Navigation"/>
 
             <map:match pattern="">
-                <map:transform type="CommunityBrowser">
-                        <map:parameter name="depth" value="1"/>
-                </map:transform>
                 <map:serialize type="xml"/>
             </map:match>
 
