@@ -18,6 +18,7 @@ import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -29,28 +30,32 @@ public class DiscoverFacetResultsConverter {
 
     private DiscoverFacetValueConverter facetValueConverter = new DiscoverFacetValueConverter();
 
-    public FacetResultsRest convert(Context context, String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, Pageable page){
+    public FacetResultsRest convert(Context context, String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, Pageable page) {
         FacetResultsRest facetResultsRest = new FacetResultsRest();
 
-        addToFacetResultList(facetName, searchResult, facetResultsRest, page);
+        addToFacetResultList(facetName, searchResult, facetResultsRest, configuration, page);
 
         setRequestInformation(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration, facetResultsRest, page);
 
         return facetResultsRest;
     }
 
-    private void addToFacetResultList(String facetName, DiscoverResult searchResult, FacetResultsRest facetResultsRest, Pageable page) {
-            List<DiscoverResult.FacetResult> facetValues = searchResult.getFacetResult(facetName);
-            int valueCount = 0;
-            for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
-                if(valueCount >= page.getPageSize()){
-                    //We requested one facet value more as the page size. We must make sure to not return the extra value.
-                    break;
-                }
-                SearchFacetValueRest searchFacetValueRest = buildSearchFacetValueRestFromFacetResult(value);
-                facetResultsRest.addToFacetResultList(searchFacetValueRest);
-                valueCount++;
+    private void addToFacetResultList(String facetName, DiscoverResult searchResult, FacetResultsRest facetResultsRest,
+                                      DiscoveryConfiguration configuration, Pageable page) {
+
+        DiscoverySearchFilterFacet field = configuration.getSidebarFacet(facetName);
+        List<DiscoverResult.FacetResult> facetValues = searchResult.getFacetResult(field);
+        int valueCount = 0;
+
+        for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
+            if (valueCount >= page.getPageSize()) {
+                //We requested one facet value more as the page size. We must make sure to not return the extra value.
+                break;
             }
+            SearchFacetValueRest searchFacetValueRest = buildSearchFacetValueRestFromFacetResult(value);
+            facetResultsRest.addToFacetResultList(searchFacetValueRest);
+            valueCount++;
+        }
     }
 
     private SearchFacetValueRest buildSearchFacetValueRestFromFacetResult(DiscoverResult.FacetResult value) {
@@ -63,7 +68,7 @@ public class DiscoverFacetResultsConverter {
         facetResultsRest.setDsoType(dsoType);
         facetResultsRest.setPage(page);
 
-        facetResultsRest.setFacetEntry(convertFacetEntry(facetName, searchResult, page));
+        facetResultsRest.setFacetEntry(convertFacetEntry(facetName, searchResult, configuration, page));
 
         facetResultsRest.setSort(SearchResultsRest.Sorting.fromPage(page));
 
@@ -75,14 +80,18 @@ public class DiscoverFacetResultsConverter {
         }
     }
 
-    private SearchFacetEntryRest convertFacetEntry(final String facetName, final DiscoverResult searchResult, final Pageable page) {
+    private SearchFacetEntryRest convertFacetEntry(final String facetName, final DiscoverResult searchResult, final DiscoveryConfiguration configuration, final Pageable page) {
+        DiscoverySearchFilterFacet field = configuration.getSidebarFacet(facetName);
+
         SearchFacetEntryRest facetEntryRest = new SearchFacetEntryRest(facetName);
-        if(!searchResult.getFacetResult(facetName).isEmpty()){
-            facetEntryRest.setFacetType(searchResult.getFacetResult(facetName).get(0).getFieldType());
+        List<DiscoverResult.FacetResult> facetResults = searchResult.getFacetResult(field);
+
+        if (!facetResults.isEmpty()) {
+            facetEntryRest.setFacetType(facetResults.get(0).getFieldType());
         }
 
         //We requested one extra facet value. Check if that value is present to indicate that there are more results
-        facetEntryRest.setHasMore( searchResult.getFacetResult(facetName).size() > page.getPageSize() );
+        facetEntryRest.setHasMore(facetResults.size() > page.getPageSize());
 
         return facetEntryRest;
     }
