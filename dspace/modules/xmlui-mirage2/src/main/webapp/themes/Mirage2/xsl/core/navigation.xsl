@@ -48,7 +48,7 @@
                 <div id="ds-search-option" class="ds-option-set">
                     <!-- The form, complete with a text box and a button, all built from attributes referenced
                  from under pageMeta. -->
-                    <form id="ds-search-form" class="" method="post">
+                    <form id="ds-search-form" class="" method="get">
                         <xsl:attribute name="action">
                             <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>
                             <xsl:value-of
