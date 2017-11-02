@@ -7,13 +7,14 @@
  */
 package org.dspace.discovery.configuration;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
@@ -180,5 +181,14 @@ public class DiscoveryConfiguration implements InitializingBean{
 
             throw new DiscoveryConfigurationException(error.toString());
         }
-    }   
+    }
+
+    public DiscoverySearchFilterFacet getSidebarFacet(final String facetName) {
+        for (DiscoverySearchFilterFacet sidebarFacet : sidebarFacets) {
+            if(StringUtils.equals(sidebarFacet.getIndexFieldName(), facetName)) {
+                return sidebarFacet;
+            }
+        }
+        return null;
+    }
 }
