@@ -26,7 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class BrowseEntryHalLinkFactory extends HalLinkFactory<BrowseEntryResource, RestResourceController> {
 
-    protected void addLinks(final BrowseEntryResource halResource, final Pageable pageable, final LinkedList<Link> list) {
+    protected void addLinks(final BrowseEntryResource halResource, final Pageable pageable, final LinkedList<Link> list) throws Exception{
         BrowseEntryRest data = halResource.getContent();
 
         if(data != null) {

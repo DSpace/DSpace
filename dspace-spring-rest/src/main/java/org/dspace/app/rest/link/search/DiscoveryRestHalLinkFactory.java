@@ -19,14 +19,14 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, DiscoveryRestController> {
 
-    protected UriComponentsBuilder buildSearchBaseLink(final DiscoveryResultsRest data) {
+    protected UriComponentsBuilder buildSearchBaseLink(final DiscoveryResultsRest data) throws Exception {
         UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
                 .getSearchObjects(data.getQuery(), data.getDsoType(), data.getScope(), data.getConfigurationName(), null, null));
 
         return addFilterParams(uriBuilder, data);
     }
 
-    protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) {
+    protected UriComponentsBuilder buildFacetBaseLink(final FacetResultsRest data) throws Exception {
         UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
                 .getFacetValues(data.getFacetEntry().getName(), data.getQuery(), data.getDsoType(), data.getScope(), null, null));
 
@@ -34,7 +34,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
     }
 
     protected UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder, DiscoveryResultsRest data) {
-        if (data.getAppliedFilters() != null) {
+        if (uriComponentsBuilder != null && data != null && data.getAppliedFilters() != null) {
             for (SearchResultsRest.AppliedFilter filter : data.getAppliedFilters()) {
                 //TODO Make sure the filter format is defined in only one place
                 uriComponentsBuilder.queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());

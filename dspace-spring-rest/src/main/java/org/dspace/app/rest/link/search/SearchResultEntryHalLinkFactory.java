@@ -28,7 +28,7 @@ public class SearchResultEntryHalLinkFactory extends DiscoveryRestHalLinkFactory
     private Utils utils;
 
     @Override
-    protected void addLinks(SearchResultEntryResource halResource, Pageable pageable, LinkedList<Link> list) {
+    protected void addLinks(SearchResultEntryResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
         SearchResultEntryRest data = halResource.getContent();
 
         if(data != null && data.getDspaceObject() != null) {

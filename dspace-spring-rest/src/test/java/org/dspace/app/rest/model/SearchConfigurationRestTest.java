@@ -7,14 +7,10 @@
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.app.rest.DiscoveryRestController;
+import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * This class' purpose is to test the SearchConfigurationRest

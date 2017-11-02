@@ -7,13 +7,13 @@
  */
 package org.dspace.app.rest;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.RootRest;
 import org.dspace.app.rest.model.hateoas.RootResource;
 import org.dspace.app.rest.repository.RootRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;

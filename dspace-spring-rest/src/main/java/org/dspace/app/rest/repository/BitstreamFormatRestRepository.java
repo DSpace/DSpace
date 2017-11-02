@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.hateoas.BitstreamFormatResource;
@@ -17,9 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * This is the repository responsible to manage BitstreamFormat Rest object

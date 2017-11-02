@@ -7,11 +7,12 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.DiscoveryRestController;
-
 import java.util.LinkedList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.dspace.app.rest.DiscoveryRestController;
 
 /**
  * This class' purpose is to create a container for the information used in the SearchFacetEntryResource
@@ -23,7 +24,7 @@ public class SearchFacetEntryRest implements RestModel {
 
     private String name;
     private String facetType;
-    private boolean hasMore = false;
+    private Boolean hasMore = null;
 
     @JsonIgnore
     private List<SearchFacetValueRest> values;
@@ -73,11 +74,12 @@ public class SearchFacetEntryRest implements RestModel {
         this.facetType = facetType;
     }
 
-    public void setHasMore(final boolean hasMore) {
+    public void setHasMore(final Boolean hasMore) {
         this.hasMore = hasMore;
     }
 
-    public boolean isHasMore() {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public Boolean isHasMore() {
         return hasMore;
     }
 }

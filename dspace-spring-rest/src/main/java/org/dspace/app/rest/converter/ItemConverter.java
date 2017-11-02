@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.ItemRest;
@@ -16,9 +19,6 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is the converter from/to the Item in the DSpace API data model and the

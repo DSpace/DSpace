@@ -7,16 +7,13 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This class' purpose is to give information about the FacetConfiguration to be displayed on the /facets endpoint
@@ -25,13 +22,13 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
 
     public static final String NAME = "discover";
     public static final String CATEGORY = RestModel.DISCOVER;
-    @JsonIgnore
+
     private String scope;
-    @JsonIgnore
+
     private String configurationName;
 
     @JsonIgnore
-    private LinkedList<SidebarFacet> sidebarFacets = new LinkedList<>();
+    private LinkedList<SearchFacetEntryRest> sidebarFacets = new LinkedList<>();
 
     public String getCategory() {
         return CATEGORY;
@@ -48,6 +45,7 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
     public String getScope() {
         return scope;
     }
+
     public void setScope(String scope){
         this.scope = scope;
     }
@@ -55,12 +53,13 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
     public String getConfigurationName() {
         return configurationName;
     }
+
     public void setConfigurationName(String configurationName){
         this.configurationName = configurationName;
     }
 
-    public List<SidebarFacet> getSidebarFacets(){ return sidebarFacets;}
-    public void addSidebarFacet(SidebarFacet sidebarFacet){sidebarFacets.add(sidebarFacet);}
+    public List<SearchFacetEntryRest> getSidebarFacets(){ return sidebarFacets;}
+    public void addSidebarFacet(SearchFacetEntryRest sidebarFacet){sidebarFacets.add(sidebarFacet);}
 
     @Override
     public boolean equals(Object object){
@@ -84,27 +83,5 @@ public class FacetConfigurationRest extends BaseObjectRest<String> {
                 .append(this.getSidebarFacets())
                 .toHashCode();
     }
-
-    public static class SidebarFacet{
-        private String name;
-        private String type;
-        public String getName(){ return name;}
-        public void setName(String name){this.name=name;}
-        public String getType(){ return type;}
-        public void setType(String type){this.type=type;}
-        @Override
-        public boolean equals(Object object){
-            return (object instanceof SidebarFacet &&
-                    new EqualsBuilder().append(this.getName(), ((SidebarFacet) object).getName())
-                            .isEquals());
-        }
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder(17, 37)
-                    .append(this.getName())
-                    .toHashCode();
-        }
-    }
-
 
 }

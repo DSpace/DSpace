@@ -7,22 +7,16 @@
  */
 package org.dspace.app.rest.link.search;
 
+import static org.junit.Assert.assertEquals;
+
 import org.dspace.app.rest.DiscoveryRestController;
 import org.dspace.app.rest.link.HalLinkFactory;
-import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.LinkedList;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 /**
  * This class' purpose is to test the SearchConfigurationResourceHalLinkFactory

@@ -81,10 +81,8 @@ public class DiscoverFacetResultsConverter {
             facetEntryRest.setFacetType(searchResult.getFacetResult(facetName).get(0).getFieldType());
         }
 
-        if(searchResult.getFacetResult(facetName).size() > page.getPageSize()){
-            //We requested one extra facet value. Check if that value is present to indicate that there are more results
-            facetEntryRest.setHasMore(true);
-        }
+        //We requested one extra facet value. Check if that value is present to indicate that there are more results
+        facetEntryRest.setHasMore( searchResult.getFacetResult(facetName).size() > page.getPageSize() );
 
         return facetEntryRest;
     }

@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FacetConfigurationResourceHalLinkFactory extends DiscoveryRestHalLinkFactory<FacetConfigurationResource> {
 
-    protected void addLinks(FacetConfigurationResource halResource, Pageable page, LinkedList<Link> list) {
+    protected void addLinks(FacetConfigurationResource halResource, Pageable page, LinkedList<Link> list) throws Exception {
         FacetConfigurationRest data = halResource.getContent();
 
         if(data != null){

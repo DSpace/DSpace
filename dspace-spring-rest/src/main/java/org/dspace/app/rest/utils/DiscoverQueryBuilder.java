@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.utils;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,16 +24,21 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.discovery.*;
-import org.dspace.discovery.configuration.*;
+import org.dspace.discovery.DiscoverFacetField;
+import org.dspace.discovery.DiscoverFilterQuery;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.FacetYearRange;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class builds the queries for the /search and /facet endpoints.
@@ -123,7 +132,8 @@ public class DiscoverQueryBuilder {
         }
     }
 
-    private DiscoverQuery buildCommonDiscoverQuery(Context context, DiscoveryConfiguration discoveryConfiguration, String query, List<SearchFilter> searchFilters, String dsoType) throws InvalidSearchFilterException, InvalidDSpaceObjectTypeException {
+    private DiscoverQuery buildCommonDiscoverQuery(Context context, DiscoveryConfiguration discoveryConfiguration, String query,
+                                                   List<SearchFilter> searchFilters, String dsoType) throws InvalidSearchFilterException, InvalidDSpaceObjectTypeException {
         DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration);
 
         //Add search filters
@@ -231,7 +241,6 @@ public class DiscoverQueryBuilder {
         ArrayList<String> filterQueries = new ArrayList<>(searchFilters.size());
 
         try {
-            //TODO TOM take into account OR filters
             for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
                 DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context,
                         searchFilter.getName(), searchFilter.getOperator(), searchFilter.getValue());
