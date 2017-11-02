@@ -7,7 +7,7 @@
  <!ELEMENT form (field)+ >
  <!ATTLIST form name NMTOKEN #REQUIRED>
  
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, language?, repeatable?, label, type-bind?, input-type, hint, required?, regex?, vocabulary?, visibility?, readonly?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -51,3 +51,5 @@
  <!ELEMENT visibility (#PCDATA) >
 
  <!ATTLIST language value-pairs-name CDATA  #IMPLIED>  
+
+ <!ELEMENT readonly (#PCDATA) >
