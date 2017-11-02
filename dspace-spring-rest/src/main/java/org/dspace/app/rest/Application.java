@@ -28,7 +28,6 @@ import org.dspace.utils.servlet.DSpaceWebappServletFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
@@ -45,13 +44,6 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.servlet.Filter;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import java.io.File;
 
 /**
  * Define the Spring Boot Application settings itself. This class takes the place
@@ -91,31 +83,6 @@ public class Application extends SpringBootServletInitializer {
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(Application.class)
                 .initializers(new DSpaceKernelInitializer());
-    }
-
-        // start the kernel when the webapp starts
-        try {
-            this.kernelImpl = DSpaceKernelInit.getKernel(null);
-            if (!this.kernelImpl.isRunning()) {
-                this.kernelImpl.start(getProvidedHome(dspaceHome)); // init the kernel
-            }
-
-            return application
-                    .parent(kernelImpl.getServiceManager().getApplicationContext())
-                    .listeners(new DSpaceKernelDestroyer(kernelImpl))
-                    .sources(Application.class);
-
-        } catch (Exception e) {
-            // failed to start so destroy it and log and throw an exception
-            try {
-                this.kernelImpl.destroy();
-            } catch (Exception e1) {
-                // nothing
-            }
-            String message = "Failure during SpringApplicationBuilder configuration: " + e.getMessage();
-            log.error(message + ":" + e.getMessage(), e);
-            throw new RuntimeException(message, e);
-        }
     }
 
     @Bean
@@ -162,7 +129,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    public RequestContextListener requestContextListener(){
+    public RequestContextListener requestContextListener() {
         return new RequestContextListener();
     }
 
@@ -191,16 +158,16 @@ public class Application extends SpringBootServletInitializer {
 
     /** Utility class that will destroy the DSpace Kernel on Spring Boot shutdown */
     private class DSpaceKernelDestroyer implements ApplicationListener<ContextClosedEvent> {
-        private DSpaceKernelImpl kernelImpl;
+        private DSpaceKernelImpl kernel;
 
-        public DSpaceKernelDestroyer(DSpaceKernelImpl kernelImpl) {
-            this.kernelImpl = kernelImpl;
+        public DSpaceKernelDestroyer(DSpaceKernelImpl kernel) {
+            this.kernel = kernel;
         }
 
         public void onApplicationEvent(final ContextClosedEvent event) {
-            if (this.kernelImpl != null) {
-                this.kernelImpl.destroy();
-                this.kernelImpl = null;
+            if (this.kernel != null) {
+                this.kernel.destroy();
+                this.kernel = null;
             }
         }
     }
@@ -208,36 +175,45 @@ public class Application extends SpringBootServletInitializer {
     /** Utility class that will initialize the DSpace Kernel on Spring Boot startup */
     private class DSpaceKernelInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-        private transient DSpaceKernelImpl kernelImpl;
+        private transient DSpaceKernel dspaceKernel;
 
         public void initialize(final ConfigurableApplicationContext applicationContext) {
 
             String dspaceHome = applicationContext.getEnvironment().getProperty("dspace.dir");
 
-            // start the kernel when the webapp starts
-            try {
-                this.kernelImpl = DSpaceKernelInit.getKernel(null);
-                if (!this.kernelImpl.isRunning()) {
-                    this.kernelImpl.start(getProvidedHome(dspaceHome)); // init the kernel
-                }
+            this.dspaceKernel = DSpaceKernelManager.getDefaultKernel();
+            if (this.dspaceKernel == null) {
+                DSpaceKernelImpl kernelImpl = null;
+                try {
+                    kernelImpl = DSpaceKernelInit.getKernel(null);
+                    if (!kernelImpl.isRunning()) {
+                        kernelImpl.start(getProvidedHome(dspaceHome)); // init the kernel
+                    }
+                    this.dspaceKernel = kernelImpl;
 
+                } catch (Exception e) {
+                    // failed to start so destroy it and log and throw an exception
+                    try {
+                        if (kernelImpl != null) {
+                            kernelImpl.destroy();
+                        }
+                        this.dspaceKernel = null;
+                    } catch (Exception e1) {
+                        // nothing
+                    }
+                    String message = "Failure during ServletContext initialisation: " + e.getMessage();
+                    log.error(message + ":" + e.getMessage(), e);
+                    throw new RuntimeException(message, e);
+                }
+            }
+
+            if (applicationContext.getParent() == null) {
                 //Set the DSpace Kernel Application context as a parent of the Spring Boot context so that
                 //we can auto-wire all DSpace Kernel services
-                applicationContext.setParent(kernelImpl.getServiceManager().getApplicationContext());
+                applicationContext.setParent(dspaceKernel.getServiceManager().getApplicationContext());
 
                 //Add a listener for Spring Boot application shutdown so that we can nicely cleanup the DSpace kernel.
-                applicationContext.addApplicationListener(new DSpaceKernelDestroyer(kernelImpl));
-
-            } catch (Exception e) {
-                // failed to start so destroy it and log and throw an exception
-                try {
-                    this.kernelImpl.destroy();
-                } catch (Exception e1) {
-                    // nothing
-                }
-                String message = "Failure during ServletContext initialisation: " + e.getMessage();
-                log.error(message + ":" + e.getMessage(), e);
-                throw new RuntimeException(message, e);
+                applicationContext.addApplicationListener(new DSpaceKernelDestroyer((DSpaceKernelImpl) dspaceKernel));
             }
         }
 

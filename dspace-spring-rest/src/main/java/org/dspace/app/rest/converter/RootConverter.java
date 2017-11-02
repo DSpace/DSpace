@@ -8,8 +8,6 @@
 package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.RootRest;
-import org.dspace.app.rest.utils.ApplicationConfig;
-import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

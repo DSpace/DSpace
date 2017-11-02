@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SearchConfigurationResourceHalLinkFactory extends HalLinkFactory<SearchConfigurationResource, DiscoveryRestController> {
 
-    protected void addLinks(SearchConfigurationResource halResource, Pageable pageable, LinkedList<Link> list) {
+    protected void addLinks(SearchConfigurationResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
         SearchConfigurationRest data = halResource.getContent();
 
         if(data != null){

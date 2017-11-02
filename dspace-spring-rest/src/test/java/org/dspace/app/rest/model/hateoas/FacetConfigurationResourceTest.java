@@ -7,13 +7,12 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.dspace.app.rest.model.FacetConfigurationRest;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 /**
  * This class' purpose is to test the FacetConfigurationRest class
  */

@@ -31,6 +31,10 @@ public class SearchFacetEntryResource extends HALResource<SearchFacetEntryRest> 
         addEmbeds();
     }
 
+    public SearchFacetEntryResource(final SearchFacetEntryRest facetData) {
+        this(facetData, null);
+    }
+
     @JsonIgnore
     public SearchFacetEntryRest getFacetData() {
         return getContent();
@@ -41,13 +45,15 @@ public class SearchFacetEntryResource extends HALResource<SearchFacetEntryRest> 
     }
 
     private void addEmbeds() {
-        List<SearchFacetValueResource> valueResourceList = new LinkedList<>();
+        if(searchData != null) {
+            List<SearchFacetValueResource> valueResourceList = new LinkedList<>();
 
-        for (SearchFacetValueRest valueRest : CollectionUtils.emptyIfNull(getContent().getValues())) {
-            SearchFacetValueResource valueResource = new SearchFacetValueResource(valueRest, getContent(), searchData);
-            valueResourceList.add(valueResource);
+            for (SearchFacetValueRest valueRest : CollectionUtils.emptyIfNull(getContent().getValues())) {
+                SearchFacetValueResource valueResource = new SearchFacetValueResource(valueRest, getContent(), searchData);
+                valueResourceList.add(valueResource);
+            }
+
+            embedResource("values", valueResourceList);
         }
-
-        embedResource("values", valueResourceList);
     }
 }

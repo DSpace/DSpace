@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
@@ -14,8 +16,6 @@ import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * This class' purpose is to create a SearchConfigurationRest object from the DiscoveryConfiguration to be given

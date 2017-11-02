@@ -7,6 +7,11 @@
  */
 package org.dspace.app.rest.parameter.resolver;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.springframework.core.MethodParameter;
@@ -14,11 +19,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-
-import java.lang.reflect.ParameterizedType;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Custom Request parameter resolver to fill in {@link org.dspace.app.rest.parameter.SearchFilter} parameter objects

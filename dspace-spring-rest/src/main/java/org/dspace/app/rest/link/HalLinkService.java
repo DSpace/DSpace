@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,18 +31,22 @@ import org.springframework.stereotype.Component;
 @ComponentScan
 public class HalLinkService {
 
+    private static final Logger log = Logger.getLogger(HalLinkService.class);
+
     @Autowired
     private List<HalLinkFactory> halLinkFactories;
 
     private Map<String, List<HalLinkFactory>> cachedMappings = new ConcurrentHashMap<>();
 
-    public void addLinks(HALResource halResource, Pageable pageable){
+    public void addLinks(HALResource halResource, Pageable pageable) throws Exception {
         LinkedList<Link> links = new LinkedList<>();
 
         List<HalLinkFactory> supportedFactories = getSupportedFactories(halResource);
         for(HalLinkFactory halLinkFactory : supportedFactories){
            links.addAll(halLinkFactory.getLinksFor(halResource, pageable));
         }
+
+        links.sort((Link l1, Link l2) -> ObjectUtils.compare(l1.getRel(), l2.getRel()));
 
         halResource.add(links);
 
@@ -83,7 +89,11 @@ public class HalLinkService {
     }
 
     public HALResource addLinks(HALResource halResource) {
-        addLinks(halResource, null);
+        try {
+            addLinks(halResource, null);
+        } catch (Exception ex) {
+            log.warn("Unable to add links to HAL resource " + halResource, ex);
+        }
         return halResource;
     }
 

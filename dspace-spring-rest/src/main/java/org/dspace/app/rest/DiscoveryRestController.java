@@ -67,7 +67,7 @@ public class DiscoveryRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET)
     public SearchSupportResource getSearchSupport(@RequestParam(name = "scope", required = false) String dsoScope,
-                                                  @RequestParam(name = "configuration", required = false) String configurationName){
+                                                  @RequestParam(name = "configuration", required = false) String configurationName) throws Exception {
 
         SearchSupportRest searchSupportRest = discoveryRestRepository.getSearchSupport();
         SearchSupportResource searchSupportResource = new SearchSupportResource(searchSupportRest);
@@ -77,7 +77,7 @@ public class DiscoveryRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET, value = "/search")
     public SearchConfigurationResource getSearchConfiguration(@RequestParam(name = "scope", required = false) String dsoScope,
-                                                              @RequestParam(name = "configuration", required = false) String configurationName) {
+                                                              @RequestParam(name = "configuration", required = false) String configurationName) throws Exception {
         if(log.isTraceEnabled()) {
             log.trace("Retrieving search configuration for scope " + StringUtils.trimToEmpty(dsoScope)
                     + " and configuration name " + StringUtils.trimToEmpty(configurationName));
@@ -96,7 +96,7 @@ public class DiscoveryRestController implements InitializingBean {
                                                    @RequestParam(name = "scope", required = false) String dsoScope,
                                                    @RequestParam(name = "configuration", required = false) String configurationName,
                                                    List<SearchFilter> searchFilters,
-                                                   Pageable page) {
+                                                   Pageable page) throws Exception {
         if(log.isTraceEnabled()) {
             log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
                     + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
@@ -117,7 +117,7 @@ public class DiscoveryRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET, value = "/facets")
     public FacetConfigurationResource getFacetsConfiguration(@RequestParam(name = "scope", required = false) String dsoScope,
-                                       @RequestParam(name = "configuration", required = false) String configurationName) {
+                                       @RequestParam(name = "configuration", required = false) String configurationName) throws Exception {
         if(log.isTraceEnabled()) {
             log.trace("Retrieving facet configuration for scope " + StringUtils.trimToEmpty(dsoScope)
                     + " and configuration name " + StringUtils.trimToEmpty(configurationName));
@@ -125,6 +125,7 @@ public class DiscoveryRestController implements InitializingBean {
 
         FacetConfigurationRest facetConfigurationRest = discoveryRestRepository.getFacetsConfiguration(dsoScope, configurationName);
         FacetConfigurationResource facetConfigurationResource = new FacetConfigurationResource(facetConfigurationRest);
+
         halLinkService.addLinks(facetConfigurationResource);
         return facetConfigurationResource;
     }
@@ -135,7 +136,7 @@ public class DiscoveryRestController implements InitializingBean {
                                                          @RequestParam(name = "dsoType", required = false) String dsoType,
                                                          @RequestParam(name = "scope", required = false) String dsoScope,
                                                          List<SearchFilter> searchFilters,
-                                                         Pageable page) {
+                                                         Pageable page) throws Exception {
         if(log.isTraceEnabled()) {
             log.trace("Facetting on facet " + facetName + " with scope: " + StringUtils.trimToEmpty(dsoScope)
                     + ", dsoType: " + StringUtils.trimToEmpty(dsoType)

@@ -7,13 +7,12 @@
  */
 package org.dspace.app.rest.link.search;
 
+import static org.junit.Assert.assertEquals;
+
 import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
 import org.dspace.app.rest.model.hateoas.SearchSupportResource;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * This class' purpose is to test the SearchSupportHalLinkFactory class

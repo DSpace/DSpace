@@ -8,7 +8,12 @@
 package org.dspace.app.rest.converter;
 
 
-import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
+import static junit.framework.TestCase.assertFalse;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
+
+import java.util.LinkedList;
+
 import org.dspace.app.rest.model.SearchConfigurationRest;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
@@ -20,18 +25,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 
 /**
  * This class' purpose is to test the DiscoverConfigurationConverter

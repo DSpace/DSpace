@@ -7,12 +7,12 @@
  */
 package org.dspace.app.rest.converter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.dspace.app.rest.model.SearchSupportRest;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * This class' purpose is to test the DiscoverSearchSupportConverter

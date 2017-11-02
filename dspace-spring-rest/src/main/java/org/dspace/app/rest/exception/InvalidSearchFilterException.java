@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.exception;
 
-import java.sql.SQLException;
-
 /**
  * This class provides an exception to be used when the SearchFilter given is invalid
  */

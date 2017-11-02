@@ -7,11 +7,11 @@
  */
 package org.dspace.app.rest.configuration;
 
-import org.dspace.kernel.config.SpringLoader;
-import org.dspace.services.ConfigurationService;
-
 import java.io.File;
 import java.net.MalformedURLException;
+
+import org.dspace.kernel.config.SpringLoader;
+import org.dspace.services.ConfigurationService;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)

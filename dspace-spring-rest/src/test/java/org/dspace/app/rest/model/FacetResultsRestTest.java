@@ -7,11 +7,11 @@
  */
 package org.dspace.app.rest.model;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * This class' purpose is to test the FacetResultsRest class

@@ -33,7 +33,7 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
         }
     }
 
-    public List<Link> getLinksFor(HALResource halResource, Pageable pageable) {
+    public List<Link> getLinksFor(HALResource halResource, Pageable pageable) throws Exception {
         LinkedList<Link> list = new LinkedList<>();
 
         if(halResource != null && supports(halResource.getClass())){
@@ -69,7 +69,7 @@ public abstract class HalLinkFactory<RESOURCE, CONTROLLER> {
         return methodOn(clazz);
     }
 
-    protected abstract void addLinks(RESOURCE halResource, Pageable pageable, LinkedList<Link> list);
+    protected abstract void addLinks(RESOURCE halResource, Pageable pageable, LinkedList<Link> list) throws Exception;
 
     protected abstract Class<CONTROLLER> getControllerClass();
 

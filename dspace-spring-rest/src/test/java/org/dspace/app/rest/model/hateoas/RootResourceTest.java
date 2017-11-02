@@ -7,7 +7,8 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.dspace.app.rest.model.RootRest;
 import org.junit.Before;

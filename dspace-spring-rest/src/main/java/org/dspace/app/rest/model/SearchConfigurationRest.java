@@ -7,16 +7,13 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
-import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This class' purpose is to store the information that'll be shown on the /search endpoint.

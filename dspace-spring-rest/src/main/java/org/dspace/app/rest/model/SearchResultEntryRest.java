@@ -7,12 +7,12 @@
  */
 package org.dspace.app.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.dspace.app.rest.DiscoveryRestController;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.app.rest.DiscoveryRestController;
 
 /**
  * This class' purpose is to create a container for the information in the SearchResultEntryResource

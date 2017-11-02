@@ -7,11 +7,11 @@
  */
 package org.dspace.app.rest.model;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class FacetConfigurationRestTest {
 
@@ -29,9 +29,8 @@ public class FacetConfigurationRestTest {
 
     @Test
     public void testAddSidebarFacetsContainsCorrectSidebarFacet(){
-        FacetConfigurationRest.SidebarFacet sidebarFacet = new FacetConfigurationRest.SidebarFacet();
-        sidebarFacet.setType("date");
-        sidebarFacet.setName("dateName");
+        SearchFacetEntryRest sidebarFacet = new SearchFacetEntryRest("dateName");
+        sidebarFacet.setFacetType("date");
 
         facetConfigurationRest.addSidebarFacet(sidebarFacet);
 

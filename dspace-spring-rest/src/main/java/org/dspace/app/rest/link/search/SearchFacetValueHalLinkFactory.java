@@ -23,8 +23,9 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 @Component
 public class SearchFacetValueHalLinkFactory extends DiscoveryRestHalLinkFactory<SearchFacetValueResource> {
+
     @Override
-    protected void addLinks(SearchFacetValueResource halResource, Pageable pageable, LinkedList<Link> list) {
+    protected void addLinks(SearchFacetValueResource halResource, Pageable pageable, LinkedList<Link> list) throws Exception {
 
         if(halResource.getSearchData() != null && halResource.getFacetData() != null && halResource.getValueData() != null){
 

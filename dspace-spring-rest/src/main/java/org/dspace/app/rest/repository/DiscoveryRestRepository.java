@@ -7,12 +7,20 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.*;
+import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
+import org.dspace.app.rest.converter.DiscoverFacetConfigurationConverter;
+import org.dspace.app.rest.converter.DiscoverFacetResultsConverter;
+import org.dspace.app.rest.converter.DiscoverResultConverter;
+import org.dspace.app.rest.converter.DiscoverSearchSupportConverter;
 import org.dspace.app.rest.exception.InvalidRequestException;
-import org.dspace.app.rest.model.*;
-import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
-import org.dspace.app.rest.model.hateoas.SearchResultsResource;
+import org.dspace.app.rest.model.FacetConfigurationRest;
+import org.dspace.app.rest.model.FacetResultsRest;
+import org.dspace.app.rest.model.SearchConfigurationRest;
+import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.model.SearchSupportRest;
 import org.dspace.app.rest.parameter.SearchFilter;
 import org.dspace.app.rest.utils.DiscoverQueryBuilder;
 import org.dspace.app.rest.utils.ScopeResolver;
@@ -25,11 +33,8 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * This class' purpose is to return a REST object to the controller class. This repository handles all the information lookup
@@ -76,7 +81,8 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         return discoverConfigurationConverter.convert(configuration);
     }
 
-    public SearchResultsRest getSearchObjects(final String query, final String dsoType, final String dsoScope, final String configurationName, final List<SearchFilter> searchFilters, final Pageable page) {
+    public SearchResultsRest getSearchObjects(final String query, final String dsoType, final String dsoScope, final String configurationName,
+                                              final List<SearchFilter> searchFilters, final Pageable page) throws InvalidRequestException {
         Context context = obtainContext();
 
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
@@ -89,8 +95,6 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             discoverQuery = queryBuilder.buildQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page);
             searchResult = searchService.search(context, scopeObject, discoverQuery);
 
-        } catch (InvalidRequestException e) {
-            log.warn("Received an invalid request", e);
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
         }
@@ -104,14 +108,14 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
 
-        return discoverFacetConfigurationConverter.convert(configuration);
+        return discoverFacetConfigurationConverter.convert(configurationName, dsoScope, configuration);
     }
 
     public SearchSupportRest getSearchSupport() {
         return discoverSearchSupportConverter.convert();
     }
 
-    public FacetResultsRest getFacetObjects(String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, Pageable page){
+    public FacetResultsRest getFacetObjects(String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, Pageable page) throws InvalidRequestException {
 
         Context context = obtainContext();
 
@@ -124,9 +128,6 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
             discoverQuery = queryBuilder.buildFacetQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page, facetName);
             searchResult = searchService.search(context, scopeObject, discoverQuery);
 
-        } catch (InvalidRequestException e) {
-            log.warn("Received an invalid request", e);
-            //TODO TOM handle invalid request
         } catch (SearchServiceException e) {
             log.error("Error while searching with Discovery", e);
             //TODO TOM handle search exception

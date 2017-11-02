@@ -10,11 +10,6 @@ package org.dspace.app.rest.model;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.dspace.kernel.DSpaceKernel;
-import org.dspace.servicemanager.DSpaceServiceManager;
-import org.dspace.servicemanager.config.DSpaceConfigurationService;
 
 /**
  * Methods to implement to make a REST resource addressable
