@@ -65,26 +65,6 @@
 
 
         <xsl:choose>
-            <xsl:when test="$type='community'">
-                <xsl:call-template name="communitySummaryList">
-                    <xsl:with-param name="handle">
-                        <xsl:value-of select="$handle"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="externalMetadataUrl">
-                        <xsl:value-of select="$externalMetadataURL"/>
-                    </xsl:with-param>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:when test="$type='collection'">
-                <xsl:call-template name="collectionSummaryList">
-                    <xsl:with-param name="handle">
-                        <xsl:value-of select="$handle"/>
-                    </xsl:with-param>
-                    <xsl:with-param name="externalMetadataUrl">
-                        <xsl:value-of select="$externalMetadataURL"/>
-                    </xsl:with-param>
-                </xsl:call-template>
-            </xsl:when>
             <xsl:when test="$type='item'">
                 <xsl:call-template name="itemSummaryList">
                     <xsl:with-param name="handle">
@@ -98,55 +78,6 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template name="communitySummaryList">
-        <xsl:param name="handle"/>
-        <xsl:param name="externalMetadataUrl"/>
-
-        <xsl:variable name="metsDoc" select="document($externalMetadataUrl)"/>
-
-        <div class="community-browser-row">
-            <a href="{$metsDoc/mets:METS/@OBJID}">
-                <xsl:choose>
-                    <xsl:when test="dri:list[@n=(concat($handle, ':dc.title')) and descendant::text()]">
-                        <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.title'))]/dri:item"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                    </xsl:otherwise>
-                </xsl:choose>
-                <!--Display community strengths (item counts) if they exist-->
-                <xsl:if test="string-length($metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">
-                    <xsl:text> [</xsl:text>
-                    <xsl:value-of
-                            select="$metsDoc/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='format'][@qualifier='extent'][1]"/>
-                    <xsl:text>]</xsl:text>
-                </xsl:if>
-            </a>
-            <div class="artifact-info">
-            <xsl:if test="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item">
-                <p>
-                    <xsl:apply-templates select="dri:list[@n=(concat($handle, ':dc.description.abstract'))]/dri:item[1]"/>
-                </p>
-            </xsl:if>
-        </div>
-
-        </div>
-    </xsl:template>
-
-    <xsl:template name="collectionSummaryList">
-        <xsl:param name="handle"/>
-        <xsl:param name="externalMetadataUrl"/>
-
-        <xsl:call-template name="communitySummaryList">
-            <xsl:with-param name="handle">
-                <xsl:value-of select="$handle"/>
-            </xsl:with-param>
-            <xsl:with-param name="externalMetadataUrl">
-                <xsl:value-of select="$externalMetadataUrl"/>
-            </xsl:with-param>
-        </xsl:call-template>
-
-    </xsl:template>
 
     <xsl:template name="itemSummaryList">
         <xsl:param name="handle"/>
@@ -424,7 +355,7 @@
         <xsl:text>
             if (!window.DSpace.i18n) {
                 window.DSpace.i18n = {};
-            } 
+            }
             if (!window.DSpace.i18n.discovery) {
                 window.DSpace.i18n.discovery = {};
             }
