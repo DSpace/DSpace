@@ -171,6 +171,11 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     public List<WorkspaceItem> findAll(Context context) throws SQLException {
         return workspaceItemDAO.findAll(context);
     }
+    
+    @Override
+    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException {
+    	return workspaceItemDAO.findAll(context, limit, offset);
+    }
 
     @Override
     public void update(Context context, WorkspaceItem workspaceItem) throws SQLException, AuthorizeException {
