@@ -239,7 +239,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         //We set our action to context path, since the eventual action will depend on which url we click on
-        Division mainForm = searchDiv.addInteractiveDivision("main-form", getBasicUrl(), Division.METHOD_POST, "");
+        Division mainForm = searchDiv.addInteractiveDivision("main-form", getBasicUrl(), Division.METHOD_GET, "");
 
         String query = getQuery();
         //Indicate that the form we are submitting lists search results
@@ -766,10 +766,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             }
         }
     }
-    
+
     /**
      *  Prepare DiscoverQuery given the current scope and query string
-     * 
+     *
      * @param scope the dspace object parent
      * @param query the query.
      * @param fqs the filter queries.
@@ -781,9 +781,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             throws UIException, SearchServiceException {
 
     	this.queryArgs = new DiscoverQuery();
-    	
+
     	int page = getParameterPage();
-    	    	
+
     	// Escape any special characters in this user-entered query
         query = DiscoveryUIUtils.escapeQueryChars(query);
 
@@ -791,7 +791,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
         if (fqs != null) {
             filterQueries.addAll(Arrays.asList(fqs));
-        }        
+        }
 
         //Add the configured default filter queries
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
@@ -874,7 +874,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         }
 
         queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
-        
+
         return queryArgs;
     }
 
@@ -891,7 +891,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         if (queryResults != null) {
             return;
         }
-        
+
         this.queryResults = SearchUtils.getSearchService().search(context, scope, prepareQuery(scope, getQuery(), getFilterQueries()));
     }
 
@@ -1156,4 +1156,3 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 + countCollections + "," + countItems + ")"));
     }
 }
-
