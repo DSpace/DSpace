@@ -67,12 +67,14 @@ public class DatabaseRegistryUpdater implements FlywayCallback {
             RegistryLoader.loadBitstreamFormats(context, base + "bitstream-formats.xml");
 
             // Load updates to Metadata schema registries (if any)
+            // FIXME this list should not be hard-wired.
             log.info("Updating Metadata Registries based on metadata type configs in " + base);
             MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
             MetadataImporter.loadRegistry(base + "dcterms-types.xml", true);
             MetadataImporter.loadRegistry(base + "local-types.xml", true);
             MetadataImporter.loadRegistry(base + "eperson-types.xml", true);
             MetadataImporter.loadRegistry(base + "sword-metadata.xml", true);
+            MetadataImporter.loadRegistry(base + "dspace-types.xml", true);
 
             // Check if XML Workflow is enabled in workflow.cfg
             if (WorkflowServiceFactory.getInstance().getWorkflowService() instanceof XmlWorkflowService) {

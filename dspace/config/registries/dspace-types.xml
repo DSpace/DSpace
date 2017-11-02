@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Metadata types for DSpace's internal use.  These explicitly have no meaning to
+any other product, and should be exposed only for backup and restore.
+-->
+<dspace-dc-types>
+    <dspace-header>
+        <title>DSpace internal metadata types</title>
+        <contributor.author>Mark H. Wood</contributor.author>
+        <date-created>04-Nov-2016</date-created>
+    </dspace-header>
+
+    <dc-schema>
+        <name>dspace</name>
+        <namespace>http://dspace.org/local</namespace>
+    </dc-schema>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>identifier_generation_disabled</element>
+        <qualifier>Handle</qualifier>
+        <scope_note>True if Handle generation is disabled in this container</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dspace</schema>
+        <element>identifier_generation_disabled</element>
+        <qualifier>DOI</qualifier>
+        <scope_note>True if DOI generation is disabled in this container</scope_note>
+    </dc-type>
+</dspace-dc-types>

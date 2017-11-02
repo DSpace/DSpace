@@ -62,6 +62,8 @@ public class DOI
     protected DOI() {
     }
 
+    public static String getIdentifierTypeName() { return "DOI"; }
+
     public Integer getID() {
         return id;
     }

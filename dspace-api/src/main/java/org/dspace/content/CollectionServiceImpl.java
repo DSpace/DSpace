@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
@@ -46,8 +45,11 @@ import org.dspace.eperson.service.SubscribeService;
 import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
+import org.dspace.services.ConfigurationService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service implementation for the Collection object.
@@ -59,9 +61,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> implements CollectionService {
 
     /**
-     * log4j category
+     * logging category
      */
-    private static final Logger log = Logger.getLogger(CollectionServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(CollectionServiceImpl.class);
 
     @Autowired(required = true)
     protected CollectionDAO collectionDAO;
@@ -87,6 +89,8 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
     protected WorkspaceItemService workspaceItemService;
     @Autowired(required = true)
     protected HarvestedCollectionService harvestedCollectionService;
+    @Autowired(required = true)
+    protected ConfigurationService configurationService;
 
 
     protected CollectionServiceImpl() {
@@ -98,6 +102,14 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         return create(context, community, null);
     }
 
+    /** Configuration key prefix for default metadata values. */
+    private static final String CFG_PREFIX_DEFAULT_METADATA
+            = "content.collection.metadata-defaults";
+
+    /** Length of default metadata configuration prefix plus trailing dot. */
+    private static final int CFG_PREFIX_DEFAULT_METADATA_LENGTH
+            = CFG_PREFIX_DEFAULT_METADATA.length() + 1;
+
     @Override
     public Collection create(Context context, Community community, String handle)
         throws SQLException, AuthorizeException {
@@ -106,6 +118,20 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         }
 
         Collection newCollection = collectionDAO.create(context, new Collection());
+
+        // Apply default metadata
+        for (String key : configurationService.getPropertyKeys(CFG_PREFIX_DEFAULT_METADATA)) {
+            String field = key.substring(CFG_PREFIX_DEFAULT_METADATA_LENGTH);
+            String[] parts = field.split("\\.", 3);
+            String schema = parts.length > 0 ? parts[0] : null;
+            String element = parts.length > 1 ? parts[1] : null;
+            String qualifier = parts.length > 2 ? parts[2] : null;
+            String value = configurationService.getProperty(key);
+            log.debug("Adding metadata:  {} = {}", field, value);
+            setMetadataSingleValue(context, newCollection,
+                    schema, element, qualifier, null, value);
+        }
+
         //Add our newly created collection to our community, authorization checks occur in THIS method
         communityService.addCollection(context, community, newCollection);
 

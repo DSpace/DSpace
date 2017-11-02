@@ -36,6 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
+ * Services for identifiers used with <a href='https://handle.net/'>the Handle System</a>,
+ * with support for versioned objects.
+ *
  * @author Fabio Bolognesi (fabio at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -456,4 +459,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         }
         itemService.update(context, item);
     }
+
+    @Override
+    public String getIdentifierTypeName() { return Handle.getTypeName(); }
 }

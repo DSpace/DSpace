@@ -59,6 +59,7 @@ public class InstallItemServiceImpl implements InstallItemService {
         AuthorizeException {
         Item item = is.getItem();
         Collection collection = is.getCollection();
+        collectionService.addItem(c, collection, item);
         try {
             if (suppliedHandle == null) {
                 identifierService.register(c, item);
@@ -87,6 +88,8 @@ public class InstallItemServiceImpl implements InstallItemService {
                             String suppliedHandle)
         throws SQLException, IOException, AuthorizeException {
         Item item = is.getItem();
+
+        collectionService.addItem(c, is.getCollection(), item);
 
         try {
             if (suppliedHandle == null) {
