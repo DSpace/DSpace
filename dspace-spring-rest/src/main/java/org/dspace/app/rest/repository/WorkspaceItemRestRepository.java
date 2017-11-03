@@ -9,7 +9,9 @@ package org.dspace.app.rest.repository;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
+import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 /**
@@ -68,6 +71,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 		}
 		Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
 		return page;
+	}
+	
+	@SearchRestMethod(name = "findBySubmitter")
+	public Page<WorkspaceItemRest> findBySubmitter(Context context,@Param(value="uuid") UUID submitterID, Pageable pageable) {
+		//TODO
+		return null;
 	}
 	
 	@Override
