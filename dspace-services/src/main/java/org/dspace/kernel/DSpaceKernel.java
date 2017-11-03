@@ -15,7 +15,7 @@ import org.dspace.services.ConfigurationService;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public interface DSpaceKernel {
+public interface DSpaceKernel extends CommonLifecycle<DSpaceKernel> {
 
     public static final String KERNEL_NAME = "Kernel";
     public static final String MBEAN_PREFIX = "org.dspace:name=";

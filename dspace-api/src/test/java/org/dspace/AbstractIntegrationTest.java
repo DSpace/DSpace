@@ -8,6 +8,7 @@
 package org.dspace;
 
 import org.databene.contiperf.junit.ContiPerfRule;
+import org.databene.contiperf.junit.ContiPerfRuleExt;
 import org.junit.Ignore;
 import org.junit.Rule;
 
@@ -28,5 +29,5 @@ public class AbstractIntegrationTest extends AbstractUnitTest
     //We only enable contiperf in the integration tests, as it doesn't
     //seem so useful to run them in isolated unit tests
     @Rule
-    public ContiPerfRule contiperfRules = new ContiPerfRule();
+    public ContiPerfRule contiperfRules = new ContiPerfRuleExt();
 }

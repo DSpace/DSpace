@@ -5,7 +5,7 @@
     <artifactId>dspace-services</artifactId>
     <packaging>jar</packaging>
     <name>DSpace Services Framework :: API and Implementation</name>
-    
+
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
