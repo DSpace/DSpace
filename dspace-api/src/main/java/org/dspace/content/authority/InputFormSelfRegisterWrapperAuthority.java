@@ -7,15 +7,17 @@
  */
 package org.dspace.content.authority;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
-import org.dspace.core.Utils;
 
 /**
  * This authority is registered automatically by the ChoiceAuthorityService for
@@ -54,12 +56,30 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
 		String formName;
 		try {
 			init();
-			formName = dci.getInputFormNameByCollectionAndField(collection, field);
-			return delegates.get(formName).getMatches(field, query, collection, start, limit, locale);
+			if(collection==null) {
+				Set<Choice> choices = new HashSet<Choice>(); 
+				//workaround search in all authority configured
+				for(ChoiceAuthority ca : delegates.values()) {
+					Choices tmp = ca.getMatches(field, query, null, start, limit, locale);
+					if(tmp.total>0) {
+						Set<Choice> mySet = new HashSet<Choice>(Arrays.asList(tmp.values));
+						choices.addAll(mySet);
+					}
+				}
+				if(!choices.isEmpty()) {
+					Choice[] results = new Choice[choices.size()-1];
+					choices.toArray(results);
+					return new Choices(results, 0, choices.size(), Choices.CF_AMBIGUOUS, false);
+				}
+			}
+			else {
+				formName = dci.getInputFormNameByCollectionAndField(collection, field);
+				return delegates.get(formName).getMatches(field, query, collection, start, limit, locale);
+			}
 		} catch (DCInputsReaderException e) {
 			log.error(e.getMessage(), e);
 		}
-		return null;
+		return new Choices(Choices.CF_NOTFOUND);
 	}
 
 	@Override
@@ -67,12 +87,30 @@ public class InputFormSelfRegisterWrapperAuthority implements ChoiceAuthority {
 		String formName;
 		try {
 			init();
-			formName = dci.getInputFormNameByCollectionAndField(collection, field);
-			return delegates.get(formName).getBestMatch(field, text, collection, locale);
+			if(collection==null) {
+				Set<Choice> choices = new HashSet<Choice>(); 
+				//workaround search in all authority configured
+				for(ChoiceAuthority ca : delegates.values()) {
+					Choices tmp = ca.getBestMatch(field, text, null, locale);
+					if(tmp.total>0) {
+						Set<Choice> mySet = new HashSet<Choice>(Arrays.asList(tmp.values));
+						choices.addAll(mySet);
+					}
+				}
+				if(!choices.isEmpty()) {
+					Choice[] results = new Choice[choices.size()-1];
+					choices.toArray(results);
+					return new Choices(results, 0, choices.size(), Choices.CF_UNCERTAIN, false);
+				}
+			}
+			else {
+				formName = dci.getInputFormNameByCollectionAndField(collection, field);
+				return delegates.get(formName).getBestMatch(field, text, collection, locale);
+			}
 		} catch (DCInputsReaderException e) {
 			log.error(e.getMessage(), e);
 		}
-		return null;
+		return new Choices(Choices.CF_NOTFOUND);
 	}
 
 	@Override

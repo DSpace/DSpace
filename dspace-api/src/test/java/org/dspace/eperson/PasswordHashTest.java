@@ -7,12 +7,18 @@
  */
 package org.dspace.eperson;
 
+import static org.junit.Assert.*;
+
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import org.apache.commons.codec.DecoderException;
 import org.dspace.AbstractDSpaceTest;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.dspace.core.Constants;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  *
@@ -77,14 +83,13 @@ public class PasswordHashTest extends AbstractDSpaceTest
      */
     @Test
     public void testMatches()
-            throws NoSuchAlgorithmException
-    {
+            throws NoSuchAlgorithmException, UnsupportedEncodingException {
         System.out.println("matches");
         final String secret = "Clark Kent is Superman";
 
         // Test old 1-trip MD5 hash
         MessageDigest digest = MessageDigest.getInstance("MD5");
-        PasswordHash hash = new PasswordHash(null, null, digest.digest(secret.getBytes()));
+        PasswordHash hash = new PasswordHash(null, null, digest.digest(secret.getBytes(Constants.DEFAULT_ENCODING)));
         boolean result = hash.matches(secret);
         assertTrue("Old unsalted 1-trip MD5 hash", result);
 
