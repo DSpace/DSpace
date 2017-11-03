@@ -259,8 +259,9 @@ public class MetadataAuthorityServiceImpl implements MetadataAuthorityService
 						if (!StringUtils.equals(dcinput.getInputType(), "qualdrop_value")) {
 							String fieldKey = makeFieldKey(dcinput.getSchema(), dcinput.getElement(),
 									dcinput.getQualifier());
-	                        controlled.put(fieldKey, true);
-	                        isAuthorityRequired.put(fieldKey, true);
+							boolean req = ConfigurationManager.getBooleanProperty("authority.required."+fieldKey, false);
+	                        controlled.put(fieldKey, true);	                        
+	                        isAuthorityRequired.put(fieldKey, req);
 						}
 					}
 				}

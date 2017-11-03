@@ -482,7 +482,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     }
 
     protected void getAuthoritiesAndConfidences(String fieldKey, Collection collection, List<String> values, List<String> authorities, List<Integer> confidences, int i) {
-        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), null, null);
+        Choices c = choiceAuthorityService.getBestMatch(fieldKey, values.get(i), collection, null);
         authorities.add(c.values.length > 0 ? c.values[0].authority : null);
         confidences.add(c.confidence);
     }
