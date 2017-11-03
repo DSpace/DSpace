@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.rest.webmvc.json.patch.Patch;
 
 /**
  * This is the base class for any Rest Repository. It add a DSpaceContext to the
@@ -117,4 +118,9 @@ extends AbstractDSpaceRestRepository
 	public abstract Class<T> getDomainClass();
 
 	public abstract DSpaceResource<T> wrapResource(T model, String... rels);
+
+	public RestModel patch(Patch patch) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
