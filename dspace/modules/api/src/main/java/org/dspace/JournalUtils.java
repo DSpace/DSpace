@@ -483,6 +483,34 @@ public class JournalUtils {
         return items;
     }
 
+    public static boolean isJournalConceptListedInCrossref(DryadJournalConcept journalConcept) {
+        if (journalConcept.getISSN().isEmpty()) {
+            log.error("journal concept " + journalConcept.getConceptID() + " doesn't have an ISSN");
+            return false;
+        } else {
+            String crossRefURL = crossRefApiRoot + "journals/" + journalConcept.getISSN();
+            try {
+                URL url = new URL(crossRefURL.replaceAll("\\s+", ""));
+                ObjectMapper m = new ObjectMapper();
+                JsonNode rootNode = m.readTree(url.openStream());
+                JsonNode titleNode = rootNode.path("message").path("title");
+                if (titleNode != null) {
+                    if (titleNode.textValue().equalsIgnoreCase(journalConcept.getFullName())) {
+                        return true;
+                    } else {
+                        log.error("journal concept " + journalConcept.getConceptID() + " lists ISSN " + journalConcept.getISSN() + ", but that belongs to a journal titled " + titleNode.textValue());
+                        return false;
+                    }
+                } else {
+                    log.error("journal concept " + journalConcept.getConceptID() + " has an invalid crossref ISSN");
+                }
+            } catch (Exception e) {
+                log.error("couldn't query crossref: " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
     public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript, StringBuilder resultString) throws RESTModelException {
         String crossRefURL = null;
         if (resultString == null) {
