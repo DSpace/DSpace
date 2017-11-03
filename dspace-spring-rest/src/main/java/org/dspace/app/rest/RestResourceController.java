@@ -41,6 +41,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.json.patch.JsonPatchPatchConverter;
+import org.springframework.data.rest.webmvc.json.patch.Patch;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
@@ -51,6 +53,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * This is the main entry point of the new REST API. Its responsibility is to
@@ -73,6 +77,9 @@ public class RestResourceController implements InitializingBean {
 
 	@Autowired
 	RestRepositoryUtils repositoryUtils;
+	
+	@Autowired
+	JsonPatchPatchConverter patchConverter;
 
 	@Override
 	public void afterPropertiesSet() {
@@ -153,6 +160,29 @@ public class RestResourceController implements InitializingBean {
 			@PathVariable String model, @PathVariable String id, @PathVariable String rel, @PathVariable String relid,
 			Pageable page, PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
 		return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);		
+	}
+	
+	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
+	public ResourceSupport patch(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable Integer id, @RequestParam(required = false) JsonNode jsonNode) {
+		Patch patch = patchConverter.convert(jsonNode);
+		return patchInternal(request, apiCategory, model, id, patch);
+	}
+
+	public <ID extends Serializable> ResourceSupport patchInternal(HttpServletRequest request, String apiCategory,
+			String model, ID id, Patch patch) {
+		checkModelPluralForm(apiCategory, model);
+		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		RestModel modelObject = null;
+		try {
+			modelObject = repository.patch(patch);
+		} catch (ClassCastException e) {
+		}
+		if (modelObject == null) {
+			throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+		}
+		DSpaceResource result = repository.wrapResource(modelObject);
+		return result;
 	}
 	
 	private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request, String apiCategory, String model,
