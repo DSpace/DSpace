@@ -181,14 +181,19 @@ public class DiscoverQueryBuilder {
         }
 
         //Update Discovery query
-        if (sortBy != null && searchSortConfiguration.isValidSortField(sortBy)) {
+        DiscoverySortFieldConfiguration sortFieldConfiguration = searchSortConfiguration.getSortFieldConfiguration(sortBy);
+
+        if (sortFieldConfiguration != null) {
+            String sortField = searchService.toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+
             if ("asc".equalsIgnoreCase(sortOrder)) {
-                queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.asc);
+                queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.asc);
             } else if ("desc".equalsIgnoreCase(sortOrder)) {
-                queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.desc);
+                queryArgs.setSortField(sortField, DiscoverQuery.SORT_ORDER.desc);
             } else {
                 throw new InvalidSortingException(sortOrder + " is not a valid sort order");
             }
+
         } else {
             throw new InvalidSortingException(sortBy + " is not a valid sort field");
         }

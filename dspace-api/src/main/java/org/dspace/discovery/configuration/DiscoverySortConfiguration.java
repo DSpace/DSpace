@@ -15,16 +15,18 @@
 package org.dspace.discovery.configuration;
 
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class DiscoverySortConfiguration {
+
+    public static final String SCORE = "score";
 
     /** Attributes used for sorting of results **/
     public enum SORT_ORDER {
@@ -62,15 +64,22 @@ public class DiscoverySortConfiguration {
         this.defaultSortOrder = defaultSortOrder;
     }
     
-    public boolean isValidSortField(String sortField) {
-        if(StringUtils.equals("score", sortField)) {
-            return true;
+    public DiscoverySortFieldConfiguration getSortFieldConfiguration(String sortField) {
+        if(StringUtils.isBlank(sortField)) {
+            return null;
         }
+
+        if(StringUtils.equalsIgnoreCase(SCORE, sortField)) {
+            DiscoverySortFieldConfiguration configuration = new DiscoverySortFieldConfiguration();
+            configuration.setMetadataField(SCORE);
+            return configuration;
+        }
+
         for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
             if(StringUtils.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
-                return true;
+                return sortFieldConfiguration;
             }
         }
-        return false;
+        return null;
     }
 }

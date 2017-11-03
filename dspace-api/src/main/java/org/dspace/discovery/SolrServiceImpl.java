@@ -7,6 +7,8 @@
  */
 package org.dspace.discovery;
 
+import static org.dspace.discovery.configuration.DiscoverySortConfiguration.SCORE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -2209,7 +2211,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     @Override
     public String toSortFieldIndex(String metadataField, String type)
     {
-        if (type.equals(DiscoveryConfigurationParameters.TYPE_DATE))
+        if(StringUtils.equalsIgnoreCase(SCORE, metadataField))
+        {
+            return SCORE;
+        }
+        else if (StringUtils.equals(type, DiscoveryConfigurationParameters.TYPE_DATE))
         {
             return metadataField + "_dt";
         } else {
