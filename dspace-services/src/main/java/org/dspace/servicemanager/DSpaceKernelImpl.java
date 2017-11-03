@@ -24,7 +24,6 @@ import javax.management.modelmbean.ModelMBeanAttributeInfo;
 import javax.management.modelmbean.ModelMBeanInfoSupport;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
-import org.dspace.kernel.CommonLifecycle;
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.kernel.ServiceManager;
@@ -50,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifecycle<DSpaceKernel> {
+public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean {
 
     private static Logger log = LoggerFactory.getLogger(DSpaceKernelImpl.class);
 
@@ -197,6 +196,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
     /* (non-Javadoc)
      * @see org.dspace.kernel.CommonLifecycle#destroy()
      */
+    @Override
     public void destroy() {
         if (this.destroyed) {
             return;

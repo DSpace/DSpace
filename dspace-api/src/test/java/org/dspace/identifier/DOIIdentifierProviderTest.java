@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.dspace.AbstractUnitTest;
 import org.dspace.authorize.AuthorizeException;
@@ -411,7 +413,7 @@ public class DOIIdentifierProviderTest
         DSpaceObject dso = provider.getObjectByDOI(context, doi);
         
         assertNotNull("Failed to load DSpaceObject by DOI.", dso);
-        if (item.getType() != dso.getType() || item.getID() != dso.getID())
+        if (item.getType() != dso.getType() || ObjectUtils.notEqual(item.getID(), dso.getID()))
         {
             fail("Object loaded by DOI was another object then expected!");
         }
@@ -428,7 +430,7 @@ public class DOIIdentifierProviderTest
         DSpaceObject dso = provider.resolve(context, doi);
         
         assertNotNull("Failed to resolve DOI.", dso);
-        if (item.getType() != dso.getType() || item.getID() != dso.getID())
+        if (item.getType() != dso.getType() || ObjectUtils.notEqual(item.getID(), dso.getID()))
         {
             fail("Object return by DOI lookup was another object then expected!");
         }

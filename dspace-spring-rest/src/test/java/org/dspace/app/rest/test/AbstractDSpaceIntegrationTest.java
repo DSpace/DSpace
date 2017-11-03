@@ -5,44 +5,31 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace;
+package org.dspace.app.rest.test;
+
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
+
 import org.apache.log4j.Logger;
-import org.dspace.app.util.MockUtil;
+import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.AfterClass;
-import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.runner.RunWith;
-
-import mockit.integration.junit4.JMockit;
 
 /**
- * DSpace Unit Tests need to initialize the DSpace Kernel / Service Mgr
- * in order to have access to configurations, etc. This Abstract class only
- * initializes the Kernel (without full in-memory DB initialization).
- * <P>
- * Tests which just need the Kernel (or configs) can extend this class.
- * <P>
- * Tests which also need an in-memory DB should extend AbstractUnitTest or AbstractIntegrationTest
- *
- * @see AbstractUnitTest
- * @see AbstractIntegrationTest
- * @author Tim
+ * Abstract Test class copied from DSpace API
  */
-@Ignore
-@RunWith(JMockit.class)
-public class AbstractDSpaceTest
+public class AbstractDSpaceIntegrationTest
 {
+
     /** log4j category */
-    private static final Logger log = Logger.getLogger(AbstractDSpaceTest.class);
+    private static final Logger log = Logger.getLogger(AbstractDSpaceIntegrationTest.class);
 
     /**
      * Test properties. These configure our general test environment
@@ -72,7 +59,7 @@ public class AbstractDSpaceTest
 
             //load the properties of the tests
             testProps = new Properties();
-            URL properties = AbstractUnitTest.class.getClassLoader()
+            URL properties = AbstractDSpaceIntegrationTest.class.getClassLoader()
                     .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
@@ -83,9 +70,7 @@ public class AbstractDSpaceTest
                 // NOTE: the "dspace.dir" system property MUST be specified via Maven
                 kernelImpl.start(getDspaceDir()); // init the kernel
             }
-
-            // Initialize mock Util class (allows Util.getSourceVersion() to work in Unit tests)
-            new MockUtil();
+            AbstractBuilder.init();
         }
         catch (IOException ex)
         {
@@ -93,7 +78,6 @@ public class AbstractDSpaceTest
             fail("Error initializing tests: " + ex.getMessage());
         }
     }
-
 
     /**
      * This method will be run after all tests finish as per @AfterClass. It
@@ -105,14 +89,18 @@ public class AbstractDSpaceTest
         testProps.clear();
         testProps = null;
 
+        AbstractBuilder.destroy();
+
         //Also clear out the kernel & nullify (so JUnit will clean it up)
         if (kernelImpl != null) {
             kernelImpl.destroy();
         }
         kernelImpl = null;
     }
+
     public static String getDspaceDir(){
         return System.getProperty("dspace.dir");
 
     }
 }
+
