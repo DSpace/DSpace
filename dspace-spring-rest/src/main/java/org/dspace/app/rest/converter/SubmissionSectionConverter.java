@@ -7,10 +7,13 @@
  */
 package org.dspace.app.rest.converter;
 
+import javax.servlet.ServletException;
+
 import org.apache.commons.lang.NotImplementedException;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
+import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +26,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepConfig, SubmissionSectionRest> {
 
+	private SubmissionConfigReader submissionConfigReader;
+	
 	@Override
 	public SubmissionSectionRest fromModel(SubmissionStepConfig step) {
 		SubmissionSectionRest sp = new SubmissionSectionRest();
@@ -37,6 +42,12 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
 
 	@Override
 	public SubmissionStepConfig toModel(SubmissionSectionRest obj) {
-		throw new NotImplementedException();
+		SubmissionStepConfig step;
+		try {
+			step = submissionConfigReader.getStepConfig(obj.getId());
+		} catch (ServletException e) {
+			throw new RuntimeException(e);
+		}
+		return step;
 	}
 }
