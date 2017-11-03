@@ -7,6 +7,29 @@
  */
 package org.dspace.discovery;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.UUID;
+import java.util.Vector;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.Transformer;
@@ -14,14 +37,12 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
@@ -32,11 +53,23 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.*;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.FacetParams;
+import org.apache.solr.common.params.HighlightParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.params.MoreLikeThisParams;
+import org.apache.solr.common.params.SpellingParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.handler.extraction.ExtractingParams;
-import org.dspace.content.*;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.service.ChoiceAuthorityService;
 import org.dspace.content.authority.service.MetadataAuthorityService;
@@ -44,29 +77,31 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.CommunityService;
 import org.dspace.content.service.ItemService;
-import org.dspace.core.*;
-import org.dspace.discovery.configuration.*;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LogManager;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration;
+import org.dspace.discovery.configuration.DiscoveryMoreLikeThisConfiguration;
+import org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
+import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
+import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.discovery.configuration.HierarchicalSidebarFacetConfiguration;
+import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.handle.service.HandleService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.util.MultiFormatDateParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.authorize.factory.AuthorizeServiceFactory;
-import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 
 /**
  * SolrIndexer contains the methods that index Items and their metadata,
@@ -122,9 +157,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     protected MetadataAuthorityService metadataAuthorityService;
 
     /**
-     * Non-Static CommonsHttpSolrServer for processing indexing events.
+     * Non-Static SolrServer for processing indexing events.
      */
-    private HttpSolrServer solr = null;
+    protected SolrServer solr = null;
 
 
     protected SolrServiceImpl()
@@ -132,7 +167,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     }
 
-    protected HttpSolrServer getSolr()
+    protected SolrServer getSolr()
     {
         if ( solr == null)
         {
@@ -143,20 +178,22 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             {
                 try {
                     log.debug("Solr URL: " + solrService);
-                    solr = new HttpSolrServer(solrService);
+                    HttpSolrServer solrServer = new HttpSolrServer(solrService);
 
-                    solr.setBaseURL(solrService);
-                    solr.setUseMultiPartPost(true);
+                    solrServer.setBaseURL(solrService);
+                    solrServer.setUseMultiPartPost(true);
                     // Dummy/test query to search for Item (type=2) of ID=1
                     SolrQuery solrQuery = new SolrQuery()
                             .setQuery(RESOURCE_TYPE_FIELD + ":2 AND " + RESOURCE_ID_FIELD + ":1");
                     // Only return obj identifier fields in result doc
                     solrQuery.setFields(RESOURCE_TYPE_FIELD, RESOURCE_ID_FIELD);
-                    solr.query(solrQuery);
+                    solrServer.query(solrQuery);
 
                     // As long as Solr initialized, check with DatabaseUtils to see
                     // if a reindex is in order. If so, reindex everything
                     DatabaseUtils.checkReindexDiscovery(this);
+
+                    solr = solrServer;
                 } catch (SolrServerException e) {
                     log.error("Error while initializing solr server", e);
                 }
@@ -1797,7 +1834,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     @Override
     public InputStream searchJSON(Context context, DiscoverQuery discoveryQuery, String jsonIdentifier) throws SearchServiceException {
-        if (getSolr() == null)
+        if (getSolr() == null || !(getSolr() instanceof HttpSolrServer))
         {
             return null;
         }
@@ -1809,7 +1846,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         solrQuery.setParam(CommonParams.WT, "json");
 
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(getSolr().getBaseURL()).append("/select?");
+        urlBuilder.append(((HttpSolrServer) getSolr()).getBaseURL()).append("/select?");
         urlBuilder.append(solrQuery.toString());
 
         try {
@@ -1986,38 +2023,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         }
 
         return null;
-    }
-
-
-    /**
-     * Simple means to return the search result as an InputStream
-     *
-     * @param query discovery query
-     * @return input stream
-     * @throws IOException
-     *     A general class of exceptions produced by failed or interrupted I/O operations.
-     * @throws SearchServiceException if something went wrong with querying the solr server
-     */
-    public java.io.InputStream searchAsInputStream(DiscoverQuery query) throws SearchServiceException, java.io.IOException {
-        if (getSolr() == null)
-        {
-            return null;
-        }
-        HttpHost hostURL = (HttpHost)(getSolr().getHttpClient().getParams().getParameter(ClientPNames.DEFAULT_HOST));
-
-        HttpGet method = new HttpGet(hostURL.toHostString() + "");
-        try
-        {
-            URI uri = new URIBuilder(method.getURI()).addParameter("q",query.toString()).build();
-        }
-        catch (URISyntaxException e)
-        {
-            throw new SearchServiceException(e);
-        }
-
-        HttpResponse response = getSolr().getHttpClient().execute(method);
-
-        return response.getEntity().getContent();
     }
 
     public List<DSpaceObject> search(Context context, String query, int offset, int max, String... filterquery)
