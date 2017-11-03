@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
 
 /**
- *
+ * Class to embed a page in a HAL Resource
  */
 public class EmbeddedPage extends EmbeddedPageHeader {
 

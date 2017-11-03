@@ -13,6 +13,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.dspace.app.rest.utils.URLUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
@@ -54,26 +55,34 @@ public class EmbeddedPageHeader {
     public Map<String, String> getLinks() {
         Map<String, String> links = new HashMap<String, String>();
         if (!page.isFirst()) {
-            links.put("first", _link(0));
-            links.put("self", _link(page.getNumber()));
+            links.put("first", _link(page.getSort(), 0));
+            links.put("self", _link(page.getSort(), page.getNumber()));
         }
         else {
-            links.put("self", self.build().toUriString());
+            links.put("self", _link(page.getSort(), null));
         }
         if (!page.isLast() && totalElementsIsKnown) {
-            links.put("last", _link(page.getTotalPages()-1));
+            links.put("last", _link(page.getSort(), page.getTotalPages()-1));
         }
         if (page.hasPrevious()) {
-            links.put("prev", _link(page.getNumber()-1));
+            links.put("prev", _link(page.getSort(), page.getNumber()-1));
         }
         if (page.hasNext()) {
-            links.put("next", _link(page.getNumber()+1));
+            links.put("next", _link(page.getSort(), page.getNumber()+1));
         }
         return links;
     }
 
-    private String _link(int i) {
+    private String _link(final Sort sort, Integer i) {
         UriComponentsBuilder uriComp = self.cloneBuilder();
-        return uriComp.queryParam("page", i).build().toUriString();
+        if(sort != null) {
+            for (Sort.Order order : sort) {
+                uriComp = uriComp.queryParam("sort", order.getProperty() + "," + order.getDirection());
+            }
+        }
+        if(i != null) {
+            uriComp = uriComp.queryParam("page", i);
+        }
+        return uriComp.build().toUriString();
     }
 }
