@@ -347,7 +347,6 @@ public class DCInputsReader
                 for (int j = 0; j < lenpg; j++)
                 {
 					Node npg = pl.item(j);
-					// process each page definition
 
 					if (npg.getNodeName().equals("field")) {
 						// process each field definition
@@ -359,7 +358,7 @@ public class DCInputsReader
 						// the same metadata and different visibility/type-bind
 					}
                 }
-                // sanity check number of pages
+                // sanity check number of fields
                 if (fields.size() < 1)
                 {
                     throw new DCInputsReaderException("Form " + formName + " has no fields");

@@ -28,6 +28,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
+import org.dspace.core.Utils;
 
 
 /**
@@ -494,8 +495,8 @@ public class Util {
 		for (DCInputSet inputSet : inputSets) {
 			// Replace the values of Metadatum[] with the correct ones in case
 			// of
-			// controlled vocabularies
-			String currentField = schema + "." + element + (qualifier == null ? "" : "." + qualifier);
+			// controlled vocabularies			
+			String currentField = Utils.standardize(schema, element, qualifier, ".");
 
 			if (inputSet != null) {
 
@@ -508,8 +509,8 @@ public class Util {
 					if (inputs != null) {
 
 						for (int i = 0; i < inputs.length; i++) {
-							String inputField = inputs[i].getSchema() + "." + inputs[i].getElement()
-									+ (inputs[i].getQualifier() == null ? "" : "." + inputs[i].getQualifier());
+							String inputField = Utils.standardize(inputs[i].getSchema(), inputs[i].getElement(),
+									inputs[i].getQualifier(), ".");
 							if (currentField.equals(inputField)) {
 
 								myInputs = inputs[i];

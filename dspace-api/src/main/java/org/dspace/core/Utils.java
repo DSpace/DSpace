@@ -429,6 +429,18 @@ public final class Utils
         return collection == null ? Collections.<E>emptyList() : collection;
     }
     
+	/**
+	 * Utility method to extract schema, element, qualifier from the metadata field key 
+	 * Keep in mind that this method try to auto discover the common separator used in DSpace ("_" or ".") 
+	 * 
+	 * Return an array of token with size 3 which contains:
+	 * schema = tokens[0];
+	 * element = tokens[1];
+	 * qualifier = tokens[2]; //it can be empty string
+	 * 
+	 * @param metadata (the field in the form dc.title or dc_title)
+	 * @return array of tokens 
+	 */
 	public static String[] tokenize(String metadata) {
 		String separator = metadata.contains("_") ? "_" : ".";
 		StringTokenizer dcf = new StringTokenizer(metadata, separator);
@@ -447,6 +459,15 @@ public final class Utils
 
 	}
 	
+	/**
+	 * Make the metadata field key using the separator.
+	 * 
+	 * @param schema
+	 * @param element
+	 * @param qualifier
+	 * @param separator (DSpace common separator are "_" or ".")
+	 * @return metadata field key
+	 */
 	public static String standardize(String schema, String element, String qualifier, String separator) {
 		if (StringUtils.isBlank(qualifier)) {
 			return schema + separator + element;
