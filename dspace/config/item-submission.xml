@@ -43,25 +43,33 @@
 	<!-- Messages.properties -->
 	<!-- -->
 	<step-definitions>
-
+	    <!-- The "collection" step is a "special step" which is *REQUIRED* -->
+	    <!-- In DSpace, all submitted items must be immediately assigned --> 
+	    <!-- to a collection. This step ensures that a collection is always selected. -->
+	 	<step id="collection">
+       		<heading></heading> 
+	   		<processing-class>org.dspace.app.rest.submit.step.CollectionStep</processing-class>
+			<type>collection</type>
+			<scope visibility="hidden" visibilityOutside="hidden">submission</scope>       
+     	</step>
 		<step id="traditionalpageone" mandatory="true">
 			<heading>submit.progressbar.describe.stepone</heading>
-			<processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
 			<type>submission-form</type>
 		</step>
 		<step id="traditionalpagetwo" mandatory="true">
 			<heading>submit.progressbar.describe.steptwo</heading>
-			<processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+			<processing-class>org.dspace.app.rest.submit.step.DescribeStep</processing-class>
 			<type>submission-form</type>
 		</step>
 		<step id="upload">
 			<heading>submit.progressbar.upload</heading>
-			<processing-class>org.dspace.submit.step.UploadStep</processing-class>
+			<processing-class>org.dspace.app.rest.submit.step.UploadStep</processing-class>
 			<type>upload</type>
 		</step>
 		<step id="license">
 			<heading>submit.progressbar.license</heading>
-			<processing-class>org.dspace.submit.step.LicenseStep</processing-class>
+			<processing-class>org.dspace.app.rest.submit.step.LicenseStep</processing-class>
 			<type>license</type>
 			<scope visibilityOutside="read-only">submission</scope>
 		</step>
@@ -125,6 +133,8 @@
 			<!--Uncommment to display the SAMPLE step as your first step -->
 			<!--<step id="sample"/> -->
 
+			<step id="collection" />
+			
 			<!--Step will be to Describe the item. -->
 			<step id="traditionalpageone" />
 			<step id="traditionalpagetwo" />

@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.dspace.app.rest.RestResourceController;
 
@@ -25,6 +26,8 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 
 	private Date lastModified = new Date();
 
+	private Map<String, RestModel> sections;
+	
 	@JsonIgnore
 	private ItemRest item;
 	
@@ -79,5 +82,13 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 	@Override
 	public Class getController() {
 		return RestResourceController.class;
+	}
+
+	public Map<String, RestModel> getSections() {
+		return sections;
+	}
+
+	public void setSections(Map<String, RestModel> sections) {
+		this.sections = sections;
 	}
 }
