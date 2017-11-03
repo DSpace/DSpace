@@ -7,6 +7,32 @@
  */
 package org.dspace.statistics;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import au.com.bytecode.opencsv.CSVReader;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.maxmind.geoip.Location;
@@ -20,6 +46,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.request.AbstractUpdateRequest;
@@ -36,9 +63,18 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.luke.FieldFlag;
-import org.apache.solr.common.params.*;
-import org.dspace.content.*;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.FacetParams;
+import org.apache.solr.common.params.MapSolrParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.apache.solr.common.params.ShardParams;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DCDate;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.DSpaceObjectLegacySupportService;
@@ -55,15 +91,6 @@ import org.dspace.usage.UsageWorkflowEvent;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 /**
  * Static holder for a HttpSolrClient connection pool to issue
  * usage logging events to Solr from DSpace libraries, and some static query
@@ -77,7 +104,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 {
     private static final Logger log = Logger.getLogger(SolrLoggerServiceImpl.class);
     private static final String MULTIPLE_VALUES_SPLITTER = "|";
-    protected HttpSolrServer solr;
+    protected SolrServer solr;
 
     public static final String DATE_FORMAT_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
@@ -1183,6 +1210,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void shardSolrIndex() throws IOException, SolrServerException {
+        if(!(solr instanceof HttpSolrServer)) {
+            return;
+        }
+
         /*
         Start by faceting by year so we can include each year in a separate core !
          */
@@ -1243,14 +1274,14 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
             //Start by creating a new core
             String coreName = "statistics-" + dcStart.getYearUTC();
-            HttpSolrServer statisticsYearServer = createCore(solr, coreName);
+            HttpSolrServer statisticsYearServer = createCore((HttpSolrServer) solr, coreName);
 
             System.out.println("Moving: " + totalRecords + " into core " + coreName);
             log.info("Moving: " + totalRecords + " records into core " + coreName);
 
             List<File> filesToUpload = new ArrayList<File>();
             for (int i = 0; i < totalRecords; i+=10000) {
-                String solrRequestUrl = solr.getBaseURL() + "/select";
+                String solrRequestUrl = ((HttpSolrServer) solr).getBaseURL() + "/select";
                 solrRequestUrl = generateURL(solrRequestUrl, yearQueryParams);
 
                 HttpGet get = new HttpGet(solrRequestUrl);
@@ -1356,6 +1387,10 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
 
     @Override
     public void reindexBitstreamHits(boolean removeDeletedBitstreams) throws Exception {
+        if(!(solr instanceof HttpSolrServer)) {
+            return;
+        }
+
         Context context = new Context();
 
         try {
@@ -1380,7 +1415,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 params.put(CommonParams.ROWS, String.valueOf(10000));
                 params.put(CommonParams.START, String.valueOf(i));
 
-                String solrRequestUrl = solr.getBaseURL() + "/select";
+                String solrRequestUrl = ((HttpSolrServer) solr).getBaseURL() + "/select";
                 solrRequestUrl = generateURL(solrRequestUrl, params);
 
                 HttpGet get = new HttpGet(solrRequestUrl);
@@ -1587,7 +1622,7 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
      * This code is synchonized in the event that 2 threads trigger the initialization at the same time.
      */
     protected synchronized void initSolrYearCores() {
-        if (statisticYearCoresInit) {
+        if (statisticYearCoresInit || !(solr instanceof HttpSolrServer)) {
             return;
         }
         try
@@ -1603,16 +1638,16 @@ public class SolrLoggerServiceImpl implements SolrLoggerService, InitializingBea
                 }
             });
             //Base url should like : http://localhost:{port.number}/solr
-            String baseSolrUrl = solr.getBaseURL().replace("statistics", "");
+            String baseSolrUrl = ((HttpSolrServer) solr).getBaseURL().replace("statistics", "");
             for (File solrCoreFile : solrCoreFiles) {
                 log.info("Loading core with name: " + solrCoreFile.getName());
 
-                createCore(solr, solrCoreFile.getName());
+                createCore((HttpSolrServer) solr, solrCoreFile.getName());
                 //Add it to our cores list so we can query it !
                 statisticYearCores.add(baseSolrUrl.replace("http://", "").replace("https://", "") + solrCoreFile.getName());
             }
             //Also add the core containing the current year !
-            statisticYearCores.add(solr.getBaseURL().replace("http://", "").replace("https://", ""));
+            statisticYearCores.add(((HttpSolrServer) solr).getBaseURL().replace("http://", "").replace("https://", ""));
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
