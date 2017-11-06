@@ -33,9 +33,9 @@ public class DiscoverFacetResultsConverter {
     public FacetResultsRest convert(Context context, String facetName, String query, String dsoType, String dsoScope, List<SearchFilter> searchFilters, DiscoverResult searchResult, DiscoveryConfiguration configuration, Pageable page) {
         FacetResultsRest facetResultsRest = new FacetResultsRest();
 
-        addToFacetResultList(facetName, searchResult, facetResultsRest, configuration, page);
-
         setRequestInformation(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration, facetResultsRest, page);
+
+        addToFacetResultList(facetName, searchResult, facetResultsRest, configuration, page);
 
         return facetResultsRest;
     }
@@ -66,7 +66,6 @@ public class DiscoverFacetResultsConverter {
         facetResultsRest.setQuery(query);
         facetResultsRest.setScope(dsoScope);
         facetResultsRest.setDsoType(dsoType);
-        facetResultsRest.setPage(page);
 
         facetResultsRest.setFacetEntry(convertFacetEntry(facetName, searchResult, configuration, page));
 
@@ -89,6 +88,8 @@ public class DiscoverFacetResultsConverter {
         if (!facetResults.isEmpty()) {
             facetEntryRest.setFacetType(facetResults.get(0).getFieldType());
         }
+
+        facetEntryRest.setFacetLimit(field.getFacetLimit());
 
         //We requested one extra facet value. Check if that value is present to indicate that there are more results
         facetEntryRest.setHasMore(facetResults.size() > page.getPageSize());

@@ -26,13 +26,15 @@ public class FacetResultsRestTest {
     }
 
     @Test
-    public void testFacetResultListNotNullAfterConstructor() throws Exception{
+    public void testFacetResultListNotNullAfterEntrySet() throws Exception{
+        facetResultsRest.setFacetEntry(new SearchFacetEntryRest("test"));
         assertNotNull(facetResultsRest.getFacetResultList());
     }
 
     @Test
     public void testAddToFacetResultListContainsCorrectValue() throws Exception{
         SearchFacetValueRest searchFacetValueRest = new SearchFacetValueRest();
+        facetResultsRest.setFacetEntry(new SearchFacetEntryRest("test"));
         facetResultsRest.addToFacetResultList(searchFacetValueRest);
         assertEquals(searchFacetValueRest, facetResultsRest.getFacetResultList().get(0));
     }

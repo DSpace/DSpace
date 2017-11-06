@@ -25,6 +25,7 @@ public class SearchFacetEntryRest implements RestModel {
     private String name;
     private String facetType;
     private Boolean hasMore = null;
+    private int facetLimit;
 
     @JsonIgnore
     private List<SearchFacetValueRest> values;
@@ -81,5 +82,13 @@ public class SearchFacetEntryRest implements RestModel {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public Boolean isHasMore() {
         return hasMore;
+    }
+
+    public int getFacetLimit() {
+        return facetLimit;
+    }
+
+    public void setFacetLimit(final int facetLimit) {
+        this.facetLimit = facetLimit;
     }
 }
