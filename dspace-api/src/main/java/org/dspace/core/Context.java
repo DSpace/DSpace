@@ -7,16 +7,19 @@
  */
 package org.dspace.core;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.event.Dispatcher;
 import org.dspace.event.Event;
 import org.dspace.event.factory.EventServiceFactory;
 import org.dspace.event.service.EventService;
+import org.dspace.services.factory.DSpaceServicesFactoryImpl;
 import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
@@ -264,6 +267,42 @@ public class Context
             authStateClassCallHistory.push(caller);
         }
         ignoreAuth = true;
+        
+        
+		boolean runSingleUser = DSpaceServicesFactoryImpl.getInstance().getConfigurationService()
+				.getBooleanProperty("run.single.test-user");
+		if (runSingleUser) {
+			try {
+				currentUser = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(this,
+						"test-user@mailinator.com");
+				if (currentUser == null) {		
+					EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+					EPerson eperson;
+					try {
+						eperson = ePersonService.findByEmail(this, "test-user@mailinator.com");
+						if (eperson == null) {
+							// This EPerson creation should only happen once
+							log.info("Creating initial EPerson (email=test-user@mailinator.com) for Tests");
+							eperson = ePersonService.create(this);
+							eperson.setFirstName(this, "first");
+							eperson.setLastName(this, "last");
+							eperson.setEmail("test-user@mailinator.com");
+							eperson.setCanLogIn(true);
+							eperson.setLanguage(this, I18nUtil.getDefaultLocale().getLanguage());
+							// actually save the eperson to unit testing DB
+							ePersonService.update(this, eperson);
+
+						}
+						currentUser = eperson;
+					} catch (Exception e) {
+						log.error(e.getMessage(), e);
+					}
+					
+				}
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+			}
+		}
     }
 
     /**
@@ -313,6 +352,12 @@ public class Context
             }
         }
         ignoreAuth = previousState.booleanValue();
+        
+		boolean runSingleUser = DSpaceServicesFactoryImpl.getInstance().getConfigurationService()
+				.getBooleanProperty("run.single.test-user");		
+		if (runSingleUser) {
+			currentUser = null;
+		}
     }
 
     /**
