@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -15,8 +17,6 @@ import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
 
 /**
  * This is the base class for any Rest Repository. It provides utility method to
