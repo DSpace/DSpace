@@ -119,8 +119,13 @@ extends AbstractDSpaceRestRepository
 
 	public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 
-	public RestModel patch(Patch patch) {
-		// TODO Auto-generated method stub
+	public RestModel createAndReturn() {
+		Context context = obtainContext();
+		return createAndReturn(context);
+	}
+
+	protected RestModel createAndReturn(Context context) {
 		return null;
 	}
+	
 }

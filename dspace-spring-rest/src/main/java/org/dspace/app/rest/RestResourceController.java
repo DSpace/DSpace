@@ -40,21 +40,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.rest.webmvc.ControllerUtils;
+import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.data.rest.webmvc.json.patch.JsonPatchPatchConverter;
-import org.springframework.data.rest.webmvc.json.patch.Patch;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.UriTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * This is the main entry point of the new REST API. Its responsibility is to
@@ -161,6 +164,29 @@ public class RestResourceController implements InitializingBean {
 			Pageable page, PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
 		return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);		
 	}
+
+	
+	@RequestMapping(method = RequestMethod.POST)
+	public ResponseEntity<ResourceSupport> post(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model) throws HttpRequestMethodNotSupportedException {		
+		return postInternal(request, apiCategory, model);
+	}
+	
+	public <ID extends Serializable> ResponseEntity<ResourceSupport> postInternal(HttpServletRequest request, String apiCategory,
+			String model) throws HttpRequestMethodNotSupportedException {
+		checkModelPluralForm(apiCategory, model);
+		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		RestModel modelObject = null;
+		try {
+			modelObject = repository.createAndReturn();
+		} catch (ClassCastException e) {
+		}
+		if (modelObject == null) {
+			throw new HttpRequestMethodNotSupportedException(RequestMethod.POST.toString());
+		}
+		DSpaceResource result = repository.wrapResource(modelObject);
+		return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);		
+	}	
 	
 //	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
 //	public ResourceSupport patch(HttpServletRequest request, @PathVariable String apiCategory,
@@ -168,22 +194,22 @@ public class RestResourceController implements InitializingBean {
 //		Patch patch = patchConverter.convert(jsonNode);
 //		return patchInternal(request, apiCategory, model, id, patch);
 //	}
-
-	public <ID extends Serializable> ResourceSupport patchInternal(HttpServletRequest request, String apiCategory,
-			String model, ID id, Patch patch) {
-		checkModelPluralForm(apiCategory, model);
-		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-		RestModel modelObject = null;
-		try {
-			modelObject = repository.patch(patch);
-		} catch (ClassCastException e) {
-		}
-		if (modelObject == null) {
-			throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
-		}
-		DSpaceResource result = repository.wrapResource(modelObject);
-		return result;
-	}
+//
+//	public <ID extends Serializable> ResourceSupport patchInternal(HttpServletRequest request, String apiCategory,
+//			String model, ID id, Patch patch) {
+//		checkModelPluralForm(apiCategory, model);
+//		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+//		RestModel modelObject = null;
+//		try {
+//			modelObject = repository.patch(patch);
+//		} catch (ClassCastException e) {
+//		}
+//		if (modelObject == null) {
+//			throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
+//		}
+//		DSpaceResource result = repository.wrapResource(modelObject);
+//		return result;
+//	}
 	
 	private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request, String apiCategory, String model,
 			String id, String rel, String relid, Pageable page, PagedResourcesAssembler assembler, String projection) {
@@ -355,5 +381,19 @@ public class RestResourceController implements InitializingBean {
 			result = repository.wrapResource((T) searchResult);
 		}
 		return result;
+	}
+	
+	/**
+	 * Sets the location header pointing to the resource representing the given instance. Will make sure we properly
+	 * expand the URI template potentially created as self link.
+	 * 
+	 * @param headers must not be {@literal null}.
+	 * @param assembler must not be {@literal null}.
+	 * @param source must not be {@literal null}.
+	 */
+	private void addLocationHeader(HttpHeaders headers, PersistentEntityResourceAssembler assembler, Object source) {
+
+		String selfLink = assembler.getSelfLinkFor(source).getHref();
+		headers.setLocation(new UriTemplate(selfLink).expand());
 	}
 }

@@ -8,6 +8,7 @@
 package org.dspace.submit.step;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.dspace.submit.AbstractProcessingStep;
@@ -25,6 +26,12 @@ public class UploadStep extends AbstractProcessingStep
 
 	@Override
 	public void doPostProcessing(Context context, Request obj) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void doPreProcessing(Context context, WorkspaceItem wsi) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -9,16 +9,19 @@ package org.dspace.submit;
 
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
+import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.services.model.Request;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Abstract processing class for DSpace Submission Steps. This defines the base
@@ -34,9 +37,12 @@ public abstract class AbstractProcessingStep
     protected ItemService itemService = ContentServiceFactory.getInstance().getItemService();
     protected MetadataFieldService metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-    
+	protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
+	
 	public abstract void doProcessing(Context context, Request req);
 	
 	public abstract void doPostProcessing(Context context, Request obj);
+
+	public abstract void doPreProcessing(Context context, WorkspaceItem wsi);
 
 }
