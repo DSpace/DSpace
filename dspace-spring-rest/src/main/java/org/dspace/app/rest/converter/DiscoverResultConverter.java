@@ -65,6 +65,7 @@ public class DiscoverResultConverter {
             SearchFacetEntryRest facetEntry = new SearchFacetEntryRest(field.getIndexFieldName());
             int valueCount = 0;
             facetEntry.setHasMore(false);
+            facetEntry.setFacetLimit(field.getFacetLimit());
 
             for (DiscoverResult.FacetResult value : CollectionUtils.emptyIfNull(facetValues)) {
                 //The discover results contains max facetLimit + 1 values. If we reach the "+1", indicate that there are

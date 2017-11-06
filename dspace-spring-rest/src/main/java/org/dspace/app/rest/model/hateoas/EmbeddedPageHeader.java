@@ -55,25 +55,25 @@ public class EmbeddedPageHeader {
     public Map<String, String> getLinks() {
         Map<String, String> links = new HashMap<String, String>();
         if (!page.isFirst()) {
-            links.put("first", _link(page.getSort(), 0));
-            links.put("self", _link(page.getSort(), page.getNumber()));
+            links.put("first", _link(page.getSort(), 0, page.getSize()));
+            links.put("self", _link(page.getSort(), page.getNumber(), page.getSize()));
         }
         else {
-            links.put("self", _link(page.getSort(), null));
+            links.put("self", _link(page.getSort(), null, page.getSize()));
         }
         if (!page.isLast() && totalElementsIsKnown) {
-            links.put("last", _link(page.getSort(), page.getTotalPages()-1));
+            links.put("last", _link(page.getSort(), page.getTotalPages()-1, page.getSize()));
         }
         if (page.hasPrevious()) {
-            links.put("prev", _link(page.getSort(), page.getNumber()-1));
+            links.put("prev", _link(page.getSort(), page.getNumber()-1, page.getSize()));
         }
         if (page.hasNext()) {
-            links.put("next", _link(page.getSort(), page.getNumber()+1));
+            links.put("next", _link(page.getSort(), page.getNumber()+1, page.getSize()));
         }
         return links;
     }
 
-    private String _link(final Sort sort, Integer i) {
+    private String _link(final Sort sort, Integer i, int size) {
         UriComponentsBuilder uriComp = self.cloneBuilder();
         if(sort != null) {
             for (Sort.Order order : sort) {
@@ -82,6 +82,7 @@ public class EmbeddedPageHeader {
         }
         if(i != null) {
             uriComp = uriComp.queryParam("page", i);
+            uriComp = uriComp.queryParam("size", size);
         }
         return uriComp.build().toUriString();
     }
