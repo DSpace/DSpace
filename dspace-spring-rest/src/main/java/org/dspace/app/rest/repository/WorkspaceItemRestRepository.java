@@ -96,6 +96,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	
 	@Override
 	protected WorkspaceItemRest createAndReturn(Context context) {
+		context.turnOffAuthorisationSystem();		
 		SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
 		WorkspaceItem source = null;
 		for(int stepNum = 0; stepNum<submissionConfig.getNumberOfSteps(); stepNum++) {
@@ -128,6 +129,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 				log.error(e.getMessage(), e);
 			}
 		}
+		context.restoreAuthSystemState();
 		return converter.convert(source);		
 	}
 	
