@@ -78,8 +78,8 @@ public class RestResourceController implements InitializingBean {
 	@Autowired
 	RestRepositoryUtils repositoryUtils;
 	
-	@Autowired
-	JsonPatchPatchConverter patchConverter;
+//	@Autowired
+//	JsonPatchPatchConverter patchConverter;
 
 	@Override
 	public void afterPropertiesSet() {
@@ -162,12 +162,12 @@ public class RestResourceController implements InitializingBean {
 		return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);		
 	}
 	
-	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
-	public ResourceSupport patch(HttpServletRequest request, @PathVariable String apiCategory,
-			@PathVariable String model, @PathVariable Integer id, @RequestParam(required = false) JsonNode jsonNode) {
-		Patch patch = patchConverter.convert(jsonNode);
-		return patchInternal(request, apiCategory, model, id, patch);
-	}
+//	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
+//	public ResourceSupport patch(HttpServletRequest request, @PathVariable String apiCategory,
+//			@PathVariable String model, @PathVariable Integer id, @RequestParam(required = false) JsonNode jsonNode) {
+//		Patch patch = patchConverter.convert(jsonNode);
+//		return patchInternal(request, apiCategory, model, id, patch);
+//	}
 
 	public <ID extends Serializable> ResourceSupport patchInternal(HttpServletRequest request, String apiCategory,
 			String model, ID id, Patch patch) {

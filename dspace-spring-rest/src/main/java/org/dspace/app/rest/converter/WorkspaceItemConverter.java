@@ -89,7 +89,7 @@ public class WorkspaceItemConverter
 						// load the JSPStep interface for this step
 						AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
 								.newInstance();
-						witem.getSections().put(sections.getId(), stepProcessing.getData(obj));
+						witem.getSections().put(sections.getId(), stepProcessing.getData(obj, stepConfig));
 					} else {
 						throw new Exception("The submission step class specified by '"
 								+ stepConfig.getProcessingClassName()

@@ -156,6 +156,6 @@ public class Utils {
 	 * @return
 	 */
 	public String getMetadataKey(String schema, String element, String qualifier) {
-		return schema + "." + element + (StringUtils.isNotBlank(qualifier) ? "." + qualifier : "");
+		return org.dspace.core.Utils.standardize(schema, element, qualifier, ".");
 	}
 }
