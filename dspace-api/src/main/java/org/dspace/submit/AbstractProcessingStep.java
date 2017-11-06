@@ -9,11 +9,13 @@ package org.dspace.submit;
 
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
+import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.MetadataFieldService;
 import org.dspace.content.service.WorkspaceItemService;
@@ -43,6 +45,6 @@ public abstract class AbstractProcessingStep
 	
 	public abstract void doPostProcessing(Context context, Request obj);
 
-	public abstract void doPreProcessing(Context context, WorkspaceItem wsi);
+	public abstract InProgressSubmission doPreProcessing(Context context, Request request, InProgressSubmission wsi);
 
 }

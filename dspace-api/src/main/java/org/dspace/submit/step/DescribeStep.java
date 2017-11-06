@@ -8,6 +8,7 @@
 package org.dspace.submit.step;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
@@ -35,9 +36,9 @@ public class DescribeStep extends AbstractProcessingStep
 
 
 	@Override
-	public void doPreProcessing(Context context, WorkspaceItem wsi) {
+	public InProgressSubmission doPreProcessing(Context context, Request request, InProgressSubmission wsi) {
 		// TODO Auto-generated method stub
-		
+		return wsi;
 	}
 
    
