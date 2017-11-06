@@ -56,8 +56,8 @@ public class MultipartFileSender {
     private static final String CONTENT_DISPOSITION_FORMAT = "%s;filename=\"%s\"";
     private static final String BYTES_DINVALID_BYTE_RANGE_FORMAT = "bytes */%d";
     private static final String CACHE_CONTROL = "Cache-Control";
-    private static int DEFAULT_BUFFER_SIZE = 1000000; // ..bytes = 20KB.
-    private static final long DEFAULT_EXPIRE_TIME = 60L * 60L * 1000L; // ..ms = 1 week.
+    private static int DEFAULT_BUFFER_SIZE = 1000000;
+    private static final long DEFAULT_EXPIRE_TIME = 60L * 60L * 1000L;
 
     //no-cache so request is always performed for logging
     private static final String CACHE_CONTROL_SETTING = "private, no-cache";
@@ -74,7 +74,16 @@ public class MultipartFileSender {
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String bufferSize = configurationService.getProperty("bitstream-download.buffer.size");
         if (StringUtils.isNotEmpty(bufferSize)) {
-            DEFAULT_BUFFER_SIZE = Integer.parseInt(bufferSize);
+            try {
+                int configuredBufferSize = Integer.parseInt(bufferSize);
+                if (configuredBufferSize > 0) {
+                    DEFAULT_BUFFER_SIZE = configuredBufferSize;
+                } else {
+                    log.debug("bitstream buffer size configured as < 0, using default");
+                }
+            } catch (NumberFormatException e) {
+                log.error("bitstream-download.buffer.size property wrongly configured, this should be a positive integer");
+            }
         }
     }
 
@@ -119,11 +128,11 @@ public class MultipartFileSender {
             return;
         }
 
-//        if (!Files.exists(filepath)) {
-//            logger.error("File doesn't exist at URI : {}", filepath.toAbsolutePath().toString());
-//            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-//            return;
-//        }
+        if (inputStream == null) {
+            log.error("Bitstream has no content");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         Long length = bitstream.getSizeBytes();
         String fileName = bitstream.getName();
@@ -136,12 +145,12 @@ public class MultipartFileSender {
         // Validate request headers for caching ---------------------------------------------------
         // If-None-Match header should contain "*" or ETag. If so, then return 304.
         String ifNoneMatch = request.getHeader(IF_NONE_MATCH);
-//        if (nonNull(ifNoneMatch) && matches(ifNoneMatch, bitstream.getCheckSum().getValue())) {
-//            log.error("If-None-Match header should contain \"*\" or ETag. If so, then return 304.");
-//            response.setHeader(ETAG, bitstream.getCheckSum().getValue()); // Required in 304.
-//            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-//            return;
-//        }
+        if (nonNull(ifNoneMatch) && matches(ifNoneMatch, bitstream.getCheckSum().getValue())) {
+            log.error("If-None-Match header should contain \"*\" or ETag. If so, then return 304.");
+            response.setHeader(ETAG, bitstream.getCheckSum().getValue()); // Required in 304.
+            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+            return;
+        }
 
         // If-Modified-Since header should be greater than LastModified. If so, then return 304.
         // This header is ignored if any If-None-Match header is specified.
@@ -241,8 +250,8 @@ public class MultipartFileSender {
         response.setDateHeader(LAST_MODIFIED, lastModified);
         response.setDateHeader(EXPIRES, System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
-        //TODO what does this mean
-        response.setHeader(CACHE_CONTROL, "private, no-cache");
+        //No-cache so that we can log every download
+        response.setHeader(CACHE_CONTROL, CACHE_CONTROL_SETTING);
 
 
         if (isNullOrEmpty(disposition)) {
@@ -344,7 +353,7 @@ public class MultipartFileSender {
         public Range(long start, long end, long total) {
             this.start = start;
 //            if (end <= start + DEFAULT_BUFFER_SIZE) {
-                this.end = end;
+            this.end = end;
 //            } else {
 //                this.end = Math.min(start + DEFAULT_BUFFER_SIZE, total - 1);
 //            }
