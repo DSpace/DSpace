@@ -27,6 +27,9 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 	private Date lastModified = new Date();
 
 	private Map<String, RestModel> sections;
+
+	@JsonIgnore
+	private CollectionRest collection;
 	
 	@JsonIgnore
 	private ItemRest item;
@@ -90,5 +93,13 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 
 	public void setSections(Map<String, RestModel> sections) {
 		this.sections = sections;
+	}
+
+	public CollectionRest getCollection() {
+		return collection;
+	}
+
+	public void setCollection(CollectionRest collection) {
+		this.collection = collection;
 	}
 }
