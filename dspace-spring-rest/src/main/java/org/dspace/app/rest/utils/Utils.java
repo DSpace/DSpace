@@ -161,4 +161,15 @@ public class Utils {
 	public String getMetadataKey(String schema, String element, String qualifier) {
 		return org.dspace.core.Utils.standardize(schema, element, qualifier, ".");
 	}
+
+    /**
+     * Transform the given rel name into a curied rel
+     * @param data
+     * @param name
+     * @param <T>
+     * @return
+     */
+	public <T extends RestModel> String getCurie(T data, String name) {
+		return String.format("%s:%s", data.getCategory(), name);
+	}
 }

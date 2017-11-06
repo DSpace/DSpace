@@ -70,7 +70,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 										// TODO add support for single linked object other than for collections
 										Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
 										EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
-										embedded.put(name, ep);
+										embedded.put(utils.getCurie(data, name), ep);
 										found = true;
 								}
 							}
@@ -100,14 +100,14 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 								Object linkedObject = readMethod.invoke(data);
 								Object wrapObject = linkedObject;
 								if (linkedObject instanceof RestAddressableModel) {
-									RestAddressableModel linkedRM = (RestAddressableModel) linkedObject; 
+									RestAddressableModel linkedRM = (RestAddressableModel) linkedObject;
 									wrapObject = utils.getResourceRepository(linkedRM.getCategory(), linkedRM.getType())
 											.wrapResource(linkedRM);
 
 								}
 								else {
 									if (linkedObject instanceof List) {
-										List<RestAddressableModel> linkedRMList = (List<RestAddressableModel>) linkedObject; 
+										List<RestAddressableModel> linkedRMList = (List<RestAddressableModel>) linkedObject;
 										if (linkedRMList.size() > 0) {
 											
 											DSpaceRestRepository<RestAddressableModel, ?> resourceRepository = utils.getResourceRepository(linkedRMList.get(0).getCategory(), linkedRMList.get(0).getType());
@@ -126,7 +126,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 									}
 								}
 
-								embedded.put(name, wrapObject);
+								embedded.put(utils.getCurie(data, name), wrapObject);
 							}
 							else {
 								// call the link repository
@@ -139,16 +139,15 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 									for (Method m : methods) { 
 										if (StringUtils.equals(m.getName(), linkAnnotation.method())) {
 												if ( Page.class.isAssignableFrom( m.getReturnType()) ){
-													Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);														
+													Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
 													EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
-													embedded.put(name, ep);
+													embedded.put(utils.getCurie(data, name), ep);
 												}
 												else {
 													RestAddressableModel object = (RestAddressableModel)m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
 													HALResource ep = linkRepository.wrapResource(object, linkToSubResource.getHref());
 													embedded.put(name, ep);
 												}
-
 												found = true;
 										}
 									}
@@ -164,11 +163,11 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 						else if (RestAddressableModel.class.isAssignableFrom(readMethod.getReturnType())) {
 							RestAddressableModel linkedObject = (RestAddressableModel) readMethod.invoke(data);
 							if (linkedObject != null) {
-								embedded.put(name,
+								embedded.put(utils.getCurie(data, name),
 										utils.getResourceRepository(linkedObject.getCategory(), linkedObject.getType())
 												.wrapResource(linkedObject));
 							} else {
-								embedded.put(name, null);
+								embedded.put(utils.getCurie(data, name), null);
 							}
 						}
 					}
