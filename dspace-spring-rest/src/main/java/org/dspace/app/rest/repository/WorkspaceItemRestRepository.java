@@ -27,6 +27,7 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.services.model.Request;
 import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -115,7 +116,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 					// load the JSPStep interface for this step
 					AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass
 							.newInstance();
-					stepProcessing.doPreProcessing(context, source);
+					source = (WorkspaceItem)stepProcessing.doPreProcessing(context, getRequestService().getCurrentRequest(), source);
 				} else {
 					throw new Exception("The submission step class specified by '"
 							+ stepConfig.getProcessingClassName()

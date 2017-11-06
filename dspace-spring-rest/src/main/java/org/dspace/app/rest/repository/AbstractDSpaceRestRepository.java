@@ -38,4 +38,8 @@ public abstract class AbstractDSpaceRestRepository {
 		currentRequest.setAttribute(ContextUtil.DSPACE_CONTEXT, context);
 		return context;
 	}
+
+	public RequestService getRequestService() {
+		return requestService;
+	}
 }
