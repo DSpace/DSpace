@@ -146,16 +146,4 @@ public class Utils {
 		return linkRest;
 	}
 
-	/**
-	 * Build the canonical representation of a metadata key in DSpace. ie
-	 * <schema>.<element>[.<qualifier>]
-	 * 
-	 * @param schema
-	 * @param element
-	 * @param object
-	 * @return
-	 */
-	public String getMetadataKey(String schema, String element, String qualifier) {
-		return org.dspace.core.Utils.standardize(schema, element, qualifier, ".");
-	}
 }
