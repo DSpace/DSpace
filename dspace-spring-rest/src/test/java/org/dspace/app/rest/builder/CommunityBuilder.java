@@ -11,7 +11,6 @@ import org.dspace.content.Community;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
 
 /**
  * Builder to construct Community objects

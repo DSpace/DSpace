@@ -11,13 +11,7 @@ import java.io.Serializable;
 
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
-import org.dspace.services.RequestService;
-import org.dspace.services.model.Request;
-import org.dspace.utils.DSpace;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
