@@ -368,7 +368,7 @@ public class BitstreamStorageManager
                 scratchFile.delete();
                 storedLocation = "Amazon S3 " + getS3BucketName() + ":" + key;
             } catch(Exception e) {
-                log.error("put(" + id +", is)", e);
+                log.error("Unable to store " + id + " in S3 bucket " + s3BucketName, e);
                 throw new IOException(e);
             } finally {
                 if (scratchFile.exists()) {
@@ -574,7 +574,7 @@ public class BitstreamStorageManager
                 S3Object object = s3Service.getObject(new GetObjectRequest(s3BucketName, key));
                 resultInputStream = (object != null) ? object.getObjectContent() : null;
             } catch (Exception e) {
-                log.error("get("+key+")", e);
+                log.error("Unable to get S3 item " + key + " from bucket " + s3BucketName, e);
                 throw new IOException(e);
             }
         } else {
