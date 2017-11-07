@@ -7,14 +7,7 @@
  */
 package org.dspace.submit.step;
 
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
-import org.dspace.content.Collection;
-import org.dspace.content.InProgressSubmission;
-import org.dspace.content.WorkspaceItem;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.InProgressSubmissionService;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.dspace.submit.AbstractProcessingStep;
@@ -33,24 +26,5 @@ public class SelectCollectionStep extends AbstractProcessingStep {
 	public void doPostProcessing(Context context, Request obj) {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public InProgressSubmission doPreProcessing(Context context, Request request,
-			InProgressSubmission inProgressSubmission) {
-		if (inProgressSubmission == null) {
-			String uuid = configurationService.getProperty("submission.default.collection");
-			try {
-				Collection collection = collectionService.find(context, UUID.fromString(uuid));
-				inProgressSubmission = workspaceItemService.create(context, collection, true);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}
-		else {
-			//TODO manage setup of default collection in the case WSI it is not null
-			//TODO manage setup of collection discovered into request
-		}
-		return inProgressSubmission;
 	}
 }

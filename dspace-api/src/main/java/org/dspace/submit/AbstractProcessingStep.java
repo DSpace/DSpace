@@ -45,6 +45,4 @@ public abstract class AbstractProcessingStep
 	
 	public abstract void doPostProcessing(Context context, Request obj);
 
-	public abstract InProgressSubmission doPreProcessing(Context context, Request request, InProgressSubmission wsi);
-
 }
