@@ -21,6 +21,7 @@ import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionStepConfig;
@@ -53,6 +54,9 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	
 	@Autowired
 	WorkspaceItemConverter converter;
+	
+	@Autowired
+	SubmissionService submissionService;
 	
 	private SubmissionConfigReader submissionConfigReader;
 	
@@ -97,38 +101,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	@Override
 	protected WorkspaceItemRest createAndReturn(Context context) {
 		context.turnOffAuthorisationSystem();		
-		SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
-		WorkspaceItem source = null;
-		for(int stepNum = 0; stepNum<submissionConfig.getNumberOfSteps(); stepNum++) {
-			
-			SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
-			/*
-			 * First, load the step processing class (using the current
-			 * class loader)
-			 */
-			ClassLoader loader = this.getClass().getClassLoader();
-			Class stepClass;
-			try {
-				stepClass = loader.loadClass(stepConfig.getProcessingClassName());
-
-				Object stepInstance = stepClass.newInstance();
-
-				if (stepInstance instanceof AbstractProcessingStep) {
-					// load the JSPStep interface for this step
-					AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass
-							.newInstance();
-					source = (WorkspaceItem)stepProcessing.doPreProcessing(context, getRequestService().getCurrentRequest(), source);
-				} else {
-					throw new Exception("The submission step class specified by '"
-							+ stepConfig.getProcessingClassName()
-							+ "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
-							+ " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
-				}
-
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}
+		WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest()); 
 		context.restoreAuthSystemState();
 		return converter.convert(source);		
 	}
