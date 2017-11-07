@@ -71,8 +71,9 @@ public abstract class AbstractDSpaceRestRepository {
 							eperson.setEmail("test-user@mailinator.com");
 							eperson.setCanLogIn(true);
 							eperson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
-							// actually save the eperson to unit testing DB
+							// actually save the eperson
 							ePersonService.update(context, eperson);
+							context.commit();
 						}
 						currentUser = eperson;
 					} catch (Exception e) {
