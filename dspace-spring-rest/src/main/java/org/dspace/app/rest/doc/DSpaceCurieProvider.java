@@ -31,13 +31,13 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
     @Override
     public String getNamespacedRelFrom(Link link) {
         //Used for the links section
-        return getNamespacedRelFromHref(link.getRel(), link.getHref());
+        return getNameSpacedRel(link.getRel(), link.getHref());
     }
 
     @Override
     public String getNamespacedRelFor(String rel) {
         //Used for the embedded section
-        return getNamespacedRelFromHref(rel, null);
+        return getNameSpacedRel(rel, null);
     }
 
     @Override
@@ -56,13 +56,13 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
         return Collections.unmodifiableCollection(result.values());
     }
 
-    public String getNamespacedRelFor(String category, String name) {
+    public String getNamespacedRelFor(String category, String rel) {
         String curie = getCurieForCategory(category);
-        return String.format("%s:%s", curie, name);
+        return getNameSpacedRelWithCurie(curie, rel);
     }
 
-    public String getNamespacedRelFor(RestModel data, String name) {
-        return getNamespacedRelFor(data.getCategory(), name);
+    public String getNamespacedRelFor(RestModel data, String rel) {
+        return getNamespacedRelFor(data.getCategory(), rel);
     }
 
     private String getCurieForCategory(final String category) {
@@ -70,10 +70,14 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
         return category;
     }
 
-    private String getNamespacedRelFromHref(String rel, String href) {
+    private String getNameSpacedRel(String rel, String href) {
         String curie = getCurie(href);
 
-        boolean prefixingNeeded = !IanaRels.isIanaRel(rel) && !rel.contains(":");
+        return getNameSpacedRelWithCurie(curie, rel);
+    }
+
+    private String getNameSpacedRelWithCurie(String curie, String rel) {
+        boolean prefixingNeeded = StringUtils.isNotBlank(curie) && !IanaRels.isIanaRel(rel) && !rel.contains(":");
         return prefixingNeeded ? String.format("%s:%s", curie, rel) : rel;
     }
 
