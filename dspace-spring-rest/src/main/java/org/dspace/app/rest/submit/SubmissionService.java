@@ -52,4 +52,12 @@ public class SubmissionService {
 		return wsi;
 	}
 	
+	public void saveWorkspaceItem(Context context, WorkspaceItem wsi) {
+		try {
+			workspaceItemService.update(context, wsi);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+	
 }

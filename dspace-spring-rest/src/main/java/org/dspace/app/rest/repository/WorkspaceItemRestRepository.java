@@ -100,8 +100,46 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	
 	@Override
 	protected WorkspaceItemRest createAndReturn(Context context) {
-		WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest()); 
+		WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest());		
 		return converter.convert(source);		
+	}
+
+	@Override
+	protected WorkspaceItemRest save(Context context, WorkspaceItemRest wsi) {
+		SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
+		WorkspaceItem source = converter.toModel(wsi);
+		for(int stepNum = 0; stepNum<submissionConfig.getNumberOfSteps(); stepNum++) {
+			
+			SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
+			/*
+			 * First, load the step processing class (using the current
+			 * class loader)
+			 */
+			ClassLoader loader = this.getClass().getClassLoader();
+			Class stepClass;
+			try {
+				stepClass = loader.loadClass(stepConfig.getProcessingClassName());
+
+				Object stepInstance = stepClass.newInstance();
+
+				if (stepInstance instanceof AbstractProcessingStep) {
+					// load the JSPStep interface for this step
+					AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass
+							.newInstance();
+					stepProcessing.doProcessing(context, getRequestService().getCurrentRequest(), source);
+				} else {
+					throw new Exception("The submission step class specified by '"
+							+ stepConfig.getProcessingClassName()
+							+ "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
+							+ " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
+				}
+
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+		submissionService.saveWorkspaceItem(context, source);
+		return wsi;		
 	}
 	
 	@Override

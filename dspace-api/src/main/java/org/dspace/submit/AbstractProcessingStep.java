@@ -41,8 +41,8 @@ public abstract class AbstractProcessingStep
     protected ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
 	protected WorkspaceItemService workspaceItemService = ContentServiceFactory.getInstance().getWorkspaceItemService();
 	
-	public abstract void doProcessing(Context context, Request req);
+	public abstract void doProcessing(Context context, Request req, InProgressSubmission wsi);
 	
-	public abstract void doPostProcessing(Context context, Request obj);
+	public abstract void doPostProcessing(Context context, Request obj, InProgressSubmission wsi);
 
 }

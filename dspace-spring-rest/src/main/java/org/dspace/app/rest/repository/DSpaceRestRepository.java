@@ -11,18 +11,11 @@ import java.io.Serializable;
 
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
-import org.dspace.services.RequestService;
-import org.dspace.services.model.Request;
-import org.dspace.utils.DSpace;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.rest.webmvc.json.patch.Patch;
 
 /**
  * This is the base class for any Rest Repository. It add a DSpaceContext to the
@@ -38,10 +31,20 @@ extends AbstractDSpaceRestRepository
 
 	@Override
 	public <S extends T> S save(S entity) {
-		// TODO Auto-generated method stub
-		return null;
+		Context context = obtainContext();
+		return save(context, entity);
 	}
 
+	protected <S extends T> S save(Context context, S entity) {
+		try {
+			//nothing to do default implementation commit transaction
+			context.commit();
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+		return entity;
+	}
+	
 	@Override
 	public <S extends T> Iterable<S> save(Iterable<S> entities) {
 		// TODO Auto-generated method stub
