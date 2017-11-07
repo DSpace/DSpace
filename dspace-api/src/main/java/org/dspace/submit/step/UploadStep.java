@@ -30,10 +30,4 @@ public class UploadStep extends AbstractProcessingStep
 		
 	}
 
-	@Override
-	public InProgressSubmission doPreProcessing(Context context, Request request, InProgressSubmission wsi) {
-		// TODO Auto-generated method stub
-		return wsi;
-	}
-
 }

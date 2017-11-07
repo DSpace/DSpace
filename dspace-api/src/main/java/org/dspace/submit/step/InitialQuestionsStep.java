@@ -27,11 +27,4 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public InProgressSubmission doPreProcessing(Context context, Request request, InProgressSubmission wsi) {
-		// TODO Auto-generated method stub
-		return wsi;
-	}
-    
 }
