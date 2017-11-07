@@ -30,6 +30,9 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 	private Map<String, SectionData> sections;
 	
 	@JsonIgnore
+	private CollectionRest collection;
+	
+	@JsonIgnore
 	private ItemRest item;
 	
 	@JsonIgnore
@@ -91,5 +94,13 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 
 	public void setSections(Map<String, SectionData> sections) {
 		this.sections = sections;
+	}
+
+	public CollectionRest getCollection() {
+		return collection;
+	}
+
+	public void setCollection(CollectionRest collection) {
+		this.collection = collection;
 	}
 }
