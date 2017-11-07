@@ -1,0 +1,23 @@
+== DSpace root REST endpoint
+
+[[root-list]]
+=== List REST endpoints
+
+The root endpoint lists all the main REST entrypoints and some details on the repository.
+
+==== Response structure
+
+include::{snippets}/core/root/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/core/root/links.adoc[]
+
+==== Example request
+
+include::{snippets}/core/root/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/core/root/http-response.adoc[]
