@@ -7,15 +7,11 @@
  */
 package org.dspace.app.rest.builder;
 
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
-import org.dspace.discovery.SearchServiceException;
-
-import java.sql.SQLException;
 
 /**
  * Builder to construct Collection objects
