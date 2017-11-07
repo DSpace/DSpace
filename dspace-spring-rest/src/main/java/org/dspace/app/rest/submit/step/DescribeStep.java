@@ -32,9 +32,6 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 
 	private DCInputsReader inputReader;
 	
-	@Autowired
-	private ItemService itemService;
-	
 	public DescribeStep() throws DCInputsReaderException {
 		inputReader = new DCInputsReader();
 	}
