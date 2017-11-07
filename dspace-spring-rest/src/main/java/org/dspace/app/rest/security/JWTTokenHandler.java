@@ -31,29 +31,42 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JWTTokenHandler {
 
-    public static final String EPERSON_ID = "eid";
-    public static final String SPECIAL_GROUPS = "sg";
+
+    @Autowired
+    private List<JWTClaimProvider> jwtClaimProviders;
 
     private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
 
     private String jwtKey;
     private long expirationTime;
-    private EPersonService ePersonService;
 
-    public JWTTokenHandler(EPersonService ePersonService, ConfigurationService configurationService) {
-        this.ePersonService = ePersonService;
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private EPersonClaimProvider ePersonClaimProvider;
+
+
+    public JWTTokenHandler() {
         //TODO move properties to authentication module
+        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.jwtKey = configurationService.getProperty("jwt.token.secret", "defaultjwtkeysecret");
         this.expirationTime = configurationService.getLongProperty("jwt.token.expiration", 30) * 60 * 1000;
     }
+
 
     /**
      * Retrieve EPerson from a jwt
@@ -73,7 +86,8 @@ public class JWTTokenHandler {
         SignedJWT signedJWT = SignedJWT.parse(token);
         JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
 
-        EPerson ePerson = ePersonService.find(context, UUID.fromString(jwtClaimsSet.getClaim(EPERSON_ID).toString()));
+        EPerson ePerson = getEPerson(context, jwtClaimsSet);
+
         JWSVerifier verifier = new MACVerifier(buildSigningKey(request, ePerson));
 
         //If token is valid and not expired return eperson in token
@@ -84,11 +98,20 @@ public class JWTTokenHandler {
                 && DateUtils.isAfter(expirationTime, new Date(), 60)) {
 
             log.debug("Received valid token for username: " + ePerson.getEmail());
+
+            for (JWTClaimProvider jwtClaimProvider: jwtClaimProviders) {
+                jwtClaimProvider.parseClaim(context, request, jwtClaimsSet);
+            }
+
             return ePerson;
         } else {
             log.warn("Someone tried to use an expired or non-valid token");
             return null;
         }
+    }
+
+    private EPerson getEPerson(Context context, JWTClaimsSet jwtClaimsSet) throws SQLException {
+        return ePersonClaimProvider.getEPerson(context, jwtClaimsSet);
     }
 
     /**
@@ -102,10 +125,11 @@ public class JWTTokenHandler {
      */
     public String createTokenForEPerson(Context context, HttpServletRequest request, EPerson ePerson, List<Group> groups) throws JOSEException {
         createNewSessionSalt(ePerson);
+        context.setCurrentUser(ePerson);
 
         JWSSigner signer = new MACSigner(buildSigningKey(request, ePerson));
 
-        List<String> groupIds = groups.stream().map(group -> group.getID().toString()).collect(Collectors.toList());
+
         try {
             context.commit();
         } catch (SQLException e) {
@@ -113,9 +137,13 @@ public class JWTTokenHandler {
             log.error("Error while committing salt to eperson", e);
         }
 
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .claim(EPERSON_ID, ePerson.getID().toString())
-                .claim(SPECIAL_GROUPS, groupIds)
+        JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
+
+        for (JWTClaimProvider jwtClaimProvider: jwtClaimProviders) {
+            builder = builder.claim(jwtClaimProvider.getKey(), jwtClaimProvider.getValue(context, request));
+        }
+
+        JWTClaimsSet claimsSet = builder
                 .expirationTime(new Date(System.currentTimeMillis() + expirationTime))
                 .build();
 
@@ -158,5 +186,13 @@ public class JWTTokenHandler {
         StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
         String salt = stringKeyGenerator.generateKey();
         ePerson.setSessionSalt(salt);
+    }
+
+    public List<JWTClaimProvider> getJwtClaimProviders() {
+        return jwtClaimProviders;
+    }
+
+    public void setJwtClaimProviders(List<JWTClaimProvider> jwtClaimProviders) {
+        this.jwtClaimProviders = jwtClaimProviders;
     }
 }

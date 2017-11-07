@@ -7,15 +7,17 @@
  */
 package org.dspace.app.rest.security;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Interface for a service that can provide authentication for the REST API
  */
+@Service
 public interface RestAuthenticationService {
 
     void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, String email);
@@ -25,4 +27,5 @@ public interface RestAuthenticationService {
     boolean hasAuthenticationData(HttpServletRequest request);
 
     void invalidateAuthenticationData(HttpServletRequest request, Context context);
+
 }
