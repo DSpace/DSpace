@@ -85,6 +85,7 @@ public class WorkspaceItemConverter
 		if (collection != null) {
 			SubmissionDefinitionRest def = submissionDefinitionConverter
 					.convert(submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
+			witem.setSubmissionDefinition(def);
 			for (SubmissionSectionRest sections : def.getPanels()) {
 				SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 
