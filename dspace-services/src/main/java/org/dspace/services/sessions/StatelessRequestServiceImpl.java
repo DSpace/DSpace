@@ -103,7 +103,7 @@ public final class StatelessRequestServiceImpl implements RequestService, Initia
         for (RequestInterceptor requestInterceptor : interceptors) {
             if (requestInterceptor != null) {
                 try {
-                    requestInterceptor.onStart(req.getRequestId(), null);
+                    requestInterceptor.onStart(req.getRequestId());
                 } catch (RequestInterruptionException e) {
                     String message = "Request stopped from starting by exception from the interceptor ("+requestInterceptor+"): " + e.getMessage();
                     log.warn(message);
@@ -139,14 +139,11 @@ public final class StatelessRequestServiceImpl implements RequestService, Initia
 
     private void endRequest(String requestId, Exception failure) {
         if (requestId != null) {
-            Session session = null;
-
-
             List<RequestInterceptor> interceptors = getInterceptors(true); // reverse
             for (RequestInterceptor requestInterceptor : interceptors) {
                 if (requestInterceptor != null) {
                     try {
-                        requestInterceptor.onEnd(requestId, session, (failure == null), failure);
+                        requestInterceptor.onEnd(requestId, (failure == null), failure);
                     } catch (RequestInterruptionException e) {
                         log.warn("Attempt to stop request from ending by an exception from the interceptor ("+requestInterceptor+"), cannot stop requests from ending though so request end continues, this may be an error: " + e.getMessage());
                     } catch (Exception e) {

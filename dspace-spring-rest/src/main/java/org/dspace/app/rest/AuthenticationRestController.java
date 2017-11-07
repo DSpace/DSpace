@@ -7,16 +7,14 @@
  */
 package org.dspace.app.rest;
 
-import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.StatusRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,16 +22,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
+
 //TODO add links to login, logout and status in the Root Rest Resource
 @RestController
 public class AuthenticationRestController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationRestController.class);
 
+    @Autowired
+    EPersonConverter ePersonConverter;
+
     @RequestMapping(value = "/api/status", method = RequestMethod.GET)
     public StatusRest status(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
-        return new StatusRest(context.getCurrentUser());
+        EPersonRest ePersonRest = null;
+        if (context.getCurrentUser() != null) {
+            ePersonRest = ePersonConverter.fromModel(context.getCurrentUser());
+        }
+        return new StatusRest(ePersonRest);
     }
 
     @RequestMapping(value = "/api/login", method = {RequestMethod.GET, RequestMethod.POST})

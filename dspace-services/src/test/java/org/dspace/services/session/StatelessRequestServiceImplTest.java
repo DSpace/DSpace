@@ -7,19 +7,17 @@
  */
 package org.dspace.services.session;
 
-import static org.junit.Assert.*;
-
-
 import org.dspace.services.CachingService;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
-import org.dspace.services.model.Session;
 import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.sessions.StatelessRequestServiceImpl;
 import org.dspace.test.DSpaceAbstractKernelTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 
 /**
@@ -29,20 +27,20 @@ import org.junit.Test;
  */
 public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
 
-    private StatelessRequestServiceImpl sessionRequestService;
+    private StatelessRequestServiceImpl statelessRequestService;
     private CachingService cachingService; 
 
     @Before
     public void before() {
-        sessionRequestService = getService(StatelessRequestServiceImpl.class);
+        statelessRequestService = getService(StatelessRequestServiceImpl.class);
         cachingService = getService(CachingService.class);
     }
 
     @After
     public void after() {
-        sessionRequestService.clear();
+        statelessRequestService.clear();
         cachingService.resetCaches();
-        sessionRequestService = null;
+        statelessRequestService = null;
         cachingService = null;
     }
 
@@ -51,10 +49,10 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
      */
     @Test
     public void testStartRequest() {
-        String requestId = sessionRequestService.startRequest();
+        String requestId = statelessRequestService.startRequest();
         assertNotNull(requestId);
 
-        sessionRequestService.endRequest(null);
+        statelessRequestService.endRequest(null);
     }
 
     /**
@@ -62,10 +60,10 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
      */
     @Test
     public void testEndRequest() {
-        String requestId = sessionRequestService.startRequest();
+        String requestId = statelessRequestService.startRequest();
         assertNotNull(requestId);
 
-        sessionRequestService.endRequest(null);
+        statelessRequestService.endRequest(null);
         assertNull( getRequestCache() );
     }
 
@@ -75,34 +73,34 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
     @Test
     public void testRegisterRequestListener() {
         MockRequestInterceptor mri = new MockRequestInterceptor();
-        sessionRequestService.registerRequestInterceptor(mri);
+        statelessRequestService.registerRequestInterceptor(mri);
         assertEquals("", mri.state);
         assertEquals(0, mri.hits);
 
-        String requestId = sessionRequestService.startRequest();
+        String requestId = statelessRequestService.startRequest();
         assertEquals(1, mri.hits);
         assertTrue( mri.state.startsWith("start") );
         assertTrue( mri.state.contains(requestId));
 
-        sessionRequestService.endRequest(null);
+        statelessRequestService.endRequest(null);
         assertEquals(2, mri.hits);
         assertTrue( mri.state.startsWith("end") );
         assertTrue( mri.state.contains("success"));
         assertTrue( mri.state.contains(requestId));
 
-        requestId = sessionRequestService.startRequest();
+        requestId = statelessRequestService.startRequest();
         assertEquals(3, mri.hits);
         assertTrue( mri.state.startsWith("start") );
         assertTrue( mri.state.contains(requestId));
 
-        sessionRequestService.endRequest( new RuntimeException("Oh Noes!") );
+        statelessRequestService.endRequest( new RuntimeException("Oh Noes!") );
         assertEquals(4, mri.hits);
         assertTrue( mri.state.startsWith("end") );
         assertTrue( mri.state.contains("fail"));
         assertTrue( mri.state.contains(requestId));
 
         try {
-            sessionRequestService.registerRequestInterceptor(null);
+            statelessRequestService.registerRequestInterceptor(null);
             fail("should have thrown exception");
         } catch (IllegalArgumentException e) {
             assertNotNull(e.getMessage());
@@ -114,7 +112,7 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
      */
     @Test
     public void testGetCurrentUserId() {
-        String current = sessionRequestService.getCurrentUserId();
+        String current = statelessRequestService.getCurrentUserId();
         assertNull(current);
     }
 
@@ -123,18 +121,18 @@ public class StatelessRequestServiceImplTest extends DSpaceAbstractKernelTest {
      */
     @Test
     public void testGetCurrentRequestId() {
-        String requestId = sessionRequestService.getCurrentRequestId();
+        String requestId = statelessRequestService.getCurrentRequestId();
         assertNull(requestId); // no request yet
 
-        String rid = sessionRequestService.startRequest();
+        String rid = statelessRequestService.startRequest();
 
-        requestId = sessionRequestService.getCurrentRequestId();
+        requestId = statelessRequestService.getCurrentRequestId();
         assertNotNull(requestId);
         assertEquals(rid, requestId);
 
-        sessionRequestService.endRequest(null);
+        statelessRequestService.endRequest(null);
 
-        requestId = sessionRequestService.getCurrentRequestId();
+        requestId = statelessRequestService.getCurrentRequestId();
         assertNull(requestId); // no request yet
     }
 
