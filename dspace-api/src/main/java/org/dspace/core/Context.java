@@ -267,42 +267,6 @@ public class Context
             authStateClassCallHistory.push(caller);
         }
         ignoreAuth = true;
-        
-        
-		boolean runSingleUser = DSpaceServicesFactoryImpl.getInstance().getConfigurationService()
-				.getBooleanProperty("run.single.test-user");
-		if (runSingleUser) {
-			try {
-				currentUser = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(this,
-						"test-user@mailinator.com");
-				if (currentUser == null) {		
-					EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
-					EPerson eperson;
-					try {
-						eperson = ePersonService.findByEmail(this, "test-user@mailinator.com");
-						if (eperson == null) {
-							// This EPerson creation should only happen once
-							log.info("Creating initial EPerson (email=test-user@mailinator.com) for Tests");
-							eperson = ePersonService.create(this);
-							eperson.setFirstName(this, "first");
-							eperson.setLastName(this, "last");
-							eperson.setEmail("test-user@mailinator.com");
-							eperson.setCanLogIn(true);
-							eperson.setLanguage(this, I18nUtil.getDefaultLocale().getLanguage());
-							// actually save the eperson to unit testing DB
-							ePersonService.update(this, eperson);
-
-						}
-						currentUser = eperson;
-					} catch (Exception e) {
-						log.error(e.getMessage(), e);
-					}
-					
-				}
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}
     }
 
     /**
@@ -352,12 +316,6 @@ public class Context
             }
         }
         ignoreAuth = previousState.booleanValue();
-        
-		boolean runSingleUser = DSpaceServicesFactoryImpl.getInstance().getConfigurationService()
-				.getBooleanProperty("run.single.test-user");		
-		if (runSingleUser) {
-			currentUser = null;
-		}
     }
 
     /**
