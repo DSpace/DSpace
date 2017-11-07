@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(MetadataSchemaRest.CATEGORY)
 @RelNameDSpaceResource(MetadataSchemaRest.NAME)
 public class MetadataSchemaResource extends DSpaceResource<MetadataSchemaRest> {
 	public MetadataSchemaResource(MetadataSchemaRest ms, Utils utils, String... rels) {

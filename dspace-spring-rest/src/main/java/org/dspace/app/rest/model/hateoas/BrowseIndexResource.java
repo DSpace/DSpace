@@ -18,7 +18,8 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@RelNameDSpaceResource(BrowseIndexRest.NAME)
+@DSpaceRestCategory(BrowseIndexRest.CATEGORY)
+@RelNameDSpaceResource(value = BrowseIndexRest.NAME)
 public class BrowseIndexResource extends DSpaceResource<BrowseIndexRest> {
 	public BrowseIndexResource(BrowseIndexRest bix, Utils utils, String... rels) {
 		super(bix, utils, rels);

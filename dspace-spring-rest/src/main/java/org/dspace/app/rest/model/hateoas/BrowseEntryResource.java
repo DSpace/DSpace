@@ -17,6 +17,7 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(BrowseIndexRest.CATEGORY)
 @RelNameDSpaceResource(BrowseEntryRest.NAME)
 public class BrowseEntryResource extends HALResource<BrowseEntryRest> {
 

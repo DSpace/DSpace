@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import org.dspace.app.rest.doc.DSpaceCurieProvider;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.core.EvoInflectorRelProvider;
 
 /**
@@ -19,12 +21,15 @@ import org.springframework.hateoas.core.EvoInflectorRelProvider;
  */
 public class DSpaceRelProvider extends EvoInflectorRelProvider {
 
+	@Autowired
+	private DSpaceCurieProvider dspaceCurieProvider;
+
 	@Override
 	public String getItemResourceRelFor(Class<?> type) {
-		RelNameDSpaceResource nameAnnotation = type.getAnnotation(RelNameDSpaceResource.class);
-		if (nameAnnotation != null) {
-			return nameAnnotation.value();
-		}
+        RelNameDSpaceResource nameAnnotation = type.getAnnotation(RelNameDSpaceResource.class);
+        if (nameAnnotation != null) {
+            return dspaceCurieProvider.getNamespacedRelFor(nameAnnotation.value(), nameAnnotation.value());
+        }
 		return super.getItemResourceRelFor(type);
 	}
 

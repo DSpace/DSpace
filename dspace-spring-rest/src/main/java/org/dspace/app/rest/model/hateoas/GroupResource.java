@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(GroupRest.CATEGORY)
 @RelNameDSpaceResource(GroupRest.NAME)
 public class GroupResource extends DSpaceResource<GroupRest> {
 	public GroupResource(GroupRest group, Utils utils, String... rels) {

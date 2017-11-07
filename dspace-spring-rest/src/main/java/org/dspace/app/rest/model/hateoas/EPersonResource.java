@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(EPersonRest.CATEGORY)
 @RelNameDSpaceResource(EPersonRest.NAME)
 public class EPersonResource extends DSpaceResource<EPersonRest> {
 	public EPersonResource(EPersonRest eperson, Utils utils, String... rels) {

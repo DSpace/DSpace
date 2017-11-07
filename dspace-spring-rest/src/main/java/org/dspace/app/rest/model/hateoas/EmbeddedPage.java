@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 public class EmbeddedPage extends EmbeddedPageHeader {
 
 	private List fullList;
+
 	
 	public EmbeddedPage(String self, Page page, List fullList) {
 		this(self, page, fullList, true);
@@ -33,7 +34,7 @@ public class EmbeddedPage extends EmbeddedPageHeader {
 	public List getPageContent() {
 		return page.getContent();
 	}
-	
+
 	@JsonIgnore
 	public List getFullList() {
 		return fullList;

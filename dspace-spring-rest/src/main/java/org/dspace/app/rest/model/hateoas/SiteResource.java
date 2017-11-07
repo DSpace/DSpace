@@ -25,6 +25,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(SiteRest.CATEGORY)
 @RelNameDSpaceResource(SiteRest.NAME)
 public class SiteResource extends DSpaceResource<SiteRest> {
 	public SiteResource(SiteRest site, Utils utils, String... rels) {

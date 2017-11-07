@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(CollectionRest.CATEGORY)
 @RelNameDSpaceResource(CollectionRest.NAME)
 public class CollectionResource extends DSpaceResource<CollectionRest> {
 	public CollectionResource(CollectionRest collection, Utils utils, String... rels) {		 

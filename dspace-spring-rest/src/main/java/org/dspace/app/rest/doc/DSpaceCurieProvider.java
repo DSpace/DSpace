@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.rest.model.RestModel;
 import org.springframework.hateoas.IanaRels;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
@@ -55,6 +56,20 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
         return Collections.unmodifiableCollection(result.values());
     }
 
+    public String getNamespacedRelFor(String category, String name) {
+        String curie = getCurieForCategory(category);
+        return String.format("%s:%s", curie, name);
+    }
+
+    public String getNamespacedRelFor(RestModel data, String name) {
+        return getNamespacedRelFor(data.getCategory(), name);
+    }
+
+    private String getCurieForCategory(final String category) {
+        //TODO define a mapping in XML or a properties file
+        return category;
+    }
+
     private String getNamespacedRelFromHref(String rel, String href) {
         String curie = getCurie(href);
 
@@ -63,10 +78,13 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
     }
 
     private String getCurie(String href) {
-        String curie = extractRestCategory(href);
+        String category = extractRestCategory(href);
 
-        if(StringUtils.isBlank(curie)) {
+        String curie;
+        if(StringUtils.isBlank(category)) {
             curie = DEFAULT_CURIE;
+        } else {
+            curie = getCurieForCategory(category);
         }
 
         return curie;

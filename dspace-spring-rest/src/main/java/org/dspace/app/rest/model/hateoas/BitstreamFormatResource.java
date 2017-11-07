@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(BitstreamFormatRest.CATEGORY)
 @RelNameDSpaceResource(BitstreamFormatRest.NAME)
 public class BitstreamFormatResource extends DSpaceResource<BitstreamFormatRest> {
 	public BitstreamFormatResource(BitstreamFormatRest bf, Utils utils, String... rels) {

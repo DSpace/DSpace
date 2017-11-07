@@ -25,6 +25,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(CommunityRest.CATEGORY)
 @RelNameDSpaceResource(CommunityRest.NAME)
 public class CommunityResource extends DSpaceResource<CommunityRest> {
 	public CommunityResource(CommunityRest community, Utils utils, String... rels) {

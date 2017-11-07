@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.RestAddressableModel;
@@ -27,8 +28,6 @@ import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
-
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
  * A base class for DSpace Rest HAL Resource. The HAL Resource wraps the REST
@@ -70,7 +69,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 										// TODO add support for single linked object other than for collections
 										Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
 										EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
-										embedded.put(utils.getCurie(data, name), ep);
+										addEmbeddedObject(data, utils, name, ep);
 										found = true;
 								}
 							}
@@ -126,7 +125,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 									}
 								}
 
-								embedded.put(utils.getCurie(data, name), wrapObject);
+                                addEmbeddedObject(data, utils, name, wrapObject);
 							}
 							else {
 								// call the link repository
@@ -139,10 +138,9 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 									for (Method m : methods) { 
 										if (StringUtils.equals(m.getName(), linkAnnotation.method())) {
 												if ( Page.class.isAssignableFrom( m.getReturnType()) ){
-													Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
-													EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
-													embedded.put(utils.getCurie(data, name), ep);
-												}
+												Page<? extends Serializable> pageResult = (Page<? extends RestAddressableModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
+												EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
+												addEmbeddedObject(data, utils,name, ep);}
 												else {
 													RestAddressableModel object = (RestAddressableModel)m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
 													HALResource ep = linkRepository.wrapResource(object, linkToSubResource.getHref());
@@ -163,11 +161,11 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 						else if (RestAddressableModel.class.isAssignableFrom(readMethod.getReturnType())) {
 							RestAddressableModel linkedObject = (RestAddressableModel) readMethod.invoke(data);
 							if (linkedObject != null) {
-								embedded.put(utils.getCurie(data, name),
+								addEmbeddedObject(data, utils, name,
 										utils.getResourceRepository(linkedObject.getCategory(), linkedObject.getType())
 												.wrapResource(linkedObject));
 							} else {
-								embedded.put(utils.getCurie(data, name), null);
+								addEmbeddedObject(data, utils, name, null);
 							}
 						}
 					}
@@ -177,6 +175,10 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 				throw new RuntimeException(e.getMessage(), e);
 			}
 		}
+	}
+
+	private void addEmbeddedObject(final T data, final Utils utils, final String name, final Object em) {
+		embedded.put(utils.getNamespacedRel(data, name), em);
 	}
 
 	//Trick to make Java Understand that our content extends RestModel

@@ -18,6 +18,7 @@ import org.dspace.app.rest.utils.Utils;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@DSpaceRestCategory(MetadataFieldRest.CATEGORY)
 @RelNameDSpaceResource(MetadataFieldRest.NAME)
 public class MetadataFieldResource extends DSpaceResource<MetadataFieldRest> {
 	public MetadataFieldResource(MetadataFieldRest ms, Utils utils, String... rels) {
