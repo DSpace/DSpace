@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.step.DataDescribe;
+import org.dspace.app.rest.model.step.SectionData;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
@@ -32,7 +33,7 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 	}
 	
 	@Override
-	public RestModel getData(WorkspaceItem obj, SubmissionStepConfig config) {		
+	public SectionData getData(WorkspaceItem obj, SubmissionStepConfig config) {		
 		DataDescribe data = new DataDescribe();
 		try {
 			DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
