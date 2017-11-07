@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.test;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -20,9 +21,11 @@ import javax.servlet.Filter;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Application;
+import org.dspace.app.rest.model.hateoas.DSpaceCurieProvider;
 import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +34,10 @@ import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.cli.CliDocumentation;
+import org.springframework.restdocs.http.HttpDocumentation;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentationConfigurer;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
@@ -56,24 +63,29 @@ import org.springframework.web.context.WebApplicationContext;
         TransactionalTestExecutionListener.class})
 @DirtiesContext
 @WebAppConfiguration
-public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
+public abstract class AbstractControllerIntegrationTest extends AbstractIntegrationTestWithDatabase {
 
     protected static final String AUTHORIZATION_HEADER = "Authorization";
     protected static final String AUTHORIZATION_TYPE = "Bearer";
 
-    public static final String REST_SERVER_URL = "http://localhost/api/";
+    public static final String REST_SERVER_URL = "http://localhost:8080/api/";
+    public static final String DOCUMENTATION_SNIPPETS_DIR = "target/generated-snippets/";
 
     protected MediaType contentType = new MediaType(MediaTypes.HAL_JSON.getType(),
             MediaTypes.HAL_JSON.getSubtype(), Charsets.UTF_8);
 
-
     protected HttpMessageConverter mappingJackson2HttpMessageConverter;
+
+    protected JUnitRestDocumentation restDocumentation;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Autowired
     private List<Filter> requestFilters;
+
+    @Autowired
+    private DSpaceCurieProvider curieProvider;
 
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
@@ -85,6 +97,18 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                 this.mappingJackson2HttpMessageConverter);
     }
 
+    @Rule
+    public JUnitRestDocumentation getRestDocumentation() {
+        if(restDocumentation == null) {
+            String curie = curieProvider.getCurieForCategory(getRestCategory());
+            restDocumentation = new JUnitRestDocumentation(DOCUMENTATION_SNIPPETS_DIR + curie);
+        }
+
+        return restDocumentation;
+    }
+
+    protected abstract String getRestCategory();
+
     public MockMvc getClient() throws SQLException {
         return getClient(null);
     }
@@ -95,6 +119,8 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
         }
 
         DefaultMockMvcBuilder mockMvcBuilder = webAppContextSetup(webApplicationContext)
+                //Configure Spring REST docs
+                .apply(getDocumentationConfiguration())
                 //Always log the response to debug
                 .alwaysDo(MockMvcResultHandlers.log())
                 //Add all filter implementations
@@ -118,6 +144,19 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
 
     public String getAuthToken(String user, String password) throws Exception {
         return getAuthResponse(user, password).getHeader(AUTHORIZATION_HEADER);
+    }
+
+    private MockMvcRestDocumentationConfigurer getDocumentationConfiguration() {
+        return documentationConfiguration(restDocumentation).uris()
+                .withScheme("http")
+                .withHost("localhost")
+                .withPort(8080)
+                .and().snippets()
+                .withDefaults(CliDocumentation.curlRequest(),
+                        HttpDocumentation.httpRequest(),
+                        HttpDocumentation.httpResponse()
+                        )
+                .and();
     }
 
 }

@@ -25,6 +25,7 @@ import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.matcher.BrowseEntryResourceMatcher;
 import org.dspace.app.rest.matcher.BrowseIndexMatcher;
 import org.dspace.app.rest.matcher.ItemMatcher;
+import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -42,6 +43,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
  */
 public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTest {
 
+    protected String getRestCategory() {
+        return RestModel.DISCOVER;
+    }
+
     @Test
     public void findAll() throws Exception {
         //When we call the root endpoint
@@ -58,10 +63,10 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$.page.number", is(0)))
 
                 //The array of browse index should have a size 4
-                .andExpect(jsonPath("$._embedded.browses", hasSize(4)))
+                .andExpect(jsonPath("$._embedded.discover:browses", hasSize(4)))
 
                 //Check that all (and only) the default browse indexes are present
-                .andExpect(jsonPath("$._embedded.browses", containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.discover:browses", containsInAnyOrder(
                         BrowseIndexMatcher.dateIssuedBrowseIndex("asc"),
                         BrowseIndexMatcher.contributorBrowseIndex("asc"),
                         BrowseIndexMatcher.titleBrowseIndex("asc"),
@@ -179,7 +184,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 //Check the embedded resources and that they're sorted alphabetically
                 //Check that the subject matches as expected
                 //Verify that they're sorted alphabetically
-                .andExpect(jsonPath("$._embedded.browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1),
+                .andExpect(jsonPath("$._embedded.discover:browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1),
                         BrowseEntryResourceMatcher.matchBrowseEntry( "ExtraEntry", 3),
                         BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2)
                         )));
@@ -199,7 +204,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 //Check the embedded resources and that they're sorted alphabetically
                 //Check that the subject matches as expected
                 //Verify that they're sorted alphabetically
-                .andExpect(jsonPath("$._embedded.browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2),
+                .andExpect(jsonPath("$._embedded.discover:browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2),
                         BrowseEntryResourceMatcher.matchBrowseEntry( "ExtraEntry", 3),
                         BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
                         )));
@@ -256,7 +261,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$.page.totalElements", is(1)))
                 .andExpect(jsonPath("$.page.size", is(20)))
                 //Verify that the title of the public and embargoed items are present and sorted descending
-                .andExpect(jsonPath("$._embedded.items", contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "zPublic item more", "2017-10-17")
+                .andExpect(jsonPath("$._embedded.core:items", contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "zPublic item more", "2017-10-17")
                 )));
 
         //** WHEN **
@@ -272,7 +277,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$.page.totalElements", is(3)))
                 .andExpect(jsonPath("$.page.size", is(20)))
                 //Verify that the title of the public and embargoed items are present and sorted descending
-                .andExpect(jsonPath("$._embedded.items", contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13"),
+                .andExpect(jsonPath("$._embedded.core:items", contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2, "Public item 2", "2016-02-13"),
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-14"),
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1, "zPublic item more", "2017-10-17")
                 )));
@@ -361,7 +366,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$.page.number", is(0)))
 
                 //Verify that the title of the public and embargoed items are present and sorted descending
-                .andExpect(jsonPath("$._embedded.items",
+                .andExpect(jsonPath("$._embedded.core:items",
                         contains(ItemMatcher.matchItemWithTitleAndDateIssued(publicItem2,
                                 "Public item 2", "2016-02-13"),
                                 ItemMatcher.matchItemWithTitleAndDateIssued(publicItem1,
@@ -370,11 +375,11 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                                         "An embargoed publication", "2017-08-10"))))
 
                 //The private item must not be present
-                .andExpect(jsonPath("$._embedded.items[*].metadata[?(@.key=='dc.title')].value",
+                .andExpect(jsonPath("$._embedded.core:items[*].metadata[?(@.key=='dc.title')].value",
                         not(hasItem("This is a private item"))))
 
                 //The internal item must not be present
-                .andExpect(jsonPath("$._embedded.items[*].metadata[?(@.key=='dc.title')].value",
+                .andExpect(jsonPath("$._embedded.core:items[*].metadata[?(@.key=='dc.title')].value",
                         not(hasItem("Internal publication"))))
         ;
     }
@@ -450,7 +455,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$.page.number", is(0)))
 
                 //Verify that the title and date of the items match and that they are sorted ascending
-                .andExpect(jsonPath("$._embedded.items",
+                .andExpect(jsonPath("$._embedded.core:items",
                         contains(ItemMatcher.matchItemWithTitleAndDateIssued(item1,
                                 "Item 1", "2017-10-17"),
                                 ItemMatcher.matchItemWithTitleAndDateIssued(item2,
@@ -481,7 +486,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$.page.number", is(1)))
 
                 //Verify that the title and date of the items match and that they are sorted ascending
-                .andExpect(jsonPath("$._embedded.items",
+                .andExpect(jsonPath("$._embedded.core:items",
                         contains(ItemMatcher.matchItemWithTitleAndDateIssued(item6,
                                 "Item 6", "2016-01-13"),
                                 ItemMatcher.matchItemWithTitleAndDateIssued(item7,

@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.model.hateoas;
 
 import java.util.Collection;
@@ -65,7 +72,7 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
         return getNamespacedRelFor(data.getCategory(), rel);
     }
 
-    private String getCurieForCategory(final String category) {
+    public String getCurieForCategory(final String category) {
         //TODO define a mapping in XML or a properties file
         return category;
     }
