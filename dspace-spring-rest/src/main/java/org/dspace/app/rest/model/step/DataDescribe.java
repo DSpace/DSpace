@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.RestModel;
 
 public class DataDescribe implements SectionData {
 

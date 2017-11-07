@@ -7,13 +7,16 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.step.SectionData;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
  * The WorkspaceItem REST Resource
@@ -27,7 +30,7 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 
 	private Date lastModified = new Date();
 
-	private Map<String, SectionData> sections;
+	private Map<String, Serializable> sections;
 	
 	@JsonIgnore
 	private CollectionRest collection;
@@ -87,12 +90,15 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 	public Class getController() {
 		return RestResourceController.class;
 	}
-
-	public Map<String, SectionData> getSections() {
+	
+	public Map<String, Serializable> getSections() {
+		if(sections==null) {
+			sections = new HashMap<String, Serializable>();
+		}
 		return sections;
 	}
 
-	public void setSections(Map<String, SectionData> sections) {
+	public void setSections(Map<String, Serializable> sections) {
 		this.sections = sections;
 	}
 
