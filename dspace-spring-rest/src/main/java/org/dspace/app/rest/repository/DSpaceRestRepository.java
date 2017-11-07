@@ -119,13 +119,20 @@ extends AbstractDSpaceRestRepository
 
 	public abstract DSpaceResource<T> wrapResource(T model, String... rels);
 
-	public RestModel createAndReturn() {
+	public T createAndReturn() {
 		Context context = obtainContext();
-		return createAndReturn(context);
+		T entity = createAndReturn(context);		
+		try {
+			context.commit();
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+		return entity;
 	}
 
-	protected RestModel createAndReturn(Context context) {
+	protected T createAndReturn(Context context) {
+		//nothing default implementation
 		return null;
 	}
-	
+
 }
