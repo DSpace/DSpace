@@ -494,11 +494,10 @@ public class JournalUtils {
                 JsonNode rootNode = m.readTree(url.openStream());
                 JsonNode titleNode = rootNode.path("message").path("title");
                 if (titleNode != null) {
-                    if (titleNode.textValue().equalsIgnoreCase(journalConcept.getFullName())) {
-                        return true;
-                    } else {
-                        throw new RESTModelException("journal concept " + journalConcept.getFullName() + " (" + journalConcept.getConceptID() + ") lists ISSN " + journalConcept.getISSN() + ", but that belongs to a journal titled " + titleNode.textValue());
+                    if (!titleNode.textValue().equalsIgnoreCase(journalConcept.getFullName())) {
+                        log.debug("journal concept " + journalConcept.getFullName() + " (" + journalConcept.getConceptID() + ") lists ISSN " + journalConcept.getISSN() + ", but that belongs to a journal titled " + titleNode.textValue());
                     }
+                    return true;
                 } else {
                     throw new RESTModelException("journal concept " + journalConcept.getConceptID() + " has an invalid crossref ISSN");
                 }
