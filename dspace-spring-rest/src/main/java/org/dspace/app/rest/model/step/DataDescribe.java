@@ -14,27 +14,9 @@ import java.util.Map;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.RestModel;
 
-public class DataDescribe implements RestModel {
+public class DataDescribe implements SectionData {
 
 	private Map<String, List<MetadataValueRest>> metadata = new HashMap<>();
-
-	@Override
-	public String getCategory() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Class getController() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public Map<String, List<MetadataValueRest>> getMetadata() {
 		return metadata;
