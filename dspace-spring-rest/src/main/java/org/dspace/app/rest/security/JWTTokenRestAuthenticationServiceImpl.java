@@ -36,6 +36,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     private static final Logger log = LoggerFactory.getLogger(RestAuthenticationService.class);
     private static final String ACCESS_TOKEN = "access_token";
 
+    @Autowired
     private JWTTokenHandler jwtTokenHandler;
 
     @Autowired
@@ -49,7 +50,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        jwtTokenHandler = new JWTTokenHandler(ePersonService, configurationService);
+
     }
 
     @Override
