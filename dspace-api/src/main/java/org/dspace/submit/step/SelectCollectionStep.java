@@ -47,6 +47,10 @@ public class SelectCollectionStep extends AbstractProcessingStep {
 				log.error(e.getMessage(), e);
 			}
 		}
+		else {
+			//TODO manage setup of default collection in the case WSI it is not null
+			//TODO manage setup of collection discovered into request
+		}
 		return inProgressSubmission;
 	}
 }

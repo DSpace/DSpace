@@ -185,6 +185,7 @@ public class RestResourceController implements InitializingBean {
 			throw new HttpRequestMethodNotSupportedException(RequestMethod.POST.toString());
 		}
 		DSpaceResource result = repository.wrapResource(modelObject);
+		//TODO manage HTTPHeader
 		return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);		
 	}	
 	
