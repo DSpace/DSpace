@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.dspace.app.rest.RestResourceController;
+import org.dspace.app.rest.model.step.SectionData;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -26,10 +27,7 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 
 	private Date lastModified = new Date();
 
-	private Map<String, RestModel> sections;
-
-	@JsonIgnore
-	private CollectionRest collection;
+	private Map<String, SectionData> sections;
 	
 	@JsonIgnore
 	private ItemRest item;
@@ -87,19 +85,11 @@ public class WorkspaceItemRest extends BaseObjectRest<Integer> {
 		return RestResourceController.class;
 	}
 
-	public Map<String, RestModel> getSections() {
+	public Map<String, SectionData> getSections() {
 		return sections;
 	}
 
-	public void setSections(Map<String, RestModel> sections) {
+	public void setSections(Map<String, SectionData> sections) {
 		this.sections = sections;
-	}
-
-	public CollectionRest getCollection() {
-		return collection;
-	}
-
-	public void setCollection(CollectionRest collection) {
-		this.collection = collection;
 	}
 }
