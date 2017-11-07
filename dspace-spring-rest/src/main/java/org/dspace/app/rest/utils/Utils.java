@@ -12,7 +12,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.doc.DSpaceCurieProvider;
+import org.dspace.app.rest.model.hateoas.DSpaceCurieProvider;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorityRest;

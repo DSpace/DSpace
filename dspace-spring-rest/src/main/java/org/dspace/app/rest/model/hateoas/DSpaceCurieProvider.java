@@ -1,4 +1,4 @@
-package org.dspace.app.rest.doc;
+package org.dspace.app.rest.model.hateoas;
 
 import java.util.Collection;
 import java.util.Collections;
