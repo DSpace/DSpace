@@ -483,10 +483,9 @@ public class JournalUtils {
         return items;
     }
 
-    public static boolean isJournalConceptListedInCrossref(DryadJournalConcept journalConcept) {
+    public static boolean isJournalConceptListedInCrossref(DryadJournalConcept journalConcept) throws RESTModelException {
         if (journalConcept.getISSN().isEmpty()) {
-            log.error("journal concept " + journalConcept.getConceptID() + " doesn't have an ISSN");
-            return false;
+            throw new RESTModelException("journal concept " + journalConcept.getConceptID() + " doesn't have an ISSN");
         } else {
             String crossRefURL = crossRefApiRoot + "journals/" + journalConcept.getISSN();
             try {
@@ -498,17 +497,15 @@ public class JournalUtils {
                     if (titleNode.textValue().equalsIgnoreCase(journalConcept.getFullName())) {
                         return true;
                     } else {
-                        log.error("journal concept " + journalConcept.getConceptID() + " lists ISSN " + journalConcept.getISSN() + ", but that belongs to a journal titled " + titleNode.textValue());
-                        return false;
+                        throw new RESTModelException("journal concept " + journalConcept.getFullName() + " (" + journalConcept.getConceptID() + ") lists ISSN " + journalConcept.getISSN() + ", but that belongs to a journal titled " + titleNode.textValue());
                     }
                 } else {
-                    log.error("journal concept " + journalConcept.getConceptID() + " has an invalid crossref ISSN");
+                    throw new RESTModelException("journal concept " + journalConcept.getConceptID() + " has an invalid crossref ISSN");
                 }
             } catch (Exception e) {
-                log.error("couldn't query crossref: " + e.getMessage());
+                throw new RESTModelException("couldn't query crossref for journal concept " + journalConcept.getConceptID() + " with ISSN " + journalConcept.getISSN() + ": " + e.getMessage());
             }
         }
-        return false;
     }
 
     public static Manuscript getCrossRefManuscriptMatchingManuscript(Manuscript queryManuscript, StringBuilder resultString) throws RESTModelException {
