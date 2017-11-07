@@ -100,9 +100,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	
 	@Override
 	protected WorkspaceItemRest createAndReturn(Context context) {
-		context.turnOffAuthorisationSystem();		
 		WorkspaceItem source = submissionService.createWorkspaceItem(context, getRequestService().getCurrentRequest()); 
-		context.restoreAuthSystemState();
 		return converter.convert(source);		
 	}
 	

@@ -53,6 +53,7 @@ public abstract class AbstractDSpaceRestRepository {
 		boolean runSingleUser = DSpaceServicesFactoryImpl.getInstance().getConfigurationService()
 				.getBooleanProperty("run.single.test-user");
 		if (runSingleUser) {
+			context.turnOffAuthorisationSystem();
 			EPerson currentUser = null;
 			try {
 				currentUser = EPersonServiceFactory.getInstance().getEPersonService().findByEmail(context,
