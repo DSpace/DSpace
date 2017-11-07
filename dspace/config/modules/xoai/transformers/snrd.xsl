@@ -42,11 +42,26 @@
 				<xsl:with-param name="subtype" select="$subtype"/>
 			</xsl:call-template>
 			
+			<!-- Aclaración: a partir de la versión 2015, la fecha de embargo debe mostrarse dentro de un <dc:date> como
+			segunda instancia. En el 'driver-commons.xsl' sólo se muestra alguna de las siguientes 2 fechas: dc.date.issued ó
+			sedici.date.exposure (si existe). Por lo tanto, el embargoDate siempre se mostrará segundo... -->
 			<xsl:call-template name="accessRightsAndEmbargo">
 				<xsl:with-param name="liftDate" select="doc:element[@name='sedici']/doc:element[@name='embargo']/doc:element[@name='liftDate']/doc:element/doc:field/text()"/>
 				<xsl:with-param name="context-name" select="$context"/>
 			</xsl:call-template>
 			
+			<xsl:if test="not(doc:element[@name='sedici']/doc:element[@name='rights']/doc:element[@name='uri']/doc:element/doc:field)">	
+				<xsl:call-template name="addSEDICIRepositoryLicense"/>
+			</xsl:if>
+
+			<!-- Ver "Idenficadores alternativos" en SNRD v.2015 -->
+			<!--  sedici.identifier.doi, sedici.identifier.handle, sedici.identifier.isbn -->
+			<xsl:for-each select="doc:element[@name='sedici']/doc:element[@name='identifier']/doc:element[@name='doi' or @name='handle' or @name='isbn']/doc:element/doc:field">
+				<xsl:call-template name="printAlternativeIdentifier">
+					<xsl:with-param name="type"><xsl:value-of select="../../@name"/></xsl:with-param>
+					<xsl:with-param name="value"><xsl:value-of select="./text()"/></xsl:with-param>
+				</xsl:call-template>
+			</xsl:for-each>
 			
 			<xsl:apply-templates select="@*|node()" />
 
@@ -76,6 +91,9 @@
 			<xsl:when test="$subtype='Articulo'">
 				artículo
 			</xsl:when>
+			<xsl:when test="$subtype='Resumen'">
+				documento de conferencia
+			</xsl:when>
 			<!-- No se exporta
 			<xsl:when test="$subtype='Comunicacion'">
 				artículo
@@ -87,7 +105,7 @@
 			<xsl:when test="$subtype='Contribucion a revista'">
 				artículo
 			</xsl:when> -->
-			<xsl:when test="$subtype='Informe tecnico'">
+			<xsl:when test="$subtype='Reporte'">
 				informe técnico
 			</xsl:when>
 			<xsl:when test="$subtype='Patente'">
@@ -138,16 +156,36 @@
 			</xsl:otherwise>
 		</xsl:choose>
 		</xsl:variable>
+		<!-- Prefijo añadido desde las Directrices SNRD v.2015 -->
+		<xsl:variable name="snrd_type_prefix">info:ar-repo/semantics/</xsl:variable>
 
 		<doc:element name='snrd'>
 			<doc:element name='type'>
 				<doc:element name='es'>
-						<doc:field name="value"><xsl:value-of select="normalize-space($snrd_type_snrd)"/></doc:field>
+						<doc:field name="value"><xsl:value-of select="concat($snrd_type_prefix, normalize-space($snrd_type_snrd))"/></doc:field>
 				</doc:element>
 			</doc:element>
 		</doc:element>
 		
 	</xsl:template>
+	
+	<xsl:template name="addSEDICIRepositoryLicense">
+		<doc:element name="sedici">
+			<doc:element name="rights">
+	            <doc:element name="license">
+	            	<doc:element name="es">
+						<doc:field name="value">
+							<xsl:value-of select="'Licencia de distribución no exclusiva SEDICI'"/>
+						</doc:field>
+					</doc:element>
+	            </doc:element>
+			</doc:element>
+		</doc:element>
+	</xsl:template>
+	
+	<!-- Ver "Idenficadores alternativos" en SNRD v.2015 -->
+	<!--  Silenciamos sedici.identifier.doi, sedici.identifier.handle, sedici.identifier.isbn -->
+	<xsl:template match="doc:metadata/doc:element[@name='sedici']/doc:element[@name='identifier']/doc:element[@name='doi' or @name='handle' or @name='isbn']"/>
 	
 	<!-- AUXILIARY TEMPLATES -->
 
@@ -187,5 +225,19 @@
 			</doc:element>
 		</doc:element>	
 	</xsl:template>
-
+	
+	<xsl:template name="printAlternativeIdentifier">
+		<xsl:param name="type"/>
+		<xsl:param name="value"/>
+		
+			<doc:element name="snrd">
+				<doc:element name="alternativeIdentifier">
+					<doc:field name="value">
+						<xsl:value-of select="concat('info:eu-repo/semantics/altIdentifier/',$type,'/', $value)"/>
+					</doc:field>
+				</doc:element>
+			</doc:element>
+		
+	</xsl:template>
+	
 </xsl:stylesheet>

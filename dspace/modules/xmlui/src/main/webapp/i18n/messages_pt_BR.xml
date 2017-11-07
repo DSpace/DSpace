@@ -356,7 +356,7 @@
 	<message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.title">Nenhum relatório disponível no momento</message>
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.no_report.text">Nenhum relatório disponível no momento para este serviço.  Por favor, cheque mais tarde.</message>
 
-	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Documentos destacados</message>
+	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Últimos documentos</message>
 
 
 	<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keywords">Palavra Chave</message>
@@ -1898,7 +1898,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Editor</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Assunto</message>
 	
-	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Arquivos neste Item</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Baixar arquivos</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Arquivos</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Tamanho</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-format">Formato</message>
@@ -1941,6 +1941,7 @@
 	<message key="xmlui.dri2xht1ml.METS-1.0.item-record-source">Os dados deste registro foram obtidos de</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-note">Notas</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Exceto quando indicado o contrário, este item é publicado com a seguinte licença </message>
+	<message key="xmlui.dri2xhtml.METS-1.0.cc-license-text-collection-community">Exceto quando indicado o contrário, as obras nesta coleção / comunidade são publicados sob a licença </message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-de">Alemão</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-en">Inglês</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.code-value-es">Espanhol</message>
@@ -1957,6 +1958,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">Um link para um site externo está disponível</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local">Descarga direta</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">Você pode descarregar este documento de SeDiCI</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-no-fulltext">Sem texto completo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-codirector">Co-diretor de tese</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-colaborator">Colaborador</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compiler">Compilador</message>
@@ -1986,7 +1988,8 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-embargo-liftDate">Data de final de embargo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-false-fulltext">Documento sem texto completo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Nome</message>
-	<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">extensão</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-format">Descrição física</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extensão</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materiais</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-expediente">Número de Arquivo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-other">Outros Identificadores</message>
@@ -2026,6 +2029,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-true-fulltext">Documento texto completo</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.other-attributes">Outros atributos do documento</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Informação da tese</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-audience">Contexto de Uso</message>
 	
 	
 	
@@ -2225,6 +2229,7 @@
   
 	<message key="xmlui.general.perform">Realizar</message>
 	<message key="xmlui.bitstream.downloadName">documento</message>
+	<message key="xmlui.bitstream.download">Baixar arquivo</message>
 	
 	
 	<message key="xmlui.dri2xhtml.structural.footer.developers.address">Rua 49 e 115 - Prédio Ex Liceo. 1 Andar</message>

@@ -1,0 +1,36 @@
+/var/log/dspace/checker.log
+/var/log/dspace/cocoon.log
+/var/log/dspace/solr.log
+{
+  su dspace dspace
+  missingok
+  notifempty
+  weekly
+  size 100M
+  rotate 5
+  copytruncate
+  compress
+  delaycompress
+}
+
+/var/log/dspace/dspace.log {
+  su dspace dspace
+  copytruncate
+  daily
+  size 100M
+  rotate 9999999999999999
+
+  dateext
+  dateformat .%Y-%m-%d
+  dateyesterday
+  compress
+  olddir old-logs
+
+  #postrotate
+        #comprime los logs de antes de ayer
+        #find /var/dspace/install/log/old -maxdepth 1 -name "dspace.log.????-??-??" -type f -mtime +0 -exec gzip -q {} \;
+        #copia los logs comprimidos al directorio old
+        #find /var/dspace/install/log -maxdepth 1 -name "dspace.log.????-??-??.gz" -exec mv {} /var/dspace/install/log/old/ \;
+  #endscript
+
+}

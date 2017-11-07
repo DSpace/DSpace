@@ -1281,15 +1281,17 @@ height:20px;
 height:20px;
 	padding:0px;
 	margin:0px;
+	margin-top:3px;
 	float:right;	
 	background-repeat:no-repeat;
-background-image:url(../../images/detail_linked_little2.png);
+background-image:url(../../images/detail_linked_little.png);
 }
 
 .ds-artifact-list .availability.local {
-height:20px;
+	height:20px;
 	padding:0px;
 	margin:0px;
+	margin-top:3px;
 	float:right;	
 	background-repeat:no-repeat;
 background-image:url(../../images/detail_local_little.png);
@@ -2395,7 +2397,7 @@ right:10px;
 
 .detail-view {
 padding:0px 0 0 0 ;
-/*background-image:url(../../images/sombra_abajo.png);*/
+background-image:url(../../images/sombra_abajo.png) !important;
 /*background-color:#dedede;*/
 background-position:center -40px;
 /*margin-left:120px;*/
@@ -2471,6 +2473,7 @@ width:620px;
 	padding:3px 0px;
 	border-top:1px dashed #dedede;
 	color:#3886AA;
+        width: 75%;
 }
 
 #aspect_artifactbrowser_CommunityViewer_div_community-search-browse *,
@@ -3203,14 +3206,14 @@ div.item-summary-view-metadata {
 }
 
 div.simple-item-view-authors {
-    font-size: 100%;
-    font-weight: normal;
+    float: left;
+}
+
+div#simple-author-date-view {
     border-bottom:1px solid #D8E8EB;
     padding-bottom: 2px;
     margin-bottom: 5px;
     margin-top: 10px;
-    text-align: justify;
-    width: 600px;
 }
 
 .metadata-label {
@@ -3286,7 +3289,7 @@ margin-right:9px;
 	border: dashed 1px #CFCFCF;
 	padding: 10px 15px 10px 15px;
 	margin-bottom:15px;
-	margin-top: 75px;
+	margin-top: 20px;
 	overflow:hidden;
 }
 
@@ -3548,11 +3551,16 @@ h1.communities_header {
 #icono_rea a {
 	background-image: url(../../images/icono_rea.png);
 }
+
+#icono_redmuseos a{
+	background-image: url(../../images/icono_redmuseos.png);
+}
+
 #icono_ehidrica a {
 	background-image: url(../../images/icono_ehidrica.png);
 }
 
-#icono_tesis, #icono_eventos, #icono_libros, #icono_revistas, #icono_redunci, #icono_radio, #icono_rea, #icono_ehidrica{
+#icono_tesis, #icono_eventos, #icono_libros, #icono_revistas, #icono_redunci, #icono_radio, #icono_rea, #icono_ehidrica, #icono_redmuseos{
 padding-left:5px;
 }
 
@@ -3568,6 +3576,7 @@ padding-left:5px;
 	color: #B66A3C;
 	margin: 10px 0;
 	padding: 15px 15px 15px 90px;	
+	float:left;
 }
 
 #embargo-info .ebargo_date {
@@ -3876,6 +3885,7 @@ margin-left:10px;}
 
 .simple-metadata-view-date{
 	float:right;
+	font-weight: bold;
 }
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
@@ -3894,3 +3904,105 @@ tbody.ui-accordion-header td{
 table.dropdown-table.ui-accordion tr:hover td{
 	background-color:#F6F8F9;
 }
+
+.fulltext-message {
+    color: #9d9d9d;
+    float: right;
+    margin-top: 3px;
+    padding-left: 2px;
+    padding-right: 4px;
+    font-size: 11px;
+}
+
+#item-URI-suggestion {
+    clear: both;
+    padding-top: 10px;
+}
+
+
+.intro-text a {
+    background-position: left 3px;
+    background-repeat: no-repeat;
+    color: #607890;
+    font-weight: bold;
+    height: 25px;
+    text-decoration: underline;
+}
+
+.intro-text .localizacion_electronica {
+    background-image: url("../../images/acceso_web.png");
+}
+
+.intro-text .localizacion_electronica a {
+    padding-left: 15px !important; 
+}
+
+.file-wrapper .file-embargo-message {
+  float:left; 
+  clear:both;
+  font-style:italic;
+}
+
+.intro-text .cc_license_text img{
+  padding: 10px 5px 10px 0px;
+  float: left;
+}
+
+.intro-text .cc_license_text span {
+  padding: 7px 0px;
+  display: flex;
+  vertical-align:top;
+  font-size: 10px;
+}
+
+.external-services-bar {
+   display: inline-block;
+}
+
+.external-services-bar div {
+    float: left;
+    display: inline;
+}
+
+#base-search-net,#google-scholar-search{
+  margin: -3px 0 0 8px;
+}
+#base-search-net a span{
+    background: url("../../images/icon_base_search_net.png") no-repeat scroll left top;
+    padding: 1px 0 0 18px;
+}
+
+#base-search-net a span:hover,#google-scholar-search a span:hover{
+    opacity: 0.8;
+}
+
+#google-scholar-search a span{
+  background: url("../../images/icon_google_scholar.png") no-repeat scroll left top;
+  padding: 1px 0 0 18px;
+  margin: 0 0 0 10px;
+}
+
+
+/*Social bar styles*/
+ .share-bar>div {
+       display:inline-block;
+       vertical-align:top 
+     } 
+   .share-bar { 
+       float: right; 
+       clear: right;
+    }
+  .share-bar>div a span {
+    padding: 5px 0 4px 20px;
+  }
+  
+  .share-bar>div a span:hover {
+     opacity: 0.8;
+  }
+  .share-bar>div#share_research_gate a span {
+    background: url("../../images/icon_researchgate_24x24.png") no-repeat scroll left top;
+    border-radius: 5px;
+  }
+  .share-bar>div#import_mendeley a span {
+    background: url("../../images/icon_mendeley_24x24.png") no-repeat scroll left top;
+  }

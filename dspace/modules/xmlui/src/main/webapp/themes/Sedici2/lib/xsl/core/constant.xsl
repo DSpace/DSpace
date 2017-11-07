@@ -24,6 +24,7 @@
   <xsl:variable name="imagen_fija">Imagen fija</xsl:variable>
   <xsl:variable name="objeto_fisico">Objeto Fisico</xsl:variable>
   <xsl:variable name="objeto_de_aprendizaje">Objeto de aprendizaje</xsl:variable>
+  <xsl:variable name="publicacion_seriada">Publicacion seriada</xsl:variable>
   
 
 </xsl:stylesheet>

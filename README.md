@@ -12,16 +12,27 @@ Este repositorio se creó para punto de transición para la actualización de SE
 
 **Visite [sedici.unlp.edu.ar](http://sedici.unlp.edu.ar.) para verlo en vivo.**
 
-![Screenshot](screenshot_sedici.png?raw=true)
-
-### Instalación
+## Instalación
 
 git clone git@github.com:sedici/DSpace-SEDICI-svn.git DSpace-SEDICI-svn
+
 cd DSpace-SEDICI-svn/
+<<<<<<< HEAD
 svn co https://svn.duraspace.org/dspace/dspace/tags/dspace-1.8.2/dspace dspace/dspace-tag-files
+=======
+
+svn co https://svn.duraspace.org/dspace/dspace/tags/dspace-1.8.2/dspace distribution/dspace-tag-files
+
+>>>>>>> master
 mvn eclipse:eclipse
+
 ./build.bash install
 
-# License
+## License
+
 [Apache License v2](http://www.apache.org/licenses/LICENSE-2.0.html)
+
+
+
+![Screenshot](screenshot_sedici.png?raw=true)
 

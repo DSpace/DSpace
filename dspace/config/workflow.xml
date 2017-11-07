@@ -4,6 +4,11 @@
     <workflow-map>
         <name-map collection="default" workflow="default"/>
         <name-map collection="10915/50" workflow="autoarchive"/>
+        <name-map collection="10915/28975" workflow="autoarchive"/>
+        <name-map handle="10915/27347" workflow="MuseoFisicaWF"/>
+        <name-map handle="10915/27269" workflow="MuseoAzzariniWF"/>
+        <name-map handle="10915/41027" workflow="MuseoBibliotecaPublicaWF"/>
+        <name-map collection="10915/46286" workflow="autoarchiveTesisDeGrado"/>
     </workflow-map>
 
     <!--Workflow modificado para SeDiCI-->
@@ -44,7 +49,7 @@
         </roles>
 
 		<!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
-        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="skipadminclaimaction">
+        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="acceptRoleOrNotAdmin">
             <outcomes>
                 <step status="0">SeDiCILevelReview</step>
             </outcomes>
@@ -63,15 +68,31 @@
     </workflow>
 
 	<!-- Workflow para la coleccion de autoarchivo -->
-    <workflow start="CollectionLevelReview" id="autoarchive">
+    <workflow start="SeDiCILevelReview" id="autoarchive">
 
         <roles>
-            <role id="CollectionAdmin" name="CollectionAdmin" scope="collection" description="Este paso le permite a un revisor de la Colección, editar los metadatos y aceptar o rechazar el envío"/>
             <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
         </roles>
 
-		<!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
-        <step id="CollectionLevelReview" role="CollectionAdmin" userSelectionMethod="skipadminclaimaction">
+        <!-- PASO 1: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
+        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
+            <actions>
+                <action id="editaction"/>
+                <action id="selectcollectionaction"/>
+            </actions>
+        </step>
+        
+    </workflow>
+
+  <workflow start="CollectionLevelReview" id="MuseoFisicaWF">
+
+        <roles>
+            <role id="MuseoFisicaAdmin" name="MuseoFisicaAdmin" scope="repository" description="Este paso le permite a un revisor del museo de fisica, editar los metadatos y aceptar o rechazar el envío"/>
+            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
+        </roles>
+
+        <!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
+        <step id="CollectionLevelReview" role="MuseoFisicaAdmin" userSelectionMethod="acceptRoleOrNotAdmin">
             <outcomes>
                 <step status="0">SeDiCILevelReview</step>
             </outcomes>
@@ -84,11 +105,77 @@
         <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
             <actions>
                 <action id="editaction"/>
-                <action id="selectcollectionaction"/>
             </actions>
         </step>
         
     </workflow>
 
+  <workflow start="CollectionLevelReview" id="MuseoAzzariniWF">
+
+        <roles>
+            <role id="MuseoAzzariniAdmin" name="MuseoAzzariniAdmin" scope="repository" description="Este paso le permite a un revisor del museo Azzarini editar los metadatos y aceptar o rechazar el envío"/>
+            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
+        </roles>
+
+        <!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
+        <step id="CollectionLevelReview" role="MuseoAzzariniAdmin" userSelectionMethod="acceptRoleOrNotAdmin">
+            <outcomes>
+                <step status="0">SeDiCILevelReview</step>
+            </outcomes>
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+        
+        <!-- PASO 2: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
+        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+        
+    </workflow>
+
+  <workflow start="CollectionLevelReview" id="MuseoBibliotecaPublicaWF">
+
+        <roles>
+            <role id="MuseoBibliotecaPublicaAdmin" name="MuseoBibliotecaPublicaAdmin" scope="repository" description="Este paso le permite a un revisor del museo de la biblioteca pública, editar los metadatos y aceptar o rechazar el envío"/>
+            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
+        </roles>
+
+        <!-- PASO 1: Revisión a nivel de colección (aplicable por colección) -->
+        <step id="CollectionLevelReview" role="MuseoBibliotecaPublicaAdmin" userSelectionMethod="acceptRoleOrNotAdmin">
+            <outcomes>
+                <step status="0">SeDiCILevelReview</step>
+            </outcomes>
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+        
+        <!-- PASO 2: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
+        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
+            <actions>
+                <action id="editaction"/>
+            </actions>
+        </step>
+        
+    </workflow>
+
+    <workflow id="autoarchiveTesisDeGrado" start="SeDiCILevelReview">
+        <roles>
+            <role id="SeDiCIAdmin" name="SeDiCIAdmin" scope="repository" description="Este paso le permite a los administradores de SeDiCI editar los metadatos, aceptar o rechazar el envío"/>
+        </roles>
+
+        <!-- PASO 1: Revisión a nivel de SeDiCI (aplicable a todos los ítems de todo el repositorio) -->
+        <step id="SeDiCILevelReview" role="SeDiCIAdmin" userSelectionMethod="claimaction">
+            <actions>
+                <action id="selectcollectionaction"/>
+                <action id="editaction"/>
+            </actions>
+        </step>
+
+    </workflow>
 
 </wf-config>
+

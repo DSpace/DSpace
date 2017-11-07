@@ -1,0 +1,42 @@
+
+# /etc/cron.d/backups-sedici: crontab fragment for backups
+
+DSPACE_BACKUP_DIR=/var/dspace/backups
+DSPACE_SOURCE_DIR=/var/dspace-src
+DSPACE_INSTALL_DIR=/var/dspace
+
+DATESTR="date +%Y-%m-%d_%H%M"
+
+##################################################################################
+##  SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS SYS ##
+##################################################################################
+1 12 2,25 * *	root	tar --directory / -czf $DSPACE_BACKUP_DIR/etc/etc.backup.$($DATESTR).tgz etc/
+#0 6 * * * rsync -avz /var/dspace sedici@DESTINO:sedici/
+
+##################################################################################
+## DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE DSPACE ##
+##################################################################################
+
+#backups de la base de datos postgres de SEDICI dspace_sedici@data-pg.sedici.unlp.edu.ar (todos los días de la semana a las 21:00hs)
+0 21 * * 1,2,3,4,5	root	sh $DSPACE_BACKUP_DIR/do_pgdump.sh
+
+#backup de la base de datos mysql con las autoridades de SEDICI (de lunes a viernes a las 1230)
+MYSQL_sedici_dspace_PWD=''
+30 12 * * 1,2,3,4,5	root	mysqldump -usedici_dspace -p$MYSQL_sedici_dspace_PWD s2003_sedici | gzip -c > $DSPACE_BACKUP_DIR/mysql/s2003_sedici.sql.gz
+
+#backups de configuraciones (todos los 1ro de mes a las 4:38hs)
+38 4 1 * * 	root	tar --directory $DSPACE_INSTALL_DIR -czf $DSPACE_BACKUP_DIR/config/config.backup.$($DATESTR).tgz config/
+
+#Backup en AIP una vez por semana
+#5 22 * *       dspace  sun date && $DSPACE/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 $DSPACE/backups/aip/aip-site.zip && date
+
+##################################################################################
+##  BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG BLOG  ##
+##################################################################################
+
+#backups del htdocs del BLOG (domingos a las 4:55AM)
+55 4 * * sun	root	tar --directory /var/www -czf $DSPACE_BACKUP_DIR/blog/sedici_blog.htdocs.mes-$(date +%m).tgz sedici_blog/
+
+#backups del mysql del blog todos los días a las 16:30
+MYSQL_sedici_blog_PWD=''
+30 16 * * 1,2,3,4,5	root	mysqldump -usedici_blog -p$MYSQL_sedici_blog_PWD sedici_blog2 | gzip -c > $DSPACE_BACKUP_DIR/mysql/sedici_blog2.sql.gz

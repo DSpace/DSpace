@@ -80,6 +80,12 @@
 				<dc:date><xsl:value-of select="." /></dc:date>
 			</xsl:for-each>
 			
+			<!-- Tiene que estar en segundo posición según SNRD 2015. Siempre se cumplirá porque siempre se imprimirá o el 'issued' o 'exposure'-->
+			<!-- (driver|snrd|openaire).rights.embargoEndDate = rights -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='driver' or @name='openaire' or @name='snrd']/doc:element[@name='rights']/doc:element[@name='embargoEndDate']/doc:element/doc:field[@name='value']">
+				<dc:date><xsl:value-of select="." /></dc:date>
+			</xsl:for-each>
+			
 			<!--dc.date.* = date -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='date']/doc:element[@name!='issued' and @name!='accessioned']/doc:element/doc:field[@name='value']">
 				<dc:date><xsl:value-of select="." /></dc:date>
@@ -88,24 +94,28 @@
 			<!-- sedici.embargo.period -->
 			<!-- NO VA -->
 			
+			<!-- snrd.alternativeIdentifier -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='alternativeIdentifier']/doc:field[@name='value']">
+				<dc:relation><xsl:value-of select="."/></dc:relation>
+			</xsl:for-each>
 			
 			<!--sedici.contributor.compiler = creator -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='contributor']/doc:element[@name='compiler']/doc:element/doc:field[@name='value']">
 				<dc:creator><xsl:value-of select="." /></dc:creator>
 			</xsl:for-each>
 			
-			<!--sedici.contributor.* = contributor -->
+			<!--sedici.contributor.director = contributor -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='contributor']/doc:element[@name='director']/doc:element/doc:field[@name='value']">
 				<dc:contributor><xsl:value-of select="." /></dc:contributor>
 			</xsl:for-each>
 			
-			<!--sedici.contributor.* = contributor -->
+			<!--sedici.contributor.* (menos compiler|director|editor) = contributor -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='contributor']/doc:element[@name!='compiler' and @name!='editor' and @name!='director']/doc:element/doc:field[@name='value']">
 				<dc:contributor><xsl:value-of select="." /></dc:contributor>
 			</xsl:for-each>
 			
 			<!--sedici.contributor.editor = creator -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='contributor']/doc:element/doc:field[@name='editor']">
+			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='contributor']/doc:element[@name='editor']/doc:element/doc:field[@name='value']">
 				<dc:creator><xsl:value-of select="." /></dc:creator>
 			</xsl:for-each>
 
@@ -174,6 +184,11 @@
 				<dc:description><xsl:value-of select="." /></dc:description>
 			</xsl:for-each>
 			
+			<!-- dc.audience = description -->
+			<xsl:for-each select="doc:metadata/doc:element[@name='dcterms']/doc:element[@name='audience']/doc:element/doc:field[@name='value']">
+				<dc:description><xsl:value-of select="." /></dc:description>
+			</xsl:for-each>
+			
 			<!--driver.type = type -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='driver']/doc:element[@name='type']/doc:element/doc:field[@name='value']">
 				<dc:type><xsl:value-of select="." /></dc:type>
@@ -205,13 +220,6 @@
 				<dc:rights><xsl:value-of select="." /></dc:rights>
 			</xsl:for-each>
 			
-			<!-- (driver|snrd|openaire).rights.embargoEndDate = rights -->
-			<xsl:for-each select="doc:metadata/doc:element[@name='driver' or @name='openaire']/doc:element[@name='rights']/doc:element[@name='embargoEndDate']/doc:element/doc:field[@name='value']">
-				<dc:date><xsl:value-of select="." /></dc:date>
-			</xsl:for-each>
-			<xsl:for-each select="doc:metadata/doc:element[@name='snrd']/doc:element[@name='rights']/doc:element[@name='embargoEndDate']/doc:element/doc:field[@name='value']">
-				<dc:rights><xsl:value-of select="." /></dc:rights>
-			</xsl:for-each>
 			
 			<!--sedici.rights.* = rights -->
 			<xsl:for-each select="doc:metadata/doc:element[@name='sedici']/doc:element[@name='rights']/doc:element[@name='uri']/doc:element/doc:field[@name='value']">

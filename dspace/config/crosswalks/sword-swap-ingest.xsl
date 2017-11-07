@@ -123,6 +123,23 @@
     			<xsl:value-of select="epdcx:valueString"/>
     		</dim:field>
     	</xsl:if>    
+
+	
+	 <!-- UNLP fix add license: license element: sedici.rights.uri -->
+	<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/terms/license'">
+                <dim:field mdschema="sedici" element="rights" qualifier="uri">
+                        <xsl:value-of select="epdcx:valueString"/>
+                </dim:field>
+        </xsl:if>
+
+	 <!-- UNLP fix add keywords: keywords  element: sedici.subject.keyword -->
+	 <xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/terms/subject'">
+                <dim:field mdschema="sedici" element="subject" qualifier="keyword">
+                <xsl:value-of select="epdcx:valueString"/>
+            </dim:field>
+        </xsl:if>
+
+
     	
     	<!-- item type element: dc.type  Se setea Article por defecto si viene como JournalArticle -->
    		<xsl:if test="./@epdcx:propertyURI='http://purl.org/dc/elements/1.1/type' and ./@epdcx:vesURI='http://purl.org/eprint/terms/Type'">

@@ -88,7 +88,6 @@
             	<a id="ds-header-logo-link">
                     <xsl:attribute name="href">
                         <xsl:value-of select="concat($contextPath,'/')"/>
-                        <xsl:text>/</xsl:text>
                     </xsl:attribute>
                     <span id="ds-header-logo">&#160;</span>
                     <span id="ds-header-logo-text"><i18n:text>xmlui.general.dspace_home</i18n:text></span>

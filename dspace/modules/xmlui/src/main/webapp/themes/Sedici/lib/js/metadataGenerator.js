@@ -22,7 +22,7 @@
     				linkLabel = metadataList[key].linkLabel;
     			
     			// Agregamos el "HTTP://"
-    			if(!/^http:\/\//i.test(value))
+    			if(!/^(http|https):\/\//i.test(value))
     				value = "http://"+value;
     			
     			// Arma el html a retornar
@@ -57,10 +57,7 @@
 	    subdirector: {label: "Subdirector"},
 	    editor: {label: "Editor"},
 	    editorial: {label: "Editorial"},
-		comite_editorial: {label: "Comité editorial"},
-	    comite_de_referato: {label: "Comité de referato"},
-	    consejo_asesor: {label: "Consejo asesor"},
-	    secretaria_de_redaccion: {label: "Secretaría de redacción"},
+		staff: {label: "Staff"},
 	    issn: {label: "ISSN"},
 	    isbnl: {label: "ISSN-L"},
 	    frecuencia: {label: "Frecuencia"},
@@ -74,7 +71,9 @@
         notas: {label: "Notas"},
         revista_indizada_en: {label: "Revista indizada en"},
         localizacion_fisica: {label: "Localización física"},
+        licencia_cc: {label:"Licencia Creative Commons (URL)", type: "link", validator: isValidUrl},
         localizacion_electronica: {label: "Localización electrónica", type: "link", linkLabel: "Acceder al sitio web"},
+        empty: {label: ""},
     };
 
     // Array con los codigos de los metadatos (para determinar la posicion de inserción)
@@ -83,6 +82,13 @@
     // Array con los codigos de los metadatos ordenados alfabeticamente (para la combo)
     var sortedMetadataKeys = $.map(metadataList, function(value, key) { return key; });
     sortedMetadataKeys.sort();
+    //Se agrega como primera opción el campo de metadato "empty" (vacío), eliminando la instancia existente.
+    var posEmptyElement = sortedMetadataKeys.indexOf("empty");
+    if(posEmptyElement > -1) {
+    	sortedMetadataKeys.splice(posEmptyElement, 1);
+    	// Agregar elemento "empty" en primera posición.
+    	sortedMetadataKeys.splice(0, 0, "empty");
+    }
     
     
     //////////////////////////////////////////////////////////////////
@@ -156,6 +162,10 @@
         if(textarea.val().trim() == "")
             return false;
 
+        // Intentamos agregar un metadato cuyo 'nombre de metadato' es vacío?
+        if(metadataList[combo.val()].label.length == 0)
+        	return false;
+        
         addMetadata(combo.val(), textarea.val());
         textarea.val("");
         combo.focus();
@@ -175,40 +185,45 @@
     }
     
     var addMetadata = function(key, value) {
-    	
-        var metadataElement = resultsContainer.find("."+key);
-        
-        if(metadataElement.length == 0) {
-            metadataElement = createMetadataElement(key);
-            
-        	// Buscamos la posicion donde insertar el nuevo elemento 
-            // (si el container está vacío el bucle no modifica nada)
-        	var currentInsertPosition = getInsertPosition(key);
-        	var inserted = false;
-        	resultsContainer.find("div").each(function() {
-        		var metadataInsertPosition = getInsertPosition( $(this).attr('class') );
-        		if(metadataInsertPosition > currentInsertPosition) {
-        			// Insertamos el elemento como predecesor
-        			metadataElement.insertBefore(this);
-        			inserted = true;
-        			return false;
-        		}
-        	});
-
-        	// Si el container estaba vacío, o no había ningún elemento con indice mayor, 
-        	// insertamos como último elemento
-            if(!inserted) {
-	        	resultsContainer.append(metadataElement);
-            }
-        }
-        
-        // Si tiene un tipo especial definido, hacemos el procesamiento adicional
-        if(metadataList[key].type && metadataList[key].type != "text") {
-        	value = typeHandlers[ metadataList[key].type ].encode(key, value);
-        }
-        
-        metadataElement.append( createValueElement(metadataElement, key, value) );
-        updateTarget();
+    	var followOperation = true;
+    	if(metadataList[key].validator) {
+    		 followOperation = metadataList[key].validator(value);
+    	}
+    	if(followOperation) {
+	        var metadataElement = resultsContainer.find("."+key);
+	        
+	        if(metadataElement.length == 0) {
+	            metadataElement = createMetadataElement(key);
+	            
+	        	// Buscamos la posicion donde insertar el nuevo elemento 
+	            // (si el container está vacío el bucle no modifica nada)
+	        	var currentInsertPosition = getInsertPosition(key);
+	        	var inserted = false;
+	        	resultsContainer.find("div").each(function() {
+	        		var metadataInsertPosition = getInsertPosition( $(this).attr('class') );
+	        		if(metadataInsertPosition > currentInsertPosition) {
+	        			// Insertamos el elemento como predecesor
+	        			metadataElement.insertBefore(this);
+	        			inserted = true;
+	        			return false;
+	        		}
+	        	});
+	
+	        	// Si el container estaba vacío, o no había ningún elemento con indice mayor, 
+	        	// insertamos como último elemento
+	            if(!inserted) {
+		        	resultsContainer.append(metadataElement);
+	            }
+	        }
+	        
+	        // Si tiene un tipo especial definido, hacemos el procesamiento adicional
+	        if(metadataList[key].type && metadataList[key].type != "text") {
+	        	value = typeHandlers[ metadataList[key].type ].encode(key, value);
+	        }
+	        
+	        metadataElement.append( createValueElement(metadataElement, key, value) );
+	        updateTarget();
+	    }
     };
 
     // Boton para editar/eliminar metadatos
@@ -216,9 +231,17 @@
         var key = target.parent().attr('class');
         var value = target.html().replace(/&amp;/g, '&');
 
-        // Si tiene un tipo especial definido, hacemos el procesamiento de decodificacion
-        if(metadataList[key].type && metadataList[key].type != "text") {
-        	value = typeHandlers[ metadataList[key].type ].decode(key, value);
+        if(metadataList[key] != null) {
+	        // Si tiene un tipo especial definido, hacemos el procesamiento de decodificacion
+	        if(metadataList[key].type && metadataList[key].type != "text") {
+	        	value = typeHandlers[ metadataList[key].type ].decode(key, value);
+	        }
+        } else {
+        	// Si el metadato a eliminar no está disponible en la lista de metadatos, entonces "vaciamos" el nombre del metadato.
+        	var posEmptyElement = metadataKeys.indexOf("empty");
+        	if (posEmptyElement > -1){
+        		key = "empty";
+        	}
         }
 
         textarea.val(value);
@@ -274,6 +297,21 @@
     var createMetadataElement = function(key) {
         return $("<div class='"+key+"'><span class='label'>"+metadataList[key].label+": </span></div>");
     }
+    
+    ///////////////////////////////////////////////
+    // Validation FUNCTIONS
+    //////////////////////////////////////////////
+    
+    /* Generic URL validator */
+    function isValidUrl(urlToValidate) {
+    	var GenericUrlRegex =/^(https?:\/\/)?(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\/\.,;:\s@\"]{2,})(\/.*)?$/i;
+	    if(GenericUrlRegex.test(urlToValidate)){
+	    	return true;
+	    } else {
+	    	alert('¡La URL ingresada no es válida!.');
+	    	return false;
+	    }	
+    };
 
   }
 })( jQuery );

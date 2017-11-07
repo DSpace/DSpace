@@ -86,21 +86,25 @@
 
     <!-- Es el mismo que el di:row normal, solo que necesito por el MODE -->
     <xsl:template match="dri:reference" mode="li_browse_columns">
+    <xsl:variable name="externalMetadataURL">
+       <xsl:text>cocoon:/</xsl:text>
+       <xsl:value-of select="@url"/>
+       <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+   </xsl:variable>
+    <xsl:variable name="externalDocumentRoot" select="document($externalMetadataURL)"/>
+    <xsl:variable name="collection-title" select="$externalDocumentRoot/mets:METS/mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='dc'][@element='title']/text()"/>
+    <xsl:if test="not(starts-with($collection-title,'Autoarchivo'))">    
         <li>
-            <xsl:variable name="externalMetadataURL">
-                <xsl:text>cocoon:/</xsl:text>
-                <xsl:value-of select="@url"/>
-                <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
-            </xsl:variable>
             <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-artifact-item collection
                     <xsl:if test="(position() mod 2 = 0)">even</xsl:if>
                     <xsl:if test="(position() mod 2 = 1)">odd</xsl:if>
                 </xsl:with-param>
             </xsl:call-template>
-            <xsl:apply-templates select="document($externalMetadataURL)" mode="nameCollection"/>
+            <xsl:apply-templates select="$externalDocumentRoot" mode="nameCollection"/>
             <xsl:apply-templates />
         </li>
+    </xsl:if>
     </xsl:template>
 
     <xsl:template match="mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim" mode="nameCollection">

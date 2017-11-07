@@ -12,7 +12,7 @@ echo "Transformando backup de BD ..."
 pg_restore -Ft -O -f /tmp/$FILENAME.sql /tmp/$FILENAME.tar
 
 echo "Comprimiendo ..."
-tar -cvzf $DESTFILENAME /tmp/$FILENAME.sql
+tar --directory /tmp -czf $DESTFILENAME $FILENAME.sql
 
 echo "Se genero el backup en $DESTFILENAME"
 rm /tmp/$FILENAME.tar

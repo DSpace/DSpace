@@ -190,33 +190,33 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 		    	arreglo.put("by", 6);
 		    	switch (arreglo.get(cc_license)) {
 				case 1:
-					licenseDescription="Creative Commons Attribution-NonCommercial-NoDerivs";
-					postfixLicenseDescription="(CC BY-NC-ND 2.5)";
+					licenseDescription="Creative Commons Attribution-NonCommercial-NoDerivatives";
+					postfixLicenseDescription="(CC BY-NC-ND 4.0)";
 					break;
 				case 2:
 					licenseDescription="Creative Commons Attribution-NonCommercial-ShareAlike";
-					postfixLicenseDescription="(CC BY-NC-SA 2.5)";
+					postfixLicenseDescription="(CC BY-NC-SA 4.0)";
 					break;
 				case 3:
 					licenseDescription="Creative Commons Attribution-NonCommercial";
-					postfixLicenseDescription="(CC BY-NC 2.5)";
+					postfixLicenseDescription="(CC BY-NC 4.0)";
 					break;
 				case 4:
-					licenseDescription="Creative Commons Attribution-NoDerivs";
-					postfixLicenseDescription="(CC BY-ND 2.5)";
+					licenseDescription="Creative Commons Attribution-NoDerivatives";
+					postfixLicenseDescription="(CC BY-ND 4.0)";
 					break;
 				case 5:
 					licenseDescription="Creative Commons Attribution-ShareAlike";
-					postfixLicenseDescription="(CC BY-SA 2.5)";
+					postfixLicenseDescription="(CC BY-SA 4.0)";
 					break;
 				default:
 					licenseDescription="Creative Commons Attribution";
-					postfixLicenseDescription="(CC BY 2.5)";
+					postfixLicenseDescription="(CC BY 4.0)";
 					break;
 				}
 		    	//agrego la version y la jurisdiccion
-		    	licenseUri=licenseUri+"/2.5/";
-		    	licenseDescription=licenseDescription+" 2.5";
+		    	licenseUri=licenseUri+"/4.0/";
+		    	licenseDescription=licenseDescription+" 4.0 International";
 		    	if (!jurisdictionId.equals("")){
 		    		licenseUri=licenseUri+jurisdictionId+"/";
 		    		licenseDescription=licenseDescription+" "+ jurisdictionDescription;
@@ -236,7 +236,7 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 	    	String commercial = request.getParameter("commercial_chooser");
 	        String derivatives = request.getParameter("derivatives_chooser");
 	        postfixLicenseDescription = "(cc by";
-	        String ccVersion="2.5";
+	        String ccVersion="4.0";
 	       
 	        if (commercial!=null && derivatives!=null){
 	        
@@ -257,14 +257,14 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 		    		licenseUri=licenseUri + "-" + derivatives;
 		    		postfixLicenseDescription+="-"+derivatives;
 		    		if (derivatives=="nd"){
-		    			licenseDescription=licenseDescription+"-NoDerivs";
+		    			licenseDescription=licenseDescription+"-NoDerivatives";
 		    		} else {
 		    			licenseDescription=licenseDescription+"-ShareAlike";
 		    		}
 		    	};
 		    	licenseUri=licenseUri+"/"+ ccVersion +"/";
 		    	postfixLicenseDescription+=" "+ccVersion+")";
-		    	licenseDescription=licenseDescription+" "+ccVersion;
+		    	licenseDescription=licenseDescription+" "+ccVersion+ " International";
 		    	if (!jurisdictionId.equals("")){
 		    		licenseUri=licenseUri+jurisdictionId+"/";
 		    		licenseDescription=licenseDescription+" "+ jurisdictionDescription;

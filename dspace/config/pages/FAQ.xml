@@ -94,73 +94,68 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			y una breve descripción de cada uno de ellos:
 			<ul>
 				<li>
-					<b>Artículo: </b>comprende todos aquellos textos escritos para ser publicados en una publicación periódica de corte científico o académico. 
-					También se pueden incluir otros textos, de carácter independiente, referidos a un tema específico y no demasiado extensos (menos de 50 páginas).
+					<b>Artículo: </b>comprende todos aquellos textos escritos para ser publicados en una publicación periódica de corte científico o académico. También se pueden incluir otros textos, de carácter independiente, referidos a un tema específico, no demasiado extensos (menos de 50 páginas).
 				</li>
 				<li>
-					<b>Capítulo de libro: </b>como su nombre lo indica, corresponde a un capítulo de un libro tomado en forma independiente, 
-					como suele suceder en libros conformados a partir de compilaciones o antologías de diversos tipos.
+					<b>Audio: </b>registro sonoro de diversa índole, que puede comprender música grabada en estudio o en vivo, entrevistas, testimonios, discursos, transmisiones oficiales y en cadena, programas de radio completos o fragmentos, etc.
 				</li>
 				<li>
-					<b>Comunicación: </b>escrito breve enviado generalmente a una publicación periódica sobre un tema al que ya se ha hecho 
-					referencia en la publicación. También puede incluir la comunicación de resultados esperados en una investigación, sin el 
-					desarrollo textual de la misma.
+					<b>Capítulo de libro: </b>como su nombre lo indica, corresponde a un capítulo de un libro tomado en forma independiente, como sucede en libros conformados a partir de compilaciones o antologías de diversos tipos.
 				</li>
 				<li>
-					<b>Contribución a revista: </b>escrito también breve enviado espontáneamente por un autor a una publicación periódica. Las 
-					contribuciones en general estarán referidas a las temáticas abarcadas por la publicación pero no habrán sido solicitadas por 
-					los editores.
+					<b>Comunicación: </b>escrito breve enviado generalmente a una publicación periódica sobre un tema al que ya se ha hecho referencia en la publicación. También puede incluir la comunicación de resultados esperados en una investigación, sin su desarrollo textual.
 				</li>
 				<li>
-					<b>Documento de trabajo: </b>comprende aquellos textos escritos a modo de memoria o informe sobre una determinada cuestión en 
-					la que trabajan distintas personas al mismo tiempo. Son textos de consulta frecuente para los involucrados.
+					<b>Contribución a revista: </b>escrito también breve enviado espontáneamente por un autor a una publicación periódica. Las contribuciones en general estarán referidas a las temáticas abarcadas por la publicación pero no habrán sido solicitadas por los editores.
 				</li>
 				<li>
-					<b>Documento institucional: </b>comprende todos aquellos escritos generados dentro de una institución con carácter oficial. Puede 
-					incluir ordenanzas, resoluciones, expedientes, etc.
+					<b>Documento de trabajo: </b>comprende aquellos textos escritos a modo de memoria o informe sobre una determinada cuestión en la que trabajan distintas personas al mismo tiempo. Son textos de consulta frecuente para los involucrados.
 				</li>
 				<li>
-					<b>Imagen en movimiento: </b>se refiere a documentos visuales en video o cualquier otro tipo de animación (de allí "en movimiento").
+					<b>Documento institucional: </b>comprende todos aquellos escritos generados dentro de una institución con carácter oficial. Puede incluir ordenanzas, resoluciones, expedientes, etc.
+
 				</li>
 				<li>
-					<b>Imagen fija: </b>se refiere a aquellos documentos visuales que carecen de movimiento como fotografías, infografías, dibujos, 
-					reproducciones, gráficos, pósters, etc.
+					<b>Imagen en movimiento: </b>se refiere a documentos visuales en video o cualquier otro tipo de animación (de allí “en movimiento”).
 				</li>
 				<li>
-					<b>Informe técnico: </b>comprende aquellos textos escritos donde se deja documentado el progreso y los elementos necesarios para 
-					la realización de proyectos y otros trabajos. A diferencia del documento de trabajo, el informe técnico proporciona mayor 
-					información de corte estadístico y económico.
+					<b>Imagen fija: </b>se refiere a aquellos documentos visuales que carecen de movimiento como fotografías, infografías, dibujos, reproducciones, gráficos, pósters, etc.
 				</li>
 				<li>
-					<b>Libro: </b>cualquier obra editada como tal, ya sea por una editorial o una institución, en digital o en papel. En SEDICI 
-					albergamos tanto e-books (libros electrónicos navegables) como versiones digitales de libros originalmente editados en papel.
+					<b>Libro: </b>cualquier obra editada como tal, ya sea por una editorial o una institución, en digital o en papel. En SEDICI se albergan tanto e-books (libros electrónicos navegables) como versiones digitales de libros originalmente editados en papel.
+				</li>
+				
+				<li>
+					<b>Objeto de aprendizaje: </b>todo aquel material que sirva a los efectos de la enseñanza de un tema o materia, preferentemente en el ámbito universitario o superior.
 				</li>
 				<li>
-					<b>Objeto de conferencia: </b>se denomina de este modo a cualquier trabajo presentado en un evento científico, ya se trate de 
-					un paper, una conferencia propiamente dicha, un poster, etc.
+					<b>Objeto de conferencia: </b>se denomina de este modo a cualquier trabajo presentado en un evento académico o científico, ya se trate de un paper, una conferencia propiamente dicha, un poster, etc.
+
 				</li>
 				<li>
-					<b>Preprint: </b>es la versión de un artículo enviado a una publicación periódica antes de ser revisado y publicado por ésta. 
-					Puede decirse que es el "borrador" del artículo o su versión sin editar.
+					<b>Objeto físico: </b>comprende aquellos elementos que por su porte (como los instrumentos científicos y los musicales) no pueden ser catalogados directamente en el repositorio, como aquellos alojados en los distintos museos de la UNLP. En estos casos, se recurre a imágenes (fijas o en movimiento) y a audios de los objetos para su mejor descripción.
 				</li>
 				<li>
-					<b>Revisión: </b>cualquier escrito donde se realice una reseña sobre un determinado tema o bien sobre libros, tesis y otros textos 
-					en particular.
+					<b>Preprint: </b>es la versión de un artículo enviado a una publicación periódica antes de ser revisado y publicado por ésta. Puede decirse que es el “borrador” del artículo o su versión sin editar.
+				</li>
+				
+				<li>
+					<b>Reporte: </b>comprende aquellos textos donde se deja documentado el progreso y los elementos necesarios para la realización de proyectos y otros trabajos, así como diversos tipos de informes, a saber: informes de comisiones, memorandos, informes externos de investigación, informes internos, informes estadísticos, informes para agencias de financiación y otros.
 				</li>
 				<li>
-					<b>Tesis de doctorado: </b>trabajo escrito de gran envergadura para obtener el título de Doctor de las diversas unidades académicas 
-					de la UNLP.
+					<b>Revisión: </b>cualquier escrito donde se realice una reseña sobre un determinado tema o bien sobre libros, tesis y otros textos en particular.
 				</li>
 				<li>
-					<b>Tesis de grado: </b>también llamada tesina o tesis de licenciatura es un trabajo escrito de menor envergadura que la tesis de 
-					doctorado para obtener el título de Licenciado de las diversas unidades académicas de la UNLP.
+					<b>Tesis de doctorado: </b>trabajo escrito de gran envergadura para obtener el título de Doctor de las distintas unidades académicas de la UNLP.
+				</li>
+				<li>
+					<b>Tesis de grado: </b>también llamada tesina o tesis de licenciatura, es un trabajo escrito de menor envergadura que la tesis de doctorado para obtener el título de Licenciado (o el título de grado que corresponda) de las distintas unidades académicas de la UNLP.
 				</li>
 				<li>
 					<b>Tesis de maestría: </b>trabajo escrito para obtener el título de Magister de las diversas unidades académicas de la UNLP.
 				</li>
 				<li>
-					<b>Trabajo de especialización: </b>también llamado Trabajo Final Integrador es un trabajo escrito para obtener el título de 
-					Especialista Universitario de las diversas unidades académicas de la UNLP.
+					<b>Trabajo de especialización: </b>también llamado Trabajo Final Integrador, es un trabajo escrito para obtener el título de Especialista Universitario de las distintas unidades académicas de la UNLP.
 				</li>
 			</ul> 
 		</p>

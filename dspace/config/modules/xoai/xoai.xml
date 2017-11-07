@@ -21,6 +21,22 @@
 <!-- 			<Format refid="didl" /> -->
 		</Context>
 		
+		<!-- Contexto para acceder a registros cosechables por DOAJ, en el formato de DOAJ. -->
+		<Context baseurl="doaj">
+			<Format refid="doaj" />
+			<Format refid="xoai"/>
+			<!-- Metadata mandatory : journalTitle, title, 
+				fullTextUrl (sedici/handle/10915/XX - exists always), publicationDate (dc.date.issued).  -->
+			<!-- JournalTitle : Mandatory-->
+			<Filter refid="journalTitleExists"/>
+			<!-- Pulication Date : Mandatory-->
+			<Filter refid="publicationDateExists"/>
+			<!-- Title : Mandatory -->
+			<Filter refid="titleexistsFilter" />
+			
+			<Transformer refid="doajTransformer"/>
+		</Context>
+		
 		<!--
 			Driver Guidelines:
 		 
@@ -184,6 +200,12 @@
 			<Namespace>urn:mpeg:mpeg21:2002:02-DIDL-NS</Namespace>
 			<SchemaLocation>http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd</SchemaLocation>
 		</Format>
+		<Format id="doaj">
+			<Prefix>doaj</Prefix>
+			<XSLT>metadataFormats/doaj_mtd.xsl</XSLT>
+			<Namespace>http://doaj.org/</Namespace>
+			<SchemaLocation>http://doaj.org/static/doaj/doajArticles.xsd</SchemaLocation>
+		</Format>
 	</Formats>
 	
 	<Transformers>
@@ -195,6 +217,9 @@
 		</Transformer>
 		<Transformer id="snrdTransformer">
 			<XSLT>transformers/snrd.xsl</XSLT>
+		</Transformer>
+		<Transformer id="doajTransformer">
+			<XSLT>transformers/doaj_tfm.xsl</XSLT>
 		</Transformer>
 	</Transformers>
 	
@@ -283,6 +308,20 @@
 			</Parameter>
 		</Filter>
 		
+		<Filter id="journalTitleExists">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="field">
+				<Value>sedici.relation.journalTitle</Value>
+			</Parameter>
+		</Filter>
+		
+		<Filter id="publicationDateExists">
+			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+			<Parameter key="field">
+				<Value>dc.date.issued</Value>
+			</Parameter>
+		</Filter>
+		
 		<Filter id="driverBundleOriginalOLocalizacionElectronica">
 			<Class>ar.edu.unlp.sedici.dspace.xoai.filters.DspaceExistsBundleOriginalOrElectronicLocationFilter</Class>
 		</Filter>
@@ -326,7 +365,7 @@
 				<Value>Comunicacion</Value>
 				<Value>Revision</Value>
 				<Value>Contribuciones a revistas</Value>
-				<Value>Informe tecnico</Value>
+				<Value>Reporte</Value>
 				<Value>Patente</Value>
 				<Value>Tesis de doctorado</Value>
 				<Value>Tesis de maestria</Value>
@@ -347,6 +386,9 @@
 				<Value>Trabajo practico</Value>
 				<Value>Material complementario</Value>
 				<Value>Programa</Value>
+				<Value>Resumen</Value>
+				<Value>Edicion de Revista</Value>
+				<Value>Boletin</Value>
 			</Parameter>
 		</Filter>
 		
@@ -378,7 +420,7 @@
 				<Value>Articulo</Value>
 				<Value>Documento de trabajo</Value>
 				<Value>Revision</Value>
-				<Value>Informe tecnico</Value>
+				<Value>Reporte</Value>
 				<Value>Patente</Value>
 				<Value>Tesis de doctorado</Value>
 				<Value>Tesis de maestria</Value>
@@ -388,6 +430,9 @@
 				<Value>Libro</Value>
 				<Value>Capitulo de libro</Value>
 				<Value>Objeto de conferencia</Value>
+				<Value>Resumen</Value>
+				<Value>Edicion de revista</Value>
+				<Value>Boletin</Value>
 			</Parameter>
 		</Filter>
 		
@@ -414,8 +459,8 @@
 			<!-- Just an alias -->
 		</Set>
 		<Set id="openaireSet">
-			<Pattern>ec_fundedresources</Pattern>
-			<Name>EC_fundedresources set</Name>
+			<Pattern>openaire</Pattern>
+			<Name>OpenAIRE</Name>
 			<!-- Just an alias -->
 		</Set>
 		<Set id="snrdSet">

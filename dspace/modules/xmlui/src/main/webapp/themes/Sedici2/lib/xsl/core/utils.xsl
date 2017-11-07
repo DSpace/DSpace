@@ -169,7 +169,7 @@
          	 <h2><i18n:text>sedici.home.buscar_material.title</i18n:text></h2>
          	 <p>
          	 	<i18n:text>sedici.home.buscar_material.info_pre</i18n:text>
-         	 	<span class="resource_count">30000</span>
+         	 	<span class="resource_count">55000</span>
          	 	<i18n:text>sedici.home.buscar_material.info_post</i18n:text>
          	 </p>
 	     <form>
@@ -469,6 +469,52 @@
     		<!-- Method of a Java class that use a regular expression to replace the HTML tags of a text. -->
     		<xsl:copy-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.replace($textNode,'&lt;/?(i|sub|sup)&gt;','')"/>
     	</xsl:if>
+    </xsl:template>
+    
+    <!-- Encode the Discovery filters to generate a valid URL for its use by Discovery Simple-Search -->
+    <xsl:template name="encodeDiscoveryFilter">
+    	<xsl:param name="filterValue"/>
+    	<xsl:if test="$filterValue">
+    		<xsl:value-of select="ex:replace(ex:encodeURL($filterValue),'\+','\\+')"/>
+    	</xsl:if>
+    </xsl:template>
+    
+    <!-- Parsea los metadatos guardados en el metadato 'dc.description' de una comunidad/colección. Estos metadatos fueron guardados
+    	utilizando el script metadataGenerator.js -->
+    <xsl:template name="parseCommunityCollectionMetadata">
+    	<xsl:param name="node"/>
+    	<!-- Debajo del elemento 'dc.description' hay un string. Para manipularlo hay que convertirlo hay 'node-set' -->
+		<xsl:variable name="html_nodes"><xsl:copy-of select="$node"/></xsl:variable>
+        <xsl:for-each select="exslt:node-set($html_nodes)/*">
+			<div>
+				<xsl:attribute name="class"><xsl:value-of select="./@class"/></xsl:attribute>	
+				<!-- Seguimos parseando el string y lo convertimos en otro conjunto de nodos -->
+				<xsl:for-each select="exslt:node-set(.)/*">
+					<xsl:choose>
+	           			<xsl:when test="./@class='value'">
+	           				<span>
+	           					<xsl:attribute name="class"><xsl:value-of select="'value'"/></xsl:attribute>
+                                <!-- Si el <span class="value"> tiene más de un hijo, entonces copiamos los nodos que no son text(), evitando asi perder elementos como el 
+								<a> en un metadato del tipo link. Los nodos del tipo 'text' son afectados por el "disable-output-escaping" -->
+           						<xsl:for-each select="./node()">
+           							<xsl:choose>
+           								<xsl:when test="self::text()">
+           									<xsl:value-of select="." disable-output-escaping="yes"/>
+           								</xsl:when>
+           								<xsl:otherwise>
+           									<xsl:copy-of select="."/>
+           								</xsl:otherwise>
+           							</xsl:choose>
+           						</xsl:for-each>
+	           				</span>
+	           			</xsl:when>
+	           			<xsl:otherwise>
+	           				<xsl:copy-of select="."/>
+	           			</xsl:otherwise>
+	           		</xsl:choose>
+				</xsl:for-each>
+			</div>		
+		</xsl:for-each>
     </xsl:template>
 	
 </xsl:stylesheet>

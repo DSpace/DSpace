@@ -25,7 +25,8 @@ print_help()
 }
 
 
-print_sec(){
+print_sec()
+{
     echo -e "\n===================================================="
 	echo -e "==========$1=========="
     echo "===================================================="
@@ -221,17 +222,20 @@ do_update(){
 	fi
 	
 	ant -Ddspace.dir=$INSTALL_DIR -Ddspace.configuration=$INSTALL_DIR/config/dspace.cfg -Doverwrite=false update
-		
-    print_sec "Felicitaciones! se actualizo correctamente Dspace@SeDiCI en \n\t $INSTALL_DIR"
+
+	echo -e "\n=========A revisar los siguientes archivos de configuracion"
+	diff -r $INSTALL_DIR/config $BASE_DIR/distribution/overwritten-files/config -y --suppress-common-lines --width=180 | grep -v Only | grep -v '\${.*}'
+
+        print_sec "Felicitaciones! se actualizo correctamente Dspace@SeDiCI en \n\t $INSTALL_DIR"
 }
 
 #=============================================================================
 
 echo "`whoami` dame tus privilegios de root, dame tu poder!"
-sudo ls > /dev/null 
 
 case "$1" in
     install )
+		sudo ls > /dev/null 
 		do_install $2
     	;;
     update )

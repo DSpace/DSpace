@@ -37,7 +37,7 @@
 		<xsl:param name="context-name"/>
 		
 		<xsl:variable name="date-prefix">
-			<xsl:if test="($context-name = 'driver') or ($context-name = 'openaire')">
+			<xsl:if test="($context-name = 'driver') or ($context-name = 'openaire') or ($context-name = 'snrd')">
 				<xsl:text>info:eu-repo/date/embargoEnd/</xsl:text>
 			</xsl:if>
 		</xsl:variable>
@@ -131,13 +131,16 @@
 			<xsl:when test="$subtype='Comunicacion'">
 				info:eu-repo/semantics/article
 			</xsl:when>
+			<xsl:when test="$subtype='Resumen'">
+				info:eu-repo/semantics/conferenceObject
+			</xsl:when>
 			<xsl:when test="$subtype='Revision'">
 				info:eu-repo/semantics/review
 			</xsl:when>
 			<xsl:when test="$subtype='Contribucion a revista'">
 				info:eu-repo/semantics/contributionToPeriodical
 			</xsl:when>
-			<xsl:when test="$subtype='Informe tecnico'">
+			<xsl:when test="$subtype='Reporte'">
 				info:eu-repo/semantics/report
 			</xsl:when>
 			<xsl:when test="$subtype='patente'">
@@ -220,7 +223,7 @@
 			<xsl:when test="$subtype='Contribucion a revista'">
 				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
-			<xsl:when test="$subtype='Informe tecnico'">
+			<xsl:when test="$subtype='Reporte'">
 				info:eu-repo/semantics/publishedVersion
 			</xsl:when>
 			<xsl:when test="$subtype='patente'">

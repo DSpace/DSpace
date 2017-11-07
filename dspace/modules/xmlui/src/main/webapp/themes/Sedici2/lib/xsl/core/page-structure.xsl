@@ -182,6 +182,8 @@
             -->
             <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
 
+			<link rel="search" type="application/opensearchdescription+xml" title="SEDICI para Firefox" href="http://sedici.unlp.edu.ar/moz-search-plugin.xml"/>
+			
             <link rel="shortcut icon">
                 <xsl:attribute name="href">
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
@@ -321,7 +323,12 @@
 
                 var runAfterJSImports = new FnArray();
             </script>
-
+			
+			<xsl:if test="/dri:document/dri:body/dri:div[@n='item-view']">
+				<!-- ALTMETRIC JS -->
+	            <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'>&#160;</script>
+			</xsl:if>
+			
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
@@ -764,6 +771,57 @@ placeholders for header images -->
     			$('table').accordion({autoHeight: false , collapsible: true, active: false, header: '.collection-title' });
 			});
 		</script>
+		
+		<script text="text/javascript">
+			<xsl:text disable-output-escaping="yes">
+				 /** twitter share **/    
+			    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+			
+			    /** facebook share **/
+			    (function(d, s, id) {
+			      var js, fjs = d.getElementsByTagName(s)[0];
+			      if (d.getElementById(id)) return;
+			      js = d.createElement(s); js.id = id;
+			      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.3&amp;appId=79106916048";
+			      fjs.parentNode.insertBefore(js, fjs);
+			    }(document, 'script', 'facebook-jssdk'));
+			
+			    $(document).ready(function() {
+			        var share_fb = "#share_fb"; 
+			        var share_tw = "#share_tw"; 
+			        url = window.location.href;
+			
+			        $(share_tw).append('&lt;a href="https://twitter.com/share" class="twitter-share-button" data-via="sedici_unlp" data-lang="es"   data-count="none"&gt;Twittear&lt;/a&gt;');
+			        $(share_fb).append('&lt;div class="fb-like" data-href="'+url+'" data-width="25" data-layout="button" data-action="like" data-show-faces="true" data-share="true"&gt;&lt;/div&gt;');
+			    });
+			</xsl:text>
+		</script>
+		
+		<!-- Script utilizado para validar la URL y visualizar el logo de la licencia CC en una colección/comunidad.  -->
+		<xsl:if test="/dri:document/dri:body/dri:div[@n='community-home' or @n='collection-home']">
+			<script type="text/javascript">
+					function isValidCCUrl(ccUrl) {
+				    	var CCRegex = /^(https?:\/\/)?(www\.)?creativecommons\.org\/licenses\/by(\-(nd|sa|nc(\-(nd|sa))?))?\/\d\.\d(\/\w*)?\/?$/i;
+				    	return CCRegex.test(ccUrl);
+				    };
+				
+					/* Function used to show the CCLicense Button in the collection/community view. */
+					$(document).ready(function (){
+						if($('.licencia_cc').length){
+							var cc_url = $('.licencia_cc span.value a').attr("href");
+							if(isValidCCUrl(cc_url)) {
+								var cc_type = cc_url.replace(/^(https?:\/\/)?(www\.)?creativecommons\.org\/licenses\//i,"");
+								var cc_license_text = '<i18n:text>xmlui.dri2xhtml.METS-1.0.cc-license-text-collection-community</i18n:text>' + cc_type.toUpperCase().replace(/\//g,' ').trim();
+								$('.licencia_cc').hide();
+								<xsl:text disable-output-escaping="yes">
+								$('.intro-text .licencia_cc').after('&lt;div class="cc_license_text"> &lt;a target="_blank" href="'+ cc_url +'"> &lt;img alt="Licencia Creative Commons" width="80" heigth="15" src="https://licensebuttons.net/l/' + cc_type + '80x15.png"/>&lt;/a> &lt;span>' + cc_license_text + '&lt;/span> &lt;/div>');
+								</xsl:text>
+							}
+						}
+					});
+			</script>
+		</xsl:if>
+		
     </xsl:template>
 
     <!--

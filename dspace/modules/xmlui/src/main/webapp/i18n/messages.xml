@@ -366,7 +366,7 @@
 
 	<!-- Others -->
 	
-	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Outstanding documents</message>
+	<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Last documents</message>
 
     <!-- Authentication messages used for bitstream authentication -->
 	<message key="xmlui.BitstreamReader.auth_header">The file is restricted</message>
@@ -739,7 +739,7 @@
     <message key="xmlui.Submission.submit.UploadStep.infoEmbargo">
    <b>Note:</b> If you need that your work keeps temporarily hidden, you may request its embargo by 3, 6, 12, 18 or 24 months starting from the date of presentation of the work.   
    The UNLP and repository of SEDICI fervently support the open access to the scientific-academic production and therefore <b>RECCOMEND NOT</b> apply this restriction unless it results strictly needed for pending patents, confidenciality conveins and similar situations. Have in mind that the deposit of your thesis into the repository not allow you to do derived publications with quality of inedit; a derived work is NOT the original work.
-   <br/>To apply this restriction, you will must attach over this step a note of embargo request that properly justify the request (see model <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2013/04/Modelo-nota-de-embargo.doc">Here</a>).
+   <br/>To apply this restriction, you will must attach over this step a note of embargo request that properly justify the request (see model <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2015/12/Modelo-nota-de-embargo.doc">Here</a>).
    </message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
@@ -1956,7 +1956,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Publisher</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-subject">Subject</message>
 
-	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Files in this item</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Download Files</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Files</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Name</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Size</message>
@@ -1973,6 +1973,7 @@
 
 	<message key="xmlui.dri2xhtml.METS-1.0.license-text">The following license files are associated with this item:</message>
     <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Except where otherwise noted, this item's license is described as </message>
+    <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text-collection-community">Except where otherwise noted, the items under this community/collection have the following license </message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.collection-not-implemented">
 		The summaryView of a collection is not currently used or implemented. This can be fixed
@@ -1998,6 +1999,8 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">You can download this document from SEDICI</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">External link</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">A link to an external website is available</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-availability-no-fulltext">No full text</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-audience">Usage Context</message>
 		
 
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.
@@ -2236,6 +2239,7 @@
 <message key="xmlui.dri2xhtml.METS-1.0.item-location">Location</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Geographical references</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Temporal references</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-format">Physical description</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extent</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materials</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
@@ -2324,12 +2328,12 @@
 
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta">Choose a license:</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia">Without license</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Creative Commons Attribution 2.5 Argentina (CC BY 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Creative Commons Attribution-NonCommercial 2.5 Argentina (CC BY-NC 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Creative Commons Attribution-NonCommercial-NoDerivs 2.5 Argentina (CC BY-NC-ND 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Attribution-NonCommercial-ShareAlike 2.5 Argentina (CC BY-NC-SA 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Attribution-NoDerivs 2.5 Argentina (CC BY-ND 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Attribution-ShareAlike 2.5 Argentina (CC BY-SA 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Creative Commons Attribution 4.0 International (CC BY 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</message>
 <!-- Otras traducciones -->
 
 <message key="sedici.aspect.collectionViewer.addItem">Add document</message>
@@ -2352,6 +2356,7 @@
 <message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">In edition by {0}</message>
 
 <message key="xmlui.bitstream.downloadName">document</message>
+<message key="xmlui.bitstream.download">Download file</message>
 
 <message key="xmlui.forms.remove">Remove</message>
 
@@ -2380,6 +2385,27 @@
 <message key="xmlui.XMLWorkflow.default.finaleditstep.claimaction">Accept/Reject final</message>
 <message key="xmlui.XMLWorkflow.default.finaleditstep.finaleditaction">Accept/Reject final</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
+
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview.claimaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview.editaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.claimaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.editaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
+
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.claimaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.editaction">Local review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.claimaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.editaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
+
+<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.claimaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.editaction">SEDICI review</message>
+<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.selectcollectionaction">Collection's assignment</message>
 
 <message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.claimaction">Step of the revisor assignment</message>
 <message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.selectrevieweraction">Assign revisor</message>
@@ -2445,6 +2471,8 @@
 <message key="sedici.comunidades.bdigital.info">Historical documents and other external digital resources</message>
 <message key="sedici.comunidades.rea.nombre">Open Eduational Resources</message>
 <message key="sedici.comunidades.rea.info">Learning objects and others</message>
+<message key="sedici.comunidades.redmuseos.nombre">Museum network</message>
+<message key="sedici.comunidades.redmuseos.info">Material belonging to the UNLP museum network</message>
 <message key="sedici.comunidades.ehidrica.nombre">Hydric emergency</message>
 <message key="sedici.comunidades.ehidrica.info">Jobs within the Plan of Integrated Management of Disaster's Risk</message>
 

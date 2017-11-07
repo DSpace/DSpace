@@ -50,10 +50,101 @@
     	<xsl:value-of select="$linkFilter"/>
     	<xsl:text>?fq=</xsl:text>
     	<xsl:value-of select="$filter"/>
-    	<xsl:text>:</xsl:text>
-    	<xsl:value-of select="exts:replace(str:toLowerCase($normalizedValue),' ','\ ')"/>
+    	<xsl:text>%3A</xsl:text>
+    	<xsl:call-template name="encodeDiscoveryFilter">	
+    		<xsl:with-param name="filterValue">
+    			<xsl:value-of select="str:toLowerCase($normalizedValue)"/>
+    		</xsl:with-param>
+    	</xsl:call-template>
     	<xsl:text>\|\|\|</xsl:text>
-    	<xsl:value-of select="exts:replace($normalizedValue,' ','\ ')"/>
+    	<xsl:call-template name="encodeDiscoveryFilter">	
+    		<xsl:with-param name="filterValue">
+    			<xsl:value-of select="$normalizedValue"/>
+    		</xsl:with-param>
+    	</xsl:call-template>    			
+    </xsl:template>
+    
+    <xsl:template name="showExternalServices">
+    	<xsl:param name="metadataFields"/>
+    		
+    		<xsl:variable name="title" select="$metadataFields[@element='title' and @mdschema='dc']/text()"/>
+    		<xsl:variable name="handle" select="$metadataFields[@element='identifier' and @qualifier='uri' and @mdschema='dc']/text()"/>
+    		<xsl:if test="$metadataFields">
+		    	<div class="external-services-bar">
+		    		<!-- ALTMETRIC service -->
+					<div id="altmetric-container">
+						<div class="altmetric-embed" data-badge-type='4' data-badge-popover="bottom">
+							<xsl:choose>
+								<xsl:when test="$metadataFields[@element='identifier' and @qualifier='doi' and @mdschema='sedici']">
+									<xsl:attribute name="data-doi">
+										<xsl:value-of select="$metadataFields[@element='identifier' and @qualifier='doi' and @mdschema='sedici']/text()"/>
+									</xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="data-handle">
+										<xsl:value-of select="substring-after($handle,'http://hdl.handle.net/')"/>
+									</xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
+							&#160;
+						</div>
+					</div>
+					<!-- BASE-SEARCH service -->
+		    		<div id="base-search-net">
+		    			<a target="_blank" title="View registry in BASE">
+		    				<xsl:attribute name="href">
+		    					<xsl:value-of select="'http://www.base-search.net/Search/Results?q='"/>
+		    					<xsl:value-of select="exts:encodeURL(concat('tit:',$title ,' dccoll:ftunivlaplata'))"/>
+		    					<xsl:value-of select="'&amp;lem=1&amp;type=all&amp;refid=dclink&amp;l=es'"/>
+		    				</xsl:attribute>
+		    				<span><xsl:text>BASE</xsl:text></span>
+		    			</a>
+		    		</div>
+		    		<!-- GOOGLE SCHOLAR service -->
+		    		<div id="google-scholar-search">
+		    			<a target="_blank" title="View citations in Google Scholar">
+		    				<xsl:attribute name="href">
+		    					<xsl:value-of select="concat('http://scholar.google.com/scholar?q=allintitle%3A&quot;', exts:encodeURL($title),'&quot;')"/>
+		    				</xsl:attribute>
+		    				<span><xsl:text>GoogleScholar</xsl:text></span>
+		    			</a>
+		    		</div>
+		    	</div>
+		    </xsl:if>
+    </xsl:template>
+    
+    <xsl:template name="showSocialBar">
+    	<xsl:variable name="title" select="dim:field[@element='title' and @mdschema='dc']/text()"/>
+    	<xsl:variable name="sedici_url" select="concat('http://sedici.unlp.edu.ar/handle/', substring-after(dim:field[@element='identifier' and @qualifier='uri' and @mdschema='dc']/text(),'http://hdl.handle.net/'))"/>
+    	<div class="share-bar">
+		        <div id="fb-root">
+		        	<xsl:comment>&#160;</xsl:comment>
+		        </div>
+		        <div id="share_fb">
+		        	<xsl:text>&#160;</xsl:text>
+		        </div>
+		    	<div id="share_tw">
+		    		<xsl:text>&#160;</xsl:text>
+		    	</div>
+		    	<!-- MENDELEY IMPORT service -->
+	    		<div id="import_mendeley">
+	    			<a target="_blank" title="Add this article to your Mendeley library">
+	    				<xsl:attribute name="href">
+	    					<xsl:value-of select="concat('https://www.mendeley.com/import/?url=',exts:encodeURL($sedici_url))"/>
+	    				</xsl:attribute>
+	    				<span><xsl:text>&#160;</xsl:text></span>
+	    			</a>
+	    		</div>
+	    		<!-- RESEARCH GATE -->
+		    	<div id="share_research_gate">
+		    		<a target="_blank" title="Share on ResearchGate">
+		    			<xsl:attribute name="href">
+		    				<xsl:value-of select="concat('https://www.researchgate.net/go.Share.html?url=',exts:encodeURL($sedici_url),'&amp;title=',exts:encodeURL($title))"/>
+		    			</xsl:attribute>
+		    			<span><xsl:text>&#160;</xsl:text></span>
+		    		</a>
+		    	</div>
+		</div>
     </xsl:template>
     
     <xsl:template name="itemSummaryView-DIM">
@@ -136,45 +227,50 @@
 			<xsl:with-param name="elements" select="dim:field[@element='relation' and @qualifier='bookTitle'] "/>
 		</xsl:call-template>
 
+	<div id="simple-author-date-view">
 		<!-- Author(s) row -->	
-		<div class="simple-item-view-authors">
-			<xsl:call-template name="show-common-authors"/>
-		</div>
-
-		<!-- embargo rows -->
-		<xsl:if test="(dim:field[@element='embargo' and @qualifier='liftDate'])">
-			<div id="embargo-info">
-				<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
-				<span class="embargo_date">
-					<xsl:call-template name="render-date">
-						<xsl:with-param name="dateString" select="dim:field[@element='embargo' and @qualifier='liftDate'] "/>
-					</xsl:call-template>
-				</span>
+			<div class="simple-item-view-authors">
+				<xsl:call-template name="show-common-authors"/>
 			</div>
-		</xsl:if>
-
-		<!-- date.issued row -->
-		<!-- date.exposure/date.issued : extraemos el año solamente -->
-		<xsl:choose>
-			<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
-				<xsl:call-template name="render-date-year">
-					<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='exposure']/@qualifier"/>
-					<xsl:with-param name="dateString">
-						<xsl:value-of select="dim:field[@element='date' and @qualifier='exposure']"/>
-					</xsl:with-param>
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:when test="dim:field[@element='date' and @qualifier='issued']">
-				<xsl:call-template name="render-date-year">
-					<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='issued']/@qualifier"/>
-					<xsl:with-param name="dateString">
-						<xsl:value-of select="dim:field[@element='date' and @qualifier='issued']"/>
-					</xsl:with-param>
-				</xsl:call-template>
-			</xsl:when>
-		</xsl:choose>
-		<xsl:text>&#160;</xsl:text>
+	
+			<!-- date.issued row -->
+			<!-- date.exposure/date.issued : extraemos el año solamente -->
+			<xsl:choose>
+				<xsl:when test="dim:field[@element='date' and @qualifier='exposure']">
+					<xsl:call-template name="render-date-year">
+						<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='exposure']/@qualifier"/>
+						<xsl:with-param name="dateString">
+							<xsl:value-of select="dim:field[@element='date' and @qualifier='exposure']"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="dim:field[@element='date' and @qualifier='issued']">
+					<xsl:call-template name="render-date-year">
+						<xsl:with-param name="typeDate" select="dim:field[@element='date' and @qualifier='issued']/@qualifier"/>
+						<xsl:with-param name="dateString">
+							<xsl:value-of select="dim:field[@element='date' and @qualifier='issued']"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</xsl:when>
+			</xsl:choose>
+	
+			<!-- embargo rows -->
+			<xsl:if test="(dim:field[@element='embargo' and @qualifier='liftDate'])">
+				<div id="embargo-info">
+					<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
+					<span class="embargo_date">
+						<xsl:call-template name="render-date">
+							<xsl:with-param name="dateString" select="dim:field[@element='embargo' and @qualifier='liftDate'] "/>
+						</xsl:call-template>
+					</span>
+				</div>
+			</xsl:if>
+			<xsl:text>&#160;</xsl:text>
+        </div>
         
+		<!-- Mostramos la Social Bar -->
+		<xsl:call-template name="showSocialBar"/>
+		
 		<!-- Para el Tipo de Documento mostramos el sedici.subtype porque es mas especifico -->
 		<!-- Si no hay subtype, mostramos el dc.type -->
 		<xsl:choose>
@@ -194,6 +290,7 @@
 			</xsl:when>
 			<!-- No hay otherwise -->
 		</xsl:choose>
+		
 		<!-- relation.ciclo row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'relation-ciclo'"/>
@@ -201,7 +298,7 @@
 		</xsl:call-template>
 		<!-- title.alternative row -->
 		<xsl:call-template name="showAlternativeTitles"/>
-
+		
 		<!-- Abstract row -->
 		<xsl:if test="(dim:field[@element='description' and @qualifier='abstract'])">
 			<div class="simple-item-view-description">
@@ -227,14 +324,17 @@
 			</div>
 		</xsl:if>
 		<!-- note row -->
-		<xsl:if test="(dim:field[@element='description' and @qualifier='note'])">
-			<div class="simple-item-view-description">
-				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-note</i18n:text></h2>
-				<p>
-					<xsl:value-of select="dim:field[@element='description' and @qualifier='note']" disable-output-escaping="yes"/>
-				</p>
-			</div>
-		</xsl:if>
+                <!-- note row -->
+                <xsl:if test="(dim:field[@element='description' and @qualifier='note'])">
+                        <div class="simple-item-view-description">
+                                <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-note</i18n:text></h2>
+                                <xsl:for-each select="dim:field[@element='description' and @qualifier='note']">
+                                        <p>
+                                                <xsl:value-of select="." disable-output-escaping="yes"/>
+                                        </p>
+                                </xsl:for-each>
+                        </div>
+                </xsl:if>
 
 		<!-- Solo para el tipo tesis -->
 		<xsl:if test="dim:field[@element='type'] = $tesis">
@@ -436,20 +536,6 @@
 		</xsl:call-template>
 
 		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'identifier-doi'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='doi'] "/>
-			<xsl:with-param name="separator" select="' | '"/>
-			<xsl:with-param name="type" select="'url'"/>
-		</xsl:call-template>
-
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'identifier-handle'"/>
-			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='handle'] "/>
-			<xsl:with-param name="separator" select="' | '"/>
-			<xsl:with-param name="type" select="'url'"/>
-		</xsl:call-template>
-
-		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'identifier-other'"/>
 			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='other'] "/>
 			<xsl:with-param name="separator" select="' | '"/>
@@ -487,7 +573,19 @@
 			<xsl:with-param name="name" select="'coverage-temporal'"/>
 			<xsl:with-param name="elements" select="dim:field[@element='coverage' and @qualifier='temporal'] "/>
 		</xsl:call-template>
+		
+		<!-- dc.audience -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'audience'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='audience']"/>
+		</xsl:call-template>
 
+		<!-- format row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'format'"/>
+			<xsl:with-param name="elements" select="dim:field[@element='format'][not(@qualifier)]"/>
+		</xsl:call-template>
+		
 		<!-- format.medium row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'format-medium'"/>
@@ -562,6 +660,13 @@
 			</div>
 		</xsl:if>
 
+		<xsl:apply-templates select="/mets:METS" mode="generate-bitstream"/>
+		
+		<!-- Mostramos los servicios externos -->
+        <xsl:call-template name="showExternalServices">
+        	<xsl:with-param name="metadataFields" select="//dim:field"/>
+        </xsl:call-template>
+		
 		<!-- date.available row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'date-accessioned'" />
@@ -574,9 +679,6 @@
 			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='available']" />
 			<xsl:with-param name="type" select="'date'"/>
 		</xsl:call-template>
-
-
-		<xsl:apply-templates select="/mets:METS" mode="generate-bitstream"/>
 
 		<!-- peer_review row -->
 		<!-- fulltext row -->
@@ -961,7 +1063,7 @@
 		<div id="item-file-section">
 			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
 			<xsl:choose>
-				<xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='ORE'] or ./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
+				<xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL' or @USE='ORE'] or ./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and (@qualifier='uri' or @qualifier='doi' or @qualifier='handle') and @mdschema='sedici']">
 					<xsl:if test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
 						<xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
 							<xsl:with-param name="context" select="."/>
@@ -977,6 +1079,16 @@
 					<!-- Localizacion Electronica -->
 					<xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
 						<xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici'] "/>
+					</xsl:if>
+					
+					<!-- DOI -->
+					<xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='doi' and @mdschema='sedici']">
+						<xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='doi' and @mdschema='sedici'] "/>
+					</xsl:if>
+					
+					<!-- HANDLE -->
+					<xsl:if test="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='handle' and @mdschema='sedici']">
+						<xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@element='identifier' and @qualifier='handle' and @mdschema='sedici'] "/>
 					</xsl:if>
 				</xsl:when>
 				<xsl:otherwise>
@@ -1040,8 +1152,6 @@
 			<div class="thumbnail-wrapper">
 				<xsl:choose>
              	<xsl:when test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
-	              <i18n:text>sedici.comunidades.tesis.embargo</i18n:text>
-						<br />
 						<span>
 							<xsl:choose>
 	                        <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
@@ -1091,6 +1201,8 @@
 		                        		<xsl:when test="$file_type = 'audio'">mime_audio.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
 		                        		<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
+		                        		<xsl:when test="$file_subtype = 'epub+zip'">mime_epub.png</xsl:when>
+		                        		<xsl:when test="$file_subtype = 'x-mobipocket-ebook'">mime_mobi.png</xsl:when>
 		                        		<xsl:otherwise>mime.png</xsl:otherwise>
 		                        	</xsl:choose>
 	                        	</xsl:variable>
@@ -1108,63 +1220,92 @@
 						<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
-							<div>
-								<a class="image-link" target="_blank">
-									<xsl:attribute name="href">
-				                        <xsl:value-of select="$link"/>
-				                    </xsl:attribute>
-									<span><xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/></span>
-								</a>
-							</div>
-						</xsl:if>
+						<span>
+							<a class="image-link" target="_blank">
+								<xsl:attribute name="href">
+						        	<xsl:value-of select="$link"/>
+				         		</xsl:attribute>
+								<xsl:choose>
+									<xsl:when test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
+										
+											<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" disable-output-escaping="yes"/>
+										
+									</xsl:when>
+									<xsl:otherwise>
+										<i18n:text>xmlui.bitstream.downloadName</i18n:text>
+									</xsl:otherwise>
+								</xsl:choose>
+								<br/>
+								<i18n:text>xmlui.bitstream.download</i18n:text>
+							</a>
+						</span>
 					</xsl:otherwise>
 				</xsl:choose>
-				<div>
-					<span>
-						<xsl:choose>
-							<xsl:when test="@SIZE &lt; 1024">
-								<xsl:value-of select="@SIZE"/>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-							</xsl:when>
-							<xsl:when test="@SIZE &lt; 1024 * 1024">
-								<xsl:value-of select="substring(string(@SIZE div 1024),1,5)"/>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-							</xsl:when>
-							<xsl:when test="@SIZE &lt; 1024 * 1024 * 1024">
-								<xsl:value-of select="substring(string(@SIZE div (1024 * 1024)),1,5)"/>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="substring(string(@SIZE div (1024 * 1024 * 1024)),1,5)"/>
-								<i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-							</xsl:otherwise>
-						</xsl:choose>
-					</span>
-					<xsl:text> - </xsl:text>
-	                <!-- Lookup File Type description in local messages.xml based on MIME Type.
-			         In the original DSpace, this would get resolved to an application via
-			         the Bitstream Registry, but we are constrained by the capabilities of METS
-			         and can't really pass that info through. -->
-                    <span>
-						<xsl:call-template name="getFileTypeDesc">
-							<xsl:with-param name="mimetype">
-								<xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
-								<xsl:text>/</xsl:text>
-								<xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
-							</xsl:with-param>
-						</xsl:call-template>
-					</span>
-				</div>
+				<xsl:text> (</xsl:text>
+				<span>
+					<xsl:choose>
+						<xsl:when test="@SIZE &lt; 1024">
+							<xsl:value-of select="@SIZE"/>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
+						</xsl:when>
+						<xsl:when test="@SIZE &lt; 1024 * 1024">
+							<xsl:value-of select="substring(string(@SIZE div 1024),1,5)"/>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
+						</xsl:when>
+						<xsl:when test="@SIZE &lt; 1024 * 1024 * 1024">
+							<xsl:value-of select="substring(string(@SIZE div (1024 * 1024)),1,5)"/>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="substring(string(@SIZE div (1024 * 1024 * 1024)),1,5)"/>
+							<i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+						</xsl:otherwise>
+					</xsl:choose>
+				</span>
+				<xsl:text>) - </xsl:text>
+                <!-- Lookup File Type description in local messages.xml based on MIME Type.
+		         In the original DSpace, this would get resolved to an application via
+		         the Bitstream Registry, but we are constrained by the capabilities of METS
+		         and can't really pass that info through. -->
+                   <span>
+					<xsl:call-template name="getFileTypeDesc">
+						<xsl:with-param name="mimetype">
+							<xsl:value-of select="substring-before(@MIMETYPE,'/')"/>
+							<xsl:text>/</xsl:text>
+							<xsl:value-of select="substring-after(@MIMETYPE,'/')"/>
+						</xsl:with-param>
+					</xsl:call-template>
+				</span>
 			</div>
-
+			<xsl:if test="$context/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='embargo' and @qualifier='liftDate']">
+	              <span class="file-embargo-message">
+	              	<i18n:text>sedici.comunidades.tesis.embargo</i18n:text>
+	              </span>
+	        </xsl:if>
 		</div>
 
 
 	</xsl:template>
 
 
-	<xsl:template match="dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']">
+	<xsl:template match="dim:field[@element='identifier' and (@qualifier='uri' or @qualifier='doi' or @qualifier='handle') and @mdschema='sedici']">
+		<xsl:variable name="url_value">
+			<xsl:choose>
+				<xsl:when test="@qualifier='doi'">
+					<xsl:if test="not(starts-with(.,'https://dx.doi.org/') or starts-with(.,'http://dx.doi.org/'))">
+						<xsl:value-of select="'https://dx.doi.org/'"/>
+					</xsl:if>
+				</xsl:when>
+				<xsl:when test="@qualifier='handle'">
+					<xsl:if test="not(starts-with(.,'https://hdl.handle.net/') or starts-with(.,'http://hdl.handle.net/'))">
+						<xsl:value-of select="'https://hdl.handle.net/'"/>
+					</xsl:if>
+				</xsl:when>
+			</xsl:choose>
+			
+			<xsl:value-of select="."/>
+		
+		</xsl:variable>
 		<div class="file-wrapper clearfix">
 			<div class="thumbnail-wrapper">
 				<a class="image-link" target="_blank">
@@ -1177,13 +1318,15 @@
 			<div class="file-metadata">
 				<div>
 					<i18n:text>xmlui.dri2xhtml.METS-1.0.item-identifier-uri</i18n:text>
+					<xsl:if test="@qualifier='doi'"><xsl:value-of select="' (DOI)'"/></xsl:if>
+					<xsl:if test="@qualifier='handle'"><xsl:value-of select="' (HANDLE)'"/></xsl:if>
 				</div>
 				<div>
 					<a class="image-link" target="_blank">
 						<xsl:attribute name="href">
-							<xsl:value-of select="." />
+							<xsl:value-of select="$url_value" />
 						</xsl:attribute>
-						<xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.getBaseUrl(.)" disable-output-escaping="yes"/>
+						<xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.getBaseUrl($url_value)" disable-output-escaping="yes"/>
 						<xsl:text>/...</xsl:text>
 					</a>
 				</div>
@@ -1342,25 +1485,33 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</div>
+
+			<!-- Tiene Localizacion Electronica -->
+			<xsl:if test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']">
+				<span i18n:attr="title">
+					<xsl:attribute name="class">availability linked</xsl:attribute>
+					<xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-linked-help</xsl:attribute>
+					<!-- ERROR: tengo que poner un espacio en blanco porque, sino, XSLT anida todos los <span> entre si. -->
+					<xsl:text> </xsl:text>
+				</span>
+			</xsl:if>
 			
-			<xsl:choose>
-				<!-- Tiene archivos cargados -->
-			 	<xsl:when test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']"> 
-					<span i18n:attr="title">
-					    <xsl:attribute name="class">availability local</xsl:attribute>
-					    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-local-help</xsl:attribute>
-						<xsl:text> </xsl:text>
-					</span>
-	            </xsl:when>					
-				<!-- Tiene Localizacion Electronica -->
-				<xsl:when test="dim:field[@element='identifier'  and @qualifier='uri' and @mdschema='sedici']"> 
-					<span i18n:attr="title">
-					    <xsl:attribute name="class">availability linked</xsl:attribute>
-					    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-linked-help</xsl:attribute>
-						<xsl:text> </xsl:text>
-					</span>
-				</xsl:when>
-			</xsl:choose>
+			
+			<!-- Tiene archivos cargados -->
+			<xsl:if test="../../../../mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">				
+				<span i18n:attr="title">
+					<xsl:attribute name="class">availability local</xsl:attribute>
+				    <xsl:attribute name="title">xmlui.dri2xhtml.METS-1.0.item-availability-local-help</xsl:attribute>
+				    <xsl:text> </xsl:text>
+				</span>
+			</xsl:if>
+			
+			<!-- Esta a full text? -->
+			<xsl:if test="dim:field[@element='description'  and @qualifier='fulltext' and @mdschema='sedici']/text()='false'">
+				<span class="fulltext-message">
+					<i18n:text>xmlui.dri2xhtml.METS-1.0.item-availability-no-fulltext</i18n:text>
+				</span>
+			</xsl:if>
 			
        	</div>
 	</xsl:template>

@@ -54,6 +54,12 @@
             </map:selector>
 		</map:selectors>
 	</map:components>
+	
+	<map:resources>
+		<map:resource name="xml-files">
+    		<map:read mime-type="application/opensearchdescription+xml" src="lib/xml/{xml-filename}" />
+  		</map:resource>
+	</map:resources>
 
 	<map:pipelines>
 
@@ -74,6 +80,11 @@
 			<!-- Allow the browser to cache static content for an hour -->
 			<map:parameter name="expires" value="access plus 1 hours" />
 
+			<map:match pattern="moz-search-plugin.xml" >
+    			<map:call resource="xml-files">
+    				<map:parameter name="xml-filename" value="moz-search-plugin.xml" />
+    			</map:call>
+  			</map:match>
 
 			<!-- handle static js and css -->
 			<map:match pattern="themes/*/**.js">

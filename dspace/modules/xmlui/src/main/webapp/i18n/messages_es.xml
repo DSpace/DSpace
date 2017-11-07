@@ -727,7 +727,7 @@
    convenios de confidencialidad y casos similares. Tenga en cuenta que el depósito de su tesis en el repositorio
     no lo inhabilita a realizar publicaciones derivadas con calidad de inédito; una obra derivada NO es la obra original.
    <br/>A fin de aplicar esta restricción, deberá adjuntar en este paso una nota de solicitud de embargo que justifique 
-   debidamente la solicitud (ver modelo <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2013/04/Modelo-nota-de-embargo.doc">Aqui</a>).
+   debidamente la solicitud (ver modelo <a href="http://sedici.unlp.edu.ar/blog/wp-content/uploads/2015/12/Modelo-nota-de-embargo.doc">Aqui</a>).
 </message>
 
 <message key="xmlui.Submission.submit.UploadStep.virus_error">El archivo no se ha subido, ya que parece contener un virus. Por favor, póngase en contacto con el administrador del sistema.</message>
@@ -1941,7 +1941,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-lang-other">Otro lenguaje</message>
 
 <message key="xmlui.dri2xhtml.METS-1.0.embargoed-document">Documento embargado</message>
-<message key="xmlui.dri2xhtml.METS-1.0.embargoed-document-description">Este documento no puede ser accedido aún dado que su autor ha solicitado un período de embargo hasta la fecha:</message>
+<message key="xmlui.dri2xhtml.METS-1.0.embargoed-document-description">Esta obra tiene asociado un embargo de acceso por lo que no podrá ser descargada hasta el </message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-is-peer-review">Documento revisado por pares</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-is-non-peer-review">Documento sin revisión por pares</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-true-fulltext">Documento disponible a texto completo</message>
@@ -1986,6 +1986,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-location">Ubicación física</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Referencias geográficas</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Referencias temporales</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-format">Descripción física</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extensión</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-format-medium">Materiales</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Materias</message>
@@ -2017,7 +2018,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-date">Fecha</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Editorial</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject">Tema</message>           
-<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Archivos asociados</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Descargar archivos</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-file">archivos</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Nombre</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Tamaño</message>
@@ -2052,6 +2053,8 @@ La vista resumen de la comunidad no está actualmente en uso o implementada. Est
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-local-help">El documento se encuentra disponible para descarga directa desde SEDICI</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked">Link externo</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-availability-linked-help">El documento se encuentra alojado en un sitio web externo a SEDICI</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-availability-no-fulltext">Sin texto completo</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-audience">Contexto de uso</message>
 
 
 	<!-- Internationalization elements specific to the Qualified Dublin Core metadata handler.
@@ -2125,6 +2128,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
     <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Elija de entre los siguientes grupos</message>
     
     <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Excepto donde se diga explícitamente, este item se publica bajo la siguiente licencia </message>
+    <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text-collection-community">Excepto donde se diga explícitamente, las obras dentro de esta colección/comunidad se publican bajo la licencia </message>
     
 
   <!--###### File Format MIME Type Mappings ######-->
@@ -2273,12 +2277,12 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.pregunta">Seleccione una licencia:</message>
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.sinLicencia">Sin licencia</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Creative Commons Attribution 2.5 Argentina (CC BY 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Creative Commons Attribution-NonCommercial 2.5 Argentina (CC BY-NC 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Creative Commons Attribution-NonCommercial-NoDerivs 2.5 Argentina (CC BY-NC-ND 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Attribution-NonCommercial-ShareAlike 2.5 Argentina (CC BY-NC-SA 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Attribution-NoDerivs 2.5 Argentina (CC BY-ND 2.5)</message>
-<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Attribution-ShareAlike 2.5 Argentina (CC BY-SA 2.5)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by">Creative Commons Attribution 4.0 International (CC BY 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc">Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-nd">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nc-sa">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-nd">Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.administrador.by-sa">Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</message>
 
 <!-- Otras traducciones -->
 <message key="sedici.aspect.collectionViewer.addItem">Agregar Item</message>
@@ -2299,6 +2303,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">En edición por {0}</message>
 
 <message key="xmlui.bitstream.downloadName">documento</message>
+<message key="xmlui.bitstream.download">Descargar archivo</message>
 
 <message key="xmlui.forms.remove">Eliminar</message>
 
@@ -2318,6 +2323,26 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">Revisión SEDICI</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
 
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview.claimaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.CollectionLevelReview.editaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview">Revisión </message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.editaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoAzzariniAdmin.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
+
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.claimaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.CollectionLevelReview.editaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview">Revisión </message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.editaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.MuseoFisicaAdmin.SeDiCILevelReview.selectcollectionction">Seleccione una colección</message>
+
+<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.claimaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.editaction">Revisión SEDICI</message>
+<message key="xmlui.XMLWorkflow.autoarchiveTesisDeGrado.SeDiCILevelReview.selectcollectionaction">Seleccione una colección</message>
 
 <message key="xmlui.XMLWorkflow.workflow.ClaimAction.info1">Acciones que puedes realizar en esta tarea:</message>
 <message key="xmlui.XMLWorkflow.workflow.ClaimAction.take_help">Asignar esta tarea a uno mismo.</message>
@@ -2408,7 +2433,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.date.issued">Fecha de publicación</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Fecha de publicación</message>
 <!-- Site Leve Recently Added Content -->
-<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Documentos destacados</message>
+<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Últimos documentos</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type_filter">Tipo</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher_filter">Editorial</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.ispartof">Es parte de</message>
@@ -2495,6 +2520,8 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="sedici.comunidades.bdigital.info">Documentos históricos y recursos digitales ajenos a la UNLP</message>
 <message key="sedici.comunidades.rea.nombre">Recursos educativos abiertos</message>
 <message key="sedici.comunidades.rea.info">Material educativo de cursos dictados en la UNLP</message>
+<message key="sedici.comunidades.redmuseos.nombre">Red de museos</message>
+<message key="sedici.comunidades.redmuseos.info">Material perteneciente a la red de museos de la UNLP</message>
 <message key="sedici.comunidades.ehidrica.nombre">Emergencia hídrica</message>
 <message key="sedici.comunidades.ehidrica.info">Trabajos dentro del Plan de Gestión Integrada de Riesgos de Desastres</message>
 
@@ -2538,7 +2565,7 @@ este momento. Cuando se usa QDC para los elementos de SEDICI se recomienda el us
 <message key="sedici.home.subir_material.info">Suba sus trabajos a SEDICI, para mejorar notoriamente su visibilidad e impacto</message>
 <message key="sedici.home.subir_material.linktext">Cargar un documento</message>
 <message key="sedici.home.slide_resources.title">Recursos para su investigación</message>
-<message key="sedici.home.slide_resources.info">Acceda a más de 25.000 recursos científicos y académicos producidos dentro de la UNLP</message>
+<message key="sedici.home.slide_resources.info">Acceda a miles de recursos científicos y académicos producidos dentro de la UNLP</message>
 <message key="sedici.home.slide_digital_preservation.title">Preservación digital</message>
 <message key="sedici.home.slide_digital_preservation.info">Asegure el acceso a su obra a largo plazo, aún frente a los cambios tecnológicos</message>
 <message key="sedici.home.slide_work_visibility.title">Visibilidad de sus obras</message>
