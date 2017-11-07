@@ -107,7 +107,7 @@ public class RestResourceController implements InitializingBean {
 		return findOneInternal(apiCategory, model, id, projection);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}")
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:^(?!^\\d+$)[[:alnum:]]+$+}")
 	@SuppressWarnings("unchecked")
 	public DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
 			@PathVariable String id, @RequestParam(required = false) String projection) {
@@ -144,7 +144,7 @@ public class RestResourceController implements InitializingBean {
 		return findRelInternal(request, apiCategory, model, id, rel, page, assembler, projection);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}/{rel}")
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:^(?!^\\d+$)[[:alnum:]]+$}/{rel}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable String id, @PathVariable String rel, Pageable page,
 			PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
@@ -158,7 +158,7 @@ public class RestResourceController implements InitializingBean {
 		return findRelInternal(request, apiCategory, model, uuid, rel, page, assembler, projection);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}/{rel}/{relid:[A-z0-9]+}")
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:^(?!^\\d+$)[[:alnum:]]+$}/{rel}/{relid:[A-z0-9]+}")
 	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable String id, @PathVariable String rel, @PathVariable String relid,
 			Pageable page, PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
