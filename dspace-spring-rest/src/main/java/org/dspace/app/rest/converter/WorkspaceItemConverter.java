@@ -19,6 +19,8 @@ import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.eperson.EPerson;
 import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,6 +44,9 @@ public class WorkspaceItemConverter
 	@Autowired
 	private ItemConverter itemConverter;
 
+	@Autowired
+	private CollectionConverter collectionConverter;
+	
 	private SubmissionConfigReader submissionConfigReader;
 
 	@Autowired
@@ -56,21 +61,31 @@ public class WorkspaceItemConverter
 	@Override
 	public WorkspaceItemRest fromModel(org.dspace.content.WorkspaceItem obj) {
 		WorkspaceItemRest witem = new WorkspaceItemRest();
-		witem.setId(obj.getID());
-		witem.setItem(itemConverter.convert(obj.getItem()));
+		
+		Collection collection = obj.getCollection();
+		Item item = obj.getItem();
+		EPerson submitter = null;
 		try {
-			witem.setSubmitter(epersonConverter.convert(obj.getSubmitter()));
+			 submitter = obj.getSubmitter();	
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
+		
+		
+		witem.setId(obj.getID());
+		witem.setCollection(collectionConverter.convert(collection));
+		witem.setItem(itemConverter.convert(item));
+		witem.setSubmitter(epersonConverter.convert(submitter));
+		
 
 		// 1. retrieve the submission definition
 		// 2. iterate over the submission section to allow to plugin additional
 		// info
-		Collection collection = obj.getCollection();
+		
 		if (collection != null) {
 			SubmissionDefinitionRest def = submissionDefinitionConverter
 					.convert(submissionConfigReader.getSubmissionConfigByCollection(collection.getHandle()));
+			witem.setSubmissionDefinition(def);
 			for (SubmissionSectionRest sections : def.getPanels()) {
 				SubmissionStepConfig stepConfig = submissionSectionConverter.toModel(sections);
 

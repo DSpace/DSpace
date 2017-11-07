@@ -9,7 +9,7 @@ package org.dspace.app.rest.converter;
 
 import javax.servlet.ServletException;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepConfig, SubmissionSectionRest> {
 
+	private static final Logger log = Logger.getLogger(SubmissionSectionConverter.class);
+	
 	private SubmissionConfigReader submissionConfigReader;
 	
 	@Override
@@ -42,12 +44,24 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
 
 	@Override
 	public SubmissionStepConfig toModel(SubmissionSectionRest obj) {
+		init();
 		SubmissionStepConfig step;
+		
 		try {
 			step = submissionConfigReader.getStepConfig(obj.getId());
 		} catch (ServletException e) {
 			throw new RuntimeException(e);
 		}
 		return step;
+	}
+	
+	public void init() {
+		if(submissionConfigReader==null) {
+			try {
+				submissionConfigReader = new SubmissionConfigReader();
+			} catch (ServletException e) {
+				log.error(e.getMessage(), e);
+			}
+		}		
 	}
 }
