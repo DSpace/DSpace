@@ -19,13 +19,13 @@ public class UploadStep extends AbstractProcessingStep
     private static final Logger log = Logger.getLogger(UploadStep.class);
 
 	@Override
-	public void doProcessing(Context context, Request req) {
+	public void doProcessing(Context context, Request req, InProgressSubmission wsi) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void doPostProcessing(Context context, Request obj) {
+	public void doPostProcessing(Context context, Request obj, InProgressSubmission wsi) {
 		// TODO Auto-generated method stub
 		
 	}
