@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
+import net.minidev.json.annotate.JsonIgnore;
 import org.dspace.app.util.Util;
 
 /**
@@ -15,11 +16,25 @@ import org.dspace.app.util.Util;
  * Find out your authentication status.
  *
  */
-public class StatusRest
+public class StatusRest extends DSpaceObjectRest
 {
 
     private String sourceVersion;
     private String apiVersion;
+
+    public static final String NAME = "status";
+    public static final String CATEGORY = RestModel.CORE;
+
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    @Override
+    public String getType() {
+        return NAME;
+    }
+
 
     private EPersonRest ePersonRest;
 
@@ -45,7 +60,6 @@ public class StatusRest
         }
     }
 
-
     public String getSourceVersion() {
         return this.sourceVersion;
     }
@@ -63,6 +77,8 @@ public class StatusRest
         this.apiVersion = apiVersion;
     }
 
+    @LinkRest(linkClass = EPersonRest.class)
+    @JsonIgnore
     public EPersonRest getePersonRest() {
         return ePersonRest;
     }
