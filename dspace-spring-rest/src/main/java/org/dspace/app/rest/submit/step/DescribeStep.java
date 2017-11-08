@@ -27,6 +27,12 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Describe step for DSpace Spring Rest. Handle the exposition of metadata own by the in progress submission.
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class DescribeStep extends org.dspace.submit.step.DescribeStep implements AbstractRestProcessingStep {
 
 	private static final Logger log = Logger.getLogger(DescribeStep.class);

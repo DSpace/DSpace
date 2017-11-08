@@ -15,6 +15,12 @@ import org.dspace.app.rest.model.MetadataValueRest;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 
+/**
+ * Java Bean to expose the section describe during in progress submission.
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class DataDescribe implements SectionData {
 
 	private Map<String, List<MetadataValueRest>> metadata = new HashMap<>();

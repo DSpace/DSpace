@@ -10,6 +10,12 @@ package org.dspace.app.rest.model.step;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+/**
+ * Java Bean to expose the section license during in progress submission.
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class DataLicense implements SectionData {
 	
 	@JsonProperty(access = Access.READ_ONLY)

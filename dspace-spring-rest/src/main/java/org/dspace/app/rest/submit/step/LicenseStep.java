@@ -16,6 +16,12 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 
+/**
+ * License step for DSpace Spring Rest. Expose the license information about the in progress submission.
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class LicenseStep extends org.dspace.submit.step.LicenseStep implements AbstractRestProcessingStep {
 
 	private static final String DC_RIGHTS_DATE = "dc.rights.date";

@@ -13,6 +13,12 @@ import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.WorkspaceItem;
 
+/**
+ * Collection step for DSpace Spring Rest. Expose the collection information of the in progress submission.
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class CollectionStep extends org.dspace.submit.step.SelectCollectionStep implements AbstractRestProcessingStep {
 
 	@Override
