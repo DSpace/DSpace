@@ -203,5 +203,5 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
 
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
 
-    public String getLastModified(Bitstream bitstream);
+    public Long getLastModified(Bitstream bitstream);
 }

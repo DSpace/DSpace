@@ -1,15 +1,8 @@
 package org.dspace.app.rest.utils;
 
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,8 +10,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -60,17 +60,21 @@ public class MultipartFileSender {
     private static final long DEFAULT_EXPIRE_TIME = 60L * 60L * 1000L;
 
     //no-cache so request is always performed for logging
-    private static final String CACHE_CONTROL_SETTING = "private, no-cache";
+    private static final String CACHE_CONTROL_SETTING = "private,no-cache";
 
-    BitstreamRest bitstream;
-    InputStream inputStream;
-    HttpServletRequest request;
-    HttpServletResponse response;
-    String contentType;
-    String disposition = CONTENT_DISPOSITION_INLINE;
-    long lastModified;
+    private InputStream inputStream;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
+    private String contentType;
+    private String disposition;
+    private long lastModified;
+    private long length;
+    private String fileName;
+    private String checksum;
 
-    public MultipartFileSender() {
+    public MultipartFileSender(final InputStream inputStream) {
+        this.inputStream = inputStream;
+        
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String bufferSize = configurationService.getProperty("bitstream-download.buffer.size");
         if (StringUtils.isNotEmpty(bufferSize)) {
@@ -87,14 +91,9 @@ public class MultipartFileSender {
         }
     }
 
-    public static MultipartFileSender fromBitstream(BitstreamRest bitstream) {
-        return new MultipartFileSender().setBitstream(bitstream);
-    }
 
-    //** internal setter **//
-    private MultipartFileSender setBitstream(BitstreamRest bitstream) {
-        this.bitstream = bitstream;
-        return this;
+    public static MultipartFileSender fromInputStream(InputStream inputStream) {
+        return new MultipartFileSender(inputStream);
     }
 
     public MultipartFileSender with(HttpServletRequest httpRequest) {
@@ -107,8 +106,18 @@ public class MultipartFileSender {
         return this;
     }
 
-    public MultipartFileSender withInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
+    public MultipartFileSender withLength(long length) {
+        this.length = length;
+        return this;
+    }
+
+    public MultipartFileSender withFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
+
+    public MultipartFileSender withChecksum(String checksum) {
+        this.checksum = checksum;
         return this;
     }
 
@@ -129,13 +138,10 @@ public class MultipartFileSender {
         }
 
         if (inputStream == null) {
-            log.error("Bitstream has no content");
+            log.error("Input stream has no content");
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
-        Long length = bitstream.getSizeBytes();
-        String fileName = bitstream.getName();
 
         if (StringUtils.isEmpty(fileName)) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -145,9 +151,9 @@ public class MultipartFileSender {
         // Validate request headers for caching ---------------------------------------------------
         // If-None-Match header should contain "*" or ETag. If so, then return 304.
         String ifNoneMatch = request.getHeader(IF_NONE_MATCH);
-        if (nonNull(ifNoneMatch) && matches(ifNoneMatch, bitstream.getCheckSum().getValue())) {
-            log.error("If-None-Match header should contain \"*\" or ETag. If so, then return 304.");
-            response.setHeader(ETAG, bitstream.getCheckSum().getValue()); // Required in 304.
+        if (nonNull(ifNoneMatch) && matches(ifNoneMatch, checksum)) {
+            log.debug("If-None-Match header should contain \"*\" or ETag. If so, then return 304.");
+            response.setHeader(ETAG, checksum); // Required in 304.
             response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
             return;
         }
@@ -156,8 +162,8 @@ public class MultipartFileSender {
         // This header is ignored if any If-None-Match header is specified.
         long ifModifiedSince = request.getDateHeader(IF_MODIFIED_SINCE);
         if (isNull(ifNoneMatch) && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
-            log.error("If-Modified-Since header should be greater than LastModified. If so, then return 304.");
-            response.setHeader(ETAG, bitstream.getCheckSum().getValue()); // Required in 304.
+            log.debug("If-Modified-Since header should be greater than LastModified. If so, then return 304.");
+            response.setHeader(ETAG, checksum); // Required in 304.
             response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
             return;
         }
@@ -201,18 +207,26 @@ public class MultipartFileSender {
             String ifRange = request.getHeader(IF_RANGE);
             if (nonNull(ifRange) && !ifRange.equals(fileName)) {
                 try {
+                    //Assume that the If-Range contains a date
                     long ifRangeTime = request.getDateHeader(IF_RANGE); // Throws IAE if invalid.
-                    if (ifRangeTime != -1) {
+
+                    if (ifRangeTime == -1 || ifUnmodifiedSince + 1000 <= lastModified) {
+                        //Our file has been updated, send the full range
                         ranges.add(full);
                     }
+
                 } catch (IllegalArgumentException ignore) {
-                    ranges.add(full);
+                    //Assume that the If-Range contains an ETag
+                    if (!matches(ifRange, checksum)) {
+                        //Our file has been updated, send the full range
+                        ranges.add(full);
+                    }
                 }
             }
 
             // If any valid If-Range header, then process each part of byte range.
             if (ranges.isEmpty()) {
-                log.info("If any valid If-Range header, then process each part of byte range.");
+                log.debug("If any valid If-Range header, then process each part of byte range.");
                 for (String part : range.substring(6).split(",")) {
                     // Assuming a file with length of 100, the following examples returns bytes at:
                     // 50-80 (50 to 80), 40- (40 to length=100), -20 (length-20=80 to length=100).
@@ -228,7 +242,7 @@ public class MultipartFileSender {
 
                     // Check if Range is syntactically valid. If not, then return 416.
                     if (start > end) {
-                        log.info("Check if Range is syntactically valid. If not, then return 416.");
+                        log.warn("Check if Range is syntactically valid. If not, then return 416.");
                         response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
                         response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
                         return;
@@ -246,7 +260,7 @@ public class MultipartFileSender {
         response.setBufferSize(DEFAULT_BUFFER_SIZE);
         response.setHeader(CONTENT_TYPE, contentType);
         response.setHeader(ACCEPT_RANGES, BYTES);
-        response.setHeader(ETAG, bitstream.getCheckSum().getValue());
+        response.setHeader(ETAG, checksum);
         response.setDateHeader(LAST_MODIFIED, lastModified);
         response.setDateHeader(EXPIRES, System.currentTimeMillis() + DEFAULT_EXPIRE_TIME);
 
@@ -266,7 +280,6 @@ public class MultipartFileSender {
             log.debug("Content-Disposition : {}", disposition);
         }
 
-
         // Content phase
         if (METHOD_HEAD.equals(request.getMethod())) {
             log.debug("HEAD request - skipping content");
@@ -275,31 +288,30 @@ public class MultipartFileSender {
         // Send requested file (part(s)) to client ------------------------------------------------
 
         // Prepare streams.
-        try (InputStream input = inputStream;
-             OutputStream output = response.getOutputStream()) {
+        try (OutputStream output = response.getOutputStream()) {
 
 
             if (ranges.isEmpty() || ranges.get(0) == full) {
 
                 // Return full file.
-                log.info("Return full file");
+                log.debug("Return full file");
                 response.setContentType(contentType);
                 response.setHeader(CONTENT_RANGE, String.format(BYTES_RANGE_FORMAT, full.start, full.end, full.total));
                 response.setHeader(CONTENT_LENGTH, String.valueOf(full.length));
-                Range.copy(input, output, length, full.start, full.length);
+                Range.copy(inputStream, output, length, full.start, full.length);
 
             } else if (ranges.size() == 1) {
 
                 // Return single part of file.
                 Range r = ranges.get(0);
-                log.info("Return 1 part of file : from ({}) to ({})", r.start, r.end);
+                log.debug("Return 1 part of file : from ({}) to ({})", r.start, r.end);
                 response.setContentType(contentType);
                 response.setHeader(CONTENT_RANGE, String.format(BYTES_RANGE_FORMAT, r.start, r.end, r.total));
                 response.setHeader(CONTENT_LENGTH, String.valueOf(r.length));
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
                 // Copy single part range.
-                Range.copy(input, output, length, r.start, r.length);
+                Range.copy(inputStream, output, length, r.start, r.length);
 
             } else {
 
@@ -312,7 +324,7 @@ public class MultipartFileSender {
 
                 // Copy multi part range.
                 for (Range r : Range.relativize(ranges)) {
-                    log.info("Return multi part of file : from ({}) to ({})", r.start, r.end);
+                    log.debug("Return multi part of file : from ({}) to ({})", r.start, r.end);
                     // Add multipart boundary and header fields for every range.
                     sos.println();
                     sos.println("--" + MULTIPART_BOUNDARY);
@@ -320,7 +332,7 @@ public class MultipartFileSender {
                     sos.println(CONTENT_RANGE + ": " + String.format(BYTES_RANGE_FORMAT, r.start, r.end, r.total));
 
                     // Copy single part range of multi part range.
-                    Range.copy(input, output, length, r.start, r.length);
+                    Range.copy(inputStream, output, length, r.start, r.length);
                 }
 
                 // End with multipart boundary.
@@ -352,12 +364,8 @@ public class MultipartFileSender {
          */
         public Range(long start, long end, long total) {
             this.start = start;
-//            if (end <= start + DEFAULT_BUFFER_SIZE) {
-            this.end = end;
-//            } else {
-//                this.end = Math.min(start + DEFAULT_BUFFER_SIZE, total - 1);
-//            }
-            this.length = this.end - start + 1;
+            this.end = Math.min(end, Math.min(start + DEFAULT_BUFFER_SIZE, total - 1));
+            this.length = this.end - this.start + 1;
             this.total = total;
         }
 

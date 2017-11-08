@@ -7,15 +7,15 @@
  */
 package org.dspace.storage.bitstore.service;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.core.Context;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
+
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.core.Context;
 
 /**
  * <P>
@@ -191,6 +191,11 @@ public interface BitstreamStorageService {
     public void migrate(Context context, Integer assetstoreSource, Integer assetstoreDestination, boolean deleteOld, Integer batchCommitSize) throws IOException, SQLException, AuthorizeException;
 
 
-    public String getLastModified(Bitstream bitstream);
+    /**
+     * Get the last modified timestamp of the file linked to the given bitstream
+     * @param bitstream The bitstream for which to get the last modified timestamp
+     * @return The last modified timestamp in milliseconds
+     */
+    public Long getLastModified(Bitstream bitstream);
 
 }
