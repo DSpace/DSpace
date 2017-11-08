@@ -9,14 +9,12 @@ package org.dspace.app.rest.submit;
 
 import java.io.Serializable;
 
-import org.dspace.app.rest.model.RestModel;
-import org.dspace.app.rest.model.step.SectionData;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.WorkspaceItem;
 
 public interface AbstractRestProcessingStep {
 
-	public <T extends Serializable> T getData(WorkspaceItem obj, SubmissionStepConfig config);
+	public <T extends Serializable> T getData(WorkspaceItem obj, SubmissionStepConfig config) throws Exception;
 
 
 }
