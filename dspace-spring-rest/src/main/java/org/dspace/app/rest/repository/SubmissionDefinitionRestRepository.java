@@ -22,6 +22,7 @@ import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.hateoas.SubmissionDefinitionResource;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -50,7 +51,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
 	@Autowired
 	private SubmissionDefinitionConverter converter;
 
-	public SubmissionDefinitionRestRepository() throws ServletException {
+	public SubmissionDefinitionRestRepository() throws SubmissionConfigReaderException {
 		submissionConfigReader = new SubmissionConfigReader();
 	}
 

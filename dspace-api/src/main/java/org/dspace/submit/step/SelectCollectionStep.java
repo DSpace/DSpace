@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -117,7 +118,12 @@ public class SelectCollectionStep extends AbstractProcessingStep
 
             // need to reload current submission process config,
             // since it is based on the Collection selected
-            subInfo.reloadSubmissionConfig(request);
+            try {
+				subInfo.reloadSubmissionConfig(request);
+			} catch (SubmissionConfigReaderException e) {
+				// convert to a ServletException to respect the AbstractStep contract
+				throw new ServletException(e);
+			}
         }
 
         // no errors occurred
