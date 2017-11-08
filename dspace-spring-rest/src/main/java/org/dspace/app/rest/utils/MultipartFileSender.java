@@ -141,125 +141,15 @@ public class MultipartFileSender {
 
     public void serveResource() throws Exception {
 
-        if (response == null || request == null) {
-            return;
-        }
-
-        if (inputStream == null) {
-            log.error("Input stream has no content");
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-
-        if (StringUtils.isEmpty(fileName)) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
-
-        // Validate request headers for caching ---------------------------------------------------
-        // If-None-Match header should contain "*" or ETag. If so, then return 304.
-        String ifNoneMatch = request.getHeader(IF_NONE_MATCH);
-        if (nonNull(ifNoneMatch) && matches(ifNoneMatch, checksum)) {
-            log.debug("If-None-Match header should contain \"*\" or ETag. If so, then return 304.");
-            response.setHeader(ETAG, checksum); // Required in 304.
-            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-            return;
-        }
-
-        // If-Modified-Since header should be greater than LastModified. If so, then return 304.
-        // This header is ignored if any If-None-Match header is specified.
-        long ifModifiedSince = request.getDateHeader(IF_MODIFIED_SINCE);
-        if (isNull(ifNoneMatch) && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
-            log.debug("If-Modified-Since header should be greater than LastModified. If so, then return 304.");
-            response.setHeader(ETAG, checksum); // Required in 304.
-            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
-            return;
-        }
-
-        // Validate request headers for resume ----------------------------------------------------
-
-        // If-Match header should contain "*" or ETag. If not, then return 412.
-        String ifMatch = request.getHeader(IF_MATCH);
-        if (nonNull(ifMatch) && !matches(ifMatch, fileName)) {
-            log.error("If-Match header should contain \"*\" or ETag. If not, then return 412.");
-            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-            return;
-        }
-
-        // If-Unmodified-Since header should be greater than LastModified. If not, then return 412.
-        long ifUnmodifiedSince = request.getDateHeader(IF_UNMODIFIED_SINCE);
-        if (ifUnmodifiedSince != -1 && ifUnmodifiedSince + 1000 <= lastModified) {
-            log.error("If-Unmodified-Since header should be greater than LastModified. If not, then return 412.");
-            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-            return;
-        }
-
         // Validate and process range -------------------------------------------------------------
 
         // Prepare some variables. The full Range represents the complete file.
-        Range full = new Range(0, length - 1, length);
-        List<Range> ranges = new ArrayList<>();
+        Range full = getFullRange();
+        List<Range> ranges = getRanges(full);
 
-        // Validate and process Range and If-Range headers.
-        String range = request.getHeader(RANGE);
-        if (nonNull(range)) {
-
-            // Range header should match format "bytes=n-n,n-n,n-n...". If not, then return 416.
-            if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
-                log.error("Range header should match format \"bytes=n-n,n-n,n-n...\". If not, then return 416.");
-                response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
-                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return;
-            }
-
-            String ifRange = request.getHeader(IF_RANGE);
-            if (nonNull(ifRange) && !ifRange.equals(fileName)) {
-                try {
-                    //Assume that the If-Range contains a date
-                    long ifRangeTime = request.getDateHeader(IF_RANGE); // Throws IAE if invalid.
-
-                    if (ifRangeTime == -1 || ifUnmodifiedSince + 1000 <= lastModified) {
-                        //Our file has been updated, send the full range
-                        ranges.add(full);
-                    }
-
-                } catch (IllegalArgumentException ignore) {
-                    //Assume that the If-Range contains an ETag
-                    if (!matches(ifRange, checksum)) {
-                        //Our file has been updated, send the full range
-                        ranges.add(full);
-                    }
-                }
-            }
-
-            // If any valid If-Range header, then process each part of byte range.
-            if (ranges.isEmpty()) {
-                log.debug("If any valid If-Range header, then process each part of byte range.");
-                for (String part : range.substring(6).split(",")) {
-                    // Assuming a file with length of 100, the following examples returns bytes at:
-                    // 50-80 (50 to 80), 40- (40 to length=100), -20 (length-20=80 to length=100).
-                    long start = Range.sublong(part, 0, part.indexOf("-"));
-                    long end = Range.sublong(part, part.indexOf("-") + 1, part.length());
-
-                    if (start == -1) {
-                        start = length - end;
-                        end = length - 1;
-                    } else if (end == -1 || end > length - 1) {
-                        end = length - 1;
-                    }
-
-                    // Check if Range is syntactically valid. If not, then return 416.
-                    if (start > end) {
-                        log.warn("Check if Range is syntactically valid. If not, then return 416.");
-                        response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
-                        response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                        return;
-                    }
-
-                    // Add range.
-                    ranges.add(new Range(start, end, length));
-                }
-            }
+        if (ranges == null) {
+            //The supplied range values were invalid
+            return;
         }
 
         log.debug("Content-Type : {}", contentType);
@@ -299,7 +189,7 @@ public class MultipartFileSender {
         try (OutputStream output = response.getOutputStream()) {
 
 
-            if (ranges.isEmpty() || ranges.get(0) == full) {
+            if (hasNoRanges(full, ranges)) {
 
                 // Return full file.
                 log.debug("Return full file");
@@ -349,6 +239,150 @@ public class MultipartFileSender {
         }
 
 
+    }
+
+    public boolean isValid() throws IOException {
+        if (response == null || request == null) {
+            return false;
+        }
+
+        if (inputStream == null) {
+            log.error("Input stream has no content");
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return false;
+        }
+
+        if (StringUtils.isEmpty(fileName)) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return false;
+        }
+
+        // Validate request headers for caching ---------------------------------------------------
+        // If-None-Match header should contain "*" or ETag. If so, then return 304.
+        String ifNoneMatch = request.getHeader(IF_NONE_MATCH);
+        if (nonNull(ifNoneMatch) && matches(ifNoneMatch, checksum)) {
+            log.debug("If-None-Match header should contain \"*\" or ETag. If so, then return 304.");
+            response.setHeader(ETAG, checksum); // Required in 304.
+            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+            return false;
+        }
+
+        // If-Modified-Since header should be greater than LastModified. If so, then return 304.
+        // This header is ignored if any If-None-Match header is specified.
+        long ifModifiedSince = request.getDateHeader(IF_MODIFIED_SINCE);
+        if (isNull(ifNoneMatch) && ifModifiedSince != -1 && ifModifiedSince + 1000 > lastModified) {
+            log.debug("If-Modified-Since header should be greater than LastModified. If so, then return 304.");
+            response.setHeader(ETAG, checksum); // Required in 304.
+            response.sendError(HttpServletResponse.SC_NOT_MODIFIED);
+            return false;
+        }
+
+        // Validate request headers for resume ----------------------------------------------------
+
+        // If-Match header should contain "*" or ETag. If not, then return 412.
+        String ifMatch = request.getHeader(IF_MATCH);
+        if (nonNull(ifMatch) && !matches(ifMatch, fileName)) {
+            log.error("If-Match header should contain \"*\" or ETag. If not, then return 412.");
+            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+            return false;
+        }
+
+        // If-Unmodified-Since header should be greater than LastModified. If not, then return 412.
+        long ifUnmodifiedSince = request.getDateHeader(IF_UNMODIFIED_SINCE);
+        if (ifUnmodifiedSince != -1 && ifUnmodifiedSince + 1000 <= lastModified) {
+            log.error("If-Unmodified-Since header should be greater than LastModified. If not, then return 412.");
+            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean isNoRangeRequest() throws IOException {
+        Range full = getFullRange();
+        List<Range> ranges = getRanges(full);
+
+        if(hasNoRanges(full, ranges)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean hasNoRanges(final Range full, final List<Range> ranges) {
+        return ranges != null && (ranges.isEmpty() || ranges.get(0) == full);
+    }
+
+    private Range getFullRange() {
+        return new Range(0, length - 1, length);
+    }
+
+
+    private List<Range> getRanges(final Range fullRange) throws IOException {
+        List<Range> ranges = new ArrayList<>();
+
+        // Validate and process Range and If-Range headers.
+        String range = request.getHeader(RANGE);
+        if (nonNull(range)) {
+
+            // Range header should match format "bytes=n-n,n-n,n-n...". If not, then return 416.
+            if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) {
+                log.error("Range header should match format \"bytes=n-n,n-n,n-n...\". If not, then return 416.");
+                response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
+                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+                return null;
+            }
+
+            String ifRange = request.getHeader(IF_RANGE);
+            if (nonNull(ifRange) && !ifRange.equals(fileName)) {
+                try {
+                    //Assume that the If-Range contains a date
+                    long ifRangeTime = request.getDateHeader(IF_RANGE); // Throws IAE if invalid.
+
+                    if (ifRangeTime == -1 || ifRangeTime + 1000 <= lastModified) {
+                        //Our file has been updated, send the full range
+                        ranges.add(fullRange);
+                    }
+
+                } catch (IllegalArgumentException ignore) {
+                    //Assume that the If-Range contains an ETag
+                    if (!matches(ifRange, checksum)) {
+                        //Our file has been updated, send the full range
+                        ranges.add(fullRange);
+                    }
+                }
+            }
+
+            // If any valid If-Range header, then process each part of byte range.
+            if (ranges.isEmpty()) {
+                log.debug("If any valid If-Range header, then process each part of byte range.");
+                for (String part : range.substring(6).split(",")) {
+                    // Assuming a file with length of 100, the following examples returns bytes at:
+                    // 50-80 (50 to 80), 40- (40 to length=100), -20 (length-20=80 to length=100).
+                    long start = Range.sublong(part, 0, part.indexOf("-"));
+                    long end = Range.sublong(part, part.indexOf("-") + 1, part.length());
+
+                    if (start == -1) {
+                        start = length - end;
+                        end = length - 1;
+                    } else if (end == -1 || end > length - 1) {
+                        end = length - 1;
+                    }
+
+                    // Check if Range is syntactically valid. If not, then return 416.
+                    if (start > end) {
+                        log.warn("Check if Range is syntactically valid. If not, then return 416.");
+                        response.setHeader(CONTENT_RANGE, String.format(BYTES_DINVALID_BYTE_RANGE_FORMAT, length)); // Required in 416.
+                        response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+                        return null;
+                    }
+
+                    // Add range.
+                    ranges.add(new Range(start, end, length));
+                }
+            }
+        }
+        return ranges;
     }
 
     private static boolean isNullOrEmpty(String disposition) {

@@ -22,6 +22,8 @@ import org.dspace.app.rest.utils.MultipartFileSender;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
+import org.dspace.services.EventService;
+import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +43,9 @@ public class BitstreamContentRestController {
 	@Autowired
 	private BitstreamService bitstreamService;
 
+	@Autowired
+	private EventService eventService;
+
 	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
 	public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
 											 HttpServletRequest request) throws IOException, SQLException {
@@ -56,12 +61,10 @@ public class BitstreamContentRestController {
 		Long lastModified = bitstreamService.getLastModified(bit);
         String mimetype = bit.getFormat(context).getMIMEType();
 
-        //TODO LOG DOWNLOAD if no range or if last chunk
-
 		// Pipe the bits
 		try(InputStream is = bitstreamService.retrieve(context, bit)) {
 
-			MultipartFileSender
+			MultipartFileSender sender = MultipartFileSender
 					.fromInputStream(is)
 					.withFileName(bit.getName())
 					.withLength(bit.getSize())
@@ -69,10 +72,26 @@ public class BitstreamContentRestController {
 					.withMimetype(mimetype)
 					.withLastModified(lastModified)
 					.with(request)
-					.with(response)
+					.with(response);
 
-					.serveResource();
+			if (sender.isValid()) {
+				if (sender.isNoRangeRequest()) {
+					//We only log a download request when serving a request without Range header. This is because
+					//a browser always sends a regular request first to check for Range support.
 
+					//TODO we still need to register the usage event listneres in spring
+					eventService.fireEvent(
+							new UsageEvent(
+									UsageEvent.Action.VIEW,
+									request,
+									context,
+									bit));
+				}
+
+				sender.serveResource();
+			}
+		} catch(IOException ex) {
+			log.debug("Client aborted the request before the download was complete. Client is probably switching to a Range request.", ex);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
