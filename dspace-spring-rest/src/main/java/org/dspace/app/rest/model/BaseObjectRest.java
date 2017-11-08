@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *            the class of the resource identifier
  */
 public abstract class BaseObjectRest<T extends Serializable> implements Identifiable<T>, RestModel {
-	@JsonIgnore
+
 	protected T id;
 
 	@Override
