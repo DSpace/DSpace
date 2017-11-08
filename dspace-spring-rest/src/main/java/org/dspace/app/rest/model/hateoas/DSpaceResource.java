@@ -7,17 +7,6 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,6 +23,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
+
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A base class for DSpace Rest HAL Resource. The HAL Resource wraps the REST
@@ -74,7 +74,6 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 							continue;
 						}
 						try {
-							//RestModel linkClass = linkAnnotation.linkClass().newInstance();
 							Method[] methods = linkRepository.getClass().getMethods();
 							boolean found = false;
 							for (Method m : methods) { 
@@ -109,13 +108,16 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 							Link linkToSubResource = utils.linkToSubResource(data, name);	
 							// no method is specified to retrieve the linked object(s) so check if it is already here
 							if (StringUtils.isBlank(linkAnnotation.method())) {
-								this.add(linkToSubResource);
+
 								Object linkedObject = readMethod.invoke(data);
 								Object wrapObject = linkedObject;
 								if (linkedObject instanceof RestModel) {
 									RestModel linkedRM = (RestModel) linkedObject; 
 									wrapObject = utils.getResourceRepository(linkedRM.getCategory(), linkedRM.getType())
 											.wrapResource(linkedRM);
+									if(linkAnnotation.linkClass() != null && linkAnnotation.linkClass().isAssignableFrom(linkedRM.getClass())) {
+										linkToSubResource = utils.linkToSingleResource(linkedRM, name);
+									}
 								}
 								else {
 									if (linkedObject instanceof List) {
@@ -142,13 +144,14 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 								} else {
 									embedded.put(name, null);
 								}
+								this.add(linkToSubResource);
+
 								Method writeMethod = pd.getWriteMethod();
 								writeMethod.invoke(data, new Object[] { null });
 							}
 							else {
 								// call the link repository
 								try {
-									//RestModel linkClass = linkAnnotation.linkClass().newInstance();
 									String apiCategory = data.getCategory();
 									String model = data.getType();
 									LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkAnnotation.name());

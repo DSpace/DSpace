@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import net.minidev.json.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.util.Util;
 
 /**
@@ -22,8 +22,11 @@ public class StatusRest extends DSpaceObjectRest
     private String sourceVersion;
     private String apiVersion;
 
+    private boolean okay;
+    private boolean authenticated;
+
     public static final String NAME = "status";
-    public static final String CATEGORY = RestModel.CORE;
+    public static final String CATEGORY = "";
 
     @Override
     public String getCategory() {
@@ -38,14 +41,15 @@ public class StatusRest extends DSpaceObjectRest
 
     private EPersonRest ePersonRest;
 
-//    public StatusRest() {
-//        setSourceVersion(Util.getSourceVersion());
-//        String[] version = Util.getSourceVersion().split("\\.");
-//        setApiVersion(version[0]); // major version
-//    }
-//
+    public StatusRest() {
+        setSourceVersion(Util.getSourceVersion());
+        String[] version = Util.getSourceVersion().split("\\.");
+        setApiVersion(version[0]); // major version
+        setOkay(true);
+        setAuthenticated(false);
+    }
+
 //    public StatusRest(String email, String fullname) {
-//
 //        setSourceVersion(Util.getSourceVersion());
 //        String[] version = Util.getSourceVersion().split("\\.");
 //        setApiVersion(version[0]); // major version
@@ -55,7 +59,9 @@ public class StatusRest extends DSpaceObjectRest
         setSourceVersion(Util.getSourceVersion());
         String[] version = Util.getSourceVersion().split("\\.");
         setApiVersion(version[0]); // major version
+        setOkay(true);
         if(eperson != null) {
+            setAuthenticated(true);
             this.ePersonRest = eperson;
         }
     }
@@ -77,13 +83,29 @@ public class StatusRest extends DSpaceObjectRest
         this.apiVersion = apiVersion;
     }
 
-    @LinkRest(linkClass = EPersonRest.class)
+    @LinkRest(linkClass = EPersonRest.class, name = "eperson")
     @JsonIgnore
-    public EPersonRest getePersonRest() {
+    public EPersonRest getEPersonRest() {
         return ePersonRest;
     }
 
-    public void setePersonRest(EPersonRest ePersonRest) {
+    public void setEPersonRest(EPersonRest ePersonRest) {
         this.ePersonRest = ePersonRest;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+    }
+
+    public boolean isOkay() {
+        return okay;
+    }
+
+    public void setOkay(boolean okay) {
+        this.okay = okay;
     }
 }
