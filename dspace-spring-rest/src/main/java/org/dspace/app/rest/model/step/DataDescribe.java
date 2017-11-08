@@ -13,10 +13,13 @@ import java.util.Map;
 
 import org.dspace.app.rest.model.MetadataValueRest;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+
 public class DataDescribe implements SectionData {
 
 	private Map<String, List<MetadataValueRest>> metadata = new HashMap<>();
-
+	
+	@JsonAnyGetter
 	public Map<String, List<MetadataValueRest>> getMetadata() {
 		return metadata;
 	}
