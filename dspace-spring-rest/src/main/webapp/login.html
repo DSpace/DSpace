@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Sign in - HAL Browser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="browser/vendor/css/bootstrap.css" rel="stylesheet">
+    <link href="browser/vendor/css/bootstrap-responsive.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+        .form-signin {
+            max-width: 300px;
+            padding: 19px 29px 29px;
+            margin: 0 auto 20px;
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+        }
+        .form-signin .form-signin-heading, .form-signin .checkbox {
+            margin-bottom: 10px;
+        }
+        .form-signin input[type="text"], .form-signin input[type="password"] {
+            font-size: 16px;
+            height: auto;
+            margin-bottom: 15px;
+            padding: 7px 9px;
+        }
+    </style>
+    <script src="browser/vendor/js/jquery-1.10.2.min.js"></script>
+    <script src="browser/vendor/js/bootstrap.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#login").click(function() {
+                $.ajax({
+                    //This depends on this file to be called login.html
+                    url : window.location.href.replace("login.html", "") + 'api/login',
+                    type : 'POST',
+                    async : false,
+                    data : 'password='+$("#password").val()+'&user='+$("#username").val() ,
+                    headers : {
+                        Authorization : 'Basic ' + btoa('webapp:nim-cmas'),
+                        "Content-Type" : 'application/x-www-form-urlencoded',
+                        "Accept" : 'application/json'
+                    },
+                    dataType : 'json',
+                    success : function(data) {
+                        document.cookie = "MyHalBrowserToken=" + data.access_token;
+                        window.location.href = window.location.pathname.replace("login.html", "")
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <form class="form-signin">
+        <h2 class="form-signin-heading">HAL Browser</h2>
+        <input type="text" class="input-block-level" placeholder="Username" id="username">
+        <input type="password" class="input-block-level" placeholder="Password" id="password">
+        <button type="button" class="btn btn-large btn-primary" id="login">Sign in</button>
+    </form>
+</div>
+</body>
+</html>

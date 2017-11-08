@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.security;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
@@ -60,13 +61,15 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             EPerson ePerson = ePersonService.findByEmail(context, email);
             List<Group> groups = authenticationService.getSpecialGroups(context, request);
             String token = jwtTokenHandler.createTokenForEPerson(context, request, ePerson, groups);
-            //TODO token is saved in a cookie, but might be better to save it in http header
-            Cookie cookie = new Cookie(ACCESS_TOKEN, token);
-            response.addCookie(cookie);
+
+            response.getWriter().write(wrapTokenInJsonFormat(token));
+
         } catch (JOSEException e) {
             log.error("JOSE Exception", e);
         } catch (SQLException e) {
             log.error("SQL error when adding authentication", e);
+        } catch (IOException e) {
+            log.error("Error writing to response", e);
         }
 
     }
@@ -89,7 +92,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public boolean hasAuthenticationData(HttpServletRequest request) {
-        return getCookie(request) != null;
+        return request.getHeader("Authorization") != null;
     }
 
     @Override
@@ -99,12 +102,18 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     private String getToken(HttpServletRequest request) {
-        Cookie cookie = getCookie(request);
-        return cookie == null ? null : cookie.getValue();
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null) {
+            String tokenValue = authHeader.replace("Bearer", "").trim();
+            return tokenValue;
+        }
+        return null;
     }
 
-    private Cookie getCookie(HttpServletRequest request) {
-        return WebUtils.getCookie(request, ACCESS_TOKEN);
+    //Put the token in a json-string
+    private String wrapTokenInJsonFormat(String token) {
+        return "{ \""+ ACCESS_TOKEN +"\" : \"" + token + "\" }";
     }
+
 
 }
