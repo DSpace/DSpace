@@ -18,6 +18,8 @@ import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.EPersonServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,6 +43,8 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	@Autowired
 	WorkspaceItemConverter converter;
 	
+	@Autowired
+	EPersonServiceImpl epersonService;
 	
 	public WorkspaceItemRestRepository() {
 	}
@@ -74,9 +78,19 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	}
 	
 	@SearchRestMethod(name = "findBySubmitter")
-	public Page<WorkspaceItemRest> findBySubmitter(Context context,@Param(value="uuid") UUID submitterID, Pageable pageable) {
-		//TODO
-		return null;
+	public Page<WorkspaceItemRest> findBySubmitter(@Param(value="uuid") UUID submitterID, Pageable pageable) {
+		List<WorkspaceItem> witems = null;
+		int total = 0;
+		try {		
+			Context context = obtainContext();
+			EPerson ep = epersonService.find(context, submitterID); 
+			witems = wis.findByEPerson(context, ep);
+			total = witems.size();
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		Page<WorkspaceItemRest> page = new PageImpl<WorkspaceItem>(witems, pageable, total).map(converter);
+		return page;
 	}
 	
 	@Override
