@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.SubmissionInfo;
@@ -97,7 +98,12 @@ public class DescribeStep extends AbstractProcessingStep
     {
         //load the DCInputsReader
         getInputsReader();
-        submissionConfigReader = new SubmissionConfigReader();
+        try {
+			submissionConfigReader = new SubmissionConfigReader();
+		} catch (SubmissionConfigReaderException e) {
+			// convert to a ServletException to respect the AbstractStep contract
+			throw new ServletException(e);
+		}
         metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
         choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
     }
@@ -159,7 +165,13 @@ public class DescribeStep extends AbstractProcessingStep
         {
             List<DCInputSet> inputsByCollectionHandle = inputsReader.getInputsByCollectionHandle(c.getHandle());
             for(DCInputSet iset : inputsByCollectionHandle) {
-            	SubmissionStepConfig step = submissionConfigReader.getStepConfig(iset.getFormName());
+            	SubmissionStepConfig step = null;
+				try {
+					step = submissionConfigReader.getStepConfig(iset.getFormName());
+				} catch (SubmissionConfigReaderException e) {
+					// convert to a ServletException to respect the AbstractStep contract
+					throw new ServletException(e);
+				}
             	if(step.getStepNumber()==currentPage) {
             		inputs = iset.getFields();            		
             	}

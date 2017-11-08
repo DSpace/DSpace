@@ -30,6 +30,7 @@ import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.app.util.Util;
@@ -277,7 +278,12 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
 
             // need to reload current submission process config,
             // since it is based on the Collection selected
-            subInfo.reloadSubmissionConfig(request);
+            try {
+				subInfo.reloadSubmissionConfig(request);
+			} catch (SubmissionConfigReaderException e) {
+				// convert to a ServletException to respect the AbstractStep contract
+				throw new ServletException(e);
+			}
         }
 
         slService.invalidateDTOs(request, uuidSubmission);

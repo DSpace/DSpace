@@ -89,14 +89,14 @@ public class SubmissionConfigReader
     /**
      * Load Submission Configuration from the
      * item-submission.xml configuration file 
-     * @throws ServletException if servlet error
+     * @throws SubmissionConfigReaderException if servlet error
      */
-    public SubmissionConfigReader() throws ServletException
+    public SubmissionConfigReader() throws SubmissionConfigReaderException
     {
         buildInputs(configDir + SUBMIT_DEF_FILE_PREFIX + SUBMIT_DEF_FILE_SUFFIX);
     }
 
-    public void reload() throws ServletException
+    public void reload() throws SubmissionConfigReaderException
     {
     	collectionToSubmissionConfig = null;
     	stepDefns = null;
@@ -115,7 +115,7 @@ public class SubmissionConfigReader
      * Submision Processes by name.
      * </ul>
      */
-    private void buildInputs(String fileName) throws ServletException
+    private void buildInputs(String fileName) throws SubmissionConfigReaderException
     {
         collectionToSubmissionConfig = new HashMap<String, String>();
         submitDefns = new HashMap<String, List<Map<String, String>>>();
@@ -136,12 +136,12 @@ public class SubmissionConfigReader
         }
         catch (FactoryConfigurationError fe)
         {
-            throw new ServletException(
+            throw new SubmissionConfigReaderException(
                     "Cannot create Item Submission Configuration parser", fe);
         }
         catch (Exception e)
         {
-            throw new ServletException(
+            throw new SubmissionConfigReaderException(
                     "Error creating Item Submission Configuration: " + e);
         }
     }
@@ -196,7 +196,7 @@ public class SubmissionConfigReader
      *            collection's unique Handle
      * @return the SubmissionConfig representing the item submission config
      * 
-     * @throws ServletException
+     * @throws SubmissionConfigReaderException
      *             if no default submission process configuration defined
      */
     public SubmissionConfig getSubmissionConfigByCollection(String collectionHandle)
@@ -273,11 +273,11 @@ public class SubmissionConfigReader
      * 
      * @return the SubmissionStepConfig representing the step
      * 
-     * @throws ServletException
+     * @throws SubmissionConfigReaderException
      *             if no default submission process configuration defined
      */
     public SubmissionStepConfig getStepConfig(String stepID)
-            throws ServletException
+            throws SubmissionConfigReaderException
     {
         // We should already have the step definitions loaded
         if (stepDefns != null)
@@ -299,7 +299,7 @@ public class SubmissionConfigReader
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
      */
-    private void doNodes(Node n) throws SAXException, ServletException
+    private void doNodes(Node n) throws SAXException, SubmissionConfigReaderException
     {
         if (n == null)
         {
@@ -338,16 +338,16 @@ public class SubmissionConfigReader
         }
         if (!foundMap)
         {
-            throw new ServletException(
+            throw new SubmissionConfigReaderException(
                     "No collection to item submission map ('submission-map') found in 'item-submission.xml'");
         }
         if (!foundStepDefs)
         {
-            throw new ServletException("No 'step-definitions' section found in 'item-submission.xml'");
+            throw new SubmissionConfigReaderException("No 'step-definitions' section found in 'item-submission.xml'");
         }
         if (!foundSubmitDefs)
         {
-            throw new ServletException(
+            throw new SubmissionConfigReaderException(
                     "No 'submission-definitions' section found in 'item-submission.xml'");
         }
     }
@@ -399,7 +399,7 @@ public class SubmissionConfigReader
      * HashMap whose key is the step's unique id.
      */
     private void processStepDefinition(Node e) throws SAXException,
-            ServletException
+            SubmissionConfigReaderException
     {
         stepDefns = new HashMap<String, Map<String, String>>();
 
@@ -432,7 +432,7 @@ public class SubmissionConfigReader
         // Sanity check number of step definitions
         if (stepDefns.size() < 1)
         {
-            throw new ServletException(
+            throw new SubmissionConfigReaderException(
                     "step-definition section has no steps! A step with id='collection' is required in 'item-submission.xml'!");
         }
 
@@ -449,7 +449,7 @@ public class SubmissionConfigReader
      * whose key is the submission-process's unique name.
      */
     private void processSubmissionDefinition(Node e) throws SAXException,
-            ServletException
+            SubmissionConfigReaderException
     {
         int numSubmitProcesses = 0;
         List<String> submitNames = new ArrayList<String>();
@@ -511,7 +511,7 @@ public class SubmissionConfigReader
                             }
                             else
                             {
-                                throw new SAXException(
+                                throw new SubmissionConfigReaderException(
                                         "The Submission process config named "
                                                 + submitName
                                                 + " contains a step with id="
@@ -538,7 +538,7 @@ public class SubmissionConfigReader
                 // sanity check number of steps
                 if (steps.size() < 1)
                 {
-                    throw new ServletException(
+                    throw new SubmissionConfigReaderException(
                             "Item Submission process config named "
                                     + submitName + " has no steps defined in 'item-submission.xml'");
                 }
@@ -547,7 +547,7 @@ public class SubmissionConfigReader
         }
         if (numSubmitProcesses == 0)
         {
-            throw new ServletException(
+            throw new SubmissionConfigReaderException(
                     "No 'submission-process' elements/definitions found in 'item-submission.xml'");
         }
     }
@@ -559,7 +559,7 @@ public class SubmissionConfigReader
      * 
      */
     private Map<String, String> processStepChildNodes(String configSection, Node nStep)
-            throws SAXException, ServletException
+            throws SubmissionConfigReaderException
     {
         // initialize the HashMap of step Info
         Map<String, String> stepInfo = new HashMap<String, String>();
@@ -610,7 +610,7 @@ public class SubmissionConfigReader
             String msg = "Required field " + missing
                     + " missing in a 'step' in the " + configSection
                     + " of the item submission configuration file ('item-submission.xml')";
-            throw new SAXException(msg);
+            throw new SubmissionConfigReaderException(msg);
         }
 
         return stepInfo;
