@@ -12,6 +12,12 @@ import java.io.Serializable;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.WorkspaceItem;
 
+/**
+ * Interface to retrieve information about section
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public interface AbstractRestProcessingStep {
 
 	public <T extends Serializable> T getData(WorkspaceItem obj, SubmissionStepConfig config) throws Exception;

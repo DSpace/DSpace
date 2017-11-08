@@ -16,6 +16,13 @@ import org.dspace.app.rest.model.step.DataUpload.UploadBitstreamRest;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
+/**
+ * 
+ * Java Bean to expose the section upload during in progress submission. 
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class DataUpload implements SectionData {
 	
 	@JsonUnwrapped

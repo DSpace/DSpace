@@ -23,6 +23,12 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 
+/**
+ * Upload step for DSpace Spring Rest. Expose information about the bitstream uploaded for the in progress submission. 
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class UploadStep extends org.dspace.submit.step.UploadStep implements AbstractRestProcessingStep {
 
 	@Override
