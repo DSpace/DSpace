@@ -11,6 +11,7 @@ package org.dspace.app.webui.cris.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.dspace.app.cris.model.CrisConstants;
@@ -54,12 +55,12 @@ public class RedirectResearcherPageDetailsController extends
     {        
         String paramRPId = request.getParameter("id");
         String auth = null;
-        if (paramRPId == null)
+        if (StringUtils.isBlank(paramRPId))
         {
             try
             {
                 paramRPId = request.getParameter("crisid");
-                if (paramRPId != null)
+                if (StringUtils.isNotBlank(paramRPId))
                 {
                 	auth = paramRPId;    
                 }
@@ -67,7 +68,7 @@ public class RedirectResearcherPageDetailsController extends
                 {
                 	paramRPId = request.getParameter("sourceid");
                 	
-                	if (paramRPId != null) {
+                	if (StringUtils.isNotBlank(paramRPId)) {
 	                	String paramSourceRef = request.getParameter("sourceref");
 	                	auth = ResearcherPageUtils.getRPIdentifierByStaffno(paramRPId, paramSourceRef);
                 	}
@@ -102,7 +103,7 @@ public class RedirectResearcherPageDetailsController extends
             auth = ResearcherPageUtils.getPersistentIdentifier(
                     Integer.parseInt(paramRPId), ResearcherPage.class);
         }
-        if (auth == null || auth.isEmpty())
+        if (StringUtils.isBlank(auth))
         {
             // JSPManager.showInternalError(request, response);
             JSPManager.showInvalidIDError(request, response, paramRPId,
