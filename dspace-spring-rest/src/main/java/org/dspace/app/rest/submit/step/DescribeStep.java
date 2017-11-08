@@ -38,7 +38,7 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 	}
 	
 	@Override
-	public SectionData getData(WorkspaceItem obj, SubmissionStepConfig config) {		
+	public DataDescribe getData(WorkspaceItem obj, SubmissionStepConfig config) {		
 		DataDescribe data = new DataDescribe();
 		try {
 			DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
