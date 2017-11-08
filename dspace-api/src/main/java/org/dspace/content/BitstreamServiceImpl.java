@@ -452,7 +452,7 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
         return bitstreamDAO.getNotReferencedBitstreams(context);
     }
 
-    public String getLastModified(Bitstream bitstream) {
+    public Long getLastModified(Bitstream bitstream) {
        return bitstreamStorageService.getLastModified(bitstream);
     }
 }

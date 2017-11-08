@@ -9,15 +9,19 @@ package org.dspace.app.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.repository.BitstreamRestRepository;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
+import org.dspace.content.Bitstream;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,46 +30,53 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * This is a specialized controller to provide access to the bitstream binary content
- * 
- * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
 @RestController
 @RequestMapping("/api/"+BitstreamRest.CATEGORY +"/"+ BitstreamRest.PLURAL_NAME + "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
 public class BitstreamContentRestController {
+
+	private static final Logger log = Logger.getLogger(BitstreamContentRestController.class);
+
 	@Autowired
-	private BitstreamRestRepository bitstreamRestRepository;
+	private BitstreamService bitstreamService;
 
 	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
 	public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
-											 HttpServletRequest request) throws IOException {
-		BitstreamRest bit = bitstreamRestRepository.findOne(uuid);
+											 HttpServletRequest request) throws IOException, SQLException {
+
+		Context context = ContextUtil.obtainContext(request);
+
+		Bitstream bit = bitstreamService.find(context, uuid);
 		if (bit == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
-        // Pipe the bits
-        InputStream is = bitstreamRestRepository.retrieve(uuid);
-
-		long lastModified = bitstreamRestRepository.getLastModified(uuid);
-
-        String mimetype = bit.getFormat().getMimetype();
+		Long lastModified = bitstreamService.getLastModified(bit);
+        String mimetype = bit.getFormat(context).getMIMEType();
 
         //TODO LOG DOWNLOAD if no range or if last chunk
 
+		// Pipe the bits
+		try(InputStream is = bitstreamService.retrieve(context, bit)) {
 
+			MultipartFileSender
+					.fromInputStream(is)
+					.withFileName(bit.getName())
+					.withLength(bit.getSize())
+					.withChecksum(bit.getChecksum())
+					.withMimetype(mimetype)
+					.withLastModified(lastModified)
+					.with(request)
+					.with(response)
 
-        //MultipartFileSender
-		try {
-			MultipartFileSender.fromBitstream(bit).with(request).with(response).withInputStream(is).withMimetype(mimetype).withLastModified(lastModified).serveResource();
+					.serveResource();
+
 		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			IOUtils.closeQuietly(is);
+			log.error(e.getMessage(), e);
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
-
-
 
 	}
 

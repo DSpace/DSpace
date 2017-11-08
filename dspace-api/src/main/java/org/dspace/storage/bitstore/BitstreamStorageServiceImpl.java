@@ -339,7 +339,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         }
     }
 
-    public String getLastModified(Bitstream bitstream) {
+    public Long getLastModified(Bitstream bitstream) {
         Map wantedMetadata = new HashMap();
         wantedMetadata.put("modified", null);
         try {
@@ -347,7 +347,7 @@ public class BitstreamStorageServiceImpl implements BitstreamStorageService, Ini
         } catch (IOException e) {
             log.error(e);
         }
-        return wantedMetadata.get("modified").toString();
+        return Long.valueOf(wantedMetadata.get("modified").toString());
     }
 
     /**
