@@ -24,6 +24,7 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DescribeStep extends org.dspace.submit.step.DescribeStep implements AbstractRestProcessingStep {
@@ -32,15 +33,12 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 
 	private DCInputsReader inputReader;
 	
-	@Autowired
-	private ItemService itemService;
-	
 	public DescribeStep() throws DCInputsReaderException {
 		inputReader = new DCInputsReader();
 	}
 	
 	@Override
-	public SectionData getData(WorkspaceItem obj, SubmissionStepConfig config) {		
+	public DataDescribe getData(WorkspaceItem obj, SubmissionStepConfig config) {		
 		DataDescribe data = new DataDescribe();
 		try {
 			DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
@@ -55,12 +53,12 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 					dto.setValue(md.getValue());
 					
 					if(data.getMetadata().containsKey(md.getMetadataField().toString())) {
-						data.getMetadata().get(md.getMetadataField().toString()).add(dto);
+						data.getMetadata().get(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(), md.getMetadataField().getElement(), md.getMetadataField().getQualifier(), ".")).add(dto);
 					}
 					else {
 						List<MetadataValueRest> listDto = new ArrayList<>();
 						listDto.add(dto);
-						data.getMetadata().put(md.getMetadataField().toString(), listDto);
+						data.getMetadata().put(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(), md.getMetadataField().getElement(), md.getMetadataField().getQualifier(), "."), listDto);
 					}
 				}
 			}

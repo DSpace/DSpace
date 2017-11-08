@@ -7,7 +7,32 @@
  */
 package org.dspace.app.rest.model.step;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 public class DataLicense implements SectionData {
 	
+	@JsonProperty(access = Access.READ_ONLY)
+	private String url;
+	
+	private String acceptanceDate;
+	
+	public String getAcceptanceDate() {
+		return acceptanceDate;
+	}
 
+	public void setAcceptanceDate(String acceptanceDate) {
+		this.acceptanceDate = acceptanceDate;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+
+	
 }
