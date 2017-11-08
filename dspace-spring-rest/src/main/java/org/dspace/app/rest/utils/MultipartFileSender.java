@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.utils;
 
 import static java.util.Objects.isNull;
@@ -20,10 +27,9 @@ import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * Created by kevin on 10/02/15.
- * See full code here : https://github.com/davinkevin/Podcast-Server/blob/d927d9b8cb9ea1268af74316cd20b7192ca92da7/src/main/java/lan/dk/podcastserver/utils/multipart/MultipartFileSender.java
+ * Utility class to send an input stream with Range header and ETag support.
+ * Based on https://github.com/davinkevin/Podcast-Server/blob/v1.0.0/src/main/java/lan/dk/podcastserver/service/MultiPartFileSenderService.java
  */
 public class MultipartFileSender {
 
@@ -56,7 +62,9 @@ public class MultipartFileSender {
     private static final String CONTENT_DISPOSITION_FORMAT = "%s;filename=\"%s\"";
     private static final String BYTES_DINVALID_BYTE_RANGE_FORMAT = "bytes */%d";
     private static final String CACHE_CONTROL = "Cache-Control";
+
     private static int DEFAULT_BUFFER_SIZE = 1000000;
+
     private static final long DEFAULT_EXPIRE_TIME = 60L * 60L * 1000L;
 
     //no-cache so request is always performed for logging
@@ -296,9 +304,8 @@ public class MultipartFileSender {
                 // Return full file.
                 log.debug("Return full file");
                 response.setContentType(contentType);
-                response.setHeader(CONTENT_RANGE, String.format(BYTES_RANGE_FORMAT, full.start, full.end, full.total));
-                response.setHeader(CONTENT_LENGTH, String.valueOf(full.length));
-                Range.copy(inputStream, output, length, full.start, full.length);
+                response.setHeader(CONTENT_LENGTH, String.valueOf(length));
+                Range.copy(inputStream, output, length, 0, length);
 
             } else if (ranges.size() == 1) {
 
@@ -345,7 +352,7 @@ public class MultipartFileSender {
     }
 
     private static boolean isNullOrEmpty(String disposition) {
-        return !(disposition == null || disposition.length() == 0);
+        return StringUtils.isBlank(disposition);
     }
 
 
@@ -364,7 +371,7 @@ public class MultipartFileSender {
          */
         public Range(long start, long end, long total) {
             this.start = start;
-            this.end = Math.min(end, Math.min(start + DEFAULT_BUFFER_SIZE, total - 1));
+            this.end = end;
             this.length = this.end - this.start + 1;
             this.total = total;
         }
