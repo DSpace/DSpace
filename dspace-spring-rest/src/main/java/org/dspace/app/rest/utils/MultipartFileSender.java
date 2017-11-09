@@ -7,9 +7,16 @@
  */
 package org.dspace.app.rest.utils;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.services.ConfigurationService;
+import org.dspace.services.factory.DSpaceServicesFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,15 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 /**
  * Utility class to send an input stream with Range header and ETag support.
@@ -70,7 +70,7 @@ public class MultipartFileSender {
     //no-cache so request is always performed for logging
     private static final String CACHE_CONTROL_SETTING = "private,no-cache";
 
-    private InputStream inputStream;
+    private BufferedInputStream inputStream;
     private HttpServletRequest request;
     private HttpServletResponse response;
     private String contentType;
@@ -81,8 +81,10 @@ public class MultipartFileSender {
     private String checksum;
 
     public MultipartFileSender(final InputStream inputStream) {
-        this.inputStream = inputStream;
-        
+
+        //Convert to BufferedInputStream so we can re-read the stream
+        this.inputStream = new BufferedInputStream(inputStream);
+
         ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         String bufferSize = configurationService.getProperty("bitstream-download.buffer.size");
         if (StringUtils.isNotEmpty(bufferSize)) {
@@ -220,20 +222,23 @@ public class MultipartFileSender {
                 ServletOutputStream sos = (ServletOutputStream) output;
 
                 // Copy multi part range.
-                for (Range r : Range.relativize(ranges)) {
+                for (Range r : ranges) {
                     log.debug("Return multi part of file : from ({}) to ({})", r.start, r.end);
                     // Add multipart boundary and header fields for every range.
-                    sos.println();
                     sos.println("--" + MULTIPART_BOUNDARY);
                     sos.println(CONTENT_TYPE + ": " + contentType);
                     sos.println(CONTENT_RANGE + ": " + String.format(BYTES_RANGE_FORMAT, r.start, r.end, r.total));
 
+                    //Mark position of inputstream so we can return to it later
+                    inputStream.mark(0);
                     // Copy single part range of multi part range.
                     Range.copy(inputStream, output, length, r.start, r.length);
+                    inputStream.reset();
+
+                    sos.println();
                 }
 
                 // End with multipart boundary.
-                sos.println();
                 sos.println("--" + MULTIPART_BOUNDARY + "--");
             }
         }
