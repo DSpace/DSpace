@@ -725,7 +725,8 @@ public class DCInputsReader
 			if(StringUtils.isBlank(qualifier)) {
 				qualifier = null;
 			}
-			if (inputSet.isFieldPresent(schema+"."+element+"."+qualifier)) {
+			String standardized = Utils.standardize(schema, element, qualifier, ".");
+			if (inputSet.isFieldPresent(standardized)) {
 				return inputSet.getFormName();
 			}
 		}

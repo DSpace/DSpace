@@ -97,7 +97,7 @@ public class DCInputSet
     {
         return ( isFieldPresent("dc.date.issued") && 
                  isFieldPresent("dc.identifier.citation") &&
-                 isFieldPresent("dc.publisher.null") );
+                 isFieldPresent("dc.publisher") );
     }
     
     /**
