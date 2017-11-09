@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -15,10 +17,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
+@LinksRest(links = {		
+		@LinkRest(name = LicenseRest.NAME, linkClass = LicenseRest.class, method = "getResource", optional = true)	
+	})
 public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";
 	public static final String CATEGORY = RestModel.CORE;
 
+	@JsonIgnore
+	private LicenseRest license;
+	
 	@JsonIgnore
 	private BitstreamRest logo;
 	
@@ -39,4 +47,13 @@ public class CollectionRest extends DSpaceObjectRest {
 	public String getType() {
 		return NAME;
 	}
+
+	public LicenseRest getLicense() {
+		return license;
+	}
+
+	public void setLicense(LicenseRest license) {
+		this.license = license;
+	}
+
 }
