@@ -157,10 +157,17 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 									boolean found = false;
 									for (Method m : methods) { 
 										if (StringUtils.equals(m.getName(), linkAnnotation.method())) {
-												// TODO add support for single linked object other than for collections
-												Page<? extends Serializable> pageResult = (Page<? extends RestModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
-												EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
-												embedded.put(name, ep);
+												if ( Page.class.isAssignableFrom( m.getReturnType()) ){
+													Page<? extends Serializable> pageResult = (Page<? extends RestModel>) m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);														
+													EmbeddedPage ep = new EmbeddedPage(linkToSubResource.getHref(), pageResult, null);
+													embedded.put(name, ep);
+												}
+												else {
+													RestModel object = (RestModel)m.invoke(linkRepository, null, ((BaseObjectRest) data).getId(), null, null);
+													ResourceSupport ep = linkRepository.wrapResource(object, linkToSubResource.getHref());
+													embedded.put(name, ep);
+												}
+
 												found = true;
 										}
 									}
