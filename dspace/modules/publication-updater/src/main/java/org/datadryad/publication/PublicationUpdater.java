@@ -267,7 +267,8 @@ public class PublicationUpdater extends HttpServlet {
                         databaseManuscripts = JournalUtils.getStoredManuscriptsMatchingManuscript(queryManuscript);
                         if (databaseManuscripts != null && databaseManuscripts.size() > 0) {
                             databaseManuscript = databaseManuscripts.get(0);
-                            if (isInReview) {     // only update the metadata if the item is in review.
+                            // only update the metadata if the item is in review and this ms is not one of the known former msids for this item.
+                            if (isInReview && !JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, databaseManuscript)) {
                                 StringBuilder provenance = new StringBuilder("Journal-provided metadata for msid " + databaseManuscript.getManuscriptId() + " with title '" + databaseManuscript.getTitle() + "' was added. ");
                                 if (updateItemMetadataFromManuscript(item, databaseManuscript, context, provenance)) {
                                     message = provenance;
