@@ -266,7 +266,7 @@ public class OAIDCCrosswalk extends Crosswalk
         }
 
         metadata.append("<dc:identifier>")
-        .append(ConfigurationManager.getProperty("dspace.url")  + "/handle/";)
+        .append(ConfigurationManager.getProperty("dspace.url")  + "/handle/")
         .append( item.getHandle())
         .append("</dc:identifier>");
         
