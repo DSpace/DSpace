@@ -9,8 +9,10 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,10 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
+import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -32,11 +33,12 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -129,7 +131,7 @@ public class DescribeStep extends AbstractProcessingStep
         DCInput[] inputs = null;
         try
         {
-            inputs = inputsReader.getInputs(c.getHandle()).getPageRows(
+            inputs = inputsReader.getInputs(c).getPageRows(
                     currentPage - 1,
                     subInfo.getSubmissionItem().hasMultipleTitles(),
                     subInfo.getSubmissionItem().isPublishedBefore());
@@ -139,10 +141,24 @@ public class DescribeStep extends AbstractProcessingStep
             throw new ServletException(e);
         }
 
+        // Fetch the document type (dc.type)
+        // Primero pregunto si el dc.type viene en un parametro
+        String documentType = "";
+        String documentTypeParameter = request.getParameter(MetadataField.formKey("dc", "type", null));
+        if(documentTypeParameter != null)
+        {
+            documentType = documentTypeParameter;
+        }
+        else if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+        {
+            documentType = item.getMetadata("dc.type")[0].value;
+        }
+        
         // Step 1:
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
         {
+  	    // Allow the clearing out of the metadata defined for other document types, provided it can change anytime
             if (!inputs[i]
                     .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                             : DCInput.SUBMISSION_SCOPE))
@@ -153,10 +169,23 @@ public class DescribeStep extends AbstractProcessingStep
             if (qualifier == null
                     && inputs[i].getInputType().equals("qualdrop_value"))
             {
-                qualifier = Item.ANY;
+            	List qualifiers=inputs[i].getPairs();
+            	int j=1;
+            	while (j<qualifiers.size()) {
+            		item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
+                            (String)(qualifiers.get(j)), Item.ANY);
+            		j=j+2;
+				}
+
+            } else {
+            	if (qualifier != null){
+	                item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
+	                    qualifier, Item.ANY);
+            	} else {
+            		item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
+            				null, Item.ANY);
+            	}
             }
-            item.clearMetadata(inputs[i].getSchema(), inputs[i].getElement(),
-                    qualifier, Item.ANY);
         }
 
         // Clear required-field errors first since missing authority
@@ -169,12 +198,25 @@ public class DescribeStep extends AbstractProcessingStep
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
+            // Omit fields not allowed for this document type
+            if(!inputs[j].isAllowedFor(documentType))
+            {
+            	continue;
+            }
+
             if (!inputs[j]
                         .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                                 : DCInput.SUBMISSION_SCOPE))
             {
                 continue;
             }
+            
+            // Omit fields not visible based on user's group
+            if(!inputs[j].isVisibleOnGroup(context))
+            {
+            	continue;
+            }
+            
             String element = inputs[j].getElement();
             String qualifier = inputs[j].getQualifier();
             String schema = inputs[j].getSchema();
@@ -251,7 +293,7 @@ public class DescribeStep extends AbstractProcessingStep
                     || (inputType.equals("textarea")))
             {
                 readText(request, item, schema, element, qualifier, inputs[j]
-                        .getRepeatable(), LANGUAGE_QUALIFIER);
+                        .getRepeatable(), inputs[j].isI18nable());
             }
             else
             {
@@ -284,9 +326,33 @@ public class DescribeStep extends AbstractProcessingStep
         {
             for (int i = 0; i < inputs.length; i++)
             {
+            	// Do not check the required attribute if it is not visible or not allowed for the document type
+            	String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+                if ( !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
+                {
+                	continue;
+                }
+            	
                 DCValue[] values = item.getMetadata(inputs[i].getSchema(),
                         inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
 
+                // Group-based restriction validation
+                if(inputs[i].isGroupBased()) 
+                {
+                	Group group = findGroup(context, inputs[i].getGroup());
+                	if( group == null) 
+                	{
+                		log.warn("Group "+inputs[i].getGroup()+ " does not exist, check your input_forms.xml" );
+                	}
+                	else if (!(Group.isMember(context, group.getID()) ^ inputs[i].hasToBeMemeber()) && values.length == 0 ) 
+                	{
+                		// agrega el campo faltante a la lista de errores 
+                        addErrorField(request, getFieldName(inputs[i]));
+                	}
+                	else
+                		continue;
+                }
+                
                 if (inputs[i].isRequired() && values.length == 0)
                 {
                     // since this field is missing add to list of error fields
@@ -317,6 +383,20 @@ public class DescribeStep extends AbstractProcessingStep
         return STATUS_COMPLETE;
     }
 
+    /**
+     * Mini-cache of loaded groups for group-based validation
+     * 
+     * @return Group instance
+     */
+    private Map<String, Group> loadedGroups = new HashMap<String, Group>();
+    private Group findGroup(Context context, String groupName) throws SQLException {
+    	Group group = loadedGroups.get(groupName);
+    	if(group == null) {
+    		group = Group.findByName(context, groupName);
+    		loadedGroups.put(groupName, group);
+    	}
+    	return group;
+    }
     
 
     /**
@@ -344,19 +424,18 @@ public class DescribeStep extends AbstractProcessingStep
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {
-        // by default, use the "default" collection handle
-        String collectionHandle = DCInputsReader.DEFAULT_COLLECTION;
+        // by default, prepare to use the "default" form definition
+        Collection collection = null;
 
         if (subInfo.getSubmissionItem() != null)
         {
-            collectionHandle = subInfo.getSubmissionItem().getCollection()
-                    .getHandle();
+            collection = subInfo.getSubmissionItem().getCollection();
         }
 
         // get number of input pages (i.e. "Describe" pages)
         try
         {
-            return getInputsReader().getNumberInputPages(collectionHandle);
+            return getInputsReader().getNumberInputPages(collection);
         }
         catch (DCInputsReaderException e)
         {
@@ -633,7 +712,7 @@ public class DescribeStep extends AbstractProcessingStep
      *            language to set (ISO code)
      */
     protected void readText(HttpServletRequest request, Item item, String schema,
-            String element, String qualifier, boolean repeated, String lang)
+            String element, String qualifier, boolean repeated, boolean is18nable)
     {
         // FIXME: Of course, language should be part of form, or determined
         // some other way
@@ -645,12 +724,14 @@ public class DescribeStep extends AbstractProcessingStep
 
         // Values to add
         List<String> vals = null;
+        List<String> langs = null;
         List<String> auths = null;
         List<String> confs = null;
 
         if (repeated)
         {
             vals = getRepeatedParameter(request, metadataField, metadataField);
+            langs = getRepeatedParameter(request, metadataField, metadataField+"_lang");
             if (isAuthorityControlled)
             {
                 auths = getRepeatedParameter(request, metadataField, metadataField+"_authority");
@@ -670,6 +751,8 @@ public class DescribeStep extends AbstractProcessingStep
                         .substring(removeButton.length()));
 
                 vals.remove(valToRemove);
+                if(is18nable)
+                	langs.remove(valToRemove);
                 if(isAuthorityControlled)
                 {
                    auths.remove(valToRemove);
@@ -681,10 +764,19 @@ public class DescribeStep extends AbstractProcessingStep
         {
             // Just a single name
             vals = new LinkedList<String>();
+            langs = new LinkedList<String>();
             String value = request.getParameter(metadataField);
+            String selectedLang = LANGUAGE_QUALIFIER;
+            if(is18nable && request.getParameter(metadataField+"_lang") != null) {
+            	selectedLang = request.getParameter(metadataField+"_lang");
+            	if(selectedLang.isEmpty())
+            		selectedLang = null;
+            }
+            
             if (value != null)
             {
                 vals.add(value.trim());
+                langs.add(selectedLang);
             }
             if (isAuthorityControlled)
             {
@@ -705,6 +797,10 @@ public class DescribeStep extends AbstractProcessingStep
         {
             // Add to the database if non-empty
             String s = vals.get(i);
+            String selectedLang = LANGUAGE_QUALIFIER;
+            if(is18nable)
+            	selectedLang = langs.get(i);
+            	
             if ((s != null) && !s.equals(""))
             {
                 if (isAuthorityControlled)
@@ -719,14 +815,14 @@ public class DescribeStep extends AbstractProcessingStep
                     }
                     else
                     {
-                        item.addMetadata(schema, element, qualifier, lang, s,
+                        item.addMetadata(schema, element, qualifier, selectedLang, s,
                                 authKey, (sconf != null && sconf.length() > 0) ?
                                         Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
                     }
                 }
                 else
                 {
-                    item.addMetadata(schema, element, qualifier, lang, s);
+                    item.addMetadata(schema, element, qualifier, selectedLang, s);
                 }
             }
         }

@@ -32,9 +32,33 @@
     </scm>
 
     <properties>
-        <default.dspace.dir>/dspace</default.dspace.dir>
-        <default.mail.server>smtp.example.com</default.mail.server>
-        <default.solr.server>http://localhost:8080/solr</default.solr.server>
+		<default.db.name>postgres</default.db.name>
+		<default.db.driver>org.postgresql.Driver</default.db.driver>
+		<default.db.url>jdbc:postgresql://localhost:5432/dspace</default.db.url>
+		<default.db.username>dspace_user</default.db.username>
+		<default.db.password>dspace_password</default.db.password>
+		<default.dspace.dir>/dspace</default.dspace.dir>
+		<default.mail.server>smtp.example.com</default.mail.server>
+		<default.solr.server>http://localhost:8080/solr</default.solr.server>
+		
+		<default.mail.server>smtp.example.com</default.mail.server>
+		<default.mail.server.username>myusername</default.mail.server.username>
+		<default.mail.server.password>mypassword</default.mail.server.password>
+		<default.mail.server.port>25</default.mail.server.port>
+		<default.mail.server.disabled>true</default.mail.server.disabled>
+		<default.mail.allowed.referrers>localhost, 127.0.0.1,163.10.34.,192.168.1.</default.mail.allowed.referrers>
+		<default.mail.extraproperties>mail.smtp.socketFactory.port=465, \
+									mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory, \
+									mail.smtp.socketFactory.fallback=false</default.mail.extraproperties>
+		
+		<default.sedici2003.database.url>jdbc\:mysql\://localhost\:3306/s2003_sedici?zeroDateTimeBehavior=convertToNull</default.sedici2003.database.url>
+		<default.sedici2003.database.username>root</default.sedici2003.database.username>
+		<default.sedici2003.database.password>root</default.sedici2003.database.password>
+		<default.dspace.hostname>localhost</default.dspace.hostname>
+		<default.dspace.baseUrl>http://localhost:8080</default.dspace.baseUrl>
+		<default.xmlui.google.analytics.key>UA-XXXXXX-X</default.xmlui.google.analytics.key>
+		<default.xmlui.debug>true</default.xmlui.debug>
+	
     </properties>
 
     <profiles>
@@ -168,12 +192,12 @@
                 <dependency>
                     <groupId>com.sun.media</groupId>
                     <artifactId>jai_imageio</artifactId>
-                    <version>1.0_01</version>
+                    <version>1.2</version>
                 </dependency>
                 <dependency>
                     <groupId>javax.media</groupId>
                     <artifactId>jai_core</artifactId>
-                    <version>1.1.2_01</version>
+                    <version>1.1.4</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -208,6 +232,7 @@
                 </executions>
             </plugin>
         </plugins>
+		<finalName>dspace-sedici-distribution</finalName>
     </build>
 
     <dependencies>
@@ -254,6 +279,19 @@
               </exclusion>
             </exclusions> 
         </dependency>
+	<!--
+	<dependency>
+		<groupId>ar.edu.unlp.sedici</groupId>
+		<artifactId>plugins</artifactId>
+		<version>${project.version}</version>
+	</dependency>
+
+	<dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xoai-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+	-->
     </dependencies>
 
 </project>

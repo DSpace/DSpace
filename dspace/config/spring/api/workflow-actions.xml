@@ -11,6 +11,11 @@
     <bean id="editactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.AcceptEditRejectAction" scope="prototype"/>
     <bean id="finaleditactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.FinalEditAction" scope="prototype"/>
     <bean id="singleuserreviewactionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SingleUserReviewAction" scope="prototype"/>
+	<bean id="selectcollectionactionAPI" class="ar.edu.unlp.sedici.dspace.xmlworkflow.state.actions.processingaction.SeDiCISelectCollectionAction" scope="prototype"/>
+
+	<bean id="skipadminclaimactionAPI" class="ar.edu.unlp.sedici.dspace.xmlworkflow.state.actions.processingaction.SkipAdminClaimAction" scope="prototype"/>
+
+	<bean id="acceptRoleOrNotAdminAPI" class="ar.edu.unlp.sedici.dspace.xmlworkflow.state.actions.processingaction.AcceptRoleOrNotAdmin" scope="prototype"/>
 
     <bean id="selectrevieweractionAPI" class="org.dspace.xmlworkflow.state.actions.processingaction.SelectReviewerAction" scope="prototype">
         <property name="roleId" value="reviewer"/>
@@ -34,6 +39,12 @@
     <bean id="editaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="editaction"/>
         <property name="processingAction" ref="editactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+
+    <bean id="selectcollectionaction" class="org.dspace.xmlworkflow.state.actions.WorkflowActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="selectcollectionaction"/>
+        <property name="processingAction" ref="selectcollectionactionAPI"/>
         <property name="requiresUI" value="true"/>
     </bean>
 
@@ -72,6 +83,18 @@
 
 
 <!--User selection actions-->
+    <bean id="skipadminclaimaction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
+        <constructor-arg type="java.lang.String" value="skipadminclaimaction"/>
+        <property name="processingAction" ref="skipadminclaimactionAPI"/>
+        <property name="requiresUI" value="true"/>
+    </bean>
+    
+    <bean id="acceptRoleOrNotAdmin" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
+    	<constructor-arg type="java.lang.String" value="acceptRoleOrNotAdmin"/>
+    	<property name="processingAction" ref="acceptRoleOrNotAdminAPI"/>
+    	<property name="requiresUI" value="true"/>
+    </bean>
+
     <bean id="claimaction" class="org.dspace.xmlworkflow.state.actions.UserSelectionActionConfig" scope="prototype">
         <constructor-arg type="java.lang.String" value="claimaction"/>
         <property name="processingAction" ref="claimactionAPI"/>

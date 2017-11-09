@@ -5,8 +5,9 @@
 
  <!ELEMENT form-map (name-map)* >
  <!ELEMENT name-map EMPTY >
- <!ATTLIST name-map 
-           collection-handle CDATA #REQUIRED
+ <!ATTLIST name-map
+           handle CDATA #IMPLIED 
+           collection-handle CDATA #IMPLIED
            form-name NMTOKEN #REQUIRED>
 
  <!ELEMENT form-definitions (form)+ >
@@ -14,7 +15,7 @@
  <!ATTLIST form name NMTOKEN #REQUIRED>
  <!ELEMENT page (field)+ >
  <!ATTLIST page number NMTOKEN #REQUIRED>
- <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, input-type, hint, required?, vocabulary?) >
+ <!ELEMENT field (dc-schema, dc-element, dc-qualifier?, repeatable?, label, input-type, hint, required?, vocabulary?, type-bind?, visibility?) >
  <!ELEMENT dc-schema (#PCDATA) >
  <!ELEMENT dc-element (#PCDATA) >
  <!ELEMENT dc-qualifier (#PCDATA) >
@@ -25,6 +26,8 @@
   
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>
+ <!ELEMENT type-bind (#PCDATA)>
+ <!ELEMENT visibility (#PCDATA)>
 
  <!ELEMENT form-value-pairs (value-pairs)* >
  <!ELEMENT value-pairs (pair)+ >
@@ -39,7 +42,7 @@
              (e.g. 'language_iso')
   -->
  <!ATTLIST value-pairs value-pairs-name CDATA #REQUIRED
-                            dc-term   CDATA #REQUIRED
+                            dc-term   CDATA #IMPLIED
  >
   
  <!ELEMENT pair (displayed-value,stored-value) >

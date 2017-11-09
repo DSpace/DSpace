@@ -12,6 +12,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.*;
 import org.apache.cocoon.reading.ResourceReader;
 import org.apache.excalibur.source.Source;
@@ -92,6 +93,9 @@ public class ConcatenationReader extends ResourceReader {
         // do super stuff
         super.setup(resolver, objectModel, path+"/"+files[files.length-1], par);
 
+        if(!this.inputSource.exists())
+        	throw new ResourceNotFoundException("No se encuentra el recurso "+this.inputSource.getURI());
+        
         // add stream enumerator
         this.streamEnumeration = new StreamEnumeration();
 
@@ -266,6 +270,9 @@ public class ConcatenationReader extends ResourceReader {
                 InputStream elem = inputSources.get(index).getInputStream();
                 index++;
                 return elem;
+            } catch(FileNotFoundException e) {
+                log.error("NO SE ENCONTROSE!!", e);
+                throw new NoSuchElementException(e.getMessage());
             } catch (IOException e) {
                 log.error("IOException in StreamEnumeration.nextElement when retrieving InputStream of a Source; index = "
                         + index + ", inputSources.size = " + inputSources.size(), e);

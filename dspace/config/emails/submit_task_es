@@ -1,0 +1,26 @@
+# Workflow task email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}  submitter's name
+# {3}  Description of task
+# {4}  link to 'my DSpace' page 
+#
+Subject: [Dspace@SeDiCI] Nuevo recurso en {1}
+
+Un nuevo recurso ha sido depositado en el repositorio:
+
+Título:      {0}
+Enviado por: {2}
+Colección:   {1}
+
+Para tomar esta tarea, visite http://sedici.unlp.edu.ar/submissions
+
+Muchas gracias.
+Cordialmente,
+
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
+Universidad Nacional de La Plata
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141

@@ -406,8 +406,9 @@ function startManageEPeople()
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
+	//getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -422,8 +423,9 @@ function startManageGroups()
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
+	//getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -438,8 +440,9 @@ function startManageMetadataRegistry()
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
+	//getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -454,8 +457,9 @@ function startManageFormatRegistry()
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
+	//getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -470,8 +474,9 @@ function startManageItems()
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
+	//getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -486,8 +491,9 @@ function startManageAuthorizations()
 
 	// This should never return, but just in case it does then point
 	// the user to the home page.
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath());
-	getDSContext().complete();
+	//getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -504,8 +510,9 @@ function startEditItem()
 	doEditItem(itemID);
 
 	var item = Item.find(getDSContext(),itemID);
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
-	getDSContext().complete();
+	//getDSContext().complete();
 	item = null;
 	cocoon.exit();
 }
@@ -523,8 +530,9 @@ function startMapItems()
 	doMapItems(collectionID);
 
 	var collection = Collection.find(getDSContext(),collectionID);
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
-    getDSContext().complete();
+    //getDSContext().complete();
 	collection = null;
 	cocoon.exit();
 }
@@ -535,9 +543,9 @@ function startMetadataImport()
         assertAdministrator();
 
 	doMetadataImport();
-
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath());
-        getDSContext().complete();
+        //getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -548,13 +556,22 @@ function startCreateCollection()
 {
 	var communityID = cocoon.request.get("communityID");
 
+	var result;
 	assertAuthorized(Constants.COMMUNITY,communityID,Constants.ADD);
+    result=doCreateCollection(communityID);
 
-	doCreateCollection(communityID);
-
-	// Root level community, cancel out to the global community list.
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
-	getDSContext().complete();
+    // Root level community, cancel out to the global community list.
+    cocoon.sendPage("admin/finalize");
+	if (result.getParameter("collectionID")){
+		var collection = Collection.find(getDSContext(),result.getParameter("collectionID"));
+		cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
+		
+	} else{
+		var community = Community.find(getDSContext(),communityID);
+		cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getHandle(),true);
+	}
+	
+	//getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -572,8 +589,9 @@ function startEditCollection()
 
 	// Go back to the collection
 	var collection = Collection.find(getDSContext(),collectionID);
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+collection.getHandle(),true);
-	getDSContext().complete();
+	//getDSContext().complete();
 	collection = null;
 	cocoon.exit();
 }
@@ -584,12 +602,12 @@ function startEditCollection()
 function startCreateCommunity()
 {
 	var communityID = cocoon.request.get("communityID");
-
 	doCreateCommunity(communityID);
 
 	// Root level community, cancel out to the global community list.
+    cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
-	getDSContext().complete();
+	//getDSContext().complete();
 	cocoon.exit();
 }
 
@@ -606,8 +624,9 @@ function startEditCommunity()
 
 	// Go back to the community
 	var community = Community.find(getDSContext(),communityID);
+	cocoon.sendPage("admin/finalize");
 	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+community.getHandle(),true);
-	getDSContext().complete();
+	//getDSContext().complete();
 	community = null;
 	cocoon.exit();
 }
@@ -620,9 +639,9 @@ function startCurate()
         assertAdministrator();
 
         doCurate();
-
+        cocoon.sendPage("admin/finalize");
         cocoon.redirectTo(cocoon.request.getContextPath());
-        getDSContext().complete();
+        //getDSContext().complete();
         cocoon.exit();
 }
 
@@ -800,8 +819,9 @@ function doEditEPerson(epersonID)
         		// the user is loged in as another user, we can't let them continue on
         		// using this flow because they might not have permissions. So forward
         		// them to the homepage.
+        		cocoon.sendPage("admin/finalize");
         		cocoon.redirectTo(cocoon.request.getContextPath(),true);
-				getDSContext().complete();
+				//getDSContext().complete();
 				cocoon.exit();
         	}
         }
@@ -1630,8 +1650,9 @@ function doDeleteItem(itemID)
 		var result = FlowItemUtils.processDeleteItem(getDSContext(),itemID);
 
 		if (result.getContinue()) {
+			cocoon.sendPage("admin/finalize");
 			cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
-			getDSContext().complete();
+			//getDSContext().complete();
 			cocoon.exit();
 		}
 
@@ -2743,8 +2764,9 @@ function doDeleteCollection(collectionID)
 		var result = FlowContainerUtils.processDeleteCollection(getDSContext(),collectionID);
 
 		if (result.getContinue()) {
+			cocoon.sendPage("admin/finalize");
 			cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
-			getDSContext().complete();
+			//getDSContext().complete();
 			cocoon.exit();
 		}
 	}
@@ -2772,14 +2794,15 @@ function doCreateCollection(communityID)
 			// send the user to the authorization screen
 			if (result.getContinue() && result.getParameter("collectionID")) {
 				collectionID = result.getParameter("collectionID");
-				result = doEditCollection(collectionID,true);
+				doEditCollection(collectionID,true);
 				// If they return then pass them back to where they came from.
 				return result;
 			}
 		}
 		else if (cocoon.request.get("submit_cancel")) {
+			cocoon.sendPage("admin/finalize");
 			cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
-			getDSContext().complete();
+			//getDSContext().complete();
 			cocoon.exit();
 		}
 	} while (true);
@@ -2824,8 +2847,9 @@ function doCreateCommunity(parentCommunityID)
 			}
 		}
 		else if (cocoon.request.get("submit_cancel")) {
+			cocoon.sendPage("admin/finalize");
 			cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
-			getDSContext().complete();
+			//getDSContext().complete();
 			cocoon.exit();
 		}
 	} while (true);
@@ -2925,8 +2949,9 @@ function doDeleteCommunity(communityID) {
 		var result = FlowContainerUtils.processDeleteCommunity(getDSContext(),communityID);
 
 		if (result.getContinue()) {
+			cocoon.sendPage("admin/finalize");
 			cocoon.redirectTo(cocoon.request.getContextPath()+"/community-list",true);
-			getDSContext().complete();
+			//getDSContext().complete();
 			cocoon.exit();
 		}
 	}

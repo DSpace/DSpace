@@ -7,26 +7,17 @@
  */
 package org.dspace.core;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
+import org.apache.log4j.helpers.OptionConverter;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.log4j.Category;
-import org.apache.log4j.Logger;
-import org.apache.log4j.helpers.OptionConverter;
 
 /**
  * Class for reading the DSpace system configuration. The main configuration is
@@ -919,7 +910,10 @@ public class ConfigurationManager
                 properties = new Properties();
                 moduleProps = new HashMap<String, Properties>();
                 is = url.openStream();
-                properties.load(is);
+		/* SEDICI-BEGIN */
+                // creates a InputStreamReader to use the system default charset
+                properties.load( new InputStreamReader(is) );
+		/* SEDICI-END */
 
                 // walk values, interpolating any embedded references.
                 for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )

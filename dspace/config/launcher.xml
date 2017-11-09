@@ -346,6 +346,35 @@
 			<class>org.dspace.discovery.IndexClient</class>
 		</step>
 	</command>
+    <command>
+        <name>create-user</name>
+        <description>Create a DSpace user account</description>
+        <step>
+            <class>ar.edu.unlp.sedici.dspace.administer.CreateUser</class>
+        </step>
+    </command>
+    <command>
+        <name>create-group</name>
+        <description>Create a DSpace group</description>
+        <step>
+            <class>ar.edu.unlp.sedici.dspace.administer.CreateGroup</class>
+        </step>
+    </command>
+    <command>
+        <name>import-users</name>
+        <description>Import users from a file</description>
+        <step>
+            <class>ar.edu.unlp.sedici.dspace.administer.ImportUsers</class>
+        </step>
+    </command>
+    
+    <command>
+		<name>xoai</name>
+		<description>XOAI script manager</description>
+		<step>
+			<class>org.dspace.xoai.app.XOAI</class>
+		</step>
+	</command>
 
 
 </commands>

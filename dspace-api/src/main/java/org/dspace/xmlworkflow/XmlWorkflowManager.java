@@ -14,22 +14,25 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.*;
+import org.dspace.embargo.EmbargoManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.*;
 import org.dspace.xmlworkflow.storedcomponents.*;
-import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+
+import ar.edu.unlp.sedici.util.AuthorizeUtil;
 
 /**
  * When an item is submitted and is somewhere in a workflow, it has a row in the
@@ -65,7 +68,10 @@ public class XmlWorkflowManager {
         removeUserItemPolicies(context, myitem, myitem.getSubmitter());
         grantSubmitterReadPolicies(context, myitem);
 
-        context.turnOffAuthorisationSystem();
+    	// Decides if the alert email should be sent 
+    	if(!shouldSendAlert(context, wfi, null))
+    		noEMail.put(myitem.getID(), Boolean.TRUE);
+        
         Step firstStep = wf.getFirstStep();
         if(firstStep.isValidStep(context, wfi)){
              activateFirstStep(context, wf, firstStep, wfi);
@@ -80,11 +86,178 @@ public class XmlWorkflowManager {
 
         }
         // remove the WorkspaceItem
+        context.turnOffAuthorisationSystem();
         wsi.deleteWrapper();
         context.restoreAuthSystemState();
         return wfi;
     }
 
+    // SEDICI-BEGIN: inserción de un item (archivado) en el workflow
+    public static XmlWorkflowItem startEditItemMetadata(Context context, String handle) throws SQLException, IOException, WorkflowConfigurationException, AuthorizeException, WorkflowException {
+    	
+    	// Obtenemos el item a editar
+    	DSpaceObject object = HandleManager.resolveToObject(context, handle);
+    	if(object.getType() != Constants.ITEM)
+        	return null;
+
+    	// Creación del wrapper XmlWorkflowItem (seguimos los pasos del start() original, adaptando lo necesario)
+    	Item item = (Item) object;
+    	
+    	// Primero verificamos que exista un XmlWorkflowItem para este item
+    	if( workflowItemExists(context, item) )
+    		return GetWorkflowItem(context, item); 
+    		//throw new WorkflowException("El item "+handle+" ya se ecuentra dentro del workflow");
+    	
+        Collection collection = item.getOwningCollection();
+        Workflow wf = WorkflowFactory.getWorkflow(collection);
+
+        XmlWorkflowItem wfi = XmlWorkflowItem.create(context);
+        wfi.setItem(item);
+        wfi.setCollection(collection);
+        // Estos 3 booleans no se usan
+        wfi.setMultipleFiles(false);
+        wfi.setMultipleTitles(false);
+        wfi.setPublishedBefore(false);
+
+        // TODO Ver si hay que setear el flag withdraw para evitar que el item siga publico
+        //item.withdraw();
+        
+        wfi.update();
+        //Se remueve la reasignación de permisos. ver ticket #2182
+        //removeUserItemPolicies(context, item, item.getSubmitter());
+        //grantSubmitterReadPolicies(context, item);
+
+        // Shouldn't send the email (the logged user is an admin)
+		noEMail.put(item.getID(), Boolean.TRUE);
+
+        //context.turnOffAuthorisationSystem();
+        Step firstStep = wf.getFirstStep();
+        if(firstStep.isValidStep(context, wfi)){
+             activateFirstStep(context, wf, firstStep, wfi);
+        } else {
+            //Get our next step, if none is found, archive our item
+            firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);
+            if(firstStep == null){
+                archive(context, wfi);
+            }else{
+                activateFirstStep(context, wf, firstStep, wfi);
+            }
+        }       
+        //context.restoreAuthSystemState();
+        return wfi;
+    }
+    
+    public static boolean tienePermisoDeWorkflow(Workflow wf, Item item, Context context){
+        XmlWorkflowItem wfi=null;
+        Step firstStep = wf.getFirstStep();
+        EPerson usuario=context.getCurrentUser();
+        boolean retorno=false;
+		try {
+			wfi = XmlWorkflowItem.create(context);
+	        wfi.setItem(item);
+	        wfi.setCollection(item.getOwningCollection());
+	        wfi.deleteWrapper();
+			if(!firstStep.isValidStep(context, wfi)){			
+			    //Get our next step, if none is found, archive our item
+			    firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);			    
+			}
+			if(firstStep != null){
+		        RoleMembers miembros=firstStep.getRole().getMembers(context, wfi);
+		        if (miembros.getEPersons().contains(context.getCurrentUser())){
+		        	retorno=true;
+		        } else {
+		            for (Group grupo : miembros.getGroups()) {
+		    			if (grupo.isMember(usuario)){
+		    				retorno=true;
+		    			}
+		    		}
+		        }
+		    };
+		    if (wfi!=null){				
+					wfi.deleteWrapper();
+		    };
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+
+		return retorno;
+
+    }
+    
+    /**
+     * Ya que a la gente de DSpace se les olvido crear un metodo para retornar un XmlWorkflowItem según el Item,
+     * agregamos uno aqui
+     * 
+     * @param item
+     * @return
+     * @throws SQLException 
+     */
+    private static boolean workflowItemExists(Context context, Item item) throws SQLException {
+    	 // Look for the unique workspaceitem entry where 'item_id' references this item
+        TableRow row =  DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", item.getID());
+        return (row != null);
+    }
+    
+    /**
+     * Decide si debe enviarse o no un mail de notificación de nueva tarea disponible, según si el usuario logueado es administrador o no.
+     * 
+     * @param context DSpace context
+     * @param wfi XmlWorkflowItem related to this invocation
+     * @param useNoEMail signals if the item's ID should be set in the noEMail static var
+     * @return whether the mail should be sent or not
+     * @throws SQLException
+     */
+    public static boolean shouldSendAlert(Context context, XmlWorkflowItem wfi, EPerson eperson) throws SQLException {
+    	// Checks the ADMIN privilege on target collection for the scpeficied eperson or the current users if eperson is null
+    	if(eperson == null) {
+    		return !AuthorizeManager.isAdmin(context, wfi.getCollection());
+    	} else {
+    		return !AuthorizeUtil.isAdmin(context, eperson, wfi.getCollection());
+    	}
+    }
+    
+    /**
+     * Ya que a la gente de DSpace se les olvido crear un metodo para retornar un XmlWorkflowItem según el Item,
+     * agregamos uno aqui
+     * 
+     * @param item
+     * @return
+     * @throws SQLException 
+     */
+    public static XmlWorkflowItem GetWorkflowItem(Context context, Item item) throws SQLException {
+    	 // Look for the unique workspaceitem entry where 'item_id' references this item
+        TableRow row =  DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", item.getID());
+        XmlWorkflowItem retorno=null;
+        if (row!=null){
+        	try {
+				retorno= XmlWorkflowItem.find(context, row.getIntColumn("workflowitem_id"));
+			} catch (AuthorizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        };
+        return retorno;
+    }
+    
+    public static PoolTask GetPoolTask(Context context, XmlWorkflowItem workflowItem, EPerson person) throws SQLException {
+    	PoolTask poolTask=null;    	
+		try {
+			poolTask = PoolTask.findByWorkflowIdAndEPerson(context, workflowItem.getID(), person.getID());
+		} catch (AuthorizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return poolTask;
+   }
+    
+    //SEDICI-END
+    
     //TODO: this is currently not used in our notifications. Look at the code used by the original WorkflowManager
     /**
      * startWithoutNotify() starts the workflow normally, but disables
@@ -194,6 +367,9 @@ public class XmlWorkflowManager {
             if (nextActionConfig != null) {
                 nextActionConfig.getProcessingAction().activate(c, wfi);
                 if (nextActionConfig.requiresUI() && !enteredNewStep) {
+                	//Antes de crear la nueva OwnedTask, eliminamos la anterior
+                    ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
+                    deleteClaimedTask(c, wfi, task);
                     createOwnedTask(c, wfi, currentStep, nextActionConfig, user);
                     return nextActionConfig;
                 } else if( nextActionConfig.requiresUI() && enteredNewStep){
@@ -294,10 +470,40 @@ public class XmlWorkflowManager {
                 + wfi.getID() + "item_id=" + item.getID() + "collection_id="
                 + collection.getID()));
 
-        InstallItem.installItem(c, wfi);
+        //SEDICI-BEGIN es un Item nuevo en el repositorio o uno existente?
+        if(item.isArchived()) {
+        	/*
+        	 * TODO probar y habilitar parche para #1785
+        	// En lugar de hacer un Install, no hacemos mas que eliminar el XmlWorkflowItem (directamente o con un restore, segun el embargo)
+        	DCDate newLiftDate;
+        	try{
+        		newLiftDate=EmbargoManager.getEmbargoDate(c, item);
+        	}catch (IllegalArgumentException e) {
+        		//liftDate is in the past or uninterpretable 
+        		newLiftDate=null;
+			}
+        	DCDate oldLiftDate = getLiftDate(item); 
+        	
+        	if (oldLiftDate != null && newLiftDate == null){
+        		//se anula el embargo
+        		EmbargoManager.liftEmbargo(c, item);
+        	}else if (newLiftDate != null && !newLiftDate.equals(oldLiftDate)){
+                EmbargoManager.setEmbargo(c, item, newLiftDate);
+        	}else{//newLiftDate.equals(oldLiftDate)
+        		//no-op
+        	}
+        	*/
+       		wfi.deleteWrapper();
+        	
+        } else { 
+        	// Codigo original antes de agregar este IF
+        	
+        	InstallItem.installItem(c, wfi);
 
-        //Notify
-        notifyOfArchive(c, item, collection);
+	        //Notify only when it is needed
+	        if(shouldSendAlert(c, wfi, wfi.getSubmitter()))
+	        	notifyOfArchive(c, item, collection);
+        }
 
         //Clear any remaining workflow metadata
         item.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
@@ -754,6 +960,45 @@ public class XmlWorkflowManager {
     }
 
     public static String getMyDSpaceLink() {
-        return ConfigurationManager.getProperty("dspace.url") + "/mydspace";
+        return ConfigurationManager.getProperty("dspace.url") + "/submissions";
+    }
+
+    private static DCDate getLiftDate(Item item ){
+        
+        String lift = ConfigurationManager.getProperty("embargo.field.lift");
+        String sa[] = lift.split("\\.", 3);
+        
+        String lift_schema = sa[0];
+        String lift_element = sa[1];
+        String lift_qualifier = sa.length > 2 ? sa[2] : null;
+
+        DCValue[] liftDate = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
+        return liftDate.length==0?null:new DCDate(liftDate[0].value);
+        
+    }
+    
+    
+    
+    private static final String wf_edited_schema = "sedici";
+    private static final String wf_edited_element = "workflowEdited";
+    
+    public static void cleanWorkflowEdited(Context c, Item item) throws SQLException, AuthorizeException {
+    	item.clearMetadata(wf_edited_schema, wf_edited_element, null, "es");
+        item.update();
+        c.commit();
+    }
+    	
+    public static void setWorkflowEdited(Context c, Item item) throws SQLException, AuthorizeException {
+    	item.clearMetadata(wf_edited_schema, wf_edited_element, null, "es");
+    	item.addMetadata(wf_edited_schema, wf_edited_element, null, "es", "true");
+        item.update();
+        c.commit();
+    }
+
+    public static boolean isWorkflowEdited(Item item) {
+    	DCValue[] values = item.getMetadata(wf_edited_schema, wf_edited_element, null, "es");
+    	if(values.length > 0)
+    		return "true".equals( values[0].value );
+    	return false;
     }
 }

@@ -4,9 +4,13 @@
 # Parameters: {0} is the details of the new collections and items
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace Subscription
+Subject: SeDiCI - Subscription
 New items are available in the collections you have subscribed to:
 
 {0}
 
-DSpace
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
+Universidad Nacional de La Plata
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141

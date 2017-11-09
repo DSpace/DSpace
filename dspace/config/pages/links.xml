@@ -1,0 +1,153 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
+	version="1.1">
+
+	<meta>
+		<pageMeta>
+			<metadata element="title">SEDICI - Links</metadata>
+		</pageMeta>
+	</meta>
+
+	<body>
+		<div>
+			<head>Links</head>
+
+			<div id='pagina_estatica' class="pagina_links">
+				
+				<h1>Links UNLP</h1>
+				<ul>
+					<li>
+						<a href="http://www.unlp.edu.ar" target="_blank">http://www.unlp.edu.ar</a>
+						<p>Sitio institucional de la Universidad Nacional de La Plata
+							(UNLP), con vínculos a cada unidad académica e información de
+							todas las carreras que se dictan en esta casa de estudios, entre
+							otros items de interés.</p>
+					</li>
+
+					<li>
+						<a href="http://prebi.unlp.edu.ar" target="_blank">http://prebi.unlp.edu.ar</a>
+						<p>Sitio principal del Proyecto de Enlace de Bibliotecas (PrEBi),
+							donde se puede solicitar bibliografía de difícil acceso a través
+							de las diferentes bibliotecas integrantes del Proyecto LibLink
+							(ISTEC).</p>
+					</li>
+
+					<li>
+						<a href="http://www.roble.unlp.edu.ar" target="_blank">http://www.roble.unlp.edu.ar</a>
+						<p>Sitio de ROBLE, portal de bibliotecas de la Universidad Nacional de La Plata.</p>
+					</li>
+					<a href="http://www.unlp.edu.ar/propiedadintelectual" target="_blank">http://www.unlp.edu.ar/propiedadintelectual</a>
+					<p>Dirección de Propiedad Intelectual (DPI) de la UNLP. La Dirección
+					brinda asesoramiento jurídico especializado, realiza trámites de
+					registro de PI pertenecientes a la universidad e interviene en la
+					gestión y negociación de contratos de transferencia de tecnología,
+					entre otras funciones.</p>
+
+					<li>
+						<a href="http://www.lapalabra.unlp.edu.ar" target="_blank">http://www.lapalabra.unlp.edu.ar</a>
+						<p>Blog de La Palabra Universitaria, publicación mensual de la
+							UNLP. La misma se edita desde el 2005 y se distribuye en papel el
+							segundo domingo de cada mes junto con el diario platense El Día.</p>
+					</li>
+					
+					<li>
+						<a href="http://www.editorial.unlp.edu.ar/" target="_blank">http://www.editorial.unlp.edu.ar/</a>
+						<p>Editorial de la Universidad Nacional de La Plata</p>
+					</li>
+				</ul>
+
+				<h1>Iniciativa Open Archives</h1>
+				<ul>
+
+					<li>
+						<a href="http://www.openarchives.org" target="_blank">http://www.openarchives.org</a>
+						<p>Sitio de la Iniciativa Open Archives. La iniciativa propone
+							estándares de interoperabilidad para el acceso a documentos en
+							forma abierta entre bibliotecas digitales. Allí se pueden
+							encontrar especificaciones sobre el protocolo OAI-PMH para la
+							recolección de metadatos ('harvesting''), entre otros.</p>
+					</li>
+
+					<li>
+						<a href="http://www.oaister.org/" target="_blank">http://www.oaister.org/</a>
+						<p>Sitio de la base de datos OAIster. La misma se compone de más
+							de 25 millones de registros de acceso abierto obtenidos mediante
+							el protocolo OAI-PMH. Incluye contenidos de muy variado tipo como
+							textos digitales, artículos, libros y otros escaneados, videos,
+							imágenes, etc.</p>
+					</li>
+				</ul>
+
+				<h1>Sitios de Tesis</h1>
+				<ul>
+
+					<li>
+						<a href="http://www.tdx.cat" target="_blank">http://www.tdx.cat</a>
+						<p>Tesis Doctorales en Red. Repositorio cooperativo que contiene
+							más de 10.000 tesis a texto completo, depositadas en las
+							univerdades participantes (entre otras, la Autonóma de Barcelona,
+							Ramón Llull, Jaume I, Murcia y Valencia) y referencias a más de
+							22.000 obtenidas por OAI-PMH.</p>
+					</li>
+
+					<li>
+						<a href="http://bib.cervantesvirtual.com/tesis/" target="_blank">http://bib.cervantesvirtual.com/tesis/</a>
+						<p>Tesis en la Biblioteca Virtual Cervantes. Se alojan tesis de
+							diversas univerdades españolas y europeas, disponibles en PDF.
+							Las mismas pueden buscarse por autor, por universidad o por
+							materia (mediante las clasificaciones de la UNESCO y CDU).</p>
+					</li>
+
+					<li>
+						<a href="http://www.ndltd.org" target="_blank">http://www.ndltd.org</a>
+						<p>Sitio de Networked Digital Library of Theses and Dissertations
+							(NDLTD). Organización internacional dedicada al uso, creación,
+							diseminación y preservación de tesis y disertaciones
+							electrónicas.</p>
+					</li>
+
+					<li>
+						<a href="http://www.virginia.edu" target="_blank">http://www.virginia.edu</a>
+						<p>Sitio de la Universidad de Virginia (USA), precursora en
+							proyectos de ETD (electronic theses and dissertations).</p>
+					</li>
+
+					<li>
+						<a href="http://www.ucm.es/BUCM/" target="_blank">http://www.ucm.es/BUCM/</a>
+						<p>Biblioteca de la Universidad Complutense de Madrid (España). Portal de tesis digitales de REBIUN. 
+							Contiene información y acceso a tesis en el ámbito hispánico.</p>
+					</li>
+
+					<li>
+						<a href="http://www.cybertesis.cl/" target="_blank">http://www.cybertesis.cl</a>
+						<p>Portal de tesis electrónicas. Cybertesis es una herramienta de
+							búsqueda de tesis electrónicas de diversas universidades
+							desarrollada por la Universidad de Chile. </p>
+					</li>
+				</ul>
+
+				<h1>Otros links</h1>
+
+				<ul>
+					<li>
+						<a href="http://www.rebiun.org" target="_blank">http://www.rebiun.org</a>
+						<p>Sitio de la Red de Bibliotecas Universitarias (REBIUN) de
+							España. REBIUN es un organismo que nuclea a todas las bibliotecas
+							universitarias españolas, compuesto por diferentes grupos de
+							trabajo (Catálogo Colectivo, Préstamo Interbibliotecario,
+							Patrimonio Bibliográfico, entre otros).</p>
+					</li>
+
+					<li>
+						<a href="http://www.ibict.br" target="_blank">http://www.ibict.br</a>
+						<p>Sitio del Instituto Brasileiro de Informação em Ciência e
+							Tecnologia (IBICT). EL IBICT promueve la competencia, desarrollo
+							de recursos y la infraestructura de información en ciencia y
+							tecnología para la producción, la socialización y la integración
+							de conocimientos científicos y tecnológicos.</p>
+					</li>
+				</ul> 				
+			</div>
+		</div>
+	</body>
+
+</document>

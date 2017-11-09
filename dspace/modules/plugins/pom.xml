@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>plugins</artifactId>
+    <packaging>jar</packaging>
+    <name>plugins</name>
+
+    <parent>
+        <artifactId>dspace-sedici</artifactId>
+        <groupId>ar.edu.unlp.sedici</groupId>
+        <relativePath>../</relativePath>
+        <version>1.8.2</version>
+    </parent>
+
+    
+    <dependencies>
+    	<dependency>
+			<groupId>ar.edu.unlp.sedici</groupId>
+			<artifactId>sedici2003-api</artifactId>
+			<version>1.8.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+		
+		
+        <dependency>
+        	<!-- Esta dependencia es por xmlworkflow ... -->
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+        	<!-- Esta dependencia es por las extensiones para xoai ... -->
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xoai-api</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+        
+		</plugins>
+    </build>
+
+</project>

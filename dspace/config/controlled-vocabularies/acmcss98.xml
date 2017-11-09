@@ -1,0 +1,2925 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+The ACM Computing Classification System [1998 Version] 
+
+Copyright 2006, by the Association for Computing Machinery, Inc. Permission to make digital or hard copies of part or all of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. To copy otherwise, to republish, to post on servers, or to redistribute to lists, requires prior specific permission and/or a fee. Request permission to republish from: Publications Dept., ACM, Inc. Fax +1 (212) 869-0481 or E-mail permissions@acm.org. 
+
+This XML derivative of The ACM Computing Classification System [1998 Version] was made by the University of Minho <http://www.uminho.pt>, Department of Information Systems <http://www.dsi.uminho.pt> with ACM's permission. 
+For more information regarding the conversion, please contact the authors: Ana Alice Baptista <analice@dsi.uminho.pt>; Miguel Ferreira <mferreira@dsi.uminho.pt>; or refer to the Web site http://dspace-dev.dsi.uminho.pt:8080/en/addon_acmccs98.jsp. 
+
+For permission to use this version outside of the conditions stated above, please contact ACM. 
+-->
+<node id="acmccs98" label="ACMCCS98">
+	<isComposedBy>
+		<node id="A." label="General Literature">
+			<isComposedBy>
+				<node id="A.0" label="GENERAL">
+					<isComposedBy>
+						<node label="Biographies/autobiographies" id="A.0.0"/>
+						<node label="Conference proceedings" id="A.0.1"/>
+						<node label="General literary works (e.g., fiction, plays)" id="A.0.2"/>
+					</isComposedBy>
+				</node>
+				<node id="A.1" label="INTRODUCTORY AND SURVEY"/>
+				<node id="A.2" label="REFERENCE (e.g., dictionaries, encyclopedias, glossaries)"/>
+				<node id="A.m" label="MISCELLANEOUS"/>
+			</isComposedBy>
+		</node>
+		<node id="B." label="Hardware">
+			<isComposedBy>
+				<node id="B.0" label="GENERAL"/>
+				<node id="B.1" label="CONTROL STRUCTURES AND MICROPROGRAMMING">
+					<isRelatedTo>
+						<node id="D.3.2"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="B.1.0" label="General"/>
+						<node id="B.1.1" label="Control Design Styles">
+							<isComposedBy>
+								<node label="Hardwired control" id="B.1.1.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Microprogrammed logic arrays" id="B.1.1.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Writable control store" id="B.1.1.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.1.2" label="Control Structure Performance Analysis and Design Aids">
+							<isComposedBy>
+								<node label="Automatic synthesis" id="B.1.2.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Formal models" id="B.1.2.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Simulation" id="B.1.2.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.1.3" label="Control Structure Reliability, Testing, and Fault-Tolerance">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Diagnostics" id="B.1.3.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error-checking" id="B.1.3.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Redundant design" id="B.1.3.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Test generation" id="B.1.3.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.1.4" label="Microprogram Design Aids">
+							<isRelatedTo>
+								<node id="D.2.2"/>
+								<node id="D.2.4"/>
+								<node id="D.3.2"/>
+								<node id="D.3.4"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Firmware engineering" id="B.1.4.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Languages and compilers" id="B.1.4.1"/>
+								<node label="Machine-independent microcode generation" id="B.1.4.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Optimization" id="B.1.4.3"/>
+								<node label="Verification" id="B.1.4.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.1.5" label="Microcode Applications">
+							<isComposedBy>
+								<node label="Direct data manipulation" id="B.1.5.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Firmware support of operating systems/instruction sets" id="B.1.5.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Instruction set interpretation" id="B.1.5.2"/>
+								<node label="Peripheral control" id="B.1.5.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Special-purpose" id="B.1.5.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.1.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="B.2" label="ARITHMETIC AND LOGIC STRUCTURES">
+					<isComposedBy>
+						<node id="B.2.0" label="General"/>
+						<node id="B.2.1" label="Design Styles">
+							<isRelatedTo>
+								<node id="C.1.1"/>
+								<node id="C.1.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Calculator" id="B.2.1.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Parallel" id="B.2.1.1"/>
+								<node label="Pipeline" id="B.2.1.2"/>
+							</isComposedBy>
+						</node>
+						<node id="B.2.2" label="Performance Analysis and Design Aids">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Simulation" id="B.2.2.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Verification" id="B.2.2.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Worst-case analysis" id="B.2.2.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.2.3" label="Reliability, Testing, and Fault-Tolerance">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Diagnostics" id="B.2.3.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error-checking" id="B.2.3.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Redundant design" id="B.2.3.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Test generation" id="B.2.3.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.2.4" label="High-Speed Arithmetic">
+							<isComposedBy>
+								<node label="Algorithms" id="B.2.4.0"/>
+								<node label="Cost/performance" id="B.2.4.1"/>
+							</isComposedBy>
+						</node>
+						<node id="B.2.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="B.3" label="MEMORY STRUCTURES">
+					<isComposedBy>
+						<node id="B.3.0" label="General"/>
+						<node id="B.3.1" label="Semiconductor Memories">
+							<isRelatedTo>
+								<node id="B.7.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Dynamic memory (DRAM)" id="B.3.1.0"/>
+								<node label="Read-only memory (ROM)" id="B.3.1.1"/>
+								<node label="Static memory (SRAM)" id="B.3.1.2"/>
+							</isComposedBy>
+						</node>
+						<node id="B.3.2" label="Design Styles">
+							<isRelatedTo>
+								<node id="D.4.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Associative memories" id="B.3.2.0"/>
+								<node label="Cache memories" id="B.3.2.1"/>
+								<node label="Interleaved memories" id="B.3.2.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Mass storage (e.g., magnetic, optical, RAID)" id="B.3.2.3"/>
+								<node label="Primary memory" id="B.3.2.4"/>
+								<node label="Sequential-access memory" id="B.3.2.5">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Shared memory" id="B.3.2.6"/>
+								<node label="Virtual memory" id="B.3.2.7"/>
+							</isComposedBy>
+						</node>
+						<node id="B.3.3" label="Performance Analysis and Design Aids">
+							<isRelatedTo>
+								<node id="B.8"/>
+								<node id="C.4"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Formal models" id="B.3.3.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Simulation" id="B.3.3.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Worst-case analysis" id="B.3.3.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.3.4" label="Reliability, Testing, and Fault-Tolerance">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Diagnostics" id="B.3.4.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error-checking" id="B.3.4.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Redundant design" id="B.3.4.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Test generation" id="B.3.4.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.3.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="B.4" label="INPUT/OUTPUT AND DATA COMMUNICATIONS">
+					<isComposedBy>
+						<node id="B.4.0" label="General"/>
+						<node id="B.4.1" label="Data Communications Devices">
+							<isComposedBy>
+								<node label="Processors" id="B.4.1.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Receivers (e.g., voice, data, image)" id="B.4.1.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Transmitters" id="B.4.1.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.4.2" label="Input/Output Devices">
+							<isComposedBy>
+								<node label="Channels and controllers" id="B.4.2.0"/>
+								<node label="Data terminals and printers" id="B.4.2.1"/>
+								<node label="Image display" id="B.4.2.2"/>
+								<node label="Voice" id="B.4.2.3"/>
+							</isComposedBy>
+						</node>
+						<node id="B.4.3" label="Interconnections (Subsystems)">
+							<isComposedBy>
+								<node label="Asynchronous/synchronous operation" id="B.4.3.0"/>
+								<node label="Fiber optics" id="B.4.3.1"/>
+								<node label="Interfaces" id="B.4.3.2"/>
+								<node label="Parallel I/O" id="B.4.3.3"/>
+								<node label="Physical structures (e.g., backplanes, cables, chip carriers)" id="B.4.3.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Topology (e.g., bus, point-to-point)" id="B.4.3.5"/>
+							</isComposedBy>
+						</node>
+						<node id="B.4.4" label="Performance Analysis and Design Aids">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Formal models" id="B.4.4.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Simulation" id="B.4.4.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Verification" id="B.4.4.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Worst-case analysis" id="B.4.4.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.4.5" label="Reliability, Testing, and Fault-Tolerance">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Built-in tests" id="B.4.5.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Diagnostics" id="B.4.5.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error-checking" id="B.4.5.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Hardware reliability" id="B.4.5.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Redundant design" id="B.4.5.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Test generation" id="B.4.5.5">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.4.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="B.5" label="REGISTER-TRANSFER-LEVEL IMPLEMENTATION">
+					<isComposedBy>
+						<node id="B.5.0" label="General"/>
+						<node id="B.5.1" label="Design">
+							<isComposedBy>
+								<node label="Arithmetic and logic units" id="B.5.1.0"/>
+								<node label="Control design" id="B.5.1.1"/>
+								<node label="Data-path design" id="B.5.1.2"/>
+								<node label="Memory design" id="B.5.1.3"/>
+								<node label="Styles (e.g., parallel, pipeline, special-purpose)" id="B.5.1.4"/>
+							</isComposedBy>
+						</node>
+						<node id="B.5.2" label="Design Aids">
+							<isComposedBy>
+								<node label="Automatic synthesis" id="B.5.2.0"/>
+								<node label="Hardware description languages" id="B.5.2.1"/>
+								<node label="Optimization" id="B.5.2.2"/>
+								<node label="Simulation" id="B.5.2.3"/>
+								<node label="Verification" id="B.5.2.4"/>
+							</isComposedBy>
+						</node>
+						<node id="B.5.3" label="Reliability and Testing">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Built-in tests" id="B.5.3.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error-checking" id="B.5.3.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Redundant design" id="B.5.3.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Test generation" id="B.5.3.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Testability" id="B.5.3.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.5.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="B.6" label="LOGIC DESIGN">
+					<isComposedBy>
+						<node id="B.6.0" label="General"/>
+						<node id="B.6.1" label="Design Styles">
+							<isComposedBy>
+								<node label="Cellular arrays and automata" id="B.6.1.0"/>
+								<node label="Combinational logic" id="B.6.1.1"/>
+								<node label="Logic arrays" id="B.6.1.2"/>
+								<node label="Memory control and access" id="B.6.1.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Memory used as logic" id="B.6.1.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Parallel circuits" id="B.6.1.5"/>
+								<node label="Sequential circuits" id="B.6.1.6"/>
+							</isComposedBy>
+						</node>
+						<node id="B.6.2" label="Reliability and Testing">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Built-in tests" id="B.6.2.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error-checking" id="B.6.2.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Redundant design" id="B.6.2.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Test generation" id="B.6.2.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Testability" id="B.6.2.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.6.3" label="Design Aids">
+							<isComposedBy>
+								<node label="Automatic synthesis" id="B.6.3.0"/>
+								<node label="Hardware description languages" id="B.6.3.1"/>
+								<node label="Optimization" id="B.6.3.2"/>
+								<node label="Simulation" id="B.6.3.3"/>
+								<node label="Switching theory" id="B.6.3.4"/>
+								<node label="Verification" id="B.6.3.5"/>
+							</isComposedBy>
+						</node>
+						<node id="B.6.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="B.7" label="INTEGRATED CIRCUITS">
+					<isComposedBy>
+						<node id="B.7.0" label="General"/>
+						<node id="B.7.1" label="Types and Design Styles">
+							<isComposedBy>
+								<node label="Advanced technologies" id="B.7.1.0"/>
+								<node label="Algorithms implemented in hardware" id="B.7.1.1"/>
+								<node label="Gate arrays" id="B.7.1.2"/>
+								<node label="Input/output circuits" id="B.7.1.3"/>
+								<node label="Memory technologies" id="B.7.1.4"/>
+								<node label="Microprocessors and microcomputers" id="B.7.1.5"/>
+								<node label="Standard cells" id="B.7.1.6">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="VLSI (very large scale integration)" id="B.7.1.7"/>
+							</isComposedBy>
+						</node>
+						<node id="B.7.2" label="Design Aids">
+							<isComposedBy>
+								<node label="Graphics" id="B.7.2.0"/>
+								<node label="Layout" id="B.7.2.1"/>
+								<node label="Placement and routing" id="B.7.2.2"/>
+								<node label="Simulation" id="B.7.2.3"/>
+								<node label="Verification" id="B.7.2.4"/>
+							</isComposedBy>
+						</node>
+						<node id="B.7.3" label="Reliability and Testing">
+							<isRelatedTo>
+								<node id="B.8"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Built-in tests" id="B.7.3.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error-checking" id="B.7.3.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Redundant design" id="B.7.3.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Test generation" id="B.7.3.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Testability" id="B.7.3.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="B.7.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="B.8" label="PERFORMANCE AND RELIABILITY">
+					<isRelatedTo>
+						<node id="C.4"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="B.8.0" label="General"/>
+						<node id="B.8.1" label="Reliability, Testing, and Fault-Tolerance"/>
+						<node id="B.8.2" label="Performance Analysis and Design Aids"/>
+						<node id="B.8.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="B.m" label="MISCELLANEOUS">
+					<isComposedBy>
+						<node label="Design management" id="B.m.0"/>
+					</isComposedBy>
+				</node>
+			</isComposedBy>
+		</node>
+		<node id="C." label="Computer Systems Organization">
+			<isComposedBy>
+				<node id="C.0" label="GENERAL">
+					<isComposedBy>
+						<node label="Hardware/software interfaces" id="C.0.0"/>
+						<node label="Instruction set design (e.g., RISC, CISC, VLIW)" id="C.0.1"/>
+						<node label="Modeling of computer architecture" id="C.0.2"/>
+						<node label="System architectures" id="C.0.3"/>
+						<node label="Systems specification methodology" id="C.0.4"/>
+					</isComposedBy>
+				</node>
+				<node id="C.1" label="PROCESSOR ARCHITECTURES">
+					<isComposedBy>
+						<node id="C.1.0" label="General"/>
+						<node id="C.1.1" label="Single Data Stream Architectures">
+							<isComposedBy>
+								<node label="Multiple-instruction-stream, single-data-stream processors (MISD)" id="C.1.1.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Pipeline processors" id="C.1.1.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="RISC/CISC, VLIW architectures" id="C.1.1.2"/>
+								<node label="Single-instruction-stream, single-data-stream processors (SISD)" id="C.1.1.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Von Neumann architectures" id="C.1.1.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="C.1.2" label="Multiple Data Stream Architectures (Multiprocessors)">
+							<isComposedBy>
+								<node label="Array and vector processors" id="C.1.2.0"/>
+								<node label="Associative processors" id="C.1.2.1"/>
+								<node label="Connection machines" id="C.1.2.2"/>
+								<node label="Interconnection architectures (e.g., common bus, multiport memory, crossbar switch)" id="C.1.2.3"/>
+								<node label="Multiple-instruction-stream, multiple-data-stream processors (MIMD)" id="C.1.2.4"/>
+								<node label="Parallel processors" id="C.1.2.5">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Pipeline processors" id="C.1.2.6">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Single-instruction-stream, multiple-data-stream processors (SIMD)" id="C.1.2.7"/>
+							</isComposedBy>
+						</node>
+						<node id="C.1.3" label="Other Architecture Styles">
+							<isComposedBy>
+								<node label="Adaptable architectures" id="C.1.3.0"/>
+								<node label="Analog computers" id="C.1.3.1"/>
+								<node label="Capability architectures" id="C.1.3.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Cellular architecture (e.g., mobile)" id="C.1.3.3"/>
+								<node label="Data-flow architectures" id="C.1.3.4"/>
+								<node label="Heterogeneous (hybrid) systems" id="C.1.3.5"/>
+								<node label="High-level language architectures" id="C.1.3.6">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Neural nets" id="C.1.3.7"/>
+								<node label="Pipeline processors" id="C.1.3.8"/>
+								<node label="Stack-oriented processors" id="C.1.3.9">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="C.1.4" label="Parallel Architectures">
+							<isComposedBy>
+								<node label="Distributed architectures" id="C.1.4.0"/>
+								<node label="Mobile processors" id="C.1.4.1"/>
+							</isComposedBy>
+						</node>
+						<node id="C.1.m" label="Miscellaneous">
+							<isComposedBy>
+								<node label="Analog computers" id="C.1.m.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Hybrid systems" id="C.1.m.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="C.2" label="COMPUTER-COMMUNICATION NETWORKS">
+					<isComposedBy>
+						<node id="C.2.0" label="General">
+							<isComposedBy>
+								<node label="Data communications" id="C.2.0.0"/>
+								<node label="Open Systems Interconnection reference model (OSI)" id="C.2.0.1"/>
+								<node label="Security and protection (e.g., firewalls)" id="C.2.0.2"/>
+							</isComposedBy>
+						</node>
+						<node id="C.2.1" label="Network Architecture and Design">
+							<isComposedBy>
+								<node label="Asynchronous Transfer Mode (ATM)" id="C.2.1.0"/>
+								<node label="Centralized networks" id="C.2.1.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Circuit-switching networks" id="C.2.1.2"/>
+								<node label="Distributed networks" id="C.2.1.3"/>
+								<node label="Frame relay networks" id="C.2.1.4"/>
+								<node label="ISDN (Integrated Services Digital Network)" id="C.2.1.5"/>
+								<node label="Network communications" id="C.2.1.6"/>
+								<node label="Network topology" id="C.2.1.7"/>
+								<node label="Packet-switching networks" id="C.2.1.8"/>
+								<node label="Store and forward networks" id="C.2.1.9"/>
+								<node label="Wireless communication" id="C.2.1.10"/>
+							</isComposedBy>
+						</node>
+						<node id="C.2.2" label="Network Protocols">
+							<isComposedBy>
+								<node label="Applications (SMTP, FTP, etc.)" id="C.2.2.0"/>
+								<node label="Protocol architecture (OSI model)" id="C.2.2.1"/>
+								<node label="Protocol verification" id="C.2.2.2"/>
+								<node label="Routing protocols" id="C.2.2.3"/>
+							</isComposedBy>
+						</node>
+						<node id="C.2.3" label="Network Operations">
+							<isComposedBy>
+								<node label="Network management" id="C.2.3.0"/>
+								<node label="Network monitoring" id="C.2.3.1"/>
+								<node label="Public networks" id="C.2.3.2"/>
+							</isComposedBy>
+						</node>
+						<node id="C.2.4" label="Distributed Systems">
+							<isComposedBy>
+								<node label="Client/server" id="C.2.4.0"/>
+								<node label="Distributed applications" id="C.2.4.1"/>
+								<node label="Distributed databases" id="C.2.4.2"/>
+								<node label="Network operating systems" id="C.2.4.3"/>
+							</isComposedBy>
+						</node>
+						<node id="C.2.5" label="Local and Wide-Area Networks">
+							<isComposedBy>
+								<node label="Access schemes" id="C.2.5.0"/>
+								<node label="Buses" id="C.2.5.1"/>
+								<node label="Ethernet (e.g., CSMA/CD)" id="C.2.5.2"/>
+								<node label="High-speed (e.g., FDDI, fiber channel, ATM)" id="C.2.5.3"/>
+								<node label="Internet (e.g., TCP/IP)" id="C.2.5.4"/>
+								<node label="Token rings" id="C.2.5.5"/>
+							</isComposedBy>
+						</node>
+						<node id="C.2.6" label="Internetworking">
+							<isRelatedTo>
+								<node id="C.2.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Routers" id="C.2.6.0"/>
+								<node label="Standards (e.g., TCP/IP)" id="C.2.6.1"/>
+							</isComposedBy>
+						</node>
+						<node id="C.2.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="C.3" label="SPECIAL-PURPOSE AND APPLICATION-BASED SYSTEMS">
+					<isRelatedTo>
+						<node id="J.7"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node label="Microprocessor/microcomputer applications" id="C.3.0"/>
+						<node label="Process control systems" id="C.3.1"/>
+						<node label="Real-time and embedded systems" id="C.3.2"/>
+						<node label="Signal processing systems" id="C.3.3"/>
+						<node label="Smartcards" id="C.3.4"/>
+					</isComposedBy>
+				</node>
+				<node id="C.4" label="PERFORMANCE OF SYSTEMS">
+					<isComposedBy>
+						<node label="Design studies" id="C.4.0"/>
+						<node label="Fault tolerance" id="C.4.1"/>
+						<node label="Measurement techniques" id="C.4.2"/>
+						<node label="Modeling techniques" id="C.4.3"/>
+						<node label="Performance attributes" id="C.4.4"/>
+						<node label="Reliability, availability, and serviceability" id="C.4.5"/>
+					</isComposedBy>
+				</node>
+				<node id="C.5" label="COMPUTER SYSTEM IMPLEMENTATION">
+					<isComposedBy>
+						<node id="C.5.0" label="General"/>
+						<node id="C.5.1" label="Large and Medium (``Mainframe'') Computers">
+							<isComposedBy>
+								<node label="Super (very large) computers" id="C.5.1.0"/>
+							</isComposedBy>
+						</node>
+						<node id="C.5.2" label="Minicomputers">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node id="C.5.3" label="Microcomputers">
+							<isComposedBy>
+								<node label="Microprocessors" id="C.5.3.0"/>
+								<node label="Personal computers" id="C.5.3.1"/>
+								<node label="Portable devices (e.g., laptops, personal digital assistants)" id="C.5.3.2"/>
+								<node label="Workstations" id="C.5.3.3"/>
+							</isComposedBy>
+						</node>
+						<node id="C.5.4" label="VLSI Systems"/>
+						<node id="C.5.5" label="Servers"/>
+						<node id="C.5.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="C.m" label="MISCELLANEOUS"/>
+			</isComposedBy>
+		</node>
+		<node id="D." label="Software">
+			<isComposedBy>
+				<node id="D.0" label="GENERAL"/>
+				<node id="D.1" label="PROGRAMMING TECHNIQUES">
+					<isRelatedTo>
+						<node id="E."/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="D.1.0" label="General"/>
+						<node id="D.1.1" label="Applicative (Functional) Programming"/>
+						<node id="D.1.2" label="Automatic Programming">
+							<isRelatedTo>
+								<node id="I.2.2"/>
+							</isRelatedTo>
+						</node>
+						<node id="D.1.3" label="Concurrent Programming">
+							<isComposedBy>
+								<node label="Distributed programming" id="D.1.3.0"/>
+								<node label="Parallel programming" id="D.1.3.1"/>
+							</isComposedBy>
+						</node>
+						<node id="D.1.4" label="Sequential Programming"/>
+						<node id="D.1.5" label="Object-oriented Programming"/>
+						<node id="D.1.6" label="Logic Programming"/>
+						<node id="D.1.7" label="Visual Programming"/>
+						<node id="D.1.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="D.2" label="SOFTWARE ENGINEERING">
+					<isRelatedTo>
+						<node id="K.6.3"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="D.2.0" label="General">
+							<isRelatedTo>
+								<node id="K.5.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Protection mechanisms" id="D.2.0.0"/>
+								<node label="Standards" id="D.2.0.1"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.1" label="Requirements/Specifications">
+							<isRelatedTo>
+								<node id="D.3.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Elicitation methods (e.g., rapid prototyping, interviews, JAD)" id="D.2.1.0"/>
+								<node label="Languages" id="D.2.1.1"/>
+								<node label="Methodologies (e.g., object-oriented, structured)" id="D.2.1.2"/>
+								<node label="Tools" id="D.2.1.3"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.2" label="Design Tools and Techniques">
+							<isComposedBy>
+								<node label="Computer-aided software engineering (CASE)" id="D.2.2.0"/>
+								<node label="Decision tables" id="D.2.2.1"/>
+								<node label="Evolutionary prototyping" id="D.2.2.2"/>
+								<node label="Flow charts" id="D.2.2.3"/>
+								<node label="Modules and interfaces" id="D.2.2.4"/>
+								<node label="Object-oriented design methods" id="D.2.2.5"/>
+								<node label="Petri nets" id="D.2.2.6"/>
+								<node label="Programmer workbench" id="D.2.2.7">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Software libraries" id="D.2.2.8"/>
+								<node label="State diagrams" id="D.2.2.9"/>
+								<node label="Structured programming" id="D.2.2.10">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Top-down programming" id="D.2.2.11">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="User interfaces" id="D.2.2.12"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.3" label="Coding Tools and Techniques">
+							<isComposedBy>
+								<node label="Object-oriented programming" id="D.2.3.0"/>
+								<node label="Pretty printers" id="D.2.3.1"/>
+								<node label="Program editors" id="D.2.3.2"/>
+								<node label="Reentrant code" id="D.2.3.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Standards" id="D.2.3.4"/>
+								<node label="Structured programming" id="D.2.3.5"/>
+								<node label="Top-down programming" id="D.2.3.6"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.4" label="Software/Program Verification">
+							<isRelatedTo>
+								<node id="F.3.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Assertion checkers" id="D.2.4.0"/>
+								<node label="Class invariants" id="D.2.4.1"/>
+								<node label="Correctness proofs" id="D.2.4.2"/>
+								<node label="Formal methods" id="D.2.4.3"/>
+								<node label="Model checking" id="D.2.4.4"/>
+								<node label="Programming by contract" id="D.2.4.5"/>
+								<node label="Reliability" id="D.2.4.6"/>
+								<node label="Statistical methods" id="D.2.4.7"/>
+								<node label="Validation" id="D.2.4.8"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.5" label="Testing and Debugging">
+							<isComposedBy>
+								<node label="Code inspections and walk-throughs" id="D.2.5.0"/>
+								<node label="Debugging aids" id="D.2.5.1"/>
+								<node label="Diagnostics" id="D.2.5.2"/>
+								<node label="Distributed debugging" id="D.2.5.3"/>
+								<node label="Dumps" id="D.2.5.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error handling and recovery" id="D.2.5.5"/>
+								<node label="Monitors" id="D.2.5.6"/>
+								<node label="Symbolic execution" id="D.2.5.7"/>
+								<node label="Testing tools (e.g., data generators, coverage testing)" id="D.2.5.8"/>
+								<node label="Tracing" id="D.2.5.9"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.6" label="Programming Environments">
+							<isComposedBy>
+								<node label="Graphical environments" id="D.2.6.0"/>
+								<node label="Integrated environments" id="D.2.6.1"/>
+								<node label="Interactive environments" id="D.2.6.2"/>
+								<node label="Programmer workbench" id="D.2.6.3"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.7" label="Distribution, Maintenance, and Enhancement">
+							<isComposedBy>
+								<node label="Corrections" id="D.2.7.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Documentation" id="D.2.7.1"/>
+								<node label="Enhancement" id="D.2.7.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Extensibility" id="D.2.7.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Portability" id="D.2.7.4"/>
+								<node label="Restructuring, reverse engineering, and reengineering" id="D.2.7.5"/>
+								<node label="Version control" id="D.2.7.6"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.8" label="Metrics">
+							<isRelatedTo>
+								<node id="D.4.8"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Complexity measures" id="D.2.8.0"/>
+								<node label="Performance measures" id="D.2.8.1"/>
+								<node label="Process metrics" id="D.2.8.2"/>
+								<node label="Product metrics" id="D.2.8.3"/>
+								<node label="Software science" id="D.2.8.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="D.2.9" label="Management">
+							<isRelatedTo>
+								<node id="K.6.3"/>
+								<node id="K.6.4"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Copyrights" id="D.2.9.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Cost estimation" id="D.2.9.1"/>
+								<node label="Life cycle" id="D.2.9.2"/>
+								<node label="Productivity" id="D.2.9.3"/>
+								<node label="Programming teams" id="D.2.9.4"/>
+								<node label="Software configuration management" id="D.2.9.5"/>
+								<node label="Software process models (e.g., CMM, ISO, PSP)" id="D.2.9.6"/>
+								<node label="Software quality assurance (SQA)" id="D.2.9.7"/>
+								<node label="Time estimation" id="D.2.9.8"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.10" label="Design">
+							<isRelatedTo>
+								<node id="D.2.2"/>
+							</isRelatedTo>
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+							<isComposedBy>
+								<node label="Methodologies" id="D.2.10.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Representation" id="D.2.10.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="D.2.11" label="Software Architectures">
+							<isComposedBy>
+								<node label="Data abstraction" id="D.2.11.0"/>
+								<node label="Domain-specific architectures" id="D.2.11.1"/>
+								<node label="Information hiding" id="D.2.11.2"/>
+								<node label="Languages (e.g., description, interconnection, definition)" id="D.2.11.3"/>
+								<node label="Patterns (e.g., client/server, pipeline, blackboard)" id="D.2.11.4"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.12" label="Interoperability">
+							<isComposedBy>
+								<node label="Data mapping" id="D.2.12.0"/>
+								<node label="Distributed objects" id="D.2.12.1"/>
+								<node label="Interface definition languages" id="D.2.12.2"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.13" label="Reusable Software">
+							<isComposedBy>
+								<node label="Domain engineering" id="D.2.13.0"/>
+								<node label="Reusable libraries" id="D.2.13.1"/>
+								<node label="Reuse models" id="D.2.13.2"/>
+							</isComposedBy>
+						</node>
+						<node id="D.2.m" label="Miscellaneous">
+							<isComposedBy>
+								<node label="Rapid prototyping" id="D.2.m.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Reusable software" id="D.2.m.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="D.3" label="PROGRAMMING LANGUAGES">
+					<isComposedBy>
+						<node id="D.3.0" label="General">
+							<isComposedBy>
+								<node label="Standards" id="D.3.0.0"/>
+							</isComposedBy>
+						</node>
+						<node id="D.3.1" label="Formal Definitions and Theory">
+							<isRelatedTo>
+								<node id="D.2.1"/>
+								<node id="F.3.1"/>
+								<node id="F.3.2"/>
+								<node id="F.4.2"/>
+								<node id="F.4.3"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Semantics" id="D.3.1.0"/>
+								<node label="Syntax" id="D.3.1.1"/>
+							</isComposedBy>
+						</node>
+						<node id="D.3.2" label="Language Classifications">
+							<isComposedBy>
+								<node label="Applicative (functional) languages" id="D.3.2.0"/>
+								<node label="Concurrent, distributed, and parallel languages" id="D.3.2.1"/>
+								<node label="Constraint and logic languages" id="D.3.2.2"/>
+								<node label="Data-flow languages" id="D.3.2.3"/>
+								<node label="Design languages" id="D.3.2.4"/>
+								<node label="Extensible languages" id="D.3.2.5"/>
+								<node label="Macro and assembly languages" id="D.3.2.6"/>
+								<node label="Microprogramming languages" id="D.3.2.7">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Multiparadigm languages" id="D.3.2.8"/>
+								<node label="Nondeterministic languages" id="D.3.2.9">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Nonprocedural languages" id="D.3.2.10">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Object-oriented languages" id="D.3.2.11"/>
+								<node label="Specialized application languages" id="D.3.2.12"/>
+								<node label="Very high-level languages" id="D.3.2.13"/>
+							</isComposedBy>
+						</node>
+						<node id="D.3.3" label="Language Constructs and Features">
+							<isRelatedTo>
+								<node id="E.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Abstract data types" id="D.3.3.0"/>
+								<node label="Classes and objects" id="D.3.3.1"/>
+								<node label="Concurrent programming structures" id="D.3.3.2"/>
+								<node label="Constraints" id="D.3.3.3"/>
+								<node label="Control structures" id="D.3.3.4"/>
+								<node label="Coroutines" id="D.3.3.5"/>
+								<node label="Data types and structures" id="D.3.3.6"/>
+								<node label="Dynamic storage management" id="D.3.3.7"/>
+								<node label="Frameworks" id="D.3.3.8"/>
+								<node label="Inheritance" id="D.3.3.9"/>
+								<node label="Input/output" id="D.3.3.10"/>
+								<node label="Modules, packages" id="D.3.3.11"/>
+								<node label="Patterns" id="D.3.3.12"/>
+								<node label="Polymorphism" id="D.3.3.13"/>
+								<node label="Procedures, functions, and subroutines" id="D.3.3.14"/>
+								<node label="Recursion" id="D.3.3.15"/>
+							</isComposedBy>
+						</node>
+						<node id="D.3.4" label="Processors">
+							<isComposedBy>
+								<node label="Code generation" id="D.3.4.0"/>
+								<node label="Compilers" id="D.3.4.1"/>
+								<node label="Debuggers" id="D.3.4.2"/>
+								<node label="Incremental compilers" id="D.3.4.3"/>
+								<node label="Interpreters" id="D.3.4.4"/>
+								<node label="Memory management (garbage collection)" id="D.3.4.5"/>
+								<node label="Optimization" id="D.3.4.6"/>
+								<node label="Parsing" id="D.3.4.7"/>
+								<node label="Preprocessors" id="D.3.4.8"/>
+								<node label="Retargetable compilers" id="D.3.4.9"/>
+								<node label="Run-time environments" id="D.3.4.10"/>
+								<node label="Translator writing systems and compiler generators" id="D.3.4.11"/>
+							</isComposedBy>
+						</node>
+						<node id="D.3.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="D.4" label="OPERATING SYSTEMS">
+					<isRelatedTo>
+						<node id="C."/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="D.4.0" label="General"/>
+						<node id="D.4.1" label="Process Management">
+							<isComposedBy>
+								<node label="Concurrency" id="D.4.1.0"/>
+								<node label="Deadlocks" id="D.4.1.1"/>
+								<node label="Multiprocessing/multiprogramming/multitasking" id="D.4.1.2"/>
+								<node label="Mutual exclusion" id="D.4.1.3"/>
+								<node label="Scheduling" id="D.4.1.4"/>
+								<node label="Synchronization" id="D.4.1.5"/>
+								<node label="Threads" id="D.4.1.6"/>
+							</isComposedBy>
+						</node>
+						<node id="D.4.2" label="Storage Management">
+							<isComposedBy>
+								<node label="Allocation/deallocation strategies" id="D.4.2.0"/>
+								<node label="Distributed memories" id="D.4.2.1"/>
+								<node label="Garbage collection" id="D.4.2.2"/>
+								<node label="Main memory" id="D.4.2.3"/>
+								<node label="Secondary storage" id="D.4.2.4"/>
+								<node label="Segmentation" id="D.4.2.5">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Storage hierarchies" id="D.4.2.6"/>
+								<node label="Swapping" id="D.4.2.7">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Virtual memory" id="D.4.2.8"/>
+							</isComposedBy>
+						</node>
+						<node id="D.4.3" label="File Systems Management">
+							<isRelatedTo>
+								<node id="E.5"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Access methods" id="D.4.3.0"/>
+								<node label="Directory structures" id="D.4.3.1"/>
+								<node label="Distributed file systems" id="D.4.3.2"/>
+								<node label="File organization" id="D.4.3.3"/>
+								<node label="Maintenance" id="D.4.3.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="D.4.4" label="Communications Management">
+							<isRelatedTo>
+								<node id="C.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Buffering" id="D.4.4.0"/>
+								<node label="Input/output" id="D.4.4.1"/>
+								<node label="Message sending" id="D.4.4.2"/>
+								<node label="Network communication" id="D.4.4.3"/>
+								<node label="Terminal management" id="D.4.4.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="D.4.5" label="Reliability">
+							<isComposedBy>
+								<node label="Backup procedures" id="D.4.5.0"/>
+								<node label="Checkpoint/restart" id="D.4.5.1"/>
+								<node label="Fault-tolerance" id="D.4.5.2"/>
+								<node label="Verification" id="D.4.5.3"/>
+							</isComposedBy>
+						</node>
+						<node id="D.4.6" label="Security and Protection">
+							<isRelatedTo>
+								<node id="K.6.5"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Access controls" id="D.4.6.0"/>
+								<node label="Authentication" id="D.4.6.1"/>
+								<node label="Cryptographic controls" id="D.4.6.2"/>
+								<node label="Information flow controls" id="D.4.6.3"/>
+								<node label="Invasive software (e.g., viruses, worms, Trojan horses)" id="D.4.6.4"/>
+								<node label="Security kernels" id="D.4.6.5">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Verification" id="D.4.6.6">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="D.4.7" label="Organization and Design">
+							<isComposedBy>
+								<node label="Batch processing systems" id="D.4.7.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Distributed systems" id="D.4.7.1"/>
+								<node label="Hierarchical design" id="D.4.7.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Interactive systems" id="D.4.7.3"/>
+								<node label="Real-time systems and embedded systems" id="D.4.7.4"/>
+							</isComposedBy>
+						</node>
+						<node id="D.4.8" label="Performance">
+							<isRelatedTo>
+								<node id="C.4"/>
+								<node id="D.2.8"/>
+								<node id="I.6"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Measurements" id="D.4.8.0"/>
+								<node label="Modeling and prediction" id="D.4.8.1"/>
+								<node label="Monitors" id="D.4.8.2"/>
+								<node label="Operational analysis" id="D.4.8.3"/>
+								<node label="Queueing theory" id="D.4.8.4"/>
+								<node label="Simulation" id="D.4.8.5"/>
+								<node label="Stochastic analysis" id="D.4.8.6"/>
+							</isComposedBy>
+						</node>
+						<node id="D.4.9" label="Systems Programs and Utilities">
+							<isComposedBy>
+								<node label="Command and control languages" id="D.4.9.0"/>
+								<node label="Linkers" id="D.4.9.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Loaders" id="D.4.9.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Window managers" id="D.4.9.3"/>
+							</isComposedBy>
+						</node>
+						<node id="D.4.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="D.m" label="MISCELLANEOUS">
+					<isComposedBy>
+						<node label="Software psychology" id="D.m.0">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+					</isComposedBy>
+				</node>
+			</isComposedBy>
+		</node>
+		<node id="E." label="Data">
+			<isComposedBy>
+				<node id="E.0" label="GENERAL"/>
+				<node id="E.1" label="DATA STRUCTURES">
+					<isComposedBy>
+						<node label="Arrays" id="E.1.0"/>
+						<node label="Distributed data structures" id="E.1.1"/>
+						<node label="Graphs and networks" id="E.1.2"/>
+						<node label="Lists, stacks, and queues" id="E.1.3"/>
+						<node label="Records" id="E.1.4"/>
+						<node label="Tables" id="E.1.5">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node label="Trees" id="E.1.6"/>
+					</isComposedBy>
+				</node>
+				<node id="E.2" label="DATA STORAGE REPRESENTATIONS">
+					<isComposedBy>
+						<node label="Composite structures" id="E.2.0">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node label="Contiguous representations" id="E.2.1">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node label="Hash-table representations" id="E.2.2"/>
+						<node label="Linked representations" id="E.2.3"/>
+						<node label="Object representation" id="E.2.4"/>
+						<node label="Primitive data items" id="E.2.5">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="E.3" label="DATA ENCRYPTION">
+					<isComposedBy>
+						<node label="Code breaking" id="E.3.0"/>
+						<node label="Data encryption standard (DES)" id="E.3.1">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node label="Public key cryptosystems" id="E.3.2"/>
+						<node label="Standards (e.g., DES, PGP, RSA)" id="E.3.3"/>
+					</isComposedBy>
+				</node>
+				<node id="E.4" label="CODING AND INFORMATION THEORY">
+					<isRelatedTo>
+						<node id="H.1.1"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node label="Data compaction and compression" id="E.4.0"/>
+						<node label="Error control codes" id="E.4.1"/>
+						<node label="Formal models of communication" id="E.4.2"/>
+						<node label="Nonsecret encoding schemes" id="E.4.3">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="E.5" label="FILES">
+					<isRelatedTo>
+						<node id="D.4.3"/>
+						<node id="F.2.2"/>
+						<node id="H.2"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node label="Backup/recovery" id="E.5.0"/>
+						<node label="Optimization" id="E.5.1">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node label="Organization/structure" id="E.5.2"/>
+						<node label="Sorting/searching" id="E.5.3"/>
+					</isComposedBy>
+				</node>
+				<node id="E.m" label="MISCELLANEOUS"/>
+			</isComposedBy>
+		</node>
+		<node id="F." label="Theory of Computation">
+			<isComposedBy>
+				<node id="F.0" label="GENERAL"/>
+				<node id="F.1" label="COMPUTATION BY ABSTRACT DEVICES">
+					<isComposedBy>
+						<node id="F.1.0" label="General"/>
+						<node id="F.1.1" label="Models of Computation">
+							<isRelatedTo>
+								<node id="F.4.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Automata (e.g., finite, push-down, resource-bounded)" id="F.1.1.0"/>
+								<node label="Bounded-action devices (e.g., Turing machines, random access machines)" id="F.1.1.1"/>
+								<node label="Computability theory" id="F.1.1.2"/>
+								<node label="Relations between models" id="F.1.1.3"/>
+								<node label="Self-modifying machines (e.g., neural networks)" id="F.1.1.4"/>
+								<node label="Unbounded-action devices (e.g., cellular automata, circuits, networks of machines)" id="F.1.1.5"/>
+							</isComposedBy>
+						</node>
+						<node id="F.1.2" label="Modes of Computation">
+							<isComposedBy>
+								<node label="Alternation and nondeterminism" id="F.1.2.0"/>
+								<node label="Interactive and reactive computation" id="F.1.2.1"/>
+								<node label="Online computation" id="F.1.2.2"/>
+								<node label="Parallelism and concurrency" id="F.1.2.3"/>
+								<node label="Probabilistic computation" id="F.1.2.4"/>
+								<node label="Relations among modes" id="F.1.2.5">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Relativized computation" id="F.1.2.6"/>
+							</isComposedBy>
+						</node>
+						<node id="F.1.3" label="Complexity Measures and Classes">
+							<isRelatedTo>
+								<node id="F.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Complexity hierarchies" id="F.1.3.0"/>
+								<node label="Machine-independent complexity" id="F.1.3.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Reducibility and completeness" id="F.1.3.2"/>
+								<node label="Relations among complexity classes" id="F.1.3.3"/>
+								<node label="Relations among complexity measures" id="F.1.3.4"/>
+							</isComposedBy>
+						</node>
+						<node id="F.1.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="F.2" label="ANALYSIS OF ALGORITHMS AND PROBLEM COMPLEXITY">
+					<isRelatedTo>
+						<node id="B.6"/>
+						<node id="B.7"/>
+						<node id="F.1.3"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="F.2.0" label="General"/>
+						<node id="F.2.1" label="Numerical Algorithms and Problems">
+							<isRelatedTo>
+								<node id="G.1"/>
+								<node id="G.4"/>
+								<node id="I.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Computation of transforms (e.g., fast Fourier transform)" id="F.2.1.0"/>
+								<node label="Computations in finite fields" id="F.2.1.1"/>
+								<node label="Computations on matrices" id="F.2.1.2"/>
+								<node label="Computations on polynomials" id="F.2.1.3"/>
+								<node label="Number-theoretic computations (e.g., factoring, primality testing)" id="F.2.1.4"/>
+							</isComposedBy>
+						</node>
+						<node id="F.2.2" label="Nonnumerical Algorithms and Problems">
+							<isRelatedTo>
+								<node id="E.2"/>
+								<node id="E.3"/>
+								<node id="E.4"/>
+								<node id="E.5"/>
+								<node id="G.2"/>
+								<node id="H.2"/>
+								<node id="H.3"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Complexity of proof procedures" id="F.2.2.0"/>
+								<node label="Computations on discrete structures" id="F.2.2.1"/>
+								<node label="Geometrical problems and computations" id="F.2.2.2"/>
+								<node label="Pattern matching" id="F.2.2.3"/>
+								<node label="Routing and layout" id="F.2.2.4"/>
+								<node label="Sequencing and scheduling" id="F.2.2.5"/>
+								<node label="Sorting and searching" id="F.2.2.6"/>
+							</isComposedBy>
+						</node>
+						<node id="F.2.3" label="Tradeoffs between Complexity Measures">
+							<isRelatedTo>
+								<node id="F.1.3"/>
+							</isRelatedTo>
+						</node>
+						<node id="F.2.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="F.3" label="LOGICS AND MEANINGS OF PROGRAMS">
+					<isComposedBy>
+						<node id="F.3.0" label="General"/>
+						<node id="F.3.1" label="Specifying and Verifying and Reasoning about Programs">
+							<isRelatedTo>
+								<node id="D.2.1"/>
+								<node id="D.2.4"/>
+								<node id="D.3.1"/>
+								<node id="E.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Assertions" id="F.3.1.0"/>
+								<node label="Invariants" id="F.3.1.1"/>
+								<node label="Logics of programs" id="F.3.1.2"/>
+								<node label="Mechanical verification" id="F.3.1.3"/>
+								<node label="Pre- and post-conditions" id="F.3.1.4"/>
+								<node label="Specification techniques" id="F.3.1.5"/>
+							</isComposedBy>
+						</node>
+						<node id="F.3.2" label="Semantics of Programming Languages">
+							<isRelatedTo>
+								<node id="D.3.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Algebraic approaches to semantics" id="F.3.2.0"/>
+								<node label="Denotational semantics" id="F.3.2.1"/>
+								<node label="Operational semantics" id="F.3.2.2"/>
+								<node label="Partial evaluation" id="F.3.2.3"/>
+								<node label="Process models" id="F.3.2.4"/>
+								<node label="Program analysis" id="F.3.2.5"/>
+							</isComposedBy>
+						</node>
+						<node id="F.3.3" label="Studies of Program Constructs">
+							<isRelatedTo>
+								<node id="D.3.2"/>
+								<node id="D.3.3"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Control primitives" id="F.3.3.0"/>
+								<node label="Functional constructs" id="F.3.3.1"/>
+								<node label="Object-oriented constructs" id="F.3.3.2"/>
+								<node label="Program and recursion schemes" id="F.3.3.3"/>
+								<node label="Type structure" id="F.3.3.4"/>
+							</isComposedBy>
+						</node>
+						<node id="F.3.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="F.4" label="MATHEMATICAL LOGIC AND FORMAL LANGUAGES">
+					<isComposedBy>
+						<node id="F.4.0" label="General"/>
+						<node id="F.4.1" label="Mathematical Logic">
+							<isRelatedTo>
+								<node id="F.1.1"/>
+								<node id="I.2.2"/>
+								<node id="I.2.3"/>
+								<node id="I.2.4"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Computability theory" id="F.4.1.0"/>
+								<node label="Computational logic" id="F.4.1.1"/>
+								<node label="Lambda calculus and related systems" id="F.4.1.2"/>
+								<node label="Logic and constraint programming" id="F.4.1.3"/>
+								<node label="Mechanical theorem proving" id="F.4.1.4"/>
+								<node label="Modal logic" id="F.4.1.5"/>
+								<node label="Model theory" id="F.4.1.6"/>
+								<node label="Proof theory" id="F.4.1.7"/>
+								<node label="Recursive function theory" id="F.4.1.8"/>
+								<node label="Set theory" id="F.4.1.9"/>
+								<node label="Temporal logic" id="F.4.1.10"/>
+							</isComposedBy>
+						</node>
+						<node id="F.4.2" label="Grammars and Other Rewriting Systems">
+							<isRelatedTo>
+								<node id="D.3.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Decision problems" id="F.4.2.0"/>
+								<node label="Grammar types (e.g., context-free, context-sensitive)" id="F.4.2.1"/>
+								<node label="Parallel rewriting systems (e.g., developmental systems, L-systems)" id="F.4.2.2"/>
+								<node label="Parsing" id="F.4.2.3"/>
+								<node label="Thue systems" id="F.4.2.4"/>
+							</isComposedBy>
+						</node>
+						<node id="F.4.3" label="Formal Languages">
+							<isRelatedTo>
+								<node id="D.3.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Algebraic language theory" id="F.4.3.0"/>
+								<node label="Classes defined by grammars or automata (e.g., context-free languages, regular sets, recursive sets)" id="F.4.3.1"/>
+								<node label="Classes defined by resource-bounded automata" id="F.4.3.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Decision problems" id="F.4.3.3"/>
+								<node label="Operations on languages" id="F.4.3.4"/>
+							</isComposedBy>
+						</node>
+						<node id="F.4.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="F.m" label="MISCELLANEOUS"/>
+			</isComposedBy>
+		</node>
+		<node id="G." label="Mathematics of Computing">
+			<isComposedBy>
+				<node id="G.0" label="GENERAL"/>
+				<node id="G.1" label="NUMERICAL ANALYSIS">
+					<isComposedBy>
+						<node id="G.1.0" label="General">
+							<isComposedBy>
+								<node label="Computer arithmetic" id="G.1.0.0"/>
+								<node label="Conditioning (and ill-conditioning)" id="G.1.0.1"/>
+								<node label="Error analysis" id="G.1.0.2"/>
+								<node label="Interval arithmetic" id="G.1.0.3"/>
+								<node label="Multiple precision arithmetic" id="G.1.0.4"/>
+								<node label="Numerical algorithms" id="G.1.0.5"/>
+								<node label="Parallel algorithms" id="G.1.0.6"/>
+								<node label="Stability (and instability)" id="G.1.0.7"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.1" label="Interpolation">
+							<isRelatedTo>
+								<node id="I.3.5"/>
+								<node id="I.3.7"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Difference formulas" id="G.1.1.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Extrapolation" id="G.1.1.1"/>
+								<node label="Interpolation formulas" id="G.1.1.2"/>
+								<node label="Smoothing" id="G.1.1.3"/>
+								<node label="Spline and piecewise polynomial interpolation" id="G.1.1.4"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.2" label="Approximation">
+							<isComposedBy>
+								<node label="Approximation of surfaces and contours" id="G.1.2.0"/>
+								<node label="Chebyshev approximation and theory" id="G.1.2.1"/>
+								<node label="Elementary function approximation" id="G.1.2.2"/>
+								<node label="Fast Fourier transforms (FFT)" id="G.1.2.3"/>
+								<node label="Least squares approximation" id="G.1.2.4"/>
+								<node label="Linear approximation" id="G.1.2.5"/>
+								<node label="Minimax approximation and algorithms" id="G.1.2.6"/>
+								<node label="Nonlinear approximation" id="G.1.2.7"/>
+								<node label="Rational approximation" id="G.1.2.8"/>
+								<node label="Special function approximations" id="G.1.2.9"/>
+								<node label="Spline and piecewise polynomial approximation" id="G.1.2.10"/>
+								<node label="Wavelets and fractals" id="G.1.2.11"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.3" label="Numerical Linear Algebra">
+							<isComposedBy>
+								<node label="Conditioning" id="G.1.3.0"/>
+								<node label="Determinants" id="G.1.3.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Eigenvalues and eigenvectors (direct and iterative methods)" id="G.1.3.2"/>
+								<node label="Error analysis" id="G.1.3.3"/>
+								<node label="Linear systems (direct and iterative methods)" id="G.1.3.4"/>
+								<node label="Matrix inversion" id="G.1.3.5"/>
+								<node label="Pseudoinverses" id="G.1.3.6">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Singular value decomposition" id="G.1.3.7"/>
+								<node label="Sparse, structured, and very large systems (direct and iterative methods)" id="G.1.3.8"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.4" label="Quadrature and Numerical Differentiation">
+							<isRelatedTo>
+								<node id="F.2.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Adaptive and iterative quadrature" id="G.1.4.0"/>
+								<node label="Automatic differentiation" id="G.1.4.1"/>
+								<node label="Equal interval integration" id="G.1.4.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Error analysis" id="G.1.4.3"/>
+								<node label="Finite difference methods" id="G.1.4.4"/>
+								<node label="Gaussian quadrature" id="G.1.4.5"/>
+								<node label="Iterative methods" id="G.1.4.6"/>
+								<node label="Multidimensional (multiple) quadrature" id="G.1.4.7"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.5" label="Roots of Nonlinear Equations">
+							<isComposedBy>
+								<node label="Continuation (homotopy) methods" id="G.1.5.0"/>
+								<node label="Convergence" id="G.1.5.1"/>
+								<node label="Error analysis" id="G.1.5.2"/>
+								<node label="Iterative methods" id="G.1.5.3"/>
+								<node label="Polynomials, methods for" id="G.1.5.4"/>
+								<node label="Systems of equations" id="G.1.5.5"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.6" label="Optimization">
+							<isComposedBy>
+								<node label="Constrained optimization" id="G.1.6.0"/>
+								<node label="Convex programming" id="G.1.6.1"/>
+								<node label="Global optimization" id="G.1.6.2"/>
+								<node label="Gradient methods" id="G.1.6.3"/>
+								<node label="Integer programming" id="G.1.6.4"/>
+								<node label="Least squares methods" id="G.1.6.5"/>
+								<node label="Linear programming" id="G.1.6.6"/>
+								<node label="Nonlinear programming" id="G.1.6.7"/>
+								<node label="Quadratic programming methods" id="G.1.6.8"/>
+								<node label="Simulated annealing" id="G.1.6.9"/>
+								<node label="Stochastic programming" id="G.1.6.10"/>
+								<node label="Unconstrained optimization" id="G.1.6.11"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.7" label="Ordinary Differential Equations">
+							<isComposedBy>
+								<node label="Boundary value problems" id="G.1.7.0"/>
+								<node label="Chaotic systems" id="G.1.7.1"/>
+								<node label="Convergence and stability" id="G.1.7.2"/>
+								<node label="Differential-algebraic equations" id="G.1.7.3"/>
+								<node label="Error analysis" id="G.1.7.4"/>
+								<node label="Finite difference methods" id="G.1.7.5"/>
+								<node label="Initial value problems" id="G.1.7.6"/>
+								<node label="Multistep and multivalue methods" id="G.1.7.7"/>
+								<node label="One-step (single step) methods" id="G.1.7.8"/>
+								<node label="Stiff equations" id="G.1.7.9"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.8" label="Partial Differential Equations">
+							<isComposedBy>
+								<node label="Domain decomposition methods" id="G.1.8.0"/>
+								<node label="Elliptic equations" id="G.1.8.1"/>
+								<node label="Finite difference methods" id="G.1.8.2"/>
+								<node label="Finite element methods" id="G.1.8.3"/>
+								<node label="Finite volume methods" id="G.1.8.4"/>
+								<node label="Hyperbolic equations" id="G.1.8.5"/>
+								<node label="Inverse problems" id="G.1.8.6"/>
+								<node label="Iterative solution techniques" id="G.1.8.7"/>
+								<node label="Method of lines" id="G.1.8.8"/>
+								<node label="Multigrid and multilevel methods" id="G.1.8.9"/>
+								<node label="Parabolic equations" id="G.1.8.10"/>
+								<node label="Spectral methods" id="G.1.8.11"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.9" label="Integral Equations">
+							<isComposedBy>
+								<node label="Delay equations" id="G.1.9.0"/>
+								<node label="Fredholm equations" id="G.1.9.1"/>
+								<node label="Integro-differential equations" id="G.1.9.2"/>
+								<node label="Volterra equations" id="G.1.9.3"/>
+							</isComposedBy>
+						</node>
+						<node id="G.1.10" label="Applications"/>
+						<node id="G.1.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="G.2" label="DISCRETE MATHEMATICS">
+					<isComposedBy>
+						<node id="G.2.0" label="General"/>
+						<node id="G.2.1" label="Combinatorics">
+							<isRelatedTo>
+								<node id="F.2.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Combinatorial algorithms" id="G.2.1.0"/>
+								<node label="Counting problems" id="G.2.1.1"/>
+								<node label="Generating functions" id="G.2.1.2"/>
+								<node label="Permutations and combinations" id="G.2.1.3"/>
+								<node label="Recurrences and difference equations" id="G.2.1.4"/>
+							</isComposedBy>
+						</node>
+						<node id="G.2.2" label="Graph Theory">
+							<isRelatedTo>
+								<node id="F.2.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Graph algorithms" id="G.2.2.0"/>
+								<node label="Graph labeling" id="G.2.2.1"/>
+								<node label="Hypergraphs" id="G.2.2.2"/>
+								<node label="Network problems" id="G.2.2.3"/>
+								<node label="Path and circuit problems" id="G.2.2.4"/>
+								<node label="Trees" id="G.2.2.5"/>
+							</isComposedBy>
+						</node>
+						<node id="G.2.3" label="Applications"/>
+						<node id="G.2.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="G.3" label="PROBABILITY AND STATISTICS">
+					<isComposedBy>
+						<node label="Contingency table analysis" id="G.3.0"/>
+						<node label="Correlation and regression analysis" id="G.3.1"/>
+						<node label="Distribution functions" id="G.3.2"/>
+						<node label="Experimental design" id="G.3.3"/>
+						<node label="Markov processes" id="G.3.4"/>
+						<node label="Multivariate statistics" id="G.3.5"/>
+						<node label="Nonparametric statistics" id="G.3.6"/>
+						<node label="Probabilistic algorithms (including Monte Carlo)" id="G.3.7"/>
+						<node label="Queueing theory" id="G.3.8"/>
+						<node label="Random number generation" id="G.3.9"/>
+						<node label="Reliability and life testing" id="G.3.10"/>
+						<node label="Renewal theory" id="G.3.11"/>
+						<node label="Robust regression" id="G.3.12"/>
+						<node label="Statistical computing" id="G.3.13"/>
+						<node label="Statistical software" id="G.3.14"/>
+						<node label="Stochastic processes" id="G.3.15"/>
+						<node label="Survival analysis" id="G.3.16"/>
+						<node label="Time series analysis" id="G.3.17"/>
+					</isComposedBy>
+				</node>
+				<node id="G.4" label="MATHEMATICAL SOFTWARE">
+					<isComposedBy>
+						<node label="Algorithm design and analysis" id="G.4.0"/>
+						<node label="Certification and testing" id="G.4.1"/>
+						<node label="Documentation" id="G.4.2"/>
+						<node label="Efficiency" id="G.4.3"/>
+						<node label="Parallel and vector implementations" id="G.4.4"/>
+						<node label="Portability" id="G.4.5">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node label="Reliability and robustness" id="G.4.6"/>
+						<node label="User interfaces" id="G.4.7"/>
+						<node label="Verification" id="G.4.8">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="G.m" label="MISCELLANEOUS">
+					<isComposedBy>
+						<node label="Queueing theory" id="G.m.0">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+					</isComposedBy>
+				</node>
+			</isComposedBy>
+		</node>
+		<node id="H." label="Information Systems">
+			<isComposedBy>
+				<node id="H.0" label="GENERAL"/>
+				<node id="H.1" label="MODELS AND PRINCIPLES">
+					<isComposedBy>
+						<node id="H.1.0" label="General"/>
+						<node id="H.1.1" label="Systems and Information Theory">
+							<isRelatedTo>
+								<node id="E.4"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="General systems theory" id="H.1.1.0"/>
+								<node label="Information theory" id="H.1.1.1"/>
+								<node label="Value of information" id="H.1.1.2"/>
+							</isComposedBy>
+						</node>
+						<node id="H.1.2" label="User/Machine Systems">
+							<isComposedBy>
+								<node label="Human factors" id="H.1.2.0"/>
+								<node label="Human information processing" id="H.1.2.1"/>
+								<node label="Software psychology" id="H.1.2.2"/>
+							</isComposedBy>
+						</node>
+						<node id="H.1.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="H.2" label="DATABASE MANAGEMENT">
+					<isRelatedTo>
+						<node id="E.5"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="H.2.0" label="General">
+							<isComposedBy>
+								<node label="Security, integrity, and protection" id="H.2.0.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="H.2.1" label="Logical Design">
+							<isComposedBy>
+								<node label="Data models" id="H.2.1.0"/>
+								<node label="Normal forms" id="H.2.1.1"/>
+								<node label="Schema and subschema" id="H.2.1.2"/>
+							</isComposedBy>
+						</node>
+						<node id="H.2.2" label="Physical Design">
+							<isComposedBy>
+								<node label="Access methods" id="H.2.2.0"/>
+								<node label="Deadlock avoidance" id="H.2.2.1"/>
+								<node label="Recovery and restart" id="H.2.2.2"/>
+							</isComposedBy>
+						</node>
+						<node id="H.2.3" label="Languages">
+							<isRelatedTo>
+								<node id="D.3.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Data description languages (DDL)" id="H.2.3.0"/>
+								<node label="Data manipulation languages (DML)" id="H.2.3.1"/>
+								<node label="Database (persistent) programming languages" id="H.2.3.2"/>
+								<node label="Query languages" id="H.2.3.3"/>
+								<node label="Report writers" id="H.2.3.4"/>
+							</isComposedBy>
+						</node>
+						<node id="H.2.4" label="Systems">
+							<isComposedBy>
+								<node label="Concurrency" id="H.2.4.0"/>
+								<node label="Distributed databases" id="H.2.4.1"/>
+								<node label="Multimedia databases" id="H.2.4.2"/>
+								<node label="Object-oriented databases" id="H.2.4.3"/>
+								<node label="Parallel databases" id="H.2.4.4"/>
+								<node label="Query processing" id="H.2.4.5"/>
+								<node label="Relational databases" id="H.2.4.6"/>
+								<node label="Rule-based databases" id="H.2.4.7"/>
+								<node label="Textual databases" id="H.2.4.8"/>
+								<node label="Transaction processing" id="H.2.4.9"/>
+							</isComposedBy>
+						</node>
+						<node id="H.2.5" label="Heterogeneous Databases">
+							<isComposedBy>
+								<node label="Data translation" id="H.2.5.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Program translation" id="H.2.5.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="H.2.6" label="Database Machines"/>
+						<node id="H.2.7" label="Database Administration">
+							<isComposedBy>
+								<node label="Data dictionary/directory" id="H.2.7.0"/>
+								<node label="Data warehouse and repository" id="H.2.7.1"/>
+								<node label="Logging and recovery" id="H.2.7.2"/>
+								<node label="Security, integrity, and protection" id="H.2.7.3"/>
+							</isComposedBy>
+						</node>
+						<node id="H.2.8" label="Database Applications">
+							<isComposedBy>
+								<node label="Data mining" id="H.2.8.0"/>
+								<node label="Image databases" id="H.2.8.1"/>
+								<node label="Scientific databases" id="H.2.8.2"/>
+								<node label="Spatial databases and GIS" id="H.2.8.3"/>
+								<node label="Statistical databases" id="H.2.8.4"/>
+							</isComposedBy>
+						</node>
+						<node id="H.2.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="H.3" label="INFORMATION STORAGE AND RETRIEVAL">
+					<isComposedBy>
+						<node id="H.3.0" label="General"/>
+						<node id="H.3.1" label="Content Analysis and Indexing">
+							<isComposedBy>
+								<node label="Abstracting methods" id="H.3.1.0"/>
+								<node label="Dictionaries" id="H.3.1.1"/>
+								<node label="Indexing methods" id="H.3.1.2"/>
+								<node label="Linguistic processing" id="H.3.1.3"/>
+								<node label="Thesauruses" id="H.3.1.4"/>
+							</isComposedBy>
+						</node>
+						<node id="H.3.2" label="Information Storage">
+							<isComposedBy>
+								<node label="File organization" id="H.3.2.0"/>
+								<node label="Record classification" id="H.3.2.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="H.3.3" label="Information Search and Retrieval">
+							<isComposedBy>
+								<node label="Clustering" id="H.3.3.0"/>
+								<node label="Information filtering" id="H.3.3.1"/>
+								<node label="Query formulation" id="H.3.3.2"/>
+								<node label="Relevance feedback" id="H.3.3.3"/>
+								<node label="Retrieval models" id="H.3.3.4"/>
+								<node label="Search process" id="H.3.3.5"/>
+								<node label="Selection process" id="H.3.3.6"/>
+							</isComposedBy>
+						</node>
+						<node id="H.3.4" label="Systems and Software">
+							<isComposedBy>
+								<node label="Current awareness systems (selective dissemination of information--SDI)" id="H.3.4.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Distributed systems" id="H.3.4.1"/>
+								<node label="Information networks" id="H.3.4.2"/>
+								<node label="Performance evaluation (efficiency and effectiveness)" id="H.3.4.3"/>
+								<node label="Question-answering (fact retrieval) systems" id="H.3.4.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="User profiles and alert services" id="H.3.4.5"/>
+							</isComposedBy>
+						</node>
+						<node id="H.3.5" label="Online Information Services">
+							<isComposedBy>
+								<node label="Commercial services" id="H.3.5.0"/>
+								<node label="Data sharing" id="H.3.5.1"/>
+								<node label="Web-based services" id="H.3.5.2"/>
+							</isComposedBy>
+						</node>
+						<node id="H.3.6" label="Library Automation">
+							<isComposedBy>
+								<node label="Large text archives" id="H.3.6.0"/>
+							</isComposedBy>
+						</node>
+						<node id="H.3.7" label="Digital Libraries">
+							<isComposedBy>
+								<node label="Collection" id="H.3.7.0"/>
+								<node label="Dissemination" id="H.3.7.1"/>
+								<node label="Standards" id="H.3.7.2"/>
+								<node label="Systems issues" id="H.3.7.3"/>
+								<node label="User issues" id="H.3.7.4"/>
+							</isComposedBy>
+						</node>
+						<node id="H.3.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="H.4" label="INFORMATION SYSTEMS APPLICATIONS">
+					<isComposedBy>
+						<node id="H.4.0" label="General"/>
+						<node id="H.4.1" label="Office Automation">
+							<isRelatedTo>
+								<node id="I.7"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Desktop publishing" id="H.4.1.0"/>
+								<node label="Equipment" id="H.4.1.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Groupware" id="H.4.1.2"/>
+								<node label="Spreadsheets" id="H.4.1.3"/>
+								<node label="Time management (e.g., calendars, schedules)" id="H.4.1.4"/>
+								<node label="Word processing" id="H.4.1.5"/>
+								<node label="Workflow management" id="H.4.1.6"/>
+							</isComposedBy>
+						</node>
+						<node id="H.4.2" label="Types of Systems">
+							<isComposedBy>
+								<node label="Decision support (e.g., MIS)" id="H.4.2.0"/>
+								<node label="Logistics" id="H.4.2.1"/>
+							</isComposedBy>
+						</node>
+						<node id="H.4.3" label="Communications Applications">
+							<isComposedBy>
+								<node label="Bulletin boards" id="H.4.3.0"/>
+								<node label="Computer conferencing, teleconferencing, and videoconferencing" id="H.4.3.1"/>
+								<node label="Electronic mail" id="H.4.3.2"/>
+								<node label="Information browsers" id="H.4.3.3"/>
+								<node label="Videotex" id="H.4.3.4"/>
+							</isComposedBy>
+						</node>
+						<node id="H.4.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="H.5" label="INFORMATION INTERFACES AND PRESENTATION (e.g., HCI)">
+					<isRelatedTo>
+						<node id="I.7"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="H.5.0" label="General"/>
+						<node id="H.5.1" label="Multimedia Information Systems">
+							<isComposedBy>
+								<node label="Animations" id="H.5.1.0"/>
+								<node label="Artificial, augmented, and virtual realities" id="H.5.1.1"/>
+								<node label="Audio input/output" id="H.5.1.2"/>
+								<node label="Evaluation/methodology" id="H.5.1.3"/>
+								<node label="Hypertext navigation and maps" id="H.5.1.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Video (e.g., tape, disk, DVI)" id="H.5.1.5"/>
+							</isComposedBy>
+						</node>
+						<node id="H.5.2" label="User Interfaces">
+							<isRelatedTo>
+								<node id="D.2.2"/>
+								<node id="H.1.2"/>
+								<node id="I.3.6"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Auditory (non-speech) feedback" id="H.5.2.0"/>
+								<node label="Benchmarking" id="H.5.2.1"/>
+								<node label="Ergonomics" id="H.5.2.2"/>
+								<node label="Evaluation/methodology" id="H.5.2.3"/>
+								<node label="Graphical user interfaces (GUI)" id="H.5.2.4"/>
+								<node label="Haptic I/O" id="H.5.2.5"/>
+								<node label="Input devices and strategies (e.g., mouse, touchscreen)" id="H.5.2.6"/>
+								<node label="Interaction styles (e.g., commands, menus, forms, direct manipulation)" id="H.5.2.7"/>
+								<node label="Natural language" id="H.5.2.8"/>
+								<node label="Prototyping" id="H.5.2.9"/>
+								<node label="Screen design (e.g., text, graphics, color)" id="H.5.2.10"/>
+								<node label="Standardization" id="H.5.2.11"/>
+								<node label="Style guides" id="H.5.2.12"/>
+								<node label="Theory and methods" id="H.5.2.13"/>
+								<node label="Training, help, and documentation" id="H.5.2.14"/>
+								<node label="User-centered design" id="H.5.2.15"/>
+								<node label="User interface management systems (UIMS)" id="H.5.2.16"/>
+								<node label="Voice I/O" id="H.5.2.17"/>
+								<node label="Windowing systems" id="H.5.2.18"/>
+							</isComposedBy>
+						</node>
+						<node id="H.5.3" label="Group and Organization Interfaces">
+							<isComposedBy>
+								<node label="Asynchronous interaction" id="H.5.3.0"/>
+								<node label="Collaborative computing" id="H.5.3.1"/>
+								<node label="Computer-supported cooperative work" id="H.5.3.2"/>
+								<node label="Evaluation/methodology" id="H.5.3.3"/>
+								<node label="Organizational design" id="H.5.3.4"/>
+								<node label="Synchronous interaction" id="H.5.3.5"/>
+								<node label="Theory and models" id="H.5.3.6"/>
+								<node label="Web-based interaction" id="H.5.3.7"/>
+							</isComposedBy>
+						</node>
+						<node id="H.5.4" label="Hypertext/Hypermedia">
+							<isRelatedTo>
+								<node id="I.7"/>
+								<node id="J.7"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Architectures" id="H.5.4.0"/>
+								<node label="Navigation" id="H.5.4.1"/>
+								<node label="Theory" id="H.5.4.2"/>
+								<node label="User issues" id="H.5.4.3"/>
+							</isComposedBy>
+						</node>
+						<node id="H.5.5" label="Sound and Music Computing">
+							<isRelatedTo>
+								<node id="J.5"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Methodologies and techniques" id="H.5.5.0"/>
+								<node label="Modeling" id="H.5.5.1"/>
+								<node label="Signal analysis, synthesis, and processing" id="H.5.5.2"/>
+								<node label="Systems" id="H.5.5.3"/>
+							</isComposedBy>
+						</node>
+						<node id="H.5.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="H.m" label="MISCELLANEOUS"/>
+			</isComposedBy>
+		</node>
+		<node id="I." label="Computing Methodologies">
+			<isComposedBy>
+				<node id="I.0" label="GENERAL"/>
+				<node id="I.1" label="SYMBOLIC AND ALGEBRAIC MANIPULATION">
+					<isComposedBy>
+						<node id="I.1.0" label="General"/>
+						<node id="I.1.1" label="Expressions and Their Representation">
+							<isRelatedTo>
+								<node id="E.1"/>
+								<node id="E.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Representations (general and polynomial)" id="I.1.1.0"/>
+								<node label="Simplification of expressions" id="I.1.1.1"/>
+							</isComposedBy>
+						</node>
+						<node id="I.1.2" label="Algorithms">
+							<isRelatedTo>
+								<node id="F.2.1"/>
+								<node id="F.2.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Algebraic algorithms" id="I.1.2.0"/>
+								<node label="Analysis of algorithms" id="I.1.2.1"/>
+								<node label="Nonalgebraic algorithms" id="I.1.2.2"/>
+							</isComposedBy>
+						</node>
+						<node id="I.1.3" label="Languages and Systems">
+							<isRelatedTo>
+								<node id="D.3.2"/>
+								<node id="D.3.3"/>
+								<node id="F.2.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Evaluation strategies" id="I.1.3.0"/>
+								<node label="Nonprocedural languages" id="I.1.3.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Special-purpose algebraic systems" id="I.1.3.2"/>
+								<node label="Special-purpose hardware" id="I.1.3.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Substitution mechanisms" id="I.1.3.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="I.1.4" label="Applications"/>
+						<node id="I.1.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="I.2" label="ARTIFICIAL INTELLIGENCE">
+					<isComposedBy>
+						<node id="I.2.0" label="General">
+							<isComposedBy>
+								<node label="Cognitive simulation" id="I.2.0.0"/>
+								<node label="Philosophical foundations" id="I.2.0.1"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.1" label="Applications and Expert Systems">
+							<isRelatedTo>
+								<node id="H.4"/>
+								<node id="J."/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Cartography" id="I.2.1.0"/>
+								<node label="Games" id="I.2.1.1"/>
+								<node label="Industrial automation" id="I.2.1.2"/>
+								<node label="Law" id="I.2.1.3"/>
+								<node label="Medicine and science" id="I.2.1.4"/>
+								<node label="Natural language interfaces" id="I.2.1.5"/>
+								<node label="Office automation" id="I.2.1.6"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.2" label="Automatic Programming">
+							<isRelatedTo>
+								<node id="D.1.2"/>
+								<node id="F.3.1"/>
+								<node id="F.4.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Automatic analysis of algorithms" id="I.2.2.0"/>
+								<node label="Program modification" id="I.2.2.1"/>
+								<node label="Program synthesis" id="I.2.2.2"/>
+								<node label="Program transformation" id="I.2.2.3"/>
+								<node label="Program verification" id="I.2.2.4"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.3" label="Deduction and Theorem Proving">
+							<isRelatedTo>
+								<node id="F.4.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Answer/reason extraction" id="I.2.3.0"/>
+								<node label="Deduction (e.g., natural, rule-based)" id="I.2.3.1"/>
+								<node label="Inference engines" id="I.2.3.2"/>
+								<node label="Logic programming" id="I.2.3.3"/>
+								<node label="Mathematical induction" id="I.2.3.4"/>
+								<node label="Metatheory" id="I.2.3.5">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Nonmonotonic reasoning and belief revision" id="I.2.3.6"/>
+								<node label="Resolution" id="I.2.3.7"/>
+								<node label="Uncertainty, ``fuzzy,'' and probabilistic reasoning" id="I.2.3.8"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.4" label="Knowledge Representation Formalisms and Methods">
+							<isRelatedTo>
+								<node id="F.4.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Frames and scripts" id="I.2.4.0"/>
+								<node label="Modal logic" id="I.2.4.1"/>
+								<node label="Predicate logic" id="I.2.4.2"/>
+								<node label="Relation systems" id="I.2.4.3"/>
+								<node label="Representation languages" id="I.2.4.4"/>
+								<node label="Representations (procedural and rule-based)" id="I.2.4.5"/>
+								<node label="Semantic networks" id="I.2.4.6"/>
+								<node label="Temporal logic" id="I.2.4.7"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.5" label="Programming Languages and Software">
+							<isRelatedTo>
+								<node id="D.3.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Expert system tools and techniques" id="I.2.5.0"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.6" label="Learning">
+							<isRelatedTo>
+								<node id="K.3.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Analogies" id="I.2.6.0"/>
+								<node label="Concept learning" id="I.2.6.1"/>
+								<node label="Connectionism and neural nets" id="I.2.6.2"/>
+								<node label="Induction" id="I.2.6.3"/>
+								<node label="Knowledge acquisition" id="I.2.6.4"/>
+								<node label="Language acquisition" id="I.2.6.5"/>
+								<node label="Parameter learning" id="I.2.6.6"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.7" label="Natural Language Processing">
+							<isComposedBy>
+								<node label="Discourse" id="I.2.7.0"/>
+								<node label="Language generation" id="I.2.7.1"/>
+								<node label="Language models" id="I.2.7.2"/>
+								<node label="Language parsing and understanding" id="I.2.7.3"/>
+								<node label="Machine translation" id="I.2.7.4"/>
+								<node label="Speech recognition and synthesis" id="I.2.7.5"/>
+								<node label="Text analysis" id="I.2.7.6"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.8" label="Problem Solving, Control Methods, and Search">
+							<isRelatedTo>
+								<node id="F.2.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Backtracking" id="I.2.8.0"/>
+								<node label="Control theory" id="I.2.8.1"/>
+								<node label="Dynamic programming" id="I.2.8.2"/>
+								<node label="Graph and tree search strategies" id="I.2.8.3"/>
+								<node label="Heuristic methods" id="I.2.8.4"/>
+								<node label="Plan execution, formation, and generation" id="I.2.8.5"/>
+								<node label="Scheduling" id="I.2.8.6"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.9" label="Robotics">
+							<isComposedBy>
+								<node label="Autonomous vehicles" id="I.2.9.0"/>
+								<node label="Commercial robots and applications" id="I.2.9.1"/>
+								<node label="Kinematics and dynamics" id="I.2.9.2"/>
+								<node label="Manipulators" id="I.2.9.3"/>
+								<node label="Operator interfaces" id="I.2.9.4"/>
+								<node label="Propelling mechanisms" id="I.2.9.5"/>
+								<node label="Sensors" id="I.2.9.6"/>
+								<node label="Workcell organization and planning" id="I.2.9.7"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.10" label="Vision and Scene Understanding">
+							<isRelatedTo>
+								<node id="I.4.8"/>
+								<node id="I.5"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="3D/stereo scene analysis" id="I.2.10.0"/>
+								<node label="Architecture and control structures" id="I.2.10.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Intensity, color, photometry, and thresholding" id="I.2.10.2"/>
+								<node label="Modeling and recovery of physical attributes" id="I.2.10.3"/>
+								<node label="Motion" id="I.2.10.4"/>
+								<node label="Perceptual reasoning" id="I.2.10.5"/>
+								<node label="Representations, data structures, and transforms" id="I.2.10.6"/>
+								<node label="Shape" id="I.2.10.7"/>
+								<node label="Texture" id="I.2.10.8"/>
+								<node label="Video analysis" id="I.2.10.9"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.11" label="Distributed Artificial Intelligence">
+							<isComposedBy>
+								<node label="Coherence and coordination" id="I.2.11.0"/>
+								<node label="Intelligent agents" id="I.2.11.1"/>
+								<node label="Languages and structures" id="I.2.11.2"/>
+								<node label="Multiagent systems" id="I.2.11.3"/>
+							</isComposedBy>
+						</node>
+						<node id="I.2.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="I.3" label="COMPUTER GRAPHICS">
+					<isComposedBy>
+						<node id="I.3.0" label="General"/>
+						<node id="I.3.1" label="Hardware Architecture">
+							<isRelatedTo>
+								<node id="B.4.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Graphics processors" id="I.3.1.0"/>
+								<node label="Hardcopy devices" id="I.3.1.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Input devices" id="I.3.1.2"/>
+								<node label="Parallel processing" id="I.3.1.3"/>
+								<node label="Raster display devices" id="I.3.1.4"/>
+								<node label="Storage devices" id="I.3.1.5">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Three-dimensional displays" id="I.3.1.6">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Vector display devices" id="I.3.1.7">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="I.3.2" label="Graphics Systems">
+							<isRelatedTo>
+								<node id="C.2.1"/>
+								<node id="C.2.4"/>
+								<node id="C.3"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Distributed/network graphics" id="I.3.2.0"/>
+								<node label="Remote systems" id="I.3.2.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Stand-alone systems" id="I.3.2.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="I.3.3" label="Picture/Image Generation">
+							<isComposedBy>
+								<node label="Antialiasing" id="I.3.3.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Bitmap and framebuffer operations" id="I.3.3.1"/>
+								<node label="Digitizing and scanning" id="I.3.3.2"/>
+								<node label="Display algorithms" id="I.3.3.3"/>
+								<node label="Line and curve generation" id="I.3.3.4"/>
+								<node label="Viewing algorithms" id="I.3.3.5"/>
+							</isComposedBy>
+						</node>
+						<node id="I.3.4" label="Graphics Utilities">
+							<isComposedBy>
+								<node label="Application packages" id="I.3.4.0"/>
+								<node label="Device drivers" id="I.3.4.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Graphics editors" id="I.3.4.2"/>
+								<node label="Graphics packages" id="I.3.4.3"/>
+								<node label="Meta files" id="I.3.4.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Paint systems" id="I.3.4.5"/>
+								<node label="Picture description languages" id="I.3.4.6">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Software support" id="I.3.4.7"/>
+								<node label="Virtual device interfaces" id="I.3.4.8"/>
+							</isComposedBy>
+						</node>
+						<node id="I.3.5" label="Computational Geometry and Object Modeling">
+							<isComposedBy>
+								<node label="Boundary representations" id="I.3.5.0"/>
+								<node label="Constructive solid geometry (CSG)" id="I.3.5.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Curve, surface, solid, and object representations" id="I.3.5.2"/>
+								<node label="Geometric algorithms, languages, and systems" id="I.3.5.3"/>
+								<node label="Hierarchy and geometric transformations" id="I.3.5.4"/>
+								<node label="Modeling packages" id="I.3.5.5"/>
+								<node label="Object hierarchies" id="I.3.5.6"/>
+								<node label="Physically based modeling" id="I.3.5.7"/>
+								<node label="Splines" id="I.3.5.8"/>
+							</isComposedBy>
+						</node>
+						<node id="I.3.6" label="Methodology and Techniques">
+							<isComposedBy>
+								<node label="Device independence" id="I.3.6.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Ergonomics" id="I.3.6.1"/>
+								<node label="Graphics data structures and data types" id="I.3.6.2"/>
+								<node label="Interaction techniques" id="I.3.6.3"/>
+								<node label="Languages" id="I.3.6.4"/>
+								<node label="Standards" id="I.3.6.5"/>
+							</isComposedBy>
+						</node>
+						<node id="I.3.7" label="Three-Dimensional Graphics and Realism">
+							<isComposedBy>
+								<node label="Animation" id="I.3.7.0"/>
+								<node label="Color, shading, shadowing, and texture" id="I.3.7.1"/>
+								<node label="Fractals" id="I.3.7.2"/>
+								<node label="Hidden line/surface removal" id="I.3.7.3"/>
+								<node label="Radiosity" id="I.3.7.4"/>
+								<node label="Raytracing" id="I.3.7.5"/>
+								<node label="Virtual reality" id="I.3.7.6"/>
+								<node label="Visible line/surface algorithms" id="I.3.7.7"/>
+							</isComposedBy>
+						</node>
+						<node id="I.3.8" label="Applications"/>
+						<node id="I.3.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="I.4" label="IMAGE PROCESSING AND COMPUTER VISION">
+					<isComposedBy>
+						<node id="I.4.0" label="General">
+							<isComposedBy>
+								<node label="Image displays" id="I.4.0.0"/>
+								<node label="Image processing software" id="I.4.0.1"/>
+							</isComposedBy>
+						</node>
+						<node id="I.4.1" label="Digitization and Image Capture">
+							<isComposedBy>
+								<node label="Camera calibration" id="I.4.1.0"/>
+								<node label="Imaging geometry" id="I.4.1.1"/>
+								<node label="Quantization" id="I.4.1.2"/>
+								<node label="Radiometry" id="I.4.1.3"/>
+								<node label="Reflectance" id="I.4.1.4"/>
+								<node label="Sampling" id="I.4.1.5"/>
+								<node label="Scanning" id="I.4.1.6"/>
+							</isComposedBy>
+						</node>
+						<node id="I.4.2" label="Compression (Coding)">
+							<isRelatedTo>
+								<node id="E.4"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Approximate methods" id="I.4.2.0"/>
+								<node label="Exact coding" id="I.4.2.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="I.4.3" label="Enhancement">
+							<isComposedBy>
+								<node label="Filtering" id="I.4.3.0"/>
+								<node label="Geometric correction" id="I.4.3.1"/>
+								<node label="Grayscale manipulation" id="I.4.3.2"/>
+								<node label="Registration" id="I.4.3.3"/>
+								<node label="Sharpening and deblurring" id="I.4.3.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Smoothing" id="I.4.3.5"/>
+							</isComposedBy>
+						</node>
+						<node id="I.4.4" label="Restoration">
+							<isComposedBy>
+								<node label="Inverse filtering" id="I.4.4.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Kalman filtering" id="I.4.4.1"/>
+								<node label="Pseudoinverse restoration" id="I.4.4.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Wiener filtering" id="I.4.4.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="I.4.5" label="Reconstruction">
+							<isComposedBy>
+								<node label="Series expansion methods" id="I.4.5.0"/>
+								<node label="Summation methods" id="I.4.5.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Transform methods" id="I.4.5.2"/>
+							</isComposedBy>
+						</node>
+						<node id="I.4.6" label="Segmentation">
+							<isComposedBy>
+								<node label="Edge and feature detection" id="I.4.6.0"/>
+								<node label="Pixel classification" id="I.4.6.1"/>
+								<node label="Region growing, partitioning" id="I.4.6.2"/>
+								<node label="Relaxation" id="I.4.6.3"/>
+							</isComposedBy>
+						</node>
+						<node id="I.4.7" label="Feature Measurement">
+							<isComposedBy>
+								<node label="Feature representation" id="I.4.7.0"/>
+								<node label="Invariants" id="I.4.7.1"/>
+								<node label="Moments" id="I.4.7.2"/>
+								<node label="Projections" id="I.4.7.3"/>
+								<node label="Size and shape" id="I.4.7.4"/>
+								<node label="Texture" id="I.4.7.5"/>
+							</isComposedBy>
+						</node>
+						<node id="I.4.8" label="Scene Analysis">
+							<isComposedBy>
+								<node label="Color" id="I.4.8.0"/>
+								<node label="Depth cues" id="I.4.8.1"/>
+								<node label="Motion" id="I.4.8.2"/>
+								<node label="Object recognition" id="I.4.8.3"/>
+								<node label="Photometry" id="I.4.8.4"/>
+								<node label="Range data" id="I.4.8.5"/>
+								<node label="Sensor fusion" id="I.4.8.6"/>
+								<node label="Shading" id="I.4.8.7"/>
+								<node label="Shape" id="I.4.8.8"/>
+								<node label="Stereo" id="I.4.8.9"/>
+								<node label="Surface fitting" id="I.4.8.10"/>
+								<node label="Time-varying imagery" id="I.4.8.11"/>
+								<node label="Tracking" id="I.4.8.12"/>
+							</isComposedBy>
+						</node>
+						<node id="I.4.9" label="Applications"/>
+						<node id="I.4.10" label="Image Representation">
+							<isComposedBy>
+								<node label="Hierarchical" id="I.4.10.0"/>
+								<node label="Morphological" id="I.4.10.1"/>
+								<node label="Multidimensional" id="I.4.10.2"/>
+								<node label="Statistical" id="I.4.10.3"/>
+								<node label="Volumetric" id="I.4.10.4"/>
+							</isComposedBy>
+						</node>
+						<node id="I.4.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="I.5" label="PATTERN RECOGNITION">
+					<isComposedBy>
+						<node id="I.5.0" label="General"/>
+						<node id="I.5.1" label="Models">
+							<isComposedBy>
+								<node label="Deterministic" id="I.5.1.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Fuzzy set" id="I.5.1.1"/>
+								<node label="Geometric" id="I.5.1.2"/>
+								<node label="Neural nets" id="I.5.1.3"/>
+								<node label="Statistical" id="I.5.1.4"/>
+								<node label="Structural" id="I.5.1.5"/>
+							</isComposedBy>
+						</node>
+						<node id="I.5.2" label="Design Methodology">
+							<isComposedBy>
+								<node label="Classifier design and evaluation" id="I.5.2.0"/>
+								<node label="Feature evaluation and selection" id="I.5.2.1"/>
+								<node label="Pattern analysis" id="I.5.2.2"/>
+							</isComposedBy>
+						</node>
+						<node id="I.5.3" label="Clustering">
+							<isComposedBy>
+								<node label="Algorithms" id="I.5.3.0"/>
+								<node label="Similarity measures" id="I.5.3.1"/>
+							</isComposedBy>
+						</node>
+						<node id="I.5.4" label="Applications">
+							<isComposedBy>
+								<node label="Computer vision" id="I.5.4.0"/>
+								<node label="Signal processing" id="I.5.4.1"/>
+								<node label="Text processing" id="I.5.4.2"/>
+								<node label="Waveform analysis" id="I.5.4.3"/>
+							</isComposedBy>
+						</node>
+						<node id="I.5.5" label="Implementation">
+							<isRelatedTo>
+								<node id="C.3"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Interactive systems" id="I.5.5.0"/>
+								<node label="Special architectures" id="I.5.5.1"/>
+							</isComposedBy>
+						</node>
+						<node id="I.5.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="I.6" label="SIMULATION AND MODELING">
+					<isRelatedTo>
+						<node id="G.3"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="I.6.0" label="General"/>
+						<node id="I.6.1" label="Simulation Theory">
+							<isComposedBy>
+								<node label="Model classification" id="I.6.1.0"/>
+								<node label="Systems theory" id="I.6.1.1"/>
+								<node label="Types of simulation (continuous and discrete)" id="I.6.1.2">
+									<hasNote type="1">The classification is no longer used as of January 1991, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="I.6.2" label="Simulation Languages"/>
+						<node id="I.6.3" label="Applications"/>
+						<node id="I.6.4" label="Model Validation and Analysis"/>
+						<node id="I.6.5" label="Model Development">
+							<isComposedBy>
+								<node label="Modeling methodologies" id="I.6.5.0"/>
+							</isComposedBy>
+						</node>
+						<node id="I.6.6" label="Simulation Output Analysis"/>
+						<node id="I.6.7" label="Simulation Support Systems">
+							<isComposedBy>
+								<node label="Environments" id="I.6.7.0"/>
+							</isComposedBy>
+						</node>
+						<node id="I.6.8" label="Types of Simulation">
+							<isComposedBy>
+								<node label="Animation" id="I.6.8.0"/>
+								<node label="Combined" id="I.6.8.1"/>
+								<node label="Continuous" id="I.6.8.2"/>
+								<node label="Discrete event" id="I.6.8.3"/>
+								<node label="Distributed" id="I.6.8.4"/>
+								<node label="Gaming" id="I.6.8.5"/>
+								<node label="Monte Carlo" id="I.6.8.6"/>
+								<node label="Parallel" id="I.6.8.7"/>
+								<node label="Visual" id="I.6.8.8"/>
+							</isComposedBy>
+						</node>
+						<node id="I.6.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="I.7" label="DOCUMENT AND TEXT PROCESSING">
+					<isRelatedTo>
+						<node id="H.4"/>
+						<node id="H.5"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node id="I.7.0" label="General"/>
+						<node id="I.7.1" label="Document and Text Editing">
+							<isComposedBy>
+								<node label="Document management" id="I.7.1.0"/>
+								<node label="Languages" id="I.7.1.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Spelling" id="I.7.1.2">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Version control" id="I.7.1.3"/>
+							</isComposedBy>
+						</node>
+						<node id="I.7.2" label="Document Preparation">
+							<isComposedBy>
+								<node label="Desktop publishing" id="I.7.2.0"/>
+								<node label="Format and notation" id="I.7.2.1"/>
+								<node label="Hypertext/hypermedia" id="I.7.2.2"/>
+								<node label="Index generation" id="I.7.2.3"/>
+								<node label="Languages and systems" id="I.7.2.4"/>
+								<node label="Markup languages" id="I.7.2.5"/>
+								<node label="Multi/mixed media" id="I.7.2.6"/>
+								<node label="Photocomposition/typesetting" id="I.7.2.7"/>
+								<node label="Scripting languages" id="I.7.2.8"/>
+								<node label="Standards" id="I.7.2.9"/>
+							</isComposedBy>
+						</node>
+						<node id="I.7.3" label="Index Generation">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node id="I.7.4" label="Electronic Publishing">
+							<isRelatedTo>
+								<node id="H.5.4"/>
+								<node id="J.7"/>
+							</isRelatedTo>
+						</node>
+						<node id="I.7.5" label="Document Capture">
+							<isRelatedTo>
+								<node id="I.4.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Document analysis" id="I.7.5.0"/>
+								<node label="Graphics recognition and interpretation" id="I.7.5.1"/>
+								<node label="Optical character recognition (OCR)" id="I.7.5.2"/>
+								<node label="Scanning" id="I.7.5.3"/>
+							</isComposedBy>
+						</node>
+						<node id="I.7.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="I.m" label="MISCELLANEOUS"/>
+			</isComposedBy>
+		</node>
+		<node id="J." label="Computer Applications">
+			<isComposedBy>
+				<node id="J.0" label="GENERAL"/>
+				<node id="J.1" label="ADMINISTRATIVE DATA PROCESSING">
+					<isComposedBy>
+						<node label="Business" id="J.1.0"/>
+						<node label="Education" id="J.1.1"/>
+						<node label="Financial (e.g., EFTS)" id="J.1.2"/>
+						<node label="Government" id="J.1.3"/>
+						<node label="Law" id="J.1.4"/>
+						<node label="Manufacturing" id="J.1.5"/>
+						<node label="Marketing" id="J.1.6"/>
+						<node label="Military" id="J.1.7"/>
+					</isComposedBy>
+				</node>
+				<node id="J.2" label="PHYSICAL SCIENCES AND ENGINEERING">
+					<isComposedBy>
+						<node label="Aerospace" id="J.2.0"/>
+						<node label="Archaeology" id="J.2.1"/>
+						<node label="Astronomy" id="J.2.2"/>
+						<node label="Chemistry" id="J.2.3"/>
+						<node label="Earth and atmospheric sciences" id="J.2.4"/>
+						<node label="Electronics" id="J.2.5"/>
+						<node label="Engineering" id="J.2.6"/>
+						<node label="Mathematics and statistics" id="J.2.7"/>
+						<node label="Physics" id="J.2.8"/>
+					</isComposedBy>
+				</node>
+				<node id="J.3" label="LIFE AND MEDICAL SCIENCES">
+					<isComposedBy>
+						<node label="Biology and genetics" id="J.3.0"/>
+						<node label="Health" id="J.3.1"/>
+						<node label="Medical information systems" id="J.3.2"/>
+					</isComposedBy>
+				</node>
+				<node id="J.4" label="SOCIAL AND BEHAVIORAL SCIENCES">
+					<isComposedBy>
+						<node label="Economics" id="J.4.0"/>
+						<node label="Psychology" id="J.4.1"/>
+						<node label="Sociology" id="J.4.2"/>
+					</isComposedBy>
+				</node>
+				<node id="J.5" label="ARTS AND HUMANITIES">
+					<isComposedBy>
+						<node label="Architecture" id="J.5.0"/>
+						<node label="Arts, fine and performing" id="J.5.1">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node label="Fine arts" id="J.5.2"/>
+						<node label="Language translation" id="J.5.3"/>
+						<node label="Linguistics" id="J.5.4"/>
+						<node label="Literature" id="J.5.5"/>
+						<node label="Music" id="J.5.6">
+							<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node label="Performing arts (e.g., dance, music)" id="J.5.7"/>
+					</isComposedBy>
+				</node>
+				<node id="J.6" label="COMPUTER-AIDED ENGINEERING">
+					<isComposedBy>
+						<node label="Computer-aided design (CAD)" id="J.6.0"/>
+						<node label="Computer-aided manufacturing (CAM)" id="J.6.1"/>
+					</isComposedBy>
+				</node>
+				<node id="J.7" label="COMPUTERS IN OTHER SYSTEMS">
+					<isRelatedTo>
+						<node id="C.3"/>
+					</isRelatedTo>
+					<isComposedBy>
+						<node label="Command and control" id="J.7.0"/>
+						<node label="Consumer products" id="J.7.1"/>
+						<node label="Industrial control" id="J.7.2"/>
+						<node label="Military" id="J.7.3"/>
+						<node label="Process control" id="J.7.4"/>
+						<node label="Publishing" id="J.7.5"/>
+						<node label="Real time" id="J.7.6"/>
+					</isComposedBy>
+				</node>
+				<node id="J.m" label="MISCELLANEOUS"/>
+			</isComposedBy>
+		</node>
+		<node id="K." label="Computing Milieux">
+			<isComposedBy>
+				<node id="K.0" label="GENERAL"/>
+				<node id="K.1" label="THE COMPUTER INDUSTRY">
+					<isComposedBy>
+						<node label="Markets" id="K.1.0"/>
+						<node label="Standards" id="K.1.1"/>
+						<node label="Statistics" id="K.1.2"/>
+						<node label="Suppliers" id="K.1.3"/>
+					</isComposedBy>
+				</node>
+				<node id="K.2" label="HISTORY OF COMPUTING">
+					<isComposedBy>
+						<node label="Hardware" id="K.2.0"/>
+						<node label="People" id="K.2.1"/>
+						<node label="Software" id="K.2.2"/>
+						<node label="Systems" id="K.2.3"/>
+						<node label="Theory" id="K.2.4"/>
+					</isComposedBy>
+				</node>
+				<node id="K.3" label="COMPUTERS AND EDUCATION">
+					<isComposedBy>
+						<node id="K.3.0" label="General"/>
+						<node id="K.3.1" label="Computer Uses in Education">
+							<isComposedBy>
+								<node label="Collaborative learning" id="K.3.1.0"/>
+								<node label="Computer-assisted instruction (CAI)" id="K.3.1.1"/>
+								<node label="Computer-managed instruction (CMI)" id="K.3.1.2"/>
+								<node label="Distance learning" id="K.3.1.3"/>
+							</isComposedBy>
+						</node>
+						<node id="K.3.2" label="Computer and Information Science Education">
+							<isComposedBy>
+								<node label="Accreditation" id="K.3.2.0"/>
+								<node label="Computer science education" id="K.3.2.1"/>
+								<node label="Curriculum" id="K.3.2.2"/>
+								<node label="Information systems education" id="K.3.2.3"/>
+								<node label="Literacy" id="K.3.2.4"/>
+								<node label="Self-assessment" id="K.3.2.5"/>
+							</isComposedBy>
+						</node>
+						<node id="K.3.m" label="Miscellaneous">
+							<isComposedBy>
+								<node label="Accreditation" id="K.3.m.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Computer literacy" id="K.3.m.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="K.4" label="COMPUTERS AND SOCIETY">
+					<isComposedBy>
+						<node id="K.4.0" label="General"/>
+						<node id="K.4.1" label="Public Policy Issues">
+							<isComposedBy>
+								<node label="Abuse and crime involving computers" id="K.4.1.0"/>
+								<node label="Computer-related health issues" id="K.4.1.1"/>
+								<node label="Ethics" id="K.4.1.2"/>
+								<node label="Human safety" id="K.4.1.3"/>
+								<node label="Intellectual property rights" id="K.4.1.4"/>
+								<node label="Privacy" id="K.4.1.5"/>
+								<node label="Regulation" id="K.4.1.6"/>
+								<node label="Transborder data flow" id="K.4.1.7"/>
+								<node label="Use/abuse of power" id="K.4.1.8"/>
+							</isComposedBy>
+						</node>
+						<node id="K.4.2" label="Social Issues">
+							<isComposedBy>
+								<node label="Abuse and crime involving computers" id="K.4.2.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Assistive technologies for persons with disabilities" id="K.4.2.1"/>
+								<node label="Employment" id="K.4.2.2"/>
+								<node label="Handicapped persons/special needs" id="K.4.2.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="K.4.3" label="Organizational Impacts">
+							<isComposedBy>
+								<node label="Automation" id="K.4.3.0"/>
+								<node label="Computer-supported collaborative work" id="K.4.3.1"/>
+								<node label="Employment" id="K.4.3.2"/>
+								<node label="Reengineering" id="K.4.3.3"/>
+							</isComposedBy>
+						</node>
+						<node id="K.4.4" label="Electronic Commerce">
+							<isRelatedTo>
+								<node id="J.1"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Cybercash, digital cash" id="K.4.4.0"/>
+								<node label="Distributed commercial transactions" id="K.4.4.1"/>
+								<node label="Electronic data interchange (EDI)" id="K.4.4.2"/>
+								<node label="Intellectual property" id="K.4.4.3"/>
+								<node label="Payment schemes" id="K.4.4.4"/>
+								<node label="Security" id="K.4.4.5"/>
+							</isComposedBy>
+						</node>
+						<node id="K.4.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="K.5" label="LEGAL ASPECTS OF COMPUTING">
+					<isComposedBy>
+						<node id="K.5.0" label="General"/>
+						<node id="K.5.1" label="Hardware/Software Protection">
+							<isComposedBy>
+								<node label="Copyrights" id="K.5.1.0"/>
+								<node label="Licensing" id="K.5.1.1"/>
+								<node label="Patents" id="K.5.1.2"/>
+								<node label="Proprietary rights" id="K.5.1.3"/>
+								<node label="Trade secrets" id="K.5.1.4">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+						<node id="K.5.2" label="Governmental Issues">
+							<isComposedBy>
+								<node label="Censorship" id="K.5.2.0"/>
+								<node label="Regulation" id="K.5.2.1"/>
+								<node label="Taxation" id="K.5.2.2"/>
+							</isComposedBy>
+						</node>
+						<node id="K.5.m" label="Miscellaneous">
+							<isComposedBy>
+								<node label="Contracts" id="K.5.m.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Hardware patents" id="K.5.m.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="K.6" label="MANAGEMENT OF COMPUTING AND INFORMATION SYSTEMS">
+					<isComposedBy>
+						<node id="K.6.0" label="General">
+							<isComposedBy>
+								<node label="Economics" id="K.6.0.0"/>
+							</isComposedBy>
+						</node>
+						<node id="K.6.1" label="Project and People Management">
+							<isComposedBy>
+								<node label="Life cycle" id="K.6.1.0"/>
+								<node label="Management techniques (e.g., PERT/CPM)" id="K.6.1.1"/>
+								<node label="Staffing" id="K.6.1.2"/>
+								<node label="Strategic information systems planning" id="K.6.1.3"/>
+								<node label="Systems analysis and design" id="K.6.1.4"/>
+								<node label="Systems development" id="K.6.1.5"/>
+								<node label="Training" id="K.6.1.6"/>
+							</isComposedBy>
+						</node>
+						<node id="K.6.2" label="Installation Management">
+							<isComposedBy>
+								<node label="Benchmarks" id="K.6.2.0"/>
+								<node label="Computer selection" id="K.6.2.1"/>
+								<node label="Computing equipment management" id="K.6.2.2"/>
+								<node label="Performance and usage measurement" id="K.6.2.3"/>
+								<node label="Pricing and resource allocation" id="K.6.2.4"/>
+							</isComposedBy>
+						</node>
+						<node id="K.6.3" label="Software Management">
+							<isRelatedTo>
+								<node id="D.2.9"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Software development" id="K.6.3.0"/>
+								<node label="Software maintenance" id="K.6.3.1"/>
+								<node label="Software process" id="K.6.3.2"/>
+								<node label="Software selection" id="K.6.3.3"/>
+							</isComposedBy>
+						</node>
+						<node id="K.6.4" label="System Management">
+							<isComposedBy>
+								<node label="Centralization/decentralization" id="K.6.4.0"/>
+								<node label="Management audit" id="K.6.4.1"/>
+								<node label="Quality assurance" id="K.6.4.2"/>
+							</isComposedBy>
+						</node>
+						<node id="K.6.5" label="Security and Protection">
+							<isRelatedTo>
+								<node id="D.4.6"/>
+								<node id="K.4.2"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Authentication" id="K.6.5.0"/>
+								<node label="Insurance" id="K.6.5.1">
+									<hasNote type="1">The classification is no longer used as of January 1991, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Invasive software (e.g., viruses, worms, Trojan horses)" id="K.6.5.2"/>
+								<node label="Physical security" id="K.6.5.3">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Unauthorized access (e.g., hacking, phreaking)" id="K.6.5.4"/>
+							</isComposedBy>
+						</node>
+						<node id="K.6.m" label="Miscellaneous">
+							<isComposedBy>
+								<node label="Insurance" id="K.6.m.0">
+									<hasNote type="1">The classification is no longer used as of January 1991, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Security" id="K.6.m.1">
+									<hasNote type="1">The classification is no longer used as of January 1991, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="K.7" label="THE COMPUTING PROFESSION">
+					<isComposedBy>
+						<node id="K.7.0" label="General"/>
+						<node id="K.7.1" label="Occupations"/>
+						<node id="K.7.2" label="Organizations"/>
+						<node id="K.7.3" label="Testing, Certification, and Licensing"/>
+						<node id="K.7.4" label="Professional Ethics">
+							<isRelatedTo>
+								<node id="K.4"/>
+							</isRelatedTo>
+							<isComposedBy>
+								<node label="Codes of ethics" id="K.7.4.0"/>
+								<node label="Codes of good practice" id="K.7.4.1"/>
+								<node label="Ethical dilemmas" id="K.7.4.2"/>
+							</isComposedBy>
+						</node>
+						<node id="K.7.m" label="Miscellaneous">
+							<isComposedBy>
+								<node label="Codes of good practice" id="K.7.m.0">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+								<node label="Ethics" id="K.7.m.1">
+									<hasNote type="2">The classification is no longer used as of January 1998, but the item is still searchable for previously classified documents.</hasNote>
+								</node>
+							</isComposedBy>
+						</node>
+					</isComposedBy>
+				</node>
+				<node id="K.8" label="PERSONAL COMPUTING">
+					<isComposedBy>
+						<node label="Games" id="K.8.0">
+							<hasNote type="1">The classification is no longer used as of January 1991, but the item is still searchable for previously classified documents.</hasNote>
+						</node>
+						<node id="K.8.0" label="General">
+							<isComposedBy>
+								<node label="Games" id="K.8.0.0"/>
+							</isComposedBy>
+						</node>
+						<node id="K.8.1" label="Application Packages">
+							<isComposedBy>
+								<node label="Data communications" id="K.8.1.0"/>
+								<node label="Database processing" id="K.8.1.1"/>
+								<node label="Freeware/shareware" id="K.8.1.2"/>
+								<node label="Graphics" id="K.8.1.3"/>
+								<node label="Spreadsheets" id="K.8.1.4"/>
+								<node label="Word processing" id="K.8.1.5"/>
+							</isComposedBy>
+						</node>
+						<node id="K.8.2" label="Hardware"/>
+						<node id="K.8.3" label="Management/Maintenance"/>
+						<node id="K.8.m" label="Miscellaneous"/>
+					</isComposedBy>
+				</node>
+				<node id="K.m" label="MISCELLANEOUS"/>
+			</isComposedBy>
+		</node>
+	</isComposedBy>
+</node>

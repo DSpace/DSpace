@@ -1,0 +1,86 @@
+#<IfModule mpm_prefork_module>
+#	StartServers       1
+#	MinSpareServers    1
+#	MaxSpareServers    5
+#	MaxClients        40
+#    MaxRequestsPerChild   0
+#</IfModule>
+
+NameVirtualHost *:80
+<VirtualHost *:80>
+  ServerAdmin admin@sedici.unlp.edu.ar
+  ServerName dspace.localhost
+  ServerAlias sedici.unlp.edu.ar
+  ServerAlias www.sedici.unlp.edu.ar
+  ServerAlias dspace.sedici.unlp.edu.ar
+
+  RewriteEngine On
+  #Redireccion de www.sedici.unlp.edu.ar
+  RewriteCond %{HTTP_HOST} ^www\.sedici\.unlp\.edu\.ar$
+  RewriteRule ^.*$ http://sedici.unlp.edu.ar%{REQUEST_URI} [R=permanent,L]
+
+  #se deshabilita forward-proxy
+  ProxyRequests Off
+ 
+  #DocumentRoot con reglas de escritura y otras yerbas
+  DocumentRoot /var/dspace/config/httpd
+  <Directory /var/dspace/config/httpd>
+    AllowOverride all
+    Order allow,deny
+    Allow from all
+    ErrorDocument 503 "/custom-errors/error-503.html"
+  </Directory>
+
+  #Proxy a la mediawiki 
+  ProxyPass /wiki http://wiki.sedici.unlp.edu.ar/wiki retry=10
+  ProxyPassReverse /wiki http://wiki.sedici.unlp.edu.ar/wiki
+
+  ProxyPass /blog !
+  Alias /blog "/var/www/sedici_blog"
+  <Directory /var/www/sedici_blog>
+    AllowOverride all
+    Order allow,deny
+    Allow from all
+  </Directory>
+
+  #ProxyPass / ajp://localhost:8009/ retry=10
+  #ProxyPassReverse / ajp://localhost:8009/
+  <Proxy ajp://localhost:8009/>
+    ProxySet timeout=600
+    ProxySet retry=5
+    ProxySet ping=5
+    #ttl=0 
+  </Proxy>
+
+  #Se oculta el acceso al manager para orígenes confiables
+  <Location /manager>
+    Order allow,deny
+    Deny from all
+    Allow from 163.10.34 192.168 127.0
+  </Location>
+
+  #Se restringe el acceso a /feedback para evitar la generación de exceptions masivas
+  <Location /feedback>
+    Order Deny,Allow
+    Deny from all
+  </Location>
+
+  #Se comprime todos los contenidos textuales
+  <IfModule mod_deflate.c>
+     AddType text/javascript .js
+
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE text/javascript application/x-javascript application/javascript application/ecmascript
+    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/json
+    AddOutputFilterByType DEFLATE application/rss+xml application/atom+xml  
+    #AddOutputFilterByType DEFLATE application/vnd.ms-fontobject application/x-font-ttf font/opentype image/svg+xml
+  </IfModule>
+  
+   LogLevel warn
+  ErrorLog /var/log/apache2/error-dspace.log
+  CustomLog /var/log/apache2/access-dspace.log combined
+
+  RewriteLog ${APACHE_LOG_DIR}/rewrite_dspace.log
+  RewriteLogLevel 0
+
+</VirtualHost>

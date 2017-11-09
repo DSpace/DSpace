@@ -14,8 +14,10 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.dspace.xmlworkflow.state.actions.Action;
 import org.dspace.xmlworkflow.state.actions.processingaction.ReviewAction;
 import org.xml.sax.SAXException;
@@ -56,6 +58,16 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
         message("xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_help");
     protected static final Message T_edit_submit =
         message("xmlui.XMLWorkflow.workflow.EditMetadataAction.edit_submit");
+    
+    /** Delete page messages **/
+    protected static final Message T_delete_help =
+            message("xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_help");
+    protected static final Message T_delete_submit =
+            message("xmlui.XMLWorkflow.workflow.EditMetadataAction.delete_submit");
+    protected static final Message T_submit_delete =
+            message("xmlui.Submission.workflow.DeleteTaskStep.submit_delete");
+    protected static final Message T_info3=
+            message("xmlui.Submission.workflow.DeleteTaskStep.info1");
 
     /** Reject page messages **/
     protected static final Message T_reason =
@@ -105,6 +117,9 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
             case ReviewAction.REJECT_PAGE:
                 renderRejectPage(div);
                 break;
+            case org.dspace.xmlworkflow.state.actions.processingaction.AcceptEditRejectAction.DELETE_PAGE:
+                renderDeletePage(div);
+                break;
         }
 
         div.addHidden("submission-continue").setValue(knot.getId());
@@ -113,17 +128,32 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
     private void renderMainPage(Division div) throws WingException {
         Table table = div.addTable("workflow-actions", 1, 1);
         table.setHead(T_info1);
-
-        // Approve task
-        Row row = table.addRow();
-        row.addCellContent(T_approve_help);
-        row.addCell().addButton("submit_approve").setValue(T_approve_submit);
+        Row row;
+        
+        // We show the Aprobal/Reject buttons only when the edit metadata is completed
+        if(workflowItem.getItem().isArchived() || XmlWorkflowManager.isWorkflowEdited(workflowItem.getItem())) {
+        
+	        // Approve task
+	        row = table.addRow();
+	        row.addCellContent(T_approve_help);
+	        row.addCell().addButton("submit_approve").setValue(T_approve_submit);
+        }
 
         // Reject item
         row = table.addRow();
         row.addCellContent(T_reject_help);
         row.addCell().addButton("submit_reject").setValue(T_reject_submit);
-
+        
+        try {
+			if (AuthorizeManager.authorizeActionBoolean(context,workflowItem.getItem(),org.dspace.core.Constants.DELETE)){
+				// Delete item
+			    row = table.addRow();
+			    row.addCellContent(T_delete_help);
+			    row.addCell().addButton("submit_delete").setValue(T_delete_submit);
+			}
+		} catch (SQLException e) {
+			
+		}
 
         // Edit metadata
         row = table.addRow();
@@ -158,6 +188,35 @@ public class AcceptEditRejectAction extends AbstractXMLUIAction {
 
         org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
         actions.addButton("submit_reject").setValue(T_submit_reject);
+        actions.addButton("submit_cancel").setValue(T_submit_cancel);
+
+    }
+    
+    private void renderDeletePage(Division div) throws WingException {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        
+		/*if ("netural".equals(outcome))
+        {
+            rend += " netural";
+        }
+		else if ("success".equals(outcome))
+        {
+            rend += " success";
+        }
+		else if ("failure".equals(outcome))
+        {
+            rend += " failure";
+        }*/
+		
+		Division divNotice = div.addDivision("general-message","notice failure");
+        divNotice.addPara(T_info3);
+
+        List form = div.addList("delete-workflow",List.TYPE_FORM);       
+
+        div.addHidden("page").setValue(org.dspace.xmlworkflow.state.actions.processingaction.AcceptEditRejectAction.DELETE_PAGE);
+
+        org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
+        actions.addButton("submit_delete").setValue(T_submit_delete);
         actions.addButton("submit_cancel").setValue(T_submit_cancel);
 
     }

@@ -33,7 +33,10 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
+import org.dspace.content.CollectionSearchSedici;
+import org.dspace.content.CollectionsWithCommunities;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
@@ -362,7 +365,8 @@ public class EditProfile extends AbstractDSpaceTransformer
            subscribe.addItem(T_subscriptions_help);
            
            Collection[] currentList = Subscribe.getSubscriptions(context, context.getCurrentUser());
-           Collection[] possibleList = Collection.findAll(context);
+           CollectionsWithCommunities possibleList = CollectionSearchSedici.findAllWithCommunitiesName(context);
+           //Collection[] possibleList = Collection.findAll(context);
            
            Select subscriptions = subscribe.addItem().addSelect("subscriptions");
            subscriptions.setLabel(T_email_subscriptions);
@@ -371,19 +375,28 @@ public class EditProfile extends AbstractDSpaceTransformer
            subscriptions.enableDeleteOperation();
            
            subscriptions.addOption(-1,T_select_collection);
-           for (Collection possible : possibleList)
-           {
-               String name = possible.getMetadata("name");
-               if (name.length() > 50)
-               {
-                   name = name.substring(0, 47) + "...";
+           
+           String communityName, collectionName;
+           Collection collection;
+           for (int i = 0; i < possibleList.getCollections().size(); i++) {
+           	collection=possibleList.getCollections().get(i);
+           	
+           	communityName=possibleList.getCommunitiesName().get(i);
+           	collectionName=collection.getName();
+
+      		   	if (communityName.length() > 40){
+      		   		communityName = communityName.substring(0, 39);
+               } 
+      		   	if (collectionName.length() > 40){
+      		   		collectionName = collectionName.substring(0, 39);
                }
-               subscriptions.addOption(possible.getID(), name);
+      		   	
+      		  subscriptions.addOption(collection.getID(),communityName+" > "+collectionName);
            }
                    
-           for (Collection collection: currentList)
+           for (Collection collectionAux: currentList)
            {
-               subscriptions.addInstance().setOptionSelected(collection.getID());
+               subscriptions.addInstance().setOptionSelected(collectionAux.getID());
            }
        }
        

@@ -12,10 +12,12 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
 import org.dspace.app.util.Util;
+import org.dspace.app.xmlui.aspect.workflow.ClaimTasksAction;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -35,6 +37,15 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 import org.dspace.handle.HandleManager;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowManager;
+import org.dspace.xmlworkflow.WorkflowFactory;
+import org.dspace.xmlworkflow.WorkflowRequirementsManager;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Utility methods to processes actions on Groups. These methods are used
@@ -406,6 +417,7 @@ public class FlowItemUtils
 	/**
 	 * Permanently delete the specified item, this method assumes that
 	 * the action has been confirmed.
+	 * Añadimos el borrado de los workflowitem en caso de que el item este en edicion
 	 * 
 	 * @param context The DSpace context
 	 * @param itemID The id of the to-be-deleted item.
@@ -414,25 +426,45 @@ public class FlowItemUtils
 	public static FlowResult processDeleteItem(Context context, int itemID) throws SQLException, AuthorizeException, IOException
 	{
 		FlowResult result = new FlowResult();
-		result.setContinue(false);
+		boolean retorno=false;
+		result.setContinue(retorno);
 		
 		Item item = Item.find(context, itemID);
 			
         Collection[] collections = item.getCollections();
 
-        // Remove item from all the collections it's in
-        for (Collection collection : collections)
-        {
-            collection.removeItem(item);
-        }	
-        
-        // Note: when removing an item from the last collection it will
-        // be removed from the system. So there is no need to also call
-        // an item.delete() method.        
-        
-        context.commit();
+        //removemos el workflowitem
+        XmlWorkflowItem wfItem=XmlWorkflowManager.GetWorkflowItem(context, item);//WorkflowItem.findByItem(context, item);
+        if (wfItem!=null){
+        	List<ClaimedTask> tareas=ClaimedTask.find(context, wfItem);
+        	if (tareas.isEmpty()){
+        		wfItem.deleteWrapper();
+        		retorno=true;
+        	} else {
+        		if (tareas.get(0).getOwnerID()==context.getCurrentUser().getID()){
+        			WorkflowRequirementsManager.clearInProgressUsers(context, wfItem);
+        			wfItem.deleteWrapper();         			
+            		retorno=true;
+        		}
+        	}        	
+        } else {
+        	retorno=true;
+        }
+        if (retorno){
+        	// Remove item from all the collections it's in
+	        for (Collection collection : collections)
+	        {
+	            collection.removeItem(item);
+	        }	
+	        
+	        // Note: when removing an item from the last collection it will
+	        // be removed from the system. So there is no need to also call
+	        // an item.delete() method.        
+	        
+	        context.commit();
+        };
 		
-        result.setContinue(true);
+        result.setContinue(retorno);
         
 		return result;
 	}

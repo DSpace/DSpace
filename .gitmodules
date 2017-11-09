@@ -1,0 +1,3 @@
+[submodule "dspace/modules/sedici-2003"]
+	path = dspace/modules/sedici-2003
+	url = https://github.com/sedici/SEDICI2003-Roo.git

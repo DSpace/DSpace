@@ -1,0 +1,54 @@
+#!/bin/bash
+
+
+DSPACE_VERSION="1.8.2"
+
+### Directorio de instalacion
+#INSTALL_DIR=
+
+### Usuario y grupo al que se asignaran los archivos instalados
+#dspace_user=dspace
+#dspace_group=dspace
+
+### usuario y grupo del web container
+#web_user=tomcat7
+#web_group=tomcat7
+#web_home=/var/lib/tomcat7/webapps/
+
+# informacion para la creacion de la base de datos
+seed="$RANDOM"
+dspace_dbuser="dspace$seed"
+dspace_dbname="dspace$seed"
+dspace_dbpassword="dspace"
+
+# si pg_connection_host es distinto de 'localhost', debe proporcionarse un pg_connection_user (ya que la conexion será remota)
+pg_connection_host="localhost"
+pg_connection_user=""
+
+
+#/////////////////////////////////////////////////////////////
+
+#Setea los parametros por default
+
+	if [ ! "$INSTALL_DIR" ]; then
+		INSTALL_DIR=$BASE_DIR/install
+		echo "[DEFAULT] Se toma como directorio de instalacion a $INSTALL_DIR"
+	fi	
+
+	if [ ! "$dspace_user" ]; then
+		dspace_user=`whoami`
+	fi
+	
+	if [ ! "$dspace_group" ]; then
+		dspace_group=$dspace_user
+	fi
+	
+	if [ ! "$web_user" ]; then
+		web_user=$dspace_user
+	fi
+	
+        if [ ! "$web_group" ]; then
+                web_group=$dspace_group
+        fi
+	
+	

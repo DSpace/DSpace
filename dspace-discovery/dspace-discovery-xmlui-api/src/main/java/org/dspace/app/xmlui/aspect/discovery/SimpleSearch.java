@@ -133,10 +133,16 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         Item searchBoxItem = searchList.addItem();
         Text text = searchBoxItem.addText("query");
-        text.setValue(queryString);
+        //remove the escaping slashes added to the query for the brackets
+        text.setValue(queryString.replace("\\", ""));
         text.setSize(75);
         searchBoxItem.addButton("submit").setValue(T_go);
-        addHiddenFormFields("search", request, fqs, mainSearchDiv);
+     
+        /*
+         * Se comento esta linea para cuando se realiza una nueva busqueda, no tenga en cuentas los demas filtros, solo el del paramtro query
+         * */
+        //  addHiddenFormFields("search", request, fqs, mainSearchDiv);
+
 
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -283,7 +289,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             String type = request.getParameter("filtertype");
             String value = request.getParameter("filter");
 
-            if(value != null && !value.equals("")){
+            if(type != null && !type.equals("") && value != null && !value.equals("")){
                 allFilterQueries.add(searchService.toFilterQuery(context, (type.equals("*") ? "" : type), value).getFilterQuery());
             }
 
@@ -313,6 +319,8 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         {
             return "";
         }
+        // deal with brackets in the main query
+        query = query.replace("(", "\\(").replace(")", "\\)").replace("\\\\", "\\").replace(":", "\\:");
         return query.trim();
     }
 

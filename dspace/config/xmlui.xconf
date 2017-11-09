@@ -66,13 +66,20 @@
         -->
         <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
         <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
-        <aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />
+        <!--<aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" /> -->
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
 	    <aspect name="Statistics" path="resource://aspects/Statistics/" />
-	    <aspect name="Original Workflow" path="resource://aspects/Workflow/" />
-	    <!--<aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" />-->
+	    <!-- <aspect name="Original Workflow" path="resource://aspects/Workflow/" /> -->
+	    <aspect name="News" path="resource://aspects/News/"/>
+	    <aspect name="Redirect" path="resource://aspects/Redirect/"/>
+	    <aspect name="Static Pages" path="resource://aspects/StaticPages/"/>
+		<aspect name="ExtraSubmissions" path="resource://aspects/ExtraSubmission/"/>
+		<aspect name="CollectionViewer" path="resource://aspects/CollectionViewer/"/>
+	    <aspect name="Discovery" path="resource://aspects/Discovery/" />
+	    <aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" />
+	    <aspect name="Feeds" path="resource://aspects/Feeds/" />
         <!--
             To enable Discovery, uncomment this Aspect that will enable it
             within your existing XMLUI
@@ -121,7 +128,8 @@
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
         <!-- Default theme -->
-        <theme name="Default Reference Theme" regex=".*" path="Reference/" />
+        <!-- <theme name="Default Reference Theme" regex=".*" path="Sedici/" /> -->
+        <theme name="Sedici2" regex=".*" path="Sedici2/" />
 
         <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
         <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->

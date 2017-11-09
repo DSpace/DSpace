@@ -32,7 +32,8 @@ public abstract class ProcessingAction extends Action {
             task = ClaimedTask.findByWorkflowIdAndEPerson(context, wfi.getID(), context.getCurrentUser().getID());
         //Check if we have claimed the current task
         return task != null &&
-                task.getWorkflowID().equals(getParent().getStep().getWorkflow().getID()) &&
+//			Task #3322: se comenta ésta línea para poder cambiar cambiar de workflow al cambiar la colección de un workflowitem.
+//                task.getWorkflowID().equals(getParent().getStep().getWorkflow().getID()) &&
                 task.getStepID().equals(getParent().getStep().getId()) &&
                 task.getActionID().equals(getParent().getId());
     }

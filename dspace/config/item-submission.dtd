@@ -11,14 +11,15 @@
  
  <!ELEMENT name-map EMPTY >
  <!ATTLIST name-map 
-           collection-handle CDATA #REQUIRED
+           handle CDATA #IMPLIED 
+           collection-handle CDATA #IMPLIED
            submission-name NMTOKEN #REQUIRED>
 
  <!-- 'step-definitions' must contain at least one 'step' node -->
  <!-- (The "select collection" step *must* be here)            -->
  <!ELEMENT step-definitions (step+) >
  
- <!ELEMENT step (heading?, processing-class, jspui-binding?, xmlui-binding?, workflow-editable?) >
+ <!ELEMENT step (heading?, processing-class?, jspui-binding?, xmlui-binding?, workflow-editable?) >
  <!ATTLIST step id NMTOKEN #IMPLIED>
  
  <!ELEMENT heading (#PCDATA) >

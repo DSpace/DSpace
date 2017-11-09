@@ -93,6 +93,13 @@ public class TextArea extends Field
         this.params.enableDeleteOperation();
     }
     
+    /**
+     * Sets this textarea field as a i18nable field
+     */
+    public void setI18nable() 
+    {
+    	this.params.setI18nable();
+    }
 
     /** ******************************************************************** */
     /** Raw Values * */
@@ -157,6 +164,18 @@ public class TextArea extends Field
         values.add(value);
         return value;
     }
+
+        /**
+	 * Set the value's language
+	 */
+	public Value setLanguageValue(String lang) throws WingException
+	{
+		this.removeValueOfType(Value.TYPE_LANG);
+		Value value = new Value(context, Value.TYPE_LANG);
+		value.addContent(lang);
+		values.add(value);
+		return value;
+	}
 
     /**
      * Add a field instance

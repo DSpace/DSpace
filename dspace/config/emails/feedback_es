@@ -1,0 +1,31 @@
+# E-mail sent with the information filled out in a feedback form.
+#
+# Parameters: {0} current date
+#             {1} email address that the user provided
+#             {2} logged in as
+#             {3} page that the user was on when they selected feedback
+#             {4} User-Agent HTTP Header
+#             {5} Session Id
+#             {6} The user's comments
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: SeDiCI - Formulario de contacto
+
+Comentarios:
+
+{6}
+
+
+Fecha: {0}
+Email: {1}
+Logueado como: {2}
+Página de referencia: {3}
+Agente del usuario: {4}
+Sesión: {5}
+
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
+Universidad Nacional de La Plata
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141

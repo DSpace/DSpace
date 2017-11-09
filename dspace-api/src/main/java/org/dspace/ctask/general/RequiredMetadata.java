@@ -18,6 +18,7 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -79,7 +80,7 @@ public class RequiredMetadata extends AbstractCurationTask
                     handle = "in workflow";
                 }
                 sb.append("Item: ").append(handle);
-                for (String req : getReqList(item.getOwningCollection().getHandle()))
+                for (String req : getReqList(item.getOwningCollection()))
                 {
                     DCValue[] vals = item.getMetadata(req);
                     if (vals.length == 0)
@@ -112,17 +113,13 @@ public class RequiredMetadata extends AbstractCurationTask
         }
     }
     
-    private List<String> getReqList(String handle) throws DCInputsReaderException
+    private List<String> getReqList(Collection collection) throws DCInputsReaderException
     {
-        List<String> reqList = reqMap.get(handle);
-        if (reqList == null)
-        {
-            reqList = reqMap.get("default");
-        }
+        List<String> reqList = reqMap.get(collection.getHandle());
         if (reqList == null)
         {
             reqList = new ArrayList<String>();
-            DCInputSet inputs = reader.getInputs(handle);
+            DCInputSet inputs = reader.getInputs(collection);
             for (int i = 0; i < inputs.getNumberPages(); i++)
             {
                 for (DCInput input : inputs.getPageRows(i, true, true))
@@ -142,7 +139,7 @@ public class RequiredMetadata extends AbstractCurationTask
                     }
                 }
             }
-            reqMap.put(inputs.getFormName(), reqList);
+            reqMap.put(collection.getHandle(), reqList);
         }
         return reqList;
     }

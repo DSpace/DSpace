@@ -18,6 +18,10 @@
  <!-- for handle "default".                                                -->
  <submission-map>
    <name-map collection-handle="default" submission-name="traditional" />
+   <name-map collection-handle="10915/50" submission-name="autoarchiveSubmission" />
+
+   <!--10915/46286: Autarchivo de Tesis de Grado -->
+   <name-map collection-handle="10915/46286" submission-name="tesisDeGrado" />
  </submission-map>
 
 
@@ -111,6 +115,74 @@
        <jspui-binding>org.dspace.app.webui.submit.step.JSPSampleStep</jspui-binding>
        <workflow-editable>true</workflow-editable>
      </step>
+     
+      <!--Step sediciDescribeItem will be to Describe the item.-->
+      <step id="sediciDescribeItem">
+        <heading>submit.progressbar.describe</heading>
+        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
+		<xmlui-binding>ar.edu.unlp.sedici.aspect.extraSubmission.submit.DescribeStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+      
+      <!--Step sediciUploadItem will be to Upload the item.-->
+      <step id="sediciUploadItem">
+        <heading>submit.progressbar.upload</heading>
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.UploadStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+      
+      <!--Step sediciVerifyItem will be to Verify/Review everything -->
+ 	  <step id="sediciVerifyItem">
+        <heading>submit.progressbar.verify</heading>
+        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+ 	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
+		<workflow-editable>true</workflow-editable>
+      </step>
+
+      <!--Step sediciCCLicense will be to select a Creative Commons License-->
+      <step id="sediciCCLicense">
+        <heading>submit.progressbar.CClicense</heading>
+        <processing-class>org.dspace.submit.step.SediciCCLicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.SediciCCLicenseStep</xmlui-binding>
+		<workflow-editable>true</workflow-editable>
+      </step>
+      
+      <!--Step sediciAdministratorCCLicense will be to select a Creative Commons License-->
+      <step id="sediciAdministratorCCLicense">
+        <heading>submit.progressbar.CClicense</heading>
+        <processing-class>org.dspace.submit.step.SediciAdministratorCCLicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.SediciAdministratorCCLicenseStep</xmlui-binding>
+		<workflow-editable>true</workflow-editable>
+      </step>
+
+      <!--Step sediciSignOffLicense will be to Sign off on the License-->
+      <step id="sediciSignOffLicense">
+        <heading>submit.progressbar.license</heading>
+        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
+      </step>
+      
+      <!--Step sediciAutomaticData cagará datos fijos en el item. No tendrá interface.
+      Se quita por ahora
+      <step id="sediciAutomaticData">
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticMetadataStep</processing-class>
+		<workflow-editable>true</workflow-editable>
+      </step> -->
+      
+      <!--Step para controlar si el item fue revisado. No tendrá interface-->
+      <step id="sediciWorkflowEditedControl">
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.WorkflowEditedControlStep</processing-class>
+		<workflow-editable>true</workflow-editable>
+      </step> 
+      
  </step-definitions>
 
  <!-- The submission-definitions map lays out the detailed definition of   -->
@@ -174,74 +246,83 @@
      <!--<step id="sample"/>-->
           
      <!--Step 1 will be to gather initial information-->
-	  <step>
-	    <heading>submit.progressbar.initial-questions</heading>
-		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class>
-		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	    
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding>
-	    <workflow-editable>true</workflow-editable>
-	  </step>
+<!-- 	  <step> -->
+<!-- 	    <heading>submit.progressbar.initial-questions</heading> -->
+<!-- 		<processing-class>org.dspace.submit.step.InitialQuestionsStep</processing-class> -->
+<!-- 		<jspui-binding>org.dspace.app.webui.submit.step.JSPInitialQuestionsStep</jspui-binding>   	     -->
+<!-- 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.InitialQuestionsStep</xmlui-binding> -->
+<!-- 	    <workflow-editable>true</workflow-editable> -->
+<!-- 	  </step> -->
 	
 	<!--If you disable the initial questions step you should insert the -->
 	<!--SkipInitialQuestionsStep below, to enable proper processing of  -->
 	<!--input-forms configuration                                       -->
-	<!-- 
 	<step>
 		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
 	</step>
-    -->  
       
       <!--Step 2 will be to Describe the item.-->
-      <step>
-        <heading>submit.progressbar.describe</heading>
-        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.DescribeStep</xmlui-binding>
-        <workflow-editable>true</workflow-editable>
-      </step>
+      <step id="sediciDescribeItem"/>
           
       <!--Step 3 will be to Upload the item-->
-      <step>
-        <heading>submit.progressbar.upload</heading>
-        <processing-class>org.dspace.submit.step.UploadStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
-        <workflow-editable>true</workflow-editable>
-      </step>
+      <step id="sediciUploadItem"/>
      
- 	  <!--Step 4 will be to Verify/Review everything -->
- 	  <step>
-        <heading>submit.progressbar.verify</heading>
-        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
- 	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
-		<workflow-editable>true</workflow-editable>
-      </step>
+      <!--Step 4 will be to Verify/Review everything -->
+ 	  <step id="sediciVerifyItem"/>
+
+      <!--Step 5 will be to select a License-->
+      <step id="sediciAdministratorCCLicense"/>
+      
+      <!--Step 6 cagará datos fijos en el item. No tendrá interface
+      <step id="sediciAutomaticData"/>
+		-->
+      <!--Step 7 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
+      <step id="sediciWorkflowEditedControl"/>
+    
+   </submission-process>
+   
+   <submission-process name="autoarchiveSubmission">
+   <step>
+		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+	</step>
+      
+      <!--Step 2 will be to Describe the item.-->
+      <step id="sediciDescribeItem"/>
+          
+      <!--Step 3 will be to Upload the item-->
+      <step id="sediciUploadItem"/>
+     
+      <!--Step 4 will be to Verify/Review everything -->
+ 	  <step id="sediciVerifyItem"/>
 
       <!--Step 5 will be to select a Creative Commons License-->
-      <!-- Uncomment this step to allow the user to select a Creative Commons license -->
-       <!--
-      <step>
-        <heading>submit.progressbar.CClicense</heading>
-        <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
-      </step>
-      -->
+      <step id="sediciCCLicense"/>
 
       <!--Step 6 will be to Sign off on the License-->
-      <step>
-        <heading>submit.progressbar.license</heading>
-        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
-      </step>
-
-
-     
+<!--       <step id="sediciSignOffLicense"/> -->
+      
+      <!--Step 7 cagará datos fijos en el item. No tendrá interface
+      <step id="sediciAutomaticData"/>
+    -->
+      <!--Step 8 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
+      <step id="sediciWorkflowEditedControl"/>
+    
    </submission-process>
+
+       <submission-process name="tesisDeGrado">
+               <step>
+                       <processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+               </step>
+       
+           <!--Step 2 will be to Describe the item.-->
+           <step id="sediciDescribeItem"/>
+             
+           <!--Step 3 will be to Upload the item-->
+               <step id="sediciUploadItem"/>
+       
+               <!--Step 4 Setea el flag indicando que se completo el proceso de edición desde el workflow. No tiene interface-->
+               <step id="sediciWorkflowEditedControl"/>
+       </submission-process>
 
  </submission-definitions>
 

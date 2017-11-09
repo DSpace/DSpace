@@ -1,0 +1,13 @@
+User-agent: *
+Crawl-delay: 3
+Allow: /
+Disallow: /themes
+Sitemap:  http://sedici.unlp.edu.ar/sitemap
+
+#No queremos crawling de estos bots 3296
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+

@@ -6,7 +6,7 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace - The item export you requested was not completed.
+Subject: SeDiCi - The item export you requested was not completed
 The item export you requested was not completed, due to the following reason:
  {0}
 
@@ -14,6 +14,8 @@ For more information you may contact your system administrator:
  {1}
 
 
-
-The DSpace Team
-
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
+Universidad Nacional de La Plata
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141

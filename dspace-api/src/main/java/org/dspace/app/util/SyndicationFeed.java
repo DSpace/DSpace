@@ -89,8 +89,9 @@ public class SyndicationFeed
     private static String defaultExternalMedia = "dc.source.uri";
 
     // metadata field for Item title in entry:
-    private static String titleField =
-        getDefaultedConfiguration("webui.feed.item.title", defaultTitleField);
+    private static String titleField[] =
+        getDefaultedConfiguration("webui.feed.item.title", defaultTitleField).split("\\s*,\\s*");
+
 
     // metadata field for Item publication date in entry:
     private static String dateField =
@@ -242,7 +243,7 @@ public class SyndicationFeed
                 entry.setLink(entryURL);
                 entry.setUri(entryURL);
              
-                String title = getOneDC(item, titleField);
+                String title = getJoinedMetadata(item, titleField, ": ");
                 entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : title);
              
                 // "published" date -- should be dc.date.issued
@@ -570,5 +571,33 @@ public class SyndicationFeed
         DCValue dcv[] = item.getMetadata(field);
         return (dcv.length > 0) ? dcv[0].value : null;
     }
+    
+    /* SEDICI-BEGIN */
+    private String getJoinedMetadata(Item item, String[] metadataFields, String separator)
+    {
+    	StringBuffer sb = new StringBuffer();
+    	boolean first = true;
+        for (String metadataField : metadataFields)
+        {
+        	DCValue values[] = item.getMetadata(metadataField);
+            for (DCValue v : values)
+            {
+            	if (v.value.isEmpty())
+            		continue;
+            	
+            	if (first)
+            	{
+              		first = false;
+              		sb.append(v.value);
+            	}
+              	else 
+              	{
+              		sb.append(separator).append(v.value);
+              	}
+            }
+        }
+		return sb.toString();
+    }
+    /* SEDICI-END */
 }
 

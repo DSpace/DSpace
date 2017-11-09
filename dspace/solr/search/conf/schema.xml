@@ -240,6 +240,7 @@
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.EnglishPorterFilterFactory" protected="protwords.txt"/>
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+        <filter class="solr.ASCIIFoldingFilterFactory"/>
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
@@ -253,6 +254,7 @@
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.EnglishPorterFilterFactory" protected="protwords.txt"/>
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+        <filter class="solr.ASCIIFoldingFilterFactory"/>
       </analyzer>
     </fieldType>
 
@@ -434,6 +436,7 @@
             <filter class="solr.StopFilterFactory" />
             <!-- The TrimFilter removes any leading or trailing whitespace -->
             <filter class="solr.TrimFilterFactory" />
+            <filter class="solr.ASCIIFoldingFilterFactory"/>
         </analyzer>
     </fieldType>
 
@@ -441,7 +444,7 @@
         <analyzer>
             <!--Treats the entire field as a single token, regardless of its content-->
             <tokenizer class="solr.KeywordTokenizerFactory"/>
-
+			<filter class="solr.ASCIIFoldingFilterFactory"/>
             <!--<filter class="solr.LowerCaseFilterFactory" />-->
         </analyzer>
     </fieldType>

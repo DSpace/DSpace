@@ -276,6 +276,10 @@ to administer DSpace.
 			</map:select>
 						
 			<map:generate/>
+
+		    <map:match pattern="admin/finalize">
+           	   <map:serialize/>
+            </map:match>
 			<map:act type="CurrentActivityAction"/>
 			<map:transform type="SystemwideAlerts"/>
 			<map:transform type="Navigation"/>

@@ -7,9 +7,12 @@
  */
 package org.dspace.app.xmlui.aspect.discovery;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -26,6 +29,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.*;
@@ -40,10 +44,10 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
+import ar.edu.unlp.sedici.xmlui.exception.BadRequestException;
 
 /**
  * Filter which displays facets on which a user can filter his discovery search
@@ -87,7 +91,16 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         DSpace dspace = new DSpace();
         config = dspace.getConfigurationService();
         searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
+        DEFAULT_PAGE_SIZE=ConfigurationManager.getIntProperty("sedici-dspace","xmlui.discovery.search-limit", 60);
+    }
 
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException   {
+    	super.setup(resolver, objectModel, src, parameters);
+    	
+    	// Checks for field parameter
+    	if(ObjectModelHelper.getRequest(objectModel).getParameter(SearchFilterParam.FACET_FIELD) == null)
+    		throw new BadRequestException("You must provide a field parameter");
     }
 
     /**
@@ -415,7 +428,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             //Add already existing filter queries
             url = addFilterQueriesToUrl(url);
             //Last add the current filter query
-            url += "&fq=" + URLEncoder.encode(filterQuery, "UTF-8");
+            url += "&fq=" + filterQuery;
             cell.addXref(url, displayedValue + " (" + value.getCount() + ")"
             );
         }

@@ -31,6 +31,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
@@ -156,9 +157,10 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 
         Collection collection = (Collection) dso;
 
+        Community parentComunity = (Community)collection.getParentObject();
         // Set the page title
-        String name = collection.getMetadata("name");
-        if (name == null || name.length() == 0)
+        String name = parentComunity.getMetadata("name")+ " - " +collection.getMetadata("name");
+        if (name == null || name.trim().length() == 0)
         {
             pageMeta.addMetadata("title").addContent(T_untitled);
         }

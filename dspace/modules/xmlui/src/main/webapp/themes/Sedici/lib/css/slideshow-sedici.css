@@ -1,0 +1,113 @@
+/*
+	Slideshow
+*/
+
+#slides {
+	top:15px;
+	left:4px;
+	z-index:100;
+}
+
+/*
+	Slides container
+	Important:
+	Set the width of your slides container
+	Set to display none, prevents content flash
+*/
+
+.slides_container {
+	width:700px;
+	overflow:hidden;
+	position:relative;
+	display:none;
+}
+
+/*
+	Each slide
+	Important:
+	Set the width of your slides
+	If height not specified height will be set by the slide content
+	Set to display block
+*/
+
+.slides_container div.slide {
+	width:700px;
+	height:300px;
+	display:block;
+}
+
+
+/*
+	Next/prev buttons
+*/
+
+#slides .next,#slides .prev {
+	position:absolute;
+	top:129px;
+	left:0px;
+	width:24px;
+	height:43px;
+	display:block;
+	z-index:101;
+}
+
+#slides .next {
+	left:676px;
+}
+
+/*
+	Pagination
+*/
+
+#slides .pagination {
+	margin:-15px auto auto;
+	width:100px;
+	background: none;
+}
+
+#slides .pagination li {
+	float:left;
+	margin:0 1px;
+	list-style:none;
+}
+
+#slides .pagination li a {
+	display:block;
+	width:12px;
+	height:0;
+	padding-top:12px;
+	background-image:url(../../images/pagination.png);
+	background-position:0 0;
+	float:left;
+	overflow:hidden;
+}
+
+#slides .pagination li.current a {
+	background-position:0 -12px;
+}
+
+/*
+	Caption
+*/
+
+#slides .caption h1 {
+	font-size: 15px;
+	font-weight: bold;
+	color:#fff;
+}
+#slides .caption {
+	z-index:500;
+	position:absolute;
+	bottom:-35px;
+	left:0;
+	height:60px;
+	padding:5px 30px 5px 10px;
+	background:#000;
+	background:rgba(0,0,0,.5);
+	width:660px;
+	font-size: 12px;
+	line-height:1.4;
+	color:#fff;
+	border-top:1px solid #000;
+	text-shadow:none;
+}

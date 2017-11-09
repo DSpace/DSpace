@@ -1,0 +1,30 @@
+# E-mail sent to designated address when an internal server error occurs
+#
+# Parameters:  {0} DSpace server URL
+#             {1} Date & time
+#             {2} Session ID + IP address
+#             {3} User details
+#             {4} URL + HTTP parameters, if any
+#             {5} Cause
+#             {6} Exception stack trace
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: [Dspace@SeDiCI] Excepción {5}
+* Ruta completa: {0}{4}
+* Fecha: {1}
+* Usuario: {3}
+* ID de sesión y dirección de IP: {2}
+* URL del error: {4}
+* Causa: {5}
+* Parametros: {6}
+* Stack trace del error:
+
+{7} 
+
+
+Servicio de Difusión de la Creación Intelectual (http://sedici.unlp.edu.ar)
+Universidad Nacional de La Plata
+Ubicación: 49 y 115 s/n, 1er piso, Departamento de Ciencias Básicas, Facultad de Ingeniería.
+Mapa: http://sedici.unlp.edu.ar/pages/comoLlegar
+Tel 0221- 4236677/6696 Interno 141

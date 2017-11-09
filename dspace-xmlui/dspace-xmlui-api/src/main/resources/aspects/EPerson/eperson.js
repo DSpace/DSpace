@@ -17,10 +17,13 @@ importClass(Packages.org.dspace.eperson.AccountManager);
 importClass(Packages.org.dspace.eperson.Subscribe);
 importClass(Packages.org.dspace.authorize.AuthorizeException);
 
+importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
 importClass(Packages.org.dspace.app.xmlui.utils.AuthenticationUtil);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 
 importClass(Packages.java.lang.String);
+importClass(Packages.ar.edu.unlp.sedici.util.FlashMessagesUtil);
+importClass(Packages.java.util.Arrays);
 
 /**
  * This class defines the workflows for three flows within the EPerson aspect.
@@ -39,6 +42,24 @@ function getObjectModel()
 function getDSContext()
 {
 	return ContextUtil.obtainContext(getObjectModel());
+}
+
+/**
+ * Return the HTTP Request object for this request
+ */
+function getHttpRequest()
+{
+	//return getObjectModel().get(HttpEnvironment.HTTP_REQUEST_OBJECT)
+
+	// Cocoon's request object handles form encoding, thus if the users enters
+	// non-ascii characters such as those found in foreign languages they will
+	// come through corrupted if they are not obtained through the cocoon request
+	// object. However, since the dspace-api is built to accept only HttpServletRequest
+	// a wrapper class HttpServletRequestCocoonWrapper has bee built to translate
+	// the cocoon request back into a servlet request. This is not a fully complete
+	// translation as some methods are unimplemented. But it is enough for our
+	// purposes here.
+	return new HttpServletRequestCocoonWrapper(getObjectModel());
 }
 
 function getEPerson() 
@@ -384,6 +405,21 @@ function updateInformation(eperson)
 	    return errors;
 	}
 	
+	if(firstName.length() > 64) {
+		firstName = firstName.substring(0,64);
+		FlashMessagesUtil.setAlertMessage(getHttpRequest().getSession(), "sedici.EPerson.string-too-long", Arrays.asList(["Nombre", "64"]));
+	}
+		
+	if(lastName.length() > 64) {
+		lastName = lastName.substring(0,64);
+		FlashMessagesUtil.setAlertMessage(getHttpRequest().getSession(), "sedici.EPerson.string-too-long", Arrays.asList(["Apellido", "64"]));
+	}
+
+	if(phone.length() > 32) {
+		phone = phone.substring(0,32);
+		FlashMessagesUtil.setAlertMessage(getHttpRequest().getSession(), "sedici.EPerson.string-too-long", Arrays.asList(["Teléfono", "32"]));
+	}
+
 	eperson.setFirstName(firstName);
 	eperson.setLastName(lastName);
 	

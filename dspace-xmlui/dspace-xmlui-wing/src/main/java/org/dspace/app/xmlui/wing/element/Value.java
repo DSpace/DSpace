@@ -45,13 +45,15 @@ public class Value extends RichTextContainer
     public static final String TYPE_INTERPRETED = "interpreted";
 
     public static final String TYPE_OPTION = "option";
+    
+    public static final String TYPE_LANG = "lang";
 
     /** value of the metadata authority code associated with a raw value */
     public static final String TYPE_AUTHORITY = "authority";
 
     /** All the possible value types collected into one array. */
     public static final String[] TYPES = { TYPE_RAW, TYPE_INTERPRETED,
-            TYPE_OPTION, TYPE_AUTHORITY};
+            TYPE_OPTION, TYPE_AUTHORITY, TYPE_LANG};
 
     /** The type of this value element */
     private String type;

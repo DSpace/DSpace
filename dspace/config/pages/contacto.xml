@@ -1,0 +1,47 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/"
+xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<meta>
+	<pageMeta>
+		<metadata element="title">SEDICI - Contacto</metadata>
+	</pageMeta>
+</meta>
+
+<body>
+<div>
+
+<head>Contacto</head>
+
+<div id='pagina_estatica' class="pagina_contacto">
+
+	<h2>Dudas o sugerencias sobre SEDICI</h2>
+		
+	<p>
+		Estimado usuario, puede enviarnos sus dudas o sugerencias via email a la direccion 
+		<strong>info@sedici.unlp.edu.ar</strong> o completando el formulario que se presenta a continuación. 
+	</p>
+
+	<form name="contacto" method="post" action="contacto">
+		<div>
+			<label>Nombre y Apellido:</label>
+			<input type="text" name="apellido" size="30" value=""/>
+		</div>
+		<div>
+			<label>Email:</label>
+			<input type="text" name="mail" size="35" value=""/>
+		</div>
+		<div>
+			<label>Mensaje:</label>
+			<textarea name="descripcion" rows="10" cols="40" wrap=""> </textarea>
+		</div>
+		<div>
+			<input type="submit" name="enviar" value="Enviar"/>
+		</div>
+	</form>
+
+</div>
+
+</div>
+</body>
+
+</document>

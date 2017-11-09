@@ -7,6 +7,7 @@
  */
 package org.dspace.app.util;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -610,7 +611,7 @@ public class SubmissionInfo
             // reload the proper Submission process config
             // (by reading the XML config file)
             subInfo.submissionConfig = submissionConfigReader
-                    .getSubmissionConfig(subInfo.getCollectionHandle(), subInfo
+                    .getSubmissionConfig(subInfo.getSubmissionItem().getCollection(), subInfo
                             .isInWorkflow());
 
             // cache this new submission process configuration

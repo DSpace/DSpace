@@ -1,0 +1,462 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/"
+xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<meta>
+	<pageMeta>
+		<metadata element="title">SEDICI - Preguntas frecuentes</metadata>
+	</pageMeta>
+</meta>
+
+<body>
+<div>
+
+<head>Preguntas frecuentes</head>
+
+<div id='pagina_estatica' class="pagina_faq">
+
+<div id="preguntas">
+	<h1>¿Qué es y como se compone SEDICI?</h1>
+	<ul>
+		<li><a href="pages/FAQ#que_es">¿Qué es SEDICI?</a></li>
+		<li><a href="pages/FAQ#acervo">¿Cómo se compone el acervo de SEDICI?</a></li>
+	</ul>
+	
+	<h1>Tipos de documentos y ordenamiento en SEDICI</h1>
+	<ul>
+		<li><a href="pages/FAQ#tipos">¿Qué tipos de documentos se pueden encontrar en SEDICI?</a></li>
+		<li><a href="pages/FAQ#organizacion">¿Cómo están organizados los recursos en SEDICI?</a></li>
+	</ul>
+
+	<h1>Búsquedas en SEDICI</h1>
+	<ul>
+		<li><a href="pages/FAQ#busqueda">¿Cómo realizar una búsqueda en SEDICI?</a></li>
+	</ul>
+	
+	<h1>Publicar en SEDICI</h1>
+	<ul>
+		<li><a href="pages/FAQ#beneficios">¿Cuáles son los beneficios de registrarse como usuario del sitio?</a></li>
+		<li><a href="pages/FAQ#autoarchivo">¿Qué es el autoarchivo?</a></li>
+		<li><a href="pages/FAQ#autoarchivo_tesis">¿Qué diferencia existe entre el autorachivo convencional y el autoarchivo de una tesis de posgrado?</a></li>
+		<li><a href="pages/FAQ#info_tesistas">Si soy un tesista de posgrado, ¿puedo depositar mi tesis personalmente? ¿Qué se necesita?</a></li>
+		<li><a href="pages/FAQ#tipos_archivos">¿Qué tipos de archivos se admiten y cuáles son sus especificaciones?</a></li>
+		<li><a href="pages/FAQ#por_que">¿Por qué publicar en SEDICI?</a></li>
+		<li><a href="pages/FAQ#licencia_cc">¿Qué son las licencias Creative Commons?</a></li>
+		<li><a href="pages/FAQ#licencia_distribucion">¿Qué es y para qué sirve la Licencia de Distribución No Exclusiva de SEDICI?</a></li>
+	</ul>
+
+	<h1>Otros aspectos y preguntas frecuentes</h1>
+	<ul>
+		<li><a href="pages/FAQ#embargo">¿Qué es el período de embargo?</a></li>
+		<li><a href="pages/FAQ#isbn">¿SEDICI tramita el número de ISBN para las tesis de posgrado?</a></li>
+		<li><a href="pages/FAQ#nuevos_materiales">¿De qué modo puedo estar al corriente de los materiales que se agregan diariamente a SEDICI?</a></li>
+	</ul>
+</div>
+
+<br/>
+<hr/>
+<br/>
+
+<div id="respuestas">
+	<div id="que_es">
+		<h1>¿Qué es SEDICI?</h1>
+		<p>
+			El Servicio de Difusión de la Creación Intelectual (SEDICI) es el repositorio institucional de la 
+			Universidad Nacional de La Plata. Esto significa que alberga, preserva y difunde mundialmente, a 
+			través de su sitio web, las creaciones y producciones intelectuales, científicas y artísticas de 
+			los diversos actores de la universidad (alumnos, profesores e investigadores). Dado que SeDICI adhiere 
+			a las políticas de acceso abierto (Open Access), todo su acervo está disponible de forma libre y gratuita, 
+			contando en su gran mayoría con los documentos a texto completo.
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
+	</div>
+	
+				
+	<div id="acervo">
+		<h1>¿Cómo se compone el acervo de SEDICI?</h1>
+		<p>
+			El acervo de SEDICI está compuesto por más de 18.000 recursos, en su gran mayoría artículos y tesis. 
+			Los números exactos pueden observarse en la página de <a href="http://sedici.unlp.edu.ar">inicio</a>. 
+			Como repositorio institucional, SEDICI tiene la misión, por la resolución 78/11, de preservar y difundir 
+			una copia digital de todas las tesis de posgrado, las que en este momento superan las 2800. Por otra 
+			parte, en los casos en que SEDICI no cuenta con el texto completo del recurso se procura brindar el sitio 
+			físico exacto donde se lo puede encontrar, vale decir, en qué ubicación de una biblioteca dada dentro de la 
+			UNLP se aloja. En otras ocasiones, SEDICI brinda un enlace externo al recurso. De este modo, se trata siempre 
+			de asegurar la máxima disponibilidad del recurso para todos los usuarios.
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
+	</div>
+	
+
+	<div id="tipos">
+		<h1>¿Qué tipos de documentos se pueden encontrar en SEDICI?</h1>
+		<p>
+			A continuación se brinda una lista de los tipos de documento que pueden encontrarse en SEDICI 
+			y una breve descripción de cada uno de ellos:
+			<ul>
+				<li>
+					<b>Artículo: </b>comprende todos aquellos textos escritos para ser publicados en una publicación periódica de corte científico o académico. También se pueden incluir otros textos, de carácter independiente, referidos a un tema específico, no demasiado extensos (menos de 50 páginas).
+				</li>
+				<li>
+					<b>Audio: </b>registro sonoro de diversa índole, que puede comprender música grabada en estudio o en vivo, entrevistas, testimonios, discursos, transmisiones oficiales y en cadena, programas de radio completos o fragmentos, etc.
+				</li>
+				<li>
+					<b>Capítulo de libro: </b>como su nombre lo indica, corresponde a un capítulo de un libro tomado en forma independiente, como sucede en libros conformados a partir de compilaciones o antologías de diversos tipos.
+				</li>
+				<li>
+					<b>Comunicación: </b>escrito breve enviado generalmente a una publicación periódica sobre un tema al que ya se ha hecho referencia en la publicación. También puede incluir la comunicación de resultados esperados en una investigación, sin su desarrollo textual.
+				</li>
+				<li>
+					<b>Contribución a revista: </b>escrito también breve enviado espontáneamente por un autor a una publicación periódica. Las contribuciones en general estarán referidas a las temáticas abarcadas por la publicación pero no habrán sido solicitadas por los editores.
+				</li>
+				<li>
+					<b>Documento de trabajo: </b>comprende aquellos textos escritos a modo de memoria o informe sobre una determinada cuestión en la que trabajan distintas personas al mismo tiempo. Son textos de consulta frecuente para los involucrados.
+				</li>
+				<li>
+					<b>Documento institucional: </b>comprende todos aquellos escritos generados dentro de una institución con carácter oficial. Puede incluir ordenanzas, resoluciones, expedientes, etc.
+
+				</li>
+				<li>
+					<b>Imagen en movimiento: </b>se refiere a documentos visuales en video o cualquier otro tipo de animación (de allí “en movimiento”).
+				</li>
+				<li>
+					<b>Imagen fija: </b>se refiere a aquellos documentos visuales que carecen de movimiento como fotografías, infografías, dibujos, reproducciones, gráficos, pósters, etc.
+				</li>
+				<li>
+					<b>Libro: </b>cualquier obra editada como tal, ya sea por una editorial o una institución, en digital o en papel. En SEDICI se albergan tanto e-books (libros electrónicos navegables) como versiones digitales de libros originalmente editados en papel.
+				</li>
+				
+				<li>
+					<b>Objeto de aprendizaje: </b>todo aquel material que sirva a los efectos de la enseñanza de un tema o materia, preferentemente en el ámbito universitario o superior.
+				</li>
+				<li>
+					<b>Objeto de conferencia: </b>se denomina de este modo a cualquier trabajo presentado en un evento académico o científico, ya se trate de un paper, una conferencia propiamente dicha, un poster, etc.
+
+				</li>
+				<li>
+					<b>Objeto físico: </b>comprende aquellos elementos que por su porte (como los instrumentos científicos y los musicales) no pueden ser catalogados directamente en el repositorio, como aquellos alojados en los distintos museos de la UNLP. En estos casos, se recurre a imágenes (fijas o en movimiento) y a audios de los objetos para su mejor descripción.
+				</li>
+				<li>
+					<b>Preprint: </b>es la versión de un artículo enviado a una publicación periódica antes de ser revisado y publicado por ésta. Puede decirse que es el “borrador” del artículo o su versión sin editar.
+				</li>
+				
+				<li>
+					<b>Reporte: </b>comprende aquellos textos donde se deja documentado el progreso y los elementos necesarios para la realización de proyectos y otros trabajos, así como diversos tipos de informes, a saber: informes de comisiones, memorandos, informes externos de investigación, informes internos, informes estadísticos, informes para agencias de financiación y otros.
+				</li>
+				<li>
+					<b>Revisión: </b>cualquier escrito donde se realice una reseña sobre un determinado tema o bien sobre libros, tesis y otros textos en particular.
+				</li>
+				<li>
+					<b>Tesis de doctorado: </b>trabajo escrito de gran envergadura para obtener el título de Doctor de las distintas unidades académicas de la UNLP.
+				</li>
+				<li>
+					<b>Tesis de grado: </b>también llamada tesina o tesis de licenciatura, es un trabajo escrito de menor envergadura que la tesis de doctorado para obtener el título de Licenciado (o el título de grado que corresponda) de las distintas unidades académicas de la UNLP.
+				</li>
+				<li>
+					<b>Tesis de maestría: </b>trabajo escrito para obtener el título de Magister de las diversas unidades académicas de la UNLP.
+				</li>
+				<li>
+					<b>Trabajo de especialización: </b>también llamado Trabajo Final Integrador, es un trabajo escrito para obtener el título de Especialista Universitario de las distintas unidades académicas de la UNLP.
+				</li>
+			</ul> 
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
+	</div>
+	
+
+	<div id="organizacion">
+		<h1>¿Cómo están organizados los recursos en SEDICI?</h1>
+		<p>
+			Los recursos en SEDICI, están ordenados en comunidades y colecciones. Las comunidades sirven para hacer una primera delimitación del 
+			material en grandes conjuntos, como "Tesis", "Eventos", "Revistas", etc. Del mismo modo, las colecciones sirven para hacer una 
+			delimitación más concreta y restringida del material. Por ejemplo, la comunidad "Revistas" contiene las diversas publicaciones 
+			periódicas de la UNLP, conformando cada una de las mismas una colección independiente. En el caso de la comunidad "Tesis", ésta 
+			contiene a su vez subcomunidades (discriminadas por cada unidad académica de la UNLP) dentro de las cuales se albergan principalmente 
+			tesis, junto con otros tipos de documentos. El objeto de esta división jerárquica del material es su rápida recuperación así como 
+			su máxima visibilidad: al tener los recursos agrupados de acuerdo a los distintos criterios de ordenación es más fácil encontrarlos y 
+			también continuar la búsqueda de recursos similares. El ordenamiento de las colecciones está sujeto a periódicas revisiones para 
+			asegurar siempre el máximo provecho para los usuarios del sitio.		
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
+	</div>
+	
+
+	<div id="busqueda">
+		<h1>¿Cómo realizar una búsqueda en SEDICI?</h1>
+		<p>
+			Para realizar una búsqueda simple basta introducir una palabra (por ejemplo, "física") en el cuadro de búsqueda de la página principal de SEDICI. 
+			El sistema recuperará todos los registros que contengan la palabra "física" en cualquiera de sus metadatos (aquellos datos que sirven para 
+			catalogar correctamente un recurso). Sin embargo, este tipo de búsqueda puede traer resultados no deseados o no del todo atinados.
+			<br/> 
+			Para refinarla, puede realizarse entonces una búsqueda avanzada, en la que se especifiquen otros criterios además de la palabra deseada. 
+			Estos criterios pueden incluir: si la palabra deseada se encuentra en el título o si se prefiere buscar por fecha de publicación. 
+			También puede utilizarse la barra de navegación de la derecha, donde aparecen reflejados los resultados de la búsqueda de acuerdo a 
+			los siguientes criterios: tipo de documento (cuáles y qué cantidad contienen la palabra buscada); fecha de publicación (rango de años y 
+			qué cantidad contienen la palabra buscada); materia; autor (qué autores y qué cantidad de trabajos por autor tienen la 
+			palabra buscada) y palabra-clave.
+			<br/> 
+			Otro tipo de búsquedas también son posibles en SEDICI: por ejemplo, si se hace clic en el nombre de un autor, el sistema recuperará 
+			todos los recursos donde ese autor figure (no necesariamente en calidad de autor, ya que también puede hacerlo en calidad de director de 
+			tesis, editor, etc.); del mismo modo, al hacer clic en un descriptor o una palabra-clave, el sistema recuperará todos los recursos que 
+			los incluyan. Asimismo, es posible buscar en todo SEDICI o sólo en una determinada comunidad o colección.
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
+	</div>
+
+	
+	<div id="beneficios">
+		<h1>¿Cuáles son los beneficios de registrarme como usuario en SEDICI?</h1>
+		<p>
+			El mayor beneficio de registrarse como usuario de SEDICI es poder contribuir con sus propios trabajos a nuestro acervo. El registro es 
+			sencillo y consta sólo de dos pasos. Luego de ingresar en <a href="login">Iniciar sesión</a>, en la esquina superior derecha, dirigirse a <a href="register">Registro de nuevo usuario</a>. 
+			Allí se le pedirá que ingrese una dirección de e-mail válida. El sistema, tras comprobar la dirección, enviará a la misma un link desde el que se 
+			podrá validar el registro. Allí se podrán completar los datos personales y elegir una contraseña de acceso. Con esto, el usuario puede luego 
+			cargar sus propios trabajos desde la comodidad de su casa mediante el sistema de Autoarchivo.
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
+	</div>
+
+
+	<div id="autoarchivo">
+		<h1>¿Qué es el autoarchivo?</h1>
+		<p>
+			El autoarchivo es una tendencia mundial adoptada por todos los grandes repositorios institucionales. Es una modalidad muy eficaz 
+			para contribuir con material propio al acervo del repositorio. Consiste en una serie de pasos mediante los cuales un alumno, 
+			docente o investigador de la UNLP puede fácilmente subir sus trabajos al sitio para que luego los administradores completen 
+			su catalogación y los pongan a disposición del público. Los pasos para el autoarchivo en SEDICI son:
+			<ul>
+				<li>Iniciar sesión y dirigirse a <a href="submissions">Carga de documentos</a> (arriba a la derecha)</li>
+				<li>Una vez allí, hacer clic en "Agregar un documento".</li>
+				<li><b>Describir:</b> en esta primera pantalla se le pedirán al usuario los datos básicos de su trabajo (tipo de documento, 
+				autor, título, fecha de publicación). Puede incluir, si lo desea, un resumen del mismo y las palabras-clave.</li>
+				<li><b>Describir:</b> en esta segunda pantalla se pueden seguir ingresando datos más específicos del trabajo (por ejemplo 
+				en qué revista fue publicado o en qué evento fue presentado, etc.). También se pueden agregar todas las observaciones 
+				que se desee en el campo "Notas".</li>
+				<li><b>Adjuntar:</b> en este paso el sistema le pedirá que suba el archivo que contiene su trabajo. Para saber qué tipos de 
+				archivos se admiten y cuáles son las especificaciones técnicas que se deben observar, ver la 
+				pregunta <a href="pages/FAQ#tipos_archivos">¿Qué tipos de archivos se admiten y cuáles son sus especificaciones?</a></li>
+				<li><b>Revisar:</b> en este paso el usuario puede controlar que los datos proporcionados sean correctos y en caso contrario, 
+				regresar y corregirlos.</li>
+				<li><b>Licencia CC:</b> en este paso usted deberá seleccionar que tipo de licencia <i>Creative Commons</i> desea asociar a su documento. Encontrará 
+				más información sobre este tipo de licencias en la pregunta <a href="pages/FAQ#licencia_cc">¿Que son las licencias <i>Creative Commons</i>?</a></li>
+				<li><b>Licencia SEDICI:</b> para difundir y preservar a largo plazo su trabajo, es preciso que el usuario acepte nuestra licencia. 
+				En este paso se expone la misma para su lectura y se considera que tildar la casilla correspondiente 
+				("Conceder licencia de distribución") tiene la misma validez que la firma de puño y letra del autor o poseedor de los derechos de 
+				autor del trabajo.</li>
+				<li>Tras hacer clic en "Completar el envío", el sistema alertará a los administradores, quienes completarán el proceso de 
+				catalogación del recurso. Si algo impidiera su correcta catalogación se le avisará al usuario mediante e-mail de las razones 
+				para que pueda corregir cualquier inconveniente con su envío.</li>
+			</ul>
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
+	</div>
+	
+
+	<div id="autoarchivo_tesis">
+		<h1>¿Qué diferencia existe entre el autorachivo convencional y el autoarchivo de una tesis de posgrado?</h1>
+		<p>
+			El proceso de autoarchivo es exactamente igual, pero todos aquellos que depositen sus tesis de posgrado en 
+			cumplimiento de la resolución 78/11 recibirán, en un plazo no mayor de 48 hs. y por correo electrónico, un 
+			comprobante de depósito de la tesis que les será requerido en la oficina de Títulos de la UNLP, como parte 
+			de los requisitos para la tramitación del mismo. 		
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
+	</div>
+	
+
+	<div id="info_tesistas">
+		<h1>Si soy un tesista de posgrado, ¿puedo depositar mi tesis personalmente? ¿Qué se necesita?</h1>
+		<p>
+			Sí, los tesistas, así como todos los usuarios, pueden depositar personalmente sus trabajos en SEDICI. En el caso de ser un 
+			tesista de posgrado, los requisitos son los siguientes:
+			<ol> 
+				<li>Traer la licencia de distribución no exclusiva de SEDICI firmada de puño y letra en tinta azul. La misma puede 
+				descargarse <a href="static/resources/licencia_de_deposito.pdf">aquí</a></li>
+ 				<li>Traer una copia digital de la tesis, en CD o pen-drive (ver <a href="pages/FAQ#tipos_archivos">¿Qué tipos de archivos se admiten y cuáles son sus especificaciones?</a> para 
+ 				saber más al respecto).</li>
+ 				<li>Una copia del acta de defensa de la tesis para corroborar que la misma ha sido aprobada. Para aquellas unidades académicas 
+ 				que encuentren dificultoso proveerle esta copia al alumno, se ha dejado un recuadro al final de la licencia de distribución 
+ 				para que allí puedan asentar el número de acta y la fecha de aprobación de la tesis.</li>
+			</ol>
+			Tras presentar estos tres ítems, se le extenderá al tesista el comprobante de depósito necesario para tramitar su 
+			título en la oficina correspondiente. El comprobante es exactamente igual al que se genera en el caso de que el tesista haga autoarchivo.
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
+	</div>
+	
+	
+	<div id="tipos_archivos">
+		<h1>¿Qué tipos de archivos se admiten y cuáles son sus especificaciones?</h1>
+		<p>
+			SEDICI acepta para su publicación y difusión los siguientes tipos de documentos, los que se catalogarán 
+			de acuerdo a la tipología textual expresada en <a href="pages/FAQ#tipos">¿Qué tipos de documento se pueden encontrar en SEDICI?</a>
+			<ul>
+				<li>
+					<b>Tesis de grado y posgrado:</b> son todos aquellos trabajos presentados en forma escrita para obtener a cambio el 
+					título universitario correspondiente. Según las carreras y las modalidades pueden llamarse "tesis", "tesina", 
+					"trabajo final" y otras denominaciones similares. Los trabajos de especialización entran en esta misma categoría.
+				</li>
+				<li>
+					<b>Artículos:</b> comprenden todos aquellos textos escritos para ser publicados, principalmente, en una publicación 
+					periódica de corte científico o académico. También se pueden incluir otros textos, de carácter independiente, referidos 
+					a un tema específico y no demasiado extensos (menos de 50 páginas).
+				</li>
+				<li>
+					<b>Libros:</b> se considera como tales a trabajos de mayor envergadura que un artículo (como media general, de más de 50 
+					páginas), referidos a un tema específico y editados ya sea por una casa editorial, una institución (incluyendo la 
+					propia universidad) o autoeditados por sus autores, con su correspondiente número de ISBN.
+				</li>
+				<li>
+					<b>Conferencias, disertaciones, presentaciones en congresos y otros eventos:</b> comprenden todos aquellos trabajos, 
+					de variada extensión, que cualquier alumno, docente o investigador de la UNLP presente en congresos, seminarios, 
+					simposios y otros eventos similares en cualquier lugar del mundo, siempre que lo haga en representación de la 
+					universidad y/o de su respectiva unidad académica o grupo de investigación perteneciente a la UNLP.
+				</li>
+				<li>
+					<b>Producciones artísticas:</b> contempla específicamente los trabajos de los alumnos, docentes e investigadores de la 
+					Facultad de Bellas Artes de la universidad, pero no excluye las producciones artísticas que pudieran provenir de 
+					otros, siempre que estén vinculados a la UNLP. Se entiende por "producciones artísticas", entre otros, cuadros, 
+					imágenes (fotografías), animaciones, corto y largometrajes, videos, etc.
+				</li>
+				<li>
+					<b>Publicaciones periódicas:</b> bajo esta denominación figuran todas aquellas revistas académicas y científicas, de 
+					preferencia con referato, producidas por cualquier unidad académica de la universidad, así como laboratorio, 
+					instituto o grupo de investigación de la misma. Las revistas deben poseer su correspondiente número de ISSN e 
+					indicación del staff. SEDICI puede albergar tanto sus versiones digitales como ofrecer a sus directores/editores 
+					la posibilidad de escanear y digitalizar sin costo alguno los números que no estén disponibles en digital en 
+					la actualidad.
+				</li>
+				<li>
+					<b>Proyectos de investigación:</b> reúnen todos aquellos trabajos producidos dentro de un proyecto de investigación 
+					en particular, con su correspondiente número y designación.
+				</li>
+				<li>
+					<b>Patentes:</b> registro escrito de la invención y de los derechos que ella supone para su autor y sus cesionarios.
+				</li>
+				<li>
+					<b>Revisiones:</b> artículos breves, en general publicados en revistas, que revisan o reseñan otros trabajos, en particular 
+					pero no excluyentemente libros.
+				</li>
+			</ul>
+			En cuanto a las especificaciones técnicas, para los trabajos escritos el formato de preferencia es .pdf. SEDICI admitirá 
+			otros formatos (.doc, .ppt, etc.) pero los transformará, por razones de seguridad y preservación, a .pdf. El tamaño de los 
+			archivos, de preferencia, no deberá superar los 5 MB. En caso de que los supere, queda a criterio de los administradores 
+			subir el archivo completo o dividirlo en partes, o bien ofrecer una versión en alta resolución y otra en baja resolución. 
+			En cuanto a los demás tipos de documentos, SEDICI admite .jpg y similares para las imágenes y .avi y similares para 
+			videos y animaciones. 
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas" >Volver</a>
+	</div>
+	
+
+	<div id="por_que">
+		<h1>¿Por qué publicar en SEDICI?</h1>
+		<p>
+			A continuación se listan algunos de los beneficios de publicar en SEDICI sus trabajos:
+			<ul>
+				<li>
+					<b>Visibilidad y estabilidad:</b> a diferencia de una página web, el repositorio institucional constituye un archivo digital 
+					organizado y estable, donde los documentos se archivan y difunden en base a la utilización de estándares y protocolos normalizados, 
+					que potencian la visibilidad en Internet de autores y documentos. De este modo son recuperables tanto desde recolectores y 
+					motores de búsqueda especializados como desde los buscadores generales.
+				</li>
+				<li>
+					<b>Aumento del impacto:</b> el aumento de la visibilidad y la difusión conlleva un potencial aumento del impacto de sus 
+					trabajos.
+				</li>
+				<li>
+					<b>Integración en redes de investigación nacionales e internacionales:</b> numerosas instituciones del mundo promueven 
+					la creación de portales y estructuras para la difusión y la preservación del patrimonio intelectual, en las que 
+					los repositorios institucionales, como SEDICI, se transforman en una herramienta prioritaria para el logro de estos fines.
+				</li>
+				<li>
+					<b>Facilidad de difusión:</b> para los autores es un medio rápido y económico para difundir su obra de forma sencilla y compatible 
+					con la publicación editorial, ya que la difusión en SEDICI se realiza a título no exclusivo y el autor conserva todos 
+					sus derechos, lo que le permite publicar sus trabajos en los medios que considere pertinentes sin problema alguno.
+				</li>
+			</ul>
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas" >Volver</a>
+	</div>
+	
+
+	<div id="licencia_cc">
+		<h1>¿Qué son las licencias Creative Commons?</h1>
+		<p>
+			Cuando un recurso es difundido en Internet es una buena práctica indicar, a quienes lo acceden (ya sean personas o 
+			procesos de software), cuáles son las acciones permitidas respecto a dicho recurso. Así, debe indicarse si el recurso 
+			puede ser leído, copiado, guardado, redistribuido, reimpreso, usado como base de nuevas obras, etc. o nada de lo 
+			anterior. Por ello, en SEDICI están disponibles las siguientes licencias Creative Commons:
+
+			<ul>
+				<li><a href="http://creativecommons.org/licenses/by/2.5/ar/" target="_blank">Atribución 2.5 Argentina</a></li>
+				<li><a href="http://creativecommons.org/licenses/by-nd/2.5/ar/" target="_blank">Atribución- Sin Derivadas 2.5 Argentina</a></li>
+				<li><a href="http://creativecommons.org/licenses/by-nc-nd/2.5/ar/" target="_blank">Atribución- No Comercial- Sin Derivadas 2.5 Argentina</a></li>
+				<li><a href="http://creativecommons.org/licenses/by-nc/2.5/ar/" target="_blank">Atribución- No Comercial 2.5 Argentina</a></li>
+				<li><a href="http://creativecommons.org/licenses/by-nc-sa/2.5/ar/" target="_blank">Atribución- No Comercial- Compartir Derivadas Igual 2.5 Argentina</a></li>
+				<li><a href="http://creativecommons.org/licenses/by-sa/2.5/ar/" target="_blank">Atribución- Compartir Derivadas Igual 2.5 Argentina</a></li>
+			</ul>
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas" >Volver</a>
+	</div>
+
+
+	<div id="licencia_distribucion">
+		<h1>¿Qué es y para qué sirve la Licencia de Distribución No Exclusiva de SEDICI?</h1>
+		<p>
+			La Licencia de Distribución No Exclusiva de SEDICI es un acuerdo mediante el cual el autor y SEDICI establecen bajo qué 
+			condiciones se dará a conocer una obra. El acuerdo habilita a SEDICI, de forma no exclusiva, como expresamente se 
+			indica, a publicar, preservar y difundir los contenidos aportados por los usuarios. La condición de no exclusividad 
+			significa que el autor no pierde los derechos sobre su trabajo en ningún momento, y que puede, por ejemplo, publicar 
+			el mismo en los medios que considere oportuno en cualquier momento. Este acuerdo, a su vez, obliga a SEDICI a preservar 
+			debidamente el material aportado y a difundirlo por su portal web. De este modo, ambas partes acuerdan y reconocen los 
+			derechos que les son inherentes.
+		</p>
+		<a href="pages/FAQ#preguntas" >Volver</a>
+	</div>
+
+
+	<div id="embargo">
+		<h1>¿Qué es el período de embargo?</h1>
+		<p>
+			El período de embargo es el lapso de tiempo durante el cual el texto de la obra no será accesible al público (sí lo serán sus 
+			metadatos: título, autor, año de publicación, resumen, etc.). Las razones para solicitar período de embargo pueden ir desde 
+			el deseo de proteger el contenido de la obra, especialmente si se trata de una patente o un trabajo con un gran potencial de 
+			desarrollo futuro, hasta el hecho de no hacer público el texto de una obra que está próxima a editarse por las vías tradicionales. 
+			El autor de la obra puede solicitar que el texto no sea visible por un período mínimo de tres meses hasta un máximo de veinticuatro. 
+			Al término del período de embargo, el texto completo de la obra será públicamente accesible desde el portal.
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
+	</div>
+
+
+	<div id="isbn">
+		<h1>¿SEDICI tramita el número de ISBN para las tesis de posgrado?</h1>
+		<p>
+			<b>No</b>. SEDICI simplemente elabora un listado con las tesis de posgrado recibidas y lo eleva a la Editorial de la Universidad Nacional 
+			de La Plata (EDULP), quienes son los encargados de tramitarlo gratuitamente para las tesis que estén bajo la resolución 78/11. Todos 
+			aquellos autores que quieran solicitar un ISBN para otros trabajos, como libros o tesis de otros años, deben canalizar su pedido a 
+			través de la Dirección de Propiedad Intelectual de la Presidencia de la UNLP, quienes se encargarán del trámite pertinente.
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
+	</div>
+
+
+	<div id="nuevos_materiales">
+		<h1>¿De qué modo puedo estar al corriente de los materiales que se agregan diariamente a SEDICI?</h1>
+		<p>
+			Mediante cualquier lector de "feeds" los usuarios pueden estar al tanto de los últimos materiales cargados, ya sea en general o de 
+			una colección en particular. Para ello se han habilitado canales de RSS en cada una de las colecciones que conforman el acervo de SEDICI; 
+			basta hacer clic en el ícono correspondiente para suscribirse.
+		</p>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
+	</div>
+
+</div>
+
+</div>
+
+</div>
+</body>
+
+</document>
+

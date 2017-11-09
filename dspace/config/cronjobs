@@ -1,0 +1,46 @@
+# m h  dom mon dow   command
+# ########## MAILS ######################
+# Send out subscription e-mails at 01:00 every day
+0 1 * * *  /var/dspace/bin/dspace sub-daily
+# Run the media filter at 02:00 every day
+#0 2 * * *  /var/dspace/bin/dspace filter-media
+1 23 * * *  /var/dspace/bin/dspace filter-media -s 10915/5621,10915/2618,10915/2762,10915/15912,10915/2272,10915/15920,10915/5226 | grep -v SKIPPED | grep -v FILTERED
+# Run the checksum checker at 03:00
+0 3 * * *  /var/dspace/bin/dspace checker -lp | grep -v " old results from the database"
+
+# Mail the results to the sysadmin at 04:00
+2 4 * * 1  /var/dspace/bin/dspace checker-emailer -c
+
+#actualizo el indice de xoai
+1 9,12,15,19 * * *  /var/dspace/bin/dspace xoai import > /dev/null
+
+#actualizo la lista de spiders ips
+10 6 3 * * /var/dspace/bin/dspace stats-util -u && /var/dspace/bin/dspace stats-util -m
+
+#Generate Sitemaps
+0 6 * * *  /var/dspace/bin/dspace generate-sitemaps 
+
+#Check for pendign embargoes
+1 6 * * *  /var/dspace/bin/dspace embargo-lifter 
+
+#Actualizacion de la bbdd geolite. ver mas en http://trac.prebi.unlp.edu.ar/issues/1702
+0 5 2 * *  ant -f /var/dspace-src/distribution/target/dspace-sedici-distribution-bin/build.xml update_geolite
+
+#Backup en AIP una vez por semana
+5 22 * * sun  date && /var/dspace/bin/dspace packager -d -a -t AIP -e alira@sedici.unlp.edu.ar -u -i 10915/0 /var/dspace/backups/aip/aip-site.zip && date
+
+#GZip de logs viejos los lunes a las 5AM
+0 5 * * mon find /var/log/tomcat6 -maxdepth 1 -name "catalina.*" -type f -mtime +5 -exec gzip {} \; -exec mv {}.gz /var/log/tomcat6/old-logs/ \;
+2 5 * * mon find /var/log/tomcat6 -maxdepth 1 -name "localhost.*" -type f -mtime +5 -exec gzip {} \; -exec mv {}.gz /var/log/tomcat6/old-logs/ \;
+5 5 * * mon find /var/dspace/log -maxdepth 1 -name "dspace.log.*" -type f -mtime +30 -exec gzip {} \; -exec mv {}.gz /var/dspace/log/old-logs/ \;
+
+# ########## STATS ######################
+0 1 * * * /var/dspace/bin/dspace stat-general
+0 1 * * * /var/dspace/bin/dspace stat-monthly
+0 2 * * * /var/dspace/bin/dspace stat-report-general
+0 2 * * * /var/dspace/bin/dspace stat-report-monthly
+
+# ########## POSTGRES ######################
+# Clean up the database nightly at 4.20am
+# 20 4 * * * vacuumdb --analyze dspace > /dev/null 2>&1
+
