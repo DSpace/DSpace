@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -256,13 +257,24 @@ public class RestResourceController implements InitializingBean {
 			}
 			else {
 				try {
-					Page<? extends Serializable> pageResult = (Page<? extends RestModel>) linkMethod
-							.invoke(linkRepository, request, uuid, page, projection);
-					Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(uuid)
-							.slash(rel).withSelfRel();
-					PagedResources<? extends ResourceSupport> result = assembler
-							.toResource(pageResult.map(linkRepository::wrapResource), link);
-					return result;
+					if ( Page.class.isAssignableFrom( linkMethod.getReturnType()) ){
+						Page<? extends Serializable> pageResult = (Page<? extends RestModel>) linkMethod
+								.invoke(linkRepository, request, uuid, page, projection);
+						Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(uuid)
+								.slash(rel).withSelfRel();
+						PagedResources<? extends ResourceSupport> result = assembler
+								.toResource(pageResult.map(linkRepository::wrapResource), link);
+						return result;
+					}
+					else {
+						RestModel object = (RestModel)linkMethod
+						.invoke(linkRepository, request, uuid, page, projection);
+						Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(uuid)
+								.slash(rel).withSelfRel();
+						ResourceSupport result = linkRepository.wrapResource(object, link.toString());
+						return result;
+						
+					}					
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new RuntimeException(e.getMessage(), e);
 				}
