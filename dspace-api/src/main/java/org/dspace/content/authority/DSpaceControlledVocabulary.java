@@ -25,7 +25,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import ar.edu.unlp.sedici.dspace.utils.MailReporter;
+import ar.edu.unlp.sedici.util.MailReporter;
 
 /**
  * ChoiceAuthority source that reads the JSPUI-style hierarchical vocabularies

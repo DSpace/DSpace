@@ -267,7 +267,7 @@ public class OpenSearchGenerator extends AbstractGenerator
                     }
                     results[i] = dso;
                 }
-                        resultsDoc = OpenSearch.getResultsDoc(format, query, qResults,
+                        resultsDoc = OpenSearch.getResultsDoc(format, query, qResults.getHitCount(), qResults.getStart(), qResults.getPageSize(),
                                                                       container, results, FeedUtils.i18nLabels);
                         FeedUtils.unmangleI18N(resultsDoc);
                         retDoc = resultsDoc;

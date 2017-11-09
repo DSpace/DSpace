@@ -12,10 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import java.util.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +25,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
@@ -37,7 +35,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.jdom.Element;
 
-import ar.edu.unlp.sedici.xmlui.xsl.XslExtensions;
+import ar.edu.unlp.sedici.util.SediciUtils;
 /**
  * 
  * @author Sands Fish
@@ -1070,7 +1068,7 @@ public class GoogleMetadata
 		else
 			bs_filename = the_handle + "-bitstream-" + the_bitstream.getSequenceID();
 
-		path.append(XslExtensions.codificarURL(bs_filename));
+		path.append(SediciUtils.codificarURL(bs_filename));
 		path.append(".pdf?sequence=");
 		path.append(the_bitstream.getSequenceID());
 

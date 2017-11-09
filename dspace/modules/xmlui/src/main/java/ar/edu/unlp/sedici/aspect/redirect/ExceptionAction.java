@@ -30,7 +30,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.Context;
 
-import ar.edu.unlp.sedici.dspace.utils.MailReporter;
+import ar.edu.unlp.sedici.util.MailReporter;
 
 /**
  * Clase encargada de reportar las excepciones que se detectan durante la

@@ -95,5 +95,14 @@
                 <module>solr</module>
             </modules>
         </profile>
+        <profile>
+            <id>plugins</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>plugins</module>
+            </modules>
+        </profile>
     </profiles>
 </project>

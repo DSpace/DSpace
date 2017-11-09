@@ -3,36 +3,24 @@ package org.dspace.app.xmlui.aspect.submission;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
-import javax.persistence.criteria.CriteriaBuilder.Case;
 import javax.servlet.http.HttpSession;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.license.CreativeCommons;
-import org.dspace.license.CCLicenseField;
-import org.dspace.license.CCLookup;
-import org.dspace.license.CCLicense;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
-
-import ar.edu.unlp.sedici.aspect.redirect.RedirectAction;
 
 /**
  * This is an optional page of the item submission processes. The Creative 

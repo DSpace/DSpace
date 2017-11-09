@@ -103,7 +103,7 @@ public class Collection extends DSpaceObject
      *            the corresponding row in the table
      * @throws SQLException
      */
-    Collection(Context context, TableRow row) throws SQLException
+    public Collection(Context context, TableRow row) throws SQLException
     {
         ourContext = context;
         collectionRow = row;

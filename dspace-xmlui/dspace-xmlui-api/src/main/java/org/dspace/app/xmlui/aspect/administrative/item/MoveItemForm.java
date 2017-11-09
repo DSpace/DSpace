@@ -19,10 +19,11 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.content.Collection;
-import org.dspace.content.CollectionSearchSedici;
-import org.dspace.content.CollectionsWithCommunities;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+
+import ar.edu.unlp.sedici.util.CollectionSearchSedici;
+import ar.edu.unlp.sedici.util.CollectionsWithCommunities;
 
 
 /**

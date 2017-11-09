@@ -12,18 +12,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.validation.Path.Node;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.xpath.NodeSet;
-import org.dspace.core.ConfigurationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Text;
+
+import ar.edu.unlp.sedici.util.SediciUtils;
 
 /**
  * 
@@ -118,7 +117,9 @@ public class XslExtensions {
 		}
 	}
 	
+	
 	public static String codificarURL(String url){
+
 		if (url == null){
 			try{
 				throw new NullPointerException();
@@ -127,14 +128,7 @@ public class XslExtensions {
 			}
 			return "";
 		}
-		char[] reservados={'!','#','$','%','&','(',')','*','+',',','/',':',';','=','?','@','[',']',']', ' '};
-		for (char caracter: reservados) {
-			url=url.replace(caracter, '_');
-		}
-		//remplazo la comilla simple
-		url=url.replace("'", "_"); 	
- 
-		return url;
+		return SediciUtils.codificarURL(url);
 	}
 	
 	public static boolean matches(String cadena, String regex) throws PatternSyntaxException{

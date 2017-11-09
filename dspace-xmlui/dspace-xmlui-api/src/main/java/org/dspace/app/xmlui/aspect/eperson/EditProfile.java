@@ -33,8 +33,6 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
-import org.dspace.content.CollectionSearchSedici;
-import org.dspace.content.CollectionsWithCommunities;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
@@ -42,6 +40,9 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.xml.sax.SAXException;
+
+import ar.edu.unlp.sedici.util.CollectionSearchSedici;
+import ar.edu.unlp.sedici.util.CollectionsWithCommunities;
 
 /**
  * Display a form that allows the user to edit their profile.

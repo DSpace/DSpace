@@ -17,14 +17,15 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
-import org.dspace.content.CollectionSearchSedici;
-import org.dspace.content.CollectionsWithCommunities;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
+
+import ar.edu.unlp.sedici.util.CollectionSearchSedici;
+import ar.edu.unlp.sedici.util.CollectionsWithCommunities;
 
 public class SeDiCISelectCollectionStep extends AbstractXMLUIAction {
 

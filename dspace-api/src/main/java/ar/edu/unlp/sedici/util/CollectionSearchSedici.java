@@ -1,5 +1,5 @@
 
-package org.dspace.content;
+package ar.edu.unlp.sedici.util;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
