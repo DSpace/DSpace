@@ -7,8 +7,12 @@
  */
 package org.dspace.app.rest.converter;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.LicenseRest;
 import org.dspace.content.Bitstream;
+import org.dspace.content.service.CollectionService;
+import org.dspace.core.service.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +28,10 @@ public class CollectionConverter
 		extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest> {
 	@Autowired
 	private BitstreamConverter bitstreamConverter;
+	@Autowired
+	private CollectionService collectionService;
+	@Autowired
+	private LicenseService licenseService;
 	
 	@Override
 	public org.dspace.content.Collection toModel(org.dspace.app.rest.model.CollectionRest obj) {
