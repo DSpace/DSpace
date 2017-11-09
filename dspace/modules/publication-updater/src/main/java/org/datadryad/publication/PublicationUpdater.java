@@ -125,6 +125,8 @@ public class PublicationUpdater extends HttpServlet {
 
                 } else {
                     aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "no or incorrect authorization token provided");
+                    LOGGER.error("no or incorrect authorization token provided");
+                    return;
                 }
             }
             LOGGER.info("Automatic Publication Updater finished");
@@ -134,6 +136,9 @@ public class PublicationUpdater extends HttpServlet {
     }
 
     private boolean isAuthorized(List<NameValuePair> queryParams) {
+        if ("".equals(getUser(queryParams))) {
+            return false;
+        }
         for (NameValuePair param : queryParams) {
             if (param.getName().equals("auth")) {
                 String token = ConfigurationManager.getProperty("publication.updater.token");
@@ -174,6 +179,15 @@ public class PublicationUpdater extends HttpServlet {
             }
         }
         return "a";
+    }
+
+    private String getUser(List<NameValuePair> queryParams) {
+        for (NameValuePair param : queryParams) {
+            if (param.getName().equals("user")) {
+                return param.getValue();
+            }
+        }
+        return "";
     }
 
     private void checkPublications(Context context, String startLetter) {
