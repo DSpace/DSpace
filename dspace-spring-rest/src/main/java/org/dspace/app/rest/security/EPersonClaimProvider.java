@@ -32,7 +32,6 @@ public class EPersonClaimProvider implements JWTClaimProvider{
         EPerson ePerson = getEPerson(context, jwtClaimsSet);
 
         context.setCurrentUser(ePerson);
-        ePerson.setLastActive(new Date());
     }
 
     public EPerson getEPerson(Context context, JWTClaimsSet jwtClaimsSet) throws SQLException {

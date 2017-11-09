@@ -17,6 +17,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.authorize.service.AuthorizeService;
@@ -54,28 +55,41 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        Context context = null;
 
+        Context context = ContextUtil.obtainContext(request);
+        if(context.getCurrentUser() != null) {
+            return authenticateRefreshTokenRequest(context);
+        } else {
+            return authenticateNewLogin(authentication);
+        }
+    }
+
+    private Authentication authenticateRefreshTokenRequest(Context context) {
+        return createAuthenticationToken(null, context);
+    }
+
+    private Authentication authenticateNewLogin(Authentication authentication) {
+        Context newContext = null;
         try {
-            context = new Context();
+            newContext = new Context();
             String name = authentication.getName();
             String password = authentication.getCredentials().toString();
 
-            int implicitStatus = authenticationService.authenticateImplicit(context, null, null, null, request);
+            int implicitStatus = authenticationService.authenticateImplicit(newContext, null, null, null, request);
 
             if (implicitStatus == AuthenticationMethod.SUCCESS) {
-                log.info(LogManager.getHeader(context, "login", "type=implicit"));
-                return createAuthenticationToken(password, context);
+                log.info(LogManager.getHeader(newContext, "login", "type=implicit"));
+                return createAuthenticationToken(password, newContext);
             } else {
-                int authenticateResult = authenticationService.authenticate(context, name, password, null, request);
+                int authenticateResult = authenticationService.authenticate(newContext, name, password, null, request);
                 if (AuthenticationMethod.SUCCESS == authenticateResult) {
 
                     log.info(LogManager
-                            .getHeader(context, "login", "type=explicit"));
+                            .getHeader(newContext, "login", "type=explicit"));
 
-                    return createAuthenticationToken(password, context);
+                    return createAuthenticationToken(password, newContext);
                 } else {
-                    log.info(LogManager.getHeader(context, "failed_login", "email="
+                    log.info(LogManager.getHeader(newContext, "failed_login", "email="
                             + name + ", result="
                             + authenticateResult));
                     throw new BadCredentialsException("Login failed");
@@ -86,9 +100,9 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         } catch (Exception e) {
             log.error("Error while authenticating in the rest api", e);
         } finally {
-            if (context != null && context.isValid()) {
+            if (newContext != null && newContext.isValid()) {
                 try {
-                    context.complete();
+                    newContext.complete();
                 } catch (SQLException e) {
                     log.error(e.getMessage() + " occurred while trying to close", e);
                 }

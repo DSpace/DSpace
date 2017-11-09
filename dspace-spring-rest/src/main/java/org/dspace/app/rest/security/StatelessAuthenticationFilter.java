@@ -24,7 +24,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
@@ -64,13 +63,8 @@ public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
 
         if (restAuthenticationService.hasAuthenticationData(request)) {
             // parse the token.
-            Context context = null;
-            try {
-                context = ContextUtil.obtainContext(request);
-            } catch (SQLException e) {
-                log.error("Unable to obtain context from request", e);
-                //TODO FREDERIC throw exception to fail fast
-            }
+
+            Context context = ContextUtil.obtainContext(request);
 
             EPerson eperson = restAuthenticationService.getAuthenticatedEPerson(request, context);
             if (eperson != null) {
