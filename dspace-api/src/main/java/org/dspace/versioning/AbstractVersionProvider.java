@@ -78,7 +78,10 @@ public abstract class AbstractVersionProvider {
             
             for(Bitstream nativeBitstream : nativeBundle.getBitstreams())
             {
-                Bitstream bitstreamNew = createBitstream(c, nativeBitstream);
+                // Metadata and additional information like internal identifier, 
+                // file size, checksum, and checksum algorithm are set by the bitstreamStorageService.clone(...)
+                // and respectively bitstreamService.clone(...) method.
+                Bitstream bitstreamNew =  bitstreamStorageService.clone(c, nativeBitstream);
 
                 bundleService.addBitstream(c, bundleNew, bitstreamNew);
 
@@ -100,16 +103,6 @@ public abstract class AbstractVersionProvider {
                 bitstreamService.update(c, bitstreamNew);
             }
         }
-    }
-
-
-    protected Bitstream createBitstream(Context context, Bitstream nativeBitstream) throws AuthorizeException, SQLException, IOException {
-        Bitstream newBitstream = bitstreamStorageService.clone(context, nativeBitstream);
-	    List<MetadataValue> bitstreamMeta = bitstreamService.getMetadata(nativeBitstream, Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-	    for (MetadataValue value : bitstreamMeta) {
-		    bitstreamService.addMetadata(context, newBitstream, value.getMetadataField(), value.getLanguage(), value.getValue(), value.getAuthority(), value.getConfidence());
-	    }
-	    return newBitstream;
     }
 
     public void setIgnoredMetadataFields(Set<String> ignoredMetadataFields) {
