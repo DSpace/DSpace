@@ -11,7 +11,7 @@ release.properties
 
 ## Ignore project files created by Eclipse
 .settings/
-#.project
+.project
 .classpath
 .tomcatplugin
 
