@@ -7,14 +7,11 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.dspace.app.rest.model.AuthorityEntryRest;
 import org.dspace.app.rest.model.CollectionRest;
 import org.dspace.app.rest.model.LicenseRest;
 import org.dspace.app.rest.model.hateoas.LicenseResource;
@@ -23,8 +20,6 @@ import org.dspace.content.service.CollectionService;
 import org.dspace.core.Context;
 import org.dspace.core.service.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.stereotype.Component;
@@ -50,7 +45,7 @@ public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
 		return new LicenseResource(model);
 	}
 	
-	public LicenseRest getResource(HttpServletRequest request, UUID uuid, Pageable pageable, String projection) throws Exception {
+	public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection) throws Exception {
 		Context context = obtainContext();
 		Collection collection = collectionService.find(context, uuid);
 		
@@ -67,4 +62,7 @@ public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
 		return licenseRest;
 	}
 	
+	public boolean isEmbeddableRelation(LicenseRest data, String name) {
+		return false;
+	}
 }

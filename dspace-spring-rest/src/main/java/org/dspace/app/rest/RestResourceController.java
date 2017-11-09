@@ -284,7 +284,7 @@ public class RestResourceController implements InitializingBean {
 		DSpaceResource result = repository.wrapResource(modelObject, rel);
 		if (result.getLink(rel) == null) {
 			// TODO create a custom exception
-			throw new ResourceNotFoundException(rel + "undefined for " + model);
+			throw new ResourceNotFoundException(rel + " undefined for " + model);
 		} else if (result.getEmbedded().get(rel) instanceof EmbeddedPage) {
 			// this is a very inefficient scenario. We have an embedded list
 			// already fully retrieved that we need to limit with pagination

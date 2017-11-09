@@ -17,32 +17,35 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-@LinksRest(links = {		
-		@LinkRest(name = LicenseRest.NAME, linkClass = LicenseRest.class, method = "getResource", optional = true)	
-	})
+@LinksRest(links = {
+		@LinkRest(name = LicenseRest.NAME, linkClass = LicenseRest.class, method = "getLicenseCollection", optional = true),
+		@LinkRest(name = AccessConditionRest.NAME, linkClass = AccessConditionRest.class, method = "getDefaultBitstreamPoliciesForCollection", optional = true)
+})
 public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";
 	public static final String CATEGORY = RestModel.CORE;
 
 	@JsonIgnore
 	private LicenseRest license;
-	
+	@JsonIgnore
+	private List<AccessConditionRest> defaultBitstreamsPolicies;
+
 	@JsonIgnore
 	private BitstreamRest logo;
-	
+
 	public BitstreamRest getLogo() {
 		return logo;
 	}
-	
+
 	public void setLogo(BitstreamRest logo) {
 		this.logo = logo;
 	}
-	
+
 	@Override
 	public String getCategory() {
 		return CATEGORY;
 	}
-	
+
 	@Override
 	public String getType() {
 		return NAME;
@@ -55,5 +58,14 @@ public class CollectionRest extends DSpaceObjectRest {
 	public void setLicense(LicenseRest license) {
 		this.license = license;
 	}
+
+	public List<AccessConditionRest> getDefaultBitstreamsPolicies() {
+		return defaultBitstreamsPolicies;
+	}
+
+	public void setDefaultBitstreamsPolicies(List<AccessConditionRest> defaultBitstreamsPolicies) {
+		this.defaultBitstreamsPolicies = defaultBitstreamsPolicies;
+	}
+
 
 }

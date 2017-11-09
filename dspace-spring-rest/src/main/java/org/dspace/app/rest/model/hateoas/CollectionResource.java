@@ -7,7 +7,9 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import org.dspace.app.rest.model.AccessConditionRest;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.LicenseRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
@@ -20,7 +22,8 @@ import org.dspace.app.rest.utils.Utils;
  */
 @RelNameDSpaceResource(CollectionRest.NAME)
 public class CollectionResource extends DSpaceResource<CollectionRest> {
-	public CollectionResource(CollectionRest collection, Utils utils, String... rels) {
+	public CollectionResource(CollectionRest collection, Utils utils, String... rels) {		 
 		super(collection, utils, rels);
+		add(utils.linkToSubResource(collection, AccessConditionRest.NAME));
 	}
 }
