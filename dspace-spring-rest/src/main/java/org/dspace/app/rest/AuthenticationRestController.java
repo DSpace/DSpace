@@ -90,12 +90,9 @@ public class AuthenticationRestController {
     protected ResponseEntity getLoginResponse(HttpServletRequest request, String failedMessage) {
         //Get the context and check if we have an authenticated eperson
         org.dspace.core.Context context = null;
-        try {
-            context = ContextUtil.obtainContext(request);
-        } catch (SQLException e) {
-            log.error("Unable to load user information from the database: " + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+
+        context = ContextUtil.obtainContext(request);
+
 
         if(context == null || context.getCurrentUser() == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)

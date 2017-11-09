@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
-
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
@@ -41,11 +39,7 @@ public abstract class AbstractDSpaceRestRepository {
 
 	protected Context obtainContext() {
 		Request currentRequest = requestService.getCurrentRequest();
-		try {
-			return ContextUtil.obtainContext(currentRequest.getServletRequest());
-		} catch (SQLException e) {
-			log.error("Unable to obtain context object", e);
-			return null;
-		}
+		return ContextUtil.obtainContext(currentRequest.getServletRequest());
+
 	}
 }
