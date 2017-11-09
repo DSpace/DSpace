@@ -419,9 +419,9 @@
         "sponsor" : "German National Library of Medicine",
         "embargo" : "Y",
         "issn" : "1861-8863",
-        "submission" : "A",
+        "submission" : "R",
         "hidden" : "Y",
-        "integrated" : "N"
+        "integrated" : "Y"
      },
      {
         "hidden" : "Y",
