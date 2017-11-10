@@ -10,6 +10,8 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
+import org.dspace.app.submit.accesscondition.SubmissionFormField;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -21,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value = Include.NON_NULL)
-public class SubmissionFormFieldRest {
+public class SubmissionFormFieldRest implements SubmissionFormField {
 	private String label;
 	private boolean mandatory;
 	private boolean repeatable;

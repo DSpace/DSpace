@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +14,15 @@ import javax.servlet.ServletException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.model.AccessConditionOptionRest;
 import org.dspace.app.rest.model.AccessConditionTypeEnum;
+import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.model.hateoas.SubmissionUploadResource;
-import org.dspace.app.rest.submit.accesscondition.AccessConditionOption;
-import org.dspace.app.rest.submit.accesscondition.UploadConfiguration;
-import org.dspace.app.rest.submit.accesscondition.UploadConfigurationService;
 import org.dspace.app.rest.utils.DateMathParser;
+import org.dspace.app.submit.accesscondition.AccessConditionOption;
+import org.dspace.app.submit.accesscondition.UploadConfiguration;
+import org.dspace.app.submit.accesscondition.UploadConfigurationService;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionStepConfig;
@@ -107,7 +106,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 		return new SubmissionUploadResource(sd, utils, rels);
 	}
 
-	private SubmissionUploadRest convert(Context context, UploadConfiguration config) throws Exception {
+	private SubmissionUploadRest convert(Context context, UploadConfiguration<SubmissionFormFieldRest> config) throws Exception {
 		SubmissionUploadRest result = new SubmissionUploadRest();
 		for (AccessConditionOption option : config.getOptions()) {
 			AccessConditionOptionRest optionRest = new AccessConditionOptionRest();

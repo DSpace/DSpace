@@ -5,22 +5,21 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.submit.accesscondition;
+package org.dspace.app.submit.accesscondition;
 
 import java.util.List;
 
-import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.services.ConfigurationService;
 
 /**
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class UploadConfiguration {
+public class UploadConfiguration<T extends SubmissionFormField>{
 	
 	private ConfigurationService configurationService;
 	
-	private List<SubmissionFormFieldRest> metadata;
+	private List<T> metadata;
 	private List<AccessConditionOption> options;
 	private Long maxSize;
 	private Boolean required;
@@ -34,11 +33,11 @@ public class UploadConfiguration {
 		this.options = options;
 	}
 
-	public List<SubmissionFormFieldRest> getMetadata() {
+	public List<T> getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(List<SubmissionFormFieldRest> metadata) {
+	public void setMetadata(List<T> metadata) {
 		this.metadata = metadata;
 	}
 
