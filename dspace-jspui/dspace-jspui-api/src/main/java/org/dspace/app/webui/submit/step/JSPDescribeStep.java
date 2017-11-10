@@ -210,7 +210,7 @@ public class JSPDescribeStep extends JSPStep
         try
         {
             request.setAttribute("submission.inputs", DescribeStep.getInputsReader(formFileName).getInputs(c
-                    .getHandle()));
+                    ));
         }
         catch (DCInputsReaderException e)
         {

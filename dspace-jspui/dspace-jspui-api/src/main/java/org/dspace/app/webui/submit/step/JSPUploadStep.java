@@ -132,7 +132,7 @@ public class JSPUploadStep extends JSPStep
             {
                 DCInputsReader inputsReader = new DCInputsReader();
                 request.setAttribute("submission.inputs", inputsReader.getInputs(c
-                        .getHandle()));
+                        ));
             }
             catch (DCInputsReaderException e)
             {
@@ -248,7 +248,7 @@ public class JSPUploadStep extends JSPStep
                             Collection c = subInfo.getSubmissionItem().getCollection();
                             DCInputsReader inputsReader = new DCInputsReader();
                             request.setAttribute("submission.inputs", inputsReader
-                                    .getInputs(c.getHandle()));
+                                    .getInputs(c));
                         }
                         catch (DCInputsReaderException e)
                         {
@@ -269,7 +269,7 @@ public class JSPUploadStep extends JSPStep
                         Collection c = subInfo.getSubmissionItem().getCollection();
                         DCInputsReader inputsReader = new DCInputsReader();
                         request.setAttribute("submission.inputs", inputsReader
-                                .getInputs(c.getHandle()));
+                                .getInputs(c));
                     }
                     catch (DCInputsReaderException e)
                     {
@@ -289,7 +289,7 @@ public class JSPUploadStep extends JSPStep
                         Collection c = subInfo.getSubmissionItem().getCollection();
                         DCInputsReader inputsReader = new DCInputsReader();
                         request.setAttribute("submission.inputs", inputsReader
-                                .getInputs(c.getHandle()));
+                                .getInputs(c));
                     }
                     catch (DCInputsReaderException e)
                     {

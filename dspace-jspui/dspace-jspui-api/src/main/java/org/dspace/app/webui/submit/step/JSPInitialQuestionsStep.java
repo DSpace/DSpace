@@ -204,7 +204,7 @@ public class JSPInitialQuestionsStep extends JSPStep
              
             // load the proper submission inputs to be used by the JSP
             request.setAttribute("submission.inputs", inputsReader.getInputs(c
-                    .getHandle()));
+                    ));
         }
         catch (DCInputsReaderException e)
         {

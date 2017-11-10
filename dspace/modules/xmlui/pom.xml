@@ -193,6 +193,11 @@
            <artifactId>dspace-sword-api</artifactId>
        </dependency>
 
+	<dependency>
+            <groupId>ar.edu.unlp.sedici</groupId>
+            <artifactId>plugins</artifactId>
+            <version>1.8.2</version>
+        </dependency>
    </dependencies>
 
 </project>
