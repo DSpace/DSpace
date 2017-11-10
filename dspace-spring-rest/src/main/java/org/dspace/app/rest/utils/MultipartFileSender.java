@@ -286,9 +286,9 @@ public class MultipartFileSender {
 
         // If-Match header should contain "*" or ETag. If not, then return 412.
         String ifMatch = request.getHeader(IF_MATCH);
-        if (nonNull(ifMatch) && !matches(ifMatch, fileName)) {
+        if (nonNull(ifMatch) && !matches(ifMatch, checksum)) {
             log.error("If-Match header should contain \"*\" or ETag. If not, then return 412.");
-            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+            response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
             return false;
         }
 
