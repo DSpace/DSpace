@@ -14,6 +14,7 @@ import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
+import org.dspace.app.rest.model.SubmissionUploadRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.SubmissionStepConfig;
@@ -40,6 +41,15 @@ public class SubmissionSectionResource extends DSpaceResource<SubmissionSectionR
 			String uribuilder = uriComponentsBuilder.build().toString();
 			Link link = new Link(uribuilder.substring(0, uribuilder.lastIndexOf("/")), SubmissionFormRest.NAME_LINK_ON_PANEL);
 			add(link);	
-		}		
+		}
+		if(SubmissionStepConfig.UPLOAD_STEP_NAME.equals(sd.getSectionType())) {
+			RestResourceController methodOn = methodOn(RestResourceController.class, SubmissionUploadRest.CATEGORY, SubmissionUploadRest.NAME);			
+			UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
+					.findRel(null, SubmissionUploadRest.CATEGORY, English.plural(SubmissionUploadRest.NAME), sd.getId(), "", null, null, null))
+					.toUriComponentsBuilder();
+			String uribuilder = uriComponentsBuilder.build().toString();
+			Link link = new Link(uribuilder.substring(0, uribuilder.lastIndexOf("/")), SubmissionFormRest.NAME_LINK_ON_PANEL);
+			add(link);	
+		}
 	}
 }

@@ -8,7 +8,7 @@
 package org.dspace.app.rest.converter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dspace.app.rest.model.AccessConditionRest;
+import org.dspace.app.rest.model.DefaultAccessConditionRest;
 import org.dspace.app.rest.model.AccessConditionTypeEnum;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.authorize.ResourcePolicy;
@@ -27,14 +27,14 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, AccessConditionRest> {
+public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, DefaultAccessConditionRest> {
 
 	@Autowired
 	ConfigurationService configurationService;
 	
 	@Override
-	public AccessConditionRest fromModel(ResourcePolicy obj) {
-		AccessConditionRest model = new AccessConditionRest();
+	public DefaultAccessConditionRest fromModel(ResourcePolicy obj) {
+		DefaultAccessConditionRest model = new DefaultAccessConditionRest();
 		model.setId(obj.getID());
 		model.setType(AccessConditionTypeEnum.openaccess);
 		if (obj.getGroup() != null) {
@@ -65,7 +65,7 @@ public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, A
 	}
 
 	@Override
-	public ResourcePolicy toModel(AccessConditionRest obj) {
+	public ResourcePolicy toModel(DefaultAccessConditionRest obj) {
 		// TODO Auto-generated method stub
 		return null;
 	}
