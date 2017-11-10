@@ -211,6 +211,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
                 }
             }
         }
+
         String[] allPaths = pathList.toArray(new String[pathList.size()]);
         applicationContext = new ClassPathXmlApplicationContext(allPaths, false);
         // Make sure that the spring files from the config directoy can override the spring files from our jars
