@@ -8,6 +8,15 @@
 
 package org.dspace.google;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -19,17 +28,12 @@ import org.apache.log4j.Logger;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 /**
@@ -46,12 +50,23 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
     private CloseableHttpClient httpclient;
     private String GoogleURL = "https://www.google-analytics.com/collect";
     private static Logger log = Logger.getLogger(GoogleRecorderEventListener.class);
-    protected ContentServiceFactory contentServiceFactory = ContentServiceFactory.getInstance();
 
+    protected ContentServiceFactory contentServiceFactory;
+    protected ConfigurationService configurationService;
 
     public GoogleRecorderEventListener() {
         // httpclient is threadsafe so we only need one.
         httpclient = HttpClients.createDefault();
+    }
+
+    @Autowired
+    public void setContentServiceFactory(ContentServiceFactory contentServiceFactory) {
+        this.contentServiceFactory = contentServiceFactory;
+    }
+
+    @Autowired
+    public void setConfigurationService(final ConfigurationService configurationService) {
+        this.configurationService = configurationService;
     }
 
     @Override
@@ -61,12 +76,9 @@ public class GoogleRecorderEventListener extends AbstractUsageEventListener {
             log.debug("Usage event received " + event.getName());
 
             // This is a wee bit messy but these keys should be combined in future.
-            analyticsKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("jspui.google.analytics.key");
-            if (analyticsKey == null ) {
-                analyticsKey = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("xmlui.google.analytics.key");
-            }
+            analyticsKey = configurationService.getProperty("google.analytics.key");
 
-            if (analyticsKey != null ) {
+            if (StringUtils.isNotBlank(analyticsKey)) {
                 try {
                     UsageEvent ue = (UsageEvent)event;
 

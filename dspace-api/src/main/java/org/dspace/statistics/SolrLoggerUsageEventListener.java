@@ -16,6 +16,7 @@ import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
 import org.dspace.usage.UsageSearchEvent;
 import org.dspace.usage.UsageWorkflowEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -31,8 +32,9 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 
     protected SolrLoggerService solrLoggerService;
 
-	public SolrLoggerUsageEventListener() {
-        solrLoggerService = StatisticsServiceFactory.getInstance().getSolrLoggerService();
+	@Autowired
+	public void setSolrLoggerService(SolrLoggerService solrLoggerService) {
+		this.solrLoggerService = solrLoggerService;
 	}
 
 	@Override
@@ -43,7 +45,7 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 			log.debug("Usage event received " + event.getName());
 			try{
 			    UsageEvent ue = (UsageEvent)event;
-			
+
 			    EPerson currentUser = ue.getContext() == null ? null : ue.getContext().getCurrentUser();
 
                 if(UsageEvent.Action.VIEW == ue.getAction()){
@@ -74,7 +76,6 @@ public class SolrLoggerUsageEventListener extends AbstractUsageEventListener {
 				log.error(e.getMessage());
 			}
 		}
-				
-	}
 
+	}
 }
