@@ -10,6 +10,7 @@ package org.dspace.app.rest.model.hateoas;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.BrowseEntryRest;
@@ -18,8 +19,6 @@ import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
  * Browse Entry Rest HAL Resource. The HAL Resource wraps the REST Resource
