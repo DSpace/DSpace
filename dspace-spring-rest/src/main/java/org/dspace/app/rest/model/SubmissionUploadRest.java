@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.app.rest.RestResourceController;
-import org.dspace.app.rest.submit.accesscondition.AccessConditionOption;
+import org.dspace.app.submit.accesscondition.AccessConditionOption;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
