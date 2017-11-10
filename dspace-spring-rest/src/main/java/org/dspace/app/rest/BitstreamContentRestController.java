@@ -22,7 +22,9 @@ import org.dspace.app.rest.utils.MultipartFileSender;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,6 +48,9 @@ public class BitstreamContentRestController {
 	@Autowired
 	private EventService eventService;
 
+	@Autowired
+	private ConfigurationService configurationService;
+
 	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
 	public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
 											 HttpServletRequest request) throws IOException, SQLException {
@@ -60,12 +65,15 @@ public class BitstreamContentRestController {
 
 		Long lastModified = bitstreamService.getLastModified(bit);
         String mimetype = bit.getFormat(context).getMIMEType();
+		int bufferSize = configurationService.getIntProperty("bitstream-download.buffer.size", -1);
 
 		// Pipe the bits
 		try(InputStream is = bitstreamService.retrieve(context, bit)) {
 
+
 			MultipartFileSender sender = MultipartFileSender
 					.fromInputStream(is)
+					.withBufferSize(bufferSize)
 					.withFileName(bit.getName())
 					.withLength(bit.getSize())
 					.withChecksum(bit.getChecksum())
