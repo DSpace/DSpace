@@ -7,25 +7,31 @@
  */
 package org.dspace.content.dao.impl;
 
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.ResourcePolicy_;
+import org.dspace.checker.ChecksumResult;
 import org.dspace.content.Collection;
+import org.dspace.content.Collection_;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.dao.CollectionDAO;
-import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
+import javax.persistence.Query;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.BasicTransformerAdapter;
+
+import javax.persistence.criteria.*;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Collection object.
@@ -34,8 +40,10 @@ import org.hibernate.transform.BasicTransformerAdapter;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> implements CollectionDAO {
-    protected CollectionDAOImpl() {
+public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> implements CollectionDAO
+{
+    protected CollectionDAOImpl()
+    {
         super();
     }
 
@@ -43,30 +51,31 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
      * Get all collections in the system. These are alphabetically sorted by
      * collection name.
      *
-     * @param context DSpace context object
-     * @param order   order by MetadataField
+     * @param context
+     *            DSpace context object
+     * @param order order by MetadataField
      * @return the collections in the system
      * @throws SQLException if database error
      */
     @Override
-    public List<Collection> findAll(Context context, MetadataField order) throws SQLException {
+    public List<Collection> findAll(Context context, MetadataField order) throws SQLException
+    {
         return findAll(context, order, null, null);
     }
 
     @Override
-    public List<Collection> findAll(Context context, MetadataField order, Integer limit, Integer offset)
-        throws SQLException {
+    public List<Collection> findAll(Context context, MetadataField order, Integer limit, Integer offset) throws SQLException {
         StringBuilder query = new StringBuilder();
-        query.append("SELECT ").append(Collection.class.getSimpleName()).append(" FROM Collection as ")
-             .append(Collection.class.getSimpleName()).append(" ");
+        query.append("SELECT ").append(Collection.class.getSimpleName()).append(" FROM Collection as ").append(Collection.class.getSimpleName()).append(" ");
         addMetadataLeftJoin(query, Collection.class.getSimpleName(), Arrays.asList(order));
         addMetadataSortQuery(query, Arrays.asList(order), null);
 
         Query hibernateQuery = createQuery(context, query.toString());
-        if (offset != null) {
+        if(offset != null)
+        {
             hibernateQuery.setFirstResult(offset);
         }
-        if (limit != null) {
+        if(limit != null){
             hibernateQuery.setMaxResults(limit);
         }
         hibernateQuery.setParameter(order.toString(), order.getID());
@@ -75,29 +84,51 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     public Collection findByTemplateItem(Context context, Item item) throws SQLException {
-        Criteria criteria = createCriteria(context, Collection.class);
-        criteria.add(Restrictions.eq("template_item", item));
-        return uniqueResult(criteria);
+//        Criteria criteria = createCriteria(context, Collection.class);
+//        criteria.add(Restrictions.eq("template_item", item));
+//        return uniqueResult(criteria);
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
+        Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
+        //TODO Used to be template_item, may be wrong
+        criteriaQuery.select(collectionRoot);
+        criteriaQuery.where(criteriaBuilder.equal(collectionRoot.get(Collection_.template), item));
+        return uniqueResult(context, criteriaQuery, false, Collection.class, -1, -1);
     }
 
     @Override
     public Collection findByGroup(Context context, Group group) throws SQLException {
-        Criteria criteria = createCriteria(context, Collection.class);
-        criteria.add(
-            Restrictions.or(
-                Restrictions.eq("workflowStep1", group),
-                Restrictions.eq("workflowStep2", group),
-                Restrictions.eq("workflowStep3", group),
-                Restrictions.eq("submitters", group),
-                Restrictions.eq("admins", group)
-            )
-        );
-        return singleResult(criteria);
+//        Criteria criteria = createCriteria(context, Collection.class);
+//        criteria.add(
+//                Restrictions.or(
+//                        Restrictions.eq("workflowStep1", group),
+//                        Restrictions.eq("workflowStep2", group),
+//                        Restrictions.eq("workflowStep3", group),
+//                        Restrictions.eq("submitters", group),
+//                        Restrictions.eq("admins", group)
+//                )
+//        );
+//        return singleResult(criteria);
+
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
+        Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
+        criteriaQuery.select(collectionRoot);
+        criteriaQuery.where(criteriaBuilder.or(criteriaBuilder.equal(collectionRoot.get(Collection_.workflowStep1), group),
+                                                criteriaBuilder.equal(collectionRoot.get(Collection_.workflowStep2), group),
+                                                criteriaBuilder.equal(collectionRoot.get(Collection_.workflowStep3), group),
+                                                criteriaBuilder.equal(collectionRoot.get(Collection_.submitters), group),
+                                                criteriaBuilder.equal(collectionRoot.get(Collection_.admins), group)
+                                                )
+                            );
+        return singleResult(context, criteriaQuery);
     }
 
     @Override
-    public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions)
-        throws SQLException {
+    public List<Collection> findAuthorized(Context context, EPerson ePerson, List<Integer> actions) throws SQLException {
+        //TODO RAF CHECK
         //        TableRowIterator tri = DatabaseManager.query(context,
 //                "SELECT * FROM collection, resourcepolicy, eperson " +
 //                        "WHERE resourcepolicy.resource_id = collection.collection_id AND " +
@@ -106,64 +137,79 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 //                        "( resourcepolicy.action_id = 3 OR resourcepolicy.action_id = 11 ) AND "+
 //                        "eperson.eperson_id = ?", context.getCurrentUser().getID());
 
-        Criteria criteria = createCriteria(context, Collection.class);
-        criteria.createAlias("resourcePolicies", "resourcePolicy");
+//        Criteria criteria = createCriteria(context, Collection.class);
+//        criteria.createAlias("resourcePolicies", "resourcePolicy");
+//
+//        Disjunction actionQuery = Restrictions.or();
+//        for (Integer action : actions)
+//        {
+//            actionQuery.add(Restrictions.eq("resourcePolicy.actionId", action));
+//        }
+//        criteria.add(Restrictions.and(
+//                Restrictions.eq("resourcePolicy.resourceTypeId", Constants.COLLECTION),
+//                Restrictions.eq("resourcePolicy.eperson", ePerson),
+//                actionQuery
+//        ));
+//        criteria.setCacheable(true);
+//
+//        return list(criteria);
 
-        Disjunction actionQuery = Restrictions.or();
-        for (Integer action : actions) {
-            actionQuery.add(Restrictions.eq("resourcePolicy.actionId", action));
+
+        CriteriaBuilder criteriaBuilder = getCriteriaBuilder(context);
+        CriteriaQuery criteriaQuery = getCriteriaQuery(criteriaBuilder, Collection.class);
+        Root<Collection> collectionRoot = criteriaQuery.from(Collection.class);
+        Join<Collection, ResourcePolicy> join = collectionRoot.join("resourcePolicies");
+        List<Predicate> orPredicates = new LinkedList<Predicate>();
+        for(Integer action : actions){
+            orPredicates.add(criteriaBuilder.equal(join.get(ResourcePolicy_.actionId), action));
         }
-        criteria.add(Restrictions.and(
-            Restrictions.eq("resourcePolicy.resourceTypeId", Constants.COLLECTION),
-            Restrictions.eq("resourcePolicy.eperson", ePerson),
-            actionQuery
-        ));
-        criteria.setCacheable(true);
-
-        return list(criteria);
+        Predicate orPredicate = criteriaBuilder.and(orPredicates.toArray(new Predicate[]{}));
+        criteriaQuery.select(collectionRoot);
+        criteriaQuery.where(criteriaBuilder.and(criteriaBuilder.equal(join.get(ResourcePolicy_.resourceTypeId), Constants.COLLECTION),
+                                                criteriaBuilder.equal(join.get(ResourcePolicy_.eperson), ePerson),
+                                                orPredicate));
+        return list(context, criteriaQuery, true, Collection.class, -1, -1);
     }
 
     @Override
-    public List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions)
-        throws SQLException {
-        //        TableRowIterator tri = DatabaseManager.query(context,
-        //                "SELECT \n" +
-        //                        "  * \n" +
-        //                        "FROM \n" +
-        //                        "  public.eperson, \n" +
-        //                        "  public.epersongroup2eperson, \n" +
-        //                        "  public.epersongroup, \n" +
-        //                        "  public.group2group, \n" +
-        //                        "  public.resourcepolicy rp_parent, \n" +
-        //                        "  public.collection\n" +
-        //                        "WHERE \n" +
-        //                        "  epersongroup2eperson.eperson_id = eperson.eperson_id AND\n" +
-        //                        "  epersongroup.eperson_group_id = epersongroup2eperson.eperson_group_id AND\n" +
-        //                        "  group2group.child_id = epersongroup.eperson_group_id AND\n" +
-        //                        "  rp_parent.epersongroup_id = group2group.parent_id AND\n" +
-        //                        "  collection.collection_id = rp_parent.resource_id AND\n" +
-        //                        "  eperson.eperson_id = ? AND \n" +
-        //                        "  (rp_parent.action_id = 3 OR \n" +
-        //                        "  rp_parent.action_id = 11  \n" +
-        //                        "  )  AND rp_parent.resource_type_id = 3;", context.getCurrentUser().getID());
+    public List<Collection> findAuthorizedByGroup(Context context, EPerson ePerson, List<Integer> actions) throws SQLException {
+ //        TableRowIterator tri = DatabaseManager.query(context,
+ //                "SELECT \n" +
+ //                        "  * \n" +
+ //                        "FROM \n" +
+ //                        "  public.eperson, \n" +
+ //                        "  public.epersongroup2eperson, \n" +
+ //                        "  public.epersongroup, \n" +
+ //                        "  public.group2group, \n" +
+ //                        "  public.resourcepolicy rp_parent, \n" +
+ //                        "  public.collection\n" +
+ //                        "WHERE \n" +
+ //                        "  epersongroup2eperson.eperson_id = eperson.eperson_id AND\n" +
+ //                        "  epersongroup.eperson_group_id = epersongroup2eperson.eperson_group_id AND\n" +
+ //                        "  group2group.child_id = epersongroup.eperson_group_id AND\n" +
+ //                        "  rp_parent.epersongroup_id = group2group.parent_id AND\n" +
+ //                        "  collection.collection_id = rp_parent.resource_id AND\n" +
+ //                        "  eperson.eperson_id = ? AND \n" +
+ //                        "  (rp_parent.action_id = 3 OR \n" +
+ //                        "  rp_parent.action_id = 11  \n" +
+ //                        "  )  AND rp_parent.resource_type_id = 3;", context.getCurrentUser().getID());
         StringBuilder query = new StringBuilder();
         query.append("select c from Collection c join c.resourcePolicies rp join rp.epersonGroup rpGroup WHERE ");
         for (int i = 0; i < actions.size(); i++) {
             Integer action = actions.get(i);
-            if (i != 0) {
+            if(i != 0)
+            {
                 query.append(" AND ");
             }
             query.append("rp.actionId=").append(action);
         }
         query.append(" AND rp.resourceTypeId=").append(Constants.COLLECTION);
-        query.append(
-            " AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in " +
-                "elements(epeople))");
-        Query hibernateQuery = createQuery(context, query.toString());
-        hibernateQuery.setParameter("eperson_id", ePerson.getID());
-        hibernateQuery.setCacheable(true);
+        query.append(" AND rp.epersonGroup.id IN (select g.id from Group g where (from EPerson e where e.id = :eperson_id) in elements(epeople))");
+        Query persistenceQuery = createQuery(context, query.toString());
+        persistenceQuery.setParameter("eperson_id", ePerson.getID());
+        persistenceQuery.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
-        return list(hibernateQuery);
+        return list(persistenceQuery);
 
 
     }
@@ -180,17 +226,17 @@ public class CollectionDAOImpl extends AbstractHibernateDSODAO<Collection> imple
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context)
-        throws SQLException {
-        String q = "select col as collection, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col " +
-            "join i.bundles bun join bun.bitstreams bit group by col";
+    public List<Map.Entry<Collection, Long>> getCollectionsWithBitstreamSizesTotal(Context context) throws SQLException {
+        String q = "select col as collection, sum(bit.sizeBytes) as totalBytes from Item i join i.collections col join i.bundles bun join bun.bitstreams bit group by col";
         Query query = createQuery(context, q);
-        query.setResultTransformer(new BasicTransformerAdapter() {
-            @Override
-            public Object transformTuple(Object[] tuple, String[] aliases) {
-                return new java.util.AbstractMap.SimpleImmutableEntry<>((Collection) tuple[0], (Long) tuple[1]);
-            }
-        });
-        return ((List<Map.Entry<Collection, Long>>) query.list());
+
+        //TODO RAF WRITE WUTNOW
+//        query.setResultTransformer(new BasicTransformerAdapter() {
+//            @Override
+//            public Object transformTuple(Object[] tuple, String[] aliases) {
+//                return new java.util.AbstractMap.SimpleImmutableEntry<>((Collection)tuple[0], (Long)tuple[1]);
+//            }
+//        });
+        return ((List<Map.Entry<Collection, Long>>)query.getResultList());
     }
 }

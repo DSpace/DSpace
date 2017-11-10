@@ -16,7 +16,7 @@
         <property name="hibernate.current_session_context_class">org.hibernate.context.internal.ThreadLocalSessionContext</property>
 
         <!--Debug property that can be used to display the sql-->
-        <property name="show_sql">false</property>
+        <property name="show_sql">true</property>
 
         <!--Second level cache configuration-->
         <property name="hibernate.cache.use_query_cache">true</property>

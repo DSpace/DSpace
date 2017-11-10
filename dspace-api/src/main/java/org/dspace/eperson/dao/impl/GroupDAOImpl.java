@@ -7,11 +7,6 @@
  */
 package org.dspace.eperson.dao.impl;
 
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dspace.content.MetadataField;
@@ -20,7 +15,11 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.dao.GroupDAO;
-import org.hibernate.Query;
+import javax.persistence.Query;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Group object.
@@ -29,14 +28,16 @@ import org.hibernate.Query;
  *
  * @author kevinvandevelde at atmire.com
  */
-public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements GroupDAO {
-    protected GroupDAOImpl() {
+public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements GroupDAO
+{
+    protected GroupDAOImpl()
+    {
         super();
     }
 
     @Override
-    public List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField)
-        throws SQLException {
+    public List<Group> findByMetadataField(Context context, String searchValue, MetadataField metadataField) throws SQLException
+    {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
         queryBuilder.append("SELECT ").append(groupTableName).append(" FROM Group as ").append(groupTableName);
@@ -52,8 +53,8 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     }
 
     @Override
-    public List<Group> findAll(Context context, List<MetadataField> sortMetadataFields, int pageSize, int offset)
-        throws SQLException {
+    public List<Group> findAll(Context context, List<MetadataField> sortMetadataFields, int pageSize, int offset) throws SQLException
+    {
         StringBuilder queryBuilder = new StringBuilder();
         String groupTableName = "g";
         queryBuilder.append("SELECT ").append(groupTableName).append(" FROM Group as ").append(groupTableName);
@@ -63,10 +64,10 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
 
         Query query = createQuery(context, queryBuilder.toString());
         if (pageSize > 0) {
-            query.setMaxResults(pageSize);
+        	query.setMaxResults(pageSize);
         }
         if (offset > 0) {
-            query.setFirstResult(offset);
+        	query.setFirstResult(offset);
         }
         for (MetadataField sortField : sortMetadataFields) {
             query.setParameter(sortField.toString(), sortField.getID());
@@ -77,24 +78,23 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     @Override
     public List<Group> findAll(Context context, int pageSize, int offset) throws SQLException {
         Query query = createQuery(context,
-                                  "SELECT g FROM Group g ORDER BY g.name ASC");
+                "SELECT g FROM Group g ORDER BY g.name ASC");
         if (pageSize > 0) {
-            query.setMaxResults(pageSize);
+        	query.setMaxResults(pageSize);
         }
         if (offset > 0) {
-            query.setFirstResult(offset);
+        	query.setFirstResult(offset);
         }
-        query.setCacheable(true);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
         return list(query);
     }
 
     @Override
     public List<Group> findByEPerson(Context context, EPerson ePerson) throws SQLException {
-        Query query = createQuery(context,
-                                  "from Group where (from EPerson e where e.id = :eperson_id) in elements(epeople)");
+        Query query = createQuery(context, "from Group where (from EPerson e where e.id = :eperson_id) in elements(epeople)");
         query.setParameter("eperson_id", ePerson.getID());
-        query.setCacheable(true);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
         return list(query);
     }
@@ -102,53 +102,54 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     @Override
     public Group findByName(final Context context, final String name) throws SQLException {
         Query query = createQuery(context,
-                                  "SELECT g from Group g " +
-                                      "where g.name = :name ");
+                "SELECT g from Group g " +
+                "where g.name = :name ");
 
         query.setParameter("name", name);
-        query.setCacheable(true);
+        query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
         return singleResult(query);
     }
 
     @Override
     public Group findByIdAndMembership(Context context, UUID id, EPerson ePerson) throws SQLException {
-        if (id == null || ePerson == null) {
+        if(id == null || ePerson == null) {
             return null;
         } else {
             Query query = createQuery(context,
-                                      "SELECT DISTINCT g FROM Group g " +
-                                          "LEFT JOIN g.epeople p " +
-                                          "WHERE g.id = :id AND " +
-                                          "(p.id = :eperson_id OR " +
-                                          "EXISTS ( " +
-                                          "SELECT 1 FROM Group2GroupCache gc " +
-                                          "JOIN gc.parent parent " +
-                                          "JOIN gc.child child " +
-                                          "JOIN child.epeople cp " +
-                                          "WHERE parent.id = g.id AND cp.id = :eperson_id " +
-                                          ") " +
-                                          ")");
+                    "SELECT DISTINCT g FROM Group g " +
+                            "LEFT JOIN g.epeople p " +
+                            "WHERE g.id = :id AND " +
+                            "(p.id = :eperson_id OR " +
+                            "EXISTS ( " +
+                                "SELECT 1 FROM Group2GroupCache gc " +
+                                "JOIN gc.parent parent " +
+                                "JOIN gc.child child " +
+                                "JOIN child.epeople cp " +
+                                "WHERE parent.id = g.id AND cp.id = :eperson_id " +
+                                ") " +
+                            ")");
 
             query.setParameter("id", id);
             query.setParameter("eperson_id", ePerson.getID());
-            query.setCacheable(true);
+            query.setHint("org.hibernate.cacheable", Boolean.TRUE);
 
             return singleResult(query);
         }
     }
 
     @Override
-    public List<Group> findByNameLike(final Context context, final String groupName, final int offset, final int limit)
-        throws SQLException {
+    public List<Group> findByNameLike(final Context context, final String groupName, final int offset, final int limit) throws SQLException {
         Query query = createQuery(context,
-                                  "SELECT g FROM Group g WHERE lower(g.name) LIKE lower(:name)");
+                "SELECT g FROM Group g WHERE lower(g.name) LIKE lower(:name)");
         query.setParameter("name", "%" + StringUtils.trimToEmpty(groupName) + "%");
 
-        if (0 <= offset) {
+        if(0 <= offset)
+        {
             query.setFirstResult(offset);
         }
-        if (0 <= limit) {
+        if(0 <= limit)
+        {
             query.setMaxResults(limit);
         }
 
@@ -158,7 +159,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     @Override
     public int countByNameLike(final Context context, final String groupName) throws SQLException {
         Query query = createQuery(context,
-                                  "SELECT count(*) FROM Group g WHERE lower(g.name) LIKE lower(:name)");
+                "SELECT count(*) FROM Group g WHERE lower(g.name) LIKE lower(:name)");
         query.setParameter("name", "%" + groupName + "%");
 
         return count(query);
@@ -166,8 +167,7 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
 
     @Override
     public void delete(Context context, Group group) throws SQLException {
-        Query query = getHibernateSession(context)
-            .createSQLQuery("DELETE FROM group2group WHERE parent_id=:groupId or child_id=:groupId");
+        Query query = getHibernateSession(context).createSQLQuery("DELETE FROM group2group WHERE parent_id=:groupId or child_id=:groupId");
         query.setParameter("groupId", group.getID());
         query.executeUpdate();
         super.delete(context, group);
@@ -178,11 +178,11 @@ public class GroupDAOImpl extends AbstractHibernateDSODAO<Group> implements Grou
     public List<Pair<UUID, UUID>> getGroup2GroupResults(Context context, boolean flushQueries) throws SQLException {
 
         Query query = createQuery(context, "SELECT new org.apache.commons.lang3.tuple.ImmutablePair(g.id, c.id) " +
-            "FROM Group g " +
-            "JOIN g.groups c ");
+                "FROM Group g " +
+                "JOIN g.groups c ");
 
         @SuppressWarnings("unchecked")
-        List<Pair<UUID, UUID>> results = query.list();
+        List<Pair<UUID, UUID>> results = query.getResultList();
         return results;
     }
 
