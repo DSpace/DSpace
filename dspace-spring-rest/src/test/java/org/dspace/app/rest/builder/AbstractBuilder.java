@@ -20,6 +20,7 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.CollectionService;
@@ -55,6 +56,7 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
     static GroupService groupService;
     static BundleService bundleService;
     static BitstreamService bitstreamService;
+    static BitstreamFormatService bitstreamFormatService;
     static AuthorizeService authorizeService;
     static ResourcePolicyService resourcePolicyService;
     static IndexingService indexingService;
@@ -74,6 +76,7 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
         groupService = EPersonServiceFactory.getInstance().getGroupService();
         bundleService = ContentServiceFactory.getInstance().getBundleService();
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
         authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         indexingService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);

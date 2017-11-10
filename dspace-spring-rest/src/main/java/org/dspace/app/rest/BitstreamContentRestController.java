@@ -70,7 +70,6 @@ public class BitstreamContentRestController {
 		// Pipe the bits
 		try(InputStream is = bitstreamService.retrieve(context, bit)) {
 
-
 			MultipartFileSender sender = MultipartFileSender
 					.fromInputStream(is)
 					.withBufferSize(bufferSize)
@@ -86,8 +85,6 @@ public class BitstreamContentRestController {
 				if (sender.isNoRangeRequest()) {
 					//We only log a download request when serving a request without Range header. This is because
 					//a browser always sends a regular request first to check for Range support.
-
-					//TODO we still need to register the usage event listneres in spring
 					eventService.fireEvent(
 							new UsageEvent(
 									UsageEvent.Action.VIEW,
