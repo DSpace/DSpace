@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.submit.accesscondition;
+package org.dspace.submit.model;
 
 /**
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)

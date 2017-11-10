@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.submit.accesscondition;
+package org.dspace.submit.model;
 
 import java.util.Map;
 

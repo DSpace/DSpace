@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 	
-	<bean id="uploadConfigurationDefault" class="org.dspace.app.submit.accesscondition.UploadConfiguration">
+	<bean id="uploadConfigurationDefault" class="org.dspace.submit.model.UploadConfiguration">
 		<property name="name" value="upload"></property>
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
 		<property name="metadata">
@@ -24,54 +24,54 @@
         </property>
     </bean>
 
-    <bean id="fieldBitstreamName" class="org.dspace.app.rest.model.SubmissionFormFieldRest">
+    <bean id="fieldBitstreamName" class="org.dspace.submit.model.SubmissionFormField">
 		<property name="selectableMetadata">
 			<list>
-				<bean class="org.dspace.app.rest.model.SelectableMetadata">
+				<bean class="org.dspace.submit.model.SelectableMetadata">
 					<property name="metadata" value="dc.title"></property>
 				</bean>
 			</list>		
 		</property>
     </bean>
-    <bean id="fieldBitstreamDescription" class="org.dspace.app.rest.model.SubmissionFormFieldRest">
+    <bean id="fieldBitstreamDescription" class="org.dspace.submit.model.SubmissionFormField">
 		<property name="selectableMetadata">
 			<list>
-				<bean class="org.dspace.app.rest.model.SelectableMetadata">
+				<bean class="org.dspace.submit.model.SelectableMetadata">
 					<property name="metadata" value="dc.description"></property>
 				</bean>
 			</list>		
 		</property>
     </bean>
     
-    <bean id="openAccess" class="org.dspace.app.submit.accesscondition.AccessConditionOption">
+    <bean id="openAccess" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
         <property name="type" value="openaccess"/>
         <property name="hasDate" value="false"/>
     </bean>
-    <bean id="lease" class="org.dspace.app.submit.accesscondition.AccessConditionOption">
+    <bean id="lease" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
         <property name="type" value="lease"/>
         <property name="hasDate" value="true"/>
         <property name="dateLimit" value="+1MONTHS"/>
     </bean> 
-    <bean id="embargoed" class="org.dspace.app.submit.accesscondition.AccessConditionOption">
+    <bean id="embargoed" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
         <property name="type" value="embargo"/>
         <property name="hasDate" value="true"/>
         <property name="dateLimit" value="+6MONTHS"/>
     </bean> 
-    <bean id="administrator" class="org.dspace.app.submit.accesscondition.AccessConditionOption">
+    <bean id="administrator" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Administrator"/>
         <property name="type" value="administrator"/>
         <property name="hasDate" value="false"/>
     </bean>
-    <bean id="networkAdministration" class="org.dspace.app.submit.accesscondition.AccessConditionOption">
+    <bean id="networkAdministration" class="org.dspace.submit.model.AccessConditionOption">
     	<property name="groupName" value="INSTITUTIONAL_NETWORK"/>
         <property name="type" value="networkAdministration"/>
         <property name="hasDate" value="false"/>        
     </bean>
 
-    <bean id="uploadConfigurationService" class="org.dspace.app.submit.accesscondition.UploadConfigurationService">
+    <bean id="uploadConfigurationService" class="org.dspace.submit.model.UploadConfigurationService">
         <property name="map">
             <map>
                 <entry key="upload" value-ref="uploadConfigurationDefault" />
