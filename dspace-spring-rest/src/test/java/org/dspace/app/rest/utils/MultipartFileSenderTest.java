@@ -7,14 +7,23 @@
  */
 package org.dspace.app.rest.utils;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.test.AbstractIntegrationTestWithDatabase;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,35 +31,23 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-//Test class for MultipartFileSender
-public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase {
-
+/**
+ * Test class for MultipartFileSender
+ */
+public class MultipartFileSenderTest {
 
     /**
      * log4j category
      */
     private static final Logger log = Logger.getLogger(MultipartFileSenderTest.class);
 
-    private BitstreamService bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
-    /**
-     * BitStream instance for the tests
-     */
-    private Bitstream bs;
-
     private InputStream is;
+    private String mimeType;
+    private long lastModified;
+    private long length;
+    private String fileName;
+    private String checksum;
+
 
     private HttpServletRequest request;
 
@@ -70,11 +67,15 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
     @Before
     public void init() throws AuthorizeException {
         try {
-            //we have to create a new bitstream in the database
-            context.turnOffAuthorisationSystem();
-            this.bs = bitstreamService.create(context, IOUtils.toInputStream("0123456789", CharEncoding.UTF_8));
-            this.bs.setName(context, "Test Item");
-            this.is = bitstreamService.retrieve(context, bs);
+            String content = "0123456789";
+
+            this.is = IOUtils.toInputStream(content, CharEncoding.UTF_8);
+            this.fileName = "Test-Item.txt";
+            this.mimeType = "text/plain";
+            this.lastModified = new Date().getTime();
+            this.length = content.getBytes().length;
+            this.checksum = "testsum";
+
             this.request = mock(HttpServletRequest.class);
             this.response = new MockHttpServletResponse();
 
@@ -83,9 +84,6 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
             this.responseWrapper = new ContentCachingResponseWrapper(response);
         } catch (IOException ex) {
             log.error("IO Error in init", ex);
-            fail("SQL Error in init: " + ex.getMessage());
-        } catch (SQLException ex) {
-            log.error("SQL Error in init", ex);
             fail("SQL Error in init: " + ex.getMessage());
         }
     }
@@ -98,15 +96,12 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      * but no execution order is guaranteed
      */
     @After
-    @Override
     public void destroy() {
-        bs = null;
         try {
             is.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        context.restoreAuthSystemState();
     }
 
 
@@ -116,7 +111,14 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testRangeHeader() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
         when(request.getHeader(eq("If-Range"))).thenReturn("not_file_to_serve.txt");
         when(request.getHeader(eq("Range"))).thenReturn("bytes=1-3");
@@ -134,13 +136,21 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testFullFileReturn() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
         multipartFileSender.serveResource();
 
         String content = new String(responseWrapper.getContentAsByteArray(), CharEncoding.UTF_8);
 
         assertEquals("0123456789", content);
+        assertEquals(checksum, responseWrapper.getHeader("ETag"));
     }
 
     /**
@@ -149,8 +159,14 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testOpenRange() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
-
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
         when(request.getHeader(eq("Range"))).thenReturn("bytes=5-");
 
@@ -167,7 +183,14 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testMultipleRanges() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
         when(request.getHeader(eq("Range"))).thenReturn("bytes=1-2,3-4,5-9");
 
@@ -199,7 +222,14 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testInvalidRange() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
         when(request.getHeader(eq("Range"))).thenReturn("bytes=invalid");
 
@@ -214,7 +244,14 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testEtagInResponse() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
 
         when(request.getHeader(eq("Range"))).thenReturn("bytes=1-3");
@@ -223,13 +260,20 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
 
         String etag = responseWrapper.getHeader("Etag");
 
-        assertEquals(bs.getChecksum(), etag);
+        assertEquals(checksum, etag);
     }
 
     //Check that a head request doesn't return any body, but returns the headers
     @Test
     public void testHeadRequest() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
 
         when(request.getMethod()).thenReturn("HEAD");
@@ -239,7 +283,9 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
         String content = new String(responseWrapper.getContentAsByteArray(), CharEncoding.UTF_8);
 
         assertEquals("bytes", responseWrapper.getHeader("Accept-Ranges"));
+        assertEquals(checksum, responseWrapper.getHeader("ETag"));
         assertEquals("", content);
+        assertEquals(200, responseWrapper.getStatusCode());
 
     }
 
@@ -250,10 +296,16 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testIfNoneMatchFail() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
-
-        when(request.getHeader(eq("If-None-Match"))).thenReturn(bs.getChecksum());
+        when(request.getHeader(eq("If-None-Match"))).thenReturn(checksum);
 
         multipartFileSender.isValid();
 
@@ -266,7 +318,14 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testIfNoneMatchPass() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withFileName(bs.getName()).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withFileName(fileName)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
 
         when(request.getHeader(eq("If-None-Match"))).thenReturn("pretendthisisarandomchecksumnotequaltotherequestedbitstream");
@@ -283,7 +342,13 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
      */
     @Test
     public void testNoFileName() throws Exception {
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).with(responseWrapper).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize());
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .with(responseWrapper)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length);
 
 
         multipartFileSender.isValid();
@@ -299,7 +364,15 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
     @Test
     public void testIfModifiedSinceNotModifiedSince() throws Exception {
         Long time = new Date().getTime();
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).withFileName(bs.getName()).with(responseWrapper).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize()).withLastModified(time);
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .withFileName(fileName)
+                .with(responseWrapper)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length)
+                .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(time + 100000);
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(-1L);
@@ -318,7 +391,15 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
     @Test
     public void testIfModifiedSinceModifiedSince() throws Exception {
         Long time = new Date().getTime();
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).withFileName(bs.getName()).with(responseWrapper).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize()).withLastModified(time);
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .withFileName(fileName)
+                .with(responseWrapper)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length)
+                .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(time - 100000);
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(-1L);
@@ -337,7 +418,15 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
     @Test
     public void testIfMatchNoMatch() throws Exception {
         Long time = new Date().getTime();
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).withFileName(bs.getName()).with(responseWrapper).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize()).withLastModified(time);
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .withFileName(fileName)
+                .with(responseWrapper)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length)
+                .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(-1L);
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(-1L);
@@ -355,11 +444,19 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
     @Test
     public void testIfMatchMatch() throws Exception {
         Long time = new Date().getTime();
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).withFileName(bs.getName()).with(responseWrapper).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize()).withLastModified(time);
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .withFileName(fileName)
+                .with(responseWrapper)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length)
+                .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(-1L);
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(-1L);
-        when(request.getHeader(eq("If-Match"))).thenReturn(bs.getChecksum());
+        when(request.getHeader(eq("If-Match"))).thenReturn(checksum);
 
         multipartFileSender.isValid();
 
@@ -373,7 +470,15 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
     @Test
     public void testIfUnmodifiedSinceNotModifiedSince() throws Exception {
         Long time = new Date().getTime();
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).withFileName(bs.getName()).with(responseWrapper).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize()).withLastModified(time);
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .withFileName(fileName)
+                .with(responseWrapper)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length)
+                .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(time + 100000);
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(-1L);
@@ -381,7 +486,6 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
         multipartFileSender.isValid();
 
         assertEquals(HttpServletResponse.SC_OK, responseWrapper.getStatusCode());
-
 
     }
 
@@ -392,7 +496,15 @@ public class MultipartFileSenderTest extends AbstractIntegrationTestWithDatabase
     @Test
     public void testIfUnmodifiedSinceModifiedSince() throws Exception {
         Long time = new Date().getTime();
-        MultipartFileSender multipartFileSender = MultipartFileSender.fromInputStream(is).with(requestWrapper).withFileName(bs.getName()).with(responseWrapper).withChecksum(bs.getChecksum()).withMimetype("text/plain").withLength(bs.getSize()).withLastModified(time);
+        MultipartFileSender multipartFileSender = MultipartFileSender
+                .fromInputStream(is)
+                .with(requestWrapper)
+                .withFileName(fileName)
+                .with(responseWrapper)
+                .withChecksum(checksum)
+                .withMimetype(mimeType)
+                .withLength(length)
+                .withLastModified(time);
 
         when(request.getDateHeader(eq("If-Unmodified-Since"))).thenReturn(time - 100000);
         when(request.getDateHeader(eq("If-Modified-Since"))).thenReturn(-1L);

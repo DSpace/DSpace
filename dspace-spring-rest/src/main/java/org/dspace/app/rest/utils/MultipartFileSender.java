@@ -7,15 +7,9 @@
  */
 package org.dspace.app.rest.utils;
 
-import org.apache.commons.lang3.StringUtils;
-import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +18,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to send an input stream with Range header and ETag support.
@@ -63,7 +62,7 @@ public class MultipartFileSender {
     private static final String BYTES_DINVALID_BYTE_RANGE_FORMAT = "bytes */%d";
     private static final String CACHE_CONTROL = "Cache-Control";
 
-    private static int DEFAULT_BUFFER_SIZE = 1000000;
+    private int bufferSize = 1000000;
 
     private static final long DEFAULT_EXPIRE_TIME = 60L * 60L * 1000L;
 
@@ -81,24 +80,8 @@ public class MultipartFileSender {
     private String checksum;
 
     public MultipartFileSender(final InputStream inputStream) {
-
         //Convert to BufferedInputStream so we can re-read the stream
         this.inputStream = new BufferedInputStream(inputStream);
-
-        ConfigurationService configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
-        String bufferSize = configurationService.getProperty("bitstream-download.buffer.size");
-        if (StringUtils.isNotEmpty(bufferSize)) {
-            try {
-                int configuredBufferSize = Integer.parseInt(bufferSize);
-                if (configuredBufferSize > 0) {
-                    DEFAULT_BUFFER_SIZE = configuredBufferSize;
-                } else {
-                    log.debug("bitstream buffer size configured as < 0, using default");
-                }
-            } catch (NumberFormatException e) {
-                log.error("bitstream-download.buffer.size property wrongly configured, this should be a positive integer");
-            }
-        }
     }
 
 
@@ -141,6 +124,13 @@ public class MultipartFileSender {
         return this;
     }
 
+    public MultipartFileSender withBufferSize(int bufferSize) {
+        if(bufferSize > 0) {
+            this.bufferSize = bufferSize;
+        }
+        return this;
+    }
+
     public void serveResource() throws Exception {
 
         // Validate and process range -------------------------------------------------------------
@@ -157,7 +147,7 @@ public class MultipartFileSender {
         log.debug("Content-Type : {}", contentType);
         // Initialize response.
         response.reset();
-        response.setBufferSize(DEFAULT_BUFFER_SIZE);
+        response.setBufferSize(bufferSize);
         response.setHeader(CONTENT_TYPE, contentType);
         response.setHeader(ACCEPT_RANGES, BYTES);
         response.setHeader(ETAG, checksum);
@@ -197,7 +187,7 @@ public class MultipartFileSender {
                 log.debug("Return full file");
                 response.setContentType(contentType);
                 response.setHeader(CONTENT_LENGTH, String.valueOf(length));
-                Range.copy(inputStream, output, length, 0, length);
+                Range.copy(inputStream, output, length, 0, length, bufferSize);
 
             } else if (ranges.size() == 1) {
 
@@ -210,7 +200,7 @@ public class MultipartFileSender {
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
                 // Copy single part range.
-                Range.copy(inputStream, output, length, r.start, r.length);
+                Range.copy(inputStream, output, length, r.start, r.length, bufferSize);
 
             } else {
 
@@ -232,7 +222,7 @@ public class MultipartFileSender {
                     //Mark position of inputstream so we can return to it later
                     inputStream.mark(0);
                     // Copy single part range of multi part range.
-                    Range.copy(inputStream, output, length, r.start, r.length);
+                    Range.copy(inputStream, output, length, r.start, r.length, bufferSize);
                     inputStream.reset();
 
                     sos.println();
@@ -434,8 +424,8 @@ public class MultipartFileSender {
             return (substring.length() > 0) ? Long.parseLong(substring) : -1;
         }
 
-        private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length) throws IOException {
-            byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        private static void copy(InputStream input, OutputStream output, long inputSize, long start, long length, int bufferSize) throws IOException {
+            byte[] buffer = new byte[bufferSize];
             int read;
 
             if (inputSize == length) {
