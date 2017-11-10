@@ -7,15 +7,15 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.content.Bundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
-import java.util.List;
 
 
 /**

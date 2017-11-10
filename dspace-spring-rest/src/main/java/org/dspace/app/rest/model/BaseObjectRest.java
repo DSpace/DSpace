@@ -9,9 +9,8 @@ package org.dspace.app.rest.model;
 
 import java.io.Serializable;
 
-import org.springframework.hateoas.Identifiable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.hateoas.Identifiable;
 
 /**
  * Base class for any REST resource that need to be addressable
