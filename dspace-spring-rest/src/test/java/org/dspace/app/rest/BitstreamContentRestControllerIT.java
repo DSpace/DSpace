@@ -1,10 +1,19 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
@@ -35,6 +44,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
         super.setUp();
         mockSolrServer = new MockSolrServer("statistics");
         mockSolrServer.getSolrServer().deleteByQuery("*:*");
+        mockSolrServer.getSolrServer().commit();
     }
 
     @After
@@ -73,24 +83,37 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
                     .withMimeType("text/plain")
                     .build();
 
+            //** WHEN **
+            //We download the bitstream
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+
+                    //** THEN **
                     .andExpect(status().isOk())
 
-                    //We expect the content type to be "application/hal+json;charset=UTF-8"
+                    //The Content Length must match the full length
                     .andExpect(header().longValue("Content-Length", bitstreamContent.getBytes().length))
+                    //The server should indicate we support Range requests
                     .andExpect(header().string("Accept-Ranges", "bytes"))
+                    //The ETag has to be based on the checksum
                     .andExpect(header().string("ETag", bitstream.getChecksum()))
+                    //We expect the content type to match the bitstream mime type
                     .andExpect(content().contentType("text/plain"))
+                    //THe bytes of the content must match the original content
                     .andExpect(content().bytes(bitstreamContent.getBytes()));
 
-            //Check that a statistics record was logged.
+            //A If-None-Match HEAD request on the ETag must tell is the bitstream is not modified
+            getClient().perform(head("/api/core/bitstreams/" + bitstream.getID() + "/content")
+                    .header("If-None-Match", bitstream.getChecksum()))
+                    .andExpect(status().isNotModified());
+
+            //The download and head request should also be logged as a statistics record
             mockSolrServer.getSolrServer().commit();
 
             SolrQuery query = new SolrQuery("id:\"" + bitstream.getID() + "\"")
                     .setRows(0)
                     .setStart(0);
             QueryResponse queryResponse = mockSolrServer.getSolrServer().query(query);
-            assertEquals( 1, queryResponse.getResults().getNumFound());
+            assertEquals( 2, queryResponse.getResults().getNumFound());
         }
     }
 
@@ -124,31 +147,49 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
                     .withMimeType("text/plain")
                     .build();
 
+            //** WHEN **
+            //We download only a specific byte range of the bitstream
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content")
                     .header("Range", "bytes=1-3"))
+
+                    //** THEN **
                     .andExpect(status().is(206))
 
-                    //We expect the content type to be "application/hal+json;charset=UTF-8"
+                    //The Content Length must match the requested range
                     .andExpect(header().longValue("Content-Length", 3))
+                    //The server should indicate we support Range requests
                     .andExpect(header().string("Accept-Ranges", "bytes"))
+                    //The ETag has to be based on the checksum
                     .andExpect(header().string("ETag", bitstream.getChecksum()))
+                    //The response should give us details about the range
                     .andExpect(header().string("Content-Range", "bytes 1-3/10"))
+                    //We expect the content type to match the bitstream mime type
                     .andExpect(content().contentType("text/plain"))
+                    //We only expect the bytes 1, 2 and 3
                     .andExpect(content().bytes("123".getBytes()));
 
+            //** WHEN **
+            //We download the rest of the range
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content")
                     .header("Range", "bytes=4-"))
+
+                    //** THEN **
                     .andExpect(status().is(206))
 
-                    //We expect the content type to be "application/hal+json;charset=UTF-8"
+                    //The Content Length must match the requested range
                     .andExpect(header().longValue("Content-Length", 6))
+                    //The server should indicate we support Range requests
                     .andExpect(header().string("Accept-Ranges", "bytes"))
+                    //The ETag has to be based on the checksum
                     .andExpect(header().string("ETag", bitstream.getChecksum()))
+                    //The response should give us details about the range
                     .andExpect(header().string("Content-Range", "bytes 4-9/10"))
+                    //We expect the content type to match the bitstream mime type
                     .andExpect(content().contentType("text/plain"))
+                    //We all remaining bytes, starting at byte 4
                     .andExpect(content().bytes("456789".getBytes()));
 
-            //Check that NO statistics record was logged.
+            //Check that NO statistics record was logged for the Range requests
             mockSolrServer.getSolrServer().commit();
 
             SolrQuery query = new SolrQuery("id:\"" + bitstream.getID() + "\"")
@@ -157,6 +198,12 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
             QueryResponse queryResponse = mockSolrServer.getSolrServer().query(query);
             assertEquals(0, queryResponse.getResults().getNumFound());
         }
+    }
+
+    @Test
+    public void testBitstreamNotFound() throws Exception {
+        getClient().perform(get("/api/core/bitstreams/" + UUID.randomUUID() + "/content"))
+                .andExpect(status().isNotFound());
     }
 
 }
