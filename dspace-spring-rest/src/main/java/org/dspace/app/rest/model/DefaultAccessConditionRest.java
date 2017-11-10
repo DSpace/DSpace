@@ -18,7 +18,7 @@ import org.dspace.app.rest.RestResourceController;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionRest extends BaseObjectRest<Integer> {
+public class DefaultAccessConditionRest extends BaseObjectRest<Integer> {
 
 	public static final String NAME = "defaultBitstreamsPolicies";
 	public static final String CATEGORY = RestModel.CORE;
