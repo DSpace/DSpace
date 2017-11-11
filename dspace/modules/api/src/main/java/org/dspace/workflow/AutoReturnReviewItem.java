@@ -116,10 +116,6 @@ public class AutoReturnReviewItem {
         List<ClaimedTask> claimedTasks = null;
         try {
             if (wfi != null) {
-                // make sure that this item is updated according to the ApproveReject mechanism:
-                if (!testMode) {
-                    ApproveRejectReviewItem.reviewItem(wfi);
-                }
                 claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
                 //Check for a valid task
                 // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
@@ -127,6 +123,11 @@ public class AutoReturnReviewItem {
                 if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
                     log.debug("Item " + item.getID() + " not found or not in review");
                 } else {
+                    // make sure that this item is updated according to the ApproveReject mechanism:
+                    if (!testMode) {
+                        log.info("check to see if item " + item.getID() + " is approved or rejected");
+                        ApproveRejectReviewItem.reviewItem(wfi);
+                    }
                     if (itemIsOldItemInReview(item)) {
                         if (testMode) {
                             log.info("TEST: return item " + item.getID());
