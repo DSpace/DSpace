@@ -104,9 +104,13 @@ public class ApproveRejectReviewItem {
         ManuscriptDatabaseStorageImpl manuscriptDatabaseStorage = new ManuscriptDatabaseStorageImpl();
         try {
             List<Manuscript> storedManuscripts = manuscriptDatabaseStorage.getManuscriptsMatchingManuscript(manuscript);
-            if (storedManuscripts != null && storedManuscripts.size() > 0 && !JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, storedManuscripts.get(0))) {
+            if (storedManuscripts != null && storedManuscripts.size() > 0) {
                 log.info("found stored manuscript " + storedManuscripts.get(0).getManuscriptId() + " with status " + storedManuscripts.get(0).getLiteralStatus());
-                reviewItem(statusIsApproved(storedManuscripts.get(0).getStatus()), workflowItem.getID());
+                if (!JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, storedManuscripts.get(0))) {
+                    reviewItem(statusIsApproved(storedManuscripts.get(0).getStatus()), workflowItem.getID());
+                } else {
+                    log.info("stored manuscript match was a known former manuscript number");
+                }
             }
         } catch (Exception e) {
             log.error("couldn't process review workflowitem " + workflowItem.getID() + ": " + e.getMessage());
