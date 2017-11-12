@@ -126,7 +126,7 @@ public class AutoReturnReviewItem {
                     // make sure that this item is updated according to the ApproveReject mechanism:
                     if (!testMode) {
                         log.info("check to see if item " + item.getID() + " is approved or rejected");
-                        ApproveRejectReviewItem.reviewItem(wfi);
+                        ApproveRejectReviewItem.lookupReviewItem(wfi);
                     }
                     if (itemIsOldItemInReview(item)) {
                         if (testMode) {
