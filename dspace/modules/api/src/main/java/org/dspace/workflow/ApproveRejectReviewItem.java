@@ -224,7 +224,6 @@ public class ApproveRejectReviewItem {
             Item item = wfi.getItem();
             DryadDataPackage dataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
             StringBuilder provenance = new StringBuilder();
-            associateWithManuscript(dataPackage, manuscript, provenance);
             // update duplicate submission metadata for this item.
             item.checkForDuplicateItems(c);
             if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
@@ -232,6 +231,7 @@ public class ApproveRejectReviewItem {
             } else {
                 ClaimedTask claimedTask = claimedTasks.get(0);
                 c.turnOffAuthorisationSystem();
+                associateWithManuscript(dataPackage, manuscript, provenance);
                 if (statusIsApproved(manuscript.getStatus())) { // approve
                     Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
                     WorkflowActionConfig actionConfig = workflow.getStep(claimedTask.getStepID()).getActionConfig(claimedTask.getActionID());
