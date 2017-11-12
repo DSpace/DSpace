@@ -24,11 +24,20 @@ public class ItemBuilder extends AbstractBuilder<Item> {
     private WorkspaceItem workspaceItem;
     private Group readerGroup = null;
 
-    public ItemBuilder createItem(final Context context, final Collection col1) {
+    protected ItemBuilder() {
+
+    }
+
+    public static ItemBuilder createItem(final Context context, final Collection col) {
+        ItemBuilder builder = new ItemBuilder();
+        return builder.create(context, col);
+    }
+
+    private ItemBuilder create(final Context context, final Collection col) {
         this.context = context;
 
         try {
-            workspaceItem = workspaceItemService.create(context, col1, false);
+            workspaceItem = workspaceItemService.create(context, col, false);
         } catch (Exception e) {
             return handleException(e);
         }

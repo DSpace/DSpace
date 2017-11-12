@@ -19,6 +19,25 @@ public class GroupBuilder extends AbstractBuilder<Group> {
 
     private Group group;
 
+    protected GroupBuilder() {
+
+    }
+
+    public static GroupBuilder createGroup(final Context context) {
+        GroupBuilder builder = new GroupBuilder();
+        return builder.create(context);
+    }
+
+    private GroupBuilder create(final Context context) {
+        this.context = context;
+        try {
+            group = groupService.create(context);
+        } catch (Exception e) {
+            return handleException(e);
+        }
+        return this;
+    }
+
     @Override
     protected DSpaceObjectService<Group> getDsoService() {
         return groupService;
@@ -27,16 +46,6 @@ public class GroupBuilder extends AbstractBuilder<Group> {
     @Override
     public Group build() {
         return group;
-    }
-
-    public GroupBuilder createGroup(final Context context) {
-        this.context = context;
-        try {
-            group = groupService.create(context);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-        return this;
     }
 
     public GroupBuilder withName(String groupName) {
@@ -65,4 +74,9 @@ public class GroupBuilder extends AbstractBuilder<Group> {
         }
         return this;
     }
+
+    public static AbstractBuilder<Group> cleaner() {
+        return new GroupBuilder();
+    }
+
 }

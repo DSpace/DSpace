@@ -20,8 +20,11 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.MultipartFileSender;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
@@ -51,6 +54,9 @@ public class BitstreamContentRestController implements InitializingBean {
 	@Autowired
 	private ConfigurationService configurationService;
 
+	@Autowired
+    private AuthorizeService authorizeService;
+
 	private int bufferSize;
 
     @Override
@@ -64,13 +70,13 @@ public class BitstreamContentRestController implements InitializingBean {
 
 		Context context = ContextUtil.obtainContext(request);
 
-		Bitstream bit = bitstreamService.find(context, uuid);
-		if (bit == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			return;
-		}
+        Bitstream bit = getBitstreamIfAuthorized(context, uuid, response);
+        if (bit == null) {
+            //The bitstream was not found or we're not authorized to read it.
+            return;
+        }
 
-		Long lastModified = bitstreamService.getLastModified(bit);
+        Long lastModified = bitstreamService.getLastModified(bit);
         String mimetype = bit.getFormat(context).getMIMEType();
 
 		// Pipe the bits
@@ -110,7 +116,23 @@ public class BitstreamContentRestController implements InitializingBean {
 		}
 	}
 
-	private InputStream getInputStream(Context context, Bitstream bit) {
+    private Bitstream getBitstreamIfAuthorized(Context context, @PathVariable UUID uuid, HttpServletResponse response) throws SQLException, IOException {
+        Bitstream bit = bitstreamService.find(context, uuid);
+        if (bit == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            try {
+                authorizeService.authorizeAction(context, bit, Constants.READ);
+            } catch (AuthorizeException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                bit = null;
+            }
+        }
+
+        return bit;
+    }
+
+    private InputStream getInputStream(Context context, Bitstream bit) {
 		try {
 			return bitstreamService.retrieve(context, bit);
 		} catch (Exception e) {

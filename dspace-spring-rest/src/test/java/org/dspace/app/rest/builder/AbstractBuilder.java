@@ -157,8 +157,10 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
         Context c = new Context();
         c.turnOffAuthorisationSystem();
         T attachedDso = c.reloadEntity(dso);
+
         if(attachedDso != null) {
             getDsoService().delete(c, attachedDso);
         }
     }
+
 }

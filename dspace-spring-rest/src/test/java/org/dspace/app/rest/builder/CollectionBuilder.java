@@ -20,7 +20,16 @@ public class CollectionBuilder extends AbstractBuilder<Collection> {
 
     private Collection collection;
 
-    public CollectionBuilder createCollection(final Context context, final Community parent) {
+    protected CollectionBuilder() {
+
+    }
+
+    public static CollectionBuilder createCollection(final Context context, final Community parent) {
+        CollectionBuilder builder = new CollectionBuilder();
+        return builder.create(context, parent);
+    }
+
+    private CollectionBuilder create(final Context context, final Community parent) {
         this.context = context;
         try {
             this.collection = collectionService.create(context, parent);
