@@ -19,6 +19,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 
 /**
  * Builder class to build bitstreams in test cases
@@ -28,9 +29,21 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
     public static final String ORIGINAL = "ORIGINAL";
 
     private Bitstream bitstream;
+    private Item item;
+    private Group readerGroup;
 
-    public BitstreamBuilder createBitstream(Context context, Item item, InputStream is) throws SQLException, AuthorizeException, IOException {
+    protected BitstreamBuilder() {
+
+    }
+
+    public static BitstreamBuilder createBitstream(Context context, Item item, InputStream is) throws SQLException, AuthorizeException, IOException {
+        BitstreamBuilder builder = new BitstreamBuilder();
+        return builder.create(context, item, is);
+    }
+
+    private BitstreamBuilder create(Context context, Item item, InputStream is) throws SQLException, AuthorizeException, IOException {
         this.context = context;
+        this.item = item;
 
         Bundle originalBundle = getOriginalBundle(item);
 
@@ -78,17 +91,37 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
         return targetBundle;
     }
 
-    protected DSpaceObjectService<Bitstream> getDsoService() {
-        return bitstreamService;
+    public BitstreamBuilder withEmbargoPeriod(String embargoPeriod) {
+        return setEmbargo(embargoPeriod, bitstream);
+    }
+
+    public BitstreamBuilder withReaderGroup(Group group) {
+        readerGroup = group;
+        return this;
     }
 
     public Bitstream build() {
         try {
             bitstreamService.update(context, bitstream);
+            itemService.update(context, item);
+
+            //Check if we need to make this bitstream private.
+            if(readerGroup != null) {
+                setOnlyReadPermission(bitstream, readerGroup, null);
+            }
+
+            context.dispatchEvents();
+
+            indexingService.commit();
+
         } catch (Exception e) {
-           return null;
+            return null;
         }
 
         return bitstream;
+    }
+
+    protected DSpaceObjectService<Bitstream> getDsoService() {
+        return bitstreamService;
     }
 }

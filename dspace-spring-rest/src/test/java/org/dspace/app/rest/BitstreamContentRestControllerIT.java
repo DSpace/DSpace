@@ -14,21 +14,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.eperson.Group;
 import org.dspace.solr.MockSolrServer;
 import org.junit.After;
 import org.junit.Before;
@@ -61,24 +65,24 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
 
         //** GIVEN **
         //1. A community-collection structure with one parent community and one collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
 
-        Collection col1 = new CollectionBuilder().createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. A public item with a bitstream
         String bitstreamContent = "0123456789";
 
         try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
 
-            Item publicItem1 = new ItemBuilder().createItem(context, col1)
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
                     .withTitle("Public item 1")
                     .withIssueDate("2017-10-17")
                     .withAuthor("Smith, Donald").withAuthor("Doe, John")
                     .build();
 
-            Bitstream bitstream = new BitstreamBuilder()
+            Bitstream bitstream = BitstreamBuilder
                     .createBitstream(context, publicItem1, is)
                     .withName("Test bitstream")
                     .withDescription("This is a bitstream to test range requests")
@@ -109,13 +113,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
                     .andExpect(status().isNotModified());
 
             //The download and head request should also be logged as a statistics record
-            mockSolrServer.getSolrServer().commit();
-
-            SolrQuery query = new SolrQuery("id:\"" + bitstream.getID() + "\"")
-                    .setRows(0)
-                    .setStart(0);
-            QueryResponse queryResponse = mockSolrServer.getSolrServer().query(query);
-            assertEquals( 2, queryResponse.getResults().getNumFound());
+            checkNumberOfStatsRecords(bitstream, 2);
         }
     }
 
@@ -125,24 +123,24 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
 
         //** GIVEN **
         //1. A community-collection structure with one parent community and one collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
 
-        Collection col1 = new CollectionBuilder().createCollection(context, parentCommunity).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         //2. A public item with a bitstream
         String bitstreamContent = "0123456789";
 
         try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
 
-            Item publicItem1 = new ItemBuilder().createItem(context, col1)
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
                     .withTitle("Public item 1")
                     .withIssueDate("2017-10-17")
                     .withAuthor("Smith, Donald").withAuthor("Doe, John")
                     .build();
 
-            Bitstream bitstream = new BitstreamBuilder()
+            Bitstream bitstream = BitstreamBuilder
                     .createBitstream(context, publicItem1, is)
                     .withName("Test bitstream")
                     .withDescription("This is a bitstream to test range requests")
@@ -192,13 +190,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
                     .andExpect(content().bytes("456789".getBytes()));
 
             //Check that NO statistics record was logged for the Range requests
-            mockSolrServer.getSolrServer().commit();
-
-            SolrQuery query = new SolrQuery("id:\"" + bitstream.getID() + "\"")
-                    .setRows(0)
-                    .setStart(0);
-            QueryResponse queryResponse = mockSolrServer.getSolrServer().query(query);
-            assertEquals(0, queryResponse.getResults().getNumFound());
+            checkNumberOfStatsRecords(bitstream, 0);
         }
     }
 
@@ -206,6 +198,113 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
     public void testBitstreamNotFound() throws Exception {
         getClient().perform(get("/api/core/bitstreams/" + UUID.randomUUID() + "/content"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testEmbargoedBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. A public item with an embargoed bitstream
+        String bitstreamContent = "Embargoed!";
+
+        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Item publicItem1 = ItemBuilder.createItem(context, col1)
+                    .withTitle("Public item 1")
+                    .withIssueDate("2017-10-17")
+                    .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                    .build();
+
+            Bitstream bitstream = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Test Embargoed Bitstream")
+                    .withDescription("This bitstream is embargoed")
+                    .withMimeType("text/plain")
+                    .withEmbargoPeriod("6 months")
+                    .build();
+
+            //** WHEN **
+            //We download the bitstream
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+
+                    //** THEN **
+                    .andExpect(status().isUnauthorized())
+                    //The response should not contain any content.
+                    .andExpect(content().bytes(new byte[0]));
+
+            //An unauthorized request should not log statistics
+            checkNumberOfStatsRecords(bitstream, 0);
+        }
+    }
+
+    @Test
+    public void testPrivateBitstream() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community and one collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
+
+        //2. A public item with a private bitstream
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Public item 1")
+                .withIssueDate("2017-10-17")
+                .withAuthor("Smith, Donald").withAuthor("Doe, John")
+                .build();
+
+        Group internalGroup = GroupBuilder.createGroup(context)
+                .withName("Internal Group")
+                .build();
+
+        String bitstreamContent = "Private!";
+        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+
+            Bitstream bitstream = BitstreamBuilder
+                    .createBitstream(context, publicItem1, is)
+                    .withName("Test Embargoed Bitstream")
+                    .withDescription("This bitstream is embargoed")
+                    .withMimeType("text/plain")
+                    .withReaderGroup(internalGroup)
+                    .build();
+
+            //** WHEN **
+            //We download the bitstream
+            getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
+
+                    //** THEN **
+                    .andExpect(status().isUnauthorized())
+                    //The response should not contain any content.
+                    .andExpect(content().bytes(new byte[0]));
+
+            //An unauthorized request should not log statistics
+            checkNumberOfStatsRecords(bitstream, 0);
+
+        } finally {
+            //** CLEANUP **
+            GroupBuilder.cleaner().delete(internalGroup);
+        }
+    }
+
+    private void checkNumberOfStatsRecords(Bitstream bitstream, int expectedNumberOfStatsRecords) throws SolrServerException, IOException {
+        mockSolrServer.getSolrServer().commit();
+
+        SolrQuery query = new SolrQuery("id:\"" + bitstream.getID() + "\"")
+                .setRows(0)
+                .setStart(0);
+        QueryResponse queryResponse = mockSolrServer.getSolrServer().query(query);
+        assertEquals(expectedNumberOfStatsRecords, queryResponse.getResults().getNumFound());
     }
 
 }
