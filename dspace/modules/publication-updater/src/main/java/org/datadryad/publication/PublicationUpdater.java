@@ -14,10 +14,7 @@ import org.dspace.core.I18nUtil;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.workflow.ApproveRejectReviewItem;
-import org.dspace.workflow.ClaimedTask;
-import org.dspace.workflow.DryadWorkflowUtils;
-import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -275,14 +272,17 @@ public class PublicationUpdater extends HttpServlet {
                                 }
                                 if (databaseManuscript.isAccepted()) {
                                     // see if this can be pushed out of review
-                                    ApproveRejectReviewItem.processWorkflowItemWithManuscript(context, wfi, databaseManuscript);
+                                    ApproveRejectReviewItem.processWorkflowItemUsingManuscript(context, wfi, databaseManuscript);
                                 }
                             }
                         }
                     } catch (ParseException e) {
                         // do we want to collect workflow items with faulty manuscript IDs?
                         LOGGER.error("Problem updating item " + item.getID() + ": Manuscript ID is incorrect.");
+                    } catch (ApproveRejectReviewItemException e) {
+                        LOGGER.error("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage());
                     }
+
 
                     message.append(matchItemToCrossref(context, item));
                     if (!"".equals(message.toString())) {

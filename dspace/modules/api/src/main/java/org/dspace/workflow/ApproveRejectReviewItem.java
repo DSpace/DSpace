@@ -87,7 +87,7 @@ public class ApproveRejectReviewItem {
             Manuscript manuscript = new Manuscript(journalConcept);
             manuscript.setManuscriptId(manuscriptNumber);
             manuscript.setStatus(status);
-            reviewManuscript(manuscript);
+            processWorkflowItemsUsingManuscript(manuscript);
         } else if(line.hasOption('i')) {
             // get a WorkflowItem using a workflow ID
             Integer wfItemId = Integer.parseInt(line.getOptionValue('i'));
@@ -99,7 +99,7 @@ public class ApproveRejectReviewItem {
                 Manuscript manuscript = new Manuscript();
                 manuscript.setStatus(approved ? Manuscript.STATUS_ACCEPTED : Manuscript.STATUS_REJECTED);
 
-                reviewItem(c, wfi, manuscript);
+                processWorkflowItemUsingManuscript(c, wfi, manuscript);
                 c.restoreAuthSystemState();
             } catch (SQLException ex) {
                 throw new ApproveRejectReviewItemException(ex);
@@ -136,7 +136,7 @@ public class ApproveRejectReviewItem {
                 Manuscript storedManuscript = storedManuscripts.get(0);
                 log.info("found stored manuscript " + storedManuscript.getManuscriptId() + " with status " + storedManuscript.getLiteralStatus());
                 if (!JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, storedManuscript)) {
-                    reviewItem(c, workflowItem, storedManuscript);
+                    processWorkflowItemUsingManuscript(c, workflowItem, storedManuscript);
                 } else {
                     log.info("stored manuscript match was a known former manuscript number");
                 }
@@ -156,25 +156,7 @@ public class ApproveRejectReviewItem {
         }
     }
 
-    private static void reviewItems(Context c, List<WorkflowItem> workflowItems, Manuscript manuscript) throws ApproveRejectReviewItemException {
-        for (WorkflowItem wfi : workflowItems) {
-            try {
-                reviewItem(c, wfi, manuscript);
-            } catch (ApproveRejectReviewItemException e) {
-                throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage(), e);
-            }
-        }
-    }
-
-    public static void processWorkflowItemWithManuscript(Context context, WorkflowItem wfi, Manuscript manuscript) {
-        try {
-            reviewItem(context, wfi, manuscript);
-        } catch (ApproveRejectReviewItemException e) {
-            log.error("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage());
-        }
-    }
-
-    public static void reviewManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
+    public static void processWorkflowItemsUsingManuscript(Manuscript manuscript) throws ApproveRejectReviewItemException {
         Context c = null;
         try {
             c = new Context();
@@ -194,7 +176,13 @@ public class ApproveRejectReviewItem {
             }
 
             workflowItems.addAll(WorkflowItem.findAllByManuscript(c, manuscript));
-            reviewItems(c, workflowItems, manuscript);
+            for (WorkflowItem wfi : workflowItems) {
+                try {
+                    processWorkflowItemUsingManuscript(c, wfi, manuscript);
+                } catch (ApproveRejectReviewItemException e) {
+                    throw new ApproveRejectReviewItemException("Exception caught while reviewing item " + wfi.getItem().getID() + ": " + e.getMessage(), e);
+                }
+            }
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
         } finally {
@@ -224,7 +212,7 @@ public class ApproveRejectReviewItem {
         return approved;
     }
 
-    private static void reviewItem(Context c, WorkflowItem wfi, Manuscript manuscript) throws ApproveRejectReviewItemException {
+    public static void processWorkflowItemUsingManuscript(Context c, WorkflowItem wfi, Manuscript manuscript) throws ApproveRejectReviewItemException {
 	// get a List of ClaimedTasks, using the WorkflowItem
         List<ClaimedTask> claimedTasks = null;
         try {
