@@ -105,9 +105,10 @@ public class ApproveRejectReviewItem {
         try {
             List<Manuscript> storedManuscripts = manuscriptDatabaseStorage.getManuscriptsMatchingManuscript(manuscript);
             if (storedManuscripts != null && storedManuscripts.size() > 0) {
-                log.info("found stored manuscript " + storedManuscripts.get(0).getManuscriptId() + " with status " + storedManuscripts.get(0).getLiteralStatus());
-                if (!JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, storedManuscripts.get(0))) {
-                    reviewItem(statusIsApproved(storedManuscripts.get(0).getStatus()), workflowItem.getID());
+                Manuscript storedManuscript = storedManuscripts.get(0);
+                log.info("found stored manuscript " + storedManuscript.getManuscriptId() + " with status " + storedManuscript.getLiteralStatus());
+                if (!JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item, storedManuscript)) {
+                    reviewItem(statusIsApproved(storedManuscript.getStatus()), workflowItem.getID());
                 } else {
                     log.info("stored manuscript match was a known former manuscript number");
                 }
