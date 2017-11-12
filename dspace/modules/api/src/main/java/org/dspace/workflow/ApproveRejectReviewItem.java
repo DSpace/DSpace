@@ -131,6 +131,7 @@ public class ApproveRejectReviewItem {
         Context c = null;
         try {
             c = new Context();
+            c.turnOffAuthorisationSystem();
             List<Manuscript> storedManuscripts = manuscriptDatabaseStorage.getManuscriptsMatchingManuscript(manuscript);
             if (storedManuscripts != null && storedManuscripts.size() > 0) {
                 Manuscript storedManuscript = storedManuscripts.get(0);
@@ -141,6 +142,7 @@ public class ApproveRejectReviewItem {
                     log.info("stored manuscript match was a known former manuscript number");
                 }
             }
+            c.restoreAuthSystemState();
         } catch (Exception e) {
             log.error("couldn't process review workflowitem " + workflowItem.getID() + ": " + e.getMessage());
         } finally {
@@ -224,13 +226,13 @@ public class ApproveRejectReviewItem {
             Item item = wfi.getItem();
             DryadDataPackage dataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
             StringBuilder provenance = new StringBuilder();
+            c.turnOffAuthorisationSystem();
             // update duplicate submission metadata for this item.
             item.checkForDuplicateItems(c);
             if (claimedTasks == null || claimedTasks.isEmpty() || !claimedTasks.get(0).getActionID().equals("reviewAction")) {
                 log.debug ("Item " + item.getID() + " not found or not in review");
             } else {
                 ClaimedTask claimedTask = claimedTasks.get(0);
-                c.turnOffAuthorisationSystem();
                 associateWithManuscript(dataPackage, manuscript, provenance);
                 if (statusIsApproved(manuscript.getStatus())) { // approve
                     Workflow workflow = WorkflowFactory.getWorkflow(wfi.getCollection());
@@ -261,7 +263,6 @@ public class ApproveRejectReviewItem {
                     WorkspaceItem wsi = WorkflowManager.rejectWorkflowItem(c, wfi, ePerson, null, reason, true);
                     disassociateFromManuscript(dataPackage, manuscript);
                 }
-                c.restoreAuthSystemState();
             }
         } catch (SQLException ex) {
             throw new ApproveRejectReviewItemException(ex);
@@ -275,6 +276,9 @@ public class ApproveRejectReviewItem {
             throw new ApproveRejectReviewItemException(ex);
         } catch (WorkflowException ex) {
             throw new ApproveRejectReviewItemException(ex);
+        }
+        finally {
+            c.restoreAuthSystemState();
         }
     }
 
