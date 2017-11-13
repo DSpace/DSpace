@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.rest.model.DefaultAccessConditionRest;
+import org.dspace.app.rest.model.AccessConditionRest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
@@ -22,17 +22,17 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, DefaultAccessConditionRest> {
+public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, AccessConditionRest> {
 
 	@Autowired
 	ConfigurationService configurationService;
 	
 	@Override
-	public DefaultAccessConditionRest fromModel(ResourcePolicy obj) {
-		DefaultAccessConditionRest model = new DefaultAccessConditionRest();
+	public AccessConditionRest fromModel(ResourcePolicy obj) {
+		AccessConditionRest model = new AccessConditionRest();
 		model.setPolicyType("openaccess");
 		if (obj.getGroup() != null) {
-			model.setGroupUuid(obj.getGroup().getID());			
+			model.setGroupUUID(obj.getGroup().getID());			
 			if (Group.ADMIN.equals(obj.getGroup().getName())) {
 				model.setPolicyType("administrator");
 			}
@@ -53,7 +53,7 @@ public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, D
 	}
 
 	@Override
-	public ResourcePolicy toModel(DefaultAccessConditionRest obj) {
+	public ResourcePolicy toModel(AccessConditionRest obj) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -12,27 +12,28 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * The Access Condition (ResourcePolicy) REST Resource
+ * The Access Condition REST Resource. It is intent to be an human or REST
+ * client understandable representation of the DSpace ResourcePolicy.
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class DefaultAccessConditionRest implements Serializable {
+public class AccessConditionRest implements Serializable {
 
 	public static final String NAME = "accessCondition";
 
 	private String policyType;
 	
-	private UUID groupUuid;
+	private UUID groupUUID;
 	
 	private Date endDate;
 	
-	public UUID getGroupUuid() {
-		return groupUuid;
+	public UUID getGroupUUUI() {
+		return groupUUID;
 	}
 
-	public void setGroupUuid(UUID groupUuid) {
-		this.groupUuid = groupUuid;
+	public void setGroupUUID(UUID groupUuid) {
+		this.groupUUID = groupUuid;
 	}
 
 	public Date getEndDate() {
