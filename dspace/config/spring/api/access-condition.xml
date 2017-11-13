@@ -45,29 +45,29 @@
     
     <bean id="openAccess" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
-        <property name="type" value="openaccess"/>
+        <property name="policyType" value="openaccess"/>
         <property name="hasDate" value="false"/>
     </bean>
     <bean id="lease" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
-        <property name="type" value="lease"/>
+        <property name="policyType" value="lease"/>
         <property name="hasDate" value="true"/>
         <property name="dateLimit" value="+1MONTHS"/>
     </bean> 
     <bean id="embargoed" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
-        <property name="type" value="embargo"/>
+        <property name="policyType" value="embargo"/>
         <property name="hasDate" value="true"/>
         <property name="dateLimit" value="+6MONTHS"/>
     </bean> 
     <bean id="administrator" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Administrator"/>
-        <property name="type" value="administrator"/>
+        <property name="policyType" value="administrator"/>
         <property name="hasDate" value="false"/>
     </bean>
     <bean id="networkAdministration" class="org.dspace.submit.model.AccessConditionOption">
     	<property name="groupName" value="INSTITUTIONAL_NETWORK"/>
-        <property name="type" value="networkAdministration"/>
+        <property name="policyType" value="networkAdministration"/>
         <property name="hasDate" value="false"/>        
     </bean>
 
