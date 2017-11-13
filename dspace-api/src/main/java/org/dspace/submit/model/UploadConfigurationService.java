@@ -5,15 +5,25 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.model;
+package org.dspace.submit.model;
+
+import java.util.Map;
 
 /**
- * Enumeration for Access Condition translation from ResourcePolicy
- * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public enum AccessConditionTypeEnum {
+public class UploadConfigurationService {
 
-	openaccess, administrator, embargo, lease, networkAdministration
+	private Map<String, UploadConfiguration> map;
+
+	public Map<String, UploadConfiguration> getMap() {
+		return map;
+	}
+
+	public void setMap(Map<String, UploadConfiguration> map) {
+		this.map = map;
+	}
+	
+	
 }

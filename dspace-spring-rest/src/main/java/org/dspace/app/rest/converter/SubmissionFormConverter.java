@@ -14,7 +14,6 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.ScopeEnum;
-import org.dspace.app.rest.model.SelectableMetadata;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
 import org.dspace.app.rest.model.SubmissionFormRest;
@@ -23,6 +22,7 @@ import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.submit.model.SelectableMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
