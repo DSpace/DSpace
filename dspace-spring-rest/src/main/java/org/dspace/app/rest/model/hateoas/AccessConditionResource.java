@@ -7,8 +7,7 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.DefaultAccessConditionRest;
-import org.dspace.app.rest.model.LicenseRest;
+import org.dspace.app.rest.model.AccessConditionRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.springframework.hateoas.ResourceSupport;
 
@@ -21,17 +20,17 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-@RelNameDSpaceResource(DefaultAccessConditionRest.NAME)
-public class DefaultAccessConditionResource extends ResourceSupport {
+@RelNameDSpaceResource(AccessConditionRest.NAME)
+public class AccessConditionResource extends ResourceSupport {
 
 	@JsonUnwrapped
-	private final DefaultAccessConditionRest data;
+	private final AccessConditionRest data;
 
-	public DefaultAccessConditionResource(DefaultAccessConditionRest entry) {
+	public AccessConditionResource(AccessConditionRest entry) {
 		this.data = entry;
 	}
 
-	public DefaultAccessConditionRest getData() {
+	public AccessConditionRest getData() {
 		return data;
 	}
 
