@@ -7,17 +7,18 @@
  */
 package org.dspace.app.rest.security;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
 import org.dspace.eperson.EPerson;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
-import java.util.List;
-
 public class DSpaceAuthentication implements Authentication {
 
 
-    private EPerson ePerson;
+    private Date previousLoginDate;
     private String username;
     private String password;
     private List<GrantedAuthority> authorities;
@@ -25,7 +26,7 @@ public class DSpaceAuthentication implements Authentication {
 
 
     public DSpaceAuthentication (EPerson ePerson, List<GrantedAuthority> authorities) {
-        this.ePerson = ePerson;
+        this.previousLoginDate = ePerson.getPreviousActive();
         this.username = ePerson.getEmail();
         this.authorities = authorities;
     }
@@ -68,7 +69,7 @@ public class DSpaceAuthentication implements Authentication {
         return username;
     }
 
-    public EPerson getEPerson() {
-        return ePerson;
+    public Date getPreviousLoginDate() {
+        return previousLoginDate;
     }
 }

@@ -2,23 +2,24 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.security;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
 
@@ -56,6 +57,6 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
 
         //TODO every time we log in a new token and salt is created, might need to change this
         DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
-        restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication.getEPerson());
+        restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication);
     }
 }

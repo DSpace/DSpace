@@ -7,12 +7,12 @@
  */
 package org.dspace.app.rest.security;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Interface for a service that can provide authentication for the REST API
@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public interface RestAuthenticationService {
 
-    void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, EPerson ePerson);
+    void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, DSpaceAuthentication authentication);
 
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
 
