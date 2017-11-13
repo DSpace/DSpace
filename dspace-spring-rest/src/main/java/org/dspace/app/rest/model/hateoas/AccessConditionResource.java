@@ -8,7 +8,6 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.AccessConditionRest;
-import org.dspace.app.rest.model.LicenseRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.springframework.hateoas.ResourceSupport;
 

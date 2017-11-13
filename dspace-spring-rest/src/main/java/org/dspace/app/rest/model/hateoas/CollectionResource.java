@@ -25,5 +25,6 @@ public class CollectionResource extends DSpaceResource<CollectionRest> {
 	public CollectionResource(CollectionRest collection, Utils utils, String... rels) {		 
 		super(collection, utils, rels);
 		add(utils.linkToSubResource(collection, AccessConditionRest.NAME));
+		add(utils.linkToSubResource(collection, LicenseRest.NAME));
 	}
 }
