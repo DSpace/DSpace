@@ -10,6 +10,8 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
+import org.dspace.submit.model.SubmissionFormField;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -21,64 +23,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  *
  */
 @JsonInclude(value = Include.NON_NULL)
-public class SubmissionFormFieldRest {
-	private String label;
-	private boolean mandatory;
-	private boolean repeatable;
-	private String mandatoryMessage;
-	private String hints;
+public class SubmissionFormFieldRest extends SubmissionFormField {
 	private SubmissionFormInputTypeRest input;
 	private ScopeEnum scope;
 	private SubmissionVisibilityRest visibility;
-	private List<SelectableMetadata> selectableMetadata;
-
-	public List<SelectableMetadata> getSelectableMetadata() {
-		return selectableMetadata;
-	}
-
-	public void setSelectableMetadata(List<SelectableMetadata> selectableMetadata) {
-		this.selectableMetadata = selectableMetadata;
-	}
-	
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public boolean isMandatory() {
-		return mandatory;
-	}
-
-	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
-	}
-
-	public boolean isRepeatable() {
-		return repeatable;
-	}
-
-	public void setRepeatable(boolean repeatable) {
-		this.repeatable = repeatable;
-	}
-
-	public String getMandatoryMessage() {
-		return mandatoryMessage;
-	}
-
-	public void setMandatoryMessage(String mandatoryMessage) {
-		this.mandatoryMessage = mandatoryMessage;
-	}
-
-	public String getHints() {
-		return hints;
-	}
-
-	public void setHints(String hints) {
-		this.hints = hints;
-	}
 
 	public SubmissionFormInputTypeRest getInput() {
 		return input;

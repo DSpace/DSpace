@@ -17,10 +17,11 @@ import java.util.UUID;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionRest implements Serializable {
+public class DefaultAccessConditionRest implements Serializable {
+
 	public static final String NAME = "accessCondition";
-	
-	private AccessConditionTypeEnum type;
+
+	private String policyType;
 	
 	private UUID groupUuid;
 	
@@ -42,8 +43,8 @@ public class AccessConditionRest implements Serializable {
 		this.endDate = endDate;
 	}
 
-	public void setType(AccessConditionTypeEnum type) {
-		this.type = type;
+	public void setPolicyType(String type) {
+		this.policyType = type;
 	}
 
 }
