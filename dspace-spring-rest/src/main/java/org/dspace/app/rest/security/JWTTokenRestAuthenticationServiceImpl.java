@@ -12,11 +12,11 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.nimbusds.jose.JOSEException;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
@@ -29,13 +29,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 
 @Component
 public class JWTTokenRestAuthenticationServiceImpl implements RestAuthenticationService, InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(RestAuthenticationService.class);
-    private static final String ACCESS_TOKEN = "access_token";
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String AUTHORIZATION_TYPE = "Bearer";
 
     @Autowired
     private JWTTokenHandler jwtTokenHandler;
@@ -55,14 +55,19 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
-    public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, EPerson ePerson) {
+    public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, DSpaceAuthentication authentication) {
         try {
             Context context = ContextUtil.obtainContext(request);
-//            EPerson ePerson = ePersonService.findByEmail(context, email);
-            List<Group> groups = authenticationService.getSpecialGroups(context, request);
-            String token = jwtTokenHandler.createTokenForEPerson(context, request, ePerson, groups);
+            context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
 
-            response.getWriter().write(wrapTokenInJsonFormat(token));
+            List<Group> groups = authenticationService.getSpecialGroups(context, request);
+
+            String token = jwtTokenHandler.createTokenForEPerson(context, request,
+                    authentication.getPreviousLoginDate(), groups);
+
+            addTokenToResponse(response, token);
+
+            context.commit();
 
         } catch (JOSEException e) {
             log.error("JOSE Exception", e);
@@ -71,7 +76,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         } catch (IOException e) {
             log.error("Error writing to response", e);
         }
-
     }
 
     @Override
@@ -92,7 +96,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Override
     public boolean hasAuthenticationData(HttpServletRequest request) {
-        return request.getHeader("Authorization") != null;
+        return StringUtils.isNotBlank(request.getHeader(AUTHORIZATION_HEADER));
     }
 
     @Override
@@ -101,19 +105,18 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
         jwtTokenHandler.invalidateToken(token, request, context);
     }
 
+    private void addTokenToResponse(final HttpServletResponse response, final String token) throws IOException {
+        response.setHeader(AUTHORIZATION_HEADER, String.format("%s %s", AUTHORIZATION_TYPE, token));
+    }
+
     private String getToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null) {
-            String tokenValue = authHeader.replace("Bearer", "").trim();
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
+        if (StringUtils.isNotBlank(authHeader)) {
+            String tokenValue = authHeader.replace(AUTHORIZATION_TYPE, "").trim();
             return tokenValue;
+        } else {
+            return null;
         }
-        return null;
     }
-
-    //Put the token in a json-string
-    private String wrapTokenInJsonFormat(String token) {
-        return "{ \""+ ACCESS_TOKEN +"\" : \"" + token + "\" }";
-    }
-
 
 }

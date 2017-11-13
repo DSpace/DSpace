@@ -55,9 +55,8 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-
         Context context = ContextUtil.obtainContext(request);
-        if(context.getCurrentUser() != null) {
+        if(context != null && context.getCurrentUser() != null) {
             return authenticateRefreshTokenRequest(context);
         } else {
             return authenticateNewLogin(authentication);
@@ -65,7 +64,8 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
     }
 
     private Authentication authenticateRefreshTokenRequest(Context context) {
-        return createAuthenticationToken(null, context);
+        authenticationService.updateLastActiveDate(context);
+        return createAuthentication(null, context);
     }
 
     private Authentication authenticateNewLogin(Authentication authentication) {
@@ -79,7 +79,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
             if (implicitStatus == AuthenticationMethod.SUCCESS) {
                 log.info(LogManager.getHeader(newContext, "login", "type=implicit"));
-                return createAuthenticationToken(password, newContext);
+                return createAuthentication(password, newContext);
             } else {
                 int authenticateResult = authenticationService.authenticate(newContext, name, password, null, request);
                 if (AuthenticationMethod.SUCCESS == authenticateResult) {
@@ -87,7 +87,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                     log.info(LogManager
                             .getHeader(newContext, "login", "type=explicit"));
 
-                    return createAuthenticationToken(password, newContext);
+                    return createAuthentication(password, newContext);
                 } else {
                     log.info(LogManager.getHeader(newContext, "failed_login", "email="
                             + name + ", result="
@@ -112,8 +112,9 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
         return null;
     }
 
-    private Authentication createAuthenticationToken(final String password, final Context context) {
+    private Authentication createAuthentication(final String password, final Context context) {
         EPerson ePerson = context.getCurrentUser();
+
         if(ePerson != null && StringUtils.isNotBlank(ePerson.getEmail())) {
             //Pass the eperson ID to the request service
             requestService.setCurrentUserId(ePerson.getID());

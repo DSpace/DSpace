@@ -11,8 +11,6 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,20 +29,19 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
-import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JWTTokenHandler {
+public class JWTTokenHandler implements InitializingBean {
 
 
     @Autowired
@@ -65,13 +62,12 @@ public class JWTTokenHandler {
     private EPersonService ePersonService;
 
 
-    public JWTTokenHandler() {
+    @Override
+    public void afterPropertiesSet() throws Exception {
         //TODO move properties to authentication module
-        configurationService = DSpaceServicesFactory.getInstance().getConfigurationService();
         this.jwtKey = configurationService.getProperty("jwt.token.secret", "defaultjwtkeysecret");
         this.expirationTime = configurationService.getLongProperty("jwt.token.expiration", 30) * 60 * 1000;
     }
-
 
     /**
      * Retrieve EPerson from a jwt
@@ -110,7 +106,7 @@ public class JWTTokenHandler {
 
             return ePerson;
         } else {
-            log.warn("Someone tried to use an expired or non-valid token");
+            log.warn(getIpAddress(request) + " tried to use an expired or non-valid token");
             return null;
         }
     }
@@ -123,19 +119,14 @@ public class JWTTokenHandler {
      * Create a jwt with the EPerson details in it
      * @param context
      * @param request
-     * @param detachedEPerson
+     * @param previousLoginDate
      * @param groups
      * @return
      * @throws JOSEException
      */
-    public String createTokenForEPerson(Context context, HttpServletRequest request, EPerson detachedEPerson, List<Group> groups) throws JOSEException {
+    public String createTokenForEPerson(Context context, HttpServletRequest request, Date previousLoginDate, List<Group> groups) throws JOSEException {
 
-        //This has to be set before createNewSessionSalt, otherwise authorizeException is thrown
-        context.setCurrentUser(detachedEPerson);
-
-        EPerson ePerson = createNewSessionSalt(context, detachedEPerson);
-
-
+        EPerson ePerson = updateSessionSalt(context, previousLoginDate);
 
         JWSSigner signer = new MACSigner(buildSigningKey(request, ePerson));
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
@@ -175,7 +166,7 @@ public class JWTTokenHandler {
     }
 
     private String getIpAddress(HttpServletRequest request) {
-        //TODO make using the ip address of the request optional
+        //TODO FREDERIC make using the ip address of the request optional
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
         if (ipAddress == null) {
             ipAddress = request.getRemoteAddr();
@@ -183,32 +174,30 @@ public class JWTTokenHandler {
         return ipAddress;
     }
 
-    private EPerson createNewSessionSalt(Context context, EPerson detached) {
+
+    private EPerson updateSessionSalt(final Context context, final Date previousLoginDate) {
         EPerson ePerson = null;
+
         try {
-            //Reloading doesn't seem to work
-//            ePerson = context.reloadEntity(detached);
+            ePerson = context.getCurrentUser();
 
-            //This does work, even still has the previousActive
-            ePerson = ePersonService.find(context, detached.getID());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        if (detached.getLastActive().getTime() - detached.getPreviousActive().getTime() > expirationTime) {
+            //If the previous login was within the configured token expiration time, we reuse the session salt.
+            //This allows a user to login on multiple devices/browsers at the same time.
+            if (previousLoginDate == null || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > expirationTime)) {
 
+                StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
+                String salt = stringKeyGenerator.generateKey();
+                ePerson.setSessionSalt(salt);
 
-            StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
-            String salt = stringKeyGenerator.generateKey();
-            ePerson.setSessionSalt(salt);
-
-            try {
                 ePersonService.update(context, ePerson);
-                context.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (AuthorizeException e) {
-                e.printStackTrace();
             }
+
+        } catch (SQLException e) {
+            //TODO FREDERIC: fail fast
+            e.printStackTrace();
+        } catch (AuthorizeException e) {
+            //TODO FREDERIC: fail fast
+            e.printStackTrace();
         }
 
         return ePerson;
