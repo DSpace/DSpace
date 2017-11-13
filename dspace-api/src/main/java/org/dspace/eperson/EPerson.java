@@ -92,6 +92,9 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     @Transient
     protected transient EPersonService ePersonService;
 
+    @Transient
+    private Date previousActive;
+
     /**
      * Protected constructor, create object using:
      * {@link org.dspace.eperson.service.EPersonService#create(Context)}
@@ -373,6 +376,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
      */
     public void setLastActive(Date when)
     {
+        this.previousActive = lastActive;
         this.lastActive = when;
     }
 
@@ -444,4 +448,12 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     public void setSessionSalt(String sessionSalt) {
         this.sessionSalt = sessionSalt;
     }
+
+    public Date getPreviousActive() {
+        if (previousActive == null) {
+            return new Date(0);
+        }
+        return previousActive;
+    }
+
 }

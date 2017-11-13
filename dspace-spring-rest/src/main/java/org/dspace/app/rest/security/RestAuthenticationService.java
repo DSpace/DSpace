@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public interface RestAuthenticationService {
 
-    void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, String email);
+    void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, EPerson ePerson);
 
     EPerson getAuthenticatedEPerson(HttpServletRequest request, Context context);
 

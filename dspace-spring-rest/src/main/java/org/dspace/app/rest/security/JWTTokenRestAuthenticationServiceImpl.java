@@ -55,10 +55,10 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
-    public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, String email) {
+    public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, EPerson ePerson) {
         try {
             Context context = ContextUtil.obtainContext(request);
-            EPerson ePerson = ePersonService.findByEmail(context, email);
+//            EPerson ePerson = ePersonService.findByEmail(context, email);
             List<Group> groups = authenticationService.getSpecialGroups(context, request);
             String token = jwtTokenHandler.createTokenForEPerson(context, request, ePerson, groups);
 

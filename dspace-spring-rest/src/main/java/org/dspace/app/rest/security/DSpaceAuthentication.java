@@ -7,18 +7,28 @@
  */
 package org.dspace.app.rest.security;
 
-import java.util.Collection;
-import java.util.List;
-
+import org.dspace.eperson.EPerson;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
+import java.util.List;
+
 public class DSpaceAuthentication implements Authentication {
 
+
+    private EPerson ePerson;
     private String username;
     private String password;
     private List<GrantedAuthority> authorities;
     private boolean authenticated = true;
+
+
+    public DSpaceAuthentication (EPerson ePerson, List<GrantedAuthority> authorities) {
+        this.ePerson = ePerson;
+        this.username = ePerson.getEmail();
+        this.authorities = authorities;
+    }
 
     public DSpaceAuthentication (String username, String password, List<GrantedAuthority> authorities) {
         this.username = username;
@@ -56,5 +66,9 @@ public class DSpaceAuthentication implements Authentication {
 
     public String getName() {
         return username;
+    }
+
+    public EPerson getEPerson() {
+        return ePerson;
     }
 }
