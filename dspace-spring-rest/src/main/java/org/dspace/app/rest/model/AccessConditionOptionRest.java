@@ -22,32 +22,32 @@ public class AccessConditionOptionRest {
 
 	private String type;
 	
-	private UUID groupUuid;
+	private UUID groupUUID;
 	
-	private UUID selectGroupUuid;
+	private UUID selectGroupUUID;
 	
 	private boolean hasDate;
 	
 	private Date maxEndDate;
 
-	public UUID getGroupUuid() {
-		return groupUuid;
+	public UUID getGroupUUID() {
+		return groupUUID;
 	}
 
-	public void setGroupUuid(UUID groupUuid) {
-		this.groupUuid = groupUuid;
+	public void setGroupUUID(UUID groupUuid) {
+		this.groupUUID = groupUuid;
 	}
 
 	public void setType(String type) {
 		this.type = type;
 	}
 
-	public UUID getSelectGroupUuid() {
-		return selectGroupUuid;
+	public UUID getSelectGroupUUID() {
+		return selectGroupUUID;
 	}
 
-	public void setSelectGroupUuid(UUID selectGroupUuid) {
-		this.selectGroupUuid = selectGroupUuid;
+	public void setSelectGroupUUID(UUID selectGroupUuid) {
+		this.selectGroupUUID = selectGroupUuid;
 	}
 
 	public boolean isHasDate() {

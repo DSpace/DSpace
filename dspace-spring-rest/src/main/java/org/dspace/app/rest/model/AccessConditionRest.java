@@ -28,7 +28,7 @@ public class AccessConditionRest implements Serializable {
 	
 	private Date endDate;
 	
-	public UUID getGroupUUUI() {
+	public UUID getGroupUUID() {
 		return groupUUID;
 	}
 
