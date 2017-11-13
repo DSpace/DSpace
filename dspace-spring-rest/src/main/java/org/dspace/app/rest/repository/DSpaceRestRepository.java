@@ -7,8 +7,14 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.core.Context;
@@ -16,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the base class for any Rest Repository. It add a DSpaceContext to the
@@ -29,6 +36,8 @@ public abstract class DSpaceRestRepository<T extends RestModel, ID extends Seria
 extends AbstractDSpaceRestRepository
 		implements PagingAndSortingRepository<T, ID> {
 
+	private static final Logger log = Logger.getLogger(DSpaceRestRepository.class);
+	
 	@Override
 	public <S extends T> S save(S entity) {
 		Context context = obtainContext();
@@ -138,4 +147,17 @@ extends AbstractDSpaceRestRepository
 		return null;
 	}
 
+	protected <S extends Serializable> S upload(HttpServletRequest request, String apiCategory, String model, ID id, String extraField, MultipartFile file) throws Exception {
+		throw new RuntimeException("No implementation found; Metod not allowed!"); 
+	}
+
+
+	public <S extends Serializable> List<S> upload(HttpServletRequest request, String apiCategory, String model, ID id,
+			String extraField, List<MultipartFile> files) throws Exception {
+		List<S> results = new ArrayList<>();
+		for(MultipartFile file : files) {
+			results.add(upload(request, apiCategory, model, id, extraField, file));
+		}
+		return results;
+	} 
 }

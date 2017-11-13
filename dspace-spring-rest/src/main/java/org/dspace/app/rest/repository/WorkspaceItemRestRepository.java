@@ -7,37 +7,52 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.SearchRestMethod;
-import org.dspace.app.rest.converter.SubmissionSectionConverter;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.CheckSumRest;
+import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
-import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.service.BitstreamFormatService;
+import org.dspace.content.service.BitstreamService;
+import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
-import org.dspace.services.model.Request;
-import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
+import org.dspace.services.ConfigurationService;
+import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the repository responsible to manage WorkspaceItem Rest object
@@ -53,6 +68,14 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	
 	@Autowired
 	WorkspaceItemService wis;
+	@Autowired
+	ItemService itemService;
+	@Autowired
+	BitstreamService bitstreamService;
+	@Autowired
+	BitstreamFormatService bitstreamFormatService;
+	@Autowired
+	ConfigurationService configurationService;
 	
 	@Autowired
 	WorkspaceItemConverter converter;
@@ -164,6 +187,60 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	@Override
 	public WorkspaceItemResource wrapResource(WorkspaceItemRest witem, String... rels) {
 		return new WorkspaceItemResource(witem, utils, rels);
+	}
+	
+	protected UploadBitstreamRest upload(HttpServletRequest request, String apiCategory, String model, Integer id, String extraField, MultipartFile file) throws Exception {
+		Bitstream source = null;
+		BitstreamFormat bf = null;
+		
+		Context context = obtainContext();
+		WorkspaceItem wsi = wis.find(context, id);
+		Item item = wsi.getItem();
+        // do we already have a bundle?
+        List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+        
+        InputStream inputStream =  new BufferedInputStream(file.getInputStream());
+        if (bundles.size() < 1)
+        {
+            // set bundle's name to ORIGINAL
+        	source = itemService.createSingleBitstream(context, inputStream, item, "ORIGINAL");
+        }
+        else
+        {
+            // we have a bundle already, just add bitstream
+        	source = bitstreamService.create(context, bundles.get(0), inputStream);
+        }
+
+        source.setName(context, file.getOriginalFilename());
+        //TODO how retrieve this information?
+        source.setSource(context, extraField);
+
+        // Identify the format
+        bf = bitstreamFormatService.guessFormat(context, source);
+        source.setFormat(context, bf);
+
+        // Update to DB
+        bitstreamService.update(context, source);
+        itemService.update(context, item);
+        context.commit();
+        
+        UploadBitstreamRest result = new UploadBitstreamRest();
+		List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
+		for (MetadataValue mv : source.getMetadata()) {
+			MetadataEntryRest me = new MetadataEntryRest();
+			me.setKey(mv.getMetadataField().toString('.'));
+			me.setValue(mv.getValue());
+			me.setLanguage(mv.getLanguage());
+			metadata.add(me);
+		}
+		result.setMetadata(metadata);
+		CheckSumRest checksum = new CheckSumRest();
+		checksum.setCheckSumAlgorithm(source.getChecksumAlgorithm());
+		checksum.setValue(source.getChecksum());
+		result.setCheckSum(checksum);
+		result.setSizeBytes(source.getSize());
+		result.setUrl(configurationService.getProperty("dspace.url")+"/api/"+BitstreamRest.CATEGORY +"/"+ English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
+		return result;
 	}
 
 }

@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
@@ -59,6 +60,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * This is the main entry point of the new REST API. Its responsibility is to
@@ -73,6 +75,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/{apiCategory}/{model}")
 @SuppressWarnings("rawtypes")
 public class RestResourceController implements InitializingBean {
+	
+	private static final Logger log = Logger.getLogger(RestResourceController.class);
+	
 	@Autowired
 	DiscoverableEndpointsService discoverableEndpointsService;
 
@@ -189,6 +194,41 @@ public class RestResourceController implements InitializingBean {
 		//TODO manage HTTPHeader
 		return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, result);		
 	}	
+
+	@RequestMapping(method = RequestMethod.POST, value = "/{id:\\d+}" , headers = "content-type=multipart/form-data")
+	public <ID extends Serializable> List<Serializable> upload(HttpServletRequest request,
+			@PathVariable String apiCategory, @PathVariable String model, @PathVariable Integer id,
+			@RequestParam(required=false, value="extraField") String extraField,
+		    @RequestParam("file") MultipartFile[] uploadfiles) throws HttpRequestMethodNotSupportedException {
+		//TODO manage extra field
+		return uploadInternal(request, apiCategory, model, id, extraField, uploadfiles);
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}", headers = "content-type=multipart/form-data")	
+	public <ID extends Serializable> List<Serializable> upload(HttpServletRequest request,
+			@PathVariable String apiCategory, @PathVariable String model, @PathVariable UUID id,
+			@RequestParam(required=false, value="extraField") String extraField,
+		    @RequestParam("file") MultipartFile[] uploadfiles) throws HttpRequestMethodNotSupportedException {
+		return uploadInternal(request, apiCategory, model, id, extraField, uploadfiles);
+	}
+    
+	private <ID extends Serializable> List<Serializable> uploadInternal(HttpServletRequest request, String apiCategory, String model, ID id,
+			String extraField, MultipartFile... uploadfiles) {
+		
+		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		
+		// Get file name
+//      String uploadedFileName = Arrays.stream(uploadfiles).map(x -> x.getOriginalFilename())
+//                .filter(x -> !StringUtils.isEmpty(x)).collect(Collectors.joining(" , "));
+
+		try {
+			return repository.upload(request, apiCategory, model, id, extraField, Arrays.asList(uploadfiles));
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+		return null;
+	}	
+	
 	
 //	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
 //	public ResourceSupport patch(HttpServletRequest request, @PathVariable String apiCategory,

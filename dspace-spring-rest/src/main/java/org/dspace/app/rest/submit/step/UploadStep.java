@@ -15,6 +15,7 @@ import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.step.DataUpload;
+import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
@@ -38,7 +39,7 @@ public class UploadStep extends org.dspace.submit.step.UploadStep implements Abs
 		List<Bundle> bundles = itemService.getBundles(obj.getItem(), Constants.CONTENT_BUNDLE_NAME);
 		for(Bundle bundle : bundles) {
 			for(Bitstream source : bundle.getBitstreams()) {
-				DataUpload.UploadBitstreamRest b = result.createUploadBitstreamRest();
+				UploadBitstreamRest b = new UploadBitstreamRest();
 				List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
 				for (MetadataValue mv : source.getMetadata()) {
 					MetadataEntryRest me = new MetadataEntryRest();
