@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-@Component(AccessConditionRest.CATEGORY + "." + CollectionRest.NAME + "." + AccessConditionRest.NAME)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.DEFAULT_ACCESS_CONDITIONS)
 public class DefaultAccessConditionRestLinkRepository extends AbstractDSpaceRestRepository
 		implements LinkRestRepository<AccessConditionRest> {
 

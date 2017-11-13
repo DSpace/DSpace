@@ -7,10 +7,9 @@
  */
 package org.dspace.app.rest.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
-
-import org.dspace.app.rest.RestResourceController;
 
 /**
  * The Access Condition (ResourcePolicy) REST Resource
@@ -18,32 +17,15 @@ import org.dspace.app.rest.RestResourceController;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionRest extends BaseObjectRest<Integer> {
-
-	public static final String NAME = "defaultBitstreamsPolicies";
-	public static final String CATEGORY = RestModel.CORE;
-
+public class AccessConditionRest implements Serializable {
+	public static final String NAME = "accessCondition";
+	
 	private AccessConditionTypeEnum type;
 	
 	private UUID groupUuid;
 	
 	private Date endDate;
 	
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
-
-	@Override
-	public String getType() {
-		return type.toString();
-	}
-
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
-
 	public UUID getGroupUuid() {
 		return groupUuid;
 	}

@@ -35,7 +35,6 @@ public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, A
 	@Override
 	public AccessConditionRest fromModel(ResourcePolicy obj) {
 		AccessConditionRest model = new AccessConditionRest();
-		model.setId(obj.getID());
 		model.setType(AccessConditionTypeEnum.openaccess);
 		if (obj.getGroup() != null) {
 			model.setGroupUuid(obj.getGroup().getID());			

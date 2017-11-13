@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model;
 
-import org.dspace.app.rest.RestResourceController;
+import java.io.Serializable;
 
 /**
  * The License text REST resource.
@@ -15,29 +15,11 @@ import org.dspace.app.rest.RestResourceController;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class LicenseRest implements RestModel {
-	
+public class LicenseRest implements Serializable {
 	public static final String NAME = "license";
-	public static final String CATEGORY = RestModel.CORE;
-
 	private boolean custom = false;
 	private String text; 
 	
-	@Override
-	public String getCategory() {
-		return CATEGORY;
-	}
-
-	@Override
-	public String getType() {
-		return NAME;
-	}
-
-	@Override
-	public Class getController() {
-		return RestResourceController.class;
-	}
-
 	public boolean isCustom() {
 		return custom;
 	}

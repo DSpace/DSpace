@@ -18,18 +18,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 @LinksRest(links = {
-		@LinkRest(name = LicenseRest.NAME, linkClass = LicenseRest.class, method = "getLicenseCollection", optional = true),
-		@LinkRest(name = AccessConditionRest.NAME, linkClass = AccessConditionRest.class, method = "getDefaultBitstreamPoliciesForCollection", optional = true)
+		@LinkRest(name = CollectionRest.LICENSE, linkClass = LicenseRest.class, method = "getLicenseCollection", optional = true),
+		@LinkRest(name = CollectionRest.DEFAULT_ACCESS_CONDITIONS, linkClass = AccessConditionRest.class, method = "getDefaultBitstreamPoliciesForCollection", optional = true)
 })
 public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";
 	public static final String CATEGORY = RestModel.CORE;
-
-	@JsonIgnore
-	private LicenseRest license;
-	@JsonIgnore
-	private List<AccessConditionRest> defaultBitstreamsPolicies;
-
+	public static final String LICENSE = "license";
+	public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessCondition";
 	@JsonIgnore
 	private BitstreamRest logo;
 
@@ -50,22 +46,4 @@ public class CollectionRest extends DSpaceObjectRest {
 	public String getType() {
 		return NAME;
 	}
-
-	public LicenseRest getLicense() {
-		return license;
-	}
-
-	public void setLicense(LicenseRest license) {
-		this.license = license;
-	}
-
-	public List<AccessConditionRest> getDefaultBitstreamsPolicies() {
-		return defaultBitstreamsPolicies;
-	}
-
-	public void setDefaultBitstreamsPolicies(List<AccessConditionRest> defaultBitstreamsPolicies) {
-		this.defaultBitstreamsPolicies = defaultBitstreamsPolicies;
-	}
-
-
 }

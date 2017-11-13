@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-@Component(LicenseRest.CATEGORY + "." + CollectionRest.NAME + "." + LicenseRest.NAME)
+@Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.LICENSE)
 public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
 		implements LinkRestRepository<LicenseRest> {
 
