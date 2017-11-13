@@ -112,9 +112,9 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 			Group group = groupService.findByName(context, option.getGroupName());
 			if (group != null) {
 				if ("embargo".equals(option.getPolicyType()) || "lease".equals(option.getPolicyType())) {
-					optionRest.setSelectGroupUuid(group.getID());
+					optionRest.setSelectGroupUUID(group.getID());
 				} else {
-					optionRest.setGroupUuid(group.getID());
+					optionRest.setGroupUUID(group.getID());
 				}
 			}
 			optionRest.setHasDate(option.getHasDate());
