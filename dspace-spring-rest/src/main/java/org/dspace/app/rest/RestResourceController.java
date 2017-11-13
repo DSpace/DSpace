@@ -260,20 +260,20 @@ public class RestResourceController implements InitializingBean {
 					if ( Page.class.isAssignableFrom( linkMethod.getReturnType()) ){
 						Page<? extends Serializable> pageResult = (Page<? extends RestModel>) linkMethod
 								.invoke(linkRepository, request, uuid, page, projection);
-						Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(uuid)
+						Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
 								.slash(rel).withSelfRel();
 						PagedResources<? extends ResourceSupport> result = assembler
 								.toResource(pageResult.map(linkRepository::wrapResource), link);
 						return result;
 					}
 					else {
-						RestModel object = (RestModel)linkMethod
-						.invoke(linkRepository, request, uuid, page, projection);
-						Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(uuid)
-								.slash(rel).withSelfRel();
-						ResourceSupport result = linkRepository.wrapResource(object, link.toString());
+						Serializable object = (Serializable) linkMethod.invoke(linkRepository, request, uuid, page,
+								projection);
+						Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(rel)
+								.withSelfRel();
+						ResourceSupport result = linkRepository.wrapResource(object);
+						result.add(link);						
 						return result;
-						
 					}					
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new RuntimeException(e.getMessage(), e);
@@ -314,7 +314,7 @@ public class RestResourceController implements InitializingBean {
 			@PathVariable String model, Pageable page, PagedResourcesAssembler assembler,
 			@RequestParam(required = false) String projection) {
 		DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
-		Link link = linkTo(methodOn(this.getClass(), apiCategory, English.plural(model)).findAll(apiCategory, model,
+		Link link = linkTo(methodOn(this.getClass(), apiCategory, model).findAll(apiCategory, model,
 				page, assembler, projection)).withSelfRel();
 
 		Page<DSpaceResource<T>> resources;
