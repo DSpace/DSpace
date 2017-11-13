@@ -27,9 +27,11 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
@@ -58,6 +60,9 @@ public class JWTTokenHandler {
 
     @Autowired
     private EPersonClaimProvider ePersonClaimProvider;
+
+    @Autowired
+    private EPersonService ePersonService;
 
 
     public JWTTokenHandler() {
@@ -118,25 +123,21 @@ public class JWTTokenHandler {
      * Create a jwt with the EPerson details in it
      * @param context
      * @param request
-     * @param ePerson
+     * @param detachedEPerson
      * @param groups
      * @return
      * @throws JOSEException
      */
-    public String createTokenForEPerson(Context context, HttpServletRequest request, EPerson ePerson, List<Group> groups) throws JOSEException {
-        createNewSessionSalt(ePerson);
-        context.setCurrentUser(ePerson);
+    public String createTokenForEPerson(Context context, HttpServletRequest request, EPerson detachedEPerson, List<Group> groups) throws JOSEException {
+
+        //This has to be set before createNewSessionSalt, otherwise authorizeException is thrown
+        context.setCurrentUser(detachedEPerson);
+
+        EPerson ePerson = createNewSessionSalt(context, detachedEPerson);
+
+
 
         JWSSigner signer = new MACSigner(buildSigningKey(request, ePerson));
-
-
-        try {
-            context.commit();
-        } catch (SQLException e) {
-            //TODO FREDERIC throw exception and fail fast
-            log.error("Error while committing salt to eperson", e);
-        }
-
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 
         for (JWTClaimProvider jwtClaimProvider: jwtClaimProviders) {
@@ -182,10 +183,35 @@ public class JWTTokenHandler {
         return ipAddress;
     }
 
-    private void createNewSessionSalt(EPerson ePerson) {
-        StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
-        String salt = stringKeyGenerator.generateKey();
-        ePerson.setSessionSalt(salt);
+    private EPerson createNewSessionSalt(Context context, EPerson detached) {
+        EPerson ePerson = null;
+        try {
+            //Reloading doesn't seem to work
+//            ePerson = context.reloadEntity(detached);
+
+            //This does work, even still has the previousActive
+            ePerson = ePersonService.find(context, detached.getID());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (detached.getLastActive().getTime() - detached.getPreviousActive().getTime() > expirationTime) {
+
+
+            StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
+            String salt = stringKeyGenerator.generateKey();
+            ePerson.setSessionSalt(salt);
+
+            try {
+                ePersonService.update(context, ePerson);
+                context.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (AuthorizeException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return ePerson;
     }
 
     public List<JWTClaimProvider> getJwtClaimProviders() {

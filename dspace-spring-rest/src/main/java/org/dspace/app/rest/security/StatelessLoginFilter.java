@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.security;
 
-import org.dspace.app.rest.utils.ContextUtil;
-import org.dspace.core.Context;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -57,6 +55,7 @@ public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter
                                             Authentication auth) throws IOException, ServletException {
 
         //TODO every time we log in a new token and salt is created, might need to change this
-        restAuthenticationService.addAuthenticationDataForUser(req, res, auth.getName());
+        DSpaceAuthentication dSpaceAuthentication = (DSpaceAuthentication) auth;
+        restAuthenticationService.addAuthenticationDataForUser(req, res, dSpaceAuthentication.getEPerson());
     }
 }

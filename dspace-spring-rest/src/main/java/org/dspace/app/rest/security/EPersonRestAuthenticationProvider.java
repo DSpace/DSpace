@@ -118,7 +118,7 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
             //Pass the eperson ID to the request service
             requestService.setCurrentUserId(ePerson.getID());
 
-            return new DSpaceAuthentication(ePerson.getEmail(), password, getGrantedAuthorities(context, ePerson));
+            return new DSpaceAuthentication(ePerson, getGrantedAuthorities(context, ePerson));
 
         } else {
             log.info(LogManager.getHeader(context, "failed_login", "No eperson with an non-blank e-mail address found"));
