@@ -12,7 +12,7 @@ import java.io.Serializable;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.step.UploadStatusResponse;
 import org.dspace.core.Context;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public abstract class DSpaceRestRepository<T extends RestModel, ID extends Serializable>
+public abstract class DSpaceRestRepository<T extends DirectlyAddressableRestModel, ID extends Serializable>
 extends AbstractDSpaceRestRepository
 		implements PagingAndSortingRepository<T, ID> {
 

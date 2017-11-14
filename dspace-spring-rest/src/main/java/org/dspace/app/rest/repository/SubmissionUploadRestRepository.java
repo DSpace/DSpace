@@ -50,6 +50,9 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 	private SubmissionConfigReader submissionConfigReader;
 
 	@Autowired
+	private SubmissionFormRestRepository submissionFormRestRepository;
+	
+	@Autowired
 	private UploadConfigurationService uploadConfigurationService;
 
 	@Autowired
@@ -80,7 +83,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 		for (SubmissionConfig config : subConfs) {
 			for (int i = 0; i < config.getNumberOfSteps(); i++) {
 				SubmissionStepConfig step = config.getStep(i);
-				if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(step.getId())) {
+				if (SubmissionStepConfig.UPLOAD_STEP_NAME.equals(step.getType())) {
 					UploadConfiguration uploadConfig = uploadConfigurationService.getMap().get(step.getId());
 					if (uploadConfig != null) {
 						try {
@@ -121,10 +124,10 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 			if(StringUtils.isNotBlank(option.getDateLimit())) {
 				optionRest.setMaxEndDate(dateMathParser.parseMath(option.getDateLimit()));
 			}
-			optionRest.setType(option.getPolicyType());			
+			optionRest.setPolicyType(option.getPolicyType());			
 			result.getAccessConditions().add(optionRest);
 		}
-		result.setMetadata(config.getMetadata());
+		result.setMetadata(submissionFormRestRepository.findOne(config.getMetadata()));
 		result.setMaxSize(config.getMaxSize());
 		result.setRequired(config.isRequired());
 		result.setName(config.getName());

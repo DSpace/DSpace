@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class BitstreamFormatRest extends BaseObjectRest<Integer> {
 	public static final String NAME = "bitstreamformat";
 	
-	public static final String CATEGORY = RestModel.CORE;
+	public static final String CATEGORY = DirectlyAddressableRestModel.CORE;
 	
 	private String shortDescription;
 

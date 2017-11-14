@@ -20,7 +20,7 @@ import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
 import org.dspace.app.rest.model.MetadataFieldRest;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -60,20 +60,20 @@ public class Utils {
 	}
 
 	public Link linkToSingleResource(DSpaceResource r, String rel) {
-		RestModel data = r.getData();
+		DirectlyAddressableRestModel data = r.getData();
 		return linkToSingleResource(data, rel);
 	}
 
-	public Link linkToSingleResource(RestModel data, String rel) {
+	public Link linkToSingleResource(DirectlyAddressableRestModel data, String rel) {
 		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data)
 				.withRel(rel);
 	}
 
-	public Link linkToSubResource(RestModel data, String rel) {
+	public Link linkToSubResource(DirectlyAddressableRestModel data, String rel) {
 		return linkToSubResource(data, rel, rel);
 	}
 
-	public Link linkToSubResource(RestModel data, String rel, String path) {
+	public Link linkToSubResource(DirectlyAddressableRestModel data, String rel, String path) {
 		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).slash(path)
 				.withRel(rel);
 	}
@@ -131,7 +131,7 @@ public class Utils {
 	 * @return the LinkRest annotation corresponding to the specified rel in the
 	 *         domainClass. Null if not found
 	 */
-	public LinkRest getLinkRest(String rel, Class<RestModel> domainClass) {
+	public LinkRest getLinkRest(String rel, Class<DirectlyAddressableRestModel> domainClass) {
 		LinkRest linkRest = null;
 		LinksRest linksAnnotation = domainClass.getDeclaredAnnotation(LinksRest.class);
 		if (linksAnnotation != null) {

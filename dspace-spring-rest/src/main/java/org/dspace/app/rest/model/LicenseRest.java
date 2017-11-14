@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class LicenseRest implements Serializable {
+public class LicenseRest implements RestModel {
 	public static final String NAME = "license";
 	private boolean custom = false;
 	private String text; 
@@ -35,5 +35,9 @@ public class LicenseRest implements Serializable {
 	public void setText(String text) {
 		this.text = text;
 	}
-
+	
+	@Override
+	public String getType() {
+		return NAME;
+	}
 }
