@@ -18,7 +18,7 @@ import java.util.UUID;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionRest implements Serializable {
+public class AccessConditionRest implements RestModel {
 
 	public static final String NAME = "accessCondition";
 
@@ -47,5 +47,13 @@ public class AccessConditionRest implements Serializable {
 	public void setPolicyType(String type) {
 		this.policyType = type;
 	}
-
+	
+	public String getPolicyType() {
+		return policyType;
+	}
+	
+	@Override
+	public String getType() {
+		return NAME;
+	}
 }

@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
-public class BrowseEntryRest implements Serializable {
+public class BrowseEntryRest implements RestModel {
 	private static final long serialVersionUID = -3415049466402327251L;
 	public static final String NAME = "browseEntry";
 	private String authority;
@@ -66,5 +66,10 @@ public class BrowseEntryRest implements Serializable {
 	
 	public void setBrowseIndex(BrowseIndexRest browseIndex) {
 		this.browseIndex = browseIndex;
+	}
+	
+	@Override
+	public String getType() {
+		return NAME;
 	}
 }
