@@ -47,7 +47,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 /**
- * TODO TOM UNIT TEST
+ * Unit tests for {@link DiscoverQueryBuilder}
  */
 @RunWith(MockitoJUnitRunner.class)
 public class DiscoverQueryBuilderTest {

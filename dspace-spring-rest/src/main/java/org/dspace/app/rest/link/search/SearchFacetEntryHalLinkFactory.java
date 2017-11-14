@@ -43,7 +43,7 @@ public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<
 
         addFilterParams(uriBuilder, searchData);
 
-        //If our rest data contains a list of values, contruct the page links. Otherwise, only add a self link
+        //If our rest data contains a list of values, construct the page links. Otherwise, only add a self link
         if(CollectionUtils.isNotEmpty(facetData.getValues())) {
             PageImpl page = new PageImpl<>(facetData.getValues(), new PageRequest(0, facetData.getFacetLimit()),
                     facetData.getValues().size() + (facetData.isHasMore() ? 1 : 0));
