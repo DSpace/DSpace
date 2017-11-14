@@ -7,12 +7,7 @@
 	<bean id="uploadConfigurationDefault" class="org.dspace.submit.model.UploadConfiguration">
 		<property name="name" value="upload"></property>
 		<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-		<property name="metadata">
-			<list>
-                <ref local="fieldBitstreamName"/> 
-                <ref local="fieldBitstreamDescription"/>			
-			</list>
-		</property>
+		<property name="metadata" value="bitstream-metadata" />
         <property name="options">
             <list>
                 <ref local="openAccess"/> 

@@ -19,7 +19,7 @@ public class UploadConfiguration<T extends SubmissionFormField>{
 	
 	private ConfigurationService configurationService;
 	
-	private List<T> metadata;
+	private String metadataDefinition;
 	private List<AccessConditionOption> options;
 	private Long maxSize;
 	private Boolean required;
@@ -33,12 +33,12 @@ public class UploadConfiguration<T extends SubmissionFormField>{
 		this.options = options;
 	}
 
-	public List<T> getMetadata() {
-		return metadata;
+	public String getMetadata() {
+		return metadataDefinition;
 	}
 
-	public void setMetadata(List<T> metadata) {
-		this.metadata = metadata;
+	public void setMetadata(String metadata) {
+		this.metadataDefinition = metadata;
 	}
 
 	public Long getMaxSize() {

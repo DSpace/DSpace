@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.submit.model.AccessConditionOption;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -29,9 +30,10 @@ public class SubmissionUploadRest extends BaseObjectRest<String> {
 
 	private String name;
 	
-	private List<SubmissionFormFieldRest> metadata;
+	@JsonIgnore
+	private SubmissionFormRest metadata;
 
-	private List<AccessConditionOptionRest> accessConditions;
+	private List<AccessConditionOptionRest> accessConditionOptions;
 	
 	private boolean required;
 	
