@@ -7,15 +7,23 @@
  */
 package org.dspace.app.rest.submit.step;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.step.DataLicense;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Item;
+import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Request;
 import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
@@ -43,16 +51,29 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
 
 	@Override
 	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
-			String target, String index, LateObjectEvaluator value) {
-		switch (operation) {
-		case "replace":
-			
-			break;
-		case "remove":
-			
-			break;			
-		default:
-			throw new RuntimeException("Operation "+operation+" not yet implemented!");
+			String target, String index, Object value) throws Exception {
+        
+		if("acceptanceDate".equals(target)) {
+			Item item = source.getItem();
+			EPerson submitter = context.getCurrentUser();
+
+			switch (operation) {
+			case "replace":
+				// remove any existing DSpace license (just in case the user
+				// accepted it previously)
+				itemService.removeDSpaceLicense(context, item);
+
+				String license = LicenseUtils.getLicenseText(context.getCurrentLocale(), source.getCollection(), item,
+						submitter);
+				
+				LicenseUtils.grantLicense(context, item, license, (String)value);
+				break;
+			case "remove":
+				itemService.removeDSpaceLicense(context, item);
+				break;
+			default:
+				throw new RuntimeException("Operation " + operation + " not yet implemented!");
+			}
 		}
 	}
 }

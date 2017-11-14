@@ -251,16 +251,16 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 				if(path.length>4) {
 					index = path[4];
 				}
-				String operation = op.getOp();
-				LateObjectEvaluator value = (LateObjectEvaluator)op.getValue();				
-				evaluatePatch(context, request, source, wsi, operation, section, target, index, value);
+				String operation = op.getOp();							
+				
+				evaluatePatch(context, request, source, wsi, operation, section, target, index, op.getValue());
 			}
 		}
 		wis.update(context, source);
 	}
 
 	private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi, String operation, String section, String target, String index,
-			LateObjectEvaluator value) throws Exception {
+			Object value) throws Exception {
 		SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
 		for(int stepNum = 0; stepNum<submissionConfig.getNumberOfSteps(); stepNum++) {
 			

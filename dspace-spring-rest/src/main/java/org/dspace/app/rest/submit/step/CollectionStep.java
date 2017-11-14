@@ -34,7 +34,7 @@ public class CollectionStep extends org.dspace.submit.step.SelectCollectionStep 
 
 	@Override
 	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
-			String target, String index, LateObjectEvaluator value) {
+			String target, String index, Object value) {
 		switch (operation) {
 		case "move":
 			
