@@ -7,13 +7,8 @@
  */
 package org.dspace.app.rest.submit.step;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.atteo.evo.inflector.English;
-import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.model.CheckSumRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
@@ -21,10 +16,11 @@ import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
-import org.dspace.services.ConfigurationService;
+import org.dspace.core.Context;
+import org.dspace.services.model.Request;
+import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Upload step for DSpace Spring Rest. Expose information about the bitstream uploaded for the in progress submission. 
@@ -48,4 +44,21 @@ public class UploadStep extends org.dspace.submit.step.UploadStep implements Abs
 		return result; 
 	}
 
+	@Override
+	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
+			String target, String index, LateObjectEvaluator value) {
+		switch (operation) {
+		case "add":
+			
+			break;
+		case "replace":
+			
+			break;			
+		case "remove":
+			
+			break;
+		default:
+			throw new RuntimeException("Operation "+operation+" not yet implemented!");
+		}
+	}
 }
