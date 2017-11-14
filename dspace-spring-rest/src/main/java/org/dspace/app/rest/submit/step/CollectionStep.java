@@ -12,6 +12,9 @@ import java.util.UUID;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.Context;
+import org.dspace.services.model.Request;
+import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Collection step for DSpace Spring Rest. Expose the collection information of the in progress submission.
@@ -29,5 +32,15 @@ public class CollectionStep extends org.dspace.submit.step.SelectCollectionStep 
 		return null;
 	}
 
-
+	@Override
+	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
+			String target, String index, LateObjectEvaluator value) {
+		switch (operation) {
+		case "move":
+			
+			break;
+		default:
+			throw new RuntimeException("Operation "+operation+" not yet implemented!");
+		}
+	}
 }

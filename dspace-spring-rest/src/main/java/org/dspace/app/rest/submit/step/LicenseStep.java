@@ -15,6 +15,9 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.services.model.Request;
+import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * License step for DSpace Spring Rest. Expose the license information about the in progress submission.
@@ -38,4 +41,18 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
 		return result;
 	}
 
+	@Override
+	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
+			String target, String index, LateObjectEvaluator value) {
+		switch (operation) {
+		case "replace":
+			
+			break;
+		case "remove":
+			
+			break;			
+		default:
+			throw new RuntimeException("Operation "+operation+" not yet implemented!");
+		}
+	}
 }

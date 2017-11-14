@@ -11,6 +11,9 @@ import java.io.Serializable;
 
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.Context;
+import org.dspace.services.model.Request;
+import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Interface to retrieve information about section
@@ -21,6 +24,9 @@ import org.dspace.content.WorkspaceItem;
 public interface AbstractRestProcessingStep {
 
 	public <T extends Serializable> T getData(WorkspaceItem obj, SubmissionStepConfig config) throws Exception;
+
+	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
+			String target, String index, LateObjectEvaluator value) throws Exception;
 
 
 }

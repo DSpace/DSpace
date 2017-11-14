@@ -10,7 +10,6 @@ package org.dspace.app.rest.repository;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,15 +17,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
-import org.dspace.app.rest.model.BitstreamRest;
-import org.dspace.app.rest.model.CheckSumRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
+import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
@@ -35,7 +31,6 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
@@ -51,6 +46,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
+import org.springframework.data.rest.webmvc.json.patch.Patch;
+import org.springframework.data.rest.webmvc.json.patch.PatchOperation;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -189,6 +187,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 		return new WorkspaceItemResource(witem, utils, rels);
 	}
 	
+	@Override
 	public UploadBitstreamRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
 			String extraField, MultipartFile file) throws Exception {
 		
@@ -237,4 +236,65 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 		return result;
 	}
 
+	@Override
+	public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch) throws Exception {
+		List<PatchOperation> operations = patch.getOperations();
+		WorkspaceItemRest wsi = findOne(id);
+		WorkspaceItem source = wis.find(context, id);
+		for(PatchOperation op : operations) {
+			//the value in the position 0 is a null value
+			String[] path = op.getPath().split("/");
+			if("sections".equals(path[1])) {
+				String section = path[2];
+				String target = path[3];
+				String index = "";
+				if(path.length>4) {
+					index = path[4];
+				}
+				String operation = op.getOp();
+				LateObjectEvaluator value = (LateObjectEvaluator)op.getValue();				
+				evaluatePatch(context, request, source, wsi, operation, section, target, index, value);
+			}
+		}
+		wis.update(context, source);
+	}
+
+	private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi, String operation, String section, String target, String index,
+			LateObjectEvaluator value) throws Exception {
+		SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
+		for(int stepNum = 0; stepNum<submissionConfig.getNumberOfSteps(); stepNum++) {
+			
+			SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
+			
+			if (section.equals(stepConfig.getId())) {
+				/*
+				 * First, load the step processing class (using the current
+				 * class loader)
+				 */
+				ClassLoader loader = this.getClass().getClassLoader();
+				Class stepClass;
+				try {
+					stepClass = loader.loadClass(stepConfig.getProcessingClassName());
+
+					Object stepInstance = stepClass.newInstance();
+
+					if (stepInstance instanceof AbstractRestProcessingStep) {
+						// load the JSPStep interface for this step
+						AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
+								.newInstance();
+						stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, operation, target, index, value);
+					} else {
+						throw new Exception("The submission step class specified by '"
+								+ stepConfig.getProcessingClassName()
+								+ "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
+								+ " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
+					}
+
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+				}
+			}
+		}
+	}
+	
 }
