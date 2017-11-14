@@ -10,8 +10,6 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 import java.util.UUID;
 
-import org.dspace.app.rest.RestResourceController;
-
 /**
  * The Access Condition (ResourcePolicy) REST Resource
  * 
@@ -20,7 +18,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class AccessConditionOptionRest {
 
-	private String type;
+	private String policyType;
 	
 	private UUID groupUUID;
 	
@@ -38,8 +36,8 @@ public class AccessConditionOptionRest {
 		this.groupUUID = groupUuid;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setPolicyType(String type) {
+		this.policyType = type;
 	}
 
 	public UUID getSelectGroupUUID() {
@@ -66,8 +64,8 @@ public class AccessConditionOptionRest {
 		this.maxEndDate = maxEndDate;
 	}
 
-	public String getType() {
-		return type;
+	public String getPolicyType() {
+		return policyType;
 	}
 
 }

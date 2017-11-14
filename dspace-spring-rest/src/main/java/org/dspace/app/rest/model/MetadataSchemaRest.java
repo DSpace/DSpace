@@ -17,7 +17,7 @@ import org.dspace.app.rest.RestResourceController;
  */
 public class MetadataSchemaRest extends BaseObjectRest<Integer> {
 	public static final String NAME = "metadataschema";
-	public static final String CATEGORY = RestModel.CORE;
+	public static final String CATEGORY = DirectlyAddressableRestModel.CORE;
 	
 	private String prefix;
 

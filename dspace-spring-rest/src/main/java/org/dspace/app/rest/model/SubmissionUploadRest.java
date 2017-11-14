@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.submit.model.AccessConditionOption;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -24,14 +25,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SubmissionUploadRest extends BaseObjectRest<String> {
 	
 	public static final String NAME = "submissionupload";
-	public static final String NAME_LINK_ON_PANEL = RestModel.CONFIGURATION;
-	public static final String CATEGORY = RestModel.CONFIGURATION;
+	public static final String NAME_LINK_ON_PANEL = DirectlyAddressableRestModel.CONFIGURATION;
+	public static final String CATEGORY = DirectlyAddressableRestModel.CONFIGURATION;
 
 	private String name;
 	
-	private List<SubmissionFormFieldRest> metadata;
+	@JsonIgnore
+	private SubmissionFormRest metadata;
 
-	private List<AccessConditionOptionRest> accessConditions;
+	private List<AccessConditionOptionRest> accessConditionOptions;
 	
 	private boolean required;
 	
@@ -66,14 +68,14 @@ public class SubmissionUploadRest extends BaseObjectRest<String> {
 	}
 
 	public List<AccessConditionOptionRest> getAccessConditions() {
-		if(accessConditions==null) {
-			accessConditions = new ArrayList<>();
+		if(accessConditionOptions==null) {
+			accessConditionOptions = new ArrayList<>();
 		}
-		return accessConditions;
+		return accessConditionOptions;
 	}
 
 	public void setAccessConditions(List<AccessConditionOptionRest> accessConditions) {
-		this.accessConditions = accessConditions;
+		this.accessConditionOptions = accessConditions;
 	}
 
 	public boolean isRequired() {
@@ -92,11 +94,11 @@ public class SubmissionUploadRest extends BaseObjectRest<String> {
 		this.maxSize = maxSize;
 	}
 
-	public List<SubmissionFormFieldRest> getMetadata() {
+	public SubmissionFormRest getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(List<SubmissionFormFieldRest> metadata) {
+	public void setMetadata(SubmissionFormRest metadata) {
 		this.metadata = metadata;
 	}
 }
