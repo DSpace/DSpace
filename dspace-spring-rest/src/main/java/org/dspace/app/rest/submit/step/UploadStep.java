@@ -17,12 +17,14 @@ import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.app.rest.model.step.DataUpload;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
+import org.dspace.services.ConfigurationService;
 
 /**
  * Upload step for DSpace Spring Rest. Expose information about the bitstream uploaded for the in progress submission. 
@@ -31,7 +33,7 @@ import org.dspace.core.Constants;
  *
  */
 public class UploadStep extends org.dspace.submit.step.UploadStep implements AbstractRestProcessingStep {
-
+	
 	@Override
 	public DataUpload getData(WorkspaceItem obj, SubmissionStepConfig config) throws Exception {
 		
@@ -39,27 +41,11 @@ public class UploadStep extends org.dspace.submit.step.UploadStep implements Abs
 		List<Bundle> bundles = itemService.getBundles(obj.getItem(), Constants.CONTENT_BUNDLE_NAME);
 		for(Bundle bundle : bundles) {
 			for(Bitstream source : bundle.getBitstreams()) {
-				UploadBitstreamRest b = new UploadBitstreamRest();
-				List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
-				for (MetadataValue mv : source.getMetadata()) {
-					MetadataEntryRest me = new MetadataEntryRest();
-					me.setKey(mv.getMetadataField().toString('.'));
-					me.setValue(mv.getValue());
-					me.setLanguage(mv.getLanguage());
-					metadata.add(me);
-				}
-				b.setMetadata(metadata);
-				CheckSumRest checksum = new CheckSumRest();
-				checksum.setCheckSumAlgorithm(source.getChecksumAlgorithm());
-				checksum.setValue(source.getChecksum());
-				b.setCheckSum(checksum);
-				b.setSizeBytes(source.getSize());
-				b.setUrl(configurationService.getProperty("dspace.url")+"/api/"+BitstreamRest.CATEGORY +"/"+ English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
+				UploadBitstreamRest b = SubmissionService.buildUploadBitstream(configurationService, source);
 				result.getFiles().add(b);
 			}
 		}
 		return result; 
 	}
-
 
 }
