@@ -79,10 +79,11 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 
 	@Override
 	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
-			String target, String index, LateObjectEvaluator value) throws Exception {
+			String target, String index, Object value) throws Exception {
 		MetadataValueRest[] list = null;
 		if(value!=null) {
-			list = (MetadataValueRest[])value.evaluate(MetadataValueRest[].class);
+			LateObjectEvaluator object = (LateObjectEvaluator)value;
+			list = (MetadataValueRest[])object.evaluate(MetadataValueRest[].class);
 		}
 		switch (operation) {
 		case "add":

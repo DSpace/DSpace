@@ -590,5 +590,10 @@
         <qualifier>license</qualifier>
         <scope_note></scope_note>
     </dc-type>
-
+    <dc-type>
+        <schema>dc</schema>
+        <element>rights</element>
+        <qualifier>date</qualifier>
+        <scope_note></scope_note>
+    </dc-type>
 </dspace-dc-types>
