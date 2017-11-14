@@ -52,8 +52,8 @@ public class EmbeddedPageHeader {
     }
 
     @JsonProperty(value = "_links")
-    public Map<String, String> getLinks() {
-        Map<String, String> links = new HashMap<String, String>();
+    public Map<String, Object> getLinks() {
+        Map<String, Object> links = new HashMap<>();
         if (!page.isFirst()) {
             links.put("first", _link(page.getSort(), 0, page.getSize()));
             links.put("self", _link(page.getSort(), page.getNumber(), page.getSize()));
@@ -73,7 +73,7 @@ public class EmbeddedPageHeader {
         return links;
     }
 
-    private String _link(final Sort sort, Integer i, int size) {
+    private Href _link(final Sort sort, Integer i, int size) {
         UriComponentsBuilder uriComp = self.cloneBuilder();
         if(sort != null) {
             for (Sort.Order order : sort) {
@@ -84,6 +84,18 @@ public class EmbeddedPageHeader {
             uriComp = uriComp.queryParam("page", i);
             uriComp = uriComp.queryParam("size", size);
         }
-        return uriComp.build().toUriString();
+        return new Href(uriComp.build().toUriString());
+    }
+
+    private class Href {
+        private String href;
+
+        public Href(String href) {
+            this.href = href;
+        }
+
+        public String getHref() {
+            return href;
+        }
     }
 }
