@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +45,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.json.patch.JsonPatchPatchConverter;
+import org.springframework.data.rest.webmvc.json.patch.Patch;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
@@ -58,11 +59,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This is the main entry point of the new REST API. Its responsibility is to
@@ -89,9 +94,9 @@ public class RestResourceController implements InitializingBean {
 	@Autowired
 	RestRepositoryUtils repositoryUtils;
 	
-//	@Autowired
-//	JsonPatchPatchConverter patchConverter;
-
+	@Autowired
+	private ObjectMapper mapper;
+	 
 	@Override
 	public void afterPropertiesSet() {
 		List<Link> links = new ArrayList<Link>();
@@ -188,6 +193,8 @@ public class RestResourceController implements InitializingBean {
 		try {
 			modelObject = repository.createAndReturn();
 		} catch (ClassCastException e) {
+			log.error(e.getMessage(), e);
+			return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		if (modelObject == null) {
 			throw new HttpRequestMethodNotSupportedException(RequestMethod.POST.toString());
@@ -215,7 +222,7 @@ public class RestResourceController implements InitializingBean {
     
 	private <ID extends Serializable, U extends UploadStatusResponse> ResponseEntity<ResourceSupport> uploadInternal(HttpServletRequest request, String apiCategory, String model, ID id,
 			String extraField, MultipartFile uploadfile) {
-		
+		checkModelPluralForm(apiCategory, model);
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 		U result = null;
 		try {
@@ -232,29 +239,40 @@ public class RestResourceController implements InitializingBean {
 		return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
+	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
+	public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable Integer id, @RequestBody(required = true) JsonNode jsonNode) throws HttpRequestMethodNotSupportedException {
+		return patchInternal(request, apiCategory, model, id, jsonNode);
+	}
+
+	@RequestMapping(method = RequestMethod.PATCH, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}")
+	public ResponseEntity<ResourceSupport> patch(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable UUID id, @RequestBody(required = true) JsonNode jsonNode) throws HttpRequestMethodNotSupportedException {
+		return patchInternal(request, apiCategory, model, id, jsonNode);
+	}
 	
-//	@RequestMapping(method = RequestMethod.PATCH, value = "/{id:\\d+}")
-//	public ResourceSupport patch(HttpServletRequest request, @PathVariable String apiCategory,
-//			@PathVariable String model, @PathVariable Integer id, @RequestParam(required = false) JsonNode jsonNode) {
-//		Patch patch = patchConverter.convert(jsonNode);
-//		return patchInternal(request, apiCategory, model, id, patch);
-//	}
-//
-//	public <ID extends Serializable> ResourceSupport patchInternal(HttpServletRequest request, String apiCategory,
-//			String model, ID id, Patch patch) {
-//		checkModelPluralForm(apiCategory, model);
-//		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-//		RestModel modelObject = null;
-//		try {
-//			modelObject = repository.patch(patch);
-//		} catch (ClassCastException e) {
-//		}
-//		if (modelObject == null) {
-//			throw new ResourceNotFoundException(apiCategory + "." + model + " with id: " + id + " not found");
-//		}
-//		DSpaceResource result = repository.wrapResource(modelObject);
-//		return result;
-//	}
+	public <ID extends Serializable> ResponseEntity<ResourceSupport> patchInternal(HttpServletRequest request, String apiCategory,
+			String model, ID id, JsonNode jsonNode) throws HttpRequestMethodNotSupportedException {
+		
+		checkModelPluralForm(apiCategory, model);
+		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		RestModel modelObject = null;
+		try {
+			JsonPatchPatchConverter patchConverter = new JsonPatchPatchConverter(mapper);
+			Patch patch = patchConverter.convert(jsonNode);
+			modelObject = repository.patch(request, apiCategory, model, id, patch);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		if (modelObject == null) {
+			throw new HttpRequestMethodNotSupportedException(RequestMethod.PATCH.toString());
+		}
+		DSpaceResource result = repository.wrapResource(modelObject);
+		//TODO manage HTTPHeader
+		return ControllerUtils.toResponseEntity(HttpStatus.OK, null, result);		
+		
+	}
 	
 	private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request, String apiCategory, String model,
 			String id, String rel, String relid, Pageable page, PagedResourcesAssembler assembler, String projection) {
