@@ -7,10 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -23,7 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.data.rest.webmvc.json.patch.Patch;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -150,7 +147,22 @@ extends AbstractDSpaceRestRepository
 	}
 
 	public <U extends UploadStatusResponse> U upload(HttpServletRequest request, String apiCategory, String model, ID id, String extraField, MultipartFile file) throws Exception {
-		throw new RuntimeException("No implementation found; Metod not allowed!"); 
+		throw new RuntimeException("No implementation found; Method not allowed!"); 
+	}
+
+	public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) {
+		Context context = obtainContext();		
+		try {
+			patch(context, request, apiCategory, model, id, patch);		
+			context.commit();
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
+		return findOne(id);
+	}
+	
+	protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) throws Exception {
+		throw new RuntimeException("No implementation found; Method not allowed!");
 	}
 
 }
