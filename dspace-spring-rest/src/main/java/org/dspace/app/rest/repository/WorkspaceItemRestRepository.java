@@ -189,57 +189,51 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 		return new WorkspaceItemResource(witem, utils, rels);
 	}
 	
-	protected UploadBitstreamRest upload(HttpServletRequest request, String apiCategory, String model, Integer id, String extraField, MultipartFile file) throws Exception {
+	public UploadBitstreamRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
+			String extraField, MultipartFile file) throws Exception {
+		
+		UploadBitstreamRest result;
 		Bitstream source = null;
 		BitstreamFormat bf = null;
-		
+
 		Context context = obtainContext();
 		WorkspaceItem wsi = wis.find(context, id);
 		Item item = wsi.getItem();
-        // do we already have a bundle?
-        List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
-        
-        InputStream inputStream =  new BufferedInputStream(file.getInputStream());
-        if (bundles.size() < 1)
-        {
-            // set bundle's name to ORIGINAL
-        	source = itemService.createSingleBitstream(context, inputStream, item, "ORIGINAL");
-        }
-        else
-        {
-            // we have a bundle already, just add bitstream
-        	source = bitstreamService.create(context, bundles.get(0), inputStream);
-        }
+		// do we already have a bundle?
+		List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
 
-        source.setName(context, file.getOriginalFilename());
-        //TODO how retrieve this information?
-        source.setSource(context, extraField);
-
-        // Identify the format
-        bf = bitstreamFormatService.guessFormat(context, source);
-        source.setFormat(context, bf);
-
-        // Update to DB
-        bitstreamService.update(context, source);
-        itemService.update(context, item);
-        context.commit();
-        
-        UploadBitstreamRest result = new UploadBitstreamRest();
-		List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
-		for (MetadataValue mv : source.getMetadata()) {
-			MetadataEntryRest me = new MetadataEntryRest();
-			me.setKey(mv.getMetadataField().toString('.'));
-			me.setValue(mv.getValue());
-			me.setLanguage(mv.getLanguage());
-			metadata.add(me);
+		try {
+			InputStream inputStream = new BufferedInputStream(file.getInputStream());
+			if (bundles.size() < 1) {
+				// set bundle's name to ORIGINAL
+				source = itemService.createSingleBitstream(context, inputStream, item, "ORIGINAL");
+			} else {
+				// we have a bundle already, just add bitstream
+				source = bitstreamService.create(context, bundles.get(0), inputStream);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			result = new UploadBitstreamRest();
+			result.setMessage(e.getMessage());
+			result.setStatus(false);
+			return result;
 		}
-		result.setMetadata(metadata);
-		CheckSumRest checksum = new CheckSumRest();
-		checksum.setCheckSumAlgorithm(source.getChecksumAlgorithm());
-		checksum.setValue(source.getChecksum());
-		result.setCheckSum(checksum);
-		result.setSizeBytes(source.getSize());
-		result.setUrl(configurationService.getProperty("dspace.url")+"/api/"+BitstreamRest.CATEGORY +"/"+ English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
+
+		source.setName(context, file.getOriginalFilename());
+		// TODO how retrieve this information?
+		source.setSource(context, extraField);
+
+		// Identify the format
+		bf = bitstreamFormatService.guessFormat(context, source);
+		source.setFormat(context, bf);
+
+		// Update to DB
+		bitstreamService.update(context, source);
+		itemService.update(context, item);
+		context.commit();
+
+		result = SubmissionService.buildUploadBitstream(configurationService, source);
+		result.setStatus(true);
 		return result;
 	}
 

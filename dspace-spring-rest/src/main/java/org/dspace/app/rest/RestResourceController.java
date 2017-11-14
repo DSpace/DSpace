@@ -32,6 +32,7 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
+import org.dspace.app.rest.model.step.UploadStatusResponse;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.RestRepositoryUtils;
@@ -48,6 +49,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.hateoas.UriTemplate;
 import org.springframework.http.HttpHeaders;
@@ -196,37 +198,38 @@ public class RestResourceController implements InitializingBean {
 	}	
 
 	@RequestMapping(method = RequestMethod.POST, value = "/{id:\\d+}" , headers = "content-type=multipart/form-data")
-	public <ID extends Serializable> List<Serializable> upload(HttpServletRequest request,
+	public <ID extends Serializable> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
 			@PathVariable String apiCategory, @PathVariable String model, @PathVariable Integer id,
 			@RequestParam(required=false, value="extraField") String extraField,
-		    @RequestParam("file") MultipartFile[] uploadfiles) throws HttpRequestMethodNotSupportedException {
-		//TODO manage extra field
-		return uploadInternal(request, apiCategory, model, id, extraField, uploadfiles);
+		    @RequestParam("file") MultipartFile uploadfile) throws HttpRequestMethodNotSupportedException {
+		return uploadInternal(request, apiCategory, model, id, extraField, uploadfile);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}", headers = "content-type=multipart/form-data")	
-	public <ID extends Serializable> List<Serializable> upload(HttpServletRequest request,
+	public <ID extends Serializable> ResponseEntity<ResourceSupport> upload(HttpServletRequest request,
 			@PathVariable String apiCategory, @PathVariable String model, @PathVariable UUID id,
 			@RequestParam(required=false, value="extraField") String extraField,
-		    @RequestParam("file") MultipartFile[] uploadfiles) throws HttpRequestMethodNotSupportedException {
-		return uploadInternal(request, apiCategory, model, id, extraField, uploadfiles);
+		    @RequestParam("file") MultipartFile uploadfile) throws HttpRequestMethodNotSupportedException {
+		return uploadInternal(request, apiCategory, model, id, extraField, uploadfile);
 	}
     
-	private <ID extends Serializable> List<Serializable> uploadInternal(HttpServletRequest request, String apiCategory, String model, ID id,
-			String extraField, MultipartFile... uploadfiles) {
+	private <ID extends Serializable, U extends UploadStatusResponse> ResponseEntity<ResourceSupport> uploadInternal(HttpServletRequest request, String apiCategory, String model, ID id,
+			String extraField, MultipartFile uploadfile) {
 		
 		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-		
-		// Get file name
-//      String uploadedFileName = Arrays.stream(uploadfiles).map(x -> x.getOriginalFilename())
-//                .filter(x -> !StringUtils.isEmpty(x)).collect(Collectors.joining(" , "));
-
+		U result = null;
 		try {
-			return repository.upload(request, apiCategory, model, id, extraField, Arrays.asList(uploadfiles));
+			result = repository.upload(request, apiCategory, model, id, extraField, uploadfile);
+			if(result.isStatus()) {
+				return ControllerUtils.toResponseEntity(HttpStatus.CREATED, null, new Resource(result));
+			}
+			else {
+				return ControllerUtils.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, null, new Resource(result));
+			}				
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
-		return null;
+		return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
 	
