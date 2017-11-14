@@ -7,6 +7,16 @@
  */
 package org.dspace.core;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.EmptyStackException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.Stack;
+import java.util.UUID;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.DSpaceObject;
@@ -21,10 +31,6 @@ import org.dspace.storage.rdbms.DatabaseConfigVO;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.dspace.utils.DSpace;
 import org.springframework.util.CollectionUtils;
-
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Class representing the context of a particular DSpace operation. This stores

@@ -75,6 +75,10 @@ public class DiscoverySortConfiguration {
             return configuration;
         }
 
+        if(defaultSort != null && StringUtils.equals(defaultSort.getMetadataField(), sortField)) {
+            return defaultSort;
+        }
+
         for (DiscoverySortFieldConfiguration sortFieldConfiguration : CollectionUtils.emptyIfNull(sortFields)) {
             if(StringUtils.equals(sortFieldConfiguration.getMetadataField(), sortField)) {
                 return sortFieldConfiguration;

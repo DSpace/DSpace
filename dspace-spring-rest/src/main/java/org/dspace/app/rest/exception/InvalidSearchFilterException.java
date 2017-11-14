@@ -14,4 +14,8 @@ public class InvalidSearchFilterException extends InvalidRequestException {
     public InvalidSearchFilterException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public InvalidSearchFilterException(final String message) {
+        super(message);
+    }
 }

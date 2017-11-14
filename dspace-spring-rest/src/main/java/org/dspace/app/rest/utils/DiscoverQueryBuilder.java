@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.InvalidDSpaceObjectTypeException;
 import org.dspace.app.rest.exception.InvalidRequestException;
+import org.dspace.app.rest.exception.InvalidSearchFacetException;
 import org.dspace.app.rest.exception.InvalidSearchFilterException;
 import org.dspace.app.rest.exception.InvalidSortingException;
 import org.dspace.app.rest.parameter.SearchFilter;
@@ -32,9 +33,12 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
+import org.dspace.services.ConfigurationService;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -44,12 +48,22 @@ import org.springframework.stereotype.Component;
  * This class builds the queries for the /search and /facet endpoints.
  */
 @Component
-public class DiscoverQueryBuilder {
+public class DiscoverQueryBuilder implements InitializingBean {
 
     private static final Logger log = Logger.getLogger(DiscoverQueryBuilder.class);
 
     @Autowired
     private SearchService searchService;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    private int pageSizeLimit;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        pageSizeLimit = configurationService.getIntProperty("rest.search.max.results", 100);
+    }
 
     public DiscoverQuery buildQuery(Context context, DSpaceObject scope,
                                     DiscoveryConfiguration discoveryConfiguration,
@@ -95,18 +109,18 @@ public class DiscoverQueryBuilder {
         }
     }
 
-    private DiscoverQuery addFacetingForFacets(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoveryConfiguration discoveryConfiguration, String facetName, Pageable page) {
-        List<DiscoverySearchFilterFacet> facets = discoveryConfiguration.getSidebarFacets();
-        if (facets != null) {
+    private DiscoverQuery addFacetingForFacets(Context context, DSpaceObject scope, DiscoverQuery queryArgs, DiscoveryConfiguration discoveryConfiguration,
+                                               String facetName, Pageable page) throws InvalidSearchFacetException {
+
+        DiscoverySearchFilterFacet facet = discoveryConfiguration.getSidebarFacet(facetName);
+        if (facet != null) {
             queryArgs.setFacetMinCount(1);
+            int pageSize = Math.min(pageSizeLimit, page.getPageSize());
 
-            //TODO This can be optimized.
-            for (DiscoverySearchFilterFacet facet : facets) {
-                if(StringUtils.equals(facet.getIndexFieldName(), facetName)){
+            fillFacetIntoQueryArgs(context, scope, queryArgs, facet, pageSize);
 
-                    fillFacetIntoQueryArgs(context, scope, queryArgs, facet, page.getPageSize());
-                }
-            }
+        } else {
+            throw new InvalidSearchFacetException(facetName + " is not a valid search facet");
         }
 
         return queryArgs;
@@ -137,7 +151,7 @@ public class DiscoverQueryBuilder {
         DiscoverQuery queryArgs = buildBaseQueryForConfiguration(discoveryConfiguration);
 
         //Add search filters
-        queryArgs.addFilterQueries(convertFilters(context, searchFilters));
+        queryArgs.addFilterQueries(convertFilters(context, discoveryConfiguration, searchFilters));
 
         //Set search query
         if (StringUtils.isNotBlank(query)) {
@@ -210,27 +224,20 @@ public class DiscoverQueryBuilder {
     private String getDefaultSortField(DiscoverySortConfiguration searchSortConfiguration) {
         String sortBy;// Attempt to find the default one, if none found we use SCORE
         sortBy = "score";
-        if (searchSortConfiguration != null) {
-            for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration
-                    .getSortFields()) {
-                if (sortFieldConfiguration.equals(searchSortConfiguration
-                        .getDefaultSort())) {
-                    sortBy = SearchUtils
-                            .getSearchService()
-                            .toSortFieldIndex(
-                                    sortFieldConfiguration
-                                            .getMetadataField(),
-                                    sortFieldConfiguration.getType());
-                }
-            }
+        if (searchSortConfiguration != null && searchSortConfiguration.getDefaultSort() != null) {
+            DiscoverySortFieldConfiguration defaultSort = searchSortConfiguration.getDefaultSort();
+            sortBy = defaultSort.getMetadataField();
         }
         return sortBy;
     }
 
     private void configurePagination(Pageable page, DiscoverQuery queryArgs) {
         if (page != null) {
-            queryArgs.setMaxResults(page.getPageSize());
+            queryArgs.setMaxResults(Math.min(pageSizeLimit, page.getPageSize()));
             queryArgs.setStart(page.getOffset());
+        } else {
+            queryArgs.setMaxResults(pageSizeLimit);
+            queryArgs.setStart(0);
         }
     }
 
@@ -242,18 +249,22 @@ public class DiscoverQueryBuilder {
         return index;
     }
 
-    private String[] convertFilters(Context context, List<SearchFilter> searchFilters) throws InvalidSearchFilterException {
-        ArrayList<String> filterQueries = new ArrayList<>(searchFilters.size());
+    private String[] convertFilters(Context context, DiscoveryConfiguration discoveryConfiguration, List<SearchFilter> searchFilters) throws InvalidSearchFilterException {
+        ArrayList<String> filterQueries = new ArrayList<>(CollectionUtils.size(searchFilters));
 
         try {
             for (SearchFilter searchFilter : CollectionUtils.emptyIfNull(searchFilters)) {
+                DiscoverySearchFilter filter = discoveryConfiguration.getSearchFilter(searchFilter.getName());
+                if(filter == null) {
+                    throw new InvalidSearchFilterException(searchFilter.getName() + " is not a valid search filter");
+                }
+
                 DiscoverFilterQuery filterQuery = searchService.toFilterQuery(context,
-                        searchFilter.getName(), searchFilter.getOperator(), searchFilter.getValue());
+                        filter.getIndexFieldName(), searchFilter.getOperator(), searchFilter.getValue());
 
                 if (filterQuery != null) {
                     filterQueries.add(filterQuery.getFilterQuery());
                 }
-
             }
         } catch (SQLException e) {
             throw new InvalidSearchFilterException("There was a problem parsing the search filters.", e);

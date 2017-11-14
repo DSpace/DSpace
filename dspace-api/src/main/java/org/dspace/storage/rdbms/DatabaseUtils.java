@@ -187,7 +187,7 @@ public class DatabaseUtils
                             System.out.println("Migrating database to latest version AND running previously \"Ignored\" migrations... (Check logs for details)");
                             // Update the database to latest version, but set "outOfOrder=true"
                             // This will ensure any old migrations in the "ignored" state are now run
-                            updateDatabase(dataSource, connection, null, true);
+                            updateDatabase(dataSource, null, true);
                         }
                         else
                         {
@@ -210,7 +210,7 @@ public class DatabaseUtils
                             {
                                 System.out.println("Migrating database ONLY to version " + migrationVersion + " ... (Check logs for details)");
                                 // Update the database, to the version specified.
-                                updateDatabase(dataSource, connection, migrationVersion, false);
+                                updateDatabase(dataSource, migrationVersion, false);
                             }
                             else
                             {
@@ -221,7 +221,7 @@ public class DatabaseUtils
                     else
                     {
                         System.out.println("Migrating database to latest version... (Check dspace logs for details)");
-                        updateDatabase(dataSource, connection);
+                        updateDatabase(dataSource);
                     }
                     System.out.println("Done.");
                     System.exit(0);
@@ -513,15 +513,33 @@ public class DatabaseUtils
                 log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
                 flywaydb.setLocations(scriptLocations.toArray(new String[scriptLocations.size()]));
 
-                // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
-                // In this situation, we have a Registry Updater that runs PRE-migration
-                // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed once those are obsolete.
-                List<FlywayCallback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(FlywayCallback.class);
-                flywaydb.setCallbacks(flywayCallbacks.toArray(new FlywayCallback[flywayCallbacks.size()]));
-            }
-            catch(SQLException e)
-            {
-                log.error("Unable to setup Flyway against DSpace database", e);
+                    // Does the necessary Flyway table ("schema_version") exist in this database?
+                    // If not, then this is the first time Flyway has run, and we need to initialize
+                    // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
+                    // See: http://flywaydb.org/documentation/faq.html#case-sensitive
+                    if (!tableExists(connection, flywaydb.getTable(), true))
+                    {
+                        // Try to determine our DSpace database version, so we know what to tell Flyway to do
+                        String dbVersion = determineDBVersion(connection);
+
+                        // If this is a fresh install, dbVersion will be null
+                        if (dbVersion==null)
+                        {
+                            // Initialize the Flyway database table with defaults (version=1)
+                            flywaydb.baseline();
+                        }
+                        else
+                        {
+                            // Otherwise, pass our determined DB version to Flyway to initialize database table
+                            flywaydb.setBaselineVersionAsString(dbVersion);
+                            flywaydb.setBaselineDescription("Initializing from DSpace " + dbVersion + " database schema");
+                            flywaydb.baseline();
+                        }
+                    }
+
+                } catch (SQLException e) {
+                    log.error("Unable to setup Flyway against DSpace database", e);
+                }
             }
         }
 
@@ -549,7 +567,7 @@ public class DatabaseUtils
         try(Connection connection = dataSource.getConnection())
         {
             // Upgrade database to the latest version of our schema
-            updateDatabase(dataSource, connection);
+            updateDatabase(dataSource);
         }
     }
 
@@ -564,16 +582,14 @@ public class DatabaseUtils
      *
      * @param datasource
      *      DataSource object (retrieved from DatabaseManager())
-     * @param connection
-     *      Database connection
      * @throws SQLException if database error
      *      If database cannot be upgraded.
      */
-    protected static synchronized void updateDatabase(DataSource datasource, Connection connection)
+    protected static void updateDatabase(DataSource datasource)
             throws SQLException
     {
         // By default, upgrade to the *latest* version and never run migrations out-of-order
-        updateDatabase(datasource, connection, null, false);
+        updateDatabase(datasource, null, false);
     }
 
     /**
@@ -587,8 +603,6 @@ public class DatabaseUtils
      *
      * @param datasource
      *      DataSource object (retrieved from DatabaseManager())
-     * @param connection
-     *      Database connection
      * @param targetVersion
      *      If specified, only migrate the database to a particular *version* of DSpace. This is mostly just useful for testing.
      *      If null, the database is migrated to the latest version.
@@ -598,7 +612,7 @@ public class DatabaseUtils
      * @throws SQLException if database error
      *      If database cannot be upgraded.
      */
-    protected static synchronized void updateDatabase(DataSource datasource, Connection connection, String targetVersion, boolean outOfOrder)
+    protected static void updateDatabase(DataSource datasource, String targetVersion, boolean outOfOrder)
             throws SQLException
     {
         try
@@ -606,42 +620,6 @@ public class DatabaseUtils
             // Setup Flyway API against our database
             Flyway flyway = setupFlyway(datasource);
 
-            // Set whethe Flyway will run migrations "out of order". By default, this is false,
-            // and Flyway ONLY runs migrations that have a higher version number.
-            flyway.setOutOfOrder(outOfOrder);
-
-            // If a target version was specified, tell Flyway to ONLY migrate to that version
-            // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
-            if(!StringUtils.isBlank(targetVersion))
-            {
-                flyway.setTargetAsString(targetVersion);
-            }
-
-            // Does the necessary Flyway table ("schema_version") exist in this database?
-            // If not, then this is the first time Flyway has run, and we need to initialize
-            // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
-            // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-            if(!tableExists(connection, flyway.getTable(), true))
-            {
-                // Try to determine our DSpace database version, so we know what to tell Flyway to do
-                String dbVersion = determineDBVersion(connection);
-
-                // If this is a fresh install, dbVersion will be null
-                if (dbVersion==null)
-                {
-                    // Initialize the Flyway database table with defaults (version=1)
-                    flyway.baseline();
-                }
-                else
-                {
-                    // Otherwise, pass our determined DB version to Flyway to initialize database table
-                    flyway.setBaselineVersionAsString(dbVersion);
-                    flyway.setBaselineDescription("Initializing from DSpace " + dbVersion + " database schema");
-                    flyway.baseline();
-                }
-            }
-
-            // Determine pending Database migrations
             MigrationInfo[] pending = flyway.info().pending();
 
             // As long as there are pending migrations, log them and run migrate()
