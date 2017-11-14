@@ -30,6 +30,7 @@ import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -108,30 +109,30 @@ public class RestResourceController implements InitializingBean {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:\\d+}")
 	@SuppressWarnings("unchecked")
-	public DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+	public DSpaceResource<DirectlyAddressableRestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
 			@PathVariable Integer id, @RequestParam(required = false) String projection) {
 		return findOneInternal(apiCategory, model, id, projection);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{id:^(?!^\\d+$)[A-z0-9]+$+}")
 	@SuppressWarnings("unchecked")
-	public DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+	public DSpaceResource<DirectlyAddressableRestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
 			@PathVariable String id, @RequestParam(required = false) String projection) {
 		return findOneInternal(apiCategory, model, id, projection);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}")
 	@SuppressWarnings("unchecked")
-	public DSpaceResource<RestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
+	public DSpaceResource<DirectlyAddressableRestModel> findOne(@PathVariable String apiCategory, @PathVariable String model,
 			@PathVariable UUID uuid, @RequestParam(required = false) String projection) {
 		return findOneInternal(apiCategory, model, uuid, projection);
 	}
 
-	private <ID extends Serializable> DSpaceResource<RestModel> findOneInternal(String apiCategory, String model, ID id,
+	private <ID extends Serializable> DSpaceResource<DirectlyAddressableRestModel> findOneInternal(String apiCategory, String model, ID id,
 			String projection) {
 		checkModelPluralForm(apiCategory, model);
-		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-		RestModel modelObject = null;
+		DSpaceRestRepository<DirectlyAddressableRestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		DirectlyAddressableRestModel modelObject = null;
 		try {
 			modelObject = repository.findOne(id);
 		} catch (ClassCastException e) {
@@ -181,8 +182,8 @@ public class RestResourceController implements InitializingBean {
 	public <ID extends Serializable> ResponseEntity<ResourceSupport> postInternal(HttpServletRequest request, String apiCategory,
 			String model) throws HttpRequestMethodNotSupportedException {
 		checkModelPluralForm(apiCategory, model);
-		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-		RestModel modelObject = null;
+		DSpaceRestRepository<DirectlyAddressableRestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		DirectlyAddressableRestModel modelObject = null;
 		try {
 			modelObject = repository.createAndReturn();
 		} catch (ClassCastException e) {
@@ -215,7 +216,7 @@ public class RestResourceController implements InitializingBean {
 	private <ID extends Serializable> List<Serializable> uploadInternal(HttpServletRequest request, String apiCategory, String model, ID id,
 			String extraField, MultipartFile... uploadfiles) {
 		
-		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		DSpaceRestRepository<DirectlyAddressableRestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 		
 		// Get file name
 //      String uploadedFileName = Arrays.stream(uploadfiles).map(x -> x.getOriginalFilename())
@@ -256,8 +257,8 @@ public class RestResourceController implements InitializingBean {
 	private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request, String apiCategory, String model,
 			String id, String rel, String relid, Pageable page, PagedResourcesAssembler assembler, String projection) {
 		checkModelPluralForm(apiCategory, model);
-		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-		Class<RestModel> domainClass = repository.getDomainClass();
+		DSpaceRestRepository<DirectlyAddressableRestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		Class<DirectlyAddressableRestModel> domainClass = repository.getDomainClass();
 		
 		LinkRest linkRest = utils.getLinkRest(rel, domainClass);
 		if (linkRest != null) {
@@ -270,7 +271,7 @@ public class RestResourceController implements InitializingBean {
 						.slash(rel).withSelfRel();
 				List result = new ArrayList();
 				result.add(object);
-				PageImpl<RestModel> pageResult = new PageImpl(result, page, 1);
+				PageImpl<DirectlyAddressableRestModel> pageResult = new PageImpl(result, page, 1);
 				return assembler.toResource(pageResult.map(linkRepository::wrapResource),link);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				throw new RuntimeException(e.getMessage(), e);
@@ -282,8 +283,8 @@ public class RestResourceController implements InitializingBean {
 	private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request, String apiCategory,
 			String model, ID uuid, String rel, Pageable page, PagedResourcesAssembler assembler, String projection) {
 		checkModelPluralForm(apiCategory, model);
-		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
-		Class<RestModel> domainClass = repository.getDomainClass();
+		DSpaceRestRepository<DirectlyAddressableRestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		Class<DirectlyAddressableRestModel> domainClass = repository.getDomainClass();
 		
 		LinkRest linkRest = utils.getLinkRest(rel, domainClass);
 
@@ -298,7 +299,7 @@ public class RestResourceController implements InitializingBean {
 			else {
 				try {
 					if ( Page.class.isAssignableFrom( linkMethod.getReturnType()) ){
-						Page<? extends Serializable> pageResult = (Page<? extends RestModel>) linkMethod
+						Page<? extends RestModel> pageResult = (Page<? extends DirectlyAddressableRestModel>) linkMethod
 								.invoke(linkRepository, request, uuid, page, projection);
 						Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid)
 								.slash(rel).withSelfRel();
@@ -307,7 +308,7 @@ public class RestResourceController implements InitializingBean {
 						return result;
 					}
 					else {
-						Serializable object = (Serializable) linkMethod.invoke(linkRepository, request, uuid, page,
+						RestModel object = (RestModel) linkMethod.invoke(linkRepository, request, uuid, page,
 								projection);
 						Link link = linkTo(this.getClass(), apiCategory, model).slash(uuid).slash(rel)
 								.withSelfRel();
@@ -320,7 +321,7 @@ public class RestResourceController implements InitializingBean {
 				}
 			}
 		}
-		RestModel modelObject = repository.findOne(uuid);
+		DirectlyAddressableRestModel modelObject = repository.findOne(uuid);
 		DSpaceResource result = repository.wrapResource(modelObject, rel);
 		if (result.getLink(rel) == null) {
 			// TODO create a custom exception
@@ -333,14 +334,14 @@ public class RestResourceController implements InitializingBean {
 			// if we really want to implement pagination we should implement a
 			// link repository so to fall in the previous block code
 			EmbeddedPage ep = (EmbeddedPage) result.getEmbedded().get(rel);
-			List<? extends RestModel> fullList = ep.getFullList();
+			List<? extends DirectlyAddressableRestModel> fullList = ep.getFullList();
 			if (fullList == null || fullList.size() == 0)
 				return null;
 			int start = page.getOffset();
 			int end = (start + page.getPageSize()) > fullList.size() ? fullList.size() : (start + page.getPageSize());
-			DSpaceRestRepository<RestModel, ?> resourceRepository = utils
+			DSpaceRestRepository<DirectlyAddressableRestModel, ?> resourceRepository = utils
 					.getResourceRepository(fullList.get(0).getCategory(), fullList.get(0).getType());
-			PageImpl<RestModel> pageResult = new PageImpl(fullList.subList(start, end), page, fullList.size());
+			PageImpl<DirectlyAddressableRestModel> pageResult = new PageImpl(fullList.subList(start, end), page, fullList.size());
 			return assembler.toResource(pageResult.map(resourceRepository::wrapResource));
 		} else {
 			ResourceSupport resu = (ResourceSupport) result.getEmbedded().get(rel);
@@ -350,7 +351,7 @@ public class RestResourceController implements InitializingBean {
 
 	@RequestMapping(method = RequestMethod.GET)
 	@SuppressWarnings("unchecked")
-	public <T extends RestModel> PagedResources<DSpaceResource<T>> findAll(@PathVariable String apiCategory,
+	public <T extends DirectlyAddressableRestModel> PagedResources<DSpaceResource<T>> findAll(@PathVariable String apiCategory,
 			@PathVariable String model, Pageable page, PagedResourcesAssembler assembler,
 			@RequestParam(required = false) String projection) {
 		DSpaceRestRepository<T, ?> repository = utils.getResourceRepository(apiCategory, model);
@@ -402,7 +403,7 @@ public class RestResourceController implements InitializingBean {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/search/{searchMethodName}")
 	@SuppressWarnings("unchecked")
-	public <T extends RestModel> ResourceSupport executeSearchMethods(@PathVariable String apiCategory,
+	public <T extends DirectlyAddressableRestModel> ResourceSupport executeSearchMethods(@PathVariable String apiCategory,
 			@PathVariable String model, @PathVariable String searchMethodName, Pageable pageable, Sort sort,
 			PagedResourcesAssembler assembler, @RequestParam MultiValueMap<String, Object> parameters)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {

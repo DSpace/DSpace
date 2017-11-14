@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class GroupRest extends DSpaceObjectRest {
 	public static final String NAME = "group";
 	
-	public static final String CATEGORY = RestModel.EPERSON;
+	public static final String CATEGORY = DirectlyAddressableRestModel.EPERSON;
 
 	private String name;
 

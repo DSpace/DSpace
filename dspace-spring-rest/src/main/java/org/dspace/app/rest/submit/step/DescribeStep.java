@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
-import org.dspace.app.rest.model.RestModel;
+import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.step.DataDescribe;
 import org.dspace.app.rest.model.step.SectionData;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
