@@ -224,7 +224,7 @@ public class ApproveRejectReviewItem {
             //Check for a valid task
             // There must be a claimedTask & it must be in the review stage, else it isn't a review workflowitem
             Item item = wfi.getItem();
-            DryadDataPackage dataPackage = DryadDataPackage.findByWorkflowItemId(c, wfi.getID());
+            DryadDataPackage dataPackage = new DryadDataPackage(item);
             StringBuilder provenance = new StringBuilder();
             c.turnOffAuthorisationSystem();
             // update duplicate submission metadata for this item.
