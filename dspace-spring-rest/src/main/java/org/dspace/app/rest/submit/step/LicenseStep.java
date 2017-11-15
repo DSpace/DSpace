@@ -35,14 +35,14 @@ import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
  */
 public class LicenseStep extends org.dspace.submit.step.LicenseStep implements AbstractRestProcessingStep {
 
-	private static final String DC_RIGHTS_DATE = "dc.rights.date";
+	private static final String DCTERMS_RIGHTSDATE = "dcterms.accessRights";
 
 	@Override
 	public DataLicense getData(WorkspaceItem obj, SubmissionStepConfig config) throws Exception {
 		DataLicense result = new DataLicense();
 		Bitstream bitstream = bitstreamService.getBitstreamByName(obj.getItem(), Constants.LICENSE_BUNDLE_NAME, Constants.LICENSE_BITSTREAM_NAME);
 		if(bitstream!=null) {
-			String acceptanceDate = bitstreamService.getMetadata(bitstream, DC_RIGHTS_DATE);
+			String acceptanceDate = bitstreamService.getMetadata(bitstream, DCTERMS_RIGHTSDATE);
 			result.setAcceptanceDate(acceptanceDate);
 			result.setUrl(configurationService.getProperty("dspace.url")+"/api/"+BitstreamRest.CATEGORY +"/"+ English.plural(BitstreamRest.NAME) + "/" + bitstream.getID() + "/content");
 		}
