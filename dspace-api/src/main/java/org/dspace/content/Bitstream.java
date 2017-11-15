@@ -447,7 +447,7 @@ public class Bitstream extends DSpaceObject implements DSpaceObjectLegacySupport
 	 * @throws SQLException
 	 */
 	public void setAcceptanceDate(Context context, DCDate acceptanceDate) throws SQLException {
-		getBitstreamService().setMetadataSingleValue(context, this, MetadataSchema.DC_SCHEMA, "rights", "date", null, acceptanceDate.toString());
+		getBitstreamService().setMetadataSingleValue(context, this, "dcterms", "accessRights", null, null, acceptanceDate.toString());
 	}
 
 }
