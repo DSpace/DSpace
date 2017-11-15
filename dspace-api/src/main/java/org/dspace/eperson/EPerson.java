@@ -65,7 +65,7 @@ public class EPerson extends DSpaceObject implements DSpaceObjectLegacySupport
     @Column(name="salt", length = 32)
     private String salt;
 
-    @Column(name="session_salt", length = 16)
+    @Column(name="session_salt", length = 32)
     private String sessionSalt;
 
     @Column(name="digest_algorithm", length = 16)

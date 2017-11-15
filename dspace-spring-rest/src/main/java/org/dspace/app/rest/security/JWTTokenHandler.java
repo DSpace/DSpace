@@ -7,23 +7,15 @@
  */
 package org.dspace.app.rest.security;
 
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSSigner;
-import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.DirectDecrypter;
+import com.nimbusds.jose.crypto.DirectEncrypter;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.util.DateUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -31,14 +23,20 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class JWTTokenHandler implements InitializingBean {
@@ -51,6 +49,8 @@ public class JWTTokenHandler implements InitializingBean {
 
     private String jwtKey;
     private long expirationTime;
+    private boolean includeIP;
+    private boolean compressionEnabled;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -61,12 +61,19 @@ public class JWTTokenHandler implements InitializingBean {
     @Autowired
     private EPersonService ePersonService;
 
+    private byte[] encryptionKey;
+
 
     @Override
     public void afterPropertiesSet() throws Exception {
         //TODO move properties to authentication module
         this.jwtKey = configurationService.getProperty("jwt.token.secret", "defaultjwtkeysecret");
         this.expirationTime = configurationService.getLongProperty("jwt.token.expiration", 30) * 60 * 1000;
+        this.includeIP = configurationService.getBooleanProperty("jwt.token.include.ip", true);
+        this.compressionEnabled = configurationService.getBooleanProperty("jwt.compression.enabled", false);
+        //TODO Don't reuse this all the time
+        BytesKeyGenerator keyGen = KeyGenerators.secureRandom(16);
+        encryptionKey = keyGen.generateKey();
     }
 
     /**
@@ -84,7 +91,12 @@ public class JWTTokenHandler implements InitializingBean {
             return null;
         }
 
-        SignedJWT signedJWT = SignedJWT.parse(token);
+        JWEObject jweObject = JWEObject.parse(token);
+
+        jweObject.decrypt(new DirectDecrypter(encryptionKey));
+
+
+        SignedJWT signedJWT = jweObject.getPayload().toSignedJWT();
         JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
 
         EPerson ePerson = getEPerson(context, jwtClaimsSet);
@@ -144,8 +156,28 @@ public class JWTTokenHandler implements InitializingBean {
 
         signedJWT.sign(signer);
 
-        return signedJWT.serialize();
+        JWEObject jweObject = new JWEObject(
+        compression(new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM)
+                .contentType("JWT"))
+
+                .build(), new Payload(signedJWT)
+        );
+
+        jweObject.encrypt(new DirectEncrypter(encryptionKey));
+
+
+        return jweObject.serialize();
     }
+
+    //This method makes compression configurable
+    private JWEHeader.Builder compression(JWEHeader.Builder builder) {
+        if (compressionEnabled) {
+            return builder.compressionAlgorithm(CompressionAlgorithm.DEF);
+        }
+        return builder;
+    }
+
+
 
     public void invalidateToken(String token, HttpServletRequest request, Context context) {
         if (StringUtils.isNotBlank(token)) {
@@ -161,12 +193,14 @@ public class JWTTokenHandler implements InitializingBean {
     }
 
     private String buildSigningKey(HttpServletRequest request, EPerson ePerson) {
-        String ipAddress = getIpAddress(request);
+        String ipAddress = "";
+        if (includeIP) {
+            ipAddress = getIpAddress(request);
+        }
         return jwtKey + ePerson.getSessionSalt() + ipAddress;
     }
 
     private String getIpAddress(HttpServletRequest request) {
-        //TODO FREDERIC make using the ip address of the request optional
         String ipAddress = request.getHeader("X-FORWARDED-FOR");
         if (ipAddress == null) {
             ipAddress = request.getRemoteAddr();
@@ -184,30 +218,24 @@ public class JWTTokenHandler implements InitializingBean {
             //If the previous login was within the configured token expiration time, we reuse the session salt.
             //This allows a user to login on multiple devices/browsers at the same time.
             if (previousLoginDate == null || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > expirationTime)) {
-
-                StringKeyGenerator stringKeyGenerator = KeyGenerators.string();
-                String salt = stringKeyGenerator.generateKey();
-                ePerson.setSessionSalt(salt);
-
+                ePerson.setSessionSalt(generateRandomSalt());
                 ePersonService.update(context, ePerson);
             }
 
         } catch (SQLException e) {
-            //TODO FREDERIC: fail fast
-            e.printStackTrace();
+            return null;
         } catch (AuthorizeException e) {
-            //TODO FREDERIC: fail fast
-            e.printStackTrace();
+            return null;
         }
 
         return ePerson;
     }
 
-    public List<JWTClaimProvider> getJwtClaimProviders() {
-        return jwtClaimProviders;
+    //Generate a random 32 byte salt
+    private String generateRandomSalt() {
+        BytesKeyGenerator bytesKeyGenerator = KeyGenerators.secureRandom(32);
+        byte[] secretKey = bytesKeyGenerator.generateKey();
+        return Base64.encodeBase64String(secretKey);
     }
 
-    public void setJwtClaimProviders(List<JWTClaimProvider> jwtClaimProviders) {
-        this.jwtClaimProviders = jwtClaimProviders;
-    }
 }

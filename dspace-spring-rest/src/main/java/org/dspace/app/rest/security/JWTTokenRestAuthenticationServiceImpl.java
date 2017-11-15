@@ -66,7 +66,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
                     authentication.getPreviousLoginDate(), groups);
 
             addTokenToResponse(response, token);
-
             context.commit();
 
         } catch (JOSEException e) {
