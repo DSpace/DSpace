@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.util.Util;
 
 /**
@@ -16,7 +17,7 @@ import org.dspace.app.util.Util;
  * Find out your authentication status.
  *
  */
-public class StatusRest extends DSpaceObjectRest
+public class StatusRest extends BaseObjectRest<Integer>
 {
 
     private String sourceVersion;
@@ -36,6 +37,10 @@ public class StatusRest extends DSpaceObjectRest
     @Override
     public String getType() {
         return NAME;
+    }
+
+    public Class getController() {
+        return RestResourceController.class;
     }
 
 
@@ -83,7 +88,7 @@ public class StatusRest extends DSpaceObjectRest
         this.apiVersion = apiVersion;
     }
 
-    @LinkRest(linkClass = EPersonRest.class, name = "eperson")
+    @LinkRest(linkClass = EPersonRest.class, name = "eperson", optional = true)
     @JsonIgnore
     public EPersonRest getEPersonRest() {
         return ePersonRest;
