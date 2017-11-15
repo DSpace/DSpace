@@ -14,10 +14,13 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
+import org.dspace.app.rest.converter.AccessConditionsConverter;
+import org.dspace.app.rest.model.AccessConditionRest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
-import org.dspace.app.rest.model.MetadataEntryRest;
+import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.MetadataValue;
@@ -25,6 +28,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.WorkspaceItemService;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,24 +88,43 @@ public class SubmissionService {
 	
 
 	public static UploadBitstreamRest buildUploadBitstream(ConfigurationService configurationService, Bitstream source) {
-		UploadBitstreamRest b = new UploadBitstreamRest();
-		List<MetadataEntryRest> metadata = new ArrayList<MetadataEntryRest>();
-		for (MetadataValue mv : source.getMetadata()) {
-			MetadataEntryRest me = new MetadataEntryRest();
-			me.setKey(mv.getMetadataField().toString('.'));
-			me.setValue(mv.getValue());
-			me.setLanguage(mv.getLanguage());
-			metadata.add(me);
+		UploadBitstreamRest data = new UploadBitstreamRest();
+		
+		for (MetadataValue md : source.getMetadata()) {
+			
+			MetadataValueRest dto = new MetadataValueRest();
+			dto.setAuthority(md.getAuthority());
+			dto.setConfidence(md.getConfidence());
+			dto.setLanguage(md.getLanguage());
+			dto.setPlace(md.getPlace());
+			dto.setValue(md.getValue());
+			
+			String[] metadataToCheck = Utils.tokenize(md.getMetadataField().toString());					
+			if(data.getMetadata().containsKey(Utils.standardize(metadataToCheck[0], metadataToCheck[1], metadataToCheck[2], "."))) {
+				data.getMetadata().get(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(), md.getMetadataField().getElement(), md.getMetadataField().getQualifier(), ".")).add(dto);
+			}
+			else {
+				List<MetadataValueRest> listDto = new ArrayList<>();
+				listDto.add(dto);
+				data.getMetadata().put(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(), md.getMetadataField().getElement(), md.getMetadataField().getQualifier(), "."), listDto);
+			}
+			
 		}
-		b.setMetadata(metadata);
-		b.setUuid(source.getID());
+		
+		AccessConditionsConverter aCConverter = new AccessConditionsConverter();
+		for(ResourcePolicy rp : source.getResourcePolicies()) {
+			AccessConditionRest accessConditionRest = aCConverter.convert(rp);
+			data.getAccessConditions().add(accessConditionRest);
+		}
+				
+		data.setUuid(source.getID());
 		CheckSumRest checksum = new CheckSumRest();
 		checksum.setCheckSumAlgorithm(source.getChecksumAlgorithm());
 		checksum.setValue(source.getChecksum());
-		b.setCheckSum(checksum);
-		b.setSizeBytes(source.getSize());
-		b.setUrl(configurationService.getProperty("dspace.url")+"/api/"+BitstreamRest.CATEGORY +"/"+ English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
-		return b;
+		data.setCheckSum(checksum);
+		data.setSizeBytes(source.getSize());
+		data.setUrl(configurationService.getProperty("dspace.url")+"/api/"+BitstreamRest.CATEGORY +"/"+ English.plural(BitstreamRest.NAME) + "/" + source.getID() + "/content");
+		return data;
 	}
 	
 }

@@ -243,23 +243,19 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 		WorkspaceItem source = wis.find(context, id);
 		for(PatchOperation op : operations) {
 			//the value in the position 0 is a null value
-			String[] path = op.getPath().split("/");
-			if("sections".equals(path[1])) {
-				String section = path[2];
-				String target = path[3];
-				String index = "";
-				if(path.length>4) {
-					index = path[4];
-				}
+			String[] path = op.getPath().substring(1).split("/",3);
+			if("sections".equals(path[0])) {
+				String section = path[1];
+				String absolutePath = path[2];
 				String operation = op.getOp();							
 				
-				evaluatePatch(context, request, source, wsi, operation, section, target, index, op.getValue());
+				evaluatePatch(context, request, source, wsi, operation, section, absolutePath, op.getValue());
 			}
 		}
 		wis.update(context, source);
 	}
 
-	private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi, String operation, String section, String target, String index,
+	private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi, String operation, String section, String path,
 			Object value) throws Exception {
 		SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
 		for(int stepNum = 0; stepNum<submissionConfig.getNumberOfSteps(); stepNum++) {
@@ -282,7 +278,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 						// load the JSPStep interface for this step
 						AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
 								.newInstance();
-						stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, operation, target, index, value);
+						stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, operation, path, value);
 					} else {
 						throw new Exception("The submission step class specified by '"
 								+ stepConfig.getProcessingClassName()
