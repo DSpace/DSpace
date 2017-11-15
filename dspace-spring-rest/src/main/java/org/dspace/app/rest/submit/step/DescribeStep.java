@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.submit.step;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,18 +14,18 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.step.DataDescribe;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.factory.PatchOperationFactory;
+import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.model.Request;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Describe step for DSpace Spring Rest. Handle the exposition of metadata own by the in progress submission.
@@ -78,54 +77,11 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 
 	@Override
 	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
-			String target, String index, Object value) throws Exception {
-		MetadataValueRest[] list = null;
-		if(value!=null) {
-			LateObjectEvaluator object = (LateObjectEvaluator)value;
-			list = (MetadataValueRest[])object.evaluate(MetadataValueRest[].class);
-		}
-		switch (operation) {
-		case "add":
-			addValue(context, source, target, list);
-			break;
-		case "replace":
-			replaceValue(context, source, target, list);
-			break;
-		case "remove":
-			deleteValue(context, source, target, index);
-			break;
-		default:
-			throw new RuntimeException("Operation "+operation+" not yet implemented!");
-		}
-	}
-
-	private void deleteValue(Context context, WorkspaceItem source, String target, String index) throws SQLException {
-		String[] metadata = Utils.tokenize(target);
-		List<MetadataValue> mm = itemService.getMetadata(source.getItem(),  metadata[0], metadata[1], metadata[2], Item.ANY);
-		itemService.clearMetadata(context, source.getItem(), metadata[0], metadata[1], metadata[2], Item.ANY);
-		int idx = 0;
-		for(MetadataValue m : mm) {
-			Integer toDelete = Integer.parseInt(index);
-			if(idx != toDelete) {
-				itemService.addMetadata(context, source.getItem(), metadata[0], metadata[1], metadata[2], m.getLanguage(), m.getValue(), m.getAuthority(), m.getConfidence());	
-			}
-			idx++;
-		}
-	}
-
-	private void replaceValue(Context context, WorkspaceItem source, String target, MetadataValueRest[] list) throws SQLException {		
-		String[] metadata = Utils.tokenize(target);
-		itemService.clearMetadata(context, source.getItem(), metadata[0], metadata[1], metadata[2], Item.ANY);
-		for(MetadataValueRest ll : list) {
-			itemService.addMetadata(context, source.getItem(), metadata[0], metadata[1], metadata[2], ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence());
-		}		
-	}
-
-	private void addValue(Context context, WorkspaceItem source, String target, MetadataValueRest[] list) throws SQLException {
-		String[] metadata = Utils.tokenize(target);
-		for(MetadataValueRest ll : list) {
-			itemService.addMetadata(context, source.getItem(), metadata[0], metadata[1], metadata[2], ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence());
-		}
+			String path, Object value) throws Exception {
+		
+		PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory().instanceOf("metadatavalue", operation);
+		patchOperation.perform(context, currentRequest, source, path, value);
+		
 	}
 
 }

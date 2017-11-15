@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 

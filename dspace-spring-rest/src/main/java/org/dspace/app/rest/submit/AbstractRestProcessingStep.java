@@ -26,7 +26,7 @@ public interface AbstractRestProcessingStep {
 	public <T extends Serializable> T getData(WorkspaceItem obj, SubmissionStepConfig config) throws Exception;
 
 	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
-			String target, String index, Object value) throws Exception;
+			String path, Object value) throws Exception;
 
 
 }

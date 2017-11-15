@@ -106,10 +106,10 @@ public class CollectionServiceImpl extends DSpaceObjectServiceImpl<Collection> i
         Group anonymousGroup = groupService.findByName(context, Group.ANONYMOUS);
 
 
-        authorizeService.createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.READ, null);
+        authorizeService.createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.READ, null, null, null, null);
         // now create the default policies for submitted items
-        authorizeService.createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_ITEM_READ, null);
-        authorizeService.createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_BITSTREAM_READ, null);
+        authorizeService.createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_ITEM_READ, null, null, null, null);
+        authorizeService.createResourcePolicy(context, newCollection, anonymousGroup, null, Constants.DEFAULT_BITSTREAM_READ, null, null, null, null);
 
 
 

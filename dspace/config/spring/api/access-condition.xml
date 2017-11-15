@@ -18,26 +18,7 @@
             </list>
         </property>
     </bean>
-
-    <bean id="fieldBitstreamName" class="org.dspace.submit.model.SubmissionFormField">
-		<property name="selectableMetadata">
-			<list>
-				<bean class="org.dspace.submit.model.SelectableMetadata">
-					<property name="metadata" value="dc.title"></property>
-				</bean>
-			</list>		
-		</property>
-    </bean>
-    <bean id="fieldBitstreamDescription" class="org.dspace.submit.model.SubmissionFormField">
-		<property name="selectableMetadata">
-			<list>
-				<bean class="org.dspace.submit.model.SelectableMetadata">
-					<property name="metadata" value="dc.description"></property>
-				</bean>
-			</list>		
-		</property>
-    </bean>
-    
+  
     <bean id="openAccess" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
         <property name="policyType" value="openaccess"/>

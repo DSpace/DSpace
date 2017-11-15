@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.model;
 
-import java.io.Serializable;
-
 /**
  * The License text REST resource.
  * 

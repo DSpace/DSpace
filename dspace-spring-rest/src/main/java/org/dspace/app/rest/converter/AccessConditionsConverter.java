@@ -14,10 +14,9 @@ import org.dspace.services.ConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
-
 /**
- * Converter to translate ResourcePolicy into human readable value configuration.
+ * Converter to translate ResourcePolicy into human readable value
+ * configuration.
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
@@ -26,29 +25,22 @@ public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, A
 
 	@Autowired
 	ConfigurationService configurationService;
-	
+
 	@Override
 	public AccessConditionRest fromModel(ResourcePolicy obj) {
 		AccessConditionRest model = new AccessConditionRest();
-		model.setPolicyType("openaccess");
+		model.setPolicyType(obj.getRpName());
 		if (obj.getGroup() != null) {
-			model.setGroupUUID(obj.getGroup().getID());			
-			if (Group.ADMIN.equals(obj.getGroup().getName())) {
-				model.setPolicyType("administrator");
-			}
-			else {
-				if(obj.getStartDate()!=null) {
-					model.setPolicyType("embargo");
-					model.setEndDate(obj.getStartDate());
-				}
-				else {
-					if(obj.getEndDate()!=null) {
-						model.setPolicyType("lease");
-						model.setEndDate(obj.getEndDate());
-					}
+			model.setGroupUUID(obj.getGroup().getID());
+			if (obj.getStartDate() != null) {
+				model.setEndDate(obj.getStartDate());
+			} else {
+				if (obj.getEndDate() != null) {
+					model.setEndDate(obj.getEndDate());
 				}
 			}
 		}
+
 		return model;
 	}
 
