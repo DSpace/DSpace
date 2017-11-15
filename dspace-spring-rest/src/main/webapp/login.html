@@ -57,11 +57,10 @@
                     data : 'password='+$("#password").val()+'&user='+$("#username").val() ,
                     headers : {
                         "Content-Type" : 'application/x-www-form-urlencoded',
-                        "Accept" : 'application/json'
+                        "Accept:" : '*/*'
                     },
-                    dataType : 'json',
-                    success : function(data, textStatus, request) {
-                        document.cookie = "MyHalBrowserToken=" + request.getResponseHeader('Authorization');
+                    success : function(result, status, xhr) {
+                        document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
                         window.location.href = window.location.pathname.replace("login.html", "")
                     }
                 });
