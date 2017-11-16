@@ -32,6 +32,7 @@ import org.dspace.app.cris.util.ResearcherPageUtils;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -64,6 +65,10 @@ public class MyRPJSONController extends MultiActionController
         if (rp == null)
         {
             rp = new ResearcherPage();
+            String newRpStatus = ConfigurationManager.getProperty("cris","rp.profile.new.status");
+            if (newRpStatus.equals("true")) {
+                rp.setStatus(true);
+            }
             EPerson currentUser = getCurrentUser(request);
 			rp.setEpersonID(currentUser.getID());
             
