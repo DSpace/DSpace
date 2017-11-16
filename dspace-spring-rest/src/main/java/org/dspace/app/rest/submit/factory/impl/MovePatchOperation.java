@@ -13,19 +13,19 @@ import org.dspace.services.model.Request;
 
 /**
  * 
- * Class to manage HTTP PATCH method operation REMOVE
+ * Class to manage HTTP PATCH method operation MOVE
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  * @param <T>
  */
-public abstract class RemovePatchOperation<T extends Object> extends PatchOperation<T> {
+public abstract class MovePatchOperation<T extends Object> extends PatchOperation<T> {
 	
 	@Override
-	public void perform(Context context, Request currentRequest, WorkspaceItem source, String string, Object value) throws Exception{
-		remove(context, currentRequest, source, string, value);
+	public void perform(Context context, Request currentRequest, WorkspaceItem source, String string, Object value) throws Exception {
+		move(context, currentRequest, source, string, value);
 	}
 
-	abstract void remove(Context context,Request currentRequest,WorkspaceItem source,String string,Object value) throws Exception;
+	abstract void move(Context context,Request currentRequest,WorkspaceItem source,String string,Object value) throws Exception;
 	
 }

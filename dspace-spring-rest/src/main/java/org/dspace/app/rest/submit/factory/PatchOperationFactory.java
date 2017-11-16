@@ -1,11 +1,22 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.submit.factory;
 
 import org.dspace.app.rest.submit.PatchConfigurationService;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.utils.DSpace;
-import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Factory to get an instance of PatchOperation
+ * 
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
+ *
+ */
 public class PatchOperationFactory {
 	
 	private PatchConfigurationService patchConfigurationService;
