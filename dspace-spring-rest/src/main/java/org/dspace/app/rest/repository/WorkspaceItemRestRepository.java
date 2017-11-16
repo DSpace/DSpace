@@ -36,6 +36,7 @@ import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonServiceImpl;
@@ -199,13 +200,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 		WorkspaceItem wsi = wis.find(context, id);
 		Item item = wsi.getItem();
 		// do we already have a bundle?
-		List<Bundle> bundles = itemService.getBundles(item, "ORIGINAL");
+		List<Bundle> bundles = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 
 		try {
 			InputStream inputStream = new BufferedInputStream(file.getInputStream());
 			if (bundles.size() < 1) {
 				// set bundle's name to ORIGINAL
-				source = itemService.createSingleBitstream(context, inputStream, item, "ORIGINAL");
+				source = itemService.createSingleBitstream(context, inputStream, item, Constants.CONTENT_BUNDLE_NAME);
 			} else {
 				// we have a bundle already, just add bitstream
 				source = bitstreamService.create(context, bundles.get(0), inputStream);
