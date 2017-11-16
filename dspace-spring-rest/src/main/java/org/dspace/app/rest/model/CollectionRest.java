@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @LinksRest(links = {
 		@LinkRest(name = CollectionRest.LICENSE, linkClass = LicenseRest.class, method = "getLicenseCollection", optional = true),
-		@LinkRest(name = CollectionRest.DEFAULT_ACCESS_CONDITIONS, linkClass = AccessConditionRest.class, method = "getDefaultBitstreamPoliciesForCollection", optional = true)
+		@LinkRest(name = CollectionRest.DEFAULT_ACCESS_CONDITIONS, linkClass = ResourcePolicyRest.class, method = "getDefaultBitstreamPoliciesForCollection", optional = true)
 })
 public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";

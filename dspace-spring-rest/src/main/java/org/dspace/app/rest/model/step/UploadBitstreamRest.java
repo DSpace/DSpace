@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.dspace.app.rest.model.AccessConditionRest;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 
@@ -21,7 +21,7 @@ public class UploadBitstreamRest extends UploadStatusResponse {
 	
 	private UUID uuid;
 	private Map<String, List<MetadataValueRest>> metadata = new HashMap<>();
-	private List<AccessConditionRest> accessConditions;
+	private List<ResourcePolicyRest> accessConditions;
 	private Long sizeBytes;
 	private CheckSumRest checkSum;
 	private String url;
@@ -66,14 +66,14 @@ public class UploadBitstreamRest extends UploadStatusResponse {
 		this.metadata = metadata;
 	}
 
-	public List<AccessConditionRest> getAccessConditions() {
+	public List<ResourcePolicyRest> getAccessConditions() {
 		if(accessConditions==null) {
 			accessConditions = new ArrayList<>();
 		}
 		return accessConditions;
 	}
 
-	public void setAccessConditions(List<AccessConditionRest> accessConditions) {
+	public void setAccessConditions(List<ResourcePolicyRest> accessConditions) {
 		this.accessConditions = accessConditions;
 	}
 }

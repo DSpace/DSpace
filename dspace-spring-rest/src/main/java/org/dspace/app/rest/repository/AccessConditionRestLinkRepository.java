@@ -13,10 +13,10 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.converter.AccessConditionsConverter;
-import org.dspace.app.rest.model.AccessConditionRest;
+import org.dspace.app.rest.converter.ResourcePolicyConverter;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.CollectionRest;
-import org.dspace.app.rest.model.hateoas.AccessConditionResource;
+import org.dspace.app.rest.model.hateoas.ResourcePolicyResource;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  */
 @Component(CollectionRest.CATEGORY + "." + CollectionRest.NAME + "." + CollectionRest.DEFAULT_ACCESS_CONDITIONS)
 public class AccessConditionRestLinkRepository extends AbstractDSpaceRestRepository
-		implements LinkRestRepository<AccessConditionRest> {
+		implements LinkRestRepository<ResourcePolicyRest> {
 
 	@Autowired
 	CollectionService collectionService;
@@ -47,26 +47,26 @@ public class AccessConditionRestLinkRepository extends AbstractDSpaceRestReposit
 	AuthorizeService authorizeService;
 	
 	@Autowired
-	AccessConditionsConverter accessConditionsConverter;
+	ResourcePolicyConverter resourcePolicyConverter;
 	
 	@Autowired
 	Utils utils;
 	
 	@Override
-	public ResourceSupport wrapResource(AccessConditionRest model, String... rels) {
-		return new AccessConditionResource(model);
+	public ResourceSupport wrapResource(ResourcePolicyRest model, String... rels) {
+		return new ResourcePolicyResource(model);
 	}
 	
-	public Page<AccessConditionRest> getDefaultBitstreamPoliciesForCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection) throws Exception {
+	public Page<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection) throws Exception {
 		Context context = obtainContext();
 		Collection collection = collectionService.find(context, uuid);
 		
-		List<AccessConditionRest> results = new ArrayList<AccessConditionRest>();
+		List<ResourcePolicyRest> results = new ArrayList<ResourcePolicyRest>();
 		
 		List<ResourcePolicy> defaultCollectionPolicies = authorizeService.getPoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 		
 		for(ResourcePolicy pp : defaultCollectionPolicies) {
-			AccessConditionRest accessCondition = accessConditionsConverter.convert(pp);
+			ResourcePolicyRest accessCondition = resourcePolicyConverter.convert(pp);
 			if (accessCondition != null) {
 				results.add(accessCondition);
 			}

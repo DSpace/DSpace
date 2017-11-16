@@ -17,7 +17,7 @@ import java.util.UUID;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionRest implements RestModel {
+public class ResourcePolicyRest implements RestModel {
 
 	public static final String NAME = "accessCondition";
 

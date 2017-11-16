@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.converter;
 
-import org.dspace.app.rest.model.AccessConditionRest;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.eperson.Group;
 import org.dspace.services.ConfigurationService;
@@ -21,14 +21,14 @@ import org.springframework.stereotype.Component;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  */
 @Component
-public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, AccessConditionRest> {
+public class ResourcePolicyConverter extends DSpaceConverter<ResourcePolicy, ResourcePolicyRest> {
 
 	@Autowired
 	ConfigurationService configurationService;
 
 	@Override
-	public AccessConditionRest fromModel(ResourcePolicy obj) {
-		AccessConditionRest model = new AccessConditionRest();
+	public ResourcePolicyRest fromModel(ResourcePolicy obj) {
+		ResourcePolicyRest model = new ResourcePolicyRest();
 		model.setPolicyType(obj.getRpName());
 		if (obj.getGroup() != null) {
 			model.setGroupUUID(obj.getGroup().getID());
@@ -45,7 +45,7 @@ public class AccessConditionsConverter extends DSpaceConverter<ResourcePolicy, A
 	}
 
 	@Override
-	public ResourcePolicy toModel(AccessConditionRest obj) {
+	public ResourcePolicy toModel(ResourcePolicyRest obj) {
 		// TODO Auto-generated method stub
 		return null;
 	}

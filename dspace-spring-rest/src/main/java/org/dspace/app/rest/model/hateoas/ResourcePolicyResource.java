@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.AccessConditionRest;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.springframework.hateoas.ResourceSupport;
 
@@ -20,17 +20,17 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-@RelNameDSpaceResource(AccessConditionRest.NAME)
-public class AccessConditionResource extends ResourceSupport {
+@RelNameDSpaceResource(ResourcePolicyRest.NAME)
+public class ResourcePolicyResource extends ResourceSupport {
 
 	@JsonUnwrapped
-	private final AccessConditionRest data;
+	private final ResourcePolicyRest data;
 
-	public AccessConditionResource(AccessConditionRest entry) {
+	public ResourcePolicyResource(ResourcePolicyRest entry) {
 		this.data = entry;
 	}
 
-	public AccessConditionRest getData() {
+	public ResourcePolicyRest getData() {
 		return data;
 	}
 

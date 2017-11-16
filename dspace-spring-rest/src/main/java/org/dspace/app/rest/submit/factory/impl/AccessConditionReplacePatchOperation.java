@@ -10,7 +10,7 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.util.Date;
 import java.util.List;
 
-import org.dspace.app.rest.model.AccessConditionRest;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
@@ -33,7 +33,7 @@ import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<AccessConditionRest> {
+public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<ResourcePolicyRest> {
 
 	@Autowired
 	BitstreamService bitstreamService;
@@ -60,8 +60,8 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
 			for (Bitstream b : bb.getBitstreams()) {
 				if (idx == Integer.parseInt(split[0])) {
 					authorizeService.removeAllPolicies(context, b);
-					AccessConditionRest[] newAccessConditions = evaluateObject((LateObjectEvaluator) value);
-					for (AccessConditionRest newAccessCondition : newAccessConditions) {
+					ResourcePolicyRest[] newAccessConditions = evaluateObject((LateObjectEvaluator) value);
+					for (ResourcePolicyRest newAccessCondition : newAccessConditions) {
 						String name = newAccessCondition.getPolicyType();
 						Group group = groupService.find(context, newAccessCondition.getGroupUUID());
 						//TODO manage error on select group
@@ -83,8 +83,8 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
 	}
 
 	@Override
-	protected Class<AccessConditionRest[]> getClassForEvaluation() {
-		return AccessConditionRest[].class;
+	protected Class<ResourcePolicyRest[]> getClassForEvaluation() {
+		return ResourcePolicyRest[].class;
 	}
 
 }
