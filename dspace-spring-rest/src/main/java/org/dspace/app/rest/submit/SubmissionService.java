@@ -14,8 +14,8 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
-import org.dspace.app.rest.converter.AccessConditionsConverter;
-import org.dspace.app.rest.model.AccessConditionRest;
+import org.dspace.app.rest.converter.ResourcePolicyConverter;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -111,10 +111,10 @@ public class SubmissionService {
 			
 		}
 		
-		AccessConditionsConverter aCConverter = new AccessConditionsConverter();
+		ResourcePolicyConverter aCConverter = new ResourcePolicyConverter();
 		for(ResourcePolicy rp : source.getResourcePolicies()) {
-			AccessConditionRest accessConditionRest = aCConverter.convert(rp);
-			data.getAccessConditions().add(accessConditionRest);
+			ResourcePolicyRest resourcePolicyRest = aCConverter.convert(rp);
+			data.getAccessConditions().add(resourcePolicyRest);
 		}
 				
 		data.setUuid(source.getID());

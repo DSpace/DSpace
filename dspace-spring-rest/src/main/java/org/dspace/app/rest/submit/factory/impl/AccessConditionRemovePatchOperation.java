@@ -9,7 +9,7 @@ package org.dspace.app.rest.submit.factory.impl;
 
 import java.util.List;
 
-import org.dspace.app.rest.model.AccessConditionRest;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionRemovePatchOperation extends RemovePatchOperation<AccessConditionRest> {
+public class AccessConditionRemovePatchOperation extends RemovePatchOperation<ResourcePolicyRest> {
 
 	@Autowired
 	ItemService itemService;
@@ -56,8 +56,8 @@ public class AccessConditionRemovePatchOperation extends RemovePatchOperation<Ac
 	}
 
 	@Override
-	protected Class<AccessConditionRest[]> getClassForEvaluation() {
-		return AccessConditionRest[].class;
+	protected Class<ResourcePolicyRest[]> getClassForEvaluation() {
+		return ResourcePolicyRest[].class;
 	}
 
 }
