@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.model.hateoas;
+package org.dspace.app.rest.model.hateoas.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

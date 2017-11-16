@@ -148,6 +148,39 @@ public class RestResourceController implements InitializingBean {
 		return findRelInternal(request, apiCategory, model, uuid, rel, page, assembler, projection);
 	}
 
+	@RequestMapping(method = RequestMethod.GET, value = "/{id:[A-z0-9]+}/{rel}/{relid:[A-z0-9]+}")
+	public ResourceSupport findRel(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable String id, @PathVariable String rel, @PathVariable String relid,
+			Pageable page, PagedResourcesAssembler assembler, @RequestParam(required = false) String projection) {
+		return findRelEntryInternal(request, apiCategory, model, id, rel, relid, page, assembler, projection);		
+	}
+	
+	private <ID extends Serializable> ResourceSupport findRelEntryInternal(HttpServletRequest request, String apiCategory, String model,
+			String id, String rel, String relid, Pageable page, PagedResourcesAssembler assembler, String projection) {
+		checkModelPluralForm(apiCategory, model);
+		DSpaceRestRepository<RestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		Class<RestModel> domainClass = repository.getDomainClass();
+		
+		LinkRest linkRest = utils.getLinkRest(rel, domainClass);
+		if (linkRest != null) {
+			LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkRest.name());
+			Method linkMethod = repositoryUtils.getLinkMethod("getResource", linkRepository);
+			
+			try {
+				Object object = linkMethod.invoke(linkRepository, request, id, relid, page, projection);
+				Link link = linkTo(this.getClass(), apiCategory, English.plural(model)).slash(id)
+						.slash(rel).withSelfRel();
+				List result = new ArrayList();
+				result.add(object);
+				PageImpl<RestModel> pageResult = new PageImpl(result, page, 1);
+				return assembler.toResource(pageResult.map(linkRepository::wrapResource),link);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new RuntimeException(e.getMessage(), e);
+			}
+		}
+		return null;
+	}
+
 	private <ID extends Serializable> ResourceSupport findRelInternal(HttpServletRequest request, String apiCategory,
 			String model, ID uuid, String rel, Pageable page, PagedResourcesAssembler assembler, String projection) {
 		checkModelPluralForm(apiCategory, model);
@@ -162,7 +195,7 @@ public class RestResourceController implements InitializingBean {
 			
 			if (linkMethod == null) {
 				// TODO custom exception
-				throw new RuntimeException("Method for relation " + rel + " not found: " + linkRest.name());
+				throw new RuntimeException("Method for relation " + rel + " not found: " + linkRest.name() + ":" + linkRest.method());
 			}
 			else {
 				try {

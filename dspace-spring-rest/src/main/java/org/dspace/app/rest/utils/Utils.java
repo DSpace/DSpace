@@ -15,9 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
+import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.CommunityRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
+import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
@@ -95,6 +97,9 @@ public class Utils {
 		if (modelPlural.equals("communities")) {
 			return CommunityRest.NAME;
 		}
+		if (modelPlural.equals("authorities")) {
+			return AuthorityRest.NAME;
+		}
 		return modelPlural.replaceAll("s$", "");
 	}
 
@@ -139,5 +144,18 @@ public class Utils {
 			}
 		}
 		return linkRest;
+	}
+
+	/**
+	 * Build the canonical representation of a metadata key in DSpace. ie
+	 * <schema>.<element>[.<qualifier>]
+	 * 
+	 * @param schema
+	 * @param element
+	 * @param object
+	 * @return
+	 */
+	public String getMetadataKey(String schema, String element, String qualifier) {
+		return schema + "." + element + (StringUtils.isNotBlank(qualifier) ? "." + qualifier : "");
 	}
 }

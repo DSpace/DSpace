@@ -61,7 +61,7 @@ public class PluginServiceTest extends AbstractDSpaceTest
         assertNull("Plugin 2 doesn't exist", plugin);
 
         // Test for one plugin that is "selfnamed"
-        // The DCInputAuthority plugin enabled in test local.cfg reads all <form-value-pairs> in input-forms.xml
+        // The DCInputAuthority plugin enabled in test local.cfg reads all <form-value-pairs> in submission-forms.xml
         // and defines a self named plugin for each. So, we SHOULD have a "common_types" plugin.
         plugin = pluginService.getNamedPlugin(org.dspace.content.authority.ChoiceAuthority.class, "common_types");
         assertNotNull("Plugin 3 exists", plugin);
