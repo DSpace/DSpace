@@ -30,6 +30,9 @@ import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.utils.DSpace;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.WorkflowItem;
 
 /**
@@ -555,4 +558,11 @@ public class DryadDataPackage extends DryadObject {
         return authors;
     }
 
+    public VersionHistory getVersionHistory(Context c) {
+        VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
+        VersionHistory history = versioningService.findVersionHistory(c, item.getID());
+        return history;
+    }
+
 }
+
