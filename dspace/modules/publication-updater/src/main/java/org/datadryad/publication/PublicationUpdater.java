@@ -194,8 +194,14 @@ public class PublicationUpdater extends HttpServlet {
 
     private void checkSinglePublication(Context context, DryadJournalConcept dryadJournalConcept) {
         LOGGER.info("checking publication " + dryadJournalConcept.getFullName());
-        updateWorkflowItems(context, dryadJournalConcept);
-        updateArchivedItems(context, dryadJournalConcept);
+        try {
+            if (JournalUtils.isJournalConceptListedInCrossref(dryadJournalConcept)) {
+                updateWorkflowItems(context, dryadJournalConcept);
+                updateArchivedItems(context, dryadJournalConcept);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Publication updating failed: " + e.getMessage());
+        }
         LOGGER.info("finished updating publication");
     }
 
