@@ -74,4 +74,25 @@ public interface ChoiceAuthority
      * @return descriptive label - should always return something, never null.
      */
     public String getLabel(String field, String key, String locale);
+
+    default boolean isHierarchical() {
+		return false;
+	}
+	
+    default boolean isScrollable() {
+		return false;
+	}
+
+    default boolean hasIdentifier() {
+		return true;
+	}
+    
+	default public Choice getChoice(String fieldKey, String authKey, String locale) {
+		Choice result = new Choice();
+		result.authority = authKey;
+		result.label = getLabel(fieldKey, authKey, locale);
+		result.value = getLabel(fieldKey, authKey, locale);
+		return result;
+	}
+	
 }

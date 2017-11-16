@@ -28,6 +28,7 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataValue;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
+import org.dspace.core.Utils;
 
 
 /**
@@ -445,7 +446,7 @@ public class Util {
     /**
      * Get a list of all the respective "displayed-value(s)" from the given
      * "stored-value(s)" for a specific metadata field of a DSpace Item, by
-     * reading input-forms.xml
+     * reading submission-forms.xml
      * 
      * @param item
      *            The Dspace Item
@@ -489,66 +490,57 @@ public class Util {
         // Read the input form file for the specific collection
         DCInputsReader inputsReader = new DCInputsReader(formFileName);
 
-        DCInputSet inputSet = inputsReader.getInputs(col_handle);
+        List<DCInputSet> inputSets = inputsReader.getInputsByCollectionHandle(col_handle);
 
-        // Replace the values of Metadatum[] with the correct ones in case of
-        // controlled vocabularies
-        String currentField = schema + "." + element
-                + (qualifier == null ? "" : "." + qualifier);
+		for (DCInputSet inputSet : inputSets) {
+			// Replace the values of Metadatum[] with the correct ones in case
+			// of
+			// controlled vocabularies			
+			String currentField = Utils.standardize(schema, element, qualifier, ".");
 
-        if (inputSet != null)
-        {
+			if (inputSet != null) {
 
-            int pageNums = inputSet.getNumberPages();
+				int fieldsNums = inputSet.getNumberFields();
 
-            for (int p = 0; p < pageNums; p++)
-            {
+				for (int p = 0; p < fieldsNums; p++) {
 
-                DCInput[] inputs = inputSet.getPageRows(p, false, false);
+					DCInput[] inputs = inputSet.getFields();
 
-                if (inputs != null)
-                {
+					if (inputs != null) {
 
-                    for (int i = 0; i < inputs.length; i++)
-                    {
-                        String inputField = inputs[i].getSchema()
-                                + "."
-                                + inputs[i].getElement()
-                                + (inputs[i].getQualifier() == null ? "" : "."
-                                        + inputs[i].getQualifier());
-                        if (currentField.equals(inputField))
-                        {
+						for (int i = 0; i < inputs.length; i++) {
+							String inputField = Utils.standardize(inputs[i].getSchema(), inputs[i].getElement(),
+									inputs[i].getQualifier(), ".");
+							if (currentField.equals(inputField)) {
 
-                            myInputs = inputs[i];
-                            myInputsFound = true;
-                            break;
+								myInputs = inputs[i];
+								myInputsFound = true;
+								break;
 
-                        }
-                    }
-                }
-                if (myInputsFound)
-                    break;
-            }
-        }
+							}
+						}
+					}
+					if (myInputsFound)
+						break;
+				}
+			}
 
-        if (myInputsFound)
-        {
+			if (myInputsFound) {
 
-            for (MetadataValue value : values) {
+				for (MetadataValue value : values) {
 
-                String pairsName = myInputs.getPairsType();
-                String stored_value = value.getValue();
-                String displayVal = myInputs.getDisplayString(pairsName,
-                        stored_value);
+					String pairsName = myInputs.getPairsType();
+					String stored_value = value.getValue();
+					String displayVal = myInputs.getDisplayString(pairsName, stored_value);
 
-                if (displayVal != null && !"".equals(displayVal)) {
+					if (displayVal != null && !"".equals(displayVal)) {
 
-                    toReturn.add(displayVal);
-                }
+						toReturn.add(displayVal);
+					}
 
-            }
-        }
-
+				}
+			}
+		}
         return toReturn;
     }
 }

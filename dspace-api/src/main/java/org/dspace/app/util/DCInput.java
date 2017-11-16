@@ -74,6 +74,9 @@ public class DCInput
     /** is the entry closed to vocabulary terms? */
     private boolean closedVocabulary = false;
 
+    /** the regex to comply with, null if nothing */
+    private String regex = null;
+    
     /** allowed document types */
     private List<String> typeBind = null;
 
@@ -137,6 +140,7 @@ public class DCInput
         visibility = fieldMap.get("visibility");
         readOnly = fieldMap.get("readonly");
         vocabulary = fieldMap.get("vocabulary");
+        regex = fieldMap.get("regex");
         String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
                             || "yes".equalsIgnoreCase(closedVocabularyStr);
@@ -415,7 +419,7 @@ public class DCInput
 
 	/**
 	 * The closed attribute of the vocabulary tag for this field as set in 
-	 * input-forms.xml
+	 * submission-forms.xml
 	 * 
 	 * {@code 
 	 * <field>
@@ -440,6 +444,19 @@ public class DCInput
 			return true;
 		
 		return typeBind.contains(typeName);
+	}
+
+	public String getScope() {
+		return visibility;
+	}
+
+	public String getRegex() {
+		return regex;
+	}
+
+	public String getFieldName() {
+		return this.getSchema() +"."+ this.getElement() + "." + 
+        		this.getQualifier();
 	}
 	
 }

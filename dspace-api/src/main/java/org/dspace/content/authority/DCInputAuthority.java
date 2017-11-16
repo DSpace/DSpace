@@ -21,7 +21,7 @@ import org.dspace.content.Collection;
 import org.dspace.core.SelfNamedPlugin;
 
 /**
- * ChoiceAuthority source that reads the same input-forms which drive
+ * ChoiceAuthority source that reads the same submission-forms which drive
  * configurable submission.
  *
  * Configuration:
@@ -32,7 +32,7 @@ import org.dspace.core.SelfNamedPlugin;
  *   }
  *
  * It AUTOMATICALLY configures a plugin instance for each {@code <value-pairs>}
- * element (within {@code <form-value-pairs>}) of the input-forms.xml.  The name
+ * element (within {@code <form-value-pairs>}) of the submission-forms.xml.  The name
  * of the instance is the "value-pairs-name" attribute, e.g.
  * the element: {@code <value-pairs value-pairs-name="common_types" dc-term="type">}
  * defines a plugin instance "common_types".

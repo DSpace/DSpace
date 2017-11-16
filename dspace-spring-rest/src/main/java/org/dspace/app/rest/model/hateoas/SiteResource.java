@@ -15,6 +15,7 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.SiteRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
 /**

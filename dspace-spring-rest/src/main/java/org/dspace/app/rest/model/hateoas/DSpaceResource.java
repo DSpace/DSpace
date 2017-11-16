@@ -80,7 +80,7 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 						String model = data.getType();
 						LinkRestRepository linkRepository = utils.getLinkResourceRepository(apiCategory, model, linkAnnotation.name());
 
-						if (!linkRepository.isEmbbeddableRelation(data, linkAnnotation.name())) {
+						if (!linkRepository.isEmbeddableRelation(data, linkAnnotation.name())) {
 							continue;
 						}
 						try {

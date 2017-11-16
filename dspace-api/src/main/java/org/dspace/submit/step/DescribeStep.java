@@ -24,8 +24,12 @@ import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -62,7 +66,8 @@ public class DescribeStep extends AbstractProcessingStep
 
     /** hash of all submission forms details */
     private static DCInputsReader inputsReader = null;
-
+    private static SubmissionConfigReader submissionConfigReader = null;
+    
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
      * additional user interaction may be required)
@@ -93,6 +98,12 @@ public class DescribeStep extends AbstractProcessingStep
     {
         //load the DCInputsReader
         getInputsReader();
+        try {
+			submissionConfigReader = new SubmissionConfigReader();
+		} catch (SubmissionConfigReaderException e) {
+			// convert to a ServletException to respect the AbstractStep contract
+			throw new ServletException(e);
+		}
         metadataAuthorityService = ContentAuthorityServiceFactory.getInstance().getMetadataAuthorityService();
         choiceAuthorityService = ContentAuthorityServiceFactory.getInstance().getChoiceAuthorityService();
     }
@@ -152,10 +163,19 @@ public class DescribeStep extends AbstractProcessingStep
         DCInput[] inputs = null;
         try
         {
-            inputs = inputsReader.getInputs(c.getHandle()).getPageRows(
-                    currentPage - 1,
-                    subInfo.getSubmissionItem().hasMultipleTitles(),
-                    subInfo.getSubmissionItem().isPublishedBefore());
+            List<DCInputSet> inputsByCollectionHandle = inputsReader.getInputsByCollectionHandle(c.getHandle());
+            for(DCInputSet iset : inputsByCollectionHandle) {
+            	SubmissionStepConfig step = null;
+				try {
+					step = submissionConfigReader.getStepConfig(iset.getFormName());
+				} catch (SubmissionConfigReaderException e) {
+					// convert to a ServletException to respect the AbstractStep contract
+					throw new ServletException(e);
+				}
+            	if(step.getStepNumber()==currentPage) {
+            		inputs = iset.getFields();            		
+            	}
+            }
         }
         catch (DCInputsReaderException e)
         {
@@ -385,7 +405,7 @@ public class DescribeStep extends AbstractProcessingStep
      * This method may just return 1 for most steps (since most steps consist of
      * a single page). But, it should return a number greater than 1 for any
      * "step" which spans across a number of HTML pages. For example, the
-     * configurable "Describe" step (configured using input-forms.xml) overrides
+     * configurable "Describe" step (configured using submission-forms.xml) overrides
      * this method to return the number of pages that are defined by its
      * configuration file.
      * <P>
@@ -406,24 +426,7 @@ public class DescribeStep extends AbstractProcessingStep
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {
-        // by default, use the "default" collection handle
-        String collectionHandle = DCInputsReader.DEFAULT_COLLECTION;
-
-        if (subInfo.getSubmissionItem() != null)
-        {
-            collectionHandle = subInfo.getSubmissionItem().getCollection()
-                    .getHandle();
-        }
-
-        // get number of input pages (i.e. "Describe" pages)
-        try
-        {
-            return getInputsReader().getNumberInputPages(collectionHandle);
-        }
-        catch (DCInputsReaderException e)
-        {
-            throw new ServletException(e);
-        }
+        return 1;
     }
 
     /**
