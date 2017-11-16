@@ -233,7 +233,8 @@ public class JWTTokenHandler implements InitializingBean {
 
     //Generate a random 32 byte salt
     private String generateRandomSalt() {
-        BytesKeyGenerator bytesKeyGenerator = KeyGenerators.secureRandom(32);
+        //24 bytes because BASE64 encoding makes this 32 bytes
+        BytesKeyGenerator bytesKeyGenerator = KeyGenerators.secureRandom(24);
         byte[] secretKey = bytesKeyGenerator.generateKey();
         return Base64.encodeBase64String(secretKey);
     }
