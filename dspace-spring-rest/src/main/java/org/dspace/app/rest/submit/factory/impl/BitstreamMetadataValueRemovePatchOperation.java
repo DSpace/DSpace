@@ -11,6 +11,7 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.model.Request;
@@ -29,7 +30,7 @@ public class BitstreamMetadataValueRemovePatchOperation extends RemovePatchOpera
 	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value) throws Exception {
 		String[] split = path.split("/");
 		Item item = source.getItem();
-		List<Bundle> bundle = itemService.getBundles(item, "ORIGINAL");;
+		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);;
 		for(Bundle bb : bundle) {
 			int idx = 0;
 			for(Bitstream b : bb.getBitstreams()) {

@@ -40,7 +40,7 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
 		String[] split = path.split("/");
 		Item item = source.getItem();
 
-		List<Bundle> bundle = itemService.getBundles(item, "ORIGINAL");
+		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 		;
 		for (Bundle bb : bundle) {
 			int idx = 0;

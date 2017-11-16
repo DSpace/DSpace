@@ -9,6 +9,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.BundleService;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class BitstreamRemovePatchOperation extends RemovePatchOperation<String>{
 			throws Exception {
 		
 		Item item = source.getItem();
-		List<Bundle> bbb = itemService.getBundles(item, "ORIGINAL");
+		List<Bundle> bbb = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 		Bitstream bitstream = null;
 		external : for(Bundle bb : bbb) {
 			int idx = 0;
