@@ -26,7 +26,6 @@ import org.dspace.event.Event;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.service.HarvestedCollectionService;
 import org.dspace.workflow.factory.WorkflowServiceFactory;
-import org.dspace.xmlworkflow.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
