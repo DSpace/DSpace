@@ -59,7 +59,7 @@ public class ContextUtil
 
         if (context == null)
         {
-            context = ContextUtil.intializeContext();
+            context = ContextUtil.initializeContext();
             
             // Store the context in the request
             request.setAttribute(DSPACE_CONTEXT, context);
@@ -73,7 +73,7 @@ public class ContextUtil
      * @return a DSpace Context Object
      * @throws SQLException 
      */
-    private static Context intializeContext() throws SQLException
+    private static Context initializeContext() throws SQLException
     {
         // Create a new Context
         Context context = new Context();

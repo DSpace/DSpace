@@ -31,6 +31,10 @@
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueAddPatchOperation" />
 						</entry>
+						<entry key="accessConditions">
+							<bean
+								class="org.dspace.app.rest.submit.factory.impl.ResourcePolicyAddPatchOperation" />
+						</entry>						
 					</map>
 				</entry>
 				<entry key="remove">
@@ -57,7 +61,7 @@
 						</entry>
 						<entry key="accessConditions">
 							<bean
-								class="org.dspace.app.rest.submit.factory.impl.AccessConditionRemovePatchOperation" />
+								class="org.dspace.app.rest.submit.factory.impl.ResourcePolicyRemovePatchOperation" />
 						</entry>
 					</map>
 				</entry>
@@ -79,7 +83,7 @@
 						</entry>
 						<entry key="accessConditions">
 							<bean
-								class="org.dspace.app.rest.submit.factory.impl.AccessConditionReplacePatchOperation" />
+								class="org.dspace.app.rest.submit.factory.impl.ResourcePolicyReplacePatchOperation" />
 						</entry>
 					</map>
 				</entry>

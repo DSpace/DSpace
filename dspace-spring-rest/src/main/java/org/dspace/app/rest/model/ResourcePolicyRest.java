@@ -10,6 +10,8 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 import java.util.UUID;
 
+import org.dspace.app.rest.RestResourceController;
+
 /**
  * The Access Condition REST Resource. It is intent to be an human or REST
  * client understandable representation of the DSpace ResourcePolicy.
@@ -17,13 +19,24 @@ import java.util.UUID;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class ResourcePolicyRest implements RestModel {
+public class ResourcePolicyRest extends BaseObjectRest<Integer> {
 
 	public static final String NAME = "accessCondition";
+	public static final String CATEGORY = DirectlyAddressableRestModel.AUTHORIZATION;
 
-	private String policyType;
+	private String name;
+	
+	private String rpType;
+	
+	private String description;
 	
 	private UUID groupUUID;
+	
+	private UUID epersonUUID;
+	
+	private String action;
+	
+	private Date startDate;
 	
 	private Date endDate;
 	
@@ -43,16 +56,69 @@ public class ResourcePolicyRest implements RestModel {
 		this.endDate = endDate;
 	}
 
-	public void setPolicyType(String type) {
-		this.policyType = type;
-	}
-	
-	public String getPolicyType() {
-		return policyType;
-	}
 	
 	@Override
 	public String getType() {
 		return NAME;
 	}
+
+	@Override
+	public String getCategory() {		
+		return CATEGORY;
+	}
+
+	@Override
+	public Class getController() {		
+		return RestResourceController.class;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getRpType() {
+		return rpType;
+	}
+
+	public void setRpType(String rpType) {
+		this.rpType = rpType;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public UUID getEpersonUUID() {
+		return epersonUUID;
+	}
+
+	public void setEpersonUUID(UUID epersonUUID) {
+		this.epersonUUID = epersonUUID;
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+
 }

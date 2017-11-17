@@ -21,19 +21,21 @@ import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
- * Submission "replace" operation to replace resource policies in the Bitstream
+ * Submission "add" operation to add resource policies in the Bitstream
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<ResourcePolicyRest> {
+public class ResourcePolicyAddPatchOperation extends AddPatchOperation<ResourcePolicyRest> {
 
 	@Autowired
 	BitstreamService bitstreamService;
@@ -46,9 +48,11 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
 
 	@Autowired
 	GroupService groupService;
+	@Autowired
+	EPersonService epersonService;
 	
 	@Override
-	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
+	void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
 		String[] split = path.split("/");
 		Item item = source.getItem();
@@ -59,21 +63,24 @@ public class AccessConditionReplacePatchOperation extends ReplacePatchOperation<
 			int idx = 0;
 			for (Bitstream b : bb.getBitstreams()) {
 				if (idx == Integer.parseInt(split[0])) {
-					authorizeService.removeAllPolicies(context, b);
 					ResourcePolicyRest[] newAccessConditions = evaluateObject((LateObjectEvaluator) value);
 					for (ResourcePolicyRest newAccessCondition : newAccessConditions) {
-						String name = newAccessCondition.getPolicyType();
-						Group group = groupService.find(context, newAccessCondition.getGroupUUID());
-						//TODO manage error on select group
-						Date startDate = null;
-						Date endDate = null;
-						if("embargo".equals(newAccessCondition.getPolicyType())) {
-							startDate = newAccessCondition.getEndDate();
+						String name = newAccessCondition.getName();
+						String description = newAccessCondition.getDescription();
+						
+						//TODO manage error on select group and eperson
+						Group group = null;
+						if(newAccessCondition.getGroupUUID()!=null) {
+							group = groupService.find(context, newAccessCondition.getGroupUUID());
 						}
-						if("lease".equals(newAccessCondition.getPolicyType())) {
-							endDate = newAccessCondition.getEndDate();
+						EPerson eperson = null;
+						if(newAccessCondition.getEpersonUUID()!=null) {
+							eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
 						}
-						authorizeService.createResourcePolicy(context, b, group, null, Constants.READ, ResourcePolicy.TYPE_CUSTOM, name, startDate, endDate);
+
+						Date startDate = newAccessCondition.getStartDate();
+						Date endDate = newAccessCondition.getEndDate();
+						authorizeService.createResourcePolicy(context, b, group, eperson, Constants.READ, ResourcePolicy.TYPE_CUSTOM, name, description, startDate, endDate);
 						// TODO manage duplicate policy
 					}
 				}

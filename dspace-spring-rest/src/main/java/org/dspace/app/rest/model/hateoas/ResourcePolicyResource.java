@@ -9,9 +9,7 @@ package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
-import org.springframework.hateoas.ResourceSupport;
-
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import org.dspace.app.rest.utils.Utils;
 
 /**
  * Access Condition Rest HAL Resource. The HAL Resource wraps the REST Resource adding
@@ -21,17 +19,8 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
  *
  */
 @RelNameDSpaceResource(ResourcePolicyRest.NAME)
-public class ResourcePolicyResource extends ResourceSupport {
-
-	@JsonUnwrapped
-	private final ResourcePolicyRest data;
-
-	public ResourcePolicyResource(ResourcePolicyRest entry) {
-		this.data = entry;
+public class ResourcePolicyResource extends DSpaceResource<ResourcePolicyRest> {
+	public ResourcePolicyResource(ResourcePolicyRest eperson, Utils utils, String... rels) {
+		super(eperson, utils, rels);
 	}
-
-	public ResourcePolicyRest getData() {
-		return data;
-	}
-
 }

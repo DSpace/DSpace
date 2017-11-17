@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.model.BitstreamFormatRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
 
@@ -22,6 +23,7 @@ public class UploadBitstreamRest extends UploadStatusResponse {
 	private UUID uuid;
 	private Map<String, List<MetadataValueRest>> metadata = new HashMap<>();
 	private List<ResourcePolicyRest> accessConditions;
+	private BitstreamFormatRest format;
 	private Long sizeBytes;
 	private CheckSumRest checkSum;
 	private String url;
@@ -75,5 +77,13 @@ public class UploadBitstreamRest extends UploadStatusResponse {
 
 	public void setAccessConditions(List<ResourcePolicyRest> accessConditions) {
 		this.accessConditions = accessConditions;
+	}
+
+	public BitstreamFormatRest getFormat() {
+		return format;
+	}
+
+	public void setFormat(BitstreamFormatRest format) {
+		this.format = format;
 	}
 }

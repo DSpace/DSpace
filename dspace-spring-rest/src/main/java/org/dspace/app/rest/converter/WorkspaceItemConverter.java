@@ -16,11 +16,13 @@ import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -53,6 +55,9 @@ public class WorkspaceItemConverter
 	private SubmissionDefinitionConverter submissionDefinitionConverter;
 	@Autowired
 	private SubmissionSectionConverter submissionSectionConverter;
+	
+	@Autowired
+	SubmissionService submissionService; 
 
 	public WorkspaceItemConverter() throws ServletException {
 		submissionConfigReader = new SubmissionConfigReader();
@@ -104,7 +109,7 @@ public class WorkspaceItemConverter
 						// load the JSPStep interface for this step
 						AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
 								.newInstance();
-						witem.getSections().put(sections.getId(), stepProcessing.getData(obj, stepConfig));
+						witem.getSections().put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
 					} else {
 						throw new Exception("The submission step class specified by '"
 								+ stepConfig.getProcessingClassName()

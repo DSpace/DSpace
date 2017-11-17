@@ -125,7 +125,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 				optionRest.setMaxEndDate(dateMathParser.parseMath(option.getDateLimit()));
 			}
 			optionRest.setPolicyType(option.getPolicyType());			
-			result.getAccessConditions().add(optionRest);
+			result.getAccessConditionOptions().add(optionRest);
 		}
 		result.setMetadata(submissionFormRestRepository.findOne(config.getMetadata()));
 		result.setMaxSize(config.getMaxSize());

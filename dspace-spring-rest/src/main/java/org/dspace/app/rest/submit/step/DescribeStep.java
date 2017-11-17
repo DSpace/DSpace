@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.app.rest.model.step.DataDescribe;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.app.util.DCInput;
@@ -44,7 +45,7 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 	}
 	
 	@Override
-	public DataDescribe getData(WorkspaceItem obj, SubmissionStepConfig config) {		
+	public DataDescribe getData(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config) {		
 		DataDescribe data = new DataDescribe();
 		try {
 			DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());

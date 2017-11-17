@@ -7,19 +7,24 @@
  */
 package org.dspace.app.rest.submit;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
+import org.dspace.app.rest.converter.BitstreamFormatConverter;
 import org.dspace.app.rest.converter.ResourcePolicyConverter;
-import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.CheckSumRest;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
+import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -27,9 +32,11 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.CollectionService;
 import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,6 +58,12 @@ public class SubmissionService {
 	protected CollectionService collectionService;
 	@Autowired
 	protected WorkspaceItemService workspaceItemService;
+	@Autowired
+	private RequestService requestService;
+	@Autowired(required = true)
+	BitstreamFormatConverter bfConverter;
+	@Autowired(required = true)
+	ResourcePolicyConverter aCConverter; 
 	
 	public WorkspaceItem createWorkspaceItem(Context context, Request request) {
 		WorkspaceItem wsi = null;
@@ -87,7 +100,7 @@ public class SubmissionService {
 	}
 	
 
-	public static UploadBitstreamRest buildUploadBitstream(ConfigurationService configurationService, Bitstream source) {
+	public UploadBitstreamRest buildUploadBitstream(ConfigurationService configurationService, Bitstream source) throws SQLException {
 		UploadBitstreamRest data = new UploadBitstreamRest();
 		
 		for (MetadataValue md : source.getMetadata()) {
@@ -111,10 +124,14 @@ public class SubmissionService {
 			
 		}
 		
-		ResourcePolicyConverter aCConverter = new ResourcePolicyConverter();
+		HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
+		data.setFormat(bfConverter.convert(source.getFormat(ContextUtil.obtainContext(request))));	
+		
 		for(ResourcePolicy rp : source.getResourcePolicies()) {
-			ResourcePolicyRest resourcePolicyRest = aCConverter.convert(rp);
-			data.getAccessConditions().add(resourcePolicyRest);
+			if(ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType())) {
+				ResourcePolicyRest resourcePolicyRest = aCConverter.convert(rp);
+				data.getAccessConditions().add(resourcePolicyRest);				
+			}
 		}
 				
 		data.setUuid(source.getID());
