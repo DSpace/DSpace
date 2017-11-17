@@ -12,22 +12,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.dspace.app.rest.builder.CollectionBuilder;
-import org.dspace.app.rest.builder.CommunityBuilder;
-import org.dspace.app.rest.builder.ItemBuilder;
-import org.dspace.app.rest.matcher.AppliedFilterMatcher;
-import org.dspace.app.rest.matcher.FacetEntryMatcher;
-import org.dspace.app.rest.matcher.FacetValueMatcher;
-import org.dspace.app.rest.matcher.PageMatcher;
-import org.dspace.app.rest.matcher.SearchFilterMatcher;
-import org.dspace.app.rest.matcher.SearchResultMatcher;
-import org.dspace.app.rest.matcher.SortOptionMatcher;
+import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.io.IOUtils;
+import org.dspace.app.rest.builder.*;
+import org.dspace.app.rest.matcher.*;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.InputStream;
+import java.util.UUID;
 
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
 
@@ -341,7 +341,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The hasMore property has to be false because we don't have more than 20 authors that take part in the results
                 .andExpect(jsonPath("$.hasMore", is(Boolean.FALSE)))
                 //The applied filters have to be specified like this, applied filters are the parameters given below starting with f.
-                .andExpect(jsonPath("$.appliedFilters", containsInAnyOrder(
+                .andExpect(jsonPath("$.appliedFilters", contains(
                         AppliedFilterMatcher.appliedFilterEntry("title", "contains", "test", "test")
                 )))
                 //This is how the page object must look like because it's the default
@@ -683,7 +683,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 //The hasMore property needs to be false because all the dates are able to show in two intervals, therefore we don't need more pages
                 .andExpect(jsonPath("$.hasMore", is(Boolean.FALSE)))
                 //There needs to be an appliedFilters section that looks like this because we've specified a query in the parameters
-                .andExpect(jsonPath("$.appliedFilters", containsInAnyOrder(
+                .andExpect(jsonPath("$.appliedFilters", contains(
                         AppliedFilterMatcher.appliedFilterEntry("title", "contains", "test", "test")
                 )))
                 //The page object needs to look like this because we entered a size of 2 and we didn't specify a starting page so it defaults to 0
@@ -1018,7 +1018,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                         SearchResultMatcher.match("item", "items")
                 )))
                 //We need to display the appliedFilters object that contains the query that we've ran
-                .andExpect(jsonPath("$.appliedFilters", containsInAnyOrder(
+                .andExpect(jsonPath("$.appliedFilters", contains(
                         AppliedFilterMatcher.appliedFilterEntry("title", "contains", "test", "test")
                 )))
                 //These facets have to show up in the embedded.facets section as well with the given hasMore property because we don't exceed their default limit for a hasMore true (the default is 10)
@@ -1439,5 +1439,545 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         ;
 
     }
+
+
+    @Test
+    public void discoverSearchObjectsTestWithContentInABitstream() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            Bitstream bitstream = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        //Run the filter media to make the text in the bitstream searchable through the query
+        String[] args = {"filter-media", "-f", "-i", publicItem1.getHandle()};
+        runDSpaceScript(args);
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With a query stating 'ThisIsSomeDummyText'
+        getClient().perform(get("/api/discover/search/objects")
+                    .param("query", "ThisIsSomeDummyText"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //The page object needs to look like this
+                .andExpect(jsonPath("$.page", is(
+                        PageMatcher.pageEntry(0,20)
+                )))
+                //This is the only item that should be returned with the query given
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.contains(
+                        SearchResultMatcher.matchOnItemName("item", "items", "Test")
+                )))
+
+                //These facets have to show up in the embedded.facets section as well with the given hasMore property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacetInSearchObject(false),
+                        FacetEntryMatcher.subjectFacetInSearchObject(false),
+                        FacetEntryMatcher.dateIssuedFacetInSearchObject(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacetInSearchObjects(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsTestForEmbargoedItemsAndPrivateItems() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+
+        //2. Three items that are readable by Anonymous with different subjects
+        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        //Make this one public to make sure that it doesn't show up in the search
+        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .makePrivate()
+                .build();
+
+        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
+                .withEmbargoPeriod("12 months")
+                .build();
+
+        //Turn on the authorization again
+        context.restoreAuthSystemState();
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //
+        getClient().perform(get("/api/discover/search/objects"))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //The page object needs to look like this
+                .andExpect(jsonPath("$.page", is(
+                        PageMatcher.pageEntry(0,20)
+                )))
+                //These are the items that aren't set to private
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.containsInAnyOrder(
+                        SearchResultMatcher.match("community", "communities"),
+                        SearchResultMatcher.match("community", "communities"),
+                        //Collections are specified like this because they don't have any special properties
+                        SearchResultMatcher.match(),
+                        SearchResultMatcher.match(),
+                        SearchResultMatcher.matchOnItemName("item", "items", "Test"),
+                        SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                )))
+                //This is a private item, this shouldn't show up in the result
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.not(SearchResultMatcher.matchOnItemName("item", "items", "Test 2"))))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacetInSearchObject(false),
+                        FacetEntryMatcher.subjectFacetInSearchObject(false),
+                        FacetEntryMatcher.dateIssuedFacetInSearchObject(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacetInSearchObjects(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+
+
+
+    //TODO Enable when solr fulltext indexing is policy-aware
+
+    @Test
+    @Ignore
+    public void discoverSearchObjectsTestWithContentInAPrivateBitstream() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+
+        //2. one public item that is readable by Anonymous
+        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+
+        //Make the group that anon doesn't have access to
+        Group internalGroup = new GroupBuilder().createGroup(context)
+                .withName("Internal Group")
+                .build();
+        //Add this bitstream with the internal group as the reader group
+        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            Bitstream bitstream = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream")
+                    .withDescription("Test Private Bitstream")
+                    .withMimeType("text/plain")
+                    .withReaderGroup(internalGroup)
+                    .build();
+        }
+
+
+        //Run the filter media to be able to search on the text in the bitstream
+        String[] args = {"filter-media", "-f", "-i", publicItem1.getHandle()};
+        runDSpaceScript(args);
+
+        //Turn on the authorization again to make sure that private/inaccessible items don't get show/used
+        context.restoreAuthSystemState();
+        context.setCurrentUser(null);
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With a size 2
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", "ThisIsSomeDummyText"))
+
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //The page object needs to look like this
+                .andExpect(jsonPath("$.page", is(
+                        PageMatcher.pageEntry(0,20)
+                )))
+                //Make sure that the item with the private bitstream doesn't show up
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.not(Matchers.contains(
+                        SearchResultMatcher.matchOnItemName("item", "items", "Test")
+                ))))
+
+                //These facets have to show up in the embedded.facets section as well with the given hasMore property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacetInSearchObject(false),
+                        FacetEntryMatcher.subjectFacetInSearchObject(false),
+                        FacetEntryMatcher.dateIssuedFacetInSearchObject(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacetInSearchObjects(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+
+    @Test
+    public void discoverSearchObjectsTestForScope() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        UUID scope = col2.getID();
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With the scope given
+        getClient().perform(get("/api/discover/search/objects")
+                    .param("scope", String.valueOf(scope)))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The scope has to be equal to the one given in the parameters
+                .andExpect(jsonPath("$.scope", is(String.valueOf(scope))))
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //The page object needs to look like this
+                .andExpect(jsonPath("$.page", is(
+                        PageMatcher.pageEntry(0,20)
+                )))
+                //The search results have to contain the items belonging to the scope specified
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.containsInAnyOrder(
+                        SearchResultMatcher.matchOnItemName("item","items", "Test 2"),
+                        SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacetInSearchObject(false),
+                        FacetEntryMatcher.subjectFacetInSearchObject(false),
+                        FacetEntryMatcher.dateIssuedFacetInSearchObject(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacetInSearchObjects(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsTestForScopeWithPrivateItem() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        //2. Two items that are readable by Anonymous with different subjects and one private item
+        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
+                .withSubject("TestingForMore").withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
+                .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
+                .makePrivate()
+                .build();
+
+        UUID scope = col2.getID();
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With a size 2
+        getClient().perform(get("/api/discover/search/objects")
+                .param("scope", String.valueOf(scope)))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //Make sure that the scope is set to the scope given in the param
+                .andExpect(jsonPath("$.scope", is(String.valueOf(scope))))
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //The page object needs to look like this
+                .andExpect(jsonPath("$.page", is(
+                        PageMatcher.pageEntry(0,20)
+                )))
+                //Make sure that the search results contains the item with the correct scope
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.contains(
+                        SearchResultMatcher.matchOnItemName("item","items", "Test 2")
+//                        SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                )))
+                //Make sure that the search result doesn't contain the item that's set to private but does have the correct scope
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.not(Matchers.contains(
+                        SearchResultMatcher.matchOnItemName("item", "items", "Public item 2")
+                ))))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacetInSearchObject(false),
+                        FacetEntryMatcher.subjectFacetInSearchObject(false),
+                        FacetEntryMatcher.dateIssuedFacetInSearchObject(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacetInSearchObjects(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+    @Test
+    public void discoverSearchObjectsTestForHitHighlights() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        //2. Three public items that are readable by Anonymous with different subjects
+        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("AnotherTest").withSubject("ExtraEntry")
+                .build();
+
+
+        String query = "Public";
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With a query stating 'public'
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", query))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //The page object needs to look like this
+                .andExpect(jsonPath("$.page", is(
+                        PageMatcher.pageEntry(0,20)
+                )))
+                //The search results has to contain the item with the query in the title and the hithighlight has to be filled in with a string containing the query
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.contains(
+                        SearchResultMatcher.matchOnItemNameAndHitHighlight("item", "items", "Public item 2", query, "dc.title")
+                )))
+                //These facets have to show up in the embedded.facets section as well with the given hasMore property because we don't exceed their default limit for a hasMore true (the default is 10)
+                .andExpect(jsonPath("$._embedded.facets", Matchers.containsInAnyOrder(
+                        FacetEntryMatcher.authorFacetInSearchObject(false),
+                        FacetEntryMatcher.subjectFacetInSearchObject(false),
+                        FacetEntryMatcher.dateIssuedFacetInSearchObject(false),
+                        FacetEntryMatcher.hasContentInOriginalBundleFacetInSearchObjects(false)
+                )))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+
+    @Test
+    public void discoverSearchObjectsTestForHitHighlightsWithPrivateItem() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        //2. Two public items that are readable by Anonymous with different subjects and one private item
+        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Test 2")
+                .withIssueDate("1990-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("ExtraEntry")
+                .build();
+
+        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+                .withTitle("Public item 2")
+                .withIssueDate("2010-02-13")
+                .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
+                .withSubject("AnotherTest").withSubject("ExtraEntry")
+                .makePrivate()
+                .build();
+
+
+        String query = "Public";
+        //** WHEN **
+        //An anonymous user browses this endpoint to find the the objects in the system
+        //With a query stating 'Public'
+        getClient().perform(get("/api/discover/search/objects")
+                .param("query", query))
+                //** THEN **
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+                //The type has to be 'discover'
+                .andExpect(jsonPath("$.type", is("discover")))
+                //The page object needs to look like this
+                .andExpect(jsonPath("$.page", is(
+                        PageMatcher.pageEntry(0,20)
+                )))
+                //The search results should not contain this
+                .andExpect(jsonPath("$._embedded.searchResults", Matchers.not(Matchers.contains(
+                        SearchResultMatcher.matchOnItemNameAndHitHighlight("item", "items", "Public item 2", query, "dc.title")
+                ))))
+                //There always needs to be a self link available
+                .andExpect(jsonPath("$._links.self.href", containsString("/api/discover/search/objects")))
+        ;
+
+    }
+
+
+    //Scope = owningCollection
 
 }

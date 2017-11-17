@@ -8,9 +8,11 @@
 package org.dspace.app.rest.matcher;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class SearchResultMatcher {
 
@@ -55,6 +57,19 @@ public class SearchResultMatcher {
                 hasJsonPath("$.uuid", notNullValue()),
                 hasJsonPath("$.name", is(itemName)),
                 hasJsonPath("$.type", is(type))
+        );
+    }
+
+    public static Matcher<? super Object> matchOnItemNameAndHitHighlight(String type, String typePlural, String itemName, String hitHighlightQuery, String expectedFieldInHitHighlightning) {
+        return allOf(
+                hasJsonPath("$.type", is("discover")),
+                hasJsonPath("$.hitHighlights", is(
+                        HitHighlightMatcher.entry(hitHighlightQuery, expectedFieldInHitHighlightning))),
+                hasJsonPath("$._links.dspaceObject.href", containsString("/api/core/"+typePlural)),
+                hasJsonPath("$._embedded", notNullValue()),
+                hasJsonPath("$._embedded.dspaceObject", is(
+                        matchEmbeddedObjectOnItemName(type, itemName)
+                ))
         );
     }
 }
