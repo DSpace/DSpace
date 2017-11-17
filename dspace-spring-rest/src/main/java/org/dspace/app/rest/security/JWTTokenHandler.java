@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- *
+ * <p>
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest.security;
@@ -31,7 +31,6 @@ import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -50,6 +49,7 @@ public class JWTTokenHandler implements InitializingBean {
     private String jwtKey;
     private long expirationTime;
     private boolean includeIP;
+    private boolean encryptionEnabled;
     private boolean compressionEnabled;
 
     @Autowired
@@ -70,6 +70,7 @@ public class JWTTokenHandler implements InitializingBean {
         this.jwtKey = configurationService.getProperty("jwt.token.secret", "defaultjwtkeysecret");
         this.expirationTime = configurationService.getLongProperty("jwt.token.expiration", 30) * 60 * 1000;
         this.includeIP = configurationService.getBooleanProperty("jwt.token.include.ip", true);
+        this.encryptionEnabled = configurationService.getBooleanProperty("jwt.encryption.enabled", false);
         this.compressionEnabled = configurationService.getBooleanProperty("jwt.compression.enabled", false);
         //TODO Don't reuse this all the time
         BytesKeyGenerator keyGen = KeyGenerators.secureRandom(16);
@@ -87,16 +88,19 @@ public class JWTTokenHandler implements InitializingBean {
      * @throws SQLException
      */
     public EPerson parseEPersonFromToken(String token, HttpServletRequest request, Context context) throws JOSEException, ParseException, SQLException {
-        if(StringUtils.isBlank(token)) {
+        if (StringUtils.isBlank(token)) {
             return null;
         }
+        SignedJWT signedJWT;
 
-        JWEObject jweObject = JWEObject.parse(token);
+        if (encryptionEnabled) {
+            JWEObject jweObject = JWEObject.parse(token);
+            jweObject.decrypt(new DirectDecrypter(encryptionKey));
+            signedJWT = jweObject.getPayload().toSignedJWT();
+        } else {
+            signedJWT = SignedJWT.parse(token);
+        }
 
-        jweObject.decrypt(new DirectDecrypter(encryptionKey));
-
-
-        SignedJWT signedJWT = jweObject.getPayload().toSignedJWT();
         JWTClaimsSet jwtClaimsSet = signedJWT.getJWTClaimsSet();
 
         EPerson ePerson = getEPerson(context, jwtClaimsSet);
@@ -112,7 +116,7 @@ public class JWTTokenHandler implements InitializingBean {
 
             log.debug("Received valid token for username: " + ePerson.getEmail());
 
-            for (JWTClaimProvider jwtClaimProvider: jwtClaimProviders) {
+            for (JWTClaimProvider jwtClaimProvider : jwtClaimProviders) {
                 jwtClaimProvider.parseClaim(context, request, jwtClaimsSet);
             }
 
@@ -143,7 +147,7 @@ public class JWTTokenHandler implements InitializingBean {
         JWSSigner signer = new MACSigner(buildSigningKey(request, ePerson));
         JWTClaimsSet.Builder builder = new JWTClaimsSet.Builder();
 
-        for (JWTClaimProvider jwtClaimProvider: jwtClaimProviders) {
+        for (JWTClaimProvider jwtClaimProvider : jwtClaimProviders) {
             builder = builder.claim(jwtClaimProvider.getKey(), jwtClaimProvider.getValue(context, request));
         }
 
@@ -156,17 +160,21 @@ public class JWTTokenHandler implements InitializingBean {
 
         signedJWT.sign(signer);
 
-        JWEObject jweObject = new JWEObject(
-        compression(new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM)
-                .contentType("JWT"))
+        if (encryptionEnabled) {
+            JWEObject jweObject = new JWEObject(
+                    compression(new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM)
+                            .contentType("JWT"))
 
-                .build(), new Payload(signedJWT)
-        );
+                            .build(), new Payload(signedJWT)
+            );
 
-        jweObject.encrypt(new DirectEncrypter(encryptionKey));
+            jweObject.encrypt(new DirectEncrypter(encryptionKey));
 
 
-        return jweObject.serialize();
+            return jweObject.serialize();
+        } else {
+            return signedJWT.serialize();
+        }
     }
 
     //This method makes compression configurable
@@ -176,7 +184,6 @@ public class JWTTokenHandler implements InitializingBean {
         }
         return builder;
     }
-
 
 
     public void invalidateToken(String token, HttpServletRequest request, Context context) {
