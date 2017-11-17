@@ -17,10 +17,10 @@ import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.AuthorityRest;
 import org.dspace.app.rest.model.CommunityRest;
+import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
-import org.dspace.app.rest.model.MetadataFieldRest;
-import org.dspace.app.rest.model.DirectlyAddressableRestModel;
+import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -99,6 +99,9 @@ public class Utils {
 		}
 		if (modelPlural.equals("authorities")) {
 			return AuthorityRest.NAME;
+		}
+		if (modelPlural.equals("resourcePolicies")) {
+			return ResourcePolicyRest.NAME;
 		}
 		return modelPlural.replaceAll("s$", "");
 	}

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  */
 public class ResourcePolicyRest extends BaseObjectRest<Integer> {
 
-	public static final String NAME = "accessCondition";
+	public static final String NAME = "resourcePolicy";
 	public static final String CATEGORY = DirectlyAddressableRestModel.AUTHORIZATION;
 
 	private String name;
