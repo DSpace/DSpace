@@ -14,38 +14,44 @@
                 <ref local="lease"/>
                 <ref local="embargoed" />
                 <ref local="administrator"/>
-                <ref local="networkAdministration"/>
+                <!-- <ref local="networkAdministration"/> -->
             </list>
         </property>
     </bean>
   
     <bean id="openAccess" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Anonymous"/>
-        <property name="policyType" value="openaccess"/>
-        <property name="hasDate" value="false"/>
+        <property name="name" value="openaccess"/>
+        <property name="hasStartDate" value="false"/>
+        <property name="hasEndDate" value="false"/>
     </bean>
     <bean id="lease" class="org.dspace.submit.model.AccessConditionOption">
-        <property name="groupName" value="Anonymous"/>
-        <property name="policyType" value="lease"/>
-        <property name="hasDate" value="true"/>
-        <property name="dateLimit" value="+1MONTHS"/>
+        <property name="selectGroupName" value="Anonymous"/>
+        <property name="name" value="lease"/>
+        <property name="hasStartDate" value="false"/>
+        <property name="hasEndDate" value="true"/>
+        <property name="endDateLimit" value="+1MONTHS"/>
     </bean> 
     <bean id="embargoed" class="org.dspace.submit.model.AccessConditionOption">
-        <property name="groupName" value="Anonymous"/>
-        <property name="policyType" value="embargo"/>
-        <property name="hasDate" value="true"/>
-        <property name="dateLimit" value="+6MONTHS"/>
+        <property name="selectGroupName" value="Anonymous"/>
+        <property name="name" value="embargo"/>
+        <property name="hasStartDate" value="true"/>
+        <property name="startDateLimit" value="+6MONTHS"/>
+        <property name="hasEndDate" value="false"/>
+        
     </bean> 
     <bean id="administrator" class="org.dspace.submit.model.AccessConditionOption">
         <property name="groupName" value="Administrator"/>
-        <property name="policyType" value="administrator"/>
-        <property name="hasDate" value="false"/>
+        <property name="name" value="administrator"/>
+        <property name="hasStartDate" value="false"/>
+        <property name="hasEndDate" value="false"/>       
     </bean>
-    <bean id="networkAdministration" class="org.dspace.submit.model.AccessConditionOption">
+<!--     <bean id="networkAdministration" class="org.dspace.submit.model.AccessConditionOption">
     	<property name="groupName" value="INSTITUTIONAL_NETWORK"/>
-        <property name="policyType" value="networkAdministration"/>
-        <property name="hasDate" value="false"/>        
-    </bean>
+        <property name="name" value="networkAdministration"/>
+        <property name="hasStartDate" value="false"/>
+        <property name="hasEndDate" value="false"/>                
+    </bean> -->
 
     <bean id="uploadConfigurationService" class="org.dspace.submit.model.UploadConfigurationService">
         <property name="map">

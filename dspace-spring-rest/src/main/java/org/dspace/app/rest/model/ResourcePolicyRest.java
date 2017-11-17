@@ -12,6 +12,9 @@ import java.util.UUID;
 
 import org.dspace.app.rest.RestResourceController;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * The Access Condition REST Resource. It is intent to be an human or REST
  * client understandable representation of the DSpace ResourcePolicy.
@@ -26,18 +29,24 @@ public class ResourcePolicyRest extends BaseObjectRest<Integer> {
 
 	private String name;
 	
+	@JsonInclude(Include.NON_NULL)
 	private String rpType;
 	
+	@JsonInclude(Include.NON_NULL)
 	private String description;
 	
+	@JsonInclude(Include.NON_NULL)
 	private UUID groupUUID;
 	
+	@JsonInclude(Include.NON_NULL)
 	private UUID epersonUUID;
 	
 	private String action;
 	
+	@JsonInclude(Include.NON_NULL)
 	private Date startDate;
 	
+	@JsonInclude(Include.NON_NULL)
 	private Date endDate;
 	
 	public UUID getGroupUUID() {
