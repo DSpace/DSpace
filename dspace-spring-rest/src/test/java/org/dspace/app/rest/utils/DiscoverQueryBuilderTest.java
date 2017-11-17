@@ -15,6 +15,8 @@ import static org.mockito.Mockito.when;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.dspace.app.rest.exception.InvalidDSpaceObjectTypeException;
 import org.dspace.app.rest.exception.InvalidSearchFacetException;
@@ -26,11 +28,14 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverFilterQuery;
+import org.dspace.discovery.DiscoverHitHighlightingField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.FacetYearRange;
 import org.dspace.discovery.SolrServiceImpl;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
+import org.dspace.discovery.configuration.DiscoveryHitHighlightingConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
@@ -91,6 +96,23 @@ public class DiscoverQueryBuilderTest {
         discoveryConfiguration = new DiscoveryConfiguration();
         discoveryConfiguration.setDefaultFilterQueries(Arrays.asList("archived:true"));
 
+
+        DiscoveryHitHighlightingConfiguration discoveryHitHighlightingConfiguration = new DiscoveryHitHighlightingConfiguration();
+        List<DiscoveryHitHighlightFieldConfiguration> discoveryHitHighlightFieldConfigurations = new LinkedList<>();
+
+        DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration = new DiscoveryHitHighlightFieldConfiguration();
+        discoveryHitHighlightFieldConfiguration.setField("dc.title");
+
+        DiscoveryHitHighlightFieldConfiguration discoveryHitHighlightFieldConfiguration1 = new DiscoveryHitHighlightFieldConfiguration();
+        discoveryHitHighlightFieldConfiguration1.setField("fulltext");
+
+        discoveryHitHighlightFieldConfigurations.add(discoveryHitHighlightFieldConfiguration1);
+        discoveryHitHighlightFieldConfigurations.add(discoveryHitHighlightFieldConfiguration);
+
+        discoveryHitHighlightingConfiguration.setMetadataFields(discoveryHitHighlightFieldConfigurations);
+        discoveryConfiguration.setHitHighlightingConfiguration(discoveryHitHighlightingConfiguration);
+
+
         DiscoverySortConfiguration sortConfiguration = new DiscoverySortConfiguration();
 
         DiscoverySortFieldConfiguration defaultSort = new DiscoverySortFieldConfiguration();
@@ -147,7 +169,11 @@ public class DiscoverQueryBuilderTest {
                 new ReflectionEquals(new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 6, DiscoveryConfigurationParameters.SORT.COUNT)),
                 new ReflectionEquals(new DiscoverFacetField("hierarchy", DiscoveryConfigurationParameters.TYPE_HIERARCHICAL, 8, DiscoveryConfigurationParameters.SORT.VALUE))
         ));
-
+        assertThat(discoverQuery.getHitHighlightingFields(), hasSize(2));
+        assertThat(discoverQuery.getHitHighlightingFields(), containsInAnyOrder(
+                new ReflectionEquals(new DiscoverHitHighlightingField("dc.title", 0, 3)),
+                new ReflectionEquals(new DiscoverHitHighlightingField("fulltext", 0, 3))
+        ));
     }
 
     @Test
@@ -170,7 +196,11 @@ public class DiscoverQueryBuilderTest {
                 new ReflectionEquals(new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 6, DiscoveryConfigurationParameters.SORT.COUNT)),
                 new ReflectionEquals(new DiscoverFacetField("hierarchy", DiscoveryConfigurationParameters.TYPE_HIERARCHICAL, 8, DiscoveryConfigurationParameters.SORT.VALUE))
         ));
-
+        assertThat(discoverQuery.getHitHighlightingFields(), hasSize(2));
+        assertThat(discoverQuery.getHitHighlightingFields(), containsInAnyOrder(
+                new ReflectionEquals(new DiscoverHitHighlightingField("dc.title", 0, 3)),
+                new ReflectionEquals(new DiscoverHitHighlightingField("fulltext", 0, 3))
+        ));
     }
 
     @Test
@@ -195,7 +225,11 @@ public class DiscoverQueryBuilderTest {
                 new ReflectionEquals(new DiscoverFacetField("subject", DiscoveryConfigurationParameters.TYPE_TEXT, 6, DiscoveryConfigurationParameters.SORT.COUNT)),
                 new ReflectionEquals(new DiscoverFacetField("hierarchy", DiscoveryConfigurationParameters.TYPE_HIERARCHICAL, 8, DiscoveryConfigurationParameters.SORT.VALUE))
         ));
-
+        assertThat(discoverQuery.getHitHighlightingFields(), hasSize(2));
+        assertThat(discoverQuery.getHitHighlightingFields(), containsInAnyOrder(
+                new ReflectionEquals(new DiscoverHitHighlightingField("dc.title", 0, 3)),
+                new ReflectionEquals(new DiscoverHitHighlightingField("fulltext", 0, 3))
+        ));
     }
 
     @Test(expected = InvalidDSpaceObjectTypeException.class)
