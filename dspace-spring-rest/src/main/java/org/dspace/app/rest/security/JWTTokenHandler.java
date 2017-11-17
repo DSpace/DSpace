@@ -192,6 +192,14 @@ public class JWTTokenHandler implements InitializingBean {
         }
     }
 
+    /**
+     * This returns the key used for signing the token. This key is at least 256 bits/32 bytes (server key has minimum length of 1 byte and the eperson session salt is always 32 bytes),
+     * this way the key is always long enough for the HMAC using SHA-256 algorithm.
+     * More information: https://tools.ietf.org/html/rfc7518#section-3.2
+     * @param request
+     * @param ePerson
+     * @return
+     */
     private String buildSigningKey(HttpServletRequest request, EPerson ePerson) {
         String ipAddress = "";
         if (includeIP) {
