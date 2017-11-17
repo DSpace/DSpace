@@ -10,6 +10,9 @@ package org.dspace.app.rest.model;
 import java.util.Date;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 /**
  * The Access Condition (ResourcePolicy) REST Resource
  * 
@@ -18,14 +21,22 @@ import java.util.UUID;
  */
 public class AccessConditionOptionRest {
 
-	private String policyType;
+	private String name;
 	
+	@JsonInclude(Include.NON_NULL)
 	private UUID groupUUID;
 	
+	@JsonInclude(Include.NON_NULL)
 	private UUID selectGroupUUID;
 	
-	private boolean hasDate;
+	private Boolean hasStartDate;
 	
+	private Boolean hasEndDate;
+	
+	@JsonInclude(Include.NON_NULL)	
+	private Date maxStartDate;
+	
+	@JsonInclude(Include.NON_NULL)
 	private Date maxEndDate;
 
 	public UUID getGroupUUID() {
@@ -36,24 +47,12 @@ public class AccessConditionOptionRest {
 		this.groupUUID = groupUuid;
 	}
 
-	public void setPolicyType(String type) {
-		this.policyType = type;
-	}
-
 	public UUID getSelectGroupUUID() {
 		return selectGroupUUID;
 	}
 
 	public void setSelectGroupUUID(UUID selectGroupUuid) {
 		this.selectGroupUUID = selectGroupUuid;
-	}
-
-	public boolean isHasDate() {
-		return hasDate;
-	}
-
-	public void setHasDate(boolean hasDate) {
-		this.hasDate = hasDate;
 	}
 
 	public Date getMaxEndDate() {
@@ -64,8 +63,36 @@ public class AccessConditionOptionRest {
 		this.maxEndDate = maxEndDate;
 	}
 
-	public String getPolicyType() {
-		return policyType;
+	public Boolean getHasStartDate() {
+		return hasStartDate;
+	}
+
+	public void setHasStartDate(Boolean hasStartDate) {
+		this.hasStartDate = hasStartDate;
+	}
+
+	public Boolean getHasEndDate() {
+		return hasEndDate;
+	}
+
+	public void setHasEndDate(Boolean hasEndDate) {
+		this.hasEndDate = hasEndDate;
+	}
+
+	public Date getMaxStartDate() {
+		return maxStartDate;
+	}
+
+	public void setMaxStartDate(Date maxStartDate) {
+		this.maxStartDate = maxStartDate;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

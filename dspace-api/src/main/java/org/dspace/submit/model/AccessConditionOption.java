@@ -13,20 +13,26 @@ package org.dspace.submit.model;
  */
 public class AccessConditionOption {
 
-	private String policyType;
+	private String name;
 	
 	private String groupName;
 	
-	private Boolean hasDate;
+	private String selectGroupName;
 	
-	private String dateLimit;
+	private Boolean hasStartDate;
+	
+	private Boolean hasEndDate;
+	
+	private String startDateLimit;
+	
+	private String endDateLimit;
 
-	public String getPolicyType() {
-		return policyType;
+	public String getName() {
+		return name;
 	}
 
-	public void setPolicyType(String type) {
-		this.policyType = type;
+	public void setName(String type) {
+		this.name = type;
 	}
 
 	public String getGroupName() {
@@ -37,20 +43,45 @@ public class AccessConditionOption {
 		this.groupName = groupName;
 	}
 
-	public Boolean getHasDate() {
-		return hasDate;
+	public Boolean getHasStartDate() {
+		return hasStartDate;
 	}
 
-	public void setHasDate(Boolean hasDate) {
-		this.hasDate = hasDate;
+	public void setHasStartDate(Boolean hasStartDate) {
+		this.hasStartDate = hasStartDate;
 	}
 
-	public String getDateLimit() {
-		return dateLimit;
+	public Boolean getHasEndDate() {
+		return hasEndDate;
 	}
 
-	public void setDateLimit(String dateLimit) {
-		this.dateLimit = dateLimit;
+	public void setHasEndDate(Boolean hasEndDate) {
+		this.hasEndDate = hasEndDate;
 	}
-	
+
+	public String getStartDateLimit() {
+		return startDateLimit;
+	}
+
+	public void setStartDateLimit(String startDateLimit) {
+		this.startDateLimit = startDateLimit;
+	}
+
+	public String getEndDateLimit() {
+		return endDateLimit;
+	}
+
+	public void setEndDateLimit(String endDateLimit) {
+		this.endDateLimit = endDateLimit;
+	}
+
+	public String getSelectGroupName() {
+		return selectGroupName;
+	}
+
+	public void setSelectGroupName(String selectGroupName) {
+		this.selectGroupName = selectGroupName;
+	}
+
+
 }

@@ -112,19 +112,27 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 		SubmissionUploadRest result = new SubmissionUploadRest();
 		for (AccessConditionOption option : config.getOptions()) {
 			AccessConditionOptionRest optionRest = new AccessConditionOptionRest();
-			Group group = groupService.findByName(context, option.getGroupName());
-			if (group != null) {
-				if ("embargo".equals(option.getPolicyType()) || "lease".equals(option.getPolicyType())) {
-					optionRest.setSelectGroupUUID(group.getID());
-				} else {
+			if (option.getGroupName() != null) {
+				Group group = groupService.findByName(context, option.getGroupName());
+				if (group != null) {
 					optionRest.setGroupUUID(group.getID());
 				}
 			}
-			optionRest.setHasDate(option.getHasDate());
-			if(StringUtils.isNotBlank(option.getDateLimit())) {
-				optionRest.setMaxEndDate(dateMathParser.parseMath(option.getDateLimit()));
+			if (option.getSelectGroupName() != null) {
+				Group group = groupService.findByName(context, option.getSelectGroupName());
+				if (group != null) {
+					optionRest.setSelectGroupUUID(group.getID());
+				}
 			}
-			optionRest.setPolicyType(option.getPolicyType());			
+			optionRest.setHasStartDate(option.getHasStartDate());
+			optionRest.setHasEndDate(option.getHasEndDate());
+			if(StringUtils.isNotBlank(option.getStartDateLimit())) {
+				optionRest.setMaxStartDate(dateMathParser.parseMath(option.getStartDateLimit()));
+			}
+			if(StringUtils.isNotBlank(option.getEndDateLimit())) {
+				optionRest.setMaxEndDate(dateMathParser.parseMath(option.getEndDateLimit()));
+			}
+			optionRest.setName(option.getName());			
 			result.getAccessConditionOptions().add(optionRest);
 		}
 		result.setMetadata(submissionFormRestRepository.findOne(config.getMetadata()));
