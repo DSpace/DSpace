@@ -27,12 +27,13 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.DiscoverFacetField;
 import org.dspace.discovery.DiscoverFilterQuery;
+import org.dspace.discovery.DiscoverHitHighlightingField;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.FacetYearRange;
 import org.dspace.discovery.SearchService;
-import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.DiscoveryHitHighlightFieldConfiguration;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
@@ -80,7 +81,19 @@ public class DiscoverQueryBuilder implements InitializingBean {
         configurePagination(page, queryArgs);
         configureSorting(page, queryArgs, discoveryConfiguration.getSearchSortConfiguration());
 
+        addDiscoveryHitHighlightFields(discoveryConfiguration, queryArgs);
         return queryArgs;
+    }
+
+    private void addDiscoveryHitHighlightFields(DiscoveryConfiguration discoveryConfiguration, DiscoverQuery queryArgs) {
+        if(discoveryConfiguration.getHitHighlightingConfiguration() != null)
+        {
+            List<DiscoveryHitHighlightFieldConfiguration> metadataFields = discoveryConfiguration.getHitHighlightingConfiguration().getMetadataFields();
+            for (DiscoveryHitHighlightFieldConfiguration fieldConfiguration : metadataFields)
+            {
+                queryArgs.addHitHighlightingField(new DiscoverHitHighlightingField(fieldConfiguration.getField(), fieldConfiguration.getMaxSize(), fieldConfiguration.getSnippets()));
+            }
+        }
     }
 
     public DiscoverQuery buildFacetQuery(Context context, DSpaceObject scope,

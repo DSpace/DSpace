@@ -7,8 +7,14 @@
  */
 package org.dspace.app.rest.test;
 
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
-import org.dspace.app.rest.builder.AbstractBuilder;
+import org.dspace.app.launcher.ScriptLauncher;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
@@ -17,6 +23,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.storage.rdbms.DatabaseUtils;
+import org.jdom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -177,6 +184,35 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         // Cleanup Context object by setting it to null
         if(context !=null) {
             context = null;
+        }
+    }
+
+    public void runDSpaceScript(String[] args) throws Exception {
+        int status = 0;
+        try {
+            // Load up the ScriptLauncher's configuration
+            Document commandConfigs = ScriptLauncher.getConfig(kernelImpl);
+
+            // Check that there is at least one argument (if not display command options)
+            if (args.length < 1)
+            {
+                log.error("You must provide at least one command argument");
+            }
+
+            // Look up command in the configuration, and execute.
+            ScriptLauncher.runOneCommand(commandConfigs, args, kernelImpl);
+
+
+        } catch(ExitException e){
+            status = e.getStatus();
+        }
+
+        if(status != 0){
+            log.error("Failed to run script " + Arrays.toString(args));
+        }
+
+        if(!context.isValid()){
+            setUp();
         }
     }
 }
