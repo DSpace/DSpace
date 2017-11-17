@@ -210,7 +210,7 @@ public class AddBitstreamsAction extends UpdateBitstreamsAction {
 				if (group != null)
 				{
                     authorizeService.removeAllPolicies(context, bs);  // remove the default policy
-                    authorizeService.createResourcePolicy(context, bs, group, null, ce.permissionsActionId, null, null, null, null);
+                    authorizeService.createResourcePolicy(context, bs, group, null, ce.permissionsActionId, null, null, null, null, null);
 				}
 	        }
 	        

@@ -67,14 +67,14 @@ public class SubmissionUploadRest extends BaseObjectRest<String> {
 		return CATEGORY;
 	}
 
-	public List<AccessConditionOptionRest> getAccessConditions() {
+	public List<AccessConditionOptionRest> getAccessConditionOptions() {
 		if(accessConditionOptions==null) {
 			accessConditionOptions = new ArrayList<>();
 		}
 		return accessConditionOptions;
 	}
 
-	public void setAccessConditions(List<AccessConditionOptionRest> accessConditions) {
+	public void setAccessConditionOptions(List<AccessConditionOptionRest> accessConditions) {
 		this.accessConditionOptions = accessConditions;
 	}
 

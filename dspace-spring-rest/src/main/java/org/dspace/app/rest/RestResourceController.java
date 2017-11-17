@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchNotFoundException;
@@ -385,6 +386,8 @@ public class RestResourceController implements InitializingBean {
 			resources = repository.findAll(page).map(repository::wrapResource);
 		} catch (PaginationException pe) {
 			resources = new PageImpl<DSpaceResource<T>>(new ArrayList<DSpaceResource<T>>(), page, pe.getTotal());
+		} catch (RepositoryMethodNotImplementedException mne) {
+			throw mne;
 		}
 		PagedResources<DSpaceResource<T>> result = assembler.toResource(resources, link);
 		if (repositoryUtils.haveSearchMethods(repository)) {

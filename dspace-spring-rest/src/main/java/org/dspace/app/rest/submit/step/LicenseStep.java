@@ -11,6 +11,7 @@ import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.model.step.DataLicense;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
+import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.rest.submit.factory.PatchOperationFactory;
 import org.dspace.app.rest.submit.factory.impl.PatchOperation;
 import org.dspace.app.util.SubmissionStepConfig;
@@ -31,7 +32,7 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
 	private static final String DCTERMS_RIGHTSDATE = "dcterms.accessRights";
 
 	@Override
-	public DataLicense getData(WorkspaceItem obj, SubmissionStepConfig config) throws Exception {
+	public DataLicense getData(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config) throws Exception {
 		DataLicense result = new DataLicense();
 		Bitstream bitstream = bitstreamService.getBitstreamByName(obj.getItem(), Constants.LICENSE_BUNDLE_NAME, Constants.LICENSE_BITSTREAM_NAME);
 		if(bitstream!=null) {

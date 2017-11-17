@@ -18,8 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 @LinksRest(links = {
-		@LinkRest(name = CollectionRest.LICENSE, linkClass = LicenseRest.class, method = "getLicenseCollection", optional = true),
-		@LinkRest(name = CollectionRest.DEFAULT_ACCESS_CONDITIONS, linkClass = ResourcePolicyRest.class, method = "getDefaultBitstreamPoliciesForCollection", optional = true)
+		@LinkRest(name = CollectionRest.LICENSE, linkClass = LicenseRest.class, method = "getLicenseCollection", optional = true)
 })
 public class CollectionRest extends DSpaceObjectRest {
 	public static final String NAME = "collection";
@@ -28,7 +27,10 @@ public class CollectionRest extends DSpaceObjectRest {
 	public static final String DEFAULT_ACCESS_CONDITIONS = "defaultAccessConditions";
 	@JsonIgnore
 	private BitstreamRest logo;
-
+	
+	@JsonIgnore
+	private List<ResourcePolicyRest> defaultAccessConditions;
+	
 	public BitstreamRest getLogo() {
 		return logo;
 	}
@@ -45,5 +47,15 @@ public class CollectionRest extends DSpaceObjectRest {
 	@Override
 	public String getType() {
 		return NAME;
+	}
+
+	@LinkRest(linkClass = ResourcePolicyRest.class)
+	@JsonIgnore
+	public List<ResourcePolicyRest> getDefaultAccessConditions() {
+		return defaultAccessConditions;
+	}
+
+	public void setDefaultAccessConditions(List<ResourcePolicyRest> defaultAccessConditions) {
+		this.defaultAccessConditions = defaultAccessConditions;
 	}
 }

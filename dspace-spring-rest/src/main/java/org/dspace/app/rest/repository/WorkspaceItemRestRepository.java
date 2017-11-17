@@ -232,7 +232,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 		itemService.update(context, item);
 		context.commit();
 
-		result = SubmissionService.buildUploadBitstream(configurationService, source);
+		result = submissionService.buildUploadBitstream(configurationService, source);
 		result.setStatus(true);
 		return result;
 	}

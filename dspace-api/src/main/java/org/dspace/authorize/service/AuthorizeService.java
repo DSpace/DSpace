@@ -471,7 +471,7 @@ public interface AuthorizeService {
      */
     public void generateAutomaticPolicies(Context context, Date embargoDate, String reason, DSpaceObject dso, Collection owningCollection) throws SQLException, AuthorizeException;
 
-    public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson, int type, String rpType, String rpName, Date startDate, Date endDate) throws SQLException, AuthorizeException;
+    public ResourcePolicy createResourcePolicy(Context context, DSpaceObject dso, Group group, EPerson eperson, int type, String rpType, String rpName, String rpDescription, Date startDate, Date endDate) throws SQLException, AuthorizeException;
 
     public ResourcePolicy createOrModifyPolicy(ResourcePolicy policy, Context context, String name, Group group, EPerson ePerson, Date embargoDate, int action, String reason, DSpaceObject dso) throws AuthorizeException, SQLException;
 

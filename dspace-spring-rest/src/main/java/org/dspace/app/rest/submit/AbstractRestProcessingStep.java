@@ -23,7 +23,7 @@ import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
  */
 public interface AbstractRestProcessingStep {
 
-	public <T extends Serializable> T getData(WorkspaceItem obj, SubmissionStepConfig config) throws Exception;
+	public <T extends Serializable> T getData(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config) throws Exception;
 
 	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
 			String path, Object value) throws Exception;

@@ -22,7 +22,6 @@ import org.dspace.app.rest.utils.Utils;
 public class CollectionResource extends DSpaceResource<CollectionRest> {
 	public CollectionResource(CollectionRest collection, Utils utils, String... rels) {		 
 		super(collection, utils, rels);
-		add(utils.linkToSubResource(collection, CollectionRest.DEFAULT_ACCESS_CONDITIONS));
 		add(utils.linkToSubResource(collection, CollectionRest.LICENSE));
 	}
 }

@@ -9,8 +9,8 @@ package org.dspace.app.rest.converter;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.eperson.Group;
-import org.dspace.services.ConfigurationService;
+import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.core.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,23 +24,31 @@ import org.springframework.stereotype.Component;
 public class ResourcePolicyConverter extends DSpaceConverter<ResourcePolicy, ResourcePolicyRest> {
 
 	@Autowired
-	ConfigurationService configurationService;
-
+	ResourcePolicyService resourcePolicyService;
+	
 	@Override
 	public ResourcePolicyRest fromModel(ResourcePolicy obj) {
+		
 		ResourcePolicyRest model = new ResourcePolicyRest();
-		model.setPolicyType(obj.getRpName());
+		
+		model.setId(obj.getID());
+		
+		model.setName(obj.getRpName());
+		model.setDescription(obj.getRpDescription());
+		model.setRpType(obj.getRpType());
+		
+		model.setAction(resourcePolicyService.getActionText(obj));
+		
+		model.setStartDate(obj.getStartDate());
+		model.setEndDate(obj.getEndDate());
+		
 		if (obj.getGroup() != null) {
 			model.setGroupUUID(obj.getGroup().getID());
-			if (obj.getStartDate() != null) {
-				model.setEndDate(obj.getStartDate());
-			} else {
-				if (obj.getEndDate() != null) {
-					model.setEndDate(obj.getEndDate());
-				}
-			}
 		}
-
+		
+		if(obj.getEPerson() != null) {
+			model.setEpersonUUID(obj.getEPerson().getID());
+		}
 		return model;
 	}
 

@@ -10,11 +10,16 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.util.List;
 
 import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -27,30 +32,49 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class AccessConditionRemovePatchOperation extends RemovePatchOperation<ResourcePolicyRest> {
+public class ResourcePolicyRemovePatchOperation extends RemovePatchOperation<ResourcePolicyRest> {
 
 	@Autowired
 	ItemService itemService;
 	
 	@Autowired
-	AuthorizeService authorizeService;
+	ResourcePolicyService resourcePolicyService;
 	
 	@Override
 	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
 		String[] split = path.split("/");
+		String bitstreamIdx = split[0];
+		String rpIdx = split[2];
+		
 		Item item = source.getItem();
 
 		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
-		;
+		
+		ResourcePolicy dpolicy = null;
+		
 		for (Bundle bb : bundle) {
 			int idx = 0;
 			for (Bitstream b : bb.getBitstreams()) {
-				if (idx == Integer.parseInt(split[0])) {
-					authorizeService.removeAllPolicies(context, b);
+				if (idx == Integer.parseInt(bitstreamIdx)) {
+					List<ResourcePolicy> policies = resourcePolicyService.find(context, b, ResourcePolicy.TYPE_CUSTOM);
+					int index = 0;
+					for(ResourcePolicy policy : policies) {						
+						Integer toDelete = Integer.parseInt(rpIdx);
+						if(index == toDelete) {
+							dpolicy = policy;
+							b.getResourcePolicies().remove(policy);
+							break;
+						}
+						index++;
+					}
 				}
 				idx++;
 			}
+		}
+		
+		if(dpolicy!=null) {			
+			resourcePolicyService.delete(context, dpolicy);
 		}
 		
 	}
