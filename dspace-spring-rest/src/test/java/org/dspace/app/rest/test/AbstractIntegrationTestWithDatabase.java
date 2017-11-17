@@ -43,6 +43,11 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     protected EPerson eperson;
 
     /**
+     * The password of our test eperson
+     */
+    protected String password = "mySuperS3cretP4ssW0rd";
+
+    /**
      * The test Parent Community
      */
     protected Community parentCommunity = null;
@@ -106,6 +111,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 eperson.setEmail("test@email.com");
                 eperson.setCanLogIn(true);
                 eperson.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+                ePersonService.setPassword(eperson, password);
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, eperson);
             }
