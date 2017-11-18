@@ -7,22 +7,23 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.apache.commons.lang3.StringUtils;
+import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.model.BaseObjectRest;
 import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.LinksRest;
@@ -32,8 +33,17 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.rest.webmvc.EmbeddedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.core.EmbeddedWrappers;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 /**
  * A base class for DSpace Rest HAL Resource. The HAL Resource wraps the REST

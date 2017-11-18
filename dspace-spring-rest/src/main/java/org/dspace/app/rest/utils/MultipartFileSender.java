@@ -29,6 +29,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class to send an input stream with Range header and ETag support.
  * Based on https://github.com/davinkevin/Podcast-Server/blob/v1.0.0/src/main/java/lan/dk/podcastserver/service/MultiPartFileSenderService.java
+ *
+ * @author Atmire NV (info at atmire dot com)
+ *
  */
 public class MultipartFileSender {
 

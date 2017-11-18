@@ -38,6 +38,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * This is a specialized controller to provide access to the bitstream binary content
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Atmire NV (info at atmire dot com)
+ *
  */
 @RestController
 @RequestMapping("/api/"+BitstreamRest.CATEGORY +"/"+ BitstreamRest.PLURAL_NAME + "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")

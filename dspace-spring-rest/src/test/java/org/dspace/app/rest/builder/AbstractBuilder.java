@@ -7,10 +7,6 @@
  */
 package org.dspace.app.rest.builder;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -20,15 +16,7 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BundleService;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.InstallItemService;
-import org.dspace.content.service.ItemService;
-import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
@@ -42,8 +30,14 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.MutablePeriod;
 import org.joda.time.format.PeriodFormat;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+
 /**
  * Abstract builder to construct DSpace Objects
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public abstract class AbstractBuilder<T extends DSpaceObject> {
 
@@ -157,10 +151,8 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
         Context c = new Context();
         c.turnOffAuthorisationSystem();
         T attachedDso = c.reloadEntity(dso);
-
         if(attachedDso != null) {
             getDsoService().delete(c, attachedDso);
         }
     }
-
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.app.rest.model.MetadataEntryRest;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.MetadataValue;
+import org.springframework.core.convert.converter.Converter;
 
 /**
  * 

@@ -16,6 +16,8 @@ import org.springframework.test.context.ContextCustomizerFactory;
 
 /**
  * Context customizer factory to set the parent context of our Spring Boot application in TEST mode
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class DSpaceKernelContextCustomizerFactory implements ContextCustomizerFactory {
 

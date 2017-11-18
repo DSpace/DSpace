@@ -15,6 +15,11 @@ import static org.hamcrest.Matchers.startsWith;
 
 import org.hamcrest.Matcher;
 
+/**
+ * Class to match JSON browse entries in ITs
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 public class BrowseEntryResourceMatcher {
     public static Matcher<? super Object> matchBrowseEntry(String value, int expectedCount) {
         return allOf(

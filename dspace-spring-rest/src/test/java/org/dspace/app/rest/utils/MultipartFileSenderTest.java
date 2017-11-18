@@ -33,6 +33,8 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 /**
  * Test class for MultipartFileSender
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class MultipartFileSenderTest {
 

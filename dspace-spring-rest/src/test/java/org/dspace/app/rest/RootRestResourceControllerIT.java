@@ -9,9 +9,7 @@ package org.dspace.app.rest;
 
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Test;
@@ -19,6 +17,8 @@ import org.junit.Test;
 
 /**
  * Integration test for the {@link RootRestResourceController}
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class RootRestResourceControllerIT extends AbstractControllerIntegrationTest {
 

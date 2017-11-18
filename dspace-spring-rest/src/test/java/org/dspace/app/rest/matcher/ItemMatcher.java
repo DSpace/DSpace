@@ -20,6 +20,8 @@ import org.hamcrest.Matcher;
 
 /**
  * Utility class to construct a Matcher for an item
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class ItemMatcher {
 

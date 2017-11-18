@@ -40,6 +40,8 @@ import org.springframework.web.context.WebApplicationContext;
 /**
  * Abstract controller integration test class that will take care of setting up the
  * environment to run the integration test
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {Application.class, ApplicationConfig.class})
