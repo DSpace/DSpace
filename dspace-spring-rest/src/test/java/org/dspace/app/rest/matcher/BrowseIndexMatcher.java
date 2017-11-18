@@ -20,6 +20,8 @@ import org.hamcrest.Matchers;
 
 /**
  * Utility class to construct a Matcher for a browse index
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class BrowseIndexMatcher {
 

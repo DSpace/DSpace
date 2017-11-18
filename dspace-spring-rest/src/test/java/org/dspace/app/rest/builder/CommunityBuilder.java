@@ -14,6 +14,8 @@ import org.dspace.core.Context;
 
 /**
  * Builder to construct Community objects
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class CommunityBuilder extends AbstractBuilder<Community> {
 

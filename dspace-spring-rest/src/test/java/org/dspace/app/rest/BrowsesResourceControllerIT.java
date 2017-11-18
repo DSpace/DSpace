@@ -36,6 +36,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 /**
  * Integration test to test the /api/discover/browses endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTest {
 

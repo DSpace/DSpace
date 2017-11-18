@@ -7,15 +7,15 @@
  */
 package org.dspace.storage.bitstore.service;
 
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.core.Context;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
-
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.core.Context;
 
 /**
  * <P>

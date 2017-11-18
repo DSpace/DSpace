@@ -27,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Service implementation for the Bitstream object.

@@ -110,5 +110,4 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
 		context.abort();
 		return is;
 	}
-
 }

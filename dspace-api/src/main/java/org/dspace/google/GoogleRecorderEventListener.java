@@ -8,14 +8,6 @@
 
 package org.dspace.google;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -29,11 +21,17 @@ import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.services.model.Event;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 /**

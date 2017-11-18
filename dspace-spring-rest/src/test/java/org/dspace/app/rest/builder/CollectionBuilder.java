@@ -15,6 +15,8 @@ import org.dspace.core.Context;
 
 /**
  * Builder to construct Collection objects
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class CollectionBuilder extends AbstractBuilder<Collection> {
 

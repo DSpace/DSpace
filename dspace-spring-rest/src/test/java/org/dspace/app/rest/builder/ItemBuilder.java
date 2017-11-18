@@ -18,6 +18,8 @@ import org.dspace.eperson.Group;
 
 /**
  * Builder to construct Item objects
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class ItemBuilder extends AbstractBuilder<Item> {
 
