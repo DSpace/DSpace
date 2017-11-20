@@ -28,7 +28,7 @@ public class SearchFacetEntryRest implements RestModel {
     private int facetLimit;
 
     @JsonIgnore
-    private List<SearchFacetValueRest> values;
+    private List<SearchFacetValueRest> values = new LinkedList<>();
 
     public SearchFacetEntryRest(final String name) {
         this.name = name;
@@ -56,10 +56,6 @@ public class SearchFacetEntryRest implements RestModel {
     }
 
     public void addValue(final SearchFacetValueRest valueRest) {
-        if(values == null) {
-            values = new LinkedList<>();
-        }
-
         values.add(valueRest);
     }
 
