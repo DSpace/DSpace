@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.BrowseEntryRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 
 /**
  * Browse Entry Rest HAL Resource. The HAL Resource wraps the REST Resource
