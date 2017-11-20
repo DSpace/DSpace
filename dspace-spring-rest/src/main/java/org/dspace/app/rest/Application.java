@@ -158,9 +158,9 @@ public class Application extends SpringBootServletInitializer {
 
     /** Utility class that will destroy the DSpace Kernel on Spring Boot shutdown */
     private class DSpaceKernelDestroyer implements ApplicationListener<ContextClosedEvent> {
-        private DSpaceKernelImpl kernel;
+        private DSpaceKernel kernel;
 
-        public DSpaceKernelDestroyer(DSpaceKernelImpl kernel) {
+        public DSpaceKernelDestroyer(DSpaceKernel kernel) {
             this.kernel = kernel;
         }
 
@@ -202,7 +202,7 @@ public class Application extends SpringBootServletInitializer {
                         // nothing
                     }
                     String message = "Failure during ServletContext initialisation: " + e.getMessage();
-                    log.error(message + ":" + e.getMessage(), e);
+                    log.error(message, e);
                     throw new RuntimeException(message, e);
                 }
             }
@@ -213,7 +213,7 @@ public class Application extends SpringBootServletInitializer {
                 applicationContext.setParent(dspaceKernel.getServiceManager().getApplicationContext());
 
                 //Add a listener for Spring Boot application shutdown so that we can nicely cleanup the DSpace kernel.
-                applicationContext.addApplicationListener(new DSpaceKernelDestroyer((DSpaceKernelImpl) dspaceKernel));
+                applicationContext.addApplicationListener(new DSpaceKernelDestroyer(dspaceKernel));
             }
         }
 
