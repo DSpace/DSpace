@@ -325,13 +325,13 @@ public class Authenticate
         // so we can detect session hijacking.
         session.setAttribute("dspace.current.remote.addr",
                              request.getRemoteAddr());
-
-        ExtraLoggedInAction extraLoggedInActions = new DSpace().getSingletonService(ExtraLoggedInAction.class);
+        List<ExtraLoggedInAction> extraLoggedInActions = new DSpace().getServiceManager().getServicesByType(ExtraLoggedInAction.class);
 
 		if (extraLoggedInActions != null) {				
-			extraLoggedInActions.loggedIn(context, request, context.getCurrentUser());
+			for (ExtraLoggedInAction extraAction : extraLoggedInActions) {
+				extraAction.loggedIn(context, request, context.getCurrentUser());
+			}
 		}
-
     }
 
     /**
