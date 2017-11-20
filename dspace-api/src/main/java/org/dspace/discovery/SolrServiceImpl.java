@@ -1386,11 +1386,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             if(values != null && values.size() > 0 && values.get(0) != null && values.get(0).getValue() != null)
             {
                 // group on parent
-                String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
-                if (handlePrefix == null || handlePrefix.length() == 0)
-                {
-                    handlePrefix = "http://hdl.handle.net/";
-                }
+                String handlePrefix = handleService.getCanonicalPrefix();
 
                 doc.addField("publication_grp",values.get(0).getValue().replaceFirst(handlePrefix, "") );
 
