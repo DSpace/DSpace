@@ -12,10 +12,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.InputStream;
+import java.util.UUID;
+
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.*;
-import org.dspace.app.rest.matcher.*;
+import org.dspace.app.rest.builder.BitstreamBuilder;
+import org.dspace.app.rest.builder.CollectionBuilder;
+import org.dspace.app.rest.builder.CommunityBuilder;
+import org.dspace.app.rest.builder.GroupBuilder;
+import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.matcher.AppliedFilterMatcher;
+import org.dspace.app.rest.matcher.FacetEntryMatcher;
+import org.dspace.app.rest.matcher.FacetValueMatcher;
+import org.dspace.app.rest.matcher.PageMatcher;
+import org.dspace.app.rest.matcher.SearchFilterMatcher;
+import org.dspace.app.rest.matcher.SearchResultMatcher;
+import org.dspace.app.rest.matcher.SortOptionMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -25,9 +38,6 @@ import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.io.InputStream;
-import java.util.UUID;
 
 public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest {
 
@@ -906,7 +916,6 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("f").withSubject("g")
                 .withSubject("h").withSubject("i")
                 .withSubject("j").withSubject("k")
-
                 .build();
 
         Item publicItem2 = new ItemBuilder().createItem(context, col2)

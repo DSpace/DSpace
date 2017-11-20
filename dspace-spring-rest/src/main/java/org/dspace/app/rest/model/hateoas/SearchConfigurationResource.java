@@ -8,6 +8,7 @@
 package org.dspace.app.rest.model.hateoas;
 
 import org.dspace.app.rest.model.SearchConfigurationRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 
 /**
  * This class serves as a wrapper class to wrap the SearchConfigurationRest into a HAL resource
