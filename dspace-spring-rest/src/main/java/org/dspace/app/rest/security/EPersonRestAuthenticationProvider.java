@@ -36,6 +36,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class is reponsible for authenticating a user via REST
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 @Component
 public class EPersonRestAuthenticationProvider implements AuthenticationProvider{
 
@@ -140,9 +145,9 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
             if (isAdmin) {
                 authorities.add(new SimpleGrantedAuthority(ADMIN_GRANT));
-            } else {
-                authorities.add(new SimpleGrantedAuthority(EPERSON_GRANT));
             }
+
+            authorities.add(new SimpleGrantedAuthority(EPERSON_GRANT));
         }
 
         return authorities;

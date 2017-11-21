@@ -1,4 +1,23 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.security;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -15,16 +34,8 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mock.web.MockHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import org.springframework.security.crypto.keygen.KeyGenerators;
+import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -69,17 +80,27 @@ public class JWTTokenHandlerTest {
 
     @Test
     public void testJWTNoEncryption() throws Exception {
-        Date previous = new Date(new Date().getTime() - 10000000000L);
+        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
         String token = jwtTokenHandler.createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
         SignedJWT signedJWT = SignedJWT.parse(token);
-        String personId = (String) signedJWT.getJWTClaimsSet().getClaim("eid");
+        String personId = (String) signedJWT.getJWTClaimsSet().getClaim(EPersonClaimProvider.EPERSON_ID);
         assertEquals("epersonID", personId);
+    }
+
+    @Test(expected = ParseException.class)
+    public void testJWTEncrypted() throws Exception {
+        when(jwtTokenHandler.isEncryptionEnabled()).thenReturn(true);
+        Date previous = new Date(System.currentTimeMillis() - 10000000000L);
+        StringKeyGenerator keyGenerator = KeyGenerators.string();
+        when(jwtTokenHandler.getEncryptionKey()).thenReturn(keyGenerator.generateKey().getBytes());
+        String token = jwtTokenHandler.createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
+        SignedJWT signedJWT = SignedJWT.parse(token);
     }
 
     //temporary set a negative expiration time so the token is invalid immediately
     @Test
     public void testExpiredToken() throws Exception {
-        when(jwtTokenHandler.getExpirationTime()).thenReturn(-99999999L);
+        when(jwtTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
         String token = jwtTokenHandler.createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());
@@ -91,7 +112,7 @@ public class JWTTokenHandlerTest {
     //Try if we can change the expiration date
     @Test
     public void testTokenTampering() throws Exception {
-        when(jwtTokenHandler.getExpirationTime()).thenReturn(-99999999L);
+        when(jwtTokenHandler.getExpirationPeriod()).thenReturn(-99999999L);
         when(ePersonClaimProvider.getEPerson(any(Context.class), any(JWTClaimsSet.class))).thenReturn(ePerson);
         Date previous = new Date(new Date().getTime() - 10000000000L);
         String token = jwtTokenHandler.createTokenForEPerson(context, new MockHttpServletRequest(), previous, new ArrayList<>());

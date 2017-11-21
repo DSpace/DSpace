@@ -8,6 +8,7 @@
 package org.dspace.app.rest.security;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -53,7 +54,8 @@ public class SpecialGroupClaimProvider implements JWTClaimProvider {
     public void parseClaim(Context context, HttpServletRequest request, JWTClaimsSet jwtClaimsSet) {
         try {
             List<String> groupIds = jwtClaimsSet.getStringListClaim(SPECIAL_GROUPS);
-            for (String groupId : groupIds) {
+
+            for (String groupId : CollectionUtils.emptyIfNull(groupIds)) {
                 context.setSpecialGroup(UUID.fromString(groupId));
             }
         } catch (ParseException e) {

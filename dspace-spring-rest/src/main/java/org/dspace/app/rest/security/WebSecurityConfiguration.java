@@ -23,7 +23,11 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-
+/**
+ * Spring Security configuration for DSpace Spring Rest
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 @EnableWebSecurity
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)

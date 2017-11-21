@@ -7,6 +7,11 @@
  */
 package org.dspace.app.rest.security;
 
+import java.sql.SQLException;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -14,11 +19,11 @@ import org.dspace.eperson.service.EPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.UUID;
-
+/**
+ * Provides a claim for a JSON Web Token, this claim is responsible for adding the EPerson ID to it
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 @Component
 public class EPersonClaimProvider implements JWTClaimProvider{
 

@@ -1,4 +1,20 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.security;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.dspace.core.Context;
@@ -12,13 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class EPersonClaimProviderTest {
 
@@ -58,8 +67,8 @@ public class EPersonClaimProviderTest {
     @Test
     public void testParseClaim() throws Exception {
         ePersonClaimProvider.parseClaim(context, httpServletRequest, jwtClaimsSet);
-        assertEquals(context.getCurrentUser().getID(), ePerson.getID());
 
+        verify(context).setCurrentUser(ePerson);
     }
 
     @Test
