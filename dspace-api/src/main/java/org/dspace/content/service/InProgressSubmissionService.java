@@ -8,7 +8,9 @@
 package org.dspace.content.service;
 
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 
 import java.sql.SQLException;
@@ -40,4 +42,6 @@ public interface InProgressSubmissionService<T extends InProgressSubmission> {
      * @throws AuthorizeException if authorization error
      */
     public void update(Context context, T inProgressSubmission) throws SQLException, AuthorizeException;
+    
+	public void move(Context context, T inProgressSubmission, Collection fromCollection, Collection toCollection) throws Exception;
 }
