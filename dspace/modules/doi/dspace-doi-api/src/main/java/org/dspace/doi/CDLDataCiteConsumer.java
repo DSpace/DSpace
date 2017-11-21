@@ -74,9 +74,6 @@ public class CDLDataCiteConsumer implements Consumer {
             ctx.abort();
 	    log.error("Problem updating DataCite settings for an item based on event " + event, e);
         }
-        finally {
-            ctx.complete();
-        }
 
     }
 

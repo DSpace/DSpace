@@ -83,7 +83,6 @@ public class VersioningConsumer implements Consumer {
                 }
                 break;
             }
-            ctx.complete();
         }
         catch (Exception e) {
             ctx.abort();

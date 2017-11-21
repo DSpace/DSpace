@@ -54,7 +54,6 @@ public class ItemModificationConsumer implements Consumer {
                 }
                 break;
             }
-            ctx.complete();
         } catch (Exception e) {
             ctx.abort();
         }
