@@ -23,6 +23,7 @@ public abstract class PatchOperation<T extends Object> {
 
 	public abstract void perform(Context context, Request currentRequest, WorkspaceItem source, String path, Object value) throws Exception;
 	
+	//FIXME manage only single value
 	public T[] evaluateObject(LateObjectEvaluator value) {
 		T[] list = null;
 		if(value!=null) {

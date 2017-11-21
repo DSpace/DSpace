@@ -85,6 +85,10 @@
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.ResourcePolicyReplacePatchOperation" />
 						</entry>
+						<entry key="collection">
+							<bean
+								class="org.dspace.app.rest.submit.factory.impl.CollectionReplacePatchOperation" />
+						</entry>						
 					</map>
 				</entry>
 			</map>
