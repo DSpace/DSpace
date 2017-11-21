@@ -51,7 +51,7 @@
             $("#login").click(function() {
                 $.ajax({
                     //This depends on this file to be called login.html
-                    url : window.location.href.replace("login.html", "") + 'api/login',
+                    url : window.location.href.replace("login.html", "") + 'api/authn/login',
                     type : 'POST',
                     async : false,
                     data : 'password='+$("#password").val()+'&user='+$("#username").val() ,
