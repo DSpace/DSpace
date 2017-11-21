@@ -56,7 +56,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 //Tell Spring to not create Sessions
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 //Return the login URL when having an access denied error
-                .exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/api/login")).and()
+                .exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/api/authn/login")).and()
                 //Anonymous requests should have the "ANONYMOUS" security grant
                 .anonymous().authorities(ANONYMOUS_GRANT).and()
                 //Wire up the HttpServletRequest with the current SecurityContext values
@@ -69,7 +69,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         //On logout, clear the "session" salt
                         .addLogoutHandler(customLogoutHandler)
                         //Configure the logout entry point
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/api/authn/logout"))
                         //When logout is successful, return OK (200) status
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                         //Everyone can call this endpoint
@@ -79,13 +79,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 //Configure the URL patterns with their authentication requirements
                 .authorizeRequests()
                     //Allow GET and POST by anyone on the login endpoint
-                    .antMatchers( "/api/login").permitAll()
+                    .antMatchers( "/api/authn/login").permitAll()
                     //Everyone can call GET on the status endpoint
-                    .antMatchers(HttpMethod.GET, "/api/status").permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
                 .and()
 
                 //Add a filter before our login endpoints to do the authentication based on the data in the HTTP request
-                .addFilterBefore(new StatelessLoginFilter("/api/login", authenticationManager(), restAuthenticationService), LogoutFilter.class)
+                .addFilterBefore(new StatelessLoginFilter("/api/authn/login", authenticationManager(), restAuthenticationService), LogoutFilter.class)
                 //TODO see comment at org.dspace.app.rest.AuthenticationRestController.shibbolethLogin()
                 .addFilterBefore(new StatelessLoginFilter("/shibboleth-login", authenticationManager(), restAuthenticationService), LogoutFilter.class)
 
