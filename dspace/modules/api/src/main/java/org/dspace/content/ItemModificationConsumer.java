@@ -28,7 +28,6 @@ public class ItemModificationConsumer implements Consumer {
         int st = event.getSubjectType();
 
         try {
-            ctx = new Context();
             ctx.turnOffAuthorisationSystem();
 
             switch (st) {

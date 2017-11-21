@@ -55,7 +55,6 @@ public class VersioningConsumer implements Consumer {
         int et = event.getEventType();
 
         try {
-            ctx = new Context();
             ctx.turnOffAuthorisationSystem();
 
             switch (st) {
