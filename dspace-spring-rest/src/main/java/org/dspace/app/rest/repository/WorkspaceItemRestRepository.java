@@ -247,7 +247,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 			String[] path = op.getPath().substring(1).split("/",3);
 			if("sections".equals(path[0])) {
 				String section = path[1];
-				String absolutePath = path[2];
+				String absolutePath = "";
+				if(path.length>2) {
+					absolutePath = path[2];
+				}
 				String operation = op.getOp();							
 				
 				evaluatePatch(context, request, source, wsi, operation, section, absolutePath, op.getValue());
