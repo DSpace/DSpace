@@ -7,6 +7,14 @@
  */
 package org.dspace.app.rest.security;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -19,13 +27,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-
+/**
+ * Custom Spring authentication filter for Stateless authentication, intercepts requests to check for valid
+ * authentication
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
 
     private static final Logger log = LoggerFactory.getLogger(StatelessAuthenticationFilter.class);

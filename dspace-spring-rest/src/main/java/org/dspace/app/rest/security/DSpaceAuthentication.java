@@ -15,6 +15,11 @@ import org.dspace.eperson.EPerson;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
+/**
+ * Custom Authentication for use with DSpace
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 public class DSpaceAuthentication implements Authentication {
 
 

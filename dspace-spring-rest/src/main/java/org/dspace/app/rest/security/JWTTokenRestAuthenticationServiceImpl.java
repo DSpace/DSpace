@@ -30,6 +30,11 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Rest Authentication implementation for JSON Web Tokens
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 @Component
 public class JWTTokenRestAuthenticationServiceImpl implements RestAuthenticationService, InitializingBean {
 
@@ -55,7 +60,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
-    public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, DSpaceAuthentication authentication) {
+    public void addAuthenticationDataForUser(HttpServletRequest request, HttpServletResponse response, DSpaceAuthentication authentication) throws IOException {
         try {
             Context context = ContextUtil.obtainContext(request);
             context.setCurrentUser(ePersonService.findByEmail(context, authentication.getName()));
@@ -72,8 +77,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
             log.error("JOSE Exception", e);
         } catch (SQLException e) {
             log.error("SQL error when adding authentication", e);
-        } catch (IOException e) {
-            log.error("Error writing to response", e);
         }
     }
 
@@ -99,7 +102,7 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
     }
 
     @Override
-    public void invalidateAuthenticationData(HttpServletRequest request, Context context) {
+    public void invalidateAuthenticationData(HttpServletRequest request, Context context) throws Exception {
         String token = getToken(request);
         jwtTokenHandler.invalidateToken(token, request, context);
     }

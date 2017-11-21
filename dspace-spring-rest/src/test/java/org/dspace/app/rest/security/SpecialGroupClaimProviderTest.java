@@ -1,4 +1,21 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.security;
+
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import org.dspace.core.Context;
@@ -10,14 +27,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SpecialGroupClaimProviderTest {
@@ -69,9 +78,10 @@ public class SpecialGroupClaimProviderTest {
     @Test
     public void parseClaim() throws Exception {
         specialGroupClaimProvider.parseClaim(context, httpServletRequest, jwtClaimsSet);
-        assertEquals(specialGroups.get(0), UUID.fromString(id1));
-        assertEquals(specialGroups.get(1), UUID.fromString(id2));
-        assertEquals(specialGroups.get(2), UUID.fromString(id3));
+
+        assertThat(specialGroups, containsInAnyOrder(
+                UUID.fromString(id1), UUID.fromString(id2), UUID.fromString(id3)));
+
     }
 
 }

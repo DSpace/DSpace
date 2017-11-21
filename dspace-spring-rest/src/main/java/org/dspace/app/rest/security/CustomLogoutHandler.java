@@ -7,8 +7,6 @@
  */
 package org.dspace.app.rest.security;
 
-import java.sql.SQLException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,6 +19,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
 
+/**
+ * Custom logout handler to support stateless sessions
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 @Component
 public class CustomLogoutHandler implements LogoutHandler {
 
@@ -40,8 +43,9 @@ public class CustomLogoutHandler implements LogoutHandler {
             Context context = ContextUtil.obtainContext(httpServletRequest);
             restAuthenticationService.invalidateAuthenticationData(httpServletRequest, context);
             context.commit();
-        } catch (SQLException e) {
-            log.error("Unable to obtain context", e);
+
+        } catch (Exception e) {
+            log.error("Unable to logout", e);
         }
     }
 }
