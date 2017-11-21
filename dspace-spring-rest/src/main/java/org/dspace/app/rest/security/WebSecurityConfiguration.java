@@ -57,8 +57,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anonymous().authorities(ANONYMOUS_GRANT).and()
                 //Wire up the HttpServletRequest with the current SecurityContext values
                 .servletApi().and()
-                //Disable CSRF as our API can be used by clients on an other domain
-                //TODO This might be a good reason to switch from using cookies to using HTTP headers
+                //Disable CSRF as our API can be used by clients on an other domain, we are also protected against this, since we pass the token in a header
                 .csrf().disable()
 
                 //Logout configuration

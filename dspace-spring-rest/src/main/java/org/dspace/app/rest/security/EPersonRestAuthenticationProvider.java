@@ -136,7 +136,6 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
                 isAdmin = authorizeService.isAdmin(context, eperson);
             } catch (SQLException e) {
                 log.error("SQL error while checking for admin rights", e);
-                //TODO FREDERIC throw exception to fail fast
             }
 
             if (isAdmin) {
