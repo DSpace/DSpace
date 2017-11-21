@@ -66,7 +66,6 @@ public class JWTTokenHandler implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        //TODO move properties to authentication module
         this.jwtKey = configurationService.getProperty("jwt.token.secret", "defaultjwtkeysecret");
         this.expirationTime = configurationService.getLongProperty("jwt.token.expiration", 30) * 60 * 1000;
         this.includeIP = configurationService.getBooleanProperty("jwt.token.include.ip", true);
@@ -152,7 +151,7 @@ public class JWTTokenHandler implements InitializingBean {
         }
 
         JWTClaimsSet claimsSet = builder
-                .expirationTime(new Date(System.currentTimeMillis() + expirationTime))
+                .expirationTime(new Date(System.currentTimeMillis() + getExpirationTime()))
                 .build();
 
         SignedJWT signedJWT = new SignedJWT(
@@ -254,4 +253,7 @@ public class JWTTokenHandler implements InitializingBean {
         return Base64.encodeBase64String(secretKey);
     }
 
+    public long getExpirationTime() {
+        return expirationTime;
+    }
 }

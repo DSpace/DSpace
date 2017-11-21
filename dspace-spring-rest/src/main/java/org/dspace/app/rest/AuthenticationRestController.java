@@ -10,7 +10,7 @@ package org.dspace.app.rest;
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.StatusRest;
-import org.dspace.app.rest.model.hateoas.StatusResource;
+import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -42,14 +42,14 @@ public class AuthenticationRestController {
 
 
     @RequestMapping(value = "/api/status", method = RequestMethod.GET)
-    public StatusResource status(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+    public AuthenticationStatusResource status(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
         if (context.getCurrentUser() != null) {
             ePersonRest = ePersonConverter.fromModel(context.getCurrentUser());
         }
-        StatusResource statusResource = new StatusResource( new StatusRest(ePersonRest), utils);
-        return statusResource;
+        AuthenticationStatusResource authenticationStatusResource = new AuthenticationStatusResource( new StatusRest(ePersonRest), utils);
+        return authenticationStatusResource;
     }
 
     @RequestMapping(value = "/api/login", method = {RequestMethod.GET, RequestMethod.POST})
