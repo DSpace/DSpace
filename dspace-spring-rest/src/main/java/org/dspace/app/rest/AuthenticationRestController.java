@@ -7,16 +7,24 @@
  */
 package org.dspace.app.rest;
 
+import java.sql.SQLException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.StatusRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
+import org.dspace.app.rest.model.hateoas.AuthnResource;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,11 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
-
-//TODO add links to login, logout and status in the Root Rest Resource
+@RequestMapping(value = "/api/" + AuthnRest.CATEGORY)
 @RestController
 public class AuthenticationRestController {
 
@@ -41,7 +45,19 @@ public class AuthenticationRestController {
     private Utils utils;
 
 
-    @RequestMapping(value = "/api/status", method = RequestMethod.GET)
+
+    @RequestMapping(method = RequestMethod.GET)
+    public AuthnResource authn(HttpServletRequest request, HttpServletResponse response) {
+        AuthnResource authnResource = new AuthnResource(new AuthnRest(), utils);
+        //This might be too hardcoded
+        authnResource.add(new Link(Utils.getRestURL(request) + "/api/authn/login", "login"));
+        authnResource.add(new Link(Utils.getRestURL(request) + "/api/authn/logout", "logout"));
+        authnResource.add(new Link(Utils.getRestURL(request) + "/api/authn/status", "status"));
+
+        return authnResource;
+    }
+
+    @RequestMapping(value = "/status", method = RequestMethod.GET)
     public AuthenticationStatusResource status(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
@@ -52,7 +68,7 @@ public class AuthenticationRestController {
         return authenticationStatusResource;
     }
 
-    @RequestMapping(value = "/api/login", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity login(HttpServletRequest request, @RequestParam(name = "user") String user,
                                 @RequestParam(name = "password") String password) {
         //If you can get here, you should be authenticated, the actual login is handled by spring security
@@ -64,6 +80,7 @@ public class AuthenticationRestController {
     }
 
     //TODO This should be moved under API, but then we also need to update org.dspace.authenticate.ShibAuthentication
+    //This is also not gonna work until it is moved
     @RequestMapping(value = "/shibboleth-login", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity shibbolethLogin(HttpServletRequest request) {
         //If you can get here, you should be authenticated, the actual login is handled by spring security.
@@ -102,5 +119,6 @@ public class AuthenticationRestController {
             return ResponseEntity.ok().build();
         }
     }
+
 
 }
