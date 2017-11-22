@@ -7,17 +7,16 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.BrowseEntryRest;
 import org.dspace.app.rest.model.BrowseIndexRest;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Browse Entry Rest HAL Resource. The HAL Resource wraps the REST Resource
@@ -41,7 +40,7 @@ public class BrowseEntryResource extends ResourceSupport {
 		BrowseIndexRest bix = entry.getBrowseIndex();
 		RestResourceController methodOn = methodOn(RestResourceController.class, bix.getCategory(), bix.getType());
 		UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn
-				.findRel(null, bix.getCategory(), English.plural(bix.getType()), bix.getId(), BrowseIndexRest.ITEMS, null, null, null))
+				.findRel(null, bix.getCategory(), bix.getTypePlural(), bix.getId(), BrowseIndexRest.ITEMS, null, null, null))
 				.toUriComponentsBuilder();
 		Link link = new Link(addFilterParams(uriComponentsBuilder).build().toString(), BrowseIndexRest.ITEMS);
 		add(link);

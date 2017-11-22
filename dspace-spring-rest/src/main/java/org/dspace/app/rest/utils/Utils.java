@@ -14,7 +14,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.model.CommunityRest;
@@ -65,7 +64,7 @@ public class Utils {
 	}
 
 	public Link linkToSingleResource(RestModel data, String rel) {
-		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data)
+		return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data)
 				.withRel(rel);
 	}
 
@@ -74,7 +73,7 @@ public class Utils {
 	}
 
 	public Link linkToSubResource(RestModel data, String rel, String path) {
-		return linkTo(data.getController(), data.getCategory(), English.plural(data.getType())).slash(data).slash(path)
+		return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data).slash(path)
 				.withRel(rel);
 	}
 
