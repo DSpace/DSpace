@@ -106,7 +106,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
     }
 
     public MockHttpServletResponse getAuthResponse(String user, String password) throws Exception {
-        return getClient().perform(post("/api/login")
+        return getClient().perform(post("/api/authn/login")
             .param("user", user)
             .param("password", password))
             .andReturn().getResponse();

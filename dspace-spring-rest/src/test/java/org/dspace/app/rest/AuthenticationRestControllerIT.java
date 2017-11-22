@@ -145,7 +145,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.authenticated", is(true)))
                 .andExpect(jsonPath("$.type", is("status")));
 
-        getClient(token).perform(get("/api/logout"))
+        getClient(token).perform(get("/api/authn/logout"))
                 .andExpect(status().isOk());
 
         getClient(token).perform(get("/api/status"))
@@ -166,7 +166,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
 
         assertNotEquals(token1, token2);
-        getClient(token1).perform(get("/api/logout"));
+        getClient(token1).perform(get("/api/authn/logout"));
 
         getClient(token1).perform(get("/api/status"))
                 .andExpect(status().isOk())
@@ -191,7 +191,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //Sleep so tokens are different
         sleep(1000);
 
-        String newToken = getClient(token).perform(get("/api/login"))
+        String newToken = getClient(token).perform(get("/api/authn/login"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getHeader("Authorization");
 
@@ -219,7 +219,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testFailedLoginResponseCode() throws Exception {
-        getClient().perform(get("/api/login").param("user", eperson.getEmail()).param("password", "fakePassword"))
+        getClient().perform(get("/api/authn/login").param("user", eperson.getEmail()).param("password", "fakePassword"))
                 .andExpect(status().isUnauthorized());
     }
 }
