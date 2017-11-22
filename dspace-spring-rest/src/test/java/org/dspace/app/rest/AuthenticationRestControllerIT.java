@@ -239,4 +239,43 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._links.logout.href", endsWith("logout")))
                 .andExpect(jsonPath("$._links.status.href", endsWith("status")));
     }
+
+    /**
+     * Check if we can just request a new token after we logged out
+     * @throws Exception
+     */
+    @Test
+    public void testLoginAgainAfterLogout() throws Exception {
+        String token = getAuthToken(eperson.getEmail(), password);
+
+        //Check if we have a valid token
+        getClient(token).perform(get("/api/authn/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.type", is("status")));
+
+        //Logout
+        getClient(token).perform(get("/api/authn/logout"))
+                .andExpect(status().isOk());
+
+        //Check if we are actually logged out
+        getClient(token).perform(get("/api/authn/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(false)))
+                .andExpect(jsonPath("$.type", is("status")));
+
+        //request a new token
+        token = getAuthToken(eperson.getEmail(), password);
+
+        //Check if we succesfully authenticated again
+        getClient(token).perform(get("/api/authn/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.okay", is(true)))
+                .andExpect(jsonPath("$.authenticated", is(true)))
+                .andExpect(jsonPath("$.type", is("status")));
+
+
+    }
 }
