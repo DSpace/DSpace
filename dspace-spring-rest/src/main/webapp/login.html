@@ -13,6 +13,7 @@
     <meta charset="utf-8">
     <title>Sign in - HAL Browser</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
     <link href="browser/vendor/css/bootstrap.css" rel="stylesheet">
     <link href="browser/vendor/css/bootstrap-responsive.css" rel="stylesheet">
     <style type="text/css">
@@ -46,27 +47,7 @@
     </style>
     <script src="browser/vendor/js/jquery-1.10.2.min.js"></script>
     <script src="browser/vendor/js/bootstrap.js"></script>
-    <script>
-        $(document).ready(function() {
-            $("#login").click(function() {
-                $.ajax({
-                    //This depends on this file to be called login.html
-                    url : window.location.href.replace("login.html", "") + 'api/authn/login',
-                    type : 'POST',
-                    async : false,
-                    data : 'password='+$("#password").val()+'&user='+$("#username").val() ,
-                    headers : {
-                        "Content-Type" : 'application/x-www-form-urlencoded',
-                        "Accept:" : '*/*'
-                    },
-                    success : function(result, status, xhr) {
-                        document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
-                        window.location.href = window.location.pathname.replace("login.html", "")
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -77,5 +58,51 @@
         <button type="button" class="btn btn-large btn-primary" id="login">Sign in</button>
     </form>
 </div>
+
+<script>
+    $(document).ready(function() {
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-center",
+            "preventDuplicates": false,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "3000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut",
+            "onclick" : function() { toastr.remove(); }
+        }
+
+        $("#login").click(function() {
+            $.ajax({
+                //This depends on this file to be called login.html
+                url : window.location.href.replace("login.html", "") + 'api/authn/login',
+                type : 'POST',
+                async : false,
+                data : 'password='+$("#password").val()+'&user='+$("#username").val() ,
+                headers : {
+                    "Content-Type" : 'application/x-www-form-urlencoded',
+                    "Accept:" : '*/*'
+                },
+                success : function(result, status, xhr) {
+                    document.cookie = "MyHalBrowserToken=" + xhr.getResponseHeader('Authorization').split(" ")[1];
+                    toastr.success('You are now logged in. Please wait while we redirect you...', 'Login Successful');
+                    setTimeout(function() {
+                        window.location.href = window.location.pathname.replace("login.html", "");
+                    }, 2000);
+                },
+                error : function() {
+                    toastr.error('The credentials you entered are invalid. Please try again.', 'Login Failed');
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

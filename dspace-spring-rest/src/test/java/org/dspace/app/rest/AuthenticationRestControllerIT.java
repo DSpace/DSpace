@@ -66,11 +66,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String token1 = getAuthToken(eperson.getEmail(), password);
 
         //Sleep so tokens are different
-        sleep(1000);
+        sleep(1200);
 
         String token2 = getAuthToken(eperson.getEmail(), password);
 
         assertNotEquals(token1, token2);
+
         getClient(token1).perform(get("/api/authn/status"))
 
                 .andExpect(status().isOk())
@@ -166,12 +167,13 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testLogoutInvalidatesAllTokens() throws Exception {
         String token1 = getAuthToken(eperson.getEmail(), password);
 
-        sleep(1000);
+        //Sleep so tokens are different
+        sleep(1200);
 
         String token2 = getAuthToken(eperson.getEmail(), password);
 
-
         assertNotEquals(token1, token2);
+
         getClient(token1).perform(get("/api/authn/logout"));
 
         getClient(token1).perform(get("/api/authn/status"))
@@ -195,7 +197,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String token = getAuthToken(eperson.getEmail(), password);
 
         //Sleep so tokens are different
-        sleep(1000);
+        sleep(1200);
 
         String newToken = getClient(token).perform(get("/api/authn/login"))
                 .andExpect(status().isOk())
@@ -215,7 +217,9 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testReuseTokenWithDifferentIP() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/authn/status").header("X-FORWARDED-FOR", "1.1.1.1"))
+        getClient(token).perform(get("/api/authn/status")
+                .header("X-FORWARDED-FOR", "1.1.1.1"))
+
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(false)))
@@ -225,15 +229,10 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
     @Test
     public void testFailedLoginResponseCode() throws Exception {
-        getClient().perform(get("/api/authn/login").param("user", eperson.getEmail()).param("password", "fakePassword"))
-                .andExpect(status().isUnauthorized());
-    }
+        getClient().perform(get("/api/authn/login")
+                .param("user", eperson.getEmail()).param("password", "fakePassword"))
 
-    @Test
-    public void testAuthnLinkInRoot() throws Exception {
-        getClient().perform(get("/api"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$._links.authn.href", endsWith("authn")));
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

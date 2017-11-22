@@ -43,7 +43,6 @@ public class AuthenticationRestController {
     private Utils utils;
 
 
-
     @RequestMapping(method = RequestMethod.GET)
     public AuthnResource authn() throws SQLException {
         return new AuthnResource(new AuthnRest(), utils);
@@ -61,8 +60,8 @@ public class AuthenticationRestController {
     }
 
     @RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity login(HttpServletRequest request, @RequestParam(name = "user") String user,
-                                @RequestParam(name = "password") String password) {
+    public ResponseEntity login(HttpServletRequest request, @RequestParam(name = "user", required = false) String user,
+                                @RequestParam(name = "password", required = false) String password) {
         //If you can get here, you should be authenticated, the actual login is handled by spring security
         //see org.dspace.app.rest.security.StatelessLoginFilter
 
