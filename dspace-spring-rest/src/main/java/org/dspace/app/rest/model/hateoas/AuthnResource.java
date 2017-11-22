@@ -30,11 +30,7 @@ public class AuthnResource extends DSpaceResource<AuthnRest> {
     public AuthnResource(AuthnRest data, Utils utils, String... rels) throws SQLException {
         super(data, utils, rels);
 
-        AuthenticationRestController methodOn = methodOn(AuthenticationRestController.class, StatusRest.CATEGORY, StatusRest.NAME);
-
-        add(new Link(linkTo(methodOn
-                .status(null))
-                .toUriComponentsBuilder().build().toString(), "status"));
+        AuthenticationRestController methodOn = methodOn(AuthenticationRestController.class);
 
         add(new Link(linkTo(methodOn
                 .login(null, null,  null))
@@ -43,5 +39,9 @@ public class AuthnResource extends DSpaceResource<AuthnRest> {
         add(new Link(linkTo(methodOn
                 .logout())
                 .toUriComponentsBuilder().build().toString(), "logout"));
+
+        add(new Link(linkTo(methodOn
+                .status(null))
+                .toUriComponentsBuilder().build().toString(), "status"));
     }
 }

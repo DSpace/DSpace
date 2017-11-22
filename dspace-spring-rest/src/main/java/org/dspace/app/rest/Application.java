@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import java.io.File;
+import java.sql.SQLException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -79,7 +80,9 @@ public class Application extends SpringBootServletInitializer {
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(Application.class)
-                .initializers(new DSpaceKernelInitializer());
+                .initializers(
+                        new DSpaceKernelInitializer(),
+                        new FlywayDatabaseMigrationInitializer());
     }
 
     @Bean
@@ -233,6 +236,30 @@ public class Application extends SpringBootServletInitializer {
                 }
             }
             return providedHome;
+        }
+    }
+
+    private class FlywayDatabaseMigrationInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            //Run the Flyway migrations by create a Context and Database connection
+            org.dspace.core.Context context = new org.dspace.core.Context();
+            boolean failed = false;
+
+            try {
+                if(context.getDBConfig() == null) {
+                    failed = true;
+                }
+
+                context.complete();
+
+            } catch (SQLException e) {
+                failed = true;
+            }
+
+            if(failed) {
+                throw new RuntimeException("Unable to initialize the database");
+            }
         }
     }
 }
