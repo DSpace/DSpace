@@ -7,6 +7,17 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,17 +34,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
-
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A base class for DSpace Rest HAL Resource. The HAL Resource wraps the REST
@@ -141,10 +141,11 @@ public abstract class DSpaceResource<T extends RestModel> extends ResourceSuppor
 								}
 								if (linkedObject != null) {
 									embedded.put(name, wrapObject);
-								} else {
+									this.add(linkToSubResource);
+								} else if(!linkAnnotation.optional()) {
 									embedded.put(name, null);
+									this.add(linkToSubResource);
 								}
-								this.add(linkToSubResource);
 
 								Method writeMethod = pd.getWriteMethod();
 								writeMethod.invoke(data, new Object[] { null });

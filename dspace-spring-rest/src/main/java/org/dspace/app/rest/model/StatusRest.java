@@ -22,7 +22,7 @@ public class StatusRest extends BaseObjectRest<Integer>
     private boolean authenticated;
 
     public static final String NAME = "status";
-    public static final String CATEGORY = "";
+    public static final String CATEGORY = "authn";
 
     @Override
     public String getCategory() {
@@ -32,6 +32,12 @@ public class StatusRest extends BaseObjectRest<Integer>
     @Override
     public String getType() {
         return NAME;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTypePlural() {
+        return getType();
     }
 
     public Class getController() {

@@ -122,7 +122,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         //Tamper with the token, insert id of group we don't belong to
         String[] jwtSplit = token.split("\\.");
 
-        String tampered = new String(Base64.getUrlEncoder().encode(new String(Base64.getUrlDecoder().decode(token.split("\\.")[1])).replaceAll("\\[]", "[\"" + internalGroup.getID() + "\"]").getBytes()));
+        //We try to inject a special group ID to spoof membership
+        String tampered = new String(Base64.getUrlEncoder().encode(
+                new String(Base64.getUrlDecoder().decode(
+                        token.split("\\.")[1]))
+                        .replaceAll("\\[]", "[\"" + internalGroup.getID() + "\"]")
+                        .getBytes()));
 
         String tamperedToken = jwtSplit[0] + "." + tampered + "." + jwtSplit[2];
 
