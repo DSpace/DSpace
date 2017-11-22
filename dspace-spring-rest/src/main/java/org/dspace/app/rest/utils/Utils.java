@@ -11,6 +11,8 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
@@ -139,5 +141,10 @@ public class Utils {
 			}
 		}
 		return linkRest;
+	}
+
+	public static String getRestURL(HttpServletRequest request) {
+		String url = request.getRequestURL().toString();
+		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath();
 	}
 }

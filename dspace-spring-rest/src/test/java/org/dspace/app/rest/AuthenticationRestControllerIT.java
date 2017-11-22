@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static java.lang.Thread.sleep;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNotEquals;
@@ -32,7 +33,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testStatusAuthenticated() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/status"))
+        getClient(token).perform(get("/api/authn/status"))
 
                 .andExpect(status().isOk())
 
@@ -49,7 +50,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     @Test
     public void testStatusNotAuthenticated() throws Exception {
 
-        getClient().perform(get("/api/status"))
+        getClient().perform(get("/api/authn/status"))
 
                 .andExpect(status().isOk())
 
@@ -70,7 +71,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String token2 = getAuthToken(eperson.getEmail(), password);
 
         assertNotEquals(token1, token2);
-        getClient(token1).perform(get("/api/status"))
+        getClient(token1).perform(get("/api/authn/status"))
 
                 .andExpect(status().isOk())
 
@@ -83,7 +84,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._links.eperson.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._embedded.eperson.email", is(eperson.getEmail())));
 
-        getClient(token2).perform(get("/api/status"))
+        getClient(token2).perform(get("/api/authn/status"))
 
                 .andExpect(status().isOk())
 
@@ -104,7 +105,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String token = getAuthToken(eperson.getEmail(), password);
 
         //Check it is really valid
-        getClient(token).perform(get("/api/status"))
+        getClient(token).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
 
                 .andExpect(jsonPath("$.okay", is(true)))
@@ -126,7 +127,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         String tamperedToken = jwtSplit[0] + "." + tampered + "." + jwtSplit[2];
 
         //Try to get authenticated with the tampered token
-        getClient(tamperedToken).perform(get("/api/status"))
+        getClient(tamperedToken).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
 
                 .andExpect(jsonPath("$.okay", is(true)))
@@ -138,7 +139,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testLogout() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/status"))
+        getClient(token).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
 
                 .andExpect(jsonPath("$.okay", is(true)))
@@ -148,7 +149,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         getClient(token).perform(get("/api/authn/logout"))
                 .andExpect(status().isOk());
 
-        getClient(token).perform(get("/api/status"))
+        getClient(token).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
 
                 .andExpect(jsonPath("$.okay", is(true)))
@@ -168,7 +169,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
         assertNotEquals(token1, token2);
         getClient(token1).perform(get("/api/authn/logout"));
 
-        getClient(token1).perform(get("/api/status"))
+        getClient(token1).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
 
                 .andExpect(jsonPath("$.okay", is(true)))
@@ -176,7 +177,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.type", is("status")));
 
 
-        getClient(token2).perform(get("/api/status"))
+        getClient(token2).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
 
                 .andExpect(jsonPath("$.okay", is(true)))
@@ -197,7 +198,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         assertNotEquals(token, newToken);
 
-        getClient(newToken).perform(get("/api/status"))
+        getClient(newToken).perform(get("/api/authn/status"))
                 .andExpect(status().isOk())
 
                 .andExpect(jsonPath("$.okay", is(true)))
@@ -209,7 +210,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testReuseTokenWithDifferentIP() throws Exception {
         String token = getAuthToken(eperson.getEmail(), password);
 
-        getClient(token).perform(get("/api/status").header("X-FORWARDED-FOR", "1.1.1.1"))
+        getClient(token).perform(get("/api/authn/status").header("X-FORWARDED-FOR", "1.1.1.1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.okay", is(true)))
                 .andExpect(jsonPath("$.authenticated", is(false)))
@@ -221,5 +222,21 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
     public void testFailedLoginResponseCode() throws Exception {
         getClient().perform(get("/api/authn/login").param("user", eperson.getEmail()).param("password", "fakePassword"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testAuthnLinkInRoot() throws Exception {
+        getClient().perform(get("/api"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._links.authn.href", endsWith("authn")));
+    }
+
+    @Test
+    public void testLoginLogoutStatusLink() throws Exception {
+        getClient().perform(get("/api/authn"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._links.login.href", endsWith("login")))
+                .andExpect(jsonPath("$._links.logout.href", endsWith("logout")))
+                .andExpect(jsonPath("$._links.status.href", endsWith("status")));
     }
 }
