@@ -101,10 +101,10 @@ public class SubmissionInfo extends HashMap
      * 
      * @return a SubmissionInfo object
      * 
-     * @throws ServletException
-     *             if an error occurs
+     * @throws SubmissionConfigReaderException
+     *             if an error occurs with the submission configuration retrieval
      */
-    public static SubmissionInfo load(HttpServletRequest request, InProgressSubmission subItem) throws ServletException
+    public static SubmissionInfo load(HttpServletRequest request, InProgressSubmission subItem) throws SubmissionConfigReaderException
     {
         boolean forceReload = false;
     	SubmissionInfo subInfo = new SubmissionInfo();
@@ -192,11 +192,11 @@ public class SubmissionInfo extends HashMap
      * @param request
      *            The HTTP Servlet Request object
      * 
-     * @throws ServletException
-     *             if an error occurs
+	 * @throws SubmissionConfigReaderException
+     *             if an error occurs with the submission configuration retrieval
      */
     public void reloadSubmissionConfig(HttpServletRequest request)
-            throws ServletException
+            throws SubmissionConfigReaderException
     {
         // Only if the submission item is created can we set its collection
         String collectionHandle = SubmissionConfigReader.DEFAULT_COLLECTION;
@@ -221,11 +221,11 @@ public class SubmissionInfo extends HashMap
      * 
      * @return the SubmissionStepConfig representing the step
      * 
-     * @throws ServletException
+     * @throws SubmissionConfigReaderException
      *             if no default submission process configuration defined
      */
     public SubmissionStepConfig getStepConfig(String stepID)
-            throws ServletException
+            throws SubmissionConfigReaderException
     {
         return submissionConfigReader.getStepConfig(stepID);
     }
@@ -592,7 +592,7 @@ public class SubmissionInfo extends HashMap
      */
     private static void loadSubmissionConfig(HttpServletRequest request,
             SubmissionInfo subInfo, boolean forceReload)
-            throws ServletException
+            throws SubmissionConfigReaderException
     {
 
         log.debug("Loading Submission Config information");
@@ -610,8 +610,7 @@ public class SubmissionInfo extends HashMap
             // reload the proper Submission process config
             // (by reading the XML config file)
             subInfo.submissionConfig = submissionConfigReader
-                    .getSubmissionConfig(subInfo.getCollectionHandle(), subInfo
-                            .isInWorkflow());
+                    .getSubmissionConfigByCollection(subInfo.getCollectionHandle());
 
             // cache this new submission process configuration
             saveSubmissionConfigToCache(request.getSession(),

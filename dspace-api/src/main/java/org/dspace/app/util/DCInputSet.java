@@ -7,7 +7,6 @@
  */
 package org.dspace.app.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,26 +21,31 @@ public class DCInputSet
 {
     /** name of the input set  */
     private String formName = null; 
-    /** the inputs ordered by page and row position */
-    private DCInput[][] inputPages = null;
+    /** the inputs ordered by row position */
+    private DCInput[] inputs = null;
     
-        /** constructor
-         * @param formName form name
-         * @param pages pages
-         * @param listMap map
-         */
-    public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
+	/**
+	 * constructor
+	 * 
+	 * @param formName
+	 *            form name
+	 * @param headings
+	 * @param mandatoryFlags
+	 * @param fields
+	 *            fields
+	 * @param listMap
+	 *            map
+	 */
+	public DCInputSet(String formName,
+			List<Map<String, String>> fields, Map<String, List<String>> listMap)
     {
         this.formName = formName;
-        inputPages = new DCInput[pages.size()][];
-        for ( int i = 0; i < inputPages.length; i++ )
+        this.inputs = new DCInput[fields.size()];
+        for ( int i = 0; i < inputs.length; i++ )
         {
-            List<Map<String, String>> page = pages.get(i);
-            inputPages[i] = new DCInput[page.size()];
-            for ( int j = 0; j < inputPages[i].length; j++ )
-            {
-                inputPages[i][j] = new DCInput(page.get(j), listMap);
-            }
+            Map<String, String> field = fields.get(i);
+            inputs[i] = new DCInput(field, listMap);
+            
         }
     }
     
@@ -55,43 +59,23 @@ public class DCInputSet
     }
     
     /**
-     * Return the number of pages in this  input set
+     * Return the number of fields in this  input set
      * @return number of pages
      */
-    public int getNumberPages()
+    public int getNumberFields()
     {
-        return inputPages.length;
+        return inputs.length;
     }
     
     /**
-     * Get all the rows for a page from the form definition
+     * Get all the fields
      *
-     * @param  pageNum    desired page within set
-     * @param  addTitleAlternative flag to add the additional title row
-     * @param  addPublishedBefore  flag to add the additional published info
-     *
-     * @return  an array containing the page's displayable rows
+     * @return  an array containing the fields
      */
     
-    public DCInput[] getPageRows(int pageNum, boolean addTitleAlternative,
-                                   boolean addPublishedBefore)
+    public DCInput[] getFields()
     {
-        List<DCInput> filteredInputs = new ArrayList<DCInput>();
-        if ( pageNum < inputPages.length )
-        {
-            for (int i = 0; i < inputPages[pageNum].length; i++ )
-            {
-                DCInput input = inputPages[pageNum][i];
-                if (doField(input, addTitleAlternative, addPublishedBefore))
-                {
-                    filteredInputs.add(input);
-                }
-            }
-        }
-
-        // Convert list into an array
-        DCInput[] inputArray = new DCInput[filteredInputs.size()];
-        return filteredInputs.toArray(inputArray);
+    	return inputs;
     }
     
     /**
@@ -101,7 +85,7 @@ public class DCInputSet
      */
     public boolean isDefinedMultTitles()
     {
-        return isFieldPresent("title.alternative");
+        return isFieldPresent("dc.title.alternative");
     }
     
     /**
@@ -111,9 +95,9 @@ public class DCInputSet
      */
     public boolean isDefinedPubBefore()
     {
-        return ( isFieldPresent("date.issued") && 
-                 isFieldPresent("identifier.citation") &&
-                 isFieldPresent("publisher.null") );
+        return ( isFieldPresent("dc.date.issued") && 
+                 isFieldPresent("dc.identifier.citation") &&
+                 isFieldPresent("dc.publisher.null") );
     }
     
     /**
@@ -125,18 +109,14 @@ public class DCInputSet
      */
     public boolean isFieldPresent(String fieldName)
     {
-        for (int i = 0; i < inputPages.length; i++)
+        for (int i = 0; i < inputs.length; i++)
         {
-            DCInput[] pageInputs = inputPages[i];
-            for (int row = 0; row < pageInputs.length; row++)
-            {
-                String fullName = pageInputs[row].getElement() + "." + 
-                                    pageInputs[row].getQualifier();
+            DCInput field = inputs[i];
+                String fullName = field.getFieldName();
                 if (fullName.equals(fieldName))
                 {
                     return true;
                 }
-            }
         }
         return false;
     }
@@ -155,20 +135,16 @@ public class DCInputSet
          if (documentType == null) {
              documentType = "";
          }
-         for (int i = 0; i < inputPages.length; i++)
+         for (int i = 0; i < inputs.length; i++)
          {
-             DCInput[] pageInputs = inputPages[i];
-             for (int row = 0; row < pageInputs.length; row++)
-             {
-                 String fullName = pageInputs[row].getElement() + "." + 
-                                     pageInputs[row].getQualifier();
+             DCInput field = inputs[i];
+                 String fullName = field.getFieldName();
                  if (fullName.equals(fieldName) )
                  {
-                     if (pageInputs[row].isAllowedFor(documentType)) {
+                     if (field.isAllowedFor(documentType)) {
                          return true;
                      }
                  }
-             }
          }
          return false;
      }
@@ -176,24 +152,25 @@ public class DCInputSet
     protected boolean doField(DCInput dcf, boolean addTitleAlternative,
                                    boolean addPublishedBefore)
     {
-        String rowName = dcf.getElement() + "." + dcf.getQualifier();
-        if ( rowName.equals("title.alternative") && ! addTitleAlternative )
+        String rowName = dcf.getFieldName();
+        if ( rowName.equals("dc.title.alternative") && ! addTitleAlternative )
         {
             return false;
         }
-        if (rowName.equals("date.issued") && ! addPublishedBefore )
+        if (rowName.equals("dc.date.issued") && ! addPublishedBefore )
         {
             return false;
         }
-        if (rowName.equals("publisher.null") && ! addPublishedBefore )
+        if (rowName.equals("dc.publisher.null") && ! addPublishedBefore )
         {
             return false;
         }
-        if (rowName.equals("identifier.citation") && ! addPublishedBefore )
+        if (rowName.equals("dc.identifier.citation") && ! addPublishedBefore )
         {
             return false;
         }
 
         return true;
     }
+
 }

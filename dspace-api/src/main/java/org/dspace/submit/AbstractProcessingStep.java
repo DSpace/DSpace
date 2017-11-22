@@ -300,7 +300,7 @@ public abstract class AbstractProcessingStep
      * This method may just return 1 for most steps (since most steps consist of
      * a single page). But, it should return a number greater than 1 for any
      * "step" which spans across a number of HTML pages. For example, the
-     * configurable "Describe" step (configured using input-forms.xml) overrides
+     * configurable "Describe" step (configured using submission-forms.xml) overrides
      * this method to return the number of pages that are defined by its
      * configuration file.
      * <P>

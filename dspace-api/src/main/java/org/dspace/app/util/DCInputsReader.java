@@ -13,13 +13,19 @@ import java.util.*;
 import org.dspace.services.factory.DSpaceServicesFactory;
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;
+
+import javax.servlet.ServletException;
 import javax.xml.parsers.*;
 
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.dspace.content.Collection;
 import org.dspace.content.MetadataSchema;
+import org.dspace.core.Utils;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
- * form definitions file, input-forms.xml, from the configuration directory.
+ * form definitions file, submission-forms.xml, from the configuration directory.
  * A forms definition details the page and field layout of the metadata
  * collection pages used by the submission process. Each forms definition
  * starts with a unique name that gets associated with that form set.
@@ -48,22 +54,17 @@ public class DCInputsReader
     public static final String DEFAULT_COLLECTION = "default";
 
     /** Name of the form definition XML file  */
-    static final String FORM_DEF_FILE = "input-forms.xml";
+    static final String FORM_DEF_FILE = "submission-forms.xml";
 
     /** Keyname for storing dropdown value-pair set name */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
 
-    /**
-     * Reference to the collections to forms map, computed from the forms
-     * definition file
-     */
-    private Map<String, String> whichForms = null;
 
     /**
      * Reference to the forms definitions map, computed from the forms
      * definition file
      */
-    private Map<String, List<List<Map<String, String>>>> formDefns  = null;
+    private Map<String, List<Map<String, String>>> formDefns  = null;
 
     /**
      * Reference to the value-pairs map, computed from the forms definition file
@@ -107,10 +108,9 @@ public class DCInputsReader
     private void buildInputs(String fileName)
          throws DCInputsReaderException
     {
-        whichForms = new HashMap<String, String>();
-        formDefns  = new HashMap<String, List<List<Map<String, String>>>>();
+        formDefns  = new HashMap<String, List<Map<String, String>>>();
         valuePairs = new HashMap<String, List<String>>();
-
+        
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
         try
@@ -154,47 +154,124 @@ public class DCInputsReader
      * @return DC input set
      * @throws DCInputsReaderException
      *             if no default set defined
+     * @throws ServletException 
      */
-    public DCInputSet getInputs(String collectionHandle)
+    public List<DCInputSet> getInputsByCollectionHandle(String collectionHandle)
         throws DCInputsReaderException
     {
-        String formName = whichForms.get(collectionHandle);
-        if (formName == null)
+    	SubmissionConfig config;
+		try {
+			config = new SubmissionConfigReader().getSubmissionConfigByCollection(collectionHandle);
+			String formName = config.getSubmissionName();
+	        if (formName == null)
+	        {
+	            throw new DCInputsReaderException("No form designated as default");
+	        }
+	        List<DCInputSet> results = new ArrayList<DCInputSet>();
+	        for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
+				SubmissionStepConfig step = config.getStep(idx);
+				if(SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
+					results.add(getInputsByFormName(step.getId()));
+				}
+	        }
+	        return results;
+		} catch (SubmissionConfigReaderException e) {
+			throw new DCInputsReaderException("No form designated as default", e);
+		}
+    }
+       
+    public List<DCInputSet> getInputsBySubmissionName(String name)
+            throws DCInputsReaderException
         {
-            formName = whichForms.get(DEFAULT_COLLECTION);
+        	SubmissionConfig config;
+    		try {
+    			config = new SubmissionConfigReader().getSubmissionConfigByName(name);
+    			String formName = config.getSubmissionName();
+    	        if (formName == null)
+    	        {
+    	            throw new DCInputsReaderException("No form designated as default");
+    	        }
+    	        List<DCInputSet> results = new ArrayList<DCInputSet>();
+    	        for (int idx = 0; idx < config.getNumberOfSteps(); idx++) {
+    				SubmissionStepConfig step = config.getStep(idx);
+    				if(SubmissionStepConfig.INPUT_FORM_STEP_NAME.equals(step.getType())) {
+    					results.add(getInputsByFormName(step.getId()));
+    				}
+    	        }
+    	        return results;
+    		} catch (SubmissionConfigReaderException e) {
+    			throw new DCInputsReaderException("No form designated as default", e);
+    		}
         }
-        if (formName == null)
-        {
-            throw new DCInputsReaderException("No form designated as default");
-        }
+    
+    /**
+     * Returns the set of DC inputs used for a particular input form
+     *
+     * @param formName
+     *            input form unique name
+     * @return DC input set
+     * @throws DCInputsReaderException
+     *             if not found
+     */
+    public DCInputSet getInputsByFormName(String formName)
+        throws DCInputsReaderException
+    {
         // check mini-cache, and return if match
         if ( lastInputSet != null && lastInputSet.getFormName().equals( formName ) )
         {
             return lastInputSet;
         }
         // cache miss - construct new DCInputSet
-        List<List<Map<String, String>>> pages = formDefns.get(formName);
+        List<Map<String, String>> pages = formDefns.get(formName);
         if ( pages == null )
         {
             throw new DCInputsReaderException("Missing the " + formName  + " form");
         }
-        lastInputSet = new DCInputSet(formName, pages, valuePairs);
+		lastInputSet = new DCInputSet(formName,
+				pages, valuePairs);
         return lastInputSet;
     }
     
     /**
-     * Return the number of pages the inputs span for a desginated collection
-     * @param  collectionHandle   collection's unique Handle
-     * @return number of pages of input
-     * @throws DCInputsReaderException if no default set defined
-     */
-    public int getNumberInputPages(String collectionHandle)
-        throws DCInputsReaderException
-    {
-        return getInputs(collectionHandle).getNumberPages();
-    }
-    
-    /**
+	 * 
+	 * @return the number of defined input forms
+	 */
+	public int countInputs() {
+		return formDefns.size();
+	}
+
+
+	/**
+	 * Returns all the Input forms with pagination 
+	 * 
+	 * @param limit
+	 *            max number of Input Forms to return
+	 * @param offset
+	 *            number of Input form to skip in the return
+	 *            
+	 * @return the list of input forms
+	 * @throws DCInputsReaderException 
+	 * 
+	 */
+	public List<DCInputSet> getAllInputs(Integer limit, Integer offset) throws DCInputsReaderException {
+		int idx = 0;
+		int count = 0;
+		List<DCInputSet> subConfigs = new LinkedList<DCInputSet>();
+		for (String key : formDefns.keySet()) {
+			if (offset == null || idx >= offset) {
+				count++;
+				subConfigs.add(getInputsByFormName(key));
+			}
+			idx++;
+			if (count >= limit) {
+				break;
+			}
+		}
+		return subConfigs;
+	}
+
+
+	/**
      * Process the top level child nodes in the passed top-level node. These
      * should correspond to the collection-form maps, the form definitions, and
      * the display/storage word pairs.
@@ -212,7 +289,6 @@ public class DCInputsReader
         Node e = getElement(n);
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
-        boolean foundMap  = false;
         boolean foundDefs = false;
         for (int i = 0; i < len; i++)
         {
@@ -222,12 +298,7 @@ public class DCInputsReader
                 continue;
             }
             String tagName = nd.getNodeName();
-            if (tagName.equals("form-map"))
-            {
-                processMap(nd);
-                foundMap = true;
-            }
-            else if (tagName.equals("form-definitions"))
+            if (tagName.equals("form-definitions"))
             {
                 processDefinition(nd);
                 foundDefs = true;
@@ -238,50 +309,9 @@ public class DCInputsReader
             }
             // Ignore unknown nodes
         }
-        if (!foundMap)
-        {
-            throw new DCInputsReaderException("No collection to form map found");
-        }
         if (!foundDefs)
         {
             throw new DCInputsReaderException("No form definition found");
-        }
-    }
-
-    /**
-     * Process the form-map section of the XML file.
-     * Each element looks like:
-     *   <name-map collection-handle="hdl" form-name="name" />
-     * Extract the collection handle and form name, put name in hashmap keyed
-     * by the collection handle.
-     */
-    private void processMap(Node e)
-        throws SAXException
-    {
-        NodeList nl = e.getChildNodes();
-        int len = nl.getLength();
-        for (int i = 0; i < len; i++)
-        {
-            Node nd = nl.item(i);
-            if (nd.getNodeName().equals("name-map"))
-            {
-                String id = getAttribute(nd, "collection-handle");
-                String value = getAttribute(nd, "form-name");
-                String content = getValue(nd);
-                if (id == null)
-                {
-                    throw new SAXException("name-map element is missing collection-handle attribute");
-                }
-                if (value == null)
-                {
-                    throw new SAXException("name-map element is missing form-name attribute");
-                }
-                if (content != null && content.length() > 0)
-                {
-                    throw new SAXException("name-map element has content, it should be empty.");
-                }
-                whichForms.put(id, value);
-            }  // ignore any child node that isn't a "name-map"
         }
     }
 
@@ -310,45 +340,28 @@ public class DCInputsReader
                 {
                     throw new SAXException("form element has no name attribute");
                 }
-                List<List<Map<String, String>>> pages = new ArrayList<List<Map<String, String>>>(); // the form contains pages
-                formDefns.put(formName, pages);
+                List<Map<String, String>> fields = new ArrayList<Map<String, String>>(); // the form contains fields
+                formDefns.put(formName, fields);
                 NodeList pl = nd.getChildNodes();
                 int lenpg = pl.getLength();
                 for (int j = 0; j < lenpg; j++)
                 {
-                    Node npg = pl.item(j);
-                    // process each page definition
-                    if (npg.getNodeName().equals("page"))
-                    {
-                        String pgNum = getAttribute(npg, "number");
-                        if (pgNum == null)
-                        {
-                            throw new SAXException("Form " + formName + " has no identified pages");
-                        }
-                        List<Map<String, String>> page = new ArrayList<Map<String, String>>();
-                        pages.add(page);
-                        NodeList flds = npg.getChildNodes();
-                        int lenflds = flds.getLength();
-                        for (int k = 0; k < lenflds; k++)
-                        {
-                            Node nfld = flds.item(k);
-                            if ( nfld.getNodeName().equals("field") )
-                            {
-                                // process each field definition
-                                Map<String, String> field = new HashMap<String, String>();
-                                page.add(field);
-                                processPageParts(formName, pgNum, nfld, field);
+					Node npg = pl.item(j);
 
-                                // we omit the duplicate validation, allowing multiple fields definition for 
-                                // the same metadata and different visibility/type-bind
-                            }
-                        }
-                    } // ignore any child that is not a 'page'
+					if (npg.getNodeName().equals("field")) {
+						// process each field definition
+						Map<String, String> field = new HashMap<String, String>();
+						processField(formName, npg, field);
+						fields.add(field);
+						// we omit the duplicate validation, allowing multiple
+						// fields definition for
+						// the same metadata and different visibility/type-bind
+					}
                 }
-                // sanity check number of pages
-                if (pages.size() < 1)
+                // sanity check number of fields
+                if (fields.size() < 1)
                 {
-                    throw new DCInputsReaderException("Form " + formName + " has no pages");
+                    throw new DCInputsReaderException("Form " + formName + " has no fields");
                 }
             }
         }
@@ -364,7 +377,7 @@ public class DCInputsReader
      * 'twobox' are marked repeatable. Complain if dc-element, label,
      * or input-type are missing.
      */
-    private void processPageParts(String formName, String page, Node n, Map<String, String> field)
+    private void processField(String formName, Node n, Map<String, String> field)
         throws SAXException
     {
         NodeList nl = n.getChildNodes();
@@ -437,7 +450,7 @@ public class DCInputsReader
         }
         if ( missing != null )
         {
-            String msg = "Required field " + missing + " missing on page " + page + " of form " + formName;
+            String msg = "Required field " + missing + " missing on form " + formName;
             throw new SAXException(msg);
         }
         String type = field.get("input-type");
@@ -604,13 +617,10 @@ public class DCInputsReader
         while (ki.hasNext())
         {
             String idName = ki.next();
-            List<List<Map<String, String>>> pages = formDefns.get(idName);
-            for (int i = 0; i < pages.size(); i++)
+            List<Map<String, String>> fields = formDefns.get(idName);
+            for (int i = 0; i < fields.size(); i++)
             {
-                List<Map<String, String>> page = pages.get(i);
-                for (int j = 0; j < page.size(); j++)
-                {
-                    Map<String, String> fld = page.get(j);
+                Map<String, String> fld = fields.get(i);
                     // verify reference in certain input types
                     String type = fld.get("input-type");
                     if (type.equals("dropdown")
@@ -628,7 +638,6 @@ public class DCInputsReader
                 
                         // we omit the "required" and "visibility" validation, provided this must be checked in the processing class
                         // only when it makes sense (if the field isn't visible means that it is not applicable, therefore it can't be required)
-                }
             }
         }
     }
@@ -705,4 +714,21 @@ public class DCInputsReader
         // Didn't find a text node
         return null;
     }
+    
+	public String getInputFormNameByCollectionAndField(Collection collection, String field) throws DCInputsReaderException {
+		List<DCInputSet> inputSets = getInputsByCollectionHandle(collection.getHandle());
+		for (DCInputSet inputSet : inputSets) {
+			String[] tokenized = Utils.tokenize(field);
+			String schema = tokenized[0];
+			String element = tokenized[1];
+			String qualifier = tokenized[2];
+			if(StringUtils.isBlank(qualifier)) {
+				qualifier = null;
+			}
+			if (inputSet.isFieldPresent(schema+"."+element+"."+qualifier)) {
+				return inputSet.getFormName();
+			}
+		}
+		throw new DCInputsReaderException("No field configuration found!");
+	}
 }

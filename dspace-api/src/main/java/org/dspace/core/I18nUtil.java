@@ -224,17 +224,17 @@ public class I18nUtil
 
 
     /**
-     * Get the appropriate localized version of input-forms.xml according to language settings
+     * Get the appropriate localized version of submission-forms.xml according to language settings
      *
      * @param locale
-     *        Locale, the local to get the input-forms.xml for
-     * @return String - localized filename for input-forms.xml
+     *        Locale, the local to get the submission-forms.xml for
+     * @return String - localized filename for submission-forms.xml
      */
     public static String getInputFormsFileName(Locale locale)
     {
         /** Name of the form definition XML file */
         String fileName = "";
-        final String FORM_DEF_FILE = "input-forms";
+        final String FORM_DEF_FILE = "submission-forms";
         final String FILE_TYPE = ".xml";
         String defsFilename = DSpaceServicesFactory.getInstance().getConfigurationService().getProperty("dspace.dir")
                 + File.separator + "config" + File.separator + FORM_DEF_FILE;

@@ -95,7 +95,7 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
     }
 
     protected <B> B handleException(final Exception e) {
-        log.error(e);
+        log.error(e.getMessage(), e);
         return null;
     }
 
@@ -104,7 +104,7 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
     protected <B extends AbstractBuilder<T>> B addMetadataValue(final T dso, final String schema, final String element, final String qualifier, final String value) {
         try {
             getDsoService().addMetadata(context, dso, schema, element, qualifier, Item.ANY, value);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             return handleException(e);
         }
         return (B) this;
@@ -113,7 +113,7 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
     protected <B extends AbstractBuilder<T>> B setMetadataSingleValue(final T dso, final String schema, final String element, final String qualifier, final String value) {
         try {
             getDsoService().setMetadataSingleValue(context, dso, schema, element, qualifier, Item.ANY, value);
-        } catch (SQLException e) {
+        } catch (Exception e) {
             return handleException(e);
         }
 

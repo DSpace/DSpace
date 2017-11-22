@@ -10,7 +10,6 @@ package org.dspace.app.rest;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.model.AuthnRest;
@@ -24,7 +23,6 @@ import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,18 +45,12 @@ public class AuthenticationRestController {
 
 
     @RequestMapping(method = RequestMethod.GET)
-    public AuthnResource authn(HttpServletRequest request, HttpServletResponse response) {
-        AuthnResource authnResource = new AuthnResource(new AuthnRest(), utils);
-        //This might be too hardcoded
-        authnResource.add(new Link(Utils.getRestURL(request) + "/api/authn/login", "login"));
-        authnResource.add(new Link(Utils.getRestURL(request) + "/api/authn/logout", "logout"));
-        authnResource.add(new Link(Utils.getRestURL(request) + "/api/authn/status", "status"));
-
-        return authnResource;
+    public AuthnResource authn() throws SQLException {
+        return new AuthnResource(new AuthnRest(), utils);
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
-    public AuthenticationStatusResource status(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+    public AuthenticationStatusResource status(HttpServletRequest request) throws SQLException {
         Context context = ContextUtil.obtainContext(request);
         EPersonRest ePersonRest = null;
         if (context.getCurrentUser() != null) {
@@ -99,10 +91,11 @@ public class AuthenticationRestController {
         return getLoginResponse(request, "Shibboleth authentication failed: No valid Shibboleth session could be found.");
     }
 
-    //@RequestMapping(value = "/api/logout", method = {RequestMethod.GET, RequestMethod.POST})
-    //public ResponseEntity logout(HttpServletRequest request) {
+    @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity logout() {
         //This is handled by org.dspace.app.rest.security.CustomLogoutHandler
-    //}
+        return ResponseEntity.ok().build();
+    }
 
     protected ResponseEntity getLoginResponse(HttpServletRequest request, String failedMessage) {
         //Get the context and check if we have an authenticated eperson

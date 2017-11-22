@@ -170,7 +170,7 @@ public class BrowseItemLinkRepository extends AbstractDSpaceRestRepository
 	}
 	
 	@Override
-	public boolean isEmbbeddableRelation(Object data, String name) {
+	public boolean isEmbeddableRelation(Object data, String name) {
 		BrowseIndexRest bir = (BrowseIndexRest) data;
 		if (!bir.isMetadataBrowse() && "items".equals(name)) {
 			return true;
