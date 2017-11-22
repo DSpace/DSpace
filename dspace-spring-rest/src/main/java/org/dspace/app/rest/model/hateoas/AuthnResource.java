@@ -7,8 +7,17 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+import java.sql.SQLException;
+
+import org.dspace.app.rest.AuthenticationRestController;
 import org.dspace.app.rest.model.AuthnRest;
+import org.dspace.app.rest.model.StatusRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
+import org.springframework.hateoas.Link;
 
 /**
  * Authn Rest Resource, used to link to login, logout, status, ...
@@ -16,8 +25,23 @@ import org.dspace.app.rest.utils.Utils;
  * @author Atmire NV (info at atmire dot com)
  */
 @RelNameDSpaceResource(AuthnRest.NAME)
-public class AuthnResource extends DSpaceResource<AuthnRest>{
-    public AuthnResource(AuthnRest data, Utils utils, String... rels) {
+public class AuthnResource extends DSpaceResource<AuthnRest> {
+
+    public AuthnResource(AuthnRest data, Utils utils, String... rels) throws SQLException {
         super(data, utils, rels);
+
+        AuthenticationRestController methodOn = methodOn(AuthenticationRestController.class, StatusRest.CATEGORY, StatusRest.NAME);
+
+        add(new Link(linkTo(methodOn
+                .status(null))
+                .toUriComponentsBuilder().build().toString(), "status"));
+
+        add(new Link(linkTo(methodOn
+                .login(null, null,  null))
+                .toUriComponentsBuilder().build().toString(), "login"));
+
+        add(new Link(linkTo(methodOn
+                .logout())
+                .toUriComponentsBuilder().build().toString(), "logout"));
     }
 }

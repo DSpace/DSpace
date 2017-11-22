@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.dspace.app.rest.RestResourceController;
 import org.dspace.app.rest.model.BrowseEntryRest;
 import org.dspace.app.rest.model.BrowseIndexRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -46,7 +47,7 @@ public class BrowseEntryResource extends ResourceSupport {
 		add(link);
 	}
 
-	// TODO use the reflaction to discover the link repository and additional information on the link annotation to build the parameters? 
+	// TODO use the reflection to discover the link repository and additional information on the link annotation to build the parameters? 
 	private UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder) {
 		UriComponentsBuilder result;
 		if (data.getAuthority() != null) {

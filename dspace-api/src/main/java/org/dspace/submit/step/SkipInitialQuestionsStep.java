@@ -41,7 +41,7 @@ public class SkipInitialQuestionsStep extends AbstractProcessingStep
 {
     /**
      * Simply we flags the submission as the user had checked both multi-title,
-     * multi-files and published before so that the input-form configuration
+     * multi-files and published before so that the submission-form configuration
      * will be used as is
      */
     @Override

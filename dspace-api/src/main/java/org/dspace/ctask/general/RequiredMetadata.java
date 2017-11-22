@@ -27,7 +27,7 @@ import org.dspace.curate.Suspendable;
 
 /**
  * RequiredMetadata task compares item metadata with fields 
- * marked as required in input-forms.xml. The task succeeds if all
+ * marked as required in submission-forms.xml. The task succeeds if all
  * required fields are present in the item metadata, otherwise it fails.
  * Primarily a curation task demonstrator.
  *
@@ -117,27 +117,23 @@ public class RequiredMetadata extends AbstractCurationTask
         if (reqList == null)
         {
             reqList = new ArrayList<String>();
-            DCInputSet inputs = reader.getInputs(handle);
-            for (int i = 0; i < inputs.getNumberPages(); i++)
-            {
-                for (DCInput input : inputs.getPageRows(i, true, true))
-                {
-                    if (input.isRequired())
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(input.getSchema()).append(".");
-                        sb.append(input.getElement()).append(".");
-                        String qual = input.getQualifier();
-                        if (qual == null)
-                        {
-                            qual = "";
-                        }
-                        sb.append(qual);
-                        reqList.add(sb.toString());
-                    }
-                }
-            }
-            reqMap.put(inputs.getFormName(), reqList);
+            List<DCInputSet> inputSet = reader.getInputsByCollectionHandle(handle);
+			for (DCInputSet inputs : inputSet) {
+				for (DCInput input : inputs.getFields()) {
+					if (input.isRequired()) {
+						StringBuilder sb = new StringBuilder();
+						sb.append(input.getSchema()).append(".");
+						sb.append(input.getElement()).append(".");
+						String qual = input.getQualifier();
+						if (qual == null) {
+							qual = "";
+						}
+						sb.append(qual);
+						reqList.add(sb.toString());
+					}
+				}
+				reqMap.put(inputs.getFormName(), reqList);
+			}
         }
         return reqList;
     }
