@@ -285,7 +285,7 @@ public class JWTTokenHandler implements InitializingBean {
 
             //If the previous login was within the configured token expiration time, we reuse the session salt.
             //This allows a user to login on multiple devices/browsers at the same time.
-            if (previousLoginDate == null || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > expirationTime)) {
+            if (StringUtils.isBlank(ePerson.getSessionSalt()) || previousLoginDate == null || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > expirationTime)) {
                 ePerson.setSessionSalt(generateRandomSalt());
                 ePersonService.update(context, ePerson);
             }
