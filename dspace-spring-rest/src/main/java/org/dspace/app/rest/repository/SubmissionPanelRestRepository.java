@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.hateoas.SubmissionSectionResource;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
 	@Autowired
 	private SubmissionSectionConverter converter;
 	
-	public SubmissionPanelRestRepository() throws ServletException {
+	public SubmissionPanelRestRepository() throws SubmissionConfigReaderException {
 		submissionConfigReader = new SubmissionConfigReader();
 	}
 	
@@ -49,7 +50,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
 		try {
 			SubmissionStepConfig step = submissionConfigReader.getStepConfig(id);
 			return converter.convert(step);
-		} catch (ServletException e) {
+		} catch (SubmissionConfigReaderException e) {
 			//TODO wrap with a specific exception
 			throw new RuntimeException(e.getMessage(), e);
 		}		

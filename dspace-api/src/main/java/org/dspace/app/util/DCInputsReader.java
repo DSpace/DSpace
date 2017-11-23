@@ -175,8 +175,8 @@ public class DCInputsReader
 				}
 	        }
 	        return results;
-		} catch (ServletException e) {
-			throw new DCInputsReaderException("No form designated as default");
+		} catch (SubmissionConfigReaderException e) {
+			throw new DCInputsReaderException("No form designated as default", e);
 		}
     }
        
@@ -199,8 +199,8 @@ public class DCInputsReader
     				}
     	        }
     	        return results;
-    		} catch (ServletException e) {
-    			throw new DCInputsReaderException("No form designated as default");
+    		} catch (SubmissionConfigReaderException e) {
+    			throw new DCInputsReaderException("No form designated as default", e);
     		}
         }
     
