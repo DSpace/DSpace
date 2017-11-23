@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
+import org.apache.http.auth.AUTH;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -70,7 +71,7 @@ public class BitstreamContentRestController implements InitializingBean {
 
 	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
 	public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
-											 HttpServletRequest request) throws IOException, SQLException {
+											 HttpServletRequest request) throws IOException, SQLException, AuthorizeException {
 
 		Context context = ContextUtil.obtainContext(request);
 
@@ -120,17 +121,13 @@ public class BitstreamContentRestController implements InitializingBean {
 		}
 	}
 
-    private Bitstream getBitstreamIfAuthorized(Context context, @PathVariable UUID uuid, HttpServletResponse response) throws SQLException, IOException {
+    private Bitstream getBitstreamIfAuthorized(Context context, @PathVariable UUID uuid, HttpServletResponse response) throws SQLException, IOException, AuthorizeException {
         Bitstream bit = bitstreamService.find(context, uuid);
         if (bit == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            try {
-                authorizeService.authorizeAction(context, bit, Constants.READ);
-            } catch (AuthorizeException e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                bit = null;
-            }
+			authorizeService.authorizeAction(context, bit, Constants.READ);
+
         }
 
         return bit;
