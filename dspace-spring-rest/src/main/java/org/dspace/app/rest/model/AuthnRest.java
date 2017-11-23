@@ -10,7 +10,7 @@ package org.dspace.app.rest.model;
 import org.dspace.app.rest.AuthenticationRestController;
 
 /**
- * Auth Rest Object
+ * Root rest object for the /api/authn endpoint
  *
  * @author Atmire NV (info at atmire dot com)
  */

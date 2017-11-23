@@ -7,23 +7,27 @@
  */
 package org.dspace.services.events;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.dspace.kernel.mixins.ShutdownService;
-import org.dspace.services.CachingService;
-import org.dspace.services.EventService;
-import org.dspace.services.RequestService;
-import org.dspace.services.model.*;
-import org.dspace.services.model.CacheConfig.CacheScope;
-import org.dspace.services.model.Event.Scope;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.dspace.kernel.mixins.ShutdownService;
+import org.dspace.services.CachingService;
+import org.dspace.services.EventService;
+import org.dspace.services.RequestService;
+import org.dspace.services.model.Cache;
+import org.dspace.services.model.CacheConfig;
+import org.dspace.services.model.CacheConfig.CacheScope;
+import org.dspace.services.model.Event;
+import org.dspace.services.model.Event.Scope;
+import org.dspace.services.model.EventListener;
+import org.dspace.services.model.RequestInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This is a placeholder until we get a real event service going.

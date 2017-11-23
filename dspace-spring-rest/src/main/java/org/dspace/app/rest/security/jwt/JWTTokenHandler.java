@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.security;
+package org.dspace.app.rest.security.jwt;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -46,7 +46,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.keygen.BytesKeyGenerator;
 import org.springframework.security.crypto.keygen.KeyGenerators;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,17 +56,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class JWTTokenHandler implements InitializingBean {
 
+    private static final int MAX_CLOCK_SKEW_SECONDS = 60;
+    private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
 
     @Autowired
     private List<JWTClaimProvider> jwtClaimProviders;
-
-    private static final Logger log = LoggerFactory.getLogger(JWTTokenHandler.class);
-
-    private String jwtKey;
-    private long expirationTime;
-    private boolean includeIP;
-    private boolean encryptionEnabled;
-    private boolean compressionEnabled;
 
     @Autowired
     private ConfigurationService configurationService;
@@ -78,6 +71,11 @@ public class JWTTokenHandler implements InitializingBean {
     @Autowired
     private EPersonService ePersonService;
 
+    private String jwtKey;
+    private long expirationTime;
+    private boolean includeIP;
+    private boolean encryptionEnabled;
+    private boolean compressionEnabled;
     private byte[] encryptionKey;
 
 
@@ -90,18 +88,6 @@ public class JWTTokenHandler implements InitializingBean {
         this.includeIP = configurationService.getBooleanProperty("jwt.token.include.ip", true);
         this.encryptionEnabled = configurationService.getBooleanProperty("jwt.encryption.enabled", false);
         this.compressionEnabled = configurationService.getBooleanProperty("jwt.compression.enabled", false);
-
-    }
-
-    private String getSecret(String property) {
-        String secret = configurationService.getProperty(property);
-
-        if (StringUtils.isBlank(secret)) {
-            StringKeyGenerator keyGen = KeyGenerators.string();
-            secret = keyGen.generateKey();
-        }
-
-        return secret;
     }
 
     /**
@@ -141,35 +127,6 @@ public class JWTTokenHandler implements InitializingBean {
         }
     }
 
-    private boolean isValidToken(HttpServletRequest request, SignedJWT signedJWT, JWTClaimsSet jwtClaimsSet, EPerson ePerson) throws JOSEException {
-        JWSVerifier verifier = new MACVerifier(buildSigningKey(request, ePerson));
-
-        //If token is valid and not expired return eperson in token
-        Date expirationTime = jwtClaimsSet.getExpirationTime();
-        return signedJWT.verify(verifier)
-                && expirationTime != null
-                //Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
-                && DateUtils.isAfter(expirationTime, new Date(), 60);
-    }
-
-    private SignedJWT getSignedJWT(String token) throws ParseException, JOSEException {
-        SignedJWT signedJWT;
-
-        if (isEncryptionEnabled()) {
-            JWEObject jweObject = JWEObject.parse(token);
-            jweObject.decrypt(new DirectDecrypter(getEncryptionKey()));
-            signedJWT = jweObject.getPayload().toSignedJWT();
-        } else {
-            signedJWT = SignedJWT.parse(token);
-        }
-
-        return signedJWT;
-    }
-
-    private EPerson getEPerson(Context context, JWTClaimsSet jwtClaimsSet) throws SQLException {
-        return ePersonClaimProvider.getEPerson(context, jwtClaimsSet);
-    }
-
     /**
      * Create a jwt with the EPerson details in it
      *
@@ -198,6 +155,30 @@ public class JWTTokenHandler implements InitializingBean {
         return token;
     }
 
+    public void invalidateToken(String token, HttpServletRequest request, Context context) throws Exception {
+        if (StringUtils.isNotBlank(token)) {
+
+            EPerson ePerson = parseEPersonFromToken(token, request, context);
+            if (ePerson != null) {
+                ePerson.setSessionSalt("");
+            }
+
+        }
+    }
+
+    public long getExpirationPeriod() {
+        return expirationTime;
+    }
+
+
+    public boolean isEncryptionEnabled() {
+        return encryptionEnabled;
+    }
+
+    public byte[] getEncryptionKey() {
+        return encryptionKey;
+    }
+
     private JWEObject encryptJWT(SignedJWT signedJWT) throws JOSEException {
         JWEObject jweObject = new JWEObject(
                 compression(new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM)
@@ -208,6 +189,39 @@ public class JWTTokenHandler implements InitializingBean {
 
         jweObject.encrypt(new DirectEncrypter(getEncryptionKey()));
         return jweObject;
+    }
+
+    private boolean isValidToken(HttpServletRequest request, SignedJWT signedJWT, JWTClaimsSet jwtClaimsSet, EPerson ePerson) throws JOSEException {
+        if(StringUtils.isBlank(ePerson.getSessionSalt())) {
+            return false;
+        } else {
+            JWSVerifier verifier = new MACVerifier(buildSigningKey(request, ePerson));
+
+            //If token is valid and not expired return eperson in token
+            Date expirationTime = jwtClaimsSet.getExpirationTime();
+            return signedJWT.verify(verifier)
+                    && expirationTime != null
+                    //Ensure expiration timestamp is after the current time, with a minute of acceptable clock skew.
+                    && DateUtils.isAfter(expirationTime, new Date(), MAX_CLOCK_SKEW_SECONDS);
+        }
+    }
+
+    private SignedJWT getSignedJWT(String token) throws ParseException, JOSEException {
+        SignedJWT signedJWT;
+
+        if (isEncryptionEnabled()) {
+            JWEObject jweObject = JWEObject.parse(token);
+            jweObject.decrypt(new DirectDecrypter(getEncryptionKey()));
+            signedJWT = jweObject.getPayload().toSignedJWT();
+        } else {
+            signedJWT = SignedJWT.parse(token);
+        }
+
+        return signedJWT;
+    }
+
+    private EPerson getEPerson(Context context, JWTClaimsSet jwtClaimsSet) throws SQLException {
+        return ePersonClaimProvider.getEPerson(context, jwtClaimsSet);
     }
 
     private SignedJWT createSignedJWT(HttpServletRequest request, EPerson ePerson, JWTClaimsSet claimsSet) throws JOSEException {
@@ -239,18 +253,6 @@ public class JWTTokenHandler implements InitializingBean {
         return builder;
     }
 
-
-    public void invalidateToken(String token, HttpServletRequest request, Context context) throws Exception {
-        if (StringUtils.isNotBlank(token)) {
-
-            EPerson ePerson = parseEPersonFromToken(token, request, context);
-            if (ePerson != null) {
-                ePerson.setSessionSalt("");
-            }
-
-        }
-    }
-
     /**
      * This returns the key used for signing the token. This key is at least 256 bits/32 bytes (server key has minimum length of 1 byte and the eperson session salt is always 32 bytes),
      * this way the key is always long enough for the HMAC using SHA-256 algorithm.
@@ -276,46 +278,48 @@ public class JWTTokenHandler implements InitializingBean {
         return ipAddress;
     }
 
-
     private EPerson updateSessionSalt(final Context context, final Date previousLoginDate) throws SQLException {
-        EPerson ePerson = null;
+        EPerson ePerson;
 
         try {
             ePerson = context.getCurrentUser();
 
             //If the previous login was within the configured token expiration time, we reuse the session salt.
             //This allows a user to login on multiple devices/browsers at the same time.
-            if (StringUtils.isBlank(ePerson.getSessionSalt()) || previousLoginDate == null || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > expirationTime)) {
-                ePerson.setSessionSalt(generateRandomSalt());
+            if (StringUtils.isBlank(ePerson.getSessionSalt())
+                    || previousLoginDate == null
+                    || (ePerson.getLastActive().getTime() - previousLoginDate.getTime() > expirationTime)) {
+
+                ePerson.setSessionSalt(generateRandomKey());
                 ePersonService.update(context, ePerson);
             }
 
         } catch (AuthorizeException e) {
-            return null;
+            ePerson = null;
         }
 
         return ePerson;
     }
 
-    //Generate a random 32 byte salt
-    private String generateRandomSalt() {
+    private String getSecret(String property) {
+        String secret = configurationService.getProperty(property);
+
+        if (StringUtils.isBlank(secret)) {
+            secret = generateRandomKey();
+        }
+
+        return secret;
+    }
+
+    /**
+     * Generate a random 32 bytes key
+     */
+    private String generateRandomKey() {
         //24 bytes because BASE64 encoding makes this 32 bytes
+        //Base64 takes 4 characters for every 3 bytes
+
         BytesKeyGenerator bytesKeyGenerator = KeyGenerators.secureRandom(24);
         byte[] secretKey = bytesKeyGenerator.generateKey();
         return Base64.encodeBase64String(secretKey);
     }
-
-    public long getExpirationPeriod() {
-        return expirationTime;
-    }
-
-
-    public boolean isEncryptionEnabled() {
-        return encryptionEnabled;
-    }
-
-    public byte[] getEncryptionKey() {
-        return encryptionKey;
-    }
-
 }

@@ -7,11 +7,11 @@
  */
 package org.dspace.app.rest.matcher;
 
+import org.hamcrest.Matcher;
+
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
 import static org.hamcrest.Matchers.*;
-
-import org.hamcrest.Matcher;
 
 public class BrowseEntryResourceMatcher {
     public static Matcher<? super Object> matchBrowseEntry(String value, int expectedCount) {

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.security;
+package org.dspace.app.rest.security.jwt;
 
 import java.sql.SQLException;
 import java.util.UUID;

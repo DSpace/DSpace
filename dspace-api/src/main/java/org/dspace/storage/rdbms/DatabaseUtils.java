@@ -7,6 +7,23 @@
  */
 package org.dspace.storage.rdbms;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -25,18 +42,6 @@ import org.flywaydb.core.internal.dbsupport.DbSupport;
 import org.flywaydb.core.internal.dbsupport.DbSupportFactory;
 import org.flywaydb.core.internal.dbsupport.SqlScript;
 import org.flywaydb.core.internal.info.MigrationInfoDumper;
-
-import javax.sql.DataSource;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Utility class used to manage the Database. This class is used by the

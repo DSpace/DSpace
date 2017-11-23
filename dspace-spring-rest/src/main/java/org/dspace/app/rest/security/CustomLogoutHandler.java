@@ -10,6 +10,7 @@ package org.dspace.app.rest.security;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.dspace.app.rest.security.jwt.JWTTokenHandler;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.core.Context;
 import org.slf4j.Logger;

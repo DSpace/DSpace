@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.security;
+package org.dspace.app.rest.security.jwt;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
@@ -28,15 +28,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
+/**
+ * @author Atmire NV (info at atmire dot com)
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class SpecialGroupClaimProviderTest {
-
 
     @InjectMocks
     private SpecialGroupClaimProvider specialGroupClaimProvider;
 
     private List<UUID> specialGroups = new ArrayList<>();
-
 
     private Context context;
 
@@ -48,7 +49,6 @@ public class SpecialGroupClaimProviderTest {
     private HttpServletRequest httpServletRequest;
 
     private JWTClaimsSet jwtClaimsSet;
-
 
     @Before
     public void setUp() throws Exception {

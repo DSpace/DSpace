@@ -9,7 +9,6 @@ package org.dspace.app.rest;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.dspace.app.rest.model.AuthnRest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
@@ -42,8 +41,6 @@ public class RootRestResourceController {
 			root.add(new Link(restURL + l.getHref(), l.getRel()));
 		}
 
-		root.add(new Link(restURL + "/api/" + AuthnRest.CATEGORY, AuthnRest.NAME));
-
 		return root;
 	}
 
@@ -51,5 +48,4 @@ public class RootRestResourceController {
 		String url = request.getRequestURL().toString();
 		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath();
 	}
-
 }

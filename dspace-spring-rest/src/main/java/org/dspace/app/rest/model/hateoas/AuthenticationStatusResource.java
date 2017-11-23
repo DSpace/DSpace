@@ -7,7 +7,7 @@
  */
 package org.dspace.app.rest.model.hateoas;
 
-import org.dspace.app.rest.model.StatusRest;
+import org.dspace.app.rest.model.AuthenticationStatusRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 
@@ -16,9 +16,9 @@ import org.dspace.app.rest.utils.Utils;
  *
  * @author Atmire NV (info at atmire dot com)
  */
-@RelNameDSpaceResource(StatusRest.NAME)
-public class AuthenticationStatusResource extends DSpaceResource<StatusRest> {
-    public AuthenticationStatusResource(StatusRest data, Utils utils, String... rels) {
+@RelNameDSpaceResource(AuthenticationStatusRest.NAME)
+public class AuthenticationStatusResource extends DSpaceResource<AuthenticationStatusRest> {
+    public AuthenticationStatusResource(AuthenticationStatusRest data, Utils utils, String... rels) {
         super(data, utils, rels);
     }
 }

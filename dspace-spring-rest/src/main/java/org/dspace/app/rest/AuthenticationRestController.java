@@ -8,13 +8,14 @@
 package org.dspace.app.rest;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.EPersonConverter;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.EPersonRest;
-import org.dspace.app.rest.model.StatusRest;
+import org.dspace.app.rest.model.AuthenticationStatusRest;
 import org.dspace.app.rest.model.hateoas.AuthenticationStatusResource;
 import org.dspace.app.rest.model.hateoas.AuthnResource;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -22,7 +23,9 @@ import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +33,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Rest controller that handles authentication on the REST API together with the Spring Security filters
+ * configured in {@link org.dspace.app.rest.security.WebSecurityConfiguration}
+ *
+ * @author Atmire NV (info at atmire dot com)
+ */
 @RequestMapping(value = "/api/" + AuthnRest.CATEGORY)
 @RestController
-public class AuthenticationRestController {
+public class AuthenticationRestController implements InitializingBean {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationRestController.class);
+
+    @Autowired
+    DiscoverableEndpointsService discoverableEndpointsService;
 
     @Autowired
     private EPersonConverter ePersonConverter;
@@ -42,6 +54,10 @@ public class AuthenticationRestController {
     @Autowired
     private Utils utils;
 
+    @Override
+    public void afterPropertiesSet() {
+        discoverableEndpointsService.register(this, Arrays.asList(new Link("/api/" + AuthnRest.CATEGORY, AuthnRest.NAME)));
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public AuthnResource authn() throws SQLException {
@@ -55,7 +71,7 @@ public class AuthenticationRestController {
         if (context.getCurrentUser() != null) {
             ePersonRest = ePersonConverter.fromModel(context.getCurrentUser());
         }
-        AuthenticationStatusResource authenticationStatusResource = new AuthenticationStatusResource( new StatusRest(ePersonRest), utils);
+        AuthenticationStatusResource authenticationStatusResource = new AuthenticationStatusResource( new AuthenticationStatusRest(ePersonRest), utils);
         return authenticationStatusResource;
     }
 
