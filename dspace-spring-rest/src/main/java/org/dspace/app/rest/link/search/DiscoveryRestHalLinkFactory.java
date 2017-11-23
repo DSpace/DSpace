@@ -33,12 +33,29 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
         return addFilterParams(uriBuilder, data);
     }
 
+    protected UriComponentsBuilder buildSearchFacetsBaseLink(final SearchResultsRest data) throws Exception{
+        UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
+                .getFacets(data.getQuery(), data.getDsoType(), data.getScope(), data.getConfigurationName(), null, null));
+
+        uriBuilder = addSortingParms(uriBuilder, data);
+
+        return addFilterParams(uriBuilder, data);
+    }
+
     protected UriComponentsBuilder addFilterParams(UriComponentsBuilder uriComponentsBuilder, DiscoveryResultsRest data) {
         if (uriComponentsBuilder != null && data != null && data.getAppliedFilters() != null) {
             for (SearchResultsRest.AppliedFilter filter : data.getAppliedFilters()) {
                 //TODO Make sure the filter format is defined in only one place
                 uriComponentsBuilder.queryParam("f." + filter.getFilter(), filter.getValue() + "," + filter.getOperator());
             }
+        }
+
+        return uriComponentsBuilder;
+    }
+
+    protected UriComponentsBuilder addSortingParms(UriComponentsBuilder uriComponentsBuilder, DiscoveryResultsRest data){
+        if (uriComponentsBuilder != null && data != null && data.getSort() != null) {
+                uriComponentsBuilder.queryParam("sort", data.getSort().getBy() + "," +data.getSort().getOrder());
         }
 
         return uriComponentsBuilder;

@@ -29,8 +29,22 @@ public class DiscoverConfigurationConverter {
         if(configuration != null){
             addSearchFilters(searchConfigurationRest, configuration.getSearchFilters());
             addSortOptions(searchConfigurationRest, configuration.getSearchSortConfiguration());
+            setDefaultSortOption(configuration, searchConfigurationRest);
         }
         return searchConfigurationRest;
+    }
+
+    private void setDefaultSortOption(DiscoveryConfiguration configuration, SearchConfigurationRest searchConfigurationRest) {
+        String defaultSort = configuration.getSearchSortConfiguration().SCORE;
+        if(configuration.getSearchSortConfiguration() != null){
+            DiscoverySortFieldConfiguration discoverySortFieldConfiguration = configuration.getSearchSortConfiguration().getSortFieldConfiguration(defaultSort);
+            if(discoverySortFieldConfiguration != null){
+                SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
+                sortOption.setName(discoverySortFieldConfiguration.getMetadataField());
+                sortOption.setActualName(discoverySortFieldConfiguration.getType());
+                searchConfigurationRest.addSortOption(sortOption);
+            }
+        }
     }
 
 
@@ -47,11 +61,12 @@ public class DiscoverConfigurationConverter {
         if(searchSortConfiguration!=null){
             for(DiscoverySortFieldConfiguration discoverySearchSortConfiguration : CollectionUtils.emptyIfNull(searchSortConfiguration.getSortFields())){
                 SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
-                sortOption.setMetadata(discoverySearchSortConfiguration.getMetadataField());
-                sortOption.setName(discoverySearchSortConfiguration.getType());
+                sortOption.setName(discoverySearchSortConfiguration.getMetadataField());
+                sortOption.setActualName(discoverySearchSortConfiguration.getType());
                 searchConfigurationRest.addSortOption(sortOption);
             }
         }
+
     }
 
 }

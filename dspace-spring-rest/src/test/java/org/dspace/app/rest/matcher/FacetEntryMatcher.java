@@ -25,31 +25,11 @@ public class FacetEntryMatcher {
         );
     }
 
-    public static Matcher<? super Object> authorFacetInSearchObject(boolean hasMore) {
-        return allOf(
-                hasJsonPath("$.name", is("author")),
-                hasJsonPath("$.facetType", is("text")),
-                hasJsonPath("$._links.self.href", containsString("api/discover/facets/author")),
-                hasJsonPath("$.hasMore", is(hasMore))
-        );
-    }
-
-
     public static Matcher<? super Object> subjectFacet() {
         return allOf(
                 hasJsonPath("$.name", is("subject")),
                 hasJsonPath("$.facetType", is("hierarchical")),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/subject"))
-        );
-    }
-
-    public static Matcher<? super Object> subjectFacetInSearchObject(boolean hasMore) {
-        return allOf(
-                hasJsonPath("$.name", is("subject")),
-                hasJsonPath("$.facetType", is("hierarchical")),
-                hasJsonPath("$._links.self.href", containsString("api/discover/facets/subject")),
-                hasJsonPath("$.hasMore", is(hasMore))
-
         );
     }
 
@@ -61,29 +41,11 @@ public class FacetEntryMatcher {
         );
     }
 
-    public static Matcher<? super Object> dateIssuedFacetInSearchObject(boolean hasMore) {
-        return allOf(
-                hasJsonPath("$.name", is("dateIssued")),
-                hasJsonPath("$.facetType", is("date")),
-                hasJsonPath("$._links.self.href", containsString("api/discover/facets/dateIssued")),
-                hasJsonPath("$.hasMore", is(hasMore))
-        );
-    }
-
     public static Matcher<? super Object> hasContentInOriginalBundleFacet() {
         return allOf(
                 hasJsonPath("$.name", is("has_content_in_original_bundle")),
                 hasJsonPath("$.facetType", is("standard")),
                 hasJsonPath("$._links.self.href", containsString("api/discover/facets/has_content_in_original_bundle"))
-        );
-    }
-
-    public static Matcher<? super Object> hasContentInOriginalBundleFacetInSearchObjects(boolean hasMore) {
-        return allOf(
-                hasJsonPath("$.name", is("has_content_in_original_bundle")),
-                hasJsonPath("$.facetType", is("standard")),
-                hasJsonPath("$._links.self.href", containsString("api/discover/facets/has_content_in_original_bundle")),
-                hasJsonPath("$.hasMore", is(hasMore))
         );
     }
 

@@ -17,13 +17,19 @@ public class SortOptionMatcher {
 
     public static Matcher<? super Object> titleSortOption() {
         return allOf(
-                hasJsonPath("$.metadata", is("dc.title"))
+                hasJsonPath("$.name", is("dc.title"))
         );
     }
 
     public static Matcher<? super Object> dateIssuedSortOption() {
         return allOf(
-                hasJsonPath("$.metadata", is("dc.date.issued"))
+                hasJsonPath("$.name", is("dc.date.issued"))
+        );
+    }
+
+    public static Matcher<? super Object> scoreSortOption() {
+        return allOf(
+                hasJsonPath("$.name", is("score"))
         );
     }
 

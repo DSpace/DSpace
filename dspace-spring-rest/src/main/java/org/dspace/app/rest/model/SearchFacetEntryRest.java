@@ -24,6 +24,8 @@ public class SearchFacetEntryRest implements RestModel {
 
     private String name;
     private String facetType;
+
+    @JsonIgnore
     private Boolean hasMore = null;
     private int facetLimit;
 
@@ -75,7 +77,6 @@ public class SearchFacetEntryRest implements RestModel {
         this.hasMore = hasMore;
     }
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public Boolean isHasMore() {
         return hasMore;
     }

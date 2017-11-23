@@ -58,7 +58,7 @@ public class SearchResultsResource extends HALResource<SearchResultsRest> {
             entryResources.add(new SearchResultEntryResource(searchResultEntry, utils));
         }
 
-        embedResource("searchResults", entryResources);
+        embedResource("objects", entryResources);
     }
 
 }

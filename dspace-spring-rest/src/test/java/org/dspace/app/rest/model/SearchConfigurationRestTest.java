@@ -46,7 +46,7 @@ public class SearchConfigurationRestTest {
     @Test
     public void testAddSortOptionToEmptyListAndListContainsThatSortOption() throws Exception{
         SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
-        sortOption.setName("sort option");
+        sortOption.setActualName("sort option");
         searchConfigurationRest.addSortOption(sortOption);
         assertEquals(sortOption, searchConfigurationRest.getSortOptions().get(0));
     }
@@ -70,10 +70,10 @@ public class SearchConfigurationRestTest {
     @Test
     public void testAddMultipleSortOptionsToListAndListIsConstructedProperly() throws Exception{
         SearchConfigurationRest.SortOption sortOption = new SearchConfigurationRest.SortOption();
-        sortOption.setName("sort option");
+        sortOption.setActualName("sort option");
         searchConfigurationRest.addSortOption(sortOption);
         SearchConfigurationRest.SortOption sortOption2 = new SearchConfigurationRest.SortOption();
-        sortOption2.setName("sort option2");
+        sortOption2.setActualName("sort option2");
         searchConfigurationRest.addSortOption(sortOption2);
 
         assertEquals(2, searchConfigurationRest.getSortOptions().size());
