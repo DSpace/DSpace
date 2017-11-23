@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.converter.DiscoverConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetConfigurationConverter;
 import org.dspace.app.rest.converter.DiscoverFacetResultsConverter;
+import org.dspace.app.rest.converter.DiscoverFacetsConverter;
 import org.dspace.app.rest.converter.DiscoverResultConverter;
 import org.dspace.app.rest.converter.DiscoverSearchSupportConverter;
 import org.dspace.app.rest.exception.InvalidRequestException;
@@ -71,6 +72,9 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
     @Autowired
     private DiscoverFacetResultsConverter discoverFacetResultsConverter;
+
+    @Autowired
+    private DiscoverFacetsConverter discoverFacetsConverter;
 
     public SearchConfigurationRest getSearchConfiguration(final String dsoScope, final String configurationName) {
         Context context = obtainContext();
@@ -135,5 +139,29 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
 
         FacetResultsRest facetResultsRest = discoverFacetResultsConverter.convert(context, facetName, query, dsoType, dsoScope, searchFilters, searchResult, configuration, page);
         return facetResultsRest;
+    }
+
+    public SearchResultsRest getAllFacets(String query, String dsoType, String dsoScope, String configurationName, List<SearchFilter> searchFilters, Pageable page) throws InvalidRequestException{
+
+        Context context = obtainContext();
+
+        DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
+        DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
+
+        DiscoverResult searchResult = null;
+        DiscoverQuery discoverQuery = null;
+
+        try {
+            discoverQuery = queryBuilder.buildQuery(context, scopeObject, configuration, query, searchFilters, dsoType, page);
+            searchResult = searchService.search(context, scopeObject, discoverQuery);
+
+        } catch (SearchServiceException e) {
+            log.error("Error while searching with Discovery", e);
+        }
+
+        SearchResultsRest searchResultsRest = discoverFacetsConverter.convert(context, query, dsoType, configurationName, dsoScope, searchFilters, page, configuration, searchResult);
+
+        return searchResultsRest;
+
     }
 }

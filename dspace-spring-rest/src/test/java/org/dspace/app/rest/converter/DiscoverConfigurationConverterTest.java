@@ -106,8 +106,8 @@ public class DiscoverConfigurationConverterTest{
 
         int counter = 0;
         for(SearchConfigurationRest.SortOption sortOption : searchConfigurationRest.getSortOptions()){
-            assertEquals(mockedList.get(counter).getMetadataField(), sortOption.getMetadata());
-            assertEquals(mockedList.get(counter).getType(), sortOption.getName());
+            assertEquals(mockedList.get(counter).getMetadataField(), sortOption.getName());
+            assertEquals(mockedList.get(counter).getType(), sortOption.getActualName());
             counter++;
         }
 

@@ -167,35 +167,35 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public static class SortOption{
 
-        //TODO Remove this ignore when the proper name gets added through the bean ID
+        //TODO Remove this ignore when the proper actualName gets added through the bean ID
         @JsonIgnore
+        private String actualName;
         private String name;
-        private String metadata;
 
-        public void setName(String name){
-            this.name = name;
+        public void setActualName(String name){
+            this.actualName = name;
+        }
+        public String getActualName(){
+            return actualName;
+        }
+        public void setName(String metadata){
+            this.name = metadata;
         }
         public String getName(){
             return name;
-        }
-        public void setMetadata(String metadata){
-            this.metadata = metadata;
-        }
-        public String getMetadata(){
-            return metadata;
         }
         @Override
         public boolean equals(Object object){
             return (object instanceof SearchConfigurationRest.SortOption &&
                     new EqualsBuilder().append(this.getName(), ((SortOption) object).getName())
-                            .append(this.getMetadata(), ((SortOption) object).getMetadata())
+                            .append(this.getActualName(), ((SortOption) object).getActualName())
                             .isEquals());
         }
         @Override
         public int hashCode() {
             return new HashCodeBuilder(17, 37)
+                    .append(actualName)
                     .append(name)
-                    .append(metadata)
                     .toHashCode();
         }
     }

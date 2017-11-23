@@ -21,6 +21,7 @@ import org.dspace.app.rest.model.SearchResultsRest;
 import org.dspace.app.rest.model.SearchSupportRest;
 import org.dspace.app.rest.model.hateoas.FacetConfigurationResource;
 import org.dspace.app.rest.model.hateoas.FacetResultsResource;
+import org.dspace.app.rest.model.hateoas.FacetsResource;
 import org.dspace.app.rest.model.hateoas.SearchConfigurationResource;
 import org.dspace.app.rest.model.hateoas.SearchResultsResource;
 import org.dspace.app.rest.model.hateoas.SearchSupportResource;
@@ -90,6 +91,32 @@ public class DiscoveryRestController implements InitializingBean {
         return searchConfigurationResource;
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/search/facets")
+    public FacetsResource getFacets(@RequestParam(name = "query", required = false) String query,
+                                    @RequestParam(name = "dsoType", required = false) String dsoType,
+                                    @RequestParam(name = "scope", required = false) String dsoScope,
+                                    @RequestParam(name = "configuration", required = false) String configurationName,
+                                    List<SearchFilter> searchFilters,
+                                    Pageable page) throws Exception {
+
+        if(log.isTraceEnabled()) {
+            log.trace("Searching with scope: " + StringUtils.trimToEmpty(dsoScope)
+                    + ", configuration name: " + StringUtils.trimToEmpty(configurationName)
+                    + ", dsoType: " + StringUtils.trimToEmpty(dsoType)
+                    + ", query: " + StringUtils.trimToEmpty(dsoType)
+                    + ", filters: " + Objects.toString(searchFilters)
+                    + ", page: " + Objects.toString(page));
+        }
+
+        SearchResultsRest searchResultsRest = discoveryRestRepository.getAllFacets(query, dsoType, dsoScope, configurationName, searchFilters, page);
+
+        FacetsResource facetsResource = new FacetsResource(searchResultsRest);
+        halLinkService.addLinks(facetsResource);
+
+        return facetsResource;
+
+
+    }
     @RequestMapping(method = RequestMethod.GET, value = "/search/objects")
     public SearchResultsResource getSearchObjects(@RequestParam(name = "query", required = false) String query,
                                                    @RequestParam(name = "dsoType", required = false) String dsoType,
