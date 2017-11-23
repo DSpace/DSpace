@@ -7,7 +7,6 @@
  */
 package org.dspace.app.rest.repository;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.app.rest.utils.Utils;
 import org.dspace.core.Context;
@@ -25,21 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class AbstractDSpaceRestRepository {
 
-	/**
-	 * log4j category
-	 */
-	private static final Logger log = Logger.getLogger(AbstractDSpaceRestRepository.class);
-
 	@Autowired
 	protected Utils utils;
 
 	protected RequestService requestService = new DSpace().getRequestService();
 
-
-
 	protected Context obtainContext() {
 		Request currentRequest = requestService.getCurrentRequest();
 		return ContextUtil.obtainContext(currentRequest.getServletRequest());
-
 	}
 }

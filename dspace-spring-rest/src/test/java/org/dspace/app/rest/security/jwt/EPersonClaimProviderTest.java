@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.security;
+package org.dspace.app.rest.security.jwt;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -28,6 +28,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+/**
+ * @author Atmire NV (info at atmire dot com)
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class EPersonClaimProviderTest {
 
@@ -76,14 +80,5 @@ public class EPersonClaimProviderTest {
         EPerson parsed = ePersonClaimProvider.getEPerson(context, jwtClaimsSet);
         assertEquals(parsed.getID(), UUID.fromString("c3bae216-a481-496b-a524-7df5aabdb609" ));
     }
-
-
-
-
-
-
-
-
-
 
 }

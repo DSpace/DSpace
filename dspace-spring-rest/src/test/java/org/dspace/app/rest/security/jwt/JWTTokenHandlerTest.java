@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.security;
+package org.dspace.app.rest.security.jwt;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -37,7 +37,9 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
-
+/**
+ * @author Atmire NV (info at atmire dot com)
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class JWTTokenHandlerTest {
 
@@ -123,14 +125,5 @@ public class JWTTokenHandlerTest {
         EPerson parsed = jwtTokenHandler.parseEPersonFromToken(tamperedToken, httpServletRequest, context);
         assertEquals(null, parsed);
     }
-
-
-
-
-
-
-
-
-
 
 }

@@ -26,6 +26,8 @@ import org.junit.Test;
 
 /**
  * Integration test that covers various authentication scenarios
+ *
+ * @author Atmire NV (info at atmire dot com)
  */
 public class AuthenticationRestControllerIT extends AbstractControllerIntegrationTest {
 

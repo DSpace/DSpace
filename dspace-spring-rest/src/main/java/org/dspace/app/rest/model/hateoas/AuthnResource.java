@@ -14,7 +14,6 @@ import java.sql.SQLException;
 
 import org.dspace.app.rest.AuthenticationRestController;
 import org.dspace.app.rest.model.AuthnRest;
-import org.dspace.app.rest.model.StatusRest;
 import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 import org.dspace.app.rest.utils.Utils;
 import org.springframework.hateoas.Link;

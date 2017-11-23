@@ -14,6 +14,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.Filter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
 import org.dspace.app.rest.utils.ApplicationConfig;
@@ -247,7 +248,7 @@ public class Application extends SpringBootServletInitializer {
             boolean failed = false;
 
             try {
-                if(context.getDBConfig() == null) {
+                if(context.getDBConfig() == null || StringUtils.isBlank(context.getDBConfig().getDatabaseUrl())) {
                     failed = true;
                 }
 

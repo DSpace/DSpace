@@ -75,46 +75,48 @@ public class EPersonRestAuthenticationProvider implements AuthenticationProvider
 
     private Authentication authenticateNewLogin(Authentication authentication) {
         Context newContext = null;
-        try {
-            newContext = new Context();
-            String name = authentication.getName();
-            String password = authentication.getCredentials().toString();
+        Authentication output = null;
 
-            int implicitStatus = authenticationService.authenticateImplicit(newContext, null, null, null, request);
+        if(authentication != null && authentication.getCredentials() != null) {
+            try {
+                newContext = new Context();
+                String name = authentication.getName();
+                String password = authentication.getCredentials().toString();
 
-            if (implicitStatus == AuthenticationMethod.SUCCESS) {
-                log.info(LogManager.getHeader(newContext, "login", "type=implicit"));
-                return createAuthentication(password, newContext);
-            } else {
-                int authenticateResult = authenticationService.authenticate(newContext, name, password, null, request);
-                if (AuthenticationMethod.SUCCESS == authenticateResult) {
+                int implicitStatus = authenticationService.authenticateImplicit(newContext, null, null, null, request);
 
-                    log.info(LogManager
-                            .getHeader(newContext, "login", "type=explicit"));
-
-                    return createAuthentication(password, newContext);
+                if (implicitStatus == AuthenticationMethod.SUCCESS) {
+                    log.info(LogManager.getHeader(newContext, "login", "type=implicit"));
+                    output = createAuthentication(password, newContext);
                 } else {
-                    log.info(LogManager.getHeader(newContext, "failed_login", "email="
-                            + name + ", result="
-                            + authenticateResult));
-                    throw new BadCredentialsException("Login failed");
+                    int authenticateResult = authenticationService.authenticate(newContext, name, password, null, request);
+                    if (AuthenticationMethod.SUCCESS == authenticateResult) {
+
+                        log.info(LogManager
+                                .getHeader(newContext, "login", "type=explicit"));
+
+                        output = createAuthentication(password, newContext);
+                    } else {
+                        log.info(LogManager.getHeader(newContext, "failed_login", "email="
+                                + name + ", result="
+                                + authenticateResult));
+                        throw new BadCredentialsException("Login failed");
+                    }
                 }
-            }
-        } catch (BadCredentialsException e){
-            throw e;
-        } catch (Exception e) {
-            log.error("Error while authenticating in the rest api", e);
-        } finally {
-            if (newContext != null && newContext.isValid()) {
-                try {
-                    newContext.complete();
-                } catch (SQLException e) {
-                    log.error(e.getMessage() + " occurred while trying to close", e);
+            } catch (Exception e) {
+                log.error("Error while authenticating in the rest api", e);
+            } finally {
+                if (newContext != null && newContext.isValid()) {
+                    try {
+                        newContext.complete();
+                    } catch (SQLException e) {
+                        log.error(e.getMessage() + " occurred while trying to close", e);
+                    }
                 }
             }
         }
 
-        return null;
+        return output;
     }
 
     private Authentication createAuthentication(final String password, final Context context) {

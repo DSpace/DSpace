@@ -11,12 +11,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
 
 /**
- * Determine status of REST API - is it running, accessible and without errors?.
- * Find out API version (DSpace major version) and DSpace source version.
  * Find out your authentication status.
  *
  */
-public class StatusRest extends BaseObjectRest<Integer>
+public class AuthenticationStatusRest extends BaseObjectRest<Integer>
 {
     private boolean okay;
     private boolean authenticated;
@@ -47,12 +45,12 @@ public class StatusRest extends BaseObjectRest<Integer>
 
     private EPersonRest ePersonRest;
 
-    public StatusRest() {
+    public AuthenticationStatusRest() {
         setOkay(true);
         setAuthenticated(false);
     }
 
-    public StatusRest(EPersonRest eperson) {
+    public AuthenticationStatusRest(EPersonRest eperson) {
         setOkay(true);
         if(eperson != null) {
             setAuthenticated(true);

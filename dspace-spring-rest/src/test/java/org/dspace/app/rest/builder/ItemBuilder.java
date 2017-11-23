@@ -7,11 +7,7 @@
  */
 package org.dspace.app.rest.builder;
 
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.*;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;

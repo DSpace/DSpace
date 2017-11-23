@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.security;
+package org.dspace.app.rest.security.jwt;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.nimbusds.jose.JOSEException;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.rest.security.DSpaceAuthentication;
+import org.dspace.app.rest.security.RestAuthenticationService;
 import org.dspace.app.rest.utils.ContextUtil;
 import org.dspace.authenticate.service.AuthenticationService;
 import org.dspace.core.Context;
@@ -44,9 +46,6 @@ public class JWTTokenRestAuthenticationServiceImpl implements RestAuthentication
 
     @Autowired
     private JWTTokenHandler jwtTokenHandler;
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     @Autowired
     private EPersonService ePersonService;

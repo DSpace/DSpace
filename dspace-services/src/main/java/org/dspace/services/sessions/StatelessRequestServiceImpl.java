@@ -7,7 +7,18 @@
  */
 package org.dspace.services.sessions;
 
-import org.apache.commons.lang.ObjectUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.kernel.mixins.ShutdownService;
@@ -16,7 +27,6 @@ import org.dspace.services.RequestService;
 import org.dspace.services.model.Request;
 import org.dspace.services.model.RequestInterceptor;
 import org.dspace.services.model.RequestInterceptor.RequestInterruptionException;
-import org.dspace.services.model.Session;
 import org.dspace.services.sessions.model.HttpRequestImpl;
 import org.dspace.services.sessions.model.InternalRequestImpl;
 import org.dspace.utils.servicemanager.OrderedServiceComparator;
@@ -24,11 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -192,7 +197,7 @@ public final class StatelessRequestServiceImpl implements RequestService, Initia
         if(currentRequest == null) {
             return null;
         } else {
-            return ObjectUtils.toString(currentRequest.getAttribute(AUTHENTICATED_EPERSON));
+            return Objects.toString(currentRequest.getAttribute(AUTHENTICATED_EPERSON));
         }
     }
 
