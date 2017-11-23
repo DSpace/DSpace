@@ -35,7 +35,7 @@ public abstract class DiscoveryRestHalLinkFactory<T> extends HalLinkFactory<T, D
 
     protected UriComponentsBuilder buildSearchFacetsBaseLink(final SearchResultsRest data) throws Exception{
         UriComponentsBuilder uriBuilder = uriBuilder(getMethodOn()
-                .getFacets(data.getQuery(), data.getDsoType(), data.getScope(), data.getConfigurationName(), null, null));
+                .getFacets(data.getQuery(), data.getDsoType(), data.getScope(), data.getConfigurationName(), null));
 
         uriBuilder = addSortingParms(uriBuilder, data);
 

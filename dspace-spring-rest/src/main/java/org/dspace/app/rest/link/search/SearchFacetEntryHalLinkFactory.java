@@ -10,6 +10,7 @@ package org.dspace.app.rest.link.search;
 import java.util.LinkedList;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.dspace.app.rest.model.DiscoveryResultsRest;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.hateoas.EmbeddedPageHeader;
@@ -44,12 +45,11 @@ public class SearchFacetEntryHalLinkFactory extends DiscoveryRestHalLinkFactory<
         addFilterParams(uriBuilder, searchData);
 
         //If our rest data contains a list of values, construct the page links. Otherwise, only add a self link
-        if(CollectionUtils.isNotEmpty(facetData.getValues()) && facetData.isHasMore() != null) {
+        if(CollectionUtils.isNotEmpty(facetData.getValues())) {
             PageImpl page = new PageImpl<>(facetData.getValues(), new PageRequest(0, facetData.getFacetLimit()),
-                    facetData.getValues().size() + (facetData.isHasMore() ? 1 : 0));
+                    facetData.getValues().size() + (BooleanUtils.isTrue(facetData.isHasMore()) ? 1 : 0));
 
             halResource.setPageHeader(new EmbeddedPageHeader(uriBuilder, page, false));
-            list.add(buildLink(Link.REL_SELF, uriBuilder.build().toUriString()));
 
         } else {
             list.add(buildLink(Link.REL_SELF, uriBuilder.build().toUriString()));

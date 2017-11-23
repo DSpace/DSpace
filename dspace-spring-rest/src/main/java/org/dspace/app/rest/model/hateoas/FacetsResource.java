@@ -10,6 +10,7 @@ package org.dspace.app.rest.model.hateoas;
 import org.apache.commons.collections4.CollectionUtils;
 import org.dspace.app.rest.model.SearchFacetEntryRest;
 import org.dspace.app.rest.model.SearchResultsRest;
+import org.dspace.app.rest.model.hateoas.annotations.RelNameDSpaceResource;
 
 import java.util.LinkedList;
 import java.util.List;

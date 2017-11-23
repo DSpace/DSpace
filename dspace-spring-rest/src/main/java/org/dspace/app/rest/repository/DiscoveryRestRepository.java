@@ -34,6 +34,7 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
@@ -141,10 +142,10 @@ public class DiscoveryRestRepository extends AbstractDSpaceRestRepository {
         return facetResultsRest;
     }
 
-    public SearchResultsRest getAllFacets(String query, String dsoType, String dsoScope, String configurationName, List<SearchFilter> searchFilters, Pageable page) throws InvalidRequestException{
+    public SearchResultsRest getAllFacets(String query, String dsoType, String dsoScope, String configurationName, List<SearchFilter> searchFilters) throws InvalidRequestException{
 
         Context context = obtainContext();
-
+        Pageable page = new PageRequest(1,1);
         DSpaceObject scopeObject = scopeResolver.resolveScope(context, dsoScope);
         DiscoveryConfiguration configuration = searchConfigurationService.getDiscoveryConfigurationByNameOrDso(configurationName, scopeObject);
 
