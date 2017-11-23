@@ -8,11 +8,9 @@
 package org.dspace.app.rest.matcher;
 
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class SearchResultMatcher {
 
