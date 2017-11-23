@@ -8,6 +8,17 @@
 package org.dspace.submit.model;
 
 /**
+ * The SelectableMetadata REST Resource. It is not addressable directly, only
+ * used as inline object in the InputForm resource.
+ * 
+ * SelectableMetadata was introduced to make a clear distinction between the
+ * cases where a value-pairs was used as an authority list of acceptable values
+ * (dropdown) and where it was used to allow to pick the metadata to use to
+ * store the value (qualdrop_values). If a value-pair is used by a
+ * qualdrop_value it is not autoregistered as an authority, instead
+ * it is exposed as an array of SelectableMetadata object
+ * 
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
