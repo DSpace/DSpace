@@ -42,7 +42,6 @@ public class JournalConceptDatabaseStorageImpl extends AbstractOrganizationConce
             context.complete();
         } catch (SQLException e) {
             log.error("couldn't find metadata fields");
-            context.abort();
         }
     }
 

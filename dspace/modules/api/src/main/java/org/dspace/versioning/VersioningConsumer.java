@@ -85,7 +85,7 @@ public class VersioningConsumer implements Consumer {
             }
         }
         catch (Exception e) {
-            ctx.abort();
+            log.error("Exception consuming event: " + e.getMessage());
         }
     }
 

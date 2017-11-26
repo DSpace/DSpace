@@ -55,7 +55,7 @@ public class ItemModificationConsumer implements Consumer {
                 break;
             }
         } catch (Exception e) {
-            ctx.abort();
+            log.error("Exception consuming event: " + e.getMessage());
         }
     }
 }

@@ -74,7 +74,6 @@ public class VersionManager {
 
                 }
             } catch (Exception ex) {
-                context.abort();
                 throw new RuntimeException(ex);
             }
         }
@@ -116,7 +115,6 @@ public class VersionManager {
                 result.setParameter("summary", summary);
             }
         } catch (Exception ex) {
-            context.abort();
             throw new RuntimeException(ex);
         }
         return result;
@@ -146,7 +144,6 @@ public class VersionManager {
             result.setMessage(T_version_restored);
 
         } catch (Exception ex) {
-            context.abort();
             throw new RuntimeException(ex);
         }
         return result;
@@ -177,7 +174,6 @@ public class VersionManager {
             result.setMessage(T_version_delete);
 
         } catch (Exception ex) {
-            context.abort();
             throw new RuntimeException(ex);
         }
         return result;
