@@ -90,9 +90,18 @@
     boolean pmcEnabled = ConfigurationManager.getBooleanProperty("cris","pmc.enabled",false);
     boolean scopusEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.elsevier.scopus.enabled",false);
     boolean wosEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.thomsonreuters.wos.enabled",false);
-    String doi = item.getMetadata("dc.identifier.doi");
+    String doiMetadata = ConfigurationManager.getProperty("cris","ametrics.identifier.doi");
+    String isbnMetadata = ConfigurationManager.getProperty("cris","ametrics.identifier.isbn");
+    if (doiMetadata == null) {
+    	doiMetadata = "dc.identifier.doi";
+    }
+    if (isbnMetadata == null) {
+    	isbnMetadata = "dc.identifier.isbn";
+    }
+    String doi = item.getMetadata(doiMetadata);
+    String isbn = item.getMetadata(isbnMetadata);
     boolean scholarEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.google.scholar.enabled",false);
-    boolean altMetricEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.altmetric.enabled",false) && StringUtils.isNotBlank(doi);
+    boolean altMetricEnabled = ConfigurationManager.getBooleanProperty("cris","ametrics.altmetric.enabled",false) && (StringUtils.isNotBlank(doi) || StringUtils.isNotBlank(isbn));
     
     Boolean versioningEnabledBool = (Boolean)request.getAttribute("versioning.enabled");
     boolean versioningEnabled = (versioningEnabledBool!=null && versioningEnabledBool.booleanValue());
@@ -587,7 +596,8 @@ if (dedupEnabled && admin_button) { %>
 <div class="col-lg-12 col-md-4 col-sm-6">
 <div class="media altmetric">
 	<div class="media-left">
-      		<div class='altmetric-embed' data-hide-no-mentions="true" data-badge-popover="right" data-badge-type="donut" data-link-target='_blank' data-doi="<%= doi %>"></div>
+      		<div class='altmetric-embed' data-hide-no-mentions="true" data-badge-popover="right" data-badge-type="donut" data-link-target='_blank'
+      		<% if (doi != null) { %> data-doi="<%= doi %>"<% } else if (isbn != null) { %> data-isbn="<%= isbn %>"<% } %>></div>
 	</div>
 	<div class="media-body media-middle text-center">
 		<h4 class="media-heading"><fmt:message key="jsp.display-item.citation.altmetric"/></h4>
