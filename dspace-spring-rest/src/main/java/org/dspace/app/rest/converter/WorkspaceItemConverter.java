@@ -18,6 +18,7 @@ import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
@@ -59,7 +60,7 @@ public class WorkspaceItemConverter
 	@Autowired
 	SubmissionService submissionService; 
 
-	public WorkspaceItemConverter() throws ServletException {
+	public WorkspaceItemConverter() throws SubmissionConfigReaderException {
 		submissionConfigReader = new SubmissionConfigReader();
 	}
 

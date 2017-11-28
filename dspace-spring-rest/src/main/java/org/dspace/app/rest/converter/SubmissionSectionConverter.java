@@ -14,6 +14,7 @@ import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +50,7 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
 		
 		try {
 			step = submissionConfigReader.getStepConfig(obj.getId());
-		} catch (ServletException e) {
+		} catch (SubmissionConfigReaderException e) {
 			throw new RuntimeException(e);
 		}
 		return step;
@@ -59,7 +60,7 @@ public class SubmissionSectionConverter extends DSpaceConverter<SubmissionStepCo
 		if(submissionConfigReader==null) {
 			try {
 				submissionConfigReader = new SubmissionConfigReader();
-			} catch (ServletException e) {
+			} catch (SubmissionConfigReaderException e) {
 				log.error(e.getMessage(), e);
 			}
 		}		
