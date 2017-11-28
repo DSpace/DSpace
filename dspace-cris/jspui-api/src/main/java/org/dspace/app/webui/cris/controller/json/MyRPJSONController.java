@@ -65,10 +65,9 @@ public class MyRPJSONController extends MultiActionController
         if (rp == null)
         {
             rp = new ResearcherPage();
-            String newRpStatus = ConfigurationManager.getProperty("cris","rp.profile.new.status");
-            if (newRpStatus.equals("true")) {
-                rp.setStatus(true);
-            }
+            String newRpStatus = ConfigurationManager.getBooleanProperty("cris","rp.profile.new.status", false);
+            rp.setStatus(newRpStatus);
+
             EPerson currentUser = getCurrentUser(request);
 			rp.setEpersonID(currentUser.getID());
             
