@@ -62,13 +62,12 @@ public class CDLDataCiteConsumer implements Consumer {
 
                             if(response.contains("error"))
                                 log.error("Problem during the Item synchronization against DataCite : " + response);
-
-                            ctx.commit();
                         }
                     }
                     break;
                 }
             }
+            ctx.restoreAuthSystemState();
         }
         catch (Exception e) {
             log.error("Problem updating DataCite settings for an item based on event " + event, e);
