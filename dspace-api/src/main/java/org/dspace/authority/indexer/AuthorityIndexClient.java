@@ -9,7 +9,6 @@ package org.dspace.authority.indexer;
 
 import org.dspace.authority.AuthorityValue;
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.kernel.ServiceManager;
@@ -29,27 +28,28 @@ import java.util.Map;
 public class AuthorityIndexClient {
 
     private static Logger log = Logger.getLogger(AuthorityIndexClient.class);
+    private static AuthorityIndexingService indexingService;
+    private static List<AuthorityIndexerInterface> indexers;
+
+    static {
+        ServiceManager serviceManager = getServiceManager();
+        indexingService = serviceManager.getServiceByName(AuthorityIndexingService.class.getName(),AuthorityIndexingService.class);
+        indexers = serviceManager.getServicesByType(AuthorityIndexerInterface.class);
+    }
 
     public static void main(String[] args) throws Exception {
 
         //Populate our solr
         Context context = new Context();
-        ServiceManager serviceManager = getServiceManager();
-
-
-        AuthorityIndexingService indexingService = serviceManager.getServiceByName(AuthorityIndexingService.class.getName(),AuthorityIndexingService.class);
-        List<AuthorityIndexerInterface> indexers = serviceManager.getServicesByType(AuthorityIndexerInterface.class);
 
         log.info("Cleaning the old index");
-        System.out.println("Cleaning the old index");
         indexingService.cleanIndex();
 
         context.turnOffAuthorisationSystem();
         //Get all our values from the input forms
-        Map<String, AuthorityValue> toIndexValues = new HashMap<String, AuthorityValue>();
+        Map<String, AuthorityValue> toIndexValues = new HashMap<>();
         for (AuthorityIndexerInterface indexerInterface : indexers) {
             log.info("Initialize " + indexerInterface.getClass().getName());
-            System.out.println("Initialize " + indexerInterface.getClass().getName());
             indexerInterface.init(context);
             while (indexerInterface.hasMore()) {
                 AuthorityValue authorityValue = indexerInterface.nextValue();
@@ -72,16 +72,10 @@ public class AuthorityIndexClient {
         System.out.println("All done !");
     }
 
-    public static void indexItem(Context context, Item item){
-        ServiceManager serviceManager = getServiceManager();
-
-        AuthorityIndexingService indexingService = serviceManager.getServiceByName(AuthorityIndexingService.class.getName(),AuthorityIndexingService.class);
-        List<AuthorityIndexerInterface> indexers = serviceManager.getServicesByType(AuthorityIndexerInterface.class);
-
-
+    static void indexItem(Context context, Item item){
         for (AuthorityIndexerInterface indexerInterface : indexers) {
 
-            indexerInterface.init(context , item);
+            indexerInterface.init(context, item);
             while (indexerInterface.hasMore()) {
                 AuthorityValue authorityValue = indexerInterface.nextValue();
                 if(authorityValue != null)

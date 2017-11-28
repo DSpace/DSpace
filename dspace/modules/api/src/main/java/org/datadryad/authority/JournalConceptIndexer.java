@@ -18,22 +18,23 @@ import org.dspace.JournalUtils;
  */
 public class JournalConceptIndexer implements AuthorityIndexerInterface {
 
-    protected String SOURCE="JOURNALCONCEPTS";
     protected AuthorityValue nextValue;
 
-    protected LinkedList<AuthorityValue> authorities = new LinkedList();
-
-
-    public String FIELD_NAME = "prism_publicationName";
+    protected LinkedList<AuthorityValue> authorities = null;
+    private static Boolean journals_cached = false;
 
     public void init() {
-        DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
-        for (DryadJournalConcept concept : dryadJournalConcepts) {
-            if (concept.isAccepted()) {
-                for (AuthorityValue doc : createAuthorityValues(concept)) {
-                    authorities.add(doc);
+        if (authorities == null) {
+            authorities = new LinkedList<AuthorityValue>();
+        }
+        if (!journals_cached) {
+            DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
+            for (DryadJournalConcept concept : dryadJournalConcepts) {
+                if (concept.isAccepted()) {
+                    authorities.addAll(createAuthorityValues(concept));
                 }
             }
+            journals_cached = true;
         }
     }
 
@@ -75,8 +76,8 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
         for (String name : names) {
             AuthorityValue authorityValue = new AuthorityValue();
             authorityValue.setId(String.valueOf(concept.getConceptID()));
-            authorityValue.setSource(SOURCE);
-            authorityValue.setField(FIELD_NAME);
+            authorityValue.setSource(getSource());
+            authorityValue.setField(getField());
             authorityValue.setValue(concept.getFullName());
             // full-text field is for searching, so index it with no spaces.
             authorityValue.setFullText(name.replaceAll("\\s", ""));
@@ -92,7 +93,11 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
     }
 
     public String getSource() {
-        return SOURCE;
+        return "JOURNALCONCEPTS";
+    }
+
+    public String getField() {
+        return "prism_publicationName";
     }
 }
 
