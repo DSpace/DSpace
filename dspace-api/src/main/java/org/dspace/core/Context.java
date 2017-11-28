@@ -391,6 +391,7 @@ public class Context
     {
         ArrayList<Event> eventArrayList = new ArrayList<>();
         eventArrayList.addAll(events);
+        events = null;
         return eventArrayList;
     }
 
