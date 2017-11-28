@@ -919,6 +919,12 @@ public class WorkflowManager
     private static void notifyOfArchive(Context c, Item i, Collection coll)
             throws SQLException, IOException
     {
+        
+        if (ConfigurationManager.getBooleanProperty("workflow.disabled.notify.archive", false))
+        {
+            return;
+        }
+        
         try
         {
             // Get submitter
@@ -1130,6 +1136,12 @@ public class WorkflowManager
     private static void notifyGroupOfTask(Context c, WorkflowItem wi,
             Group mygroup, EPerson[] epa) throws SQLException, IOException
     {
+        
+        if (ConfigurationManager.getBooleanProperty("workflow.disabled.notify.task", false))
+        {
+            return;
+        }
+        
         // check to see if notification is turned off
         // and only do it once - delete key after notification has
         // been suppressed for the first time
