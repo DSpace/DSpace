@@ -8,14 +8,13 @@
 package org.dspace.content.dao.impl;
 
 import org.apache.log4j.Logger;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.dao.ItemDAO;
 import org.dspace.core.Context;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.DetachedCriteria;
@@ -26,11 +25,9 @@ import org.hibernate.criterion.Subqueries;
 import org.hibernate.type.StandardBasicTypes;
 
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Item object.
@@ -288,5 +285,64 @@ public class ItemDAOImpl extends AbstractHibernateDSODAO<Item> implements ItemDA
         query.setParameter("in_archive", includeArchived);
         query.setParameter("withdrawn", includeWithdrawn);
         return count(query); 
+    }
+
+    @Override
+    public Iterator<Item> findAllAuthorized(Context context, int pageSize, int pageOffset, EPerson currentUser, int action, Set<Group> groups) throws SQLException{
+        Query query = createQuery(context, "SELECT DISTINCT i" +
+                " FROM Item i" +
+                " JOIN i.resourcePolicies r" +
+                " WHERE i.inArchive = true" +
+                " AND i.discoverable = true" +
+                " AND (r.epersonGroup.id IN (:groupIdList) OR r.eperson.id = :currentUserId)" +
+                " AND (r.actionId = :actionId)" +
+                " AND (r.startDate IS NULL or r.startDate <= :currentDate)" +
+                " AND (r.endDate IS NULL or r.endDate >= :currentDate)");
+        LinkedList<UUID> list = new LinkedList<>();
+        for(Group group: groups){
+            list.add(group.getID());
+        }
+        query.setParameter("groupIdList", list);
+        if(currentUser == null){
+            query.setParameter("currentUserId", null);
+        }
+        else{
+            query.setParameter("currentUserId", currentUser.getID());
+        }
+        query.setParameter("actionId", action);
+        Date currentDate = new Date();
+        query.setParameter("currentDate", currentDate);
+        query.setFirstResult(pageOffset);
+        query.setMaxResults(pageSize);
+        return iterate(query);
+    }
+
+    @Override
+    public int countTotalAuthorized(Context context, EPerson currentUser, int action, Set<Group> groups) throws SQLException{
+        Query query = createQuery(context, "SELECT count(*) " +
+                " FROM Item i" +
+                " JOIN i.resourcePolicies r" +
+                " WHERE i.inArchive = true" +
+                " AND i.discoverable = true" +
+                " AND (r.epersonGroup.id IN (:groupIdList) OR r.eperson.id = :currentUserId)" +
+                " AND (r.actionId = :actionId)" +
+                " AND (r.startDate IS NULL or r.startDate <= :currentDate)" +
+                " AND (r.endDate IS NULL or r.endDate >= :currentDate)");
+        LinkedList<UUID> list = new LinkedList<>();
+        for(Group group: groups){
+            list.add(group.getID());
+        }
+        query.setParameter("groupIdList", list);
+        if(currentUser == null){
+            query.setParameter("currentUserId", null);
+        }
+        else{
+            query.setParameter("currentUserId", currentUser.getID());
+        }
+        query.setParameter("actionId", action);
+        Date currentDate = new Date();
+        query.setParameter("currentDate", currentDate);
+        query.setCacheable(true);
+        return count(query);
     }
 }

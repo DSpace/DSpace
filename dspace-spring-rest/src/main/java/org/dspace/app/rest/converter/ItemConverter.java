@@ -34,7 +34,7 @@ public class ItemConverter extends DSpaceObjectConverter<org.dspace.content.Item
 	private BitstreamConverter bitstreamConverter;
 
 	private static final Logger log = Logger.getLogger(ItemConverter.class);
-	
+	//TODO Check bitstream authorizations
 	@Override
 	public ItemRest fromModel(org.dspace.content.Item obj) {
 		ItemRest item = super.fromModel(obj);

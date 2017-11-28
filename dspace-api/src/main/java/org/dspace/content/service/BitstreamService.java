@@ -96,7 +96,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
      * @throws AuthorizeException if authorization error
      */
     public Bitstream register(Context context, int assetstore, String bitstreamPath)
-        	throws IOException, SQLException, AuthorizeException;
+            throws IOException, SQLException, AuthorizeException;
 
     /**
      * Set the user's format description. This implies that the format of the
@@ -113,7 +113,7 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     /**
      * Get the description of the format - either the user's or the description
      * of the format defined by the system.
-     * 
+     *
      * @param  context DSpace context object
      * @param  bitstream DSpace bitstream
      * @return a description of the format.
@@ -202,4 +202,8 @@ public interface BitstreamService extends DSpaceObjectService<Bitstream>, DSpace
     int countBitstreamsWithoutPolicy(Context context) throws SQLException;
 
     List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException;
+
+    Iterator<Bitstream> findAllAuthorized(Context context, int pageSize, int pageOffset) throws SQLException;
+
+    int countTotalAuthorized(Context context) throws SQLException;
 }

@@ -9,10 +9,14 @@ package org.dspace.content;
 
 import mockit.NonStrictExpectations;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.http.auth.AUTH;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authority.factory.AuthorityServiceFactory;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.BitstreamFormatService;
 import org.dspace.content.service.MetadataFieldService;
@@ -30,6 +34,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -1881,5 +1888,6 @@ public class ItemTest extends AbstractDSpaceObjectTest
         WorkspaceItem workspaceItem = workspaceItemService.create(context, collection, false);
         return installItemService.installItem(context, workspaceItem);
     }
+
 
 }

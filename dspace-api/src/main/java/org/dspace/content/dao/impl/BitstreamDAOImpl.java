@@ -7,6 +7,7 @@
  */
 package org.dspace.content.dao.impl;
 
+import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -15,13 +16,16 @@ import org.dspace.content.dao.BitstreamDAO;
 import org.dspace.core.AbstractHibernateDSODAO;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Hibernate implementation of the Database Access Object interface class for the Bitstream object.
@@ -32,6 +36,8 @@ import java.util.List;
  */
 public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> implements BitstreamDAO
 {
+    private static final Logger log = Logger.getLogger(BitstreamDAO.class);
+
 
     protected BitstreamDAOImpl()
     {
@@ -156,9 +162,64 @@ public class BitstreamDAOImpl extends AbstractHibernateDSODAO<Bitstream> impleme
 
     @Override
     public Iterator<Bitstream> findAll(Context context, int limit, int offset) throws SQLException {
-	Query query = createQuery(context, "select b FROM Bitstream b");
-	query.setFirstResult(offset);
-	query.setMaxResults(limit);
-	return iterate(query);
+        Query query = createQuery(context, "select b FROM Bitstream b");
+        query.setFirstResult(offset);
+        query.setMaxResults(limit);
+        return iterate(query);
+    }
+
+    @Override
+    public Iterator<Bitstream> findAllAuthorized(Context context, int pageSize, int pageOffset, EPerson currentUser, int action, Set<Group> groups) throws SQLException{
+        Query query = createQuery(context, "SELECT DISTINCT b" +
+                " FROM Bitstream b" +
+                " JOIN b.resourcePolicies r" +
+                " WHERE (r.epersonGroup.id IN (:groupIdList) OR r.eperson.id = :currentUserId)" +
+                " AND (r.actionId = :actionId)" +
+                " AND (r.startDate IS NULL or r.startDate <= :currentDate)" +
+                " AND (r.endDate IS NULL or r.endDate >= :currentDate)");
+        LinkedList<UUID> list = new LinkedList<>();
+        for(Group group: groups){
+            list.add(group.getID());
+        }
+        query.setParameter("groupIdList", list);
+        if(currentUser == null){
+            query.setParameter("currentUserId", null);
+        }
+        else{
+            query.setParameter("currentUserId", currentUser.getID());
+        }
+        query.setParameter("actionId", action);
+        Date currentDate = new Date();
+        query.setParameter("currentDate", currentDate);
+        query.setFirstResult(pageOffset);
+        query.setMaxResults(pageSize);
+        return iterate(query);
+    }
+
+    @Override
+    public int countTotalAuthorized(Context context, EPerson currentUser, int action, Set<Group> groups) throws SQLException{
+        Query query = createQuery(context, "SELECT count(*)" +
+                " FROM Bitstream b" +
+                " JOIN b.resourcePolicies r" +
+                " WHERE (r.epersonGroup.id IN (:groupIdList) OR r.eperson.id = :currentUserId)" +
+                " AND (r.actionId = :actionId)" +
+                " AND (r.startDate IS NULL or r.startDate <= :currentDate)" +
+                " AND (r.endDate IS NULL or r.endDate >= :currentDate)");
+        LinkedList<UUID> list = new LinkedList<>();
+        for(Group group: groups){
+            list.add(group.getID());
+        }
+        query.setParameter("groupIdList", list);
+        if(currentUser == null){
+            query.setParameter("currentUserId", null);
+        }
+        else{
+            query.setParameter("currentUserId", currentUser.getID());
+        }
+        query.setParameter("actionId", action);
+        Date currentDate = new Date();
+        query.setParameter("currentDate", currentDate);
+        query.setCacheable(true);
+        return count(query);
     }
 }
