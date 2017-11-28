@@ -7,10 +7,18 @@
  */
 package org.dspace.app.rest.builder;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.CharEncoding;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
 
 /**
  * Builder to construct Community objects
@@ -53,6 +61,13 @@ public class CommunityBuilder extends AbstractBuilder<Community> {
 
     public CommunityBuilder withName(final String communityName) {
         return setMetadataSingleValue(community, MetadataSchema.DC_SCHEMA, "title", null, communityName);
+    }
+
+    public CommunityBuilder withLogo(String content) throws AuthorizeException, IOException, SQLException {
+        try(InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
+            communityService.setLogo(context, community, is);
+        }
+        return this;
     }
 
     @Override
