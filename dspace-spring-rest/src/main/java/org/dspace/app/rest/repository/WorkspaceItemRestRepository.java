@@ -26,6 +26,7 @@ import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -86,7 +87,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	
 	private SubmissionConfigReader submissionConfigReader;
 	
-	public WorkspaceItemRestRepository() throws ServletException {
+	public WorkspaceItemRestRepository() throws SubmissionConfigReaderException {
 		submissionConfigReader = new SubmissionConfigReader();
 	}
 

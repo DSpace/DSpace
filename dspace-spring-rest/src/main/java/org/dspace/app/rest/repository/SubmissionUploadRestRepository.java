@@ -21,6 +21,7 @@ import org.dspace.app.rest.model.hateoas.SubmissionUploadResource;
 import org.dspace.app.rest.utils.DateMathParser;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
+import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -60,7 +61,7 @@ public class SubmissionUploadRestRepository extends DSpaceRestRepository<Submiss
 
 	DateMathParser dateMathParser = new DateMathParser();
 	
-	public SubmissionUploadRestRepository() throws ServletException {
+	public SubmissionUploadRestRepository() throws SubmissionConfigReaderException {
 		submissionConfigReader = new SubmissionConfigReader();
 	}
 
