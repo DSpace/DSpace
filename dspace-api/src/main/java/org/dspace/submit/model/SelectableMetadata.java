@@ -5,10 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.rest.model;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+package org.dspace.submit.model;
 
 /**
  * The SelectableMetadata REST Resource. It is not addressable directly, only
@@ -22,9 +19,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  * it is exposed as an array of SelectableMetadata object
  * 
  * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-@JsonInclude(value = Include.NON_NULL)
 public class SelectableMetadata {
 	private String metadata;
 	private String label;

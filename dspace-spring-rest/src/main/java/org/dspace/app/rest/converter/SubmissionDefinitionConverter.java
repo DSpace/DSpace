@@ -38,10 +38,8 @@ public class SubmissionDefinitionConverter extends DSpaceConverter<SubmissionCon
 		List<SubmissionSectionRest> panels = new LinkedList<SubmissionSectionRest>();
 		for (int idx = 0; idx < obj.getNumberOfSteps(); idx++) {
 			SubmissionStepConfig step = obj.getStep(idx);
-			if (step.isVisible()) {
-				SubmissionSectionRest sp = panelConverter.convert(step);				
-				panels.add(sp);
-			}
+			SubmissionSectionRest sp = panelConverter.convert(step);				
+			panels.add(sp);
 		}
 		sd.setPanels(panels);
 		return sd;

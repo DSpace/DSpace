@@ -168,7 +168,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 //Check the embedded resources and that they're sorted alphabetically
                 //Check that the subject matches as expected
                 //Verify that they're sorted alphabetically
-                .andExpect(jsonPath("$._embedded.browseEntryResources", contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1),
+                .andExpect(jsonPath("$._embedded.browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1),
                         BrowseEntryResourceMatcher.matchBrowseEntry( "ExtraEntry", 3),
                         BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2)
                         )));
@@ -188,7 +188,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 //Check the embedded resources and that they're sorted alphabetically
                 //Check that the subject matches as expected
                 //Verify that they're sorted alphabetically
-                .andExpect(jsonPath("$._embedded.browseEntryResources", contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2),
+                .andExpect(jsonPath("$._embedded.browseEntries", contains(BrowseEntryResourceMatcher.matchBrowseEntry("TestingForMore", 2),
                         BrowseEntryResourceMatcher.matchBrowseEntry( "ExtraEntry", 3),
                         BrowseEntryResourceMatcher.matchBrowseEntry("AnotherTest", 1)
                         )));

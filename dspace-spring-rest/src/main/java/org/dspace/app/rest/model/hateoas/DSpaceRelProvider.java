@@ -21,8 +21,9 @@ public class DSpaceRelProvider extends EvoInflectorRelProvider {
 
 	@Override
 	public String getItemResourceRelFor(Class<?> type) {
-		if (DSpaceResource.class.isAssignableFrom(type)) {
-			return type.getAnnotation(RelNameDSpaceResource.class).value();
+		RelNameDSpaceResource nameAnnotation = type.getAnnotation(RelNameDSpaceResource.class);
+		if (nameAnnotation != null) {
+			return nameAnnotation.value();
 		}
 		return super.getItemResourceRelFor(type);
 	}

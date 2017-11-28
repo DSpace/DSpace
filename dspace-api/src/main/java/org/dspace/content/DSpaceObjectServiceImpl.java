@@ -432,7 +432,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             return false;
         }
 
-        if (qualifier == null)
+        if (StringUtils.isBlank(qualifier))
         {
             // Value must be unqualified
             if (metadataField.getQualifier() != null)

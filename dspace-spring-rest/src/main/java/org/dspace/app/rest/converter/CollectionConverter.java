@@ -7,8 +7,25 @@
  */
 package org.dspace.app.rest.converter;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.CollectionRest;
+import org.dspace.app.rest.model.ResourcePolicyRest;
+import org.dspace.app.rest.utils.ContextUtil;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Collection;
+import org.dspace.content.service.CollectionService;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +39,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class CollectionConverter
 		extends DSpaceObjectConverter<org.dspace.content.Collection, org.dspace.app.rest.model.CollectionRest> {
+	
+	private static final Logger log = Logger.getLogger(CollectionConverter.class);
+	
 	@Autowired
 	private BitstreamConverter bitstreamConverter;
-	
+	@Autowired
+	private CollectionService collectionService;
+	@Autowired
+	private RequestService requestService;
+	@Autowired
+	private AuthorizeService authorizeService;
+	@Autowired
+	private ResourcePolicyConverter resourcePolicyConverter;
+
 	@Override
 	public org.dspace.content.Collection toModel(org.dspace.app.rest.model.CollectionRest obj) {
 		return (org.dspace.content.Collection) super.toModel(obj);
@@ -37,7 +65,36 @@ public class CollectionConverter
 		if (logo != null) {
 			col.setLogo(bitstreamConverter.convert(logo));
 		}
+
+		col.setDefaultAccessConditions(getDefaultBitstreamPoliciesForCollection(obj.getID()));
+
 		return col;
+	}
+
+	private List<ResourcePolicyRest> getDefaultBitstreamPoliciesForCollection(UUID uuid) {
+
+		HttpServletRequest request = requestService.getCurrentRequest().getHttpServletRequest();
+		Context context = null;
+		Collection collection = null;
+		List<ResourcePolicy> defaultCollectionPolicies = null;
+		try {
+			context = ContextUtil.obtainContext(request);
+			collection = collectionService.find(context, uuid);
+			defaultCollectionPolicies = authorizeService.getPoliciesActionFilter(context, collection,
+					Constants.DEFAULT_BITSTREAM_READ);
+		} catch (SQLException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		List<ResourcePolicyRest> results = new ArrayList<ResourcePolicyRest>();
+
+		for (ResourcePolicy pp : defaultCollectionPolicies) {
+			ResourcePolicyRest accessCondition = resourcePolicyConverter.convert(pp);
+			if (accessCondition != null) {
+				results.add(accessCondition);
+			}
+		}
+		return results;
 	}
 
 	@Override

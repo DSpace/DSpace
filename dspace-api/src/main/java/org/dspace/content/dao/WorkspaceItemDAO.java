@@ -35,6 +35,8 @@ public interface WorkspaceItemDAO extends GenericDAO<WorkspaceItem> {
 
     public List<WorkspaceItem> findAll(Context context) throws SQLException;
 
+    public List<WorkspaceItem> findAll(Context context, Integer limit, Integer offset) throws SQLException;
+    
     public List<WorkspaceItem> findWithSupervisedGroup(Context context) throws SQLException;
 
     public List<WorkspaceItem> findBySupervisedGroupMember(Context context, EPerson ePerson) throws SQLException;

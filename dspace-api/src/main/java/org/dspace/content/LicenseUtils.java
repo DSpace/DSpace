@@ -10,6 +10,7 @@ package org.dspace.content;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
@@ -133,12 +134,13 @@ public class LicenseUtils
      *            the item object of the license
      * @param licenseText
      *            the license the user granted
+     * @param acceptanceDate TODO
      * @throws SQLException if database error
      * @throws IOException if IO error
      * @throws AuthorizeException if authorization error
      */
     public static void grantLicense(Context context, Item item,
-            String licenseText) throws SQLException, IOException,
+            String licenseText, String acceptanceDate) throws SQLException, IOException,
             AuthorizeException
     {
         // Put together text to store
@@ -154,7 +156,12 @@ public class LicenseUtils
         // Now set the format and name of the bitstream
         b.setName(context, "license.txt");
         b.setSource(context, "Written by org.dspace.content.LicenseUtils");
-
+        
+        DCDate acceptanceDCDate = DCDate.getCurrent(); 
+        if(acceptanceDate!=null) {
+        	acceptanceDCDate = new DCDate(acceptanceDate);
+        }
+        b.setAcceptanceDate(context, acceptanceDCDate);
         // Find the License format
         BitstreamFormat bf = bitstreamFormat.findByShortDescription(context,
                 "License");

@@ -14,16 +14,15 @@ import java.util.List;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.ScopeEnum;
-import org.dspace.app.rest.model.SelectableMetadata;
 import org.dspace.app.rest.model.SubmissionFormFieldRest;
 import org.dspace.app.rest.model.SubmissionFormInputTypeRest;
 import org.dspace.app.rest.model.SubmissionFormRest;
 import org.dspace.app.rest.model.SubmissionVisibilityRest;
 import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.rest.utils.AuthorityUtils;
-import org.dspace.app.rest.utils.Utils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.submit.model.SelectableMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +39,6 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 	private static final String INPUT_TYPE_NAME = "name";
 	private static final String INPUT_TYPE_LOOKUP = "lookup";
 	private static final String INPUT_TYPE_LOOKUP_NAME = "lookup-name";
-
-	@Autowired
-	private Utils utils;
 
 	@Autowired
 	private AuthorityUtils authorityUtils;
@@ -98,7 +94,7 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 			} else {
 				inputRest.setType(inputType);
 			}
-			selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
+			selMd.setMetadata(org.dspace.core.Utils.standardize(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), "."));
 			selectableMetadata.add(selMd);
 
 		} else {
@@ -107,7 +103,7 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 			for (int idx = 0; idx < pairs.size(); idx += 2) {
 				SelectableMetadata selMd = new SelectableMetadata();
 				selMd.setLabel((String) pairs.get(idx));
-				selMd.setMetadata(utils.getMetadataKey(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1)));
+				selMd.setMetadata(org.dspace.core.Utils.standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
 				if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
 					selMd.setAuthority(authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
 							pairs.get(idx + 1)));

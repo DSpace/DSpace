@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dspace.content.MetadataSchema;
+import org.dspace.core.Utils;
 
 /**
  * Class representing a line in an input form.
@@ -455,8 +456,7 @@ public class DCInput
 	}
 
 	public String getFieldName() {
-		return this.getSchema() +"."+ this.getElement() + "." + 
-        		this.getQualifier();
+		return Utils.standardize(this.getSchema(), this.getElement(), this.getQualifier(), ".");
 	}
 	
 }
