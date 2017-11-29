@@ -76,7 +76,7 @@ public class BitstreamContentRestController {
         String mimetype = bit.getFormat(context).getMIMEType();
 
 		// Pipe the bits
-		try(InputStream is = getInputStream(context, bit)) {
+		try(InputStream is = bitstreamService.retrieve(context, bit)) {
 
 			MultipartFileSender sender = MultipartFileSender
 					.fromInputStream(is)
@@ -119,15 +119,6 @@ public class BitstreamContentRestController {
 
         return bit;
     }
-
-    private InputStream getInputStream(Context context, Bitstream bit) {
-		try {
-			return bitstreamService.retrieve(context, bit);
-		} catch (Exception e) {
-			log.warn("Unable to retrieve bitstream for bitstream with ID " + bit.getID());
-			return null;
-		}
-	}
 
 	private boolean isNotAnErrorResponse(HttpServletResponse response) {
 		Response.Status.Family responseCode = Response.Status.Family.familyOf(response.getStatus());
