@@ -55,6 +55,56 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
     }
 
     @Test
+    public void findAllPaginationTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Community child2 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community Two")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = new CollectionBuilder().createCollection(context, child2).withName("Collection 2").build();
+
+
+
+        getClient().perform(get("/api/core/collections")
+            .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                        CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
+                )))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.not(
+                        Matchers.contains(
+                                CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
+                        )
+                )));
+
+        getClient().perform(get("/api/core/collections")
+                .param("size", "1")
+                .param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.contains(
+                        CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
+                )))
+                .andExpect(jsonPath("$._embedded.collections", Matchers.not(
+                        Matchers.contains(
+                                CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
+                        )
+                )));
+    }
+
+
+    @Test
     public void findOneCollectionTest() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
