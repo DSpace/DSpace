@@ -50,6 +50,53 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findAllPaginationTest() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+
+        getClient().perform(get("/api/core/communities")
+                .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())
+                )))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.not(
+                        Matchers.contains(
+                                CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                        )
+                )))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+        ;
+
+        getClient().perform(get("/api/core/communities")
+                .param("size", "1")
+                .param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.contains(
+                        CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                )))
+                .andExpect(jsonPath("$._embedded.communities", Matchers.not(
+                        Matchers.contains(
+                                CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle())
+                        )
+                )))
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
+        ;
+    }
+
+    @Test
     public void findOneTest() throws Exception{
         //We turn off the authorization system in order to create the structure as defined below
         context.turnOffAuthorisationSystem();
