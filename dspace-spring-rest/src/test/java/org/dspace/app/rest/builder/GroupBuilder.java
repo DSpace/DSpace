@@ -15,19 +15,23 @@ import org.dspace.eperson.Group;
 /**
  * Builder to construct Group objects
  *
- * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
+ * @author Atmire NV (info at atmire dot com)
  */
 public class GroupBuilder extends AbstractBuilder<Group> {
 
     private Group group;
 
-    protected GroupBuilder() {
+    protected GroupBuilder(Context context) {
+        super(context);
 
     }
 
+    protected void cleanup() throws Exception {
+        delete(group);
+    }
+
     public static GroupBuilder createGroup(final Context context) {
-        GroupBuilder builder = new GroupBuilder();
+        GroupBuilder builder = new GroupBuilder(context);
         return builder.create(context);
     }
 

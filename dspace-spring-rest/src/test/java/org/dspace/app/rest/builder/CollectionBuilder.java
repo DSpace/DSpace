@@ -16,19 +16,19 @@ import org.dspace.core.Context;
 /**
  * Builder to construct Collection objects
  *
- * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
+ * @author Atmire NV (info at atmire dot com)
  */
 public class CollectionBuilder extends AbstractBuilder<Collection> {
 
     private Collection collection;
 
-    protected CollectionBuilder() {
+    protected CollectionBuilder(Context context) {
+        super(context);
 
     }
 
     public static CollectionBuilder createCollection(final Context context, final Community parent) {
-        CollectionBuilder builder = new CollectionBuilder();
+        CollectionBuilder builder = new CollectionBuilder(context);
         return builder.create(context, parent);
     }
 
@@ -58,6 +58,10 @@ public class CollectionBuilder extends AbstractBuilder<Collection> {
             return handleException(e);
         }
         return collection;
+    }
+
+    protected void cleanup() throws Exception {
+        delete(collection);
     }
 
     @Override
