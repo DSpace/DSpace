@@ -534,8 +534,11 @@ public class Scheme extends AuthorityObject
                 }
             }
             for (Concept concept : concepts) {
-                for (TableRow tr : metadataMap.get(concept.getID())) {
-                    concept.initializeCachedMetadata(tr);
+                List<TableRow> conceptRows = metadataMap.get(concept.getID());
+                if (conceptRows != null) {
+                    for (TableRow tr : metadataMap.get(concept.getID())) {
+                        concept.initializeCachedMetadata(tr);
+                    }
                 }
             }
         }
