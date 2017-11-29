@@ -10,9 +10,7 @@ package org.dspace.app.rest;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -238,9 +236,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
 
                     //** THEN **
-                    .andExpect(status().isUnauthorized())
-                    //The response should not contain any content.
-                    .andExpect(content().bytes(new byte[0]));
+                    .andExpect(status().isUnauthorized());
 
             //An unauthorized request should not log statistics
             checkNumberOfStatsRecords(bitstream, 0);
@@ -286,9 +282,7 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
             getClient().perform(get("/api/core/bitstreams/" + bitstream.getID() + "/content"))
 
                     //** THEN **
-                    .andExpect(status().isUnauthorized())
-                    //The response should not contain any content.
-                    .andExpect(content().bytes(new byte[0]));
+                    .andExpect(status().isUnauthorized());
 
             //An unauthorized request should not log statistics
             checkNumberOfStatsRecords(bitstream, 0);

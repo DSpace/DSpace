@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
-import org.apache.http.auth.AUTH;
+import org.apache.catalina.connector.ClientAbortException;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.BitstreamRest;
 import org.dspace.app.rest.utils.ContextUtil;
@@ -27,10 +27,8 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.services.ConfigurationService;
 import org.dspace.services.EventService;
 import org.dspace.usage.UsageEvent;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,9 +44,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/"+BitstreamRest.CATEGORY +"/"+ BitstreamRest.PLURAL_NAME + "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}/content")
-public class BitstreamContentRestController implements InitializingBean {
+public class BitstreamContentRestController {
 
 	private static final Logger log = Logger.getLogger(BitstreamContentRestController.class);
+
+	//Most file systems are configured to use block sizes of 4096 or 8192 and our buffer should be a multiple of that.
+	private static final int BUFFER_SIZE = 4096 * 10;
 
 	@Autowired
 	private BitstreamService bitstreamService;
@@ -57,17 +58,7 @@ public class BitstreamContentRestController implements InitializingBean {
 	private EventService eventService;
 
 	@Autowired
-	private ConfigurationService configurationService;
-
-	@Autowired
     private AuthorizeService authorizeService;
-
-	private int bufferSize;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        bufferSize = configurationService.getIntProperty("bitstream-download.buffer.size", -1);
-    }
 
 	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
 	public void retrieve(@PathVariable UUID uuid, HttpServletResponse response,
@@ -75,7 +66,7 @@ public class BitstreamContentRestController implements InitializingBean {
 
 		Context context = ContextUtil.obtainContext(request);
 
-        Bitstream bit = getBitstreamIfAuthorized(context, uuid, response);
+        Bitstream bit = getBitstream(context, uuid, response);
         if (bit == null) {
             //The bitstream was not found or we're not authorized to read it.
             return;
@@ -89,7 +80,7 @@ public class BitstreamContentRestController implements InitializingBean {
 
 			MultipartFileSender sender = MultipartFileSender
 					.fromInputStream(is)
-					.withBufferSize(bufferSize)
+					.withBufferSize(BUFFER_SIZE)
 					.withFileName(bit.getName())
 					.withLength(bit.getSize())
 					.withChecksum(bit.getChecksum())
@@ -113,21 +104,17 @@ public class BitstreamContentRestController implements InitializingBean {
 								bit));
 			}
 
-		} catch(IOException ex) {
+		} catch(ClientAbortException ex) {
 			log.debug("Client aborted the request before the download was completed. Client is probably switching to a Range request.", ex);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
-    private Bitstream getBitstreamIfAuthorized(Context context, @PathVariable UUID uuid, HttpServletResponse response) throws SQLException, IOException, AuthorizeException {
+    private Bitstream getBitstream(Context context, @PathVariable UUID uuid, HttpServletResponse response) throws SQLException, IOException, AuthorizeException {
         Bitstream bit = bitstreamService.find(context, uuid);
         if (bit == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
 			authorizeService.authorizeAction(context, bit, Constants.READ);
-
         }
 
         return bit;
