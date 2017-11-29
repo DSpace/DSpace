@@ -134,7 +134,7 @@ public class MultipartFileSender {
         return this;
     }
 
-    public void serveResource() throws Exception {
+    public void serveResource() throws IOException {
 
         // Validate and process range -------------------------------------------------------------
 

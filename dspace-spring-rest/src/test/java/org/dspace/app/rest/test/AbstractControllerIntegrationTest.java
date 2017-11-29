@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.support.ErrorPageFilter;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -84,6 +85,7 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
                 //Always log the repsonse to debug
                 .alwaysDo(MockMvcResultHandlers.log())
                 //Add all filter implementations
+                .addFilters(new ErrorPageFilter())
                 .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]))
                 .build();
     }
