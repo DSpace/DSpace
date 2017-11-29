@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
 import org.apache.commons.io.IOUtils;
@@ -230,8 +237,6 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-
-    //TODO Add bitstream to publicitem1
 
         //Add a bitstream to an item
         String bitstreamContent = "ThisIsSomeDummyText";
