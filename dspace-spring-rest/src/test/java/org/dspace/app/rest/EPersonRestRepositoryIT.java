@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest;
 
 import org.dspace.app.rest.builder.EPersonBuilder;
@@ -31,6 +38,39 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                         EPersonMatcher.matchDefaultTestEPerson()
                 )));
     }
+
+    @Test
+    public void findAllPaginationTest() throws Exception{
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Doe")
+                .withEmail("Johndoe@gmail.com")
+                .build();
+
+        getClient().perform(get("/api/eperson/eperson")
+                .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                        EPersonMatcher.matchDefaultTestEPerson()
+                )))
+                .andExpect(jsonPath("$._embedded.epersons", Matchers.not(
+                        Matchers.contains(
+                                EPersonMatcher.matchEPersonEntry(ePerson.getID(), ePerson.getEmail())
+                        )
+                )));
+
+        getClient().perform(get("/api/eperson/eperson")
+                .param("size", "1")
+                .param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
+                        EPersonMatcher.matchEPersonEntry(ePerson.getID(), ePerson.getEmail())
+                )));
+    }
+
 
     @Test
     public void findOneTest() throws Exception{
