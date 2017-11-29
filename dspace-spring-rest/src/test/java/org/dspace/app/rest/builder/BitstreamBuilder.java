@@ -32,12 +32,13 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
     private Item item;
     private Group readerGroup;
 
-    protected BitstreamBuilder() {
+    protected BitstreamBuilder(Context context) {
+        super(context);
 
     }
 
     public static BitstreamBuilder createBitstream(Context context, Item item, InputStream is) throws SQLException, AuthorizeException, IOException {
-        BitstreamBuilder builder = new BitstreamBuilder();
+        BitstreamBuilder builder = new BitstreamBuilder(context);
         return builder.create(context, item, is);
     }
 
@@ -63,8 +64,7 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
     }
 
     public BitstreamBuilder withMimeType(String mimeType) throws SQLException {
-        BitstreamFormat bf = bitstreamFormatService
-                .findByMIMEType(context, mimeType);
+        BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, mimeType);
 
         if (bf != null) {
             bitstream.setFormat(context, bf);
@@ -119,6 +119,10 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
         }
 
         return bitstream;
+    }
+
+    protected void cleanup() throws Exception {
+        delete(bitstream);
     }
 
     protected DSpaceObjectService<Bitstream> getDsoService() {
