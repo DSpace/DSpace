@@ -88,6 +88,82 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findAllPaginationTest() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = new CommunityBuilder().createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .withSubject("ExtraEntry")
+                .build();
+
+        String bitstreamContent = "ThisIsSomeDummyText";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        //Add a bitstream to an item
+        Bitstream bitstream1 = null;
+        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        getClient().perform(get("/api/core/bitstreams/")
+                .param("size","1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())
+                )))
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
+                        Matchers.contains(
+                                BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID())
+                        )
+                )))
+
+        ;
+
+        getClient().perform(get("/api/core/bitstreams/")
+                .param("size","1")
+                .param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID())
+                )))
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
+                        Matchers.contains(
+                                BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())
+                        )
+                )))
+
+        ;
+    }
+
+    @Test
     public void findOneBitstreamTest() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
