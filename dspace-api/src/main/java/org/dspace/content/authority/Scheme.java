@@ -20,6 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -507,6 +508,35 @@ public class Scheme extends AuthorityObject
             // close the TableRowIterator to free up resources
             if (tri != null) {
                 tri.close();
+            }
+        }
+
+        // initialize concepts' cached metadata:
+        // query conceptmetadatavalue table for all entries
+        if (concepts.size() > 0) {
+            HashMap<Integer, ArrayList<TableRow>> metadataMap = new HashMap<>();
+            TableRowIterator tri2 = DatabaseManager.queryTable(context, concepts.get(0).getMetadataTable(),
+                    "SELECT * FROM " + concepts.get(0).getMetadataTable() + " ORDER BY field_id");
+
+            if (tri2 != null) {
+                try {
+                    while (tri2.hasNext()) {
+                        TableRow resultRow = tri2.next();
+                        Integer parentID = resultRow.getIntColumn("parent_id");
+                        if (metadataMap.get(parentID) == null) {
+                            metadataMap.put(parentID, new ArrayList<>());
+                        }
+                        metadataMap.get(parentID).add(resultRow);
+                    }
+                } finally {
+                    // close the TableRowIterator to free up resources
+                    tri2.close();
+                }
+            }
+            for (Concept concept : concepts) {
+                for (TableRow tr : metadataMap.get(concept.getID())) {
+                    concept.initializeCachedMetadata(tr);
+                }
             }
         }
 

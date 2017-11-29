@@ -250,6 +250,17 @@ public abstract class AuthorityObject extends DSpaceObject {
         return resultList;
     }
 
+    void initializeCachedMetadata(TableRow tableRow) {
+        if (cachedMetadataValues == null) {
+            cachedMetadataValues = new HashMap<>();
+        }
+        AuthorityMetadataValue amv = new AuthorityMetadataValue(tableRow);
+        if (cachedMetadataValues.get(amv.fieldId) == null) {
+            cachedMetadataValues.put(amv.fieldId, new ArrayList<>());
+        }
+        cachedMetadataValues.get(amv.fieldId).add(amv);
+    }
+
     // get all metadata associated with an AuthorityObject
     private HashMap<Integer, ArrayList<AuthorityMetadataValue>> getCachedMetadata() {
         // if cached values present, return cache
@@ -258,7 +269,7 @@ public abstract class AuthorityObject extends DSpaceObject {
         }
 
         // otherwise, refresh cache
-        cachedMetadataValues = new HashMap<Integer, ArrayList<AuthorityMetadataValue>>();
+        cachedMetadataValues = new HashMap<>();
         Context context = getContext();
         try {
             TableRowIterator tri = DatabaseManager.queryTable(context, this.getMetadataTable() ,
@@ -269,11 +280,7 @@ public abstract class AuthorityObject extends DSpaceObject {
                 try {
                     while (tri.hasNext()) {
                         TableRow resultRow = tri.next();
-                        AuthorityMetadataValue amv = new AuthorityMetadataValue(context, resultRow);
-                        if (cachedMetadataValues.get(amv.fieldId) == null) {
-                            cachedMetadataValues.put(amv.fieldId, new ArrayList<AuthorityMetadataValue>());
-                        }
-                        cachedMetadataValues.get(amv.fieldId).add(amv);
+                        initializeCachedMetadata(resultRow);
                     }
                 } finally {
                     // close the TableRowIterator to free up resources
