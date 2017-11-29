@@ -15,19 +15,18 @@ import org.dspace.core.Context;
 /**
  * Builder to construct Community objects
  *
- * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
+ * @author Atmire NV (info at atmire dot com)
  */
 public class CommunityBuilder extends AbstractBuilder<Community> {
 
     private Community community;
 
-    protected CommunityBuilder() {
-
+    protected CommunityBuilder(Context context) {
+        super(context);
     }
 
     public static CommunityBuilder createCommunity(final Context context) {
-        CommunityBuilder builder = new CommunityBuilder();
+        CommunityBuilder builder = new CommunityBuilder(context);
         return builder.create(context);
     }
 
@@ -36,7 +35,7 @@ public class CommunityBuilder extends AbstractBuilder<Community> {
     }
 
     public static CommunityBuilder createSubCommunity(final Context context, final Community parent) {
-        CommunityBuilder builder = new CommunityBuilder();
+        CommunityBuilder builder = new CommunityBuilder(context);
         return builder.createSub(context, parent);
     }
 
@@ -68,6 +67,10 @@ public class CommunityBuilder extends AbstractBuilder<Community> {
             return null;
         }
         return community;
+    }
+
+    protected void cleanup() throws Exception {
+        delete(community);
     }
 
     @Override

@@ -18,8 +18,7 @@ import org.hamcrest.Matcher;
 /**
  * Class to match JSON browse entries in ITs
  *
- * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
+ * @author Atmire NV (info at atmire dot com)
  */
 public class BrowseEntryResourceMatcher {
     public static Matcher<? super Object> matchBrowseEntry(String value, int expectedCount) {

@@ -12,6 +12,7 @@ import static org.junit.Assert.fail;
 import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
@@ -146,16 +147,13 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     public void destroy() throws Exception {
         // Cleanup our global context object
         try {
+            AbstractBuilder.cleanupObjects();
             if(context == null || !context.isValid()){
                 context = new Context();
             }
-            parentCommunity = context.reloadEntity(parentCommunity);
             eperson = context.reloadEntity(eperson);
 
             context.turnOffAuthorisationSystem();
-            if(parentCommunity != null) {
-                ContentServiceFactory.getInstance().getCommunityService().delete(context, parentCommunity);
-            }
             if(eperson != null) {
                 EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
             }

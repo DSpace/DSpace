@@ -37,8 +37,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
  * Integration test to test the /api/discover/browses endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
  *
- * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
+ * @author Atmire NV (info at atmire dot com)
  */
 public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTest {
 
@@ -174,7 +173,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                //Check that there are indeed 3 different subjects
+                //Check that there are indeed 8 different subjects
                 .andExpect(jsonPath("$.page.totalElements", is(3)))
                 //Check the embedded resources and that they're sorted alphabetically
                 //Check that the subject matches as expected
@@ -379,7 +378,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         ;
 
         //** CLEANUP **
-        GroupBuilder.cleaner().delete(internalGroup);
+//        GroupBuilder.cleaner().delete(internalGroup);
     }
 
     @Test
