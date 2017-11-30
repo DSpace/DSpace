@@ -182,19 +182,14 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
     public abstract T build();
 
     public void delete(T dso) throws Exception {
-        Context c = null;
-        try {
-            c = new Context();
+
+        try(Context c = new Context()) {
             c.turnOffAuthorisationSystem();
             T attachedDso = c.reloadEntity(dso);
             if (attachedDso != null) {
                 getDsoService().delete(c, attachedDso);
             }
-
-        } finally {
-            if(c != null) {
-                c.complete();
-            }
+            c.complete();
         }
 
         indexingService.commit();

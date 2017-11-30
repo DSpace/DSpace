@@ -31,17 +31,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                                 .withName("Parent Community")
                                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                 .withName("Sub Community")
                                 .build();
-        Community child2 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                                 .withName("Sub Community Two")
                                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child2).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
 
 
@@ -61,17 +61,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Community child2 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community Two")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child2).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
 
 
@@ -111,17 +111,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Community child2 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community Two")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child2).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
 
 
@@ -144,17 +144,17 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Community child2 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community Two")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").withLogo("TestingContentForLogo").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child2).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").withLogo("TestingContentForLogo").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                 .andExpect(status().isOk())

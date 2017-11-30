@@ -19,11 +19,16 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.service.BitstreamService;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -32,6 +37,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest {
 
+    @Autowired
+    private BitstreamService bitstreamService;
+
     @Test
     public void findAllTest() throws Exception{
         //We turn off the authorization system in order to create the structure as defined below
@@ -39,16 +47,16 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         //2. One public items that is readable by Anonymous
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
@@ -79,7 +87,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
+                .andExpect(jsonPath("$._embedded.bitstreams", containsInAnyOrder(
                         BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID()),
                         BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID())
                 )))
@@ -94,16 +102,16 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         //2. One public items that is readable by Anonymous
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
@@ -135,11 +143,11 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("size","1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.bitstreams", contains(
                         BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())
                 )))
                 .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                        Matchers.contains(
+                        contains(
                                 BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID())
                         )
                 )))
@@ -151,13 +159,73 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                .andExpect(jsonPath("$._embedded.bitstreams", contains(
                         BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID())
                 )))
                 .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                        Matchers.contains(
+                        contains(
                                 BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())
                         )
+                )))
+
+        ;
+    }
+
+    //TODO Re-enable test after https://jira.duraspace.org/browse/DS-3774 is fixed
+    @Ignore
+    @Test
+    public void findAllWithDeletedTest() throws Exception{
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //2. One public items that is readable by Anonymous
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
+                .withTitle("Test")
+                .withIssueDate("2010-10-17")
+                .withAuthor("Smith, Donald")
+                .build();
+
+        String bitstreamContent = "This is an archived bitstream";
+        //Add a bitstream to an item
+        Bitstream bitstream = null;
+        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        //Add a bitstream to an item
+        bitstreamContent = "This is a deleted bitstream";
+        Bitstream bitstream1 = null;
+        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
+            bitstream1 = BitstreamBuilder.
+                    createBitstream(context, publicItem1, is)
+                    .withName("Bitstream1")
+                    .withMimeType("text/plain")
+                    .build();
+        }
+
+        //Delete the last bitstream
+        bitstreamService.delete(context, bitstream1);
+        context.commit();
+
+        getClient().perform(get("/api/core/bitstreams/"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.bitstreams", contains(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())
                 )))
 
         ;
@@ -171,16 +239,16 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         //2. One public items that is readable by Anonymous
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
@@ -225,16 +293,16 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         //2. One public items that is readable by Anonymous
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
@@ -265,6 +333,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/"+bitstream.getID()+"/format"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
+        //TODO add matcher on bitstream format
         ;
 
 
@@ -280,5 +349,4 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
     }
 
-    //TODO /api/core/bitstreams/search does not yet exist (404 error)
 }
