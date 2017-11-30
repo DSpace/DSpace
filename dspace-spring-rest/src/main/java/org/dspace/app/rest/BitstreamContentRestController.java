@@ -89,10 +89,6 @@ public class BitstreamContentRestController {
 					.with(request)
 					.with(response);
 
-			if (sender.isValid()) {
-				sender.serveResource();
-			}
-
 			if (sender.isNoRangeRequest() && isNotAnErrorResponse(response)) {
 				//We only log a download request when serving a request without Range header. This is because
 				//a browser always sends a regular request first to check for Range support.
@@ -102,6 +98,15 @@ public class BitstreamContentRestController {
 								request,
 								context,
 								bit));
+			}
+
+			//We have all the data we need, close the connection to the database so that it doesn't stay open during
+			//download/streaming
+			context.complete();
+
+			//Send the data
+			if (sender.isValid()) {
+				sender.serveResource();
 			}
 
 		} catch(ClientAbortException ex) {
