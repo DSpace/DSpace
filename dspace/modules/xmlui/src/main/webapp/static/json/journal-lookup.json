@@ -352,15 +352,6 @@
         "integrated" : "Y"
      },
      {
-        "sponsor" : "Evidence-based Preclinical Medicine",
-        "title" : "Evidence-based Preclinical Medicine",
-        "hidden" : "N",
-        "issn" : "2054-703X",
-        "embargo" : "N",
-        "submission" : "R",
-        "integrated" : "Y"
-     },
-     {
         "sponsor" : "Society for the Study of Evolution",
         "title" : "Evolution",
         "integrated" : "Y",
@@ -729,6 +720,15 @@
         "hidden" : "N",
         "title" : "Journal of Urban Ecology",
         "sponsor" : "$120"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Limnology and Oceanography Letters",
+        "hidden" : "Y",
+        "issn" : "2378-2242",
+        "embargo" : "F",
+        "submission" : "R",
+        "integrated" : "Y" 
      },
      {
         "sponsor" : "British Ecological Society",
