@@ -724,9 +724,9 @@
      {
         "sponsor" : "$120",
         "title" : "Limnology and Oceanography Letters",
-        "hidden" : "Y",
+        "hidden" : "N",
         "issn" : "2378-2242",
-        "embargo" : "F",
+        "embargo" : "N",
         "submission" : "R",
         "integrated" : "Y" 
      },
