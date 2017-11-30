@@ -406,6 +406,9 @@
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
 
+                        <!-- Limnology and Oceanography Letters -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Alimnology%5C+and%5C+oceanography%5C+letters%5C%7C%5C%7C%5C%7CLimnology%5C+and%5C+Oceanography%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-LOL.png" alt="Limnology and Oceanography Letters" /></a>
+
                         <!-- Evolution Letters -->
 		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aevolution%5C+letters%5C%7C%5C%7C%5C%7CEvolution%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EVOL_LETTS.png" alt="Evolution Letters" /></a>
 
@@ -414,9 +417,6 @@
 
                         <!-- Insect Systematics and Diversity -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ainsect%5C+systematics%5C+and%5C+diversity%5C%7C%5C%7C%5C%7CInsect%5C+Systematics%5C+and%5C+Diversity"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ISDIVE.png" alt="Insect Systematics and Diversity" /></a>
-
-                        <!-- Research Ideas and Outcomes -->
-		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aresearch%5C+ideas%5C+and%5C+outcomes%5C%7C%5C%7C%5C%7CResearch%5C+Ideas%5C+and%5C+Outcomes"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-RIO.png" alt="Research Ideas and Outcomes" /></a>
 
                     </div>
                 </div>
