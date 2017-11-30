@@ -137,7 +137,8 @@ public class DoiPendingServlet extends DSpaceServlet
         if (results != null && !results.isEmpty())
         {
             realresult = results.toArray(new Item[results.size()]);
-
+            
+            int i = 0;
             for (Item real : realresult)
             {
                 TableRow row = DatabaseManager.querySingle(context,
@@ -158,6 +159,13 @@ public class DoiPendingServlet extends DSpaceServlet
                     rr.add(note == null || note.isEmpty() ? "" : note);
                     doi2items.put(real.getID(), rr);
                 }
+                
+                i++;
+                if(i%50==0) {
+                    context.clearCache();
+                    context.commit();
+                }
+                
             }
         }
 
@@ -212,6 +220,7 @@ public class DoiPendingServlet extends DSpaceServlet
     private void deletePendings(Context context, List<Item> items)
             throws SQLException, AuthorizeException, SearchServiceException
     {
+        int index = 0;
         for (Item i : items)
         {
 
@@ -221,6 +230,11 @@ public class DoiPendingServlet extends DSpaceServlet
             i.update();
             context.addEvent(new Event(Event.UPDATE_FORCE, Constants.ITEM, i
                     .getID(), i.getHandle()));
+            
+            index++;
+            if(index%100==0) {
+                context.clearCache();
+            }
         }
 
         context.commit();

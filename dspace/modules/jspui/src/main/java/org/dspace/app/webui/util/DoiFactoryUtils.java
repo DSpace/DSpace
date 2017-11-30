@@ -128,12 +128,16 @@ public class DoiFactoryUtils {
 			Context context) throws SQLException {
 		List<Item> resultsItems = new ArrayList<Item>();
 		if (docs != null) {
-
+		    
+		    int i = 0;
 			for (SolrDocument doc : docs) {
 				Integer resourceId = (Integer) doc
 						.getFieldValue("search.resourceid");
 				resultsItems.add(Item.find(context, resourceId));
-
+				i++;
+				if(i%100==0) {
+				    context.clearCache();
+				}
 			}
 		}
 		return resultsItems;
