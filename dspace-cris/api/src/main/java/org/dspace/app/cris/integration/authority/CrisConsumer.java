@@ -277,7 +277,7 @@ public class CrisConsumer implements Consumer
 
                     QueryResponse qResp = searcher.search(query);
                     SolrDocumentList docList = qResp.getResults();
-                    if (docList.size() > 1)
+                    if (docList.size() > 0)
                     {
                         SolrDocument doc = docList.get(0);
                         rpKey = (String) doc.getFirstValue("cris"
