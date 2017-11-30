@@ -371,7 +371,8 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 // Do not check the required attribute if it is not visible or not allowed for the document type
 
-                if (!subInfo.isEditing() && !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
+				if (!(subInfo.isEditing() && inputs[i].isAllowedFor(documentType))
+						&& !(inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType)))
                 {
                     continue;
                 }
