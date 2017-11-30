@@ -28,7 +28,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 /**
  * This Controller advice will handle all exceptions thrown by the DSpace API module
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
  *
  */
 @ControllerAdvice

@@ -39,7 +39,8 @@ import org.junit.Test;
 /**
  * Integration test to test the /api/core/bitstreams/[id]/content endpoint
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  */
 public class BitstreamContentRestControllerIT extends AbstractControllerIntegrationTest {
 

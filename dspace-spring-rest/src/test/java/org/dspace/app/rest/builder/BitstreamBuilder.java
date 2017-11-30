@@ -24,7 +24,8 @@ import org.dspace.eperson.Group;
 /**
  * Builder class to build bitstreams in test cases
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
 
