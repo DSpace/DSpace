@@ -39,7 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
  * This is a specialized controller to provide access to the bitstream binary content
  *
  * @author Andrea Bollini (andrea.bollini at 4science.it)
- * @author Atmire NV (info at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  *
  */
 @RestController

@@ -21,7 +21,8 @@ import org.hamcrest.Matcher;
 /**
  * Utility class to construct a Matcher for an item
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class ItemMatcher {
 
