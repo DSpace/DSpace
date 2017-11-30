@@ -123,6 +123,15 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
 
     protected void cleanup() throws Exception {
         delete(bitstream);
+
+        try(Context c = new Context()) {
+            bitstream = c.reloadEntity(bitstream);
+            c.turnOffAuthorisationSystem();
+            if (bitstream != null) {
+                bitstreamService.expunge(c, bitstream);
+            }
+            c.complete();
+        }
     }
 
     protected DSpaceObjectService<Bitstream> getDsoService() {

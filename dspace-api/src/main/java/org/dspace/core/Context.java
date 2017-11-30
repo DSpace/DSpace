@@ -42,7 +42,7 @@ import java.util.*;
  * 
  * @version $Revision$
  */
-public class Context
+public class Context implements AutoCloseable
 {
     private static final Logger log = Logger.getLogger(Context.class);
 
@@ -561,6 +561,13 @@ public class Context
                 log.error("Exception aborting context", ex);
             }
             events = null;
+        }
+    }
+
+    @Override
+    public void close() {
+        if(isValid()) {
+            abort();
         }
     }
 

@@ -30,13 +30,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/communities"))
                 .andExpect(status().isOk())
@@ -56,13 +56,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/communities")
                 .param("size", "1"))
@@ -103,13 +103,13 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                 .andExpect(status().isOk())
@@ -133,14 +133,14 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .withLogo("ThisIsSomeDummyText")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/communities/" + parentCommunity.getID().toString()))
                 .andExpect(status().isOk())
@@ -173,6 +173,8 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(content().contentType(contentType));
     }
 
-    //TODO /api/core/communities/search does not yet exist, write tests when it does
+    //TODO /api/core/communities/search/top
+
+    //TODO /api/core/communities/search/subCommunities
 
 }
