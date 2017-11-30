@@ -264,9 +264,7 @@ public class SortOption
     }
     
     /**
-     * Is this a date field
-     * 
-     * @return
+     * Is this a date field?
      */
     public boolean isDate()
     {
@@ -279,9 +277,7 @@ public class SortOption
     }
     
     /**
-     * Is the default sort option
-     * 
-     * @return
+     * Is the default sort option?
      */
     public boolean isDefault()
     {
@@ -293,8 +289,7 @@ public class SortOption
     }
 
     /**
-     * Return all the configured sort options
-     * @return
+     * Return all the configured sort options.
      * @throws SortException
      */
     public static Set<SortOption> getSortOptions() throws SortException
@@ -308,9 +303,8 @@ public class SortOption
     }
     
     /**
-     * Get the defined sort option by number (.1, .2, etc)
+     * Get the defined sort option by number (.1, .2, etc).
      * @param number
-     * @return
      * @throws SortException
      */
     public static SortOption getSortOption(int number) throws SortException
@@ -327,8 +321,7 @@ public class SortOption
     }
     
     /**
-     * Get the default sort option - initially, just the first one defined
-     * @return
+     * Get the default sort option - initially, just the first one defined.
      * @throws SortException
      */
     public static SortOption getDefaultSortOption() throws SortException

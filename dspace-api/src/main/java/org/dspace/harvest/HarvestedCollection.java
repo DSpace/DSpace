@@ -212,10 +212,9 @@ public class HarvestedCollection
     }
     
     /**
-     * Find all collections with the specified status flag 
+     * Find all collections with the specified status flag.
      * @param c
      * @param status see HarvestInstance.STATUS_...
-     * @return
      * @throws SQLException
      */
     public static List<Integer> findByStatus(Context c, int status) throws SQLException {

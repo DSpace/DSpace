@@ -218,11 +218,11 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Construct the service document url for the given object, which will
-	 * be supplied in the sword:service element of other service document entries
+	 * Construct the service document URL for the given object, which will
+	 * be supplied in the sword:service element of other service document
+	 * entries.
 	 *
 	 * @param community
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String constructSubServiceUrl(Community community)
@@ -234,11 +234,11 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Construct the service document url for the given object, which will
-	 * be supplied in the sword:service element of other service document entries
+	 * Construct the service document URL for the given object, which will
+	 * be supplied in the sword:service element of other service document
+	 * entries.
 	 *
 	 * @param collection
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String constructSubServiceUrl(Collection collection)
@@ -250,11 +250,10 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Extract a DSpaceObject from the given url.  If this method is unable to
-	 * locate a meaningful and appropriate dspace object it will throw the
-	 * appropriate sword error
+	 * Extract a DSpaceObject from the given URL.  If this method is unable to
+	 * locate a meaningful and appropriate DSpace object it will throw the
+	 * appropriate SWORD error.
 	 * @param url
-	 * @return
 	 * @throws DSpaceSwordException
 	 * @throws SwordError
 	 */
@@ -305,9 +304,8 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * get the base url for service document requests
+	 * Get the base URL for service document requests.
 	 *
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String getBaseServiceDocumentUrl()
@@ -383,10 +381,9 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * is the given url the base service document url
+	 * Is the given URL the base service document URL?
 	 *
 	 * @param url
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public boolean isBaseServiceDocumentUrl(String url)
@@ -396,11 +393,10 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * Central location for constructing usable urls for dspace bitstreams.  There
-	 * is no place in the main DSpace code base for doing this.
+	 * Central location for constructing usable URLs for DSpace bitstreams.
+	 * There is no place in the main DSpace code base for doing this.
 	 *
 	 * @param bitstream
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String getBitstreamUrl(Bitstream bitstream)
@@ -491,10 +487,9 @@ public class SwordUrlManager
 	}
 
 	/**
-	 * get the media link url for the given bitstream
-	 * 
+	 * Get the media link URL for the given bitstream.
+	 *
 	 * @param bitstream
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public String getMediaLink(Bitstream bitstream)

@@ -286,6 +286,7 @@ public class IndexBrowse
 
         dao.pruneExcess(BrowseIndex.getItemBrowseIndex().getTableName(), false);
         dao.pruneExcess(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), true);
+        dao.pruneExcess(BrowseIndex.getPrivateBrowseIndex().getTableName(), true);
     }
 
     private void pruneDistinctIndex(BrowseIndex bi, List<Integer> removedIds) throws BrowseException
@@ -320,7 +321,7 @@ public class IndexBrowse
         {
             indexItem(new ItemMetadataProxy(item), addingNewItem);
         }
-        else if (item.isWithdrawn())
+        else if (item.isWithdrawn() || !item.isArchived())
         {
             indexItem(new ItemMetadataProxy(item), false);
         }
@@ -351,6 +352,7 @@ public class IndexBrowse
                     // Record doesn't exist - ensure that it doesn't exist in the withdrawn index,
                     // and add it to the archived item index
                     dao.deleteByItemID(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID());
+                    dao.deleteByItemID(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID());
                     dao.insertIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap);
                 }
 
@@ -358,20 +360,35 @@ public class IndexBrowse
             }
             else if (item.isWithdrawn())
             {
-                // Try to update an existing record in the withdrawn index
-                if (!dao.updateIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap))
-                {
-                    // Record doesn't exist - ensure that it doesn't exist in the item index,
-                    // and add it to the withdrawn item index
-                    dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
-                    dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
+                // Private items are marked as withdrawn as well. check before if they are private...
+                Item dsoItem = Item.find(context, item.getID());
+                if (!dsoItem.isDiscoverable()){
+                    if (!dao.updateIndex(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID(), sortMap)) {
+                        dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
+                        dao.insertIndex(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID(), sortMap);
+                    }
                 }
+                else{
+                    // Try to update an existing record in the withdrawn index
+                    if (!dao.updateIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap))
+                    {
+                        // Record doesn't exist - ensure that it doesn't exist in the item index,
+                        // and add it to the withdrawn item index
+                        dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
+                        dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
+                    }
+                }
+
+
+
+
             }
             else
             {
                 // This item shouldn't exist in either index - ensure that it is removed
                 dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
                 dao.deleteByItemID(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID());
+                dao.deleteByItemID(BrowseIndex.getPrivateBrowseIndex().getTableName(), item.getID());
             }
 
             // Update the community mappings if they are required, or remove them if they aren't
@@ -582,7 +599,6 @@ public class IndexBrowse
 	 * remove all the indices for the given item
 	 * 
 	 * @param item		the item to be removed
-	 * @return
 	 * @throws BrowseException
 	 */
 	public boolean itemRemoved(Item item)
@@ -607,6 +623,7 @@ public class IndexBrowse
         // Remove from the item indexes (archive and withdrawn)
         dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), itemID);
         dao.deleteByItemID(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), itemID);
+        dao.deleteByItemID(BrowseIndex.getPrivateBrowseIndex().getTableName(), itemID);
         dao.deleteCommunityMappings(itemID);
 
         return true;
@@ -883,7 +900,7 @@ public class IndexBrowse
 
             dropItemTables(BrowseIndex.getItemBrowseIndex());
             dropItemTables(BrowseIndex.getWithdrawnBrowseIndex());
-            
+            dropItemTables(BrowseIndex.getPrivateBrowseIndex());
     		if (execute())
     		{
     			context.commit();
@@ -940,6 +957,7 @@ public class IndexBrowse
 
             createItemTables(BrowseIndex.getItemBrowseIndex(), sortCols);
             createItemTables(BrowseIndex.getWithdrawnBrowseIndex(), sortCols);
+            createItemTables(BrowseIndex.getPrivateBrowseIndex(), sortCols);
             
             if (execute())
             {

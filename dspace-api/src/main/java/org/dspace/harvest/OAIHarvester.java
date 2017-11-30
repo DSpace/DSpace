@@ -402,12 +402,12 @@ public class OAIHarvester {
 			ourContext.restoreAuthSystemState();
 		}
 		
-		// If we got to this point, it means the harvest was completely succeful
+		// If we got to this point, it means the harvest was completely successful
 		Date finishTime = new Date();
 		long timeTaken = finishTime.getTime() - startTime.getTime();
-		harvestRow.setHarvestResult(startTime, "Harvest from " + oaiSource + " sucessful");
+		harvestRow.setHarvestResult(startTime, "Harvest from " + oaiSource + " successful");
 		harvestRow.setHarvestStatus(HarvestedCollection.STATUS_READY);
-		log.info("Harvest from " + oaiSource + " sucessful. The process took " + timeTaken + " milliseconds.");
+		log.info("Harvest from " + oaiSource + " successful. The process took " + timeTaken + " milliseconds.");
 		harvestRow.update();
 		ourContext.commit();
 	}
@@ -426,7 +426,7 @@ public class OAIHarvester {
     	String itemOaiID = record.getChild("header", OAI_NS).getChild("identifier", OAI_NS).getText();
     	Element header = record.getChild("header",OAI_NS);
     	
-    	// look up the item corresponsing to the OAI identifier
+    	// look up the item corresponding to the OAI identifier
     	Item item = HarvestedItem.getItemByOAIId(ourContext, itemOaiID, targetCollection.getID());
     	    	
     	// Make sure the item hasn't been deleted in the mean time
@@ -465,7 +465,7 @@ public class OAIHarvester {
     		// FIXME: check for null pointer if for some odd reason we don't have a matching hi 
     		hi = HarvestedItem.find(ourContext, item.getID());
     		
-    		// Comprate last-harvest on the item versus the last time the item was updated on the OAI provider side
+    		// Compare last-harvest on the item versus the last time the item was updated on the OAI provider side
 			// If ours is more recent, forgo this item, since it's probably a left-over from a previous harvesting attempt 
 			Date OAIDatestamp = Utils.parseISO8601Date(header.getChildText("datestamp", OAI_NS));
 			Date itemLastHarvest = hi.getHarvestDate();
@@ -524,7 +524,7 @@ public class OAIHarvester {
     		// see if we can do something about the wonky metadata
     		scrubMetadata(item);
     		
-    		// see if a handle can be exracted for the item
+    		// see if a handle can be extracted for the item
     		String handle = extractHandle(item);
     		
     		if (handle != null) 
@@ -589,7 +589,7 @@ public class OAIHarvester {
 		long timeTaken = new Date().getTime() - timeStart.getTime();
 		log.info("Item " + item.getHandle() + "(" + item.getID() + ")" + " has been ingested. The whole process took: " + timeTaken + " ms. ");
 
-    	// Un-ignore authorization
+    	// Stop ignoring authorization
     	ourContext.restoreAuthSystemState();
     }
     
@@ -693,7 +693,7 @@ public class OAIHarvester {
 					}
 					clearList.add(value.schema);
     			}
-    			// ignore the offending schema, quietly dropping all of it's metadata elements before they clog our gears 
+    			// ignore the offending schema, quietly dropping all of its metadata elements before they clog our gears 
     			else if (schemaChoice.equals("ignore")) {
     				item.clearMetadata(value.schema, Item.ANY, Item.ANY, Item.ANY);
     				continue;
@@ -788,7 +788,7 @@ public class OAIHarvester {
      * Query the OAI-PMH server for its mapping of the supplied namespace and metadata prefix.  
      * For example for a typical OAI-PMH server a query "http://www.openarchives.org/OAI/2.0/oai_dc/" would return "oai_dc". 
      * @param oaiSource the address of the OAI-PMH provider
-     * @param MDNamespace the namespace that we are trying to resove to the metadataPrefix
+     * @param MDNamespace the namespace that we are trying to resolve to the metadataPrefix
      * @return metadataPrefix the OAI-PMH provider has assigned to the supplied namespace
      */
     public static String oaiResolveNamespaceToPrefix(String oaiSource, String MDNamespace) throws IOException, ParserConfigurationException, SAXException, TransformerException, ConnectException 
@@ -1389,14 +1389,4 @@ public class OAIHarvester {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
 

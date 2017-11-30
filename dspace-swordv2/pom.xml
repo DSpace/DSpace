@@ -3,33 +3,30 @@
     <groupId>org.dspace</groupId>
     <artifactId>dspace-swordv2</artifactId>
     <packaging>war</packaging>
-    <name>DSpace SWORD v2 :: Web Application Resources</name>
+    <name>DSpace SWORD v2</name>
     <description>DSpace SWORD v2 Deposit Service Provider Web Application</description>
-    <url>http://projects.dspace.org/dspace-sword-webapp</url>
 
     <!--
        A Parent POM that Maven inherits DSpace Default
-       POM atrributes from.
+       POM attributes from.
     -->
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>1.8.2</version>
+        <version>3.0</version>
         <relativePath>..</relativePath>
     </parent>
 
-    <!--
-       The Subversion repository location is used by Continuum to update against
-       when changes have occurred, this spawns a new build cycle and releases snapshots
-       into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
-    </scm>
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
 
     <build>
+        <filters>
+            <!-- Filter using the properties file defined by dspace-parent POM -->
+            <filter>${filters.file}</filter>
+        </filters>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -60,26 +57,6 @@
 
 
     <profiles>
-        <!--
-           when activated a dspace.config configuration
-           file location passed on the commandline
-           (-Ddspace.config=...) can be passed through
-           to be used as a filter source by projects for
-           tasks such as updating the ${dspace.dir} in
-           web.xml etc.
-        -->
-        <profile>
-            <activation>
-                <property>
-                    <name>dspace.config</name>
-                </property>
-            </activation>
-            <build>
-                <filters>
-                    <filter>${dspace.config}</filter>
-                </filters>
-            </build>
-        </profile>
         <profile>
             <id>oracle-support</id>
             <activation>
@@ -115,7 +92,7 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.3</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.swordapp</groupId>
@@ -142,7 +119,6 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.15</version>
             <exclusions>
                 <exclusion>
                     <artifactId>jmxtools</artifactId>

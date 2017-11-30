@@ -661,7 +661,7 @@ public class MetadataField
      * Return <code>true</code> if <code>other</code> is the same MetadataField
      * as this object, <code>false</code> otherwise
      *
-     * @param other
+     * @param obj
      *            object to compare to
      *
      * @return <code>true</code> if object passed in represents the same

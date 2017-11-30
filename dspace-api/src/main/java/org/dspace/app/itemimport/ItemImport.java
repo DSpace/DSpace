@@ -7,6 +7,14 @@
  */
 package org.dspace.app.itemimport;
 
+import gr.ekt.transformationengine.core.DataLoader;
+import gr.ekt.transformationengine.core.TransformationEngine;
+import gr.ekt.transformationengine.exceptions.UnimplementedAbstractMethod;
+import gr.ekt.transformationengine.exceptions.UnknownClassifierException;
+import gr.ekt.transformationengine.exceptions.UnknownInputFileType;
+import gr.ekt.transformationengine.exceptions.UnsupportedComparatorMode;
+import gr.ekt.transformationengine.exceptions.UnsupportedCriterion;
+
 import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
@@ -53,6 +61,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import org.dspace.utils.DSpace;
 
 /**
  * Import items into DSpace. The conventional use is upload files by copying
@@ -122,9 +132,11 @@ public class ItemImport
             Options options = new Options();
 
             options.addOption("a", "add", false, "add items to DSpace");
+            options.addOption("b", "add-bte", false, "add items to DSpace via Biblio-Transformation-Engine (BTE)");
             options.addOption("r", "replace", false, "replace items in mapfile");
             options.addOption("d", "delete", false,
                     "delete items listed in mapfile");
+            options.addOption("i", "inputtype", true, "input type in case of BTE import");
             options.addOption("s", "source", true, "source of items (directory)");
             options.addOption("z", "zip", true, "name of zip file");
             options.addOption("c", "collection", true,
@@ -148,6 +160,7 @@ public class ItemImport
             CommandLine line = parser.parse(options, argv);
 
             String command = null; // add replace remove, etc
+            String bteInputType = null; //ris, endnote, tsv, csv, bibtex
             String sourcedir = null;
             String mapfile = null;
             String eperson = null; // db ID or email
@@ -184,6 +197,16 @@ public class ItemImport
             if (line.hasOption('d'))
             {
                 command = "delete";
+            }
+            
+            if (line.hasOption('b'))
+            {
+                command = "add-bte";
+            }
+            
+            if (line.hasOption('i'))
+            {
+                bteInputType = line.getOptionValue('i');;
             }
 
             if (line.hasOption('w'))
@@ -285,6 +308,48 @@ public class ItemImport
                 {
                     System.out
                             .println("Error - at least one destination collection must be specified");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
+            }
+            else if ("add-bte".equals(command))
+            {
+            	if (sourcedir == null)
+                {
+                    System.out
+                            .println("Error - a source file containing items must be set");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
+            	
+                if (mapfile == null)
+                {
+                    System.out
+                            .println("Error - a map file to hold importing results must be specified");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
+
+                if (eperson == null)
+                {
+                    System.out
+                            .println("Error - an eperson to do the importing must be specified");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
+
+                if (collections == null)
+                {
+                    System.out
+                            .println("Error - at least one destination collection must be specified");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
+                
+                if (bteInputType == null)
+                {
+                    System.out
+                            .println("Error - an input type (tsv, csv, ris, endnote, bibtex or any other type you have specified in BTE Spring XML configuration file) must be specified");
                     System.out.println(" (run with -h flag for details)");
                     System.exit(1);
                 }
@@ -505,6 +570,10 @@ public class ItemImport
                 {
                     myloader.deleteItems(c, mapfile);
                 }
+                else if ("add-bte".equals(command))
+                {
+                    myloader.addBTEItems(c, mycollections, sourcedir, mapfile, template, bteInputType);
+                }
 
                 // complete all transactions
                 c.complete();
@@ -562,6 +631,47 @@ public class ItemImport
         System.exit(status);
     }
 
+    private void addBTEItems(Context c, Collection[] mycollections,
+            String sourceDir, String mapFile, boolean template, String inputType) throws Exception
+    {
+        TransformationEngine te  = new DSpace().getSingletonService(TransformationEngine.class);
+
+        DataLoaderService dls  = new DSpace().getSingletonService(DataLoaderService.class);
+        DataLoader dataLoader = dls.getDataLoaders().get(inputType);
+
+        if (dataLoader!=null){
+            System.out.println("INFO: Dataloader " + dataLoader.toString()+" will be used for the import!");
+            
+            dataLoader.setFileName(sourceDir);
+            te.setDataLoader(dataLoader);
+
+            try {
+                te.transform();
+            } catch (UnknownClassifierException e) {
+                e.printStackTrace();
+            } catch (UnknownInputFileType e) {
+                e.printStackTrace();
+            } catch (UnimplementedAbstractMethod e) {
+                e.printStackTrace();
+            } catch (UnsupportedComparatorMode e) {
+                e.printStackTrace();
+            } catch (UnsupportedCriterion e) {
+                e.printStackTrace();
+            }
+
+            ItemImport myloader = new ItemImport();
+            myloader.addItems(c, mycollections, "./bte_output_dspace", mapFile, template);
+
+            //remove files from output generator
+            deleteDirectory(new File("./bte_output_dspace"));
+        }
+        else {
+            System.out.println("Error: The key used in -i parameter must match a valid DataLoader in the BTE Spring XML configuration file!");
+            return;
+        }
+    }
+
+    
     private void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {

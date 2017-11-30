@@ -74,7 +74,7 @@ function getEPerson()
  */
 function doRegister() 
 { 
-    //Make sure that user registration is enabled
+    // Make sure that user registration is enabled
     if (!(ConfigurationManager.getBooleanProperty("xmlui.user.registration", true)))
     {
         // We're configured to not allow user registration
@@ -101,7 +101,7 @@ function doRegister()
             
             if (submit_forgot != null)
             {
-                // The user attempted to register with an email address that all ready exists then they clicked
+                // The user attempted to register with an email address that already exists then they clicked
                 // the "I forgot my password" button. In this case, we send them a forgot password token.
                 AccountManager.sendForgotPasswordInfo(getDSContext(),email);
                 getDSContext().commit();
@@ -126,13 +126,13 @@ function doRegister()
             {
                 try 
                 {
-                    // May throw the AddressException or a varity of SMTP errors.
+                    // May throw the AddressException or a variety of SMTP errors.
                     AccountManager.sendRegistrationInfo(getDSContext(),email);
                     getDSContext().commit();
                 } 
                 catch (error) 
                 {
-                    // If any errors occure while trying to send the email set the field in error.
+                    // If any errors occured while trying to send the email set the field in error.
                     errors = new Array("email");
                     continue;
                 }
@@ -150,7 +150,7 @@ function doRegister()
     } 
     else 
     {
-        // We have a token. Find out who the it's for
+        // We have a token. Find out who it's for
         var email = AccountManager.getEmail(getDSContext(), token);
         
         if (email == null) 
@@ -165,7 +165,7 @@ function doRegister()
         do {
             cocoon.sendPageAndWait("register/profile",{"email" : email, "allowSetPassword":setPassword , "errors" : errors.join(',')});
             
-            // If the user had to retry the form a user may allready be created.
+            // If the user had to retry the form a user may already be created.
             var eperson = EPerson.findByEmail(getDSContext(),email);
             if (eperson == null)
             {
@@ -199,7 +199,7 @@ function doRegister()
   
 
 /**
- * Preform a forgot password processes.
+ * Perform a forgotten password processes.
  */
 function doForgotPassword() 
 { 
@@ -264,7 +264,7 @@ function doForgotPassword()
             // Get the eperson associated with the password change
             var eperson = AccountManager.getEPerson(getDSContext(), token);
 
-            // Temporaraly log the user in so that they can update their password.
+            // Temporarily log the user in so that they can update their password.
             getDSContext().setCurrentUser(eperson);
 
             errors = updatePassword(eperson);
@@ -284,7 +284,7 @@ function doForgotPassword()
   
 /**
  * Flow function to update a user's profile. This flow will iterate 
- * over the profile/update form untill the user has provided correct 
+ * over the profile/update form until the user has provided correct 
  * data (i.e. filled in the required fields and meet the minimum 
  * password requirements).
  */
@@ -366,7 +366,7 @@ function doUpdateProfile()
  * Update the eperson's profile information. Some fields, such as 
  * last_name & first_name are required.
  *
- * Missing or mailformed field names will be returned in an array. 
+ * Missing or malformed field names will be returned in an array. 
  * If the user's profile information was updated successfully then 
  * an empty array will be returned. 
  */
@@ -385,7 +385,7 @@ function updateInformation(eperson)
 	var phone = cocoon.request.getParameter("phone");
         var language = cocoon.request.getParameter("language");
 
-    // first check that each parameter is filled in before seting anything.	
+    // first, check that each parameter is filled in before setting anything.
 	var idx = 0;
 	var errors = new Array();
 	
@@ -437,7 +437,7 @@ function updateInformation(eperson)
  * requirements. 
  *
  * Any fields that are in error will be returned in an array. If
- * the user's password was updated successfull then an empty array
+ * the user's password was updated successfully then an empty array
  * will be returned.
  */
 function updatePassword(eperson) 

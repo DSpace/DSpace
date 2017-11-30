@@ -422,7 +422,7 @@ public class METSManifest
     }
 
     // translate bundle name from METS to DSpace; METS may be "CONTENT"
-    // or "ORIGINAL" for the DSPace "ORIGINAL", rest are left alone.
+    // or "ORIGINAL" for the DSpace "ORIGINAL", rest are left alone.
     private static String normalizeBundleName(String in)
     {
         if (in.equals("CONTENT"))

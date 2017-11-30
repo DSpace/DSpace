@@ -20,9 +20,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.util.DCInput;
+
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -33,9 +34,9 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
@@ -158,7 +159,9 @@ public class DescribeStep extends AbstractProcessingStep
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
         {
-  	    // Allow the clearing out of the metadata defined for other document types, provided it can change anytime
+
+        	// Allow the clearing out of the metadata defined for other document types, provided it can change anytime
+        	
             if (!inputs[i]
                     .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                             : DCInput.SUBMISSION_SCOPE))
@@ -198,7 +201,7 @@ public class DescribeStep extends AbstractProcessingStep
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
-            // Omit fields not allowed for this document type
+        	// Omit fields not allowed for this document type
             if(!inputs[j].isAllowedFor(documentType))
             {
             	continue;
@@ -332,9 +335,15 @@ public class DescribeStep extends AbstractProcessingStep
                 {
                 	continue;
                 }
-            	
+
+                String qualifier = inputs[i].getQualifier();
+                if (qualifier == null
+                        && inputs[i].getInputType().equals("qualdrop_value"))
+                {
+                    qualifier = Item.ANY;
+                }
                 DCValue[] values = item.getMetadata(inputs[i].getSchema(),
-                        inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
+                        inputs[i].getElement(), qualifier, Item.ANY);
 
                 // Group-based restriction validation
                 if(inputs[i].isGroupBased()) 
@@ -353,7 +362,8 @@ public class DescribeStep extends AbstractProcessingStep
                 		continue;
                 }
                 
-                if (inputs[i].isRequired() && values.length == 0)
+                if ((inputs[i].isRequired() && values.length == 0) &&
+                     inputs[i].isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE))
                 {
                     // since this field is missing add to list of error fields
                     addErrorField(request, getFieldName(inputs[i]));
@@ -1061,7 +1071,6 @@ public class DescribeStep extends AbstractProcessingStep
      * Return the HTML / DRI field name for the given input.
      *
      * @param input
-     * @return
      */
     public static String getFieldName(DCInput input)
     {

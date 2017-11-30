@@ -37,7 +37,7 @@ public interface InProgressSubmission
     /**
      * Update the submission, including the unarchived item.
      */
-    void update() throws SQLException, IOException, AuthorizeException;
+    void update() throws SQLException, AuthorizeException;
 
     /**
      * Get the incomplete item object

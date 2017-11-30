@@ -248,11 +248,11 @@ public class PDFPackager
             PackageUtils.createFile(pkgFile);
         }
 
-        //open up output stream to copy bistream to file
+        //open up output stream to copy bitstream to file
         FileOutputStream out = null;
         try
         {
-            //open up output stream to copy bistream to file
+            //open up output stream to copy bitstream to file
             out = new FileOutputStream(pkgFile);
             Utils.copy(pkgBs.retrieve(), out);
         }

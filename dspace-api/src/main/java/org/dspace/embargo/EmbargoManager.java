@@ -18,12 +18,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.MetadataSchema;
+import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -81,14 +76,13 @@ public class EmbargoManager
      *
      * @param context the DSpace context
      * @param item the item to embargo
-     * @param lift date on which the embargo is to be lifted.
      */
-    public static void setEmbargo(Context context, Item item, DCDate lift)
+    public static void setEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException, IOException
     {
         init();
         // if lift is null, we might be restoring an item from an AIP
-        DCDate myLift = lift;
+        DCDate myLift = getEmbargoTermsAsDate(context, item);
         if (myLift == null)
         {
              if ((myLift = recoverEmbargoDate(item)) == null)
@@ -104,7 +98,9 @@ public class EmbargoManager
             item.clearMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
             item.addMetadata(lift_schema, lift_element, lift_qualifier, null, slift);
             log.info("Set embargo on Item "+item.getHandle()+", expires on: "+slift);
+
             setter.setEmbargo(context, item);
+
             item.update();
         }
         finally
@@ -128,7 +124,7 @@ public class EmbargoManager
      * @param item the item to embargo
      * @return lift date on which the embargo is to be lifted, or null if none
      */
-    public static DCDate getEmbargoDate(Context context, Item item)
+    public static DCDate getEmbargoTermsAsDate(Context context, Item item)
         throws SQLException, AuthorizeException, IOException
     {
         init();
@@ -178,7 +174,9 @@ public class EmbargoManager
         throws SQLException, AuthorizeException, IOException
     {
         init();
-        lifter.liftEmbargo(context, item);
+
+        // new version of Embargo policies remain in place.
+        //lifter.liftEmbargo(context, item);
         item.clearMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
 
         // set the dc.date.available value to right now
@@ -218,6 +216,7 @@ public class EmbargoManager
      */
     public static void main(String argv[])
     {
+
         init();
         int status = 0;
 
@@ -234,6 +233,10 @@ public class EmbargoManager
                         "Function: ONLY check the state of embargoed Items, do NOT lift any embargoes.");
         options.addOption("l", "lift", false,
                         "Function: ONLY lift embargoes, do NOT check the state of any embargoed Items.");
+
+        options.addOption("a", "adjust", false,
+                "Function: Adjust bitstreams policies");
+
         options.addOption("h", "help", false, "help");
         CommandLine line = null;
         try
@@ -339,36 +342,41 @@ public class EmbargoManager
 
         if (lift.length > 0)
         {
+            DCDate liftDate = new DCDate(lift[0].value);
             // need to survive any failure on a single item, go on to process the rest.
             try
             {
-                DCDate liftDate = new DCDate(lift[0].value);
-                log.debug("Testing embargo on item="+item.getHandle()+", date="+liftDate.toString());
-                if (liftDate.toDate().before(now))
-                {
-                    if (line.hasOption('v'))
+                if (line.hasOption('a')){
+                    setter.setEmbargo(context, item);
+                }
+                else{
+                    log.debug("Testing embargo on item="+item.getHandle()+", date="+liftDate.toString());
+                    if (liftDate.toDate().before(now))
                     {
-                        System.err.println("Lifting embargo from Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
-                    }
-                    if (line.hasOption('n'))
-                    {
-                        if (!line.hasOption('q'))
+                        if (line.hasOption('v'))
                         {
-                            System.err.println("DRY RUN: would have lifted embargo from Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
+                            System.err.println("Lifting embargo from Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
+                        }
+                        if (line.hasOption('n'))
+                        {
+                            if (!line.hasOption('q'))
+                            {
+                                System.err.println("DRY RUN: would have lifted embargo from Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
+                            }
+                        }
+                        else if (!line.hasOption('c'))
+                        {
+                            liftEmbargo(context, item);
                         }
                     }
-                    else if (!line.hasOption('c'))
+                    else if (!line.hasOption('l'))
                     {
-                        liftEmbargo(context, item);
+                        if (line.hasOption('v'))
+                        {
+                            System.err.println("Checking current embargo on Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
+                        }
+                        setter.checkEmbargo(context, item);
                     }
-                }
-                else if (!line.hasOption('l'))
-                {
-                    if (line.hasOption('v'))
-                    {
-                        System.err.println("Checking current embargo on Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
-                    }
-                    setter.checkEmbargo(context, item);
                 }
             }
             catch (Exception e)
@@ -381,6 +389,8 @@ public class EmbargoManager
         context.removeCached(item, item.getID());
         return status;
     }
+
+
 
     // initialize - get plugins and MD field settings from config
     private static void init()
@@ -433,7 +443,7 @@ public class EmbargoManager
         String sa[] = field.split("\\.", 3);
         return sa.length > 2 ? sa[2] : null;
     }
-    
+
     // return the lift date assigned when embargo was set, or null, if either:
     // it was never under embargo, or the lift date has passed.
     private static DCDate recoverEmbargoDate(Item item) {
@@ -448,6 +458,7 @@ public class EmbargoManager
                 liftDate = null;
             }
         }
-        return liftDate;       
+        return liftDate;
     }
+
 }

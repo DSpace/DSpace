@@ -11,37 +11,6 @@
 <html>
 <head>
 <title>org.dspace.app.statistics package</title>
-<!--
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
--->
 </head>
 
 <body>
@@ -67,11 +36,11 @@ class, defined in this package, to select an event processing implementation.
 Three "stock" implementations are provided.
 </p>
 <dl>
-	<dt>{@link org.dspace.app.statistics.PassiveUsageEvent PassiveUsageEvent}</dt>
+	<dt>{@link org.dspace.usage.PassiveUsageEventListener PassiveUsageEventListener}</dt>
 	<dd>absorbs events without taking action, resulting in behavior identical
 		to that of DSpace before this package was added.  This is the default
 		if no plugin is configured.</dd>
-	<dt>{@link org.dspace.app.statistics.UsageEventTabFileLogger UsageEventTabFileLogger}</dt>
+	<dt>{@link org.dspace.usage.TabFileUsageEventListener TabFileUsageEventListener}</dt>
 	<dd>writes event records to a file in Tab Separated Values format.</dd>
 	<dt>{@link org.dspace.app.statistics.UsageEventXMLLogger UsageEventXMLLogger}</dt>
 	<dd>writes event records to a file in an XML format.  Suitable mainly for

@@ -151,7 +151,6 @@ and searching the repository.
                                                      - transformed pages with the current timestamp, which we cannot override.
                                                      - It won't prevent a spider's If-Modified-Since from working, though.
                                                     -->
-                                                    
                                                   <map:select type="browser">
                                                     <map:when test="spider">
                                                       <map:select type="IfModifiedSinceSelector">

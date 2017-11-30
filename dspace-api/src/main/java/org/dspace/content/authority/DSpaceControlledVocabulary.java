@@ -7,23 +7,25 @@
  */
 package org.dspace.content.authority;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.io.File;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.xml.sax.InputSource;
+
 import org.apache.log4j.Logger;
+
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.SelfNamedPlugin;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import ar.edu.unlp.sedici.util.MailReporter;
 
@@ -55,7 +57,7 @@ import ar.edu.unlp.sedici.util.MailReporter;
 public class DSpaceControlledVocabulary extends SelfNamedPlugin implements ChoiceAuthority
 {
 
-	private static Logger log = Logger.getLogger(DSpaceControlledVocabulary.class);
+    private static Logger log = Logger.getLogger(DSpaceControlledVocabulary.class);
     private static String xpathTemplate = "//isComposedBy/node[contains(translate(@label,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'%s')]";
     private static String idTemplate = "//isComposedBy/node[@id = '%s']";
     private static String pluginNames[] = null;
@@ -88,22 +90,24 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     {
         if (pluginNames == null)
         {
-        	class xmlFilter implements java.io.FilenameFilter
+            class xmlFilter implements java.io.FilenameFilter
             {
-        		public boolean accept(File dir, String name)
+                @Override
+                public boolean accept(File dir, String name)
                 {
-        			return name.endsWith(".xml");
-        		}
-        	}
-            String vocabulariesPath = ConfigurationManager.getProperty("dspace.dir") + "/config/controlled-vocabularies/";
-        	String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
-        	List<String> names = new ArrayList<String>();
-        	for (String filename : xmlFiles)
+                    return name.endsWith(".xml");
+                }
+            }
+            String vocabulariesPath = ConfigurationManager.getProperty("dspace.dir")
+                    + "/config/controlled-vocabularies/";
+            String[] xmlFiles = (new File(vocabulariesPath)).list(new xmlFilter());
+            List<String> names = new ArrayList<String>();
+            for (String filename : xmlFiles)
             {
-        		names.add((new File(filename)).getName().replace(".xml",""));
-        	}
-        	pluginNames = names.toArray(new String[names.size()]);
-            log.info("Got plugin names = "+Arrays.deepToString(pluginNames));
+                names.add((new File(filename)).getName().replace(".xml", ""));
+            }
+            pluginNames = names.toArray(new String[names.size()]);
+            log.info("Got plugin names = " + Arrays.deepToString(pluginNames));
         }
     }
 
@@ -155,6 +159,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	}
     }
 
+    @Override
     public Choices getMatches(String field, String text, int collection, int start, int limit, String locale)
     {
     	init();
@@ -168,8 +173,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	if (log.isDebugEnabled())	
     		log.debug(limit+" matches requested for field '" + field + "' with value '"+ text+"' starting from "+start);
     	
-    	XPath xpath = XPathFactory.newInstance().newXPath();
     	String xpathExpression = String.format(xpathTemplate, text.replaceAll("'", "&apos;").toLowerCase());
+    	XPath xpath = XPathFactory.newInstance().newXPath();
     	NodeList results;
     	
     	try {
@@ -225,6 +230,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	return new Choices(choices, 0, choices.length, Choices.CF_AMBIGUOUS, (end < totalResults));
     }
 
+    @Override
     public Choices getBestMatch(String field, String text, int collection, String locale)
     {
     	init();
@@ -232,6 +238,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         return getMatches(field, text, collection, 0, 2, locale);
     }
 
+    @Override
     public String getLabel(String field, String key, String locale)
     {
     	init();
@@ -240,15 +247,8 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	try {
     		Node node = (Node)xpath.evaluate(xpathExpression, vocabulary, XPathConstants.NODE);
     		return node.getAttributes().getNamedItem("label").getNodeValue();
-    	} catch(Exception e) {
-    		String url = "org.dspace.content.authority.getMatches()";
-    		String parameters = "field="+field+"&key="+key+"&locale="+locale;
-    		String message = "Exception on expression "+xpathExpression;
-    		log.warn(message,e);
-    		
-    		MailReporter.reportUnknownException(message, e, url,parameters);
-    		//continue
+    	} catch(XPathExpressionException e) {
+    		return("");
     	}
-    	return key;    	
     }
 }

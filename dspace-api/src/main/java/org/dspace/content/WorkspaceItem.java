@@ -16,6 +16,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -153,84 +154,84 @@ public class WorkspaceItem implements InProgressSubmission
         EPerson e = c.getCurrentUser();
 
         // read permission
-        AuthorizeManager.addPolicy(c, i, Constants.READ, e);
+        AuthorizeManager.addPolicy(c, i, Constants.READ, e, ResourcePolicy.TYPE_SUBMISSION);
 
 
         if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
             if (step1group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.READ, step1group);
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step1group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step2group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.READ, step2group);
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step2group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step3group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.READ, step3group);
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step3group, ResourcePolicy.TYPE_WORKFLOW);
             }
         }
 
 
         // write permission
-        AuthorizeManager.addPolicy(c, i, Constants.WRITE, e);
+        AuthorizeManager.addPolicy(c, i, Constants.WRITE, e, ResourcePolicy.TYPE_SUBMISSION);
 
         if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
             if (step1group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group);
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step2group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step2group);
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step2group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step3group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step3group);
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step3group, ResourcePolicy.TYPE_WORKFLOW);
             }
         }
 
         // add permission
-        AuthorizeManager.addPolicy(c, i, Constants.ADD, e);
+        AuthorizeManager.addPolicy(c, i, Constants.ADD, e, ResourcePolicy.TYPE_SUBMISSION);
 
         if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
             if (step1group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group);
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step2group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.ADD, step2group);
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step2group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step3group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.ADD, step3group);
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step3group, ResourcePolicy.TYPE_WORKFLOW);
             }
         }
 
         // remove contents permission
-        AuthorizeManager.addPolicy(c, i, Constants.REMOVE, e);
+        AuthorizeManager.addPolicy(c, i, Constants.REMOVE, e, ResourcePolicy.TYPE_SUBMISSION);
 
         if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
             if (step1group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group);
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step2group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step2group);
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step2group, ResourcePolicy.TYPE_WORKFLOW);
             }
 
             if (step3group != null)
             {
-                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step3group);
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step3group, ResourcePolicy.TYPE_WORKFLOW);
             }
         }
 
@@ -505,7 +506,7 @@ public class WorkspaceItem implements InProgressSubmission
     /**
      * Update the workspace item, including the unarchived item.
      */
-    public void update() throws SQLException, AuthorizeException, IOException
+    public void update() throws SQLException, AuthorizeException
     {
         // Authorisation is checked by the item.update() method below
 

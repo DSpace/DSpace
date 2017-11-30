@@ -30,7 +30,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * </p>
  * 
  * @see org.dspace.submit.AbstractProcessingStep
- * @see org.dspace.submit.step.InitialQuestionStep
+ * @see org.dspace.submit.step.InitialQuestionsStep
  * @see org.dspace.submit.step.DescribeStep
  * 
  * @author Andrea Bollini

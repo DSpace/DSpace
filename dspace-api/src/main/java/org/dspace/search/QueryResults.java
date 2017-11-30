@@ -18,6 +18,8 @@ import org.dspace.core.ConfigurationManager;
  */
 public class QueryResults
 {
+    private long queryTime; // time to search (ms)
+    
     private int hitCount; // total hits returned by search engine
 
     private int start; // offset of query 'page'
@@ -34,6 +36,16 @@ public class QueryResults
     /** number of metadata elements to display before truncating using "et al" */
     private int etAl = ConfigurationManager.getIntProperty("webui.itemlist.author-limit");
 
+    public long getQueryTime()
+    {
+        return queryTime;
+    }
+    
+    public void setQueryTime(long queryTime)
+    {
+        this.queryTime = queryTime;
+    }
+    
     /**
      * @return  the number of metadata fields at which to truncate with "et al"
      */

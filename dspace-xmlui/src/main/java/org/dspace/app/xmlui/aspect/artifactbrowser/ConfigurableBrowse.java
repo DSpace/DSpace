@@ -12,21 +12,20 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.*;
 
+import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.RequestUtils;
-import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.*;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -136,6 +135,22 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     private Message titleMessage = null;
     private Message trailMessage = null;
 
+    @Override
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
+        super.setup(resolver, objectModel, src, parameters);
+
+        //Verify if we have received valid parameters
+        try {
+            getUserParams();
+        } catch (ResourceNotFoundException e) {
+            throw new BadRequestException("Invalid parameters");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (UIException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Serializable getKey()
     {
         try
@@ -230,19 +245,19 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             SQLException, IOException, AuthorizeException
     {
     	try {
-	        BrowseInfo info = getBrowseInfo();
-	
-	        pageMeta.addMetadata("title").addContent(getTitleMessage(info));
-	
-	        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-	
-	        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-	        if (dso != null)
-	        {
-	            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
-	        }
-	
-	        pageMeta.addTrail().addContent(getTrailMessage(info));
+        BrowseInfo info = getBrowseInfo();
+
+        pageMeta.addMetadata("title").addContent(getTitleMessage(info));
+
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+
+        pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
+        if (dso != null)
+        {
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
+        }
+
+        pageMeta.addTrail().addContent(getTrailMessage(info));
     	} catch(ResourceNotFoundException e) {
     		// Dado que no podemos dejar que la exception continue porque este metodo no seria compatible con su padre,
     		// la capturamos aca y no hacemos NADA. Si corresponde, volvera a saltar en el metodo addBody() y se manejará alli
@@ -284,13 +299,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
                             params, info), getNextPageURL(params, info));
 
+            // Reference all the browsed items
+            ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
+                    ReferenceSet.TYPE_SUMMARY_LIST, type, null);
+
             // Are we browsing items, or unique metadata?
             if (isItemBrowse(info))
             {
-                // Reference all the browsed items
-                ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
-                        ReferenceSet.TYPE_SUMMARY_LIST, type, null);
-
                 // Add the items to the browse results
                 for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
                 {
@@ -328,6 +343,10 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     Cell cell = singleTable.addRow().addCell();
                     cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),
                           singleEntry[0]);
+                    if (StringUtils.isNotEmpty(singleEntry[2]))
+                    {
+                        cell.addContent(" ["+singleEntry[2]+"]");
+                    }
                 }  
             }
         }
@@ -443,12 +462,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 letterQuery.remove(valueKey);
             }
-            /*
-             * Here is replaced the default searchView by number (0-9) for a view of all items (T_show_all). 
-             */
-//            letterQuery.put(BrowseParams.STARTS_WITH, "0");
-//            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), "0-9");
-
+            letterQuery.put(BrowseParams.STARTS_WITH, "0");
             jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), T_show_all);
             
             for (char c = 'A'; c <= 'Z'; c++)
@@ -715,16 +729,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
             int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
             params.scope.setOffset(offset > 0 ? offset : 0);
-            int resultPerPage=RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE);
-            if (resultPerPage == -1){
-            	resultPerPage = ConfigurationManager.getIntProperty("sedici-dspace", "xmlui.artifactbrowser.ConfigurableBrowse.default-rpp", 60);
-            };
-            int configurationMaxRpp=ConfigurationManager.getIntProperty("sedici-dspace", "xmlui.artifactbrowser.ConfigurableBrowse.max-rpp", 100);
-            if (resultPerPage<configurationMaxRpp){
-            	params.scope.setResultsPerPage(resultPerPage);
-	        } else {
-	        	params.scope.setResultsPerPage(configurationMaxRpp);
-	        }
+            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
             String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
             if (filterValue == null)

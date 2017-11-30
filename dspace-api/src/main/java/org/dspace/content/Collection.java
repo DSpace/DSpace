@@ -468,7 +468,7 @@ public class Collection extends DSpaceObject
     }
 
     /**
-     * Get the logo for the collection. <code>null</code> is return if the
+     * Get the logo for the collection. <code>null</code> is returned if the
      * collection does not have a logo.
      * 
      * @return the logo of the collection, or <code>null</code>
@@ -482,11 +482,11 @@ public class Collection extends DSpaceObject
      * Give the collection a logo. Passing in <code>null</code> removes any
      * existing logo. You will need to set the format of the new logo bitstream
      * before it will work, for example to "JPEG". Note that
-     * <code>update(/code> will need to be called for the change to take
+     * <code>update</code> will need to be called for the change to take
      * effect.  Setting a logo and not calling <code>update</code> later may
      * result in a previous logo lying around as an "orphaned" bitstream.
      *
-     * @param  is   the stream to use as the new logo
+     * @param  is the stream to use as the new logo
      *
      * @return   the new logo bitstream, or <code>null</code> if there is no
      *           logo (<code>null</code> was passed in)
@@ -865,7 +865,7 @@ public class Collection extends DSpaceObject
     /**
      * Remove the template item for this collection, if there is one. Note that
      * since this has to remove the old template item ID from the collection
-     * record in the database, the colletion record will be changed, including
+     * record in the database, the collection record will be changed, including
      * any other changes made; in other words, this method does an
      * <code>update</code>.
      * 
@@ -887,7 +887,7 @@ public class Collection extends DSpaceObject
             log.info(LogManager.getHeader(ourContext, "remove_template_item",
                     "collection_id=" + getID() + ",template_item_id="
                             + template.getID()));
-            // temporary turn off auth system, we have already checked the permission on the top of the method
+            // temporarily turn off auth system, we have already checked the permission on the top of the method
             // check it again will fail because we have already broken the relation between the collection and the item
             ourContext.turnOffAuthorisationSystem();
             template.delete();
@@ -943,7 +943,7 @@ public class Collection extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
-        // will be the item an orphan?
+        // will the item be an orphan?
         TableRow row = DatabaseManager.querySingle(ourContext,
                 "SELECT COUNT(DISTINCT collection_id) AS num FROM collection2item WHERE item_id= ? ",
                 item.getID());
@@ -967,14 +967,14 @@ public class Collection extends DSpaceObject
     }
 
     /**
-     * Update the collection metadata (including logo, and workflow groups) to
+     * Update the collection metadata (including logo and workflow groups) to
      * the database. Inserts if this is a new collection.
      * 
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
      */
-    public void update() throws SQLException, IOException, AuthorizeException
+    public void update() throws SQLException, AuthorizeException
     {
         // Check authorisation
         canEdit(true);
@@ -1082,7 +1082,7 @@ public class Collection extends DSpaceObject
         		
         		if (item.isOwningCollection(this))
         		{
-        			// the collection to be deletd is the owning collection, thus remove
+        			// the collection to be deleted is the owning collection, thus remove
         			// the item from all collections it belongs to
         			Collection[] collections = item.getCollections();
         			for (int i=0; i< collections.length; i++)
@@ -1356,7 +1356,7 @@ public class Collection extends DSpaceObject
      * @param comm
      *            (optional) restrict search to a community, else null
      * @param actionID
-     *            fo the action
+     *            of the action
      * 
      * @return Collection [] of collections with matching permissions
      * @throws SQLException
@@ -1486,5 +1486,12 @@ public class Collection extends DSpaceObject
         {
             return null;
         }
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+        //Also fire a modified event since the collection HAS been modified
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), null));
     }
 }

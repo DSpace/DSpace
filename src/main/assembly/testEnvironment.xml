@@ -1,0 +1,77 @@
+<?xml version='1.0'?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<assembly
+    xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <!--
+		Package DSpace's common testing environment (configuration, etc.)
+	-->
+    <id>testEnvironment</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <moduleSets>
+        <moduleSet>
+            <sources>
+                <outputDirectoryMapping>dspace</outputDirectoryMapping>
+                <fileSets>
+                    <fileSet> <!-- installable DSpace files -->
+                        <directory />
+                        <outputDirectory />
+                        <excludes>
+                            <exclude>config/dspace.cfg</exclude>
+                        </excludes>
+                        <includes>
+                            <include>bin/**/*</include>
+                            <include>config/**/*</include>
+                            <include>etc/**/*</include>
+                            <include>modules/**/*</include>
+                            <include>solr/**/*</include>
+                        </includes>
+                    </fileSet>
+                    <fileSet> <!-- installable DSpace files needing filtering -->
+                        <includes>
+                            <include>config/dspace.cfg</include>
+                        </includes>
+                        <filtered>true</filtered>
+                    </fileSet>
+                    <fileSet> <!-- test data -->
+                        <directory>src/test/data/dspaceFolder</directory>
+                        <outputDirectory />
+                        <includes>
+                            <include>assetstore/**/*</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
+        <moduleSet>
+            <includes>
+                <include>org.dspace:dspace-api</include>
+            </includes>
+            <sources>
+                <outputDirectoryMapping>/</outputDirectoryMapping>
+                <fileSets>
+                    <fileSet>
+                        <directory>src/test/data</directory>
+                        <includes>
+                            <include>dspace.cfg.more</include>
+                        </includes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
+    </moduleSets>
+
+</assembly>

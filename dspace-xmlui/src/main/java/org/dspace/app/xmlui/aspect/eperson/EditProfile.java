@@ -297,6 +297,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        
        // First name
        Text firstName = identity.addItem().addText("first_name");
+       firstName.setAutofocus("autofocus");
        firstName.setRequired();
        firstName.setLabel(T_first_name);
        firstName.setValue(defaultFirstName);
@@ -367,7 +368,6 @@ public class EditProfile extends AbstractDSpaceTransformer
            
            Collection[] currentList = Subscribe.getSubscriptions(context, context.getCurrentUser());
            CollectionsWithCommunities possibleList = CollectionSearchSedici.findAllWithCommunitiesName(context);
-           //Collection[] possibleList = Collection.findAll(context);
            
            Select subscriptions = subscribe.addItem().addSelect("subscriptions");
            subscriptions.setLabel(T_email_subscriptions);

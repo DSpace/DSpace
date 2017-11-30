@@ -32,7 +32,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * This special comonent checks to see if the body element is empty (has no sub elements) and if
+ * This special component checks to see if the body element is empty (has no sub elements) and if
  * it is then displays some page not found text.
  * 
  * @author Scott Phillips
@@ -40,6 +40,23 @@ import org.xml.sax.SAXException;
  */
 public class PageNotFoundTransformer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    /** Language Strings */
+    private static final Message T_title =
+        message("xmlui.PageNotFound.title");
+    
+    private static final Message T_head =
+        message("xmlui.PageNotFound.head");
+    
+    private static final Message T_para1 =
+        message("xmlui.PageNotFound.para1");
+    
+    private static final Message T_go_home =
+        message("xmlui.general.go_home");
+    
+    private static final Message T_dspace_home =
+        message("xmlui.general.dspace_home");
+    
+    
     /** Where the body element is stored while we wait to see if it is empty */
     private SAXEvent bodyEvent;
     
@@ -90,7 +107,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
         if (this.bodyEvent != null)
         {
             // If we have recorded the startElement for body and we are
-            // recieving another start event, then there must be something 
+            // receiving another start event, then there must be something 
             // inside the body element, so we send the held body and carry
             // on as normal.
             sendEvent(this.bodyEvent);
@@ -117,7 +134,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     {
         if (this.bodyEvent != null && WingConstants.DRI.URI.equals(namespaceURI) && Body.E_BODY.equals(localName))
         {
-            // If we are recieving an endElement event for body while we
+            // If we are receiving an endElement event for body while we
             // still have a startElement body event recorded then
             // the body element must have been empty. In this case, record
             // that the body is empty, and send both the start and end body events.
@@ -141,7 +158,15 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     	// Consider the response is empty if the body is empty and this request was not redirected 
         if (this.bodyEmpty && !ObjectModelHelper.getResponse(objectModel).containsHeader("Location"))
         {
-            Request request = ObjectModelHelper.getRequest(objectModel);
+            Division notFound = body.addDivision("page-not-found","primary");
+            
+            notFound.setHead(T_head);
+            
+            notFound.addPara(T_para1); 
+
+            notFound.addPara().addXref(contextPath + "/",T_go_home);
+
+	    Request request = ObjectModelHelper.getRequest(objectModel);
 
             String URL = request.getRequestURI();
             if(request.getQueryString() != null)
@@ -151,6 +176,54 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
         }
     }
 
+    /** What page metadata to add to the document */
+    @Override
+    public void addPageMeta(PageMeta pageMeta) throws SAXException,
+            WingException, UIException, SQLException, IOException,
+            AuthorizeException
+    {
+        if (this.bodyEmpty)
+        {
+            // Set the page title
+            pageMeta.addMetadata("title").addContent(T_title);
+            
+            // Give theme a base trail
+            pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     /**
      * Send the given recorded sax event.
      */

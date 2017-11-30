@@ -7,44 +7,48 @@
  */
 package org.dspace;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.TimeZone;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import org.dspace.administer.RegistryImportException;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseException;
-import org.dspace.content.NonUniqueMetadataException;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
-import org.junit.*;
-import static org.junit.Assert.*;
-import mockit.*;
+
+import mockit.UsingMocksAndStubs;
+
 import org.apache.log4j.Logger;
 import org.dspace.administer.MetadataImporter;
+import org.dspace.administer.RegistryImportException;
 import org.dspace.administer.RegistryLoader;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.browse.MockBrowseCreateDAOOracle;
 import org.dspace.content.MetadataField;
+import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.search.DSIndexer;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.storage.rdbms.MockDatabaseManager;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.xml.sax.SAXException;
 
 
 
 /**
  * This is the base class for Unit Tests. It contains some generic mocks and
- * utilities that are needed by most of the unit tests developed for DSpace
+ * utilities that are needed by most of the unit tests developed for DSpace.
  *
  * @author pvillega
  */
@@ -57,22 +61,23 @@ public class AbstractUnitTest
     //Below there are static variables shared by all the instances of the class
     
     /**
-     * Test properties
+     * Test properties.
      */
     protected static Properties testProps;
 
     //Below there are variables used in each test
 
     /**
-     * Context mock object to use in the tests
+     * Context mock object to use in the tests.
      */
     protected Context context;
 
     /**
-     * EPerson mock object to use in the tests
+     * EPerson mock object to use in the tests.
      */
     protected static EPerson eperson;
 
+    protected static DSpaceKernelImpl kernelImpl;
 
     /**
      * This method will be run before the first test as per @BeforeClass. It will
@@ -81,12 +86,13 @@ public class AbstractUnitTest
      * Due to the way Maven works, unit tests can't be run from a POM package,
      * which forbids us to run the tests from the Assembly and Configuration
      * package. On the other hand we need a structure of folders to run the tests,
-     * like "solr", "report", etc.
+     * like "solr", "report", etc.  This will be provided by a JAR assembly
+     * built out of files from various modules -- see the dspace-parent POM.
      *
-     * This method will create all the folders and files required for the tests
-     * in the test folder. To facilitate the work this will consist on a copy
-     * from a folder in the resources folder. The ConfigurationManager will be
-     * initialized to load the test "dspace.cfg" and then launch the unit tests.
+     * This method will load a few properties for derived test classes.
+     * 
+     * The ConfigurationManager will be initialized to load the test
+     * "dspace.cfg".
      */
     @BeforeClass
     public static void initOnce()
@@ -98,71 +104,34 @@ public class AbstractUnitTest
 
             //load the properties of the tests
             testProps = new Properties();
-            URL properties = AbstractUnitTest.class.getClassLoader().getResource("test-config.properties");
+            URL properties = AbstractUnitTest.class.getClassLoader()
+                    .getResource("test-config.properties");
             testProps.load(properties.openStream());
 
-            //prepare the Dspace files
-            URL origin = ClassLoader.getSystemResource("dspaceFolder");
-            File source = new File(origin.getPath());
-            File dspaceTmp = new File(testProps.getProperty("test.folder"));
-            if (!dspaceTmp.exists())
-            {
-                dspaceTmp.mkdirs();
-            }
-            copyDir(source, dspaceTmp);
-
-            //copy a file into assetstore for "register" tests on Bundle, Bitstream
-            File tmpFile = new File(testProps.getProperty("test.bitstream"));
-            File destParent = new File(testProps.getProperty("test.folder.assetstore"));
-            destParent.mkdirs();
-            File dest = new File(testProps.getProperty("test.assetstore.bitstream"));
-            if(!dest.exists())
-            {
-                dest.createNewFile();
-            }
-            copyFile(tmpFile, dest);
-
             //load the test configuration file
-            URL configFile = AbstractUnitTest.class.getClassLoader().getResource(testProps.getProperty("test.config.file"));
-            ConfigurationManager.loadConfig(configFile.getPath());
+            ConfigurationManager.loadConfig(null);
 
-//            // Initialise the service manager kernel
-            DSpaceKernelImpl kernelImpl = null;
-            try {
-                kernelImpl = DSpaceKernelInit.getKernel(null);
-                if (!kernelImpl.isRunning())
-                {
-                    kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-                }
-            } catch (Exception e)
+            // Initialise the service manager kernel
+            kernelImpl = DSpaceKernelInit.getKernel(null);
+            if (!kernelImpl.isRunning())
             {
-                // Failed to start so destroy it and log and throw an exception
-                try
-                {
-                    if(kernelImpl != null){
-                        kernelImpl.destroy();
-                    }
-                }
-                catch (Exception e1)
-                {
-                    // Nothing to do
-                }
-                String message = "Failure during filter init: " + e.getMessage();
-                throw new IllegalStateException(message, e);
+                kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
             }
 
-
-            //load the default registries. This assumes the temporal filesystem is working
-            //and the in-memory DB in place
+            // Load the default registries. This assumes the temporary
+            // filesystem is working and the in-memory DB in place.
             Context ctx = new Context();
             ctx.turnOffAuthorisationSystem();
 
-            //we can't check via a boolean value (even static) as the class is destroyed by the
-            //JUnit classloader. We rely on a value that will always be in the database if it has
-            //been initialized to avoid doing the work twice            
+            // We can't check via a boolean value (even static) as the class is
+            // destroyed by the JUnit classloader. We rely on a value that will
+            // always be in the database, if it has been initialized, to avoid
+            // doing the work twice.
             if(MetadataField.find(ctx, 1) == null)
             {
-                String base = testProps.getProperty("test.folder") + File.separator + "config"+ File.separator +"registries"+ File.separator;
+                String base = ConfigurationManager.getProperty("dspace.dir")
+                        + File.separator + "config" + File.separator
+                        + "registries" + File.separator;
 
                 RegistryLoader.loadBitstreamFormats(ctx, base + "bitstream-formats.xml");
                 MetadataImporter.loadRegistry(base + "dublin-core-types.xml", true);
@@ -252,6 +221,7 @@ public class AbstractUnitTest
      * @param to Destination
      * @throws IOException There is an error while copying the content
      */
+    /*
     protected static void copyDir(File from, File to) throws IOException
     {
         if(!from.isDirectory() || !to.isDirectory())
@@ -276,6 +246,7 @@ public class AbstractUnitTest
             }
         }
     }
+     */
 
     /**
      * Removes the copies of the origin files from the destination folder. Used
@@ -285,6 +256,7 @@ public class AbstractUnitTest
      * @param to Destination from which to remove contents
      * @throws IOException There is an error while copying the content
      */
+    /*
     protected static void deleteDir(File from, File to) throws IOException
     {
         if(!from.isDirectory() || !to.isDirectory())
@@ -315,6 +287,7 @@ public class AbstractUnitTest
             }
         }
     }
+     */
 
     /**
      * Copies one file into another
@@ -323,6 +296,7 @@ public class AbstractUnitTest
      * @param to Destination of copy
      * @throws IOException There is an error while copying the content
      */
+    /*
     protected static void copyFile(File from, File to) throws IOException
     {
         if(!from.isFile() || !to.isFile())
@@ -336,6 +310,7 @@ public class AbstractUnitTest
         in.close();
         out.close();
     }
+     */
 
     /**
      * This method will be run before every test as per @Before. It will
@@ -385,27 +360,9 @@ public class AbstractUnitTest
     @AfterClass
     public static void destroyOnce()
     {
-        try
-        {
-            //the database will be cleaned automatically on shutdown (in-memory db)
-            
-            //we clear the copied resources
-            URL origin = ClassLoader.getSystemResource("dspaceFolder");
-            File source = new File(origin.getPath());
-            File dspaceTmp = new File(testProps.getProperty("test.folder"));
-            deleteDir(source, dspaceTmp);
-
-            File destParent = new File(testProps.getProperty("test.folder.assetstore"));
-            deleteDir(destParent,destParent);
-
-            //we clear the properties
-            testProps.clear();
-            testProps = null;
-        } 
-        catch (IOException ex)
-        {
-            log.error("Error cleaning the temporal files of testing", ex);
-        }
+        //we clear the properties
+        testProps.clear();
+        testProps = null;
     }
 
     /**

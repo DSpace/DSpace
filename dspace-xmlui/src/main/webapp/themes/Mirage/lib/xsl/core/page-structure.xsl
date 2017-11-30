@@ -207,8 +207,7 @@
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
                         <xsl:value-of select="$context-path"/>
                         <xsl:text>/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
-                        <xsl:text>description.xml</xsl:text>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='autolink']"/>
                     </xsl:attribute>
                     <xsl:attribute name="title" >
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']"/>
@@ -219,12 +218,12 @@
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
             <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
                         <script type="text/javascript">
-                                //Clear default text of emty text areas on focus
+                                //Clear default text of empty text areas on focus
                                 function tFocus(element)
                                 {
                                         if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}
                                 }
-                                //Clear default text of emty text areas on submit
+                                //Clear default text of empty text areas on submit
                                 function tSubmit(form)
                                 {
                                         var defaultedElements = document.getElementsByTagName("textarea");
@@ -329,7 +328,7 @@
                 </a>
                 <h1 class="pagetitle visuallyhidden">
                     <xsl:choose>
-                        <!-- protectiotion against an empty page title -->
+                        <!-- protection against an empty page title -->
                         <xsl:when test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title'])">
                             <xsl:text> </xsl:text>
                         </xsl:when>
@@ -475,7 +474,7 @@
         </xsl:variable>
 
    <xsl:if test="$ccLicenseName and $ccLicenseUri and contains($ccLicenseUri, 'creativecommons')">
-        <div about="{$handleUri}">
+        <div about="{$handleUri}" class="clearfix">
             <xsl:attribute name="style">
                 <xsl:text>margin:0em 2em 0em 2em; padding-bottom:0em;</xsl:text>
             </xsl:attribute>
@@ -507,12 +506,12 @@
         </xsl:if>
     </xsl:template>
 
-    <!-- Like the header, the footer contains various miscellanious text, links, and image placeholders -->
+    <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
         <div id="ds-footer-wrapper">
             <div id="ds-footer">
                 <div id="ds-footer-left">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2011&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
+                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2012&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
                 </div>
                 <div id="ds-footer-right">
                     <span class="theme-by">Theme by&#160;</span>
@@ -641,6 +640,13 @@
 
 
         <!-- Add theme javascipt  -->
+        <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='url']">
+            <script type="text/javascript">
+                <xsl:attribute name="src">
+                    <xsl:value-of select="."/>
+                </xsl:attribute>&#160;</script>
+        </xsl:for-each>
+
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
             <script type="text/javascript">
                 <xsl:attribute name="src">
@@ -652,7 +658,7 @@
                 </xsl:attribute>&#160;</script>
         </xsl:for-each>
 
-        <!-- add "shared" javascript from static, path is relative to webapp root-->
+        <!-- add "shared" javascript from static, path is relative to webapp root -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static']">
             <!--This is a dirty way of keeping the scriptaculous stuff from choice-support
             out of our theme without modifying the administrative and submission sitemaps.

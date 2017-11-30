@@ -213,11 +213,11 @@ public abstract class AbstractMETSDisseminator
      * a failure creating the package.
      *
      * @param context  DSpace context.
-     * @param object  DSpace object (item, collection, etc)
+     * @param dso  DSpace object (item, collection, etc)
      * @param params Properties-style list of options specific to this packager
      * @param pkgFile File where export package should be written
-     * @throws PackageValidationException if package cannot be created or there is
-     *  a fatal error in creating it.
+     * @throws PackageValidationException if package cannot be created or there
+     * is a fatal error in creating it.
      */
     @Override
     public void disseminate(Context context, DSpaceObject dso,
@@ -1219,7 +1219,7 @@ public abstract class AbstractMETSDisseminator
      * @param type - type attr value for the <div>
      * @param dso - object for which to create the div
      * @param params
-     * @return
+     * @return a new {@code Div} with {@code dso} as child.
      */
     protected Div makeChildDiv(String type, DSpaceObject dso, PackageParameters params)
     {
@@ -1394,7 +1394,7 @@ public abstract class AbstractMETSDisseminator
      * @param context current DSpace Context
      * @param params current Packager Parameters
      * @param dso current DSpace Object
-     * @param ref the rightsMD <mdRef> element
+     * @param mdRef the rightsMD <mdRef> element
      * @throws SQLException
      * @throws IOException
      * @throws AuthorizeException
@@ -1537,7 +1537,7 @@ public abstract class AbstractMETSDisseminator
                 }
                 else
                 {   //no Handle assigned, so persistent(-ish) URI for bitstream is
-                    // Format: {site-base-url}/retrieve/{bistream-internal-id}
+                    // Format: {site-base-url}/retrieve/{bitstream-internal-id}
                     return ConfigurationManager
                                     .getProperty("dspace.url")
                             + "/retrieve/"

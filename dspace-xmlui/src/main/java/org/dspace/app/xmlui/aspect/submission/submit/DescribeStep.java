@@ -48,6 +48,7 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 /**
@@ -92,7 +93,8 @@ public class DescribeStep extends AbstractSubmissionStep
      * that configuration file.
      */
     private static DCInputsReader INPUTS_READER = null;
-    
+    private static final Message T_vocabulary_link = message("xmlui.Submission.submit.DescribeStep.controlledvocabulary.link");
+
     /**
      * Ensure that the inputs reader has been initialized, this method may be
      * called multiple times with no ill-effect.
@@ -125,7 +127,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 this.requireSubmission = true;
                 this.requireStep = true;
                 
-                //Ensure that the InputsReader is initialized.
+                // Ensure that the InputsReader is initialized.
                 try
                 {
                     initializeInputsReader();
@@ -177,11 +179,24 @@ public class DescribeStep extends AbstractSubmissionStep
                 List form = div.addList("submit-describe",List.TYPE_FORM);
                 form.setHead(T_head);
 
+                // Fetch the document type (dc.type)
+                String documentType = "";
+                if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+                {
+                    documentType = item.getMetadata("dc.type")[0].value;
+                }
+                
                 // Iterate over all inputs and add it to the form.
                 for(DCInput dcInput : inputs)
                 {
                     String scope = submissionInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
                     boolean readonly = dcInput.isReadOnly(scope);
+                    
+                	// Omit fields not allowed for this document type
+                    if(!dcInput.isAllowedFor(documentType))
+                    {
+                    	continue;
+                    }
                     
                     // If the input is invisible in this scope, then skip it.
                         if (!dcInput.isVisible(scope) && !readonly)
@@ -362,7 +377,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         displayValue = value.value;
                     }
 
-                    //Only display this field if we have a value to display
+                    // Only display this field if we have a value to display
                     if (displayValue!=null && displayValue.length()>0)
                     {
 
@@ -383,9 +398,9 @@ public class DescribeStep extends AbstractSubmissionStep
                     }
                 } // For each DCValue
             } // If values exist
-        }// For each input
+        } // For each input
         
-        //return this new "describe" section
+        // return this new "describe" section
         return describeSection;
     }
     
@@ -396,11 +411,11 @@ public class DescribeStep extends AbstractSubmissionStep
          * all other names).
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
@@ -513,11 +528,11 @@ public class DescribeStep extends AbstractSubmissionStep
          * box for the month, and a 2 character text field for the day.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
@@ -602,7 +617,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         month.setOptionSelected(dcDate.getMonth());
                         
                         // Check if the day field is not specified, if so then just
-                        // put a blank value in instead of the wiered looking -1.
+                        // put a blank value in instead of the weird looking -1.
                         if (dcDate.getDay() == -1)
                         {
                             day.setValue("");
@@ -615,25 +630,25 @@ public class DescribeStep extends AbstractSubmissionStep
         }
         
         /**
-         * Render a series field to the DRI document. The series field conist of
+         * Render a series field to the DRI document. The series field conists of
          * two component text fields. When interpreted each of these fields are
          * combined back together to be a single value joined together by a
-         * semicolen. The primary use case is for the journal or report number
+         * semicolon. The primary use case is for the journal or report number
          * the left hand side is the journal and the right hand side in a
          * unique number within the journal.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
         private void renderSeriesField(List form, String fieldName, DCInput dcInput, DCValue[] dcValues, boolean readonly) throws WingException
         {
-                // The seiries field consists of two parts, a series name (text field)
+                // The series field consists of two parts, a series name (text field)
                 // and report or paper number (also a text field).
                 Composite fullSeries = form.addItem().addComposite(fieldName,"submit-"+dcInput.getInputType());
                 Text series = fullSeries.addText(fieldName+"_series");
@@ -701,16 +716,16 @@ public class DescribeStep extends AbstractSubmissionStep
         /**
          * Render a qualdrop field to the DRI document. Qualdrop fields are complicated,
          * widget wise they are composed of two fields, a select and text box field.
-         * The select field selects the metedata's qualifier and the text box is the
+         * The select field selects the metadata's qualifier and the text box is the
          * value. This means that that there is not just one metadata element that is
          * represented so the confusing part is that the name can change.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
@@ -787,11 +802,11 @@ public class DescribeStep extends AbstractSubmissionStep
          * multi row and column text field.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
@@ -884,15 +899,15 @@ public class DescribeStep extends AbstractSubmissionStep
         
         /**
          * Render a dropdown field for a choice-controlled input of the
-         * 'select' presentation  to the DRI document. The dropdown field
+         * 'select' presentation to the DRI document. The dropdown field
          * consists of an HTML select box.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
@@ -964,11 +979,11 @@ public class DescribeStep extends AbstractSubmissionStep
          * of an HTML select box.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
@@ -1035,11 +1050,11 @@ public class DescribeStep extends AbstractSubmissionStep
          * similarly named.
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
@@ -1117,11 +1132,11 @@ public class DescribeStep extends AbstractSubmissionStep
          * Render a simple text field to the DRI document
          *
          * @param form
-         *                      The form list to add the field too
+         *                      The form list to add the field to
          * @param fieldName
          *                      The field's name.
          * @param dcInput
-         *                      The field's input deffinition
+         *                      The field's input definition
          * @param dcValues
          *                      The field's pre-existing values.
          */
@@ -1133,8 +1148,17 @@ public class DescribeStep extends AbstractSubmissionStep
                 // as twobox should be listed in a two column format. Since this
                 // decision is not something the Aspect can effect we merely place
                 // as a render hint.
-                Text text = form.addItem().addText(fieldName,"submit-text");
+            org.dspace.app.xmlui.wing.element.Item item = form.addItem();
+            Text text = item.addText(fieldName, "submit-text");
 
+            if(dcInput.getVocabulary() != null){
+                String vocabularyUrl = new DSpace().getConfigurationService().getProperty("dspace.url");
+                vocabularyUrl += "/JSON/controlled-vocabulary?vocabularyIdentifier=" + dcInput.getVocabulary();
+                //Also hand down the field name so our summoning script knows the field the selected value is to end up in
+                vocabularyUrl += "&metadataFieldName=" + fieldName;
+                item.addXref("vocabulary:" + vocabularyUrl).addContent(T_vocabulary_link);
+            }
+            
                 // Setup the select field
                 text.setLabel(dcInput.getLabel());
                 text.setHelp(cleanHints(dcInput.getHints()));
@@ -1199,7 +1223,7 @@ public class DescribeStep extends AbstractSubmissionStep
                                         ti.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
                                     }
                         }
-                }
+                    }
                 }
                 else if (dcValues.length == 1)
                 {
@@ -1215,11 +1239,11 @@ public class DescribeStep extends AbstractSubmissionStep
                                 text.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
                             }
                 }
+            }
         }
-        }
-        
-        
-        
+
+
+
         /**
          * Check if the given fieldname is listed as being in error.
          *

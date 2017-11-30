@@ -388,7 +388,7 @@ public class ItemExport
     }
 
     /**
-     * Discover the different schemas in use and output a seperate metadata XML
+     * Discover the different schemas in use and output a separate metadata XML
      * file for each schema.
      * 
      * @param c
@@ -914,7 +914,7 @@ public class ItemExport
             }
             else
             {
-                // nothing to do just ignore this type of DSPaceObject
+                // nothing to do just ignore this type of DSpaceObject
             }
         }
 
@@ -1128,11 +1128,10 @@ public class ItemExport
     }
 
     /**
-     * Get the file size of the export archive represented by the file name
+     * Get the file size of the export archive represented by the file name.
      * 
      * @param fileName
-     *            name of the file to get the size
-     * @return
+     *            name of the file to get the size.
      * @throws Exception
      */
     public static long getExportFileSize(String fileName) throws Exception

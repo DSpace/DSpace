@@ -35,7 +35,7 @@ import ar.edu.unlp.sedici.util.CollectionsWithCommunities;
 /**
  * Allow the user to select a collection they wish to submit an item to, 
  * this step is sort-of but not officialy part of the item submission 
- * processes. Normaly a user will have selected a collection to submit 
+ * processes. Normally a user will have selected a collection to submit 
  * too by going to the collection's page, but if that was invalid or the 
  * user came directly from the mydspace page then this step is given.
  * 
@@ -73,7 +73,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
   
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
-    {  
+    {     
 		CollectionsWithCommunities collections; // List of possible collections.
 		String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
 		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
@@ -95,6 +95,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         List list = div.addList("select-collection", List.TYPE_FORM);
         list.setHead(T_head);       
         Select select = list.addItem().addSelect("handle");
+        select.setAutofocus("autofocus");
         select.setLabel(T_collection);
         select.setHelp(T_collection_help);
         
@@ -118,7 +119,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         
         Button submit = list.addItem().addButton("submit");
         submit.setValue(T_submit_next);
-     }
+    }
     
     /** 
      * Each submission step must define its own information to be reviewed

@@ -133,7 +133,7 @@ public class Curator
      * Assigns invocation mode.
      * 
      * @param mode one of INTERACTIVE, BATCH, ANY
-     * @return
+     * @return the Curator instance.
      */
     public Curator setInvoked(Invoked mode)
     {

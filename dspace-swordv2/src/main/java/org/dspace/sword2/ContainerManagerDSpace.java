@@ -10,11 +10,11 @@ package org.dspace.sword2;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.InProgressSubmission;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.workflow.WorkflowItem;
 import org.swordapp.server.AuthCredentials;
 import org.swordapp.server.ContainerManager;
 import org.swordapp.server.Deposit;
@@ -790,7 +790,7 @@ public class ContainerManagerDSpace extends DSpaceSwordAPI implements ContainerM
 			}
 			else if (wft.isItemInWorkflow(context, item))
 			{
-				WorkflowItem wfi = wft.getWorkflowItem(context, item);
+				InProgressSubmission wfi = wft.getWorkflowItem(context, item);
 				wfi.deleteWrapper();
 			}
 

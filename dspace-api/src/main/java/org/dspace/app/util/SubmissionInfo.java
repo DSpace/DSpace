@@ -31,7 +31,7 @@ import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
  * @author Robert Tansley
  * @version $Revision$
  */
-public class SubmissionInfo
+public class SubmissionInfo extends HashMap
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(SubmissionInfo.class);

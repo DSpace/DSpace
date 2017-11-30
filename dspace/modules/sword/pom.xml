@@ -3,35 +3,33 @@
    <groupId>org.dspace.modules</groupId>
    <artifactId>sword</artifactId>
    <packaging>war</packaging>
-   <name>DSpace SWORD :: Web Application</name>
+   <name>DSpace SWORD :: Local Customizations</name>
    <description>
-      DSpace SWORD Deposit Service Provider Web Application
+      This project allows you to overlay your own local SWORD customizations
+      on top of the default SWORD web application provided with DSpace.
    </description>
-   <url>http://swordapp.org/</url>
 
    <!--
       A Parent POM that Maven inherits DSpace Default
-      POM atrributes from.
+      POM attributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.8.2</version>
+      <version>3.0</version>
       <relativePath>..</relativePath>
    </parent>
 
-   <!--
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
-   </scm>
+   <properties>
+       <!-- This is the path to the root [dspace-src] directory. -->
+       <root.basedir>${basedir}/../../..</root.basedir>
+   </properties>
 
    <build>
+       <filters>
+           <!-- Filter using the properties file defined by dspace-parent POM -->
+           <filter>${filters.file}</filter>
+       </filters>
       <plugins>
 
          <plugin>
@@ -60,27 +58,6 @@
    </build>
 
    <profiles>
-      <!--
-         when activated a dspace.config configuration
-         file location passed on the commandline
-         (-Ddspace.config=...) can be passed through
-         to be used as a filter source by projects for
-         tasks such as updating the ${dspace.dir} in
-         web.xml etc.
-      -->
-      <profile>
-         <id>dspace-config</id>
-         <activation>
-            <property>
-               <name>dspace.config</name>
-            </property>
-         </activation>
-         <build>
-            <filters>
-               <filter>${dspace.config}</filter>
-            </filters>
-         </build>
-      </profile>
       <profile>
          <id>oracle-support</id>
          <activation>
@@ -96,40 +73,27 @@
             </dependency>
          </dependencies>
       </profile>
-      <profile>
-         <id>postgres-support</id>
-         <activation>
-            <property>
-               <name>!db.name</name>
-            </property>
-         </activation>
-         <dependencies>
-            <dependency>
-               <groupId>postgresql</groupId>
-               <artifactId>postgresql</artifactId>
-            </dependency>
-         </dependencies>
-      </profile>
    </profiles>
 
    <dependencies>
       <dependency>
+         <groupId>org.dspace.modules</groupId>
+         <artifactId>additions</artifactId>
+      </dependency>
+      <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-sword-webapp</artifactId>
+         <artifactId>dspace-sword</artifactId>
          <type>war</type>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-sword-api</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-discovery-provider</artifactId>
+         <artifactId>dspace-sword</artifactId>
+          <type>jar</type>
+          <classifier>classes</classifier>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
-         <version>2.3</version>
          <scope>provided</scope>
       </dependency>
    </dependencies>

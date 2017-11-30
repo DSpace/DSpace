@@ -25,7 +25,6 @@ import org.dspace.eperson.Group;
  * Class representing a line in an input form.
  * 
  * @author Brian S. Hughes, based on work by Jenny Toves, OCLC
- * @version
  */
 public class DCInput
 {
@@ -73,11 +72,10 @@ public class DCInput
 
     /** is the entry closed to vocabulary terms? */
     private boolean closedVocabulary = false;
-
-    /* SEDICI-BEGIN */
     /** allowed document types */
     private List<String> typeBind = null;
     
+    /* SEDICI-BEGIN */
     /** indicates the opposite of types */
 	private boolean negateTypeBind = false;
 
@@ -153,24 +151,25 @@ public class DCInput
         String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
                             || "yes".equalsIgnoreCase(closedVocabularyStr);
-        /* SEDICI-BEGIN */
+        
         // parsing of the <type-bind> element (using the colon as split separator)
         typeBind = new ArrayList<String>();
         String typeBindDef = fieldMap.get("type-bind");
         if(typeBindDef != null && typeBindDef.trim().length() > 0) {
-        	
+	 	/* SEDICI-BEGIN */
         	if(typeBindDef.startsWith("!")){
         		//Se esta negando todo el type-bind
         		negateTypeBind = true;
         		typeBindDef = typeBindDef.substring(1);
         	}
-        	
+        	/* SEDICI-END */
         	String[] types = typeBindDef.split(",");
         	for(String type : types) {
         		typeBind.add( type.trim() );
         	}
         }
         
+	 /* SEDICI-BEGIN */
         // is i18nable ?
         String i18nableStr = fieldMap.get("i18n");
         i18nable = "true".equalsIgnoreCase(i18nableStr)
@@ -463,22 +462,21 @@ public class DCInput
 		return closedVocabulary;
 	}
 
-        /* SEDICI-BEGIN */
 	/**
-	 * Decides if this field is valid for the document type. It verifies if this field is used for one or more types.
+	 * Decides if this field is valid for the document type
 	 * @param typeName Document type name
 	 * @return true when there is no type restriction or typeName is allowed
 	 */
 	public boolean isAllowedFor(String typeName) {
-		if(typeBind.isEmpty()) 
-            return true;
+		if(typeBind.size() == 0)
+			return true;
 		else if (negateTypeBind)
 			return !typeBind.contains(typeName);
 		else
 			return typeBind.contains(typeName);
 	}
 	
-	
+        /* SEDICI-BEGIN */
 	/**
 	 * Returns true if this field has a group-based mandatory restriction
 	 * @return
@@ -550,4 +548,5 @@ public class DCInput
     }
 	
     /* SEDICI-END */
+
 }

@@ -86,12 +86,11 @@ public class SwordAuthenticator
 	}
 
 	/**
-	 * Authenticate the given service document request.  This extracts the appropriate
-	 * information from the request and forwards to the appropriate authentication
-	 * method
+	 * Authenticate the given service document request.  This extracts the
+	 * appropriate information from the request and forwards to the
+	 * appropriate authentication method.
 	 *
 	 * @param auth
-	 * @return
 	 * @throws DSpaceSwordException
 	 * @throws SwordError
 	 * @throws SwordAuthException
@@ -470,7 +469,6 @@ public class SwordAuthenticator
 	 * or one of its sub groups?
 	 *
 	 * @param group
-	 * @return
 	 */
 	public boolean isUserInGroup(SwordContext swordContext, Group group)
 	{
@@ -484,10 +482,9 @@ public class SwordAuthenticator
 
 	/**
 	 * Is the onBehalfOf user a member of the given group or
-	 * one of its sub groups
+	 * one of its sub groups?
 	 *
 	 * @param group
-	 * @return
 	 */
 	public boolean isOnBehalfOfInGroup(SwordContext swordContext, Group group)
 	{
@@ -920,7 +917,7 @@ public class SwordAuthenticator
 
 	/**
 	 * Can the current SWORD Context permit deposit into the given
-	 * collection in the given DSpace Context
+	 * collection in the given DSpace Context?
 	 *
 	 * IF: the authenticated user is an administrator
 	 *   AND:
@@ -935,7 +932,6 @@ public class SwordAuthenticator
 	 *
 	 * @param swordContext
 	 * @param collection
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public boolean canSubmitTo(SwordContext swordContext, org.dspace.content.Collection collection)
@@ -1100,14 +1096,13 @@ public class SwordAuthenticator
 	}
 
 	/**
-	 * Can the given context submit to the specified dspace object.
+	 * Can the given context submit to the specified DSpace object?
 	 *
-	 * This forwards to the individual methods for different object types; see
-	 * their documentation for details of the conditions.
+	 * This forwards to the individual methods for different object types;
+	 * see their documentation for details of the conditions.
 	 *
 	 * @param context
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public boolean canSubmitTo(SwordContext context, DSpaceObject dso)

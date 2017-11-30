@@ -608,7 +608,6 @@ public class Packager
      * @param dso DSpace Object to disseminate as a package
      * @param pkgParams Parameters to pass to individual packager instances
      * @param outputFile File where final package should be saved
-     * @param identifier identifier of main DSpace object to disseminate
      * @throws IOException
      * @throws SQLException
      * @throws FileNotFoundException
@@ -616,7 +615,9 @@ public class Packager
      * @throws CrosswalkException
      * @throws PackageException
      */
-    protected void disseminate(Context context, PackageDisseminator dip, DSpaceObject dso, PackageParameters pkgParams, String outputFile)
+    protected void disseminate(Context context, PackageDisseminator dip,
+			       DSpaceObject dso, PackageParameters pkgParams,
+			       String outputFile)
             throws IOException, SQLException, FileNotFoundException, AuthorizeException, CrosswalkException, PackageException
     {
         // initialize output file

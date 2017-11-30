@@ -11,12 +11,20 @@ import com.sun.syndication.feed.module.opensearch.OpenSearchModule;
 import com.sun.syndication.feed.module.opensearch.entity.OSQuery;
 import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
 import com.sun.syndication.io.FeedException;
-import org.apache.log4j.Logger;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+
+import org.w3c.dom.Document;
+
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -161,20 +169,20 @@ public class OpenSearch
     		                          	  DSpaceObject scope, DSpaceObject[] results,
     		                          	  Map<String, String> labels) throws IOException
     {
-            try
-            {
+        try
+        {
             return getResults(format, query, totalResults, start, pageSize, scope, results, labels).outputString();
-            }
+        }
         catch (FeedException e)
-            {
+        {
             log.error(e.toString(), e);
             	throw new IOException("Unable to generate feed", e);
-            }
         }
+    }
     
     /**
      * Returns a formatted set of search results as a document
-     *
+     * 
      * @param format results format - html, rss or atom
      * @param query - the search query
      * @param totalResults - the hit count
@@ -190,18 +198,17 @@ public class OpenSearch
     		                          DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
                                       throws IOException
     {
-        	try
-        	{
+        try
+        {
             return getResults(format, query, totalResults, start, pageSize, scope, results, labels).outputW3CDom();
-        	}
+        }
         catch (FeedException e)
-        	{
+        {
             log.error(e.toString(), e);
             throw new IOException("Unable to generate feed", e);
-        	}
-    
         }
-    
+    }
+
     private static SyndicationFeed getResults(String format, String query, int totalResults, int start, int pageSize,
                                           DSpaceObject scope, DSpaceObject[] results, Map<String, String> labels)
     {
@@ -231,7 +238,7 @@ public class OpenSearch
      * @return module
      */
     private static OpenSearchModule openSearchMarkup(String query, int totalResults, int start, int pageSize)
-    { 
+    {
     	OpenSearchModule osMod = new OpenSearchModuleImpl();
     	osMod.setTotalResults(totalResults);
     	osMod.setStartIndex(start);
@@ -241,15 +248,15 @@ public class OpenSearch
         try
         {
             osq.setSearchTerms(URLEncoder.encode(query, "UTF-8"));
-        	}
+        }
         catch(UnsupportedEncodingException e)
-        	{
+        {
             log.error(e);
-        	}
+        }
         osq.setStartPage(1 + (start / pageSize));
         osMod.addQuery(osq);
         return osMod;
-        	}
+    }
     
     /**
      * Returns as a document the OpenSearch service document

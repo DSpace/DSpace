@@ -2,9 +2,8 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace</groupId>
    <artifactId>dspace-xmlui</artifactId>
-   <packaging>pom</packaging>
+   <packaging>war</packaging>
    <name>DSpace XML-UI (Manakin)</name>
-   <url>http://projects.dspace.org/dspace-xmlui</url>
    <description>
       DSpace web-based user interface based upon Apache Cocoon.
    </description>
@@ -12,25 +11,224 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>1.8.2</version>
+      <version>3.0</version>
       <relativePath>..</relativePath>
    </parent>
 
-      <!-- 
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
-   </scm>
-   
-   <modules>
-      <module>dspace-xmlui-wing</module>
-      <module>dspace-xmlui-api</module>
-      <module>dspace-xmlui-webapp</module>
-   </modules>
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
+
+    <build>
+        <filters>
+            <!-- Filter using the properties file defined by dspace-parent POM -->
+            <filter>${filters.file}</filter>
+        </filters>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
+                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>${basedir}/src/main/webapp</directory>
+                            <includes>
+                                <include>WEB-INF/web.xml</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <!--Exclude license check for XMLUI files which don't need it-->
+                    <excludes>
+                        <exclude>**/META-INF/**</exclude>
+                        <exclude>**/robots.txt</exclude>
+                        <exclude>**/readme*</exclude>
+                        <exclude>**/*.LICENSE</exclude>
+                        <exclude>**/cocoon/**</exclude>
+                        <exclude>**/scriptaculous/**</exclude>
+                        <exclude>**/jquery*</exclude>
+                        <exclude>**/modernizr*</exclude>
+                        <exclude>**/DD_belated*</exclude>
+                        <exclude>**/detectmobile*</exclude>
+                        <exclude>**/sc-mobile*</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>oracle-support</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+        </dependency>
+
+        <!-- Custom build DSpace cocoon -->
+        <dependency>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cocoon</groupId>
+            <artifactId>cocoon-core</artifactId>
+            <version>2.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.sf.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.cocoon</groupId>
+            <artifactId>cocoon-template-impl</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cocoon</groupId>
+            <artifactId>cocoon-flowscript-impl</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.cocoon</groupId>
+            <artifactId>cocoon-servlet-service-components</artifactId>
+            <version>1.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.cocoon</groupId>
+                    <artifactId>cocoon-servlet-service-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace.dependencies.cocoon</groupId>
+            <artifactId>dspace-cocoon-servlet-service-impl</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+            <version>1.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.swordapp</groupId>
+            <artifactId>sword-common</artifactId>
+        </dependency>
+
+        <!-- Explicitly Specify Latest Version of Spring -->
+        <dependency>
+            <artifactId>spring-core</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-beans</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-aop</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-context</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-tx</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-jdbc</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-web</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-webmvc</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yahoo.platform.yui</groupId>
+            <artifactId>yuicompressor</artifactId>
+            <version>2.3.6</version>
+        </dependency>
+        <!-- Needed for Form Validation -->
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <!--  Gson: Java to Json conversion -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.2.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
 
 </project>

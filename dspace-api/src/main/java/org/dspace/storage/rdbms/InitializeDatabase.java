@@ -13,9 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.IndexBrowse;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.utils.DSpace;
 
 /**
  * Command-line executed class for initializing the DSpace database. This should
@@ -39,46 +37,17 @@ public class InitializeDatabase
             System.exit(1);
         }
 
-        ConfigurationManager.loadConfig(null);
         log.info("Initializing Database");
 
         try
         {
             if("clean-database.sql".equals(argv[0]))
             {
-                try
-                {
-                    IndexBrowse browse = new IndexBrowse();
-                    browse.setDelete(true);
-                    browse.setExecute(true);
-                    browse.clearDatabase();
-                }
-                catch (BrowseException e)
-                {
-                    log.error(e.getMessage(),e);
-                    throw new IllegalStateException(e.getMessage(),e);
-                }
-                
-                DatabaseManager.loadSql(getScript(argv[0]));
-                
+               DatabaseManager.loadSql(getScript(argv[0]));
             }
             else
             {
-                
-                DatabaseManager.loadSql(getScript(argv[0]));
-                
-                try
-                {
-                    IndexBrowse browse = new IndexBrowse();
-                    browse.setRebuild(true);
-                    browse.setExecute(true);
-                    browse.initBrowse();
-                }
-                catch (BrowseException e)
-                {
-                    log.error(e.getMessage(),e);
-                    throw new IllegalStateException(e.getMessage(),e);
-                }
+               DatabaseManager.loadSql(getScript(argv[0]));
             }
             
             System.exit(0);
@@ -98,7 +67,8 @@ public class InitializeDatabase
      */
     private static FileReader getScript(String name) throws FileNotFoundException, IOException
     {
-        String dbName = ConfigurationManager.getProperty("db.name");
+        String dbName = new DSpace().getConfigurationService().getProperty("db.name") ;
+
         File myFile = null;
         
         if (dbName != null)

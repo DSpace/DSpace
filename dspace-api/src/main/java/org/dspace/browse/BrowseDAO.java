@@ -386,4 +386,8 @@ public interface BrowseDAO
     public void setAuthorityValue(String value);
 
     public String getAuthorityValue();
+    
+    public boolean isEnableBrowseFrequencies();
+
+	public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies);
 }

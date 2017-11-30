@@ -91,7 +91,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * is a unique identifier from the IdP that identifies a particular user. The
 	 * NetID can be of almost any form such as a unique integer, string, or with
 	 * Shibboleth 2.0 you can use "targeted ids". You will need to coordinate with
-	 * your shibboleth federation or identity provider. There are three ways to
+	 * your Shibboleth federation or identity provider. There are three ways to
 	 * supply identity information to DSpace:
 	 * 
 	 * 1) NetID from Shibboleth Header (best)
@@ -117,14 +117,14 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * 
 	 * If you are currently using Email based authentication (either 1 or 2) and
 	 * want to upgrade to NetID based authentication then there is an easy path.
-	 * Simply enable shibboleth to pass the NetID attribute and set the netid-header
+	 * Simply enable Shibboleth to pass the NetID attribute and set the netid-header
 	 * below to the correct value. When a user attempts to log in to DSpace first
 	 * DSpace will look for an EPerson with the passed NetID, however when this
 	 * fails DSpace will fall back to email based authentication. Then DSpace will
-	 * update the user's EPerson account record to set their netted so all future
-	 * authentications for this user will be based upon netted. One thing to note
+	 * update the user's EPerson account record to set their netid so all future
+	 * authentications for this user will be based upon netid. One thing to note
 	 * is that DSpace will prevent an account from switching NetIDs. If an account
-	 * all ready has a NetID set and then they try and authenticate with a
+	 * already has a NetID set and then they try and authenticate with a
 	 * different NetID the authentication will fail. 
 	 * 
 	 * @param context
@@ -159,17 +159,17 @@ public class ShibAuthentication implements AuthenticationMethod
 	public int authenticate(Context context, String username, String password,
 			String realm, HttpServletRequest request) throws SQLException {
 
-		// Check if sword compatability is allowed, and if so see if we can
-		// authenticate based upon a username and password. This is really helpfull
-		// if your repo uses shibboleth but you want some accounts to be able use 
-		// sword. This allows this compatability without installing the password-based
+		// Check if sword compatibility is allowed, and if so see if we can
+		// authenticate based upon a username and password. This is really helpful
+		// if your repo uses Shibboleth but you want some accounts to be able use 
+		// sword. This allows this compatibility without installing the password-based
 		// authentication method which has side effects such as allowing users to login
 		// with a username and password from the webui.
-		boolean swordCompatability = ConfigurationManager.getBooleanProperty("authentication-shibboleth","sword.compatability", true);
-		if ( swordCompatability &&
+		boolean swordCompatibility = ConfigurationManager.getBooleanProperty("authentication-shibboleth","sword.compatibility", true);
+		if ( swordCompatibility &&
 				username != null && username.length() > 0 &&
 				password != null && password.length() > 0 ) {
-			return swordCompatability(context, username, password, request);
+			return swordCompatibility(context, username, password, request);
 		}
 		
 		if (request == null) {
@@ -185,7 +185,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		if (log.isDebugEnabled()) {
 			log.debug("Starting Shibboleth Authentication");
 
-			String message = "Recieved the following headers:\n";
+			String message = "Received the following headers:\n";
 			Enumeration<String> headerNames = request.getHeaderNames();
 			while (headerNames.hasMoreElements()) {
 				String headerName = headerNames.nextElement();
@@ -247,7 +247,7 @@ public class ShibAuthentication implements AuthenticationMethod
      * the pre-defined DSpace group, so if the user loses their affiliation then the
      * next time they login they will no longer be in the group.
      * 
-     * Depending upon the shibboleth attributed use in the role-header it may be
+     * Depending upon the shibboleth attributed use in the role-header, it may be
      * scoped. Scoped is shibboleth terminology for identifying where an attribute
      * originated from. For example a students affiliation may be encoded as
      * "student@tamu.edu". The part after the @ sign is the scope, and the preceding
@@ -275,14 +275,14 @@ public class ShibAuthentication implements AuthenticationMethod
 	public int[] getSpecialGroups(Context context, HttpServletRequest request)
 	{
 		try {
-			// User has not successfully authenticated via shibboleth.
+			// User has not successfuly authenticated via shibboleth.
 			if ( request == null || 
 					context.getCurrentUser() == null || 
 					request.getSession().getAttribute("shib.authenticated") == null ) {
 				return new int[0];
 			}
 
-			// If we have all ready calculated the special groups then return them.
+			// If we have already calculated the special groups then return them.
 			if (request.getSession().getAttribute("shib.specialgroup") != null)
 			{
 				log.debug("Returning cached special groups.");
@@ -310,11 +310,11 @@ public class ShibAuthentication implements AuthenticationMethod
 				log.debug("Found Shibboleth role header: '"+roleHeader+"' = '"+affiliations+"'");
 			}
 
-			// Loop through each affilition
+			// Loop through each affiliation
 			Set<Integer> groups = new HashSet<Integer>();
 			if (affiliations != null) {
 				for ( String affiliation : affiliations) {
-					// If we ignore the affilation's scope then strip the scope if it exists.
+					// If we ignore the affiliation's scope then strip the scope if it exists.
 					if (ignoreScope) {
 						int index = affiliation.indexOf('@');
 						if (index != -1) {
@@ -355,8 +355,8 @@ public class ShibAuthentication implements AuthenticationMethod
 							log.error("Exception thrown while trying to lookup affiliation role for group name: '"+names[i].trim()+"'",sqle);
 						}
 					} // for each groupNames
-				} // foreach affilations
-			} // if affilaitons
+				} // foreach affiliations
+			} // if affiliations
 
 
 			log.info("Added current EPerson to special groups: "+groups);
@@ -538,8 +538,8 @@ public class ShibAuthentication implements AuthenticationMethod
 
 	/**
 	 * Identify an existing EPerson based upon the shibboleth attributes provided on
-	 * the request object. There are three case underwhich this can occure each in
-	 * a fall back position to the previous method.
+	 * the request object. There are three cases where this can occurr, each as
+	 * a fallback for the previous method.
 	 * 
 	 * 1) NetID from Shibboleth Header (best)
 	 *    The NetID-based method is superior because users may change their email
@@ -548,7 +548,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * 
 	 * 2) Email address from Shibboleth Header (okay)
 	 *    In the case where a NetID header is not available or not found DSpace
-	 *    will fall back to identifying a user based-upon their email address. 
+	 *    will fall back to identifying a user based upon their email address. 
 	 *    
 	 * 3) Tomcat's Remote User (worst)
 	 *    In the event that neither Shibboleth headers are found then as a last
@@ -650,7 +650,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * 
 	 * In order to create a new eperson object there is a minimal set of metadata
 	 * required: Email, First Name, and Last Name. If we don't have access to these
-	 * three peices of information then we will be unable to create a new eperson
+	 * three pieces of information then we will be unable to create a new eperson
 	 * object, such as the case when Tomcat's Remote User field is used to identify
 	 * a particular user.
 	 * 
@@ -688,7 +688,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			return null; // TODO should this throw an exception?
 		}
 
-		// Truncate values parameters that are too big.
+		// Truncate values of parameters that are too big.
 		if (fname.length() > NAME_MAX_SIZE) {
 			log.warn("Truncating eperson's first name because it is longer than "+NAME_MAX_SIZE+": '"+fname+"'");
 			fname = fname.substring(0,NAME_MAX_SIZE);
@@ -736,9 +736,9 @@ public class ShibAuthentication implements AuthenticationMethod
 
 
 	/**
-	 * After sucessfully authenticate a user this method will update the users attributes. The
+	 * After we successfully authenticated a user, this method will update the user's attributes. The
 	 * user's email, name, or other attribute may have been changed since the last time they
-	 * logged into DSpace. This method will update the database with their most recient information.
+	 * logged into DSpace. This method will update the database with their most recent information.
 	 * 
 	 * This method handles the basic DSpace metadata (email, first name, last name) along with
 	 * additional metadata set using the setMetadata() methods on the eperson object. The
@@ -761,7 +761,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		String fname = findSingleHeader(request,fnameHeader);
 		String lname = findSingleHeader(request,lnameHeader);
 
-		// Truncate values parameters that are too big.
+		// Truncate values of parameters that are too big.
 		if (fname.length() > NAME_MAX_SIZE) {
 			log.warn("Truncating eperson's first name because it is longer than "+NAME_MAX_SIZE+": '"+fname+"'");
 			fname = fname.substring(0,NAME_MAX_SIZE);
@@ -776,7 +776,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		// 1) Update the minimum metadata
 		if (netid != null && eperson.getNetid() == null)
 			// Only update the netid if none has been previously set. This can occur when a repo switches 
-			// to netid based authentication. The current users do not have netids and fall back to email based
+			// to netid based authentication. The current users do not have netids and fall back to email-based
 			// identification but once they login we update their record and lock the account to a particular netid.
 			eperson.setNetid(netid);
 		if (email != null)
@@ -822,12 +822,12 @@ public class ShibAuthentication implements AuthenticationMethod
 	}
 
 	/**
-	 * Provide password-based authentication to enable sword compatability. 
+	 * Provide password-based authentication to enable sword compatibility. 
 	 * 
-	 * Sword compatability will allow this authentication method to work when using
-	 * sword. Sort relies on username and password based authentication and is
+	 * Sword compatibility will allow this authentication method to work when using
+	 * sword. Sword relies on username and password based authentication and is
 	 * entirely incapable of supporting shibboleth. This option allows you to
-	 * authenticate username and passwords for sword sessions with out adding
+	 * authenticate username and passwords for sword sessions without adding
 	 * another authentication method onto the stack. You will need to ensure that
 	 * a user has a password. One way to do that is to create the user via the
 	 * create-administrator command line command and then edit their permissions.
@@ -838,11 +838,11 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * @param request The HTTP Request
 	 * @return A valid DSpace Authentication Method status code.
 	 */
-	protected int swordCompatability(Context context, String username, String password, HttpServletRequest request) throws SQLException {
+	protected int swordCompatibility(Context context, String username, String password, HttpServletRequest request) throws SQLException {
 
 		EPerson eperson = null;
 
-		log.debug("Shibboleth Sword compatability activated.");
+		log.debug("Shibboleth Sword compatibility activated.");
 		try {
 			eperson = EPerson.findByEmail(context, username.toLowerCase());
 		} catch (AuthorizeException ae) {
@@ -867,7 +867,7 @@ public class ShibAuthentication implements AuthenticationMethod
 			// Password matched
 			AuthenticationManager.initEPerson(context, request, eperson);
 			context.setCurrentUser(eperson);
-			log.info(eperson.getEmail()+" has been authenticated via shibboleth using password-based sword compatability mode.");
+			log.info(eperson.getEmail()+" has been authenticated via shibboleth using password-based sword compatibility mode.");
 			return SUCCESS;
 		} else {
 			// Passsword failure
@@ -884,7 +884,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * 
 	 * During initalization the mapping of additional eperson metadata will be loaded from the DSpace.cfg
 	 * and cached. While loading the metadata mapping this method will check the EPerson object to see
-	 * if it suports the metadata field. If the field is not supported and autocreate is turned on then
+	 * if it supports the metadata field. If the field is not supported and autocreate is turned on then
 	 * the field will be automatically created.
 	 * 
 	 * It is safe to call this methods multiple times.
@@ -936,7 +936,7 @@ public class ShibAuthentication implements AuthenticationMethod
 				log.debug("Loading additional eperson metadata mapping for: '"+header+"' = '"+name+"'");
 				map.put(header, name);
 			} else {
-				// The field dosn't exist, and we can't use it.
+				// The field doesn't exist, and we can't use it.
 				log.error("Skipping the additional eperson metadata mapping for: '"+header+"' = '"+name+"' because the field is not supported by the current configuration.");
 			}
 		} // foreach metadataStringList
@@ -947,9 +947,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	}
 
 	/**
-	 * Check the EPerson table deffinition to see if the metadata field name is supported. It
+	 * Check the EPerson table definition to see if the metadata field name is supported. It
 	 * checks for three things 1) that the field exists and 2) that the field is of the correct
-	 * type, varchar, and 3) that the field's size is suffcient.
+	 * type, varchar, and 3) that the field's size is sufficient.
 	 * 
 	 * If either of these checks fail then false is returned.
 	 *
@@ -1019,7 +1019,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * metadata field. All additional fields are created with type varchar( METADATA_MAX_SIZE )
 	 * 
 	 * @param metadataName The name of the new metadata field.
-	 * @return True if successfull, otherwise false.
+	 * @return True if successful, otherwise false.
 	 */
 	private static synchronized boolean autoCreateEpersonMetadataField(String metadataName) throws SQLException {
 
@@ -1064,7 +1064,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * The header name uses a bit of fuzzy logic, so it will first try case
 	 * sensitive, then it will try lowercase, and finally it will try uppercase.
 	 * 
-	 * This method will not interpret the header value in anyway.
+	 * This method will not interpret the header value in any way.
 	 * 
 	 * 
 	 * @param request The HTTP request to look for headers values on.
@@ -1103,8 +1103,8 @@ public class ShibAuthentication implements AuthenticationMethod
 
 
 		if (value != null) {
-			// If there are multiple values encodded in the shibboleth attribute
-			// they are seperated by a semicolon, and any semicolons in the
+			// If there are multiple values encoded in the shibboleth attribute
+			// they are separated by a semicolon, and any semicolons in the
 			// attribute are escaped with a backslash. For this case we are just 
 			// looking for the first attribute so we scan the value until we find 
 			// the first unescaped semicolon and chop off everything else.
@@ -1127,7 +1127,7 @@ public class ShibAuthentication implements AuthenticationMethod
 	/**
 	 * Find a particular Shibboleth header value and return the all values.
 	 * The header name uses a bit of fuzzy logic, so it will first try case
-	 * sensitive, then it will try lowercase, and finaly it will try uppercase.
+	 * sensitive, then it will try lowercase, and finally it will try uppercase.
 	 * 
 	 * Shibboleth attributes may contain multiple values separated by a
 	 * semicolon and semicolons are escaped with a backslash. This method will
@@ -1145,7 +1145,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		if (values == null)
 			return null;
 
-		// Shibboleth attributes are seperated by semicolons (and semicolons are 
+		// Shibboleth attributes are separated by semicolons (and semicolons are 
 		// escaped with a backslash). So here we will scan through the string and 
 		// split on any unescaped semicolons.
 		List<String> valueList = new ArrayList<String>();
@@ -1185,33 +1185,4 @@ public class ShibAuthentication implements AuthenticationMethod
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

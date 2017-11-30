@@ -1,0 +1,3 @@
+DSpace does NOT support the use of h2 in production.  This directory is provided
+solely for testing during development.  The test schema is kept here to
+facilitate its maintenance as the production schemata evolve.

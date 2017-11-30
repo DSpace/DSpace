@@ -39,7 +39,7 @@
 				<subfield code="a">dc</subfield>
 			</datafield>
 
-			<xsl:for-each select="//dim:field[@mdschema='dc'][@element='contibutor']">
+			<xsl:for-each select="//dim:field[@mdschema='dc'][@element='contributor']">
 				<datafield tag="720" ind1="0" ind2="0">
 					<subfield code="a">
 						<xsl:value-of select="."/>

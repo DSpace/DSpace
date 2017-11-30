@@ -1,27 +1,16 @@
-
-#Ignoro lo adquirido desde el svn de dspace
-dspace/dspace-tag-files/
-
 ## Ignore the MVN compiled output directories from version tracking
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.next
-release.properties
 
 ## Ignore project files created by Eclipse
 .settings/
 .project
 .classpath
-.tomcatplugin
-
 
 ## Ignore project files created by IntelliJ IDEA
 *.iml
 *.ipr
 *.iws
 .idea/
-overlays/
 
 ## Ignore project files created by NetBeans
 nbproject/private/
@@ -33,13 +22,9 @@ nbactions.xml
 nb-configuration.xml
 META-INF/
 
-## Ignore all *.properties file in root folder, EXCEPT build.properties (the default)
-/*.properties
-!/build.properties
-
-##Mac noise
-.DS_Store
+## Ignore all *.properties file, EXCEPT build.properties (the default)
+*.properties
+!build.properties
 
 ##Omito los datos relativos a la configuración local de dspace
 install/
-#build.properties

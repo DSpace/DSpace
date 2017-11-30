@@ -21,10 +21,13 @@ import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.usage.UsageWorkflowEvent;
+import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.*;
 import org.dspace.xmlworkflow.storedcomponents.*;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
@@ -317,6 +320,9 @@ public class XmlWorkflowManager {
         // record the start of the workflow w/provenance message
         recordStart(wfi.getItem(), firstActionConfig.getProcessingAction());
 
+        //Fire an event !
+        logWorkflowEvent(context, firstStep.getWorkflow().getID(),  null, null, wfi, null, firstStep, firstActionConfig);
+
         //If we don't have a UI activate it
         if(!firstActionConfig.requiresUI()){
             ActionResult outcome = firstActionConfig.getProcessingAction().execute(context, wfi, firstStep, null);
@@ -358,11 +364,13 @@ public class XmlWorkflowManager {
             return null;
         }else
         if (currentOutcome.getType() == ActionResult.TYPE.TYPE_OUTCOME) {
-            //We have completed our action search & retrieve the next action
+            Step nextStep = null;
             WorkflowActionConfig nextActionConfig = null;
-            if(currentOutcome.getResult() == ActionResult.OUTCOME_COMPLETE){
-                nextActionConfig = currentStep.getNextAction(currentActionConfig);
-            }
+            try {
+                //We have completed our action search & retrieve the next action
+                if(currentOutcome.getResult() == ActionResult.OUTCOME_COMPLETE){
+                    nextActionConfig = currentStep.getNextAction(currentActionConfig);
+                }
 
             if (nextActionConfig != null) {
                 nextActionConfig.getProcessingAction().activate(c, wfi);
@@ -377,39 +385,46 @@ public class XmlWorkflowManager {
                     c.restoreAuthSystemState();
                     return null;
                 } else {
-                    ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, currentStep, null);
-                    return processOutcome(c, user, workflow, currentStep, nextActionConfig, newOutcome, wfi, enteredNewStep);
+                    ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
+
+                    //Check if we have a task for this action (might not be the case with automatic steps)
+                    //First add it to our list of finished users, since no more actions remain
+                    WorkflowRequirementsManager.addFinishedUser(c, wfi, user);
+                    c.turnOffAuthorisationSystem();
+                    //Check if our requirements have been met
+                    if((currentStep.isFinished(c, wfi) && currentOutcome.getResult() == ActionResult.OUTCOME_COMPLETE) || currentOutcome.getResult() != ActionResult.OUTCOME_COMPLETE){
+                        //Delete all the table rows containing the users who performed this task
+                        WorkflowRequirementsManager.clearInProgressUsers(c, wfi);
+                        //Remove all the tasks
+                        XmlWorkflowManager.deleteAllTasks(c, wfi);
+
+
+                        nextStep = workflow.getNextStep(c, wfi, currentStep, currentOutcome.getResult());
+
+                        nextActionConfig = processNextStep(c, user, workflow, currentOutcome, wfi, nextStep);
+                        //If we require a user interface return null so that the user is redirected to the "submissions page"
+                        if(nextActionConfig == null || nextActionConfig.requiresUI()){
+                            return null;
+                        }else{
+                            return nextActionConfig;
+                        }
+                    }else{
+                        //We are done with our actions so go to the submissions page but remove action ClaimedAction first
+                        deleteClaimedTask(c, wfi, task);
+                        c.restoreAuthSystemState();
+                        nextStep = currentStep;
+                        nextActionConfig = currentActionConfig;
+                        return null;
+                    }
                 }
-            }else
-            if(enteredNewStep){
-                // If the user finished his/her step, we keep processing until there is a UI step action or no step at all
-                Step nextStep = workflow.getNextStep(c, wfi, currentStep, currentOutcome.getResult());
-                c.turnOffAuthorisationSystem();
-                return processNextStep(c, user, workflow, currentOutcome, wfi, nextStep);
-            } else {
-                //
-                ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
-
-                //Check if we have a task for this action (might not be the case with automatic steps)
-                //First add it to our list of finished users, since no more actions remain
-                WorkflowRequirementsManager.addFinishedUser(c, wfi, user);
-                c.turnOffAuthorisationSystem();
-                //Check if our requirements have been met
-                if((currentStep.isFinished(c, wfi) && currentOutcome.getResult() == ActionResult.OUTCOME_COMPLETE) || currentOutcome.getResult() != ActionResult.OUTCOME_COMPLETE){
-                    //Delete all the table rows containing the users who performed this task
-                    WorkflowRequirementsManager.clearInProgressUsers(c, wfi);
-                    //Remove all the tasks
-                    XmlWorkflowManager.deleteAllTasks(c, wfi);
-
-
-                    Step nextStep = workflow.getNextStep(c, wfi, currentStep, currentOutcome.getResult());
-
-                    return processNextStep(c, user, workflow, currentOutcome, wfi, nextStep);
-                }else{
-                    //We are done with our actions so go to the submissions page but remove action ClaimedAction first
-                    deleteClaimedTask(c, wfi, task);
-                    c.restoreAuthSystemState();
-                    return null;
+            }
+            }catch (Exception e){
+                log.error("error while processing workflow outcome", e);
+                e.printStackTrace();
+            }
+            finally {
+                if((nextStep != null && nextActionConfig != null) || wfi.getItem().isArchived()){
+                    logWorkflowEvent(c, currentStep.getWorkflow().getID(), currentStep.getId(), currentActionConfig.getId(), wfi, user, nextStep, nextActionConfig);
                 }
             }
 
@@ -417,6 +432,51 @@ public class XmlWorkflowManager {
 
         log.error(LogManager.getHeader(c, "Invalid step outcome", "Workflow item id: " + wfi.getID()));
         throw new WorkflowException("Invalid step outcome");
+    }
+
+    protected static void logWorkflowEvent(Context c, String workflowId, String previousStepId, String previousActionConfigId, XmlWorkflowItem wfi, EPerson actor, Step newStep, WorkflowActionConfig newActionConfig) throws SQLException {
+        try {
+            //Fire an event so we can log our action !
+            Item item = wfi.getItem();
+            Collection myCollection = wfi.getCollection();
+            String workflowStepString = null;
+
+            List<EPerson> currentEpersonOwners = new ArrayList<EPerson>();
+            List<Group> currentGroupOwners = new ArrayList<Group>();
+            //These are only null if our item is sent back to the submission
+            if(newStep != null && newActionConfig != null){
+                workflowStepString = workflowId + "." + newStep.getId() + "." + newActionConfig.getId();
+
+                //Retrieve the current owners of the task
+                List<ClaimedTask> claimedTasks = ClaimedTask.find(c, wfi.getID(), newStep.getId());
+                List<PoolTask> pooledTasks = PoolTask.find(c, wfi);
+                for (PoolTask poolTask : pooledTasks){
+                    if(poolTask.getEpersonID() != -1){
+                        currentEpersonOwners.add(EPerson.find(c, poolTask.getEpersonID()));
+                    }else{
+                        currentGroupOwners.add(Group.find(c, poolTask.getGroupID()));
+                    }
+                }
+                for (ClaimedTask claimedTask : claimedTasks) {
+                    currentEpersonOwners.add(EPerson.find(c, claimedTask.getOwnerID()));
+                }
+            }
+            String previousWorkflowStepString = null;
+            if(previousStepId != null && previousActionConfigId != null){
+                previousWorkflowStepString = workflowId + "." + previousStepId + "." + previousActionConfigId;
+            }
+
+            //Fire our usage event !
+            UsageWorkflowEvent usageWorkflowEvent = new UsageWorkflowEvent(c, item, wfi, workflowStepString, previousWorkflowStepString, myCollection, actor);
+
+            usageWorkflowEvent.setEpersonOwners(currentEpersonOwners.toArray(new EPerson[currentEpersonOwners.size()]));
+            usageWorkflowEvent.setGroupOwners(currentGroupOwners.toArray(new Group[currentGroupOwners.size()]));
+
+            new DSpace().getEventService().fireEvent(usageWorkflowEvent);
+        } catch (Exception e) {
+            //Catch all errors we do not want our workflow to crash because the logging threw an exception
+            log.error(LogManager.getHeader(c, "Error while logging workflow event", "Workflow Item: " + wfi.getID()), e);
+        }
     }
 
     private static WorkflowActionConfig processNextStep(Context c, EPerson user, Workflow workflow, ActionResult currentOutcome, XmlWorkflowItem wfi, Step nextStep) throws SQLException, IOException, AuthorizeException, WorkflowException, WorkflowConfigurationException {
@@ -429,7 +489,7 @@ public class XmlWorkflowManager {
             if (nextActionConfig.requiresUI()) {
                 //Since a new step has been started, stop executing actions once one with a user interface is present.
                 c.restoreAuthSystemState();
-                return null;
+                return nextActionConfig;
             } else {
                 ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, nextStep, null);
                 c.restoreAuthSystemState();
@@ -498,7 +558,7 @@ public class XmlWorkflowManager {
         } else { 
         	// Codigo original antes de agregar este IF
         	
-        	InstallItem.installItem(c, wfi);
+        InstallItem.installItem(c, wfi);
 
 	        //Notify only when it is needed
 	        if(shouldSendAlert(c, wfi, wfi.getSubmitter()))
@@ -787,6 +847,18 @@ public class XmlWorkflowManager {
             String rejection_message) throws SQLException, AuthorizeException,
             IOException
     {
+
+        String workflowID = null;
+        String currentStepId = null;
+        String currentActionConfigId = null;
+        ClaimedTask claimedTask = ClaimedTask.findByWorkflowIdAndEPerson(c, wi.getID(), e.getID());
+        if(claimedTask != null){
+            //Log it
+            workflowID = claimedTask.getWorkflowID();
+            currentStepId = claimedTask.getStepID();
+            currentActionConfigId = claimedTask.getActionID();
+        }
+
         // authorize a DSpaceActions.REJECT
         // stop workflow
         deleteAllTasks(c, wi);
@@ -830,6 +902,42 @@ public class XmlWorkflowManager {
         notifyOfReject(c, wi, e, rejection_message);
         log.info(LogManager.getHeader(c, "reject_workflow", "workflow_item_id="
                 + wi.getID() + "item_id=" + wi.getItem().getID()
+                + "collection_id=" + wi.getCollection().getID() + "eperson_id="
+                + e.getID()));
+
+        logWorkflowEvent(c, workflowID, currentStepId, currentActionConfigId, wi, e, null, null);
+
+        c.restoreAuthSystemState();
+        return wsi;
+    }
+
+    public static WorkspaceItem abort(Context c, XmlWorkflowItem wi, EPerson e) throws AuthorizeException, SQLException, IOException {
+        if (!AuthorizeManager.isAdmin(c))
+        {
+            throw new AuthorizeException(
+                    "You must be an admin to abort a workflow");
+        }
+
+        deleteAllTasks(c, wi);
+
+        c.turnOffAuthorisationSystem();
+        //Also clear all info for this step
+        WorkflowRequirementsManager.clearInProgressUsers(c, wi);
+
+        // Remove (if any) the workflowItemroles for this item
+        WorkflowItemRole[] workflowItemRoles = WorkflowItemRole.findAllForItem(c, wi.getID());
+        for (WorkflowItemRole workflowItemRole : workflowItemRoles) {
+            workflowItemRole.delete();
+        }
+
+        //Restore permissions for the submitter
+        Item item = wi.getItem();
+        grantUserAllItemPolicies(c, item, item.getSubmitter());
+        // convert into personal workspace
+        WorkspaceItem wsi = returnToWorkspace(c, wi);
+
+        log.info(LogManager.getHeader(c, "abort_workflow", "workflow_item_id="
+                + wi.getID() + "item_id=" + item.getID()
                 + "collection_id=" + wi.getCollection().getID() + "eperson_id="
                 + e.getID()));
 
@@ -1001,4 +1109,5 @@ public class XmlWorkflowManager {
     		return "true".equals( values[0].value );
     	return false;
     }
+
 }

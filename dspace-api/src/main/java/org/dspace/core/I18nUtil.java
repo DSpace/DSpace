@@ -95,7 +95,6 @@ public class I18nUtil
      * return the default Locale for the repository.
      *
      * @param ep
-     * @return
      */
     public static Locale getEPersonLocale(EPerson ep)
     {

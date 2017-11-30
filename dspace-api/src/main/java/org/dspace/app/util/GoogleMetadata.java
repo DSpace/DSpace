@@ -33,6 +33,7 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
+
 import org.jdom.Element;
 
 import ar.edu.unlp.sedici.util.SediciUtils;
@@ -68,9 +69,6 @@ public class GoogleMetadata
     public static final String PUBLISHER = "citation_publisher";
 
     /* SEDICI-BEGIN */
-    // public static final String AUTHORS = "citation_authors";
-    // public static final String DATE = "citation_date";
-
     public static final String AUTHORS = "citation_author";
 
     public static final String DATE = "citation_publication_date";
@@ -616,7 +614,7 @@ public class GoogleMetadata
             for (DCValue v : allMD)
             {
 
-                // De-dup multiple occurances of field names in item
+                // De-dup multiple occurrences of field names in item
                 if (!expandedDC.contains(buildFieldName(v)))
                 {
                     expandedDC.add(buildFieldName(v));
@@ -687,10 +685,9 @@ public class GoogleMetadata
         // ISBN
         addSingleField(ISBN);
 
-        /* SEDICI-BEGIN */
-        //JOURNAL_TITLE 
+        // JOURNAL_TITLE
         addSingleField(JOURNAL_TITLE);
-	/* SEDICI-END */
+
         // VOLUME
         addSingleField(VOLUME);
 
@@ -790,7 +787,6 @@ public class GoogleMetadata
 
     /**
      * Produce meta elements that can easily be put into the head.
-     * @return
      */
     public List<Element> disseminateList()
     {
@@ -1009,15 +1005,14 @@ public class GoogleMetadata
         return metadataMappings.get(TECH_REPORT_INSTITUTION);
     }
 
-	/* SEDICI-BEGIN */
-	/**
-	 * Gets the URL to a PDF using a very basic strategy by assuming that the
-	 * PDF is in the default content bundle, and that the item only has one
-	 * public bitstream and it is a PDF.
-	 * 
-	 * @param item
-	 * @return URL that the PDF can be directly downloaded from
-	 */
+    /**
+     * Gets the URL to a PDF using a very basic strategy by assuming that the PDF
+     * is in the default content bundle, and that the item only has one public bitstream
+     * and it is a PDF.
+     *
+     * @param item
+     * @return URL that the PDF can be directly downloaded from
+     */
 	private String getPDFSimpleUrl(Item item) {
 		Bundle[] contentBundles;
 		try {
@@ -1207,7 +1202,7 @@ public class GoogleMetadata
                 }
                 else
                 {
-                    // Otherwise, add it as the first occurance of this field
+                    // Otherwise, add it as the first occurrence of this field
                     ArrayList<String> newField = new ArrayList<String>();
                     newField.add(parsedPair[1].trim());
                     mdPairs.put(parsedPair[0].trim(), newField);
@@ -1251,5 +1246,4 @@ public class GoogleMetadata
         }
         return false;
     }
-    /* SEDICI-END */
 }

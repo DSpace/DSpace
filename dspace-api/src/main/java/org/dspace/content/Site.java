@@ -96,13 +96,19 @@ public class Site extends DSpaceObject
     }
 
     public void update()
-        throws SQLException, AuthorizeException, IOException
+        throws SQLException, AuthorizeException
     {
     }
 
     public String getName()
     {
         return ConfigurationManager.getProperty("dspace.name");
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+
     }
 
     public String getURL()

@@ -57,10 +57,15 @@ public final class BrowseIndex
 
     /** default order (asc / desc) for this index */
     private String defaultOrder = SortOption.ASCENDING;
+    
+    /** whether to display frequencies or not, in case of a "metadata" browse index*/
+    private boolean displayFrequencies = true;
 
     /** additional 'internal' tables that are always defined */
     private static BrowseIndex itemIndex      = new BrowseIndex("bi_item");
     private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn");
+    private static BrowseIndex privateIndex = new BrowseIndex("bi_private");
+
 
     /**
      * Ensure no one else can create these
@@ -301,6 +306,10 @@ public final class BrowseIndex
 	    return sortOption;
 	}
 	
+	public boolean isDisplayFrequencies() {
+		return displayFrequencies;
+	}
+
 	/**
 	 * Populate the internal array containing the bits of metadata, for
 	 * ease of use later
@@ -476,8 +485,6 @@ public final class BrowseIndex
      * <code>
      * getTableName(false, false, false, false);
      * </code>
-     * 
-     * @return
      */
     public String getTableName()
     {
@@ -485,7 +492,7 @@ public final class BrowseIndex
     }
     
     /**
-     * Get the table name for the given set of circumstances
+     * Get the table name for the given set of circumstances.
      * 
      * This is the same as calling:
      * 
@@ -496,7 +503,6 @@ public final class BrowseIndex
      * @param isDistinct	is this a distinct table
      * @param isCommunity
      * @param isCollection
-     * @return
      * @deprecated 1.5
      */
     public String getTableName(boolean isDistinct, boolean isCommunity, boolean isCollection)
@@ -510,8 +516,6 @@ public final class BrowseIndex
      * <code>
      * getTableName(false, false, false, true);
      * </code>
-     * 
-     * @return
      */
     public String getMapTableName()
     {
@@ -524,8 +528,6 @@ public final class BrowseIndex
      * <code>
      * getTableName(false, false, true, false);
      * </code>
-     *
-     * @return
      */
     public String getDistinctTableName()
     {
@@ -620,8 +622,7 @@ public final class BrowseIndex
     }
     
     /**
-     * Get the field for sorting associated with this index
-     * @return
+     * Get the field for sorting associated with this index.
      * @throws BrowseException
      */
     public String getSortField(boolean isSecondLevel) throws BrowseException
@@ -648,7 +649,6 @@ public final class BrowseIndex
     
     /**
      * @deprecated
-     * @return
      * @throws BrowseException
      */
     public static String[] tables()
@@ -680,6 +680,12 @@ public final class BrowseIndex
         while ( ((definition = ConfigurationManager.getProperty("webui.browse.index." + idx))) != null)
         {
             BrowseIndex bi = new BrowseIndex(definition, idx);
+            
+            //Load the frequency configuration
+            String freqDefinition = ConfigurationManager.getProperty("webui.browse.metadata.show-freq." + idx);
+            if (freqDefinition!=null)
+            	bi.displayFrequencies = Boolean.valueOf(freqDefinition);
+            
             browseIndices.add(bi);
             idx++;
         }
@@ -713,10 +719,9 @@ public final class BrowseIndex
     }
     
     /**
-     * Get the configured browse index that is defined to use this sort option
+     * Get the configured browse index that is defined to use this sort option.
      * 
      * @param so
-     * @return
      * @throws BrowseException
      */
     public static BrowseIndex getBrowseIndex(SortOption so) throws BrowseException
@@ -733,9 +738,7 @@ public final class BrowseIndex
     }
     
     /**
-     * Get the internally defined browse index for archived items
-     * 
-     * @return
+     * Get the internally defined browse index for archived items.
      */
     public static BrowseIndex getItemBrowseIndex()
     {
@@ -743,12 +746,17 @@ public final class BrowseIndex
     }
     
     /**
-     * Get the internally defined browse index for withdrawn items
-     * @return
+     * Get the internally defined browse index for withdrawn items.
      */
     public static BrowseIndex getWithdrawnBrowseIndex()
     {
         return BrowseIndex.withdrawnIndex;
+    }
+
+
+    public static BrowseIndex getPrivateBrowseIndex()
+    {
+        return BrowseIndex.privateIndex;
     }
     
     /**
@@ -784,19 +792,16 @@ public final class BrowseIndex
     }
 
     /**
-     * Does this browse index represent one of the internal item indexes
-     * 
-     * @return
+     * Does this browse index represent one of the internal item indexes?
      */
     public boolean isInternalIndex()
     {
-        return (this == itemIndex || this == withdrawnIndex);
+        return (this == itemIndex || this == withdrawnIndex || this == privateIndex);
     }
 
     /**
-     * Generate a base table name
+     * Generate a base table name.
      * @param number
-     * @return
      */
     private static String makeTableBaseName(int number)
     {

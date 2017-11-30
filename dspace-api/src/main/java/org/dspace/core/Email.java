@@ -130,7 +130,7 @@ public class Email
     /**
      * Create a new email message.
      */
-    Email()
+    public Email()
     {
         arguments = new ArrayList<Object>(50);
         recipients = new ArrayList<String>(50);
@@ -160,7 +160,7 @@ public class Email
      * @param cnt
      *            the content of the message
      */
-    void setContent(String cnt)
+    public void setContent(String cnt)
     {
         content = cnt;
         arguments = new ArrayList<Object>();
@@ -172,7 +172,7 @@ public class Email
      * @param s
      *            the subject of the message
      */
-    void setSubject(String s)
+    public void setSubject(String s)
     {
         subject = s;
     }
@@ -270,7 +270,7 @@ public class Email
             props.put("mail.smtp.auth", "true");
             SMTPAuthenticator smtpAuthenticator = new SMTPAuthenticator(
                     username, password);
-            session = Session.getDefaultInstance(props, smtpAuthenticator);
+            session = Session.getInstance(props, smtpAuthenticator);
         }
         else
         {

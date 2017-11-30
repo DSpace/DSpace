@@ -260,7 +260,7 @@ public class XSLTDisseminationCrosswalk
     }
 
     /**
-     * return true if this crosswalk prefers the list form over an singe
+     * return true if this crosswalk prefers the list form over an single
      * element, otherwise false.
      *
      * @see DisseminationCrosswalk
@@ -380,10 +380,10 @@ public class XSLTDisseminationCrosswalk
      /**
      * Create a new DIM field element with the given attributes.
      *
-     * @param schema The schema the DIM field belongs too.
-     * @param element The element the DIM field belongs too.
-     * @param qualifier The qualifier the DIM field belongs too.
-     * @param language The language the DIM field belongs too.
+     * @param schema The schema the DIM field belongs to.
+     * @param element The element the DIM field belongs to.
+     * @param qualifier The qualifier the DIM field belongs to.
+     * @param language The language the DIM field belongs to.
      * @param value The value of the DIM field.
      * @return A new DIM field element
      */
@@ -395,10 +395,10 @@ public class XSLTDisseminationCrosswalk
     /**
      * Create a new DIM field element with the given attributes.
      *
-     * @param schema The schema the DIM field belongs too.
-     * @param element The element the DIM field belongs too.
-     * @param qualifier The qualifier the DIM field belongs too.
-     * @param language The language the DIM field belongs too.
+     * @param schema The schema the DIM field belongs to.
+     * @param element The element the DIM field belongs to.
+     * @param qualifier The qualifier the DIM field belongs to.
+     * @param language The language the DIM field belongs to.
      * @param value The value of the DIM field.
      * @param authority The authority
      * @param confidence confidence in the authority

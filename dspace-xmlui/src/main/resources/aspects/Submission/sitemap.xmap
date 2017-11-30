@@ -29,6 +29,7 @@
       <map:transformer name="SaveOrRemoveStep" src="org.dspace.app.xmlui.aspect.submission.submit.SaveOrRemoveStep"/>
       <map:transformer name="RemovedStep" src="org.dspace.app.xmlui.aspect.submission.submit.RemovedStep"/>
       <map:transformer name="CompletedStep" src="org.dspace.app.xmlui.aspect.submission.submit.CompletedStep"/>
+      <map:transformer name="ControlledVocabularyTransformer" src="org.dspace.app.xmlui.aspect.submission.ControlledVocabularyTransformer"/>
     </map:transformers>
     
     <map:selectors>
@@ -62,12 +63,12 @@
           <!--
               There are two major flows that are present in the submissions & workflow
               aspects, one for new submissions to the repository, and another for reviewing
-              those submissions in a 3 stage workflow processes. Below are the starting
+              those submissions in a 3-stage workflow processes. Below are the starting
               points and re-entry points for those workflows.
               
               /submit               -> New submissions that have not selected a collection yet.
-              /handle/*/*/submit    -> Submitting a new item to the repository..
-              /handle/*/*/workflow  -> Preforming workflow tasks to review submissions
+              /handle/*/*/submit    -> Submitting a new item to the repository.
+              /handle/*/*/workflow  -> Performing workflow tasks to review submissions.
               -->
           
           <!-- Start a new submission, unscoped -->
@@ -165,7 +166,7 @@
                 This step will ask the user to select a collection they want
                 to submit an item to. It is not part of the 'proper' submission
                 steps in that it is not displayed in the progress list and is
-                often skipped because the user has allready selected a collection.
+                often skipped because the user has already selected a collection.
                 -->
             <map:match pattern="submit/selectCollectionStep">
               <map:transform type="SelectCollectionStep">
@@ -222,7 +223,7 @@
             </map:match>
             
             <!--
-                This step is meurly a confirmation page letting the user
+                This step is merely a confirmation page letting the user
                 know that they have completed submitting a new item to dspace.
                 -->
             <map:match pattern="handle/*/*/submit/completedStep">
@@ -236,13 +237,19 @@
           <!-- javascript libraries and utils for choice/authority-control -->
           <map:match type="regexp" pattern="(^submit)|(^handle/.*/submit)|(^handle/.*/workflow)">
             <map:transform type="IncludePageMeta">
-              <map:parameter name="javascript.static#1" value="static/js/scriptaculous/prototype.js"/>
-              <map:parameter name="javascript.static#2" value="static/js/scriptaculous/effects.js"/>
-              <map:parameter name="javascript.static#3" value="static/js/scriptaculous/builder.js"/>
-              <map:parameter name="javascript.static#4" value="static/js/scriptaculous/controls.js"/>
-              <map:parameter name="javascript.static#5" value="static/js/choice-support.js"/>
+              <map:parameter name="javascript.static#1" value="loadJQuery.js"/>
+              <map:parameter name="javascript.static#2" value="static/js/vocabulary-support.js"/>
+              <map:parameter name="javascript.static#3" value="static/js/scriptaculous/prototype.js"/>
+              <map:parameter name="javascript.static#4" value="static/js/scriptaculous/effects.js"/>
+              <map:parameter name="javascript.static#5" value="static/js/scriptaculous/builder.js"/>
+              <map:parameter name="javascript.static#6" value="static/js/scriptaculous/controls.js"/>
+              <map:parameter name="javascript.static#7" value="static/js/choice-support.js"/>
             </map:transform>
           </map:match>
+
+            <map:match pattern="controlled-vocabulary-dialog">
+                <map:transform type="ControlledVocabularyTransformer"/>
+            </map:match>
 
           <map:serialize type="xml"/>
           

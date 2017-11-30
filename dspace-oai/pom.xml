@@ -1,36 +1,127 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>org.dspace</groupId>
-   <artifactId>dspace-oai</artifactId>
-   <packaging>pom</packaging>
-   <name>DSpace OAI</name>
-   <description>Parent for DSpace OAI Service Provider Webapplication</description>
-   <url>http://projects.dspace.org/dspace-oai</url>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>dspace-oai</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace OAI 2.0</name>
+    <description>Parent project for the OAI API and Webapp</description>
 
-   <!-- 
-      A Parent POM that Maven inherits DSpace Default 
-      POM atrributes from. 
-   -->
-   <parent>
-      <groupId>org.dspace</groupId>
-      <artifactId>dspace-parent</artifactId>
-      <version>1.8.2</version>
-      <relativePath>..</relativePath>
-   </parent>
+    <parent>
+        <artifactId>dspace-parent</artifactId>
+        <groupId>org.dspace</groupId>
+        <version>3.0</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-   <!-- 
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
-   </scm>
-   
-   <modules>
-      <module>dspace-oai-api</module>
-      <module>dspace-oai-webapp</module>
-   </modules>
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
+
+    <build>
+        <filters>
+            <!-- Filter using the properties file defined by dspace-parent POM -->
+            <filter>${filters.file}</filter>
+        </filters>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
+                    <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+                    <warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
+                    <webResources>
+                        <resource>
+                            <filtering>true</filtering>
+                            <directory>${basedir}/src/main/webapp</directory>
+                            <includes>
+                                <include>WEB-INF/web.xml</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>oracle-support</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle</groupId>
+                    <artifactId>ojdbc6</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.lyncode</groupId>
+            <artifactId>xoai</artifactId>
+            <version>2.2.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>13.0</version>
+        </dependency>
+    </dependencies>
+
+    <developers>
+        <developer>
+            <name>DSpace @ Lyncode</name>
+            <email>dspace@lyncode.com</email>
+            <organization>Lyncode</organization>
+            <organizationUrl>http://www.lyncode.com</organizationUrl>
+        </developer>
+        <developer>
+            <id>helix84</id>
+            <name>Ivan Másar</name>
+            <email>helix84@centrum.sk</email>
+        </developer>
+        <developer>
+            <name>Ariel J. Lira</name>
+            <email>arieljlira@gmail.com</email>
+            <organization>SeDiCI</organization>
+            <organizationUrl>http://sedici.unlp.edu.ar</organizationUrl>
+        </developer>
+    </developers>
 </project>

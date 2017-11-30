@@ -53,8 +53,7 @@ public class StatisticsLoader
     }
 
     /**
-     * Get an array of the dates of the report files
-     * @return
+     * Get an array of the dates of the report files.
      */
     public static Date[] getMonthlyReportDates()
     {
@@ -62,8 +61,7 @@ public class StatisticsLoader
     }
 
     /**
-     * Get an array of the dates of the analysis files 
-     * @return
+     * Get an array of the dates of the analysis files.
      */
     public static Date[] getMonthlyAnalysisDates()
     {
@@ -71,9 +69,8 @@ public class StatisticsLoader
     }
 
     /**
-     * Convert the formatted dates that are the keys of the map into a date array
+     * Convert the formatted dates that are the keys of the map into a date array.
      * @param monthlyMap
-     * @return
      */
     protected static Date[] getDatesFromMap(Map<String, StatsFile> monthlyMap)
     {
@@ -97,9 +94,9 @@ public class StatisticsLoader
     }
 
     /**
-     * Sort the date array in descending (reverse chronological) order
+     * Sort the date array in descending (reverse chronological) order.
      * @param dates
-     * @return
+     * @return sorted dates.
      */
     protected static Date[] sortDatesDescending(Date[] dates)
     {
@@ -134,9 +131,8 @@ public class StatisticsLoader
     }
 
     /**
-     * Get the analysis file for a given date
+     * Get the analysis file for a given date.
      * @param date
-     * @return
      */
     public static File getAnalysisFor(String date)
     {
@@ -146,9 +142,8 @@ public class StatisticsLoader
     }
 
     /**
-     * Get the report file for a given date
+     * Get the report file for a given date.
      * @param date
-     * @return
      */
     public static File getReportFor(String date)
     {
@@ -158,8 +153,7 @@ public class StatisticsLoader
     }
 
     /**
-     * Get the current general analysis file
-     * @return
+     * Get the current general analysis file.
      */
     public static File getGeneralAnalysis()
     {
@@ -168,8 +162,7 @@ public class StatisticsLoader
     }
 
     /**
-     * Get the current general report file
-     * @return
+     * Get the current general report file.
      */
     public static File getGeneralReport()
     {
@@ -295,13 +288,13 @@ public class StatisticsLoader
     }
 
     /**
-     * Generate a StatsFile entry for this file. The pattern and date formatters are used to
-     * identify the file as a particular type, and extract the relevant information.
-     * If the file is not identified by the formatter provided, then we return null
+     * Generate a StatsFile entry for this file. The pattern and date
+     * formatters are used to identify the file as a particular type,
+     * and extract the relevant information.  If the file is not identified
+     * by the formatter provided, then we return null.
      * @param thisFile
      * @param thisPattern
      * @param sdf
-     * @return
      */
     private static StatsFile makeStatsFile(File thisFile, Pattern thisPattern, SimpleDateFormat sdf)
     {
@@ -329,8 +322,7 @@ public class StatisticsLoader
     }
 
     /**
-     * Get an array of all the analysis and report files
-     * @return
+     * Get an array of all the analysis and report files.
      */
     private static File[] getAnalysisAndReportFileList()
     {
@@ -344,7 +336,7 @@ public class StatisticsLoader
     }
 
     /**
-     * Simple class for holding information about an analysis/report file
+     * Simple class for holding information about an analysis/report file.
      */
     private static class StatsFile
     {
@@ -355,7 +347,8 @@ public class StatisticsLoader
     }
 
     /**
-     * Filter used to restrict files in the reports directory to just analysis or report types
+     * Filter used to restrict files in the reports directory to just
+     * analysis or report types.
      */
     private static class AnalysisAndReportFilter implements FilenameFilter
     {

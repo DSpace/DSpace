@@ -16,6 +16,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.apache.commons.codec.DecoderException;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -26,11 +27,10 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.eperson.PasswordHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 /**
@@ -171,7 +171,30 @@ public class RoleIngester implements PackageIngester
             data = user.getElementsByTagName(RoleDisseminator.PASSWORD_HASH);
             if (data.getLength() > 0)
             {
-                eperson.setPasswordHash(data.item(0).getTextContent());
+                Node element = data.item(0);
+                NamedNodeMap attributes = element.getAttributes();
+
+                Node algorithm = attributes.getNamedItem(RoleDisseminator.PASSWORD_DIGEST);
+                String algorithmText;
+                if (null != algorithm)
+                    algorithmText = algorithm.getNodeValue();
+                else
+                    algorithmText = null;
+
+                Node salt = attributes.getNamedItem(RoleDisseminator.PASSWORD_SALT);
+                String saltText;
+                if (null != salt)
+                    saltText = salt.getNodeValue();
+                else
+                    saltText = null;
+
+                PasswordHash password;
+                try {
+                    password = new PasswordHash(algorithmText, saltText, element.getTextContent());
+                } catch (DecoderException ex) {
+                    throw new PackageValidationException("Unable to decode hexadecimal password hash or salt", ex);
+                }
+                eperson.setPasswordHash(password);
             }
             else
             {

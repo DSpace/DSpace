@@ -27,7 +27,6 @@
  <!ELEMENT hint (#PCDATA) >
  <!ELEMENT required (#PCDATA)>
  <!ELEMENT type-bind (#PCDATA)>
- <!ELEMENT visibility (#PCDATA)>
 
  <!ELEMENT form-value-pairs (value-pairs)* >
  <!ELEMENT value-pairs (pair)+ >
@@ -54,3 +53,5 @@
  <!ELEMENT vocabulary (#PCDATA) >
 
  <!ATTLIST vocabulary closed (true|false) "false"> 
+
+ <!ELEMENT visibility (#PCDATA) >

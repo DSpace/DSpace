@@ -8,6 +8,7 @@
 package org.dspace.browse;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.core.Constants;
@@ -159,7 +160,6 @@ public class BrowseItem extends DSpaceObject
 	/**
 	 * @deprecated
 	 * @param real
-	 * @return
 	 */
 	public int getType(boolean real)
 	{
@@ -300,7 +300,6 @@ public class BrowseItem extends DSpaceObject
 	 * rendering.  That's your own fault for wanting to put images on your
 	 * browse page!
 	 * 
-	 * @return
 	 * @throws SQLException
 	 */
     public Thumbnail getThumbnail()
@@ -382,6 +381,18 @@ public class BrowseItem extends DSpaceObject
         	log.error("caught exception: ", sqle);
 			return null;
 		}
+    }
+
+    @Override
+    public void update() throws SQLException, AuthorizeException
+    {
+
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+
     }
 
     public boolean isArchived()

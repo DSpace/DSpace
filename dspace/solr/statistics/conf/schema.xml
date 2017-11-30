@@ -236,7 +236,7 @@
         <!-- The PatternReplaceFilter gives you the flexibility to use
              Java Regular expression to replace any sequence of characters
              matching a pattern with an arbitrary replacement string, 
-             which may include back refrences to portions of the orriginal
+             which may include back references to portions of the original
              string matched by the pattern.
              
              See the Java Regular Expression documentation for more
@@ -255,6 +255,7 @@
      --> 
     <fieldtype name="ignored" stored="false" indexed="false" class="solr.StrField" /> 
 
+    <fieldType name="uuid" class="solr.UUIDField" indexed="true" />
  </types>
 
 
@@ -277,8 +278,8 @@
        best performance.
    -->
 
-   <field name="type" type="integer" indexed="true" stored="true" required="true" /> 
-   <field name="id" type="integer" indexed="true" stored="true" required="true" /> 
+   <field name="type" type="integer" indexed="true" stored="true" required="false" />
+   <field name="id" type="integer" indexed="true" stored="true" required="false" />
    <field name="ip" type="string" indexed="true" stored="true" required="false" /> 
    <field name="time" type="date" indexed="true" stored="true" required="true" /> 
    <field name="epersonid" type="integer" indexed="true" stored="true" required="false" />
@@ -286,8 +287,8 @@
    <field name="country" type="string" indexed="true" stored="true" required="false" />
    <field name="countryCode" type="string" indexed="true" stored="true" required="false"/>
    <field name="city" type="string" indexed="true" stored="true" required="false"/> 
-   <field name="longitude" type="float" indexed="true" stored="true" required="false" /> 
-   <field name="latitude" type="float" indexed="true" stored="true" required="false" /> 
+   <field name="longitude" type="float" indexed="true" stored="true" required="false" />
+   <field name="latitude" type="float" indexed="true" stored="true" required="false" />
    <field name="owningComm" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningColl" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="owningItem" type="integer" indexed="true" stored="true" required="false" multiValued="true" /> 
@@ -295,9 +296,33 @@
    <field name="userAgent" type="string" indexed="true" stored="true" required="false"/>
    <field name="isBot" type="boolean" indexed="true" stored="true" required="false"/>
    <field name="bundleName" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="referrer" type="string" indexed="true" stored="true" required="false"/>
+   <field name="uid" type="uuid" indexed="true" stored="true" default="NEW" />
+
+   <!--Can either be view/search/search_result/workflow-->
+   <field name="statistics_type" type="string" indexed="true" stored="true" required="true" default="view" />
+
+   <!-- Search specific  -->
+   <field name="query" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+   <field name="scopeType" type="integer" indexed="true" stored="true" required="false" />
+   <field name="scopeId" type="integer" indexed="true" stored="true" required="false" />
+   <field name="rpp" type="integer" indexed="true" stored="true" required="false" />
+   <field name="sortBy" type="string" indexed="true" stored="true" required="false" />
+   <field name="sortOrder" type="string" indexed="true" stored="true" required="false" />
+   <field name="page" type="integer" indexed="true" stored="true" required="false" />
+
+   <!--Workflow spefic-->
+   <field name="workflowStep" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+   <field name="previousWorkflowStep" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+   <field name="owner" type="string" indexed="true" stored="true" required="false" multiValued="true"/>
+   <field name="submitter" type="integer" indexed="true" stored="true" required="false" />
+   <field name="actor" type="integer" indexed="true" stored="true" required="false" />
+   <field name="workflowItemId" type="integer" indexed="true" stored="true" required="false" />
+
 
  </fields>
 
+ <uniqueKey>uid</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
  <defaultSearchField>id</defaultSearchField>

@@ -30,6 +30,7 @@ public class UsageEvent extends Event {
 		REMOVE ("remove"),
 		BROWSE ("browse"),
 		SEARCH ("search"),
+		WORKFLOW ("workflow"),
 		LOGIN ("login"),
 		SUBSCRIBE ("subscribe"),
 		UNSUBSCRIBE ("unsubscribe"),
@@ -59,12 +60,13 @@ public class UsageEvent extends Event {
 			
 	private static String checkParams(Action action, HttpServletRequest request, Context context, DSpaceObject object)
 	{
+        StringBuilder eventName = new StringBuilder();
 		if(action == null)
         {
             throw new IllegalStateException("action cannot be null");
         }
 			
-		if(request == null)
+		if(action != Action.WORKFLOW && request == null)
         {
             throw new IllegalStateException("request cannot be null");
         }
@@ -75,21 +77,17 @@ public class UsageEvent extends Event {
             throw new IllegalStateException("context cannot be null");
         }
 		
-		if(object == null)
+		if(action != Action.WORKFLOW && action != Action.SEARCH && object == null)
         {
             throw new IllegalStateException("object cannot be null");
+        }else
+        if(object != null){
+            String objText = Constants.typeText[object.getType()].toLowerCase();
+            eventName.append(objText).append(":");
         }
-		
-		try
-		{
-			String objText = Constants.typeText[object.getType()].toLowerCase();
-			return  objText + ":" + action.text();
-		}catch(Exception e)
-		{
-			
-		}
-		return "";
-		
+        eventName.append(action.text());
+
+		return eventName.toString();
 	}
 	
 	public UsageEvent(Action action, HttpServletRequest request, Context context, DSpaceObject object)

@@ -15,7 +15,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.event.Event;
-import org.dspace.handle.HandleManager;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.utils.DSpace;
 
 /**
  * Support to install an Item in the archive.
@@ -58,29 +60,22 @@ public class InstallItem
             IOException, AuthorizeException
     {
         Item item = is.getItem();
-        String handle;
-        
-        // if no previous handle supplied, create one
-        if (suppliedHandle == null)
-        {
-            // create a new handle for this item
-            handle = HandleManager.createHandle(c, item);
-        }
-        else
-        {
-            // assign the supplied handle to this item
-            handle = HandleManager.createHandle(c, item, suppliedHandle);
+        IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+        try {
+            if(suppliedHandle == null)
+            {
+                identifierService.register(c, item);
+            }else{
+                identifierService.register(c, item, suppliedHandle);
+            }
+        } catch (IdentifierException e) {
+            throw new RuntimeException("Can't create an Identifier!");
         }
 
-        populateHandleMetadata(item, handle);
 
-        // this is really just to flush out fatal embargo metadata
-        // problems before we set inArchive.
-        DCDate liftDate = EmbargoManager.getEmbargoDate(c, item);
+        populateMetadata(c, item);
 
-        populateMetadata(c, item, liftDate);
-
-        return finishItem(c, item, is, liftDate);
+        return finishItem(c, item, is);
 
     }
 
@@ -106,29 +101,25 @@ public class InstallItem
         throws SQLException, IOException, AuthorizeException
     {
         Item item = is.getItem();
-        String handle;
 
-        // if no handle supplied
-        if (suppliedHandle == null)
-        {
-            // create a new handle for this item
-            handle = HandleManager.createHandle(c, item);
-            //only populate handle metadata for new handles
-            // (existing handles should already be in the metadata -- as it was restored by ingest process)
-            populateHandleMetadata(item, handle);
-        }
-        else
-        {
-            // assign the supplied handle to this item
-            handle = HandleManager.createHandle(c, item, suppliedHandle);
+        IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+        try {
+            if(suppliedHandle == null)
+            {
+                identifierService.register(c, item);
+            }else{
+                identifierService.register(c, item, suppliedHandle);
+            }
+        } catch (IdentifierException e) {
+            throw new RuntimeException("Can't create an Identifier!");
         }
 
-        // Even though we are restoring an item it may not have a have the proper dates. So lets
+        // Even though we are restoring an item it may not have the proper dates. So let's
         // double check that it has a date accessioned and date issued, and if either of those dates
         // are not set then set them to today.
         DCDate now = DCDate.getCurrent();
         
-        // If the item dosn't have a date.accessioned create one.
+        // If the item doesn't have a date.accessioned, create one.
         DCValue[] dateAccessioned = item.getDC("date", "accessioned", Item.ANY);
         if (dateAccessioned.length == 0)
         {
@@ -147,33 +138,11 @@ public class InstallItem
 		String provDescription = "Restored into DSpace on "+ now + " (GMT).";
 		item.addDC("description", "provenance", "en", provDescription);
 
-        return finishItem(c, item, is, null);
-    }
-
-    private static void populateHandleMetadata(Item item, String handle)
-        throws SQLException, IOException, AuthorizeException
-    {
-        String handleref = HandleManager.getCanonicalForm(handle);
-
-        // Add handle as identifier.uri DC value.
-        // First check that identifier dosn't already exist.
-        boolean identifierExists = false;
-        DCValue[] identifiers = item.getDC("identifier", "uri", Item.ANY);
-        for (DCValue identifier : identifiers)
-        {
-        	if (handleref.equals(identifier.value))
-            {
-        		identifierExists = true;
-            }
-        }
-        if (!identifierExists)
-        {
-        	item.addDC("identifier", "uri", null, handleref);
-        }
+        return finishItem(c, item, is);
     }
 
 
-    private static void populateMetadata(Context c, Item item, DCDate embargoLiftDate)
+    private static void populateMetadata(Context c, Item item)
         throws SQLException, IOException, AuthorizeException
     {
         // create accession date
@@ -182,9 +151,11 @@ public class InstallItem
 
         // add date available if not under embargo, otherwise it will
         // be set when the embargo is lifted.
-        if (embargoLiftDate == null)
+        // this will flush out fatal embargo metadata
+        // problems before we set inArchive.
+        if (EmbargoManager.getEmbargoTermsAsDate(c, item) == null)
         {
-            item.addDC("date", "available", null, now.toString());
+             item.addDC("date", "available", null, now.toString());
         }
 
         // create issue date if not present
@@ -212,7 +183,7 @@ public class InstallItem
 
     // final housekeeping when adding new Item to archive
     // common between installing and "restoring" items.
-    private static Item finishItem(Context c, Item item, InProgressSubmission is, DCDate embargoLiftDate)
+    private static Item finishItem(Context c, Item item, InProgressSubmission is)
         throws SQLException, IOException, AuthorizeException
     {
         // create collection2item mapping
@@ -221,8 +192,13 @@ public class InstallItem
         // set owning collection
         item.setOwningCollection(is.getCollection());
 
-        // set in_archive=true
-        item.setArchived(true);
+        // set in_archive=true only if the user didn't specify that it is a private item
+        if(item.isDiscoverable()){
+            item.setArchived(true);
+        }
+        else{ // private item is withdrawn as well
+            item.withdraw();
+        }
 
         // save changes ;-)
         item.update();
@@ -239,10 +215,7 @@ public class InstallItem
         item.inheritCollectionDefaultPolicies(is.getCollection());
 
         // set embargo lift date and take away read access if indicated.
-        if (embargoLiftDate != null)
-        {
-            EmbargoManager.setEmbargo(c, item, embargoLiftDate);
-        }
+        EmbargoManager.setEmbargo(c, item);
 
         return item;
     }
@@ -251,7 +224,7 @@ public class InstallItem
      * Generate provenance-worthy description of the bitstreams contained in an
      * item.
      * 
-     * @param myitem  the item generate description for
+     * @param myitem  the item to generate description for
      * 
      * @return provenance description
      */

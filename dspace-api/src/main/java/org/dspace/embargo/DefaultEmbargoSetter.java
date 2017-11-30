@@ -9,17 +9,16 @@ package org.dspace.embargo;
 
 import java.sql.SQLException;
 import java.io.IOException;
+import java.util.Date;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.DCDate;
-import org.dspace.content.Item;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
+import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
+import org.dspace.eperson.Group;
 import org.dspace.license.CreativeCommons;
 
 /**
@@ -79,20 +78,61 @@ public class DefaultEmbargoSetter implements EmbargoSetter
     public void setEmbargo(Context context, Item item)
         throws SQLException, AuthorizeException, IOException
     {
+        DCDate liftDate = EmbargoManager.getEmbargoTermsAsDate(context, item);
         for (Bundle bn : item.getBundles())
         {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
             String bnn = bn.getName();
             if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn.equals(CreativeCommons.CC_BUNDLE_NAME)))
             {
-                AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
+                //AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
+                generatePolicies(context, liftDate.toDate(), null, bn, item.getOwningCollection());
                 for (Bitstream bs : bn.getBitstreams())
                 {
-                    AuthorizeManager.removePoliciesActionFilter(context, bs, Constants.READ);
+                    //AuthorizeManager.removePoliciesActionFilter(context, bs, Constants.READ);
+                    generatePolicies(context, liftDate.toDate(), null, bs, item.getOwningCollection());
                 }
             }
         }
     }
+
+    protected void generatePolicies(Context context, Date embargoDate,
+                                        String reason, DSpaceObject dso, Collection owningCollection) throws SQLException, AuthorizeException {
+
+        // add only embargo policy
+        if(embargoDate!=null){
+
+            Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, owningCollection, Constants.DEFAULT_ITEM_READ);
+
+            // look for anonymous
+            boolean isAnonymousInPlace=false;
+            for(Group g : authorizedGroups){
+                if(g.getID()==0){
+                    isAnonymousInPlace=true;
+                }
+            }
+            if(!isAnonymousInPlace){
+                // add policies for all the groups
+                for(Group g : authorizedGroups){
+                    ResourcePolicy rp = AuthorizeManager.createOrModifyPolicy(null, context, null, g.getID(), null, embargoDate, Constants.READ, reason, dso);
+                    if(rp!=null)
+                        rp.update();
+                }
+
+            }
+            else{
+                // add policy just for anonymous
+                ResourcePolicy rp = AuthorizeManager.createOrModifyPolicy(null, context, null, 0, null, embargoDate, Constants.READ, reason, dso);
+                if(rp!=null)
+                    rp.update();
+            }
+        }
+
+    }
+
+
+
+
 
     /**
      * Check that embargo is properly set on Item: no read access to bitstreams.

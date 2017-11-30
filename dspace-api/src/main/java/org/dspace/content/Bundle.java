@@ -811,4 +811,10 @@ public class Bundle extends DSpaceObject
             return null;
         }
     }
+
+    @Override
+    public void updateLastModified()
+    {
+
+    }
 }

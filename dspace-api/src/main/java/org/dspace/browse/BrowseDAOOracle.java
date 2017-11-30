@@ -117,6 +117,8 @@ public class BrowseDAOOracle implements BrowseDAO
     private boolean itemsInArchive = true;
     private boolean itemsWithdrawn = false;
 
+    private boolean enableBrowseFrequencies = true;
+    
     public BrowseDAOOracle(Context context)
         throws BrowseException
     {
@@ -405,7 +407,12 @@ public class BrowseDAOOracle implements BrowseDAO
                 TableRow row = tri.next();
                 String valueResult = row.getStringColumn("value");
                 String authorityResult = row.getStringColumn("authority");
-                results.add(new String[]{valueResult,authorityResult});
+                if (enableBrowseFrequencies){
+                    long frequency = row.getLongColumn("num");
+                    results.add(new String[]{valueResult,authorityResult, String.valueOf(frequency)});
+                }
+                else
+                    results.add(new String[]{valueResult,authorityResult, ""});
             }
 
             return results;
@@ -768,6 +775,17 @@ public class BrowseDAOOracle implements BrowseDAO
         // prepare the limit and offset clauses
         buildRowLimitAndOffset(queryBuf, params);
 
+        //If we want frequencies and this is not a count query, enchance the query accordingly
+        if (isEnableBrowseFrequencies() && countValues==null){
+            String before = "SELECT count(*) AS num, dvalues.value, dvalues.authority FROM (";
+            String after = ") dvalues , "+tableMap+" WHERE dvalues.id = "+tableMap+".distinct_id GROUP BY "+tableMap+
+                    ".distinct_id, dvalues.value, dvalues.authority, dvalues.sort_value";
+            
+            queryBuf.insert(0, before);
+            queryBuf.append(after);
+            buildOrderBy(queryBuf);
+        }
+        
         return queryBuf.toString();
     }
 
@@ -1394,5 +1412,13 @@ public class BrowseDAOOracle implements BrowseDAO
 
     public String getAuthorityValue() {
         return authority;
+    }
+    
+    public boolean isEnableBrowseFrequencies() {
+        return enableBrowseFrequencies;
+    }
+
+    public void setEnableBrowseFrequencies(boolean enableBrowseFrequencies) {
+        this.enableBrowseFrequencies = enableBrowseFrequencies;
     }
 }

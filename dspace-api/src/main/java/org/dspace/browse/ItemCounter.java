@@ -101,10 +101,9 @@ public class ItemCounter
 	 * Get the count of the items in the given container.  If the configuration
 	 * value webui.strengths.cache is equal to 'true' this will return the
 	 * cached value if it exists.  If it is equal to 'false' it will count
-	 * the number of items in the container in real time
+	 * the number of items in the container in real time.
 	 * 
 	 * @param dso
-	 * @return
 	 * @throws ItemCountException
 	 * @throws SQLException 
 	 */

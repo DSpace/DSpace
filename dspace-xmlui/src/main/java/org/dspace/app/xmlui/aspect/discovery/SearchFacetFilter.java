@@ -14,14 +14,12 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.utils.DSpaceValidity;
-import org.dspace.app.xmlui.utils.HandleUtil;
-import org.dspace.app.xmlui.utils.RequestUtils;
-import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.utils.*;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
@@ -29,25 +27,21 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.discovery.configuration.SidebarFacetConfiguration;
 import org.dspace.handle.HandleManager;
-import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
-import ar.edu.unlp.sedici.xmlui.exception.BadRequestException;
 
 /**
  * Filter which displays facets on which a user can filter his discovery search
@@ -81,26 +75,27 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     private int DEFAULT_PAGE_SIZE = 10;
 
 
-    private ConfigurationService config = null;
-
     private SearchService searchService = null;
     private static final Message T_go = message("xmlui.general.go");
 
     public SearchFacetFilter() {
 
         DSpace dspace = new DSpace();
-        config = dspace.getConfigurationService();
         searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
-        DEFAULT_PAGE_SIZE=ConfigurationManager.getIntProperty("sedici-dspace","xmlui.discovery.search-limit", 60);
+
     }
 
     @Override
-    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException   {
-    	super.setup(resolver, objectModel, src, parameters);
-    	
-    	// Checks for field parameter
-    	if(ObjectModelHelper.getRequest(objectModel).getParameter(SearchFilterParam.FACET_FIELD) == null)
-    		throw new BadRequestException("You must provide a field parameter");
+    public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
+        super.setup(resolver, objectModel, src, parameters);
+
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String facetField = request.getParameter(SearchFilterParam.FACET_FIELD);
+
+        if(StringUtils.isBlank(facetField))
+        {
+            throw new BadRequestException("Invalid " + SearchFilterParam.FACET_FIELD + " parameter");
+        }
     }
 
     /**
@@ -145,7 +140,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     validity.add(dso);
                 }
 
-                // add reciently submitted items, serialize solr query contents.
+                // add recently submitted items, serialize solr query contents.
                 DiscoverResult response = getQueryResponse(dso);
 
                 validity.add("numFound:" + response.getDspaceObjects().size());
@@ -159,7 +154,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
                     java.util.List<DiscoverResult.FacetResult> facetValues = queryResults.getFacetResults().get(facetField);
                     for (DiscoverResult.FacetResult facetValue : facetValues) {
-                        validity.add(facetValue.getAsFilterQuery() + facetValue.getCount());
+                        validity.add(facetField + facetValue.getAsFilterQuery() + facetValue.getCount());
                     }
                 }
 
@@ -204,7 +199,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         queryArgs.setMaxResults(0);
 
-        queryArgs.addFilterQueries(getDiscoveryFilterQueries());
+        queryArgs.addFilterQueries(DiscoveryUIUtils.getFilterQueries(request, context));
 
 
         //Set the default limit to 11
@@ -257,7 +252,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if ((dso instanceof Collection) || (dso instanceof Community)) {
-            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath, true);
         }
 
         pageMeta.addTrail().addContent(message("xmlui.Discovery.AbstractSearch.type_" + facetField));
@@ -330,11 +325,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
                     Table singleTable = results.addTable("browse-by-" + facetField + "-results", (int) (queryResults.getDspaceObjects().size() + 1), 1);
 
-                    List<String> filterQueries = new ArrayList<String>();
-                    if(request.getParameterValues("fq") != null)
-                    {
-                        filterQueries = Arrays.asList(request.getParameterValues("fq"));
-                    }
+                    List<String> filterQueries = Arrays.asList(DiscoveryUIUtils.getFilterQueries(request, context));
 
 
                     int end = values.size();
@@ -354,7 +345,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     }
 
     private void addBrowseJumpNavigation(Division div, SearchFilterParam browseParams, Request request)
-            throws WingException, SQLException {
+            throws WingException, SQLException, UnsupportedEncodingException {
         String action;
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if(dso != null){
@@ -372,9 +363,14 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         for(Map.Entry<String, String> param : params.entrySet()){
             jump.addHidden(param.getKey()).setValue(param.getValue());
         }
-        String[] filterQueries = getParameterFilterQueries();
-        for (String filterQuery : filterQueries) {
-            jump.addHidden("fq").setValue(filterQuery);
+        Map<String, String[]> filterQueries = DiscoveryUIUtils.getParameterFilterQueries(request);
+        for (String parameter : filterQueries.keySet())
+        {
+            for (int i = 0; i < filterQueries.get(parameter).length; i++)
+            {
+                String value = filterQueries.get(parameter)[i];
+                jump.addHidden(parameter).setValue(value);
+            }
         }
 
         //We cannot create a filter for dates
@@ -407,7 +403,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
     private void renderFacetField(SearchFilterParam browseParams, DSpaceObject dso, String facetField, Table singleTable, List<String> filterQueries, DiscoverResult.FacetResult value) throws SQLException, WingException, UnsupportedEncodingException {
         String displayedValue = value.getDisplayedValue();
-        String filterQuery = value.getAsFilterQuery();
 //        if(field.getGap() != null){
 //            //We have a date get the year so we can display it
 //            DateFormat simpleDateformat = new SimpleDateFormat("yyyy");
@@ -418,7 +413,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         Cell cell = singleTable.addRow().addCell();
 
         //No use in selecting the same filter twice
-        if(filterQueries.contains(filterQuery)){
+        if(filterQueries.contains(searchService.toFilterQuery(context,  facetField, value.getFilterType(), value.getAsFilterQuery()).getFilterQuery())){
             cell.addContent(displayedValue + " (" + value.getCount() + ")");
         } else {
             //Add the basics
@@ -428,13 +423,15 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             //Add already existing filter queries
             url = addFilterQueriesToUrl(url);
             //Last add the current filter query
-            url += "&fq=" + filterQuery;
+            url += "&filtertype=" + facetField;
+            url += "&filter_relational_operator="+value.getFilterType();
+            url += "&filter=" + URLEncoder.encode(displayedValue, "UTF-8");
             cell.addXref(url, displayedValue + " (" + value.getCount() + ")"
             );
         }
     }
 
-    private String getNextPageURL(SearchFilterParam browseParams, Request request) {
+    private String getNextPageURL(SearchFilterParam browseParams, Request request) throws UnsupportedEncodingException, UIException {
         int offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
         if (offSet == -1)
         {
@@ -446,7 +443,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         parameters.putAll(browseParams.getControlParameters());
         parameters.put(SearchFilterParam.OFFSET, String.valueOf(offSet + DEFAULT_PAGE_SIZE));
 
-        //TODO: correct  comm/collection url
         // Add the filter queries
         String url = generateURL("search-filter", parameters);
         url = addFilterQueriesToUrl(url);
@@ -454,7 +450,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         return url;
     }
 
-    private String getPreviousPageURL(SearchFilterParam browseParams, Request request) {
+    private String getPreviousPageURL(SearchFilterParam browseParams, Request request) throws UnsupportedEncodingException, UIException {
         //If our offset should be 0 then we shouldn't be able to view a previous page url
         if (0 == queryArgs.getFacetOffset() && Util.getIntParameter(request, "offset") == -1)
         {
@@ -472,7 +468,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         parameters.putAll(browseParams.getControlParameters());
         parameters.put(SearchFilterParam.OFFSET, String.valueOf(offset - DEFAULT_PAGE_SIZE));
 
-        //TODO: correct  comm/collection url
         // Add the filter queries
         String url = generateURL("search-filter", parameters);
         url = addFilterQueriesToUrl(url);
@@ -490,72 +485,23 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         super.recycle();
     }
 
-    public String addFilterQueriesToUrl(String url){
-        String[] fqs = getParameterFilterQueries();
-        if (fqs != null) {
+    public String addFilterQueriesToUrl(String url) throws UIException {
+        Map<String, String[]> fqs = DiscoveryUIUtils.getParameterFilterQueries(ObjectModelHelper.getRequest(objectModel));
+        if (fqs != null)
+        {
             StringBuilder urlBuilder = new StringBuilder(url);
-            for (String fq : fqs) {
-                urlBuilder.append("&fq=").append(fq);
+            for (String parameter : fqs.keySet())
+            {
+                for (int i = 0; i < fqs.get(parameter).length; i++)
+                {
+                    String value = fqs.get(parameter)[i];
+                    urlBuilder.append("&").append(parameter).append("=").append(encodeForURL(value));
+                }
             }
-
             return urlBuilder.toString();
         }
 
         return url;
-    }
-
-
-    protected String[] getParameterFilterQueries() {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        java.util.List<String> fqs = new ArrayList<String>();
-        if(request.getParameterValues("fq") != null)
-        {
-            fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
-        }
-
-        //Have we added a filter using the UI
-        if(request.getParameter("filter") != null && !"".equals(request.getParameter("filter")))
-        {
-            fqs.add((request.getParameter("filtertype").equals("*") ? "" : request.getParameter("filtertype") + ":") + request.getParameter("filter"));
-        }
-        return fqs.toArray(new String[fqs.size()]);
-    }
-
-    /**
-     * Returns all the filter queries for use by discovery
-     *  This method returns more expanded filter queries then the getParameterFilterQueries
-     * @return an array containing the filter queries
-     */
-    protected String[] getDiscoveryFilterQueries() {
-        try {
-            java.util.List<String> allFilterQueries = new ArrayList<String>();
-            Request request = ObjectModelHelper.getRequest(objectModel);
-            java.util.List<String> fqs = new ArrayList<String>();
-
-            if(request.getParameterValues("fq") != null)
-            {
-                fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
-            }
-
-            String type = request.getParameter("filtertype");
-            String value = request.getParameter("filter");
-
-            if(value != null && !value.equals("")){
-                allFilterQueries.add(searchService.toFilterQuery(context, (type.equals("*") ? "" : type), value).getFilterQuery());
-            }
-
-            //Add all the previous filters also
-            for (String fq : fqs) {
-                allFilterQueries.add(searchService.toFilterQuery(context, fq).getFilterQuery());
-            }
-
-            return allFilterQueries.toArray(new String[allFilterQueries.size()]);
-        }
-        catch (RuntimeException re) {
-            throw re;
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     private static class SearchFilterParam {

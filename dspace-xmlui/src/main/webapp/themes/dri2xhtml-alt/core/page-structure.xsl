@@ -153,8 +153,7 @@
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
                         <xsl:value-of select="$context-path"/>
                         <xsl:text>/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
-                        <xsl:text>description.xml</xsl:text>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='autolink']"/>
                     </xsl:attribute>
                     <xsl:attribute name="title" >
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']"/>
@@ -165,12 +164,12 @@
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
             <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
                         <script type="text/javascript">
-                                //Clear default text of emty text areas on focus
+                                //Clear default text of empty text areas on focus
                                 function tFocus(element)
                                 {
                                         if (element.value == '<i18n:text>xmlui.dri2xhtml.default.textarea.value</i18n:text>'){element.value='';}
                                 }
-                                //Clear default text of emty text areas on submit
+                                //Clear default text of empty text areas on submit
                                 function tSubmit(form)
                                 {
                                         var defaultedElements = document.getElementsByTagName("textarea");
@@ -196,6 +195,13 @@
             </script>
 
             <!-- Add theme javascipt  -->
+            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='url']">
+                <script type="text/javascript">
+                    <xsl:attribute name="src">
+                        <xsl:value-of select="."/>
+                    </xsl:attribute>&#160;</script>
+            </xsl:for-each>
+
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
                 <script type="text/javascript">
                     <xsl:attribute name="src">
@@ -207,7 +213,7 @@
                     </xsl:attribute>&#160;</script>
             </xsl:for-each>
 
-            <!-- add "shared" javascript from static, path is relative to webapp root-->
+            <!-- add "shared" javascript from static, path is relative to webapp root -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static']">
                 <script type="text/javascript">
                     <xsl:attribute name="src">
@@ -278,7 +284,7 @@
             </a>
             <h1 class="pagetitle">
                 <xsl:choose>
-                        <!-- protectiotion against an empty page title -->
+                        <!-- protection against an empty page title -->
                         <xsl:when test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title'])">
                                 <xsl:text> </xsl:text>
                         </xsl:when>
@@ -412,7 +418,7 @@
         </xsl:if>
     </xsl:template>
 
-    <!-- Like the header, the footer contains various miscellanious text, links, and image placeholders -->
+    <!-- Like the header, the footer contains various miscellaneous text, links, and image placeholders -->
     <xsl:template name="buildFooter">
         <div id="ds-footer">
             <i18n:text>xmlui.dri2xhtml.structural.footer-promotional</i18n:text>
@@ -547,4 +553,34 @@
     <xsl:template match="dri:objectMeta" />
     <xsl:template match="dri:repositoryMeta" />
     -->
+
+    <!--
+        This variable contains a link to SFX or a SFX button (link with an image).
+        Relies on sfx.server.url and sfx.server.image_url in the config file, which are transferred in dri:pageMeta.
+    -->
+    <xsl:variable name="SFXLink">
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']">
+            <a>
+                <xsl:attribute name="href">
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']"/>
+                </xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='image_url']">
+                        <img>
+                            <xsl:attribute name="src">
+                                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='image_url']"/>
+                            </xsl:attribute>
+                            <xsl:attribute name="alt">
+                                <xsl:text>Find Full text</xsl:text>
+                            </xsl:attribute>
+                        </img>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:text>Find Full text</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </a>
+        </xsl:if>
+    </xsl:variable>
+    
 </xsl:stylesheet>

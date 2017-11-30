@@ -293,7 +293,7 @@ public class DAVServlet extends HttpServlet
 	        if (getAuthFromCookie(context, request))
 	        {
 	            putAuthCookie(context, request, response, false);
-		        Context returnContext = context;
+		        Context returnContext = context;;
 		        context = null;
 		        return returnContext;
 	        }
@@ -323,8 +323,6 @@ public class DAVServlet extends HttpServlet
 	                }
 	            }
 	        }
-
-            // Authenticate the user.
 	        if (AuthenticationManager.authenticate(context, username, password,
 	                null, request) == AuthenticationMethod.SUCCESS)
 	        {
@@ -368,7 +366,7 @@ public class DAVServlet extends HttpServlet
 	        }
 	        putAuthCookie(context, request, response, true);
 	        
-	        Context returnContext = context;
+	        Context returnContext = context;;
 	        context = null;
 	        return returnContext;
         } finally {

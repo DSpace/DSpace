@@ -343,12 +343,11 @@ public class Group extends DSpaceObject
     }
 
     /**
-     * check to see if g is a direct group member.
+     * Check to see if g is a direct group member.
      * If g is a subgroup via another group will be returned <code>false</code>
      * 
      * @param g
      *            group to check
-     * @return
      */
     public boolean isMember(Group g)
     {
@@ -381,11 +380,10 @@ public class Group extends DSpaceObject
     }
 
     /**
-     * Get all of the groups that an eperson is a member of
+     * Get all of the groups that an eperson is a member of.
      * 
      * @param c
      * @param e
-     * @return
      * @throws SQLException
      */
     public static Group[] allMemberGroups(Context c, EPerson e)
@@ -1052,9 +1050,7 @@ public class Group extends DSpaceObject
     }
    
     /**
-     * Return Group members of a Group
-     * 
-     * @return
+     * Return Group members of a Group.
      */
     public Group[] getMemberGroups()
     {
@@ -1418,5 +1414,11 @@ public class Group extends DSpaceObject
             }
         }
         return null;
+    }
+
+    @Override
+    public void updateLastModified()
+    {
+
     }
 }

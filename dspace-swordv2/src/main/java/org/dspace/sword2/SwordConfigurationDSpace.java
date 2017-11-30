@@ -253,9 +253,8 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * Get the bundle name that sword will store its original deposit packages in, when
-	 * storing them inside an item
-	 * @return
+	 * Get the bundle name that SWORD will store its original deposit
+	 * packages in, when storing them inside an item.
 	 */
 	public String getSwordBundle()
 	{
@@ -273,8 +272,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * is this a verbose deposit
-	 * @return
+	 * Is this a verbose deposit?
 	 */
 	public boolean isVerbose()
 	{
@@ -282,7 +280,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * set whether this is a verbose deposit
+	 * Set whether this is a verbose deposit.
 	 * @param verbose
 	 */
 	public void setVerbose(boolean verbose)
@@ -291,8 +289,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * what is the max upload size (in bytes) for the sword interface
-	 * @return
+	 * What is the max upload size (in bytes) for the SWORD interface?
 	 */
 	public int getMaxUploadSize()
 	{
@@ -300,7 +297,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * set the max uplaod size (in bytes) for the sword interface
+	 * Set the max uplaod size (in bytes) for the SWORD interface.
 	 * @param maxUploadSize
 	 */
 	public void setMaxUploadSize(int maxUploadSize)
@@ -309,8 +306,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * does the server support mediated deposit (aka on-behalf-of)
-	 * @return
+	 * Does the server support mediated deposit (aka on-behalf-of)?
 	 */
 	public boolean isMediated()
 	{
@@ -318,7 +314,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * set whether the server supports mediated deposit (aka on-behalf-of)
+	 * Set whether the server supports mediated deposit (aka on-behalf-of).
 	 * @param mediated
 	 */
 	public void setMediated(boolean mediated)
@@ -327,8 +323,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * should the repository keep the original package
-	 * @return
+	 * Should the repository keep the original package?
 	 */
 	public boolean isKeepOriginal()
 	{
@@ -382,12 +377,11 @@ public class SwordConfigurationDSpace implements SwordConfiguration
  	}
 
 	/**
-	 * Get the list of mime types that the given dspace object will
-	 * accept as packages
+	 * Get the list of MIME types that the given DSpace object will
+	 * accept as packages.
 	 *
 	 * @param context
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public List<String> getAccepts(Context context, DSpaceObject dso)
@@ -455,10 +449,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	 * http://purl.org/net/sword-types/METSDSpaceSIP
 	 *
 	 * and the Q value is a floating point between 0 and 1 which defines
-	 * how much  the server "likes" this packaging type
+	 * how much  the server "likes" this packaging type.
 	 *
 	 * @param col
-	 * @return
 	 */
 	public List<String> getAcceptPackaging(Collection col)
     {
@@ -548,11 +541,11 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * is the given packaging/media type supported by the given dspace object
+	 * Is the given packaging/media type supported by the given DSpace
+	 * object?
 	 *
 	 * @param packageFormat
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSwordException
 	 * @throws SwordError
 	 */
@@ -591,11 +584,10 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * is the given content mimetype acceptable to the given dspace object
+	 * Is the given content MIME type acceptable to the given DSpace object.
 	 * @param context
 	 * @param type
 	 * @param dso
-	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public boolean isAcceptableContentType(Context context, String type, DSpaceObject dso)
