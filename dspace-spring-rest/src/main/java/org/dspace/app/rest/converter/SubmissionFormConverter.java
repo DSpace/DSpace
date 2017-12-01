@@ -22,6 +22,7 @@ import org.dspace.app.rest.model.VisibilityEnum;
 import org.dspace.app.rest.utils.AuthorityUtils;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
+import org.dspace.submit.model.LanguageFormField;
 import org.dspace.submit.model.SelectableMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -74,7 +75,17 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 				VisibilityEnum.fromString(dcinput.isReadOnly("submission") ? "read-only" : null),
 				VisibilityEnum.fromString(dcinput.isReadOnly("workflow") ? "read-only" : null)));
 		inputField.setRepeatable(dcinput.isRepeatable());
-
+		if(dcinput.getLanguage()) {
+			int idx = 1;
+			for(String code : dcinput.getValueLanguageList()) {
+				if(idx%2==0) {
+					String display = dcinput.getValueLanguageList().get(idx-2);
+					LanguageFormField lang = new LanguageFormField(code, display);
+					inputField.getLanguageCodes().add(lang);
+				}
+				idx++;
+			}
+		}
 		SubmissionFormInputTypeRest inputRest = new SubmissionFormInputTypeRest();
 
 		inputRest.setRegex(dcinput.getRegex());
