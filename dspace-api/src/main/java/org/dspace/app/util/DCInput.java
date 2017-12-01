@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Utils;
 
@@ -120,7 +121,11 @@ public class DCInput
         valueLanguageList = new ArrayList();
         if (language)
         {
-            valueLanguageList = listMap.get(LanguageName);
+        	String languageNameTmp = fieldMap.get("value-pairs-name");
+        	if(StringUtils.isBlank(languageNameTmp)) {
+        		languageNameTmp = LanguageName;
+        	}
+            valueLanguageList = listMap.get(languageNameTmp);
         }
         
         String repStr = fieldMap.get("repeatable");
