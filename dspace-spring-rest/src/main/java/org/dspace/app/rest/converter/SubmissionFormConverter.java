@@ -98,8 +98,8 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 			if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
 				inputRest.setType(
 						getPresentation(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier(), inputType));
-				selMd.setAuthority(authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-						dcinput.getQualifier()));
+				selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+						dcinput.getQualifier(), dcinput.getPairsType(), dcinput.getVocabulary()));
 				selMd.setClosed(
 						authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
 			} else {
@@ -116,8 +116,8 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 				selMd.setLabel((String) pairs.get(idx));
 				selMd.setMetadata(org.dspace.core.Utils.standardize(dcinput.getSchema(), dcinput.getElement(), pairs.get(idx + 1), "."));
 				if (authorityUtils.isChoice(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier())) {
-					selMd.setAuthority(authorityUtils.getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
-							pairs.get(idx + 1)));
+					selMd.setAuthority(getAuthorityName(dcinput.getSchema(), dcinput.getElement(),
+							pairs.get(idx + 1), dcinput.getPairsType(), dcinput.getVocabulary()));
 					selMd.setClosed(
 							authorityUtils.isClosed(dcinput.getSchema(), dcinput.getElement(), dcinput.getQualifier()));
 				}
@@ -145,6 +145,17 @@ public class SubmissionFormConverter extends DSpaceConverter<DCInputSet, Submiss
 			}
 		}
 		return inputType;
+	}
+	
+	private String getAuthorityName(String schema, String element, String qualifier, String valuePairsName, String vocabularyName) {
+		if(StringUtils.isNotBlank(valuePairsName)) {
+			return valuePairsName;
+		}
+		else if (StringUtils.isNotBlank(vocabularyName)) {
+			return vocabularyName;
+		}
+		return authorityUtils.getAuthorityName(schema, element,
+				qualifier);
 	}
 
 	@Override
