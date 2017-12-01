@@ -8,6 +8,7 @@
 package org.dspace.app.rest.matcher;
 
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 import java.util.UUID;
 
@@ -24,6 +25,9 @@ public class CollectionMatcher {
                 hasJsonPath("$.name", is(name)),
                 hasJsonPath("$.handle", is(handle)),
                 hasJsonPath("$.type", is("collection")),
+                hasJsonPath("$.metadata", Matchers.contains(
+                        CollectionMetadataMatcher.matchTitle(name)
+                )),
                 matchLinks(uuid)
         );
     }
