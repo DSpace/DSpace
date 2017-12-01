@@ -28,6 +28,7 @@ public class CommunityMatcher {
                 hasJsonPath("$.metadata", Matchers.contains(
                         CommunityMetadataMatcher.matchTitle(name)
                 )),
+                hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
                 matchLinks(uuid)
         );
     }
