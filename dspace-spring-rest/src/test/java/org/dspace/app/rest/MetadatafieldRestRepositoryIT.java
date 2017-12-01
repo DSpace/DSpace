@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest;
 
+import org.dspace.app.rest.matcher.MetadataFieldMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -24,10 +25,13 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
         getClient().perform(get("/api/core/metadatafields"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
-                    .andExpect(jsonPath("$._embedded.metadatafields[0].type", Matchers.is("metadatafield")))
+                    .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                            MetadataFieldMatcher.matchMetadataField()
+                    )))
                     .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/core/metadatafields")))
                     .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields")))
                     .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/core/metadatafields")))
                     .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")));
+
     }
 }
