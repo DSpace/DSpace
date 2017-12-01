@@ -25,6 +25,9 @@ public class CommunityMatcher {
                 hasJsonPath("$.name", is(name)),
                 hasJsonPath("$.handle", is(handle)),
                 hasJsonPath("$.type", is("community")),
+                hasJsonPath("$.metadata", Matchers.contains(
+                        CommunityMetadataMatcher.matchTitle(name)
+                )),
                 matchLinks(uuid)
         );
     }
