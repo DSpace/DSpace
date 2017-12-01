@@ -70,6 +70,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream")
+                    .withDescription("description")
                     .withMimeType("text/plain")
                     .build();
         }
@@ -80,6 +81,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             bitstream1 = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream1")
+                    .withDescription("description123")
                     .withMimeType("text/plain")
                     .build();
         }
@@ -87,9 +89,9 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", containsInAnyOrder(
-                        BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID()),
-                        BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID())
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.containsInAnyOrder(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream),
+                        BitstreamMatcher.matchBitstreamEntry(bitstream1)
                 )))
 
         ;
@@ -125,6 +127,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream")
+                    .withDescription("descr")
                     .withMimeType("text/plain")
                     .build();
         }
@@ -135,6 +138,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             bitstream1 = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream1")
+                    .withDescription("desscrip1")
                     .withMimeType("text/plain")
                     .build();
         }
@@ -143,14 +147,14 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("size","1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", contains(
-                        BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())
-                )))
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream))
+                ))
                 .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                        contains(
-                                BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID())
+                        Matchers.contains(
+                                BitstreamMatcher.matchBitstreamEntry(bitstream1))
                         )
-                )))
+                ))
 
         ;
 
@@ -159,12 +163,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .param("page", "1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.bitstreams", contains(
-                        BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID())
+                .andExpect(jsonPath("$._embedded.bitstreams", Matchers.contains(
+                        BitstreamMatcher.matchBitstreamEntry(bitstream1)
                 )))
                 .andExpect(jsonPath("$._embedded.bitstreams", Matchers.not(
-                        contains(
-                                BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())
+                        Matchers.contains(
+                                BitstreamMatcher.matchBitstreamEntry(bitstream)
                         )
                 )))
 
@@ -262,6 +266,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream")
+                    .withDescription("Description")
                     .withMimeType("text/plain")
                     .build();
         }
@@ -272,6 +277,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             bitstream1 = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream1")
+                    .withDescription("Description1")
                     .withMimeType("text/plain")
                     .build();
         }
@@ -279,8 +285,8 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/"+bitstream.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())))
-                .andExpect(jsonPath("$", not(BitstreamMatcher.matchBitstreamEntry(bitstream1.getName(), bitstream1.getID()))))
+                .andExpect(jsonPath("$", BitstreamMatcher.matchBitstreamEntry(bitstream)))
+                .andExpect(jsonPath("$", not(BitstreamMatcher.matchBitstreamEntry(bitstream1))))
         ;
 
     }
@@ -316,6 +322,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             bitstream = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream")
+                    .withDescription("Description")
                     .withMimeType("text/plain")
                     .build();
         }
@@ -326,6 +333,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
             bitstream1 = BitstreamBuilder.
                     createBitstream(context, publicItem1, is)
                     .withName("Bitstream1")
+                    .withDescription("Description1234")
                     .withMimeType("text/plain")
                     .build();
         }

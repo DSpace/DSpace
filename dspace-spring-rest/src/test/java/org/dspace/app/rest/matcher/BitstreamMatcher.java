@@ -7,24 +7,31 @@
  */
 package org.dspace.app.rest.matcher;
 
+import org.dspace.content.Bitstream;
 import org.hamcrest.Matcher;
 
 import java.util.UUID;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class BitstreamMatcher {
 
-    public static Matcher<? super Object> matchBitstreamEntry(String name, UUID uuid) {
+    public static Matcher<? super Object> matchBitstreamEntry(Bitstream bitstream) {
         return allOf(
                 //Check core metadata (the JSON Path expression evaluates to a collection so we have to use contains)
-                hasJsonPath("$.uuid", is(uuid.toString())),
-                hasJsonPath("$.name", is(name)),
+                hasJsonPath("$.uuid", is(bitstream.getID().toString())),
+                hasJsonPath("$.name", is(bitstream.getName())),
+                hasJsonPath("$.bundleName", is("ORIGINAL")),
+                hasJsonPath("$.metadata", containsInAnyOrder(
+                        BitstreamMetadataMatcher.matchTitle(bitstream.getName()),
+                        BitstreamMetadataMatcher.matchDescription(bitstream.getDescription())
+                )),
+                hasJsonPath("$.sizeBytes", is((int) bitstream.getSize())),
+                hasJsonPath("$.checkSum", matchChecksum()),
+                hasJsonPath("$._embedded.format", matchFormat()),
                 //Check links
-                matchBitstreamLinks(uuid)
+                matchBitstreamLinks(bitstream.getID())
         );
     }
 
@@ -36,5 +43,18 @@ public class BitstreamMatcher {
         );
     }
 
+    private static Matcher<? super Object> matchChecksum(){
+        return allOf(
+                hasJsonPath("$.checkSumAlgorithm", not(empty())),
+                hasJsonPath("$.value", not(empty()))
+        );
+    }
+
+    private static Matcher<? super Object> matchFormat(){
+        return allOf(
+                hasJsonPath("$.mimetype", not(empty())),
+                hasJsonPath("$.type", is("bitstreamformat"))
+        );
+    }
 
 }
