@@ -701,7 +701,8 @@
                         <div>
                             DRUM is brought to you by the <a href="http://www.lib.umd.edu/">University of Maryland Libraries</a><br />
                             University of Maryland, College Park, MD 20742-7011 (301)314-1328.<br /> 
-                            Please send us your <a href="{$context-path}/feedback"> comments</a>.
+                            Please send us your <a href="{$context-path}/feedback"> comments</a>.<br />
+                            <a href="https://umd.edu/web-accessibility" target="_blank">Web Accessibility</a>
                         </div>
                     </div>
                 </div>
