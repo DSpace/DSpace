@@ -12,23 +12,15 @@ import org.hamcrest.Matchers;
 
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
-public class EPersonMetadataMatcher {
+public class MetadataschemaMatcher {
 
-    public static Matcher<? super Object> matchFirstName(String firstName){
+    public static Matcher<? super Object> matchEntry(){
         return allOf(
-                hasJsonPath("$.key", is("eperson.firstname")),
-                hasJsonPath("$.value", is(firstName))
+                hasJsonPath("$.prefix", Matchers.not(Matchers.empty())),
+                hasJsonPath("$.type", is("metadataschema")),
+                hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadataschemas"))
         );
     }
-
-    public static Matcher<? super Object> matchLastName(String lastName){
-        return allOf(
-                hasJsonPath("$.key", is("eperson.lastname")),
-                hasJsonPath("$.value", is(lastName))
-        );
-    }
-
 }
