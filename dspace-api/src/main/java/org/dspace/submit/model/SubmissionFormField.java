@@ -7,6 +7,7 @@
  */
 package org.dspace.submit.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,7 +22,8 @@ public class SubmissionFormField {
 	private String hints;
 
 	private List<SelectableMetadata> selectableMetadata;
-
+	private List<LanguageFormField> languageCodes;
+	
 	public List<SelectableMetadata> getSelectableMetadata() {
 		return selectableMetadata;
 	}
@@ -68,6 +70,17 @@ public class SubmissionFormField {
 
 	public void setHints(String hints) {
 		this.hints = hints;
+	}
+
+	public List<LanguageFormField> getLanguageCodes() {
+		if(languageCodes==null) {
+			languageCodes = new ArrayList<LanguageFormField>();
+		}
+		return languageCodes;
+	}
+
+	public void setLanguageCodes(List<LanguageFormField> languageCodes) {
+		this.languageCodes = languageCodes;
 	}
 
 }
