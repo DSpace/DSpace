@@ -34,7 +34,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.epersons", Matchers.containsInAnyOrder(
-                        EPersonMatcher.matchEPersonEntry(ePerson.getID(), ePerson.getEmail()),
+                        EPersonMatcher.matchEPersonEntry(ePerson),
                         EPersonMatcher.matchDefaultTestEPerson()
                 )));
     }
@@ -57,7 +57,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                 )))
                 .andExpect(jsonPath("$._embedded.epersons", Matchers.not(
                         Matchers.contains(
-                                EPersonMatcher.matchEPersonEntry(ePerson.getID(), ePerson.getEmail())
+                                EPersonMatcher.matchEPersonEntry(ePerson)
                         )
                 )));
 
@@ -67,7 +67,7 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.epersons", Matchers.contains(
-                        EPersonMatcher.matchEPersonEntry(ePerson.getID(), ePerson.getEmail())
+                        EPersonMatcher.matchEPersonEntry(ePerson)
                 )));
     }
 
@@ -90,11 +90,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", Matchers.is(
-                        EPersonMatcher.matchEPersonEntry(ePerson2.getID(), ePerson2.getEmail())
+                        EPersonMatcher.matchEPersonEntry(ePerson2)
                 )))
                 .andExpect(jsonPath("$", Matchers.not(
                         Matchers.is(
-                                EPersonMatcher.matchEPersonEntry(ePerson.getID(), ePerson.getEmail())
+                                EPersonMatcher.matchEPersonEntry(ePerson)
                         )
                 )));
 
@@ -118,11 +118,11 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$", Matchers.is(
-                        EPersonMatcher.matchEPersonEntry(ePerson2.getID(), ePerson2.getEmail())
+                        EPersonMatcher.matchEPersonEntry(ePerson2)
                 )))
                 .andExpect(jsonPath("$", Matchers.not(
                         Matchers.is(
-                                EPersonMatcher.matchEPersonEntry(ePerson.getID(), ePerson.getEmail())
+                                EPersonMatcher.matchEPersonEntry(ePerson)
                         )
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/eperson/epersons/" + ePerson2.getID())));
