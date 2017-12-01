@@ -267,12 +267,12 @@ public class ItemListTag extends TagSupport
                 // If the table width has been specified, we can make this a fixed layout
                 if (!StringUtils.isEmpty(tablewidth))
                 {
-                    out.println("<table style=\"width: " + tablewidth + "; table-layout: fixed;\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                    out.println("<table style=\"width: " + tablewidth + "; table-layout: fixed;\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
                 }
                 else
                 {
                     // Otherwise, don't constrain the width
-                    out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                    out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
                 }
 
                 // Output the known column widths
@@ -299,11 +299,11 @@ public class ItemListTag extends TagSupport
             }
             else if (!StringUtils.isEmpty(tablewidth))
             {
-                out.println("<table width=\"" + tablewidth + "\" align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                out.println("<table width=\"" + tablewidth + "\" align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
             }
             else
             {
-                out.println("<table align=\"center\" class=\"miscTable\" summary=\"This table browses all dspace content\">");
+                out.println("<table align=\"center\" class=\"table\" summary=\"This table browses all dspace content\">");
             }
 
             // Output the table headers
@@ -533,6 +533,23 @@ public class ItemListTag extends TagSupport
                                 sb.append(", ").append(etal);
                             }
                             metadata = "<em>" + sb.toString() + "</em>";
+                        }
+                    }
+                    //In case title has no value, replace it with "undefined" so as the user has something to
+                	//click in order to access the item page
+                    else if (field.equals(titleField)){
+                    	String undefined = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.title.undefined");
+                    	if (items[i].isWithdrawn())
+                        {
+                            metadata = "<span style=\"font-style:italic\">("+undefined+")</span>";
+                        }
+                        // format the title field correctly (as long as the item isn't withdrawn, link to it)
+                        else
+                        {
+                            metadata = "<a href=\"" + hrq.getContextPath() + "/handle/"
+                            + items[i].getHandle() + "\">"
+                            + "<span style=\"font-style:italic\">("+undefined+")</span>"
+                            + "</a>";
                         }
                     }
 

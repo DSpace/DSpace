@@ -84,6 +84,15 @@ public class EditItemServlet extends DSpaceServlet
     /** User confirms the movement of the item */
     public static final int CONFIRM_MOVE_ITEM = 8;
 
+    /** User starts withdrawal of item */
+    public static final int START_PRIVATING = 9;
+
+    /** User confirms withdrawal of item */
+    public static final int CONFIRM_PRIVATING = 10;
+
+    /** User confirms withdrawal of item */
+    public static final int PUBLICIZE = 11;
+
     /** Logger */
     private static Logger log = Logger.getLogger(EditCommunitiesServlet.class);
 
@@ -317,6 +326,32 @@ public class EditItemServlet extends DSpaceServlet
                 }
                 
                 break;
+
+        case START_PRIVATING:
+
+            // Show "withdraw item" confirmation page
+            JSPManager.showJSP(request, response,
+                    "/tools/confirm-privating-item.jsp");
+
+            break;
+
+        case CONFIRM_PRIVATING:
+
+            // Withdraw the item
+            item.setDiscoverable(false);
+            item.update();
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+            context.complete();
+
+            break;
+
+        case PUBLICIZE:
+            item.setDiscoverable(true);
+            item.update();
+            JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+            context.complete();
+
+            break;
                 
         default:
 
@@ -498,7 +533,17 @@ public class EditItemServlet extends DSpaceServlet
                 request.setAttribute("reinstate_button", Boolean.FALSE);
             }
         }
-        
+
+		if (item.isDiscoverable()) 
+		{
+			request.setAttribute("privating_button", AuthorizeManager
+					.authorizeActionBoolean(context, item, Constants.WRITE));
+		} 
+		else 
+		{
+			request.setAttribute("publicize_button", AuthorizeManager
+					.authorizeActionBoolean(context, item, Constants.WRITE));
+		}
         
         request.setAttribute("item", item);
         request.setAttribute("handle", handle);

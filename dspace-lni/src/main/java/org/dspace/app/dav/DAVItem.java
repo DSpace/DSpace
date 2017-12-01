@@ -467,7 +467,8 @@ class DAVItem extends DAVDSpaceObject
             try
             {
                 // Create a temporary file to disseminate into
-                String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
+                String tempDirectory = (ConfigurationManager.getProperty("upload.temp.dir") != null)
+                    ? ConfigurationManager.getProperty("upload.temp.dir") : System.getProperty("java.io.tmpdir"); 
                 File tempFile = File.createTempFile("DAVItemGet" + this.item.hashCode(), null, new File(tempDirectory));
                 tempFile.deleteOnExit();
 

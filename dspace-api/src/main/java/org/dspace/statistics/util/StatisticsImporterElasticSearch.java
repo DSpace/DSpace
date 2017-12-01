@@ -21,12 +21,14 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.ElasticSearchLogger;
 import org.dspace.statistics.SolrLogger;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.bulk.BulkRequestBuilder;
+
+import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.mapper.geo.GeoPoint;
+
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -39,11 +41,11 @@ import java.util.Random;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
- * Created by IntelliJ IDEA.
- * User: peterdietz
- * Date: 8/15/12
- * Time: 2:46 PM
- * To change this template use File | Settings | File Templates.
+ * Class to load intermediate statistics files (produced from log files by <code>ClassicDSpaceLogConverter</code>) into Elastic Search
+ *
+ * @see ClassicDSpaceLogConverter
+ *
+ * @author Peter Dietz (pdietz84@gmail.com)
  */
 public class StatisticsImporterElasticSearch {
     private static final Logger log = Logger.getLogger(StatisticsImporterElasticSearch.class);
@@ -429,8 +431,8 @@ public class StatisticsImporterElasticSearch {
 
     /**
      * Inner class to hold a cache of reverse lookups of IP addresses
-     * @param <K>
-     * @param <V>
+     * @param <K> IP address
+     * @param <V> hostname looked up via DNS
      */
     static class DNSCache<K,V> extends LinkedHashMap<K,V>
     {

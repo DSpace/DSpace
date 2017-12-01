@@ -39,6 +39,7 @@ public class DiscoveryConfiguration implements InitializingBean{
     private String id;
     private DiscoveryHitHighlightingConfiguration hitHighlightingConfiguration;
     private DiscoveryMoreLikeThisConfiguration moreLikeThisConfiguration;
+    private boolean spellCheckEnabled;
 
     public String getId() {
         return id;
@@ -120,6 +121,14 @@ public class DiscoveryConfiguration implements InitializingBean{
 
     public DiscoveryMoreLikeThisConfiguration getMoreLikeThisConfiguration() {
         return moreLikeThisConfiguration;
+    }
+
+    public boolean isSpellCheckEnabled() {
+        return spellCheckEnabled;
+    }
+
+    public void setSpellCheckEnabled(boolean spellCheckEnabled) {
+        this.spellCheckEnabled = spellCheckEnabled;
     }
 
     /**

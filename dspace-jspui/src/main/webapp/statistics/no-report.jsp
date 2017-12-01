@@ -18,7 +18,7 @@
 <%
     String navbar = (String) request.getAttribute("navbar");
 %>
-<dspace:layout navbar="<%=  navbar %>" titlekey="jsp.statistics.no-report.title">
+<dspace:layout style="submission" navbar="<%=  navbar %>" titlekey="jsp.statistics.no-report.title">
 
 <p><fmt:message key="jsp.statistics.no-report.info1"/></p>
 

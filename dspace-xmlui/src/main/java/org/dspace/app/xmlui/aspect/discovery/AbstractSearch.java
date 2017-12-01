@@ -46,10 +46,10 @@ import java.util.List;
 
 /**
  * This is an abstract search page. It is a collection of search methods that
- * are common between diffrent search implementation. An implementer must
+ * are common between different search implementation. An implementer must
  * implement at least three methods: addBody(), getQuery(), and generateURL().
  * <p/>
- * See the implementors SimpleSearch.
+ * See the SimpleSearch implementation.
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
@@ -208,13 +208,17 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      */
     protected void buildMainForm(Division searchDiv) throws WingException, SQLException {
         Request request = ObjectModelHelper.getRequest(objectModel);
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         //We set our action to context path, since the eventual action will depend on which url we click on
         Division mainForm = searchDiv.addInteractiveDivision("main-form", getBasicUrl(), Division.METHOD_POST, "");
 
         String query = getQuery();
+        //Indicate that the form we are submitting lists search results
+        mainForm.addHidden("search-result").setValue(Boolean.TRUE.toString());
         mainForm.addHidden("query").setValue(query);
 
+        mainForm.addHidden("current-scope").setValue(dso == null ? "" : dso.getHandle());
         Map<String, String[]> fqs = getParameterFilterQueries();
         if (fqs != null)
         {
@@ -245,7 +249,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         {
             order.setValue(request.getParameter("order"));
         }else{
-            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
             order.setValue(discoveryConfiguration.getSearchSortConfiguration().getDefaultSortOrder().toString());
         }
@@ -253,8 +256,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         {
             mainForm.addHidden("page").setValue(request.getParameter("page"));
         }
-        //Optional redirect url !
-        mainForm.addHidden("redirectUrl");
     }
 
     protected abstract String getBasicUrl() throws SQLException;
@@ -329,24 +330,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("page", "{pageNum}");
             String pageURLMask = generateURL(parameters);
-            Map<String, String[]> filterQueryParams = getParameterFilterQueries();
-            if(filterQueryParams != null)
-            {
-                StringBuilder maskBuilder = new StringBuilder(pageURLMask);
-                for (String filterQueryParam : filterQueryParams.keySet())
-                {
-                    String[] filterQueryValues = filterQueryParams.get(filterQueryParam);
-                    if(filterQueryValues != null)
-                    {
-                        for (String filterQueryValue : filterQueryValues)
-                        {
-                            maskBuilder.append("&").append(filterQueryParam).append("=").append(filterQueryValue);
-                        }
-                    }
-                }
-
-                pageURLMask = maskBuilder.toString();
-            }
+            pageURLMask = addFilterQueriesToUrl(pageURLMask);
 
             results.setMaskedPagination(itemsTotal, firstItemIndex,
                     lastItemIndex, currentPage, pagesTotal, pageURLMask);
@@ -354,7 +338,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             // Look for any communities or collections in the mix
             org.dspace.app.xmlui.wing.element.List dspaceObjectsList = null;
 
-            // Put in palce top level search result list
+            // Put it on the top of level search result list
             dspaceObjectsList = results.addList("search-results-repository",
                     org.dspace.app.xmlui.wing.element.List.TYPE_DSO_LIST, "repository-search-results");
 
@@ -417,6 +401,28 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         //}// Empty query
     }
 
+    protected String addFilterQueriesToUrl(String pageURLMask) throws UIException {
+        Map<String, String[]> filterQueryParams = getParameterFilterQueries();
+        if(filterQueryParams != null)
+        {
+            StringBuilder maskBuilder = new StringBuilder(pageURLMask);
+            for (String filterQueryParam : filterQueryParams.keySet())
+            {
+                String[] filterQueryValues = filterQueryParams.get(filterQueryParam);
+                if(filterQueryValues != null)
+                {
+                    for (String filterQueryValue : filterQueryValues)
+                    {
+                        maskBuilder.append("&").append(filterQueryParam).append("=").append(encodeForURL(filterQueryValue));
+                    }
+                }
+            }
+
+            pageURLMask = maskBuilder.toString();
+        }
+        return pageURLMask;
+    }
+
     /**
      * Render the given item, all metadata is added to the given list, which metadata will be rendered where depends on the xsl
      * @param dspaceObjectsList a list of DSpace objects
@@ -461,7 +467,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             }
         }
 
-        //Check our highlighted results, we may need to add non metadata (like our full text)
+        //Check our highlighted results, we may need to add non-metadata (like our full text)
         if(highlightedResults != null)
         {
             //Also add the full text snippet (if available !)
@@ -574,7 +580,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     }
 
     /**
-     * Add the current value to the wing list,
+     * Add the current value to the wing list
      * @param highlightedResults the highlighted results
      * @param metadataKey the metadata key {schema}.{element}.{qualifier}
      * @param metadataFieldList the wing list we need to add the metadata value to
@@ -592,7 +598,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             //Loop over all our highlighted results
             for (String highlight : highlightedResults.getHighlightResults(metadataKey))
             {
-                //If our non highlighted value matches our original one, ensure that the highlighted one is used
+                //If our non-highlighted value matches our original one, ensure that the highlighted one is used
                 DiscoverHitHighlightingField highlightConfig = queryArgs.getHitHighlightingField(metadataKey);
                 //We might also have it configured for ALL !
                 if(highlightConfig == null)
@@ -651,7 +657,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     }
 
     /**
-     * Add options to the search scope field. This field determines in what
+     * Add options to the search scope field. This field determines in which
      * communities or collections to search for the query.
      * <p/>
      * The scope list will depend upon the current search scope. There are three
@@ -790,7 +796,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             //queryArgs.a  type:Article^2
 
             // TODO: This is a hack to get Publications (Articles) to always be at the top of Groups.
-            // TODO: I think the can be more transparently done in the solr solrconfig.xml with DISMAX and boosting
+            // TODO: I think that can be more transparently done in the solr solrconfig.xml with DISMAX and boosting
             /** sort in groups to get publications to top */
             queryArgs.setSortField("dc.type", DiscoverQuery.SORT_ORDER.asc);
 
@@ -817,6 +823,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             }
         }
 
+        queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled());
+
         this.queryResults = SearchUtils.getSearchService().search(context, scope, queryArgs);
     }
 
@@ -840,7 +848,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
     /**
      * Returns all the filter queries for use by solr
-     *  This method returns more expanded filter queries then the getParameterFilterQueries
+     * This method returns more expanded filter queries then the getParameterFilterQueries
      * @return an array containing the filter queries
      */
     protected String[] getFilterQueries() {
@@ -960,7 +968,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
 
         /**
-         * Add sort by options, the gear will be rendered by a combination fo javascript & css
+         * Add sort by options, the gear will be rendered by a combination of javascript & css
          */
         String currentSort = getParameterSortBy();
         org.dspace.app.xmlui.wing.element.List sortList = searchControlsGear.addList("sort-options", org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "gear-selection");

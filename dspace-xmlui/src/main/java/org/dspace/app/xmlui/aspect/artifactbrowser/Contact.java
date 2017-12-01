@@ -105,7 +105,7 @@ public class Contact extends AbstractDSpaceTransformer implements CacheableProce
         list.addItem().addXref(contextPath+"/feedback",T_feedback_link);
         
         list.addLabel(T_email);
-        String email = ConfigurationManager.getProperty("mail.admin");
+        String email = ConfigurationManager.getProperty("feedback.recipient");
         list.addItem().addXref("mailto:"+email,email); 
     }
 }

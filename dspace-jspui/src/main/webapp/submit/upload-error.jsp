@@ -42,7 +42,7 @@
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 %>
 
-<dspace:layout locbar="off"
+<dspace:layout style="submission" locbar="off"
                navbar="off"
                titlekey="jsp.submit.upload-error.title"
                nocache="true">
@@ -57,17 +57,15 @@
         <%-- <p>There was a problem uploading your file.  Either the filename you entered
         was incorrect, or there was a network problem which prevented the file from
         reaching us correctly.  Please try again.</p> --%>
-		<p><fmt:message key="jsp.submit.upload-error.info"/></p>
+		<p class="alert alert-warning"><fmt:message key="jsp.submit.upload-error.info"/></p>
 
         <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
 <%-- HACK: <center> tag needed for broken Netscape 4.78 behaviour --%>
-        <center>
-            <p>
-                <input type="submit" name="submit_retry" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" />
-            </p>
-        </center>
+        
+        <input class="btn btn-primary col-md-offset-5" type="submit" name="submit_retry" value="<fmt:message key="jsp.submit.upload-error.retry.button"/>" />
+        
     </form>
 
 </dspace:layout>

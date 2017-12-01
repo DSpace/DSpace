@@ -308,8 +308,9 @@ public class Authenticate
      *            DSpace context
      * @param request
      *            HTTP request
+     * @throws SQLException 
      */
-    public static void loggedOut(Context context, HttpServletRequest request)
+    public static void loggedOut(Context context, HttpServletRequest request) throws SQLException
     {
         HttpSession session = request.getSession();
 
@@ -318,20 +319,29 @@ public class Authenticate
         request.removeAttribute("dspace.current.user");
         session.removeAttribute("dspace.current.user.id");
 
+        Integer previousUserID = (Integer) session.getAttribute("dspace.previous.user.id");
+        
         // Keep the user's locale setting if set
         Locale sessionLocale = UIUtil.getSessionLocale(request);
 
-        // Invalidate session unless dspace.cfg says not to
-        if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true))
+        // Invalidate session unless dspace.cfg says not to (or it is a loggedOut from a loginAs)
+        if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true) 
+                && previousUserID != null)
         {
             session.invalidate();
         }
-
 
         // Restore the session locale
         if (sessionLocale != null)
         {
             Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
+        }
+        
+        if (previousUserID != null)
+        {
+            session.removeAttribute("dspace.previous.user.id");
+            EPerson ePerson = EPerson.find(context, previousUserID);
+            loggedIn(context, request, ePerson);
         }
     }
 }

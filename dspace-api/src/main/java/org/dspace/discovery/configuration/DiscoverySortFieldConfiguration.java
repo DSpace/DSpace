@@ -10,11 +10,7 @@ package org.dspace.discovery.configuration;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Kevin
- * Date: 28/08/11
- * Time: 14:11
- * To change this template use File | Settings | File Templates.
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class DiscoverySortFieldConfiguration {
 

@@ -31,9 +31,9 @@ import org.dspace.storage.rdbms.TableRow;
  * randomly generated and thus hard to guess. When the user presents the token
  * back to the system, the AccountManager can use the token to determine the
  * identity of the eperson.
- * 
+ *
  * *NEW* now ignores expiration dates so that tokens never expire
- * 
+ *
  * @author Peter Breton
  * @version $Revision$
  */
@@ -49,12 +49,12 @@ public class AccountManager
 
     /**
      * Email registration info to the given email address.
-     * 
+     *
      * Potential error conditions: Cannot create registration data in database
      * (throws SQLException) Error sending email (throws MessagingException)
      * Error reading email template (throws IOException) Authorization error
      * (throws AuthorizeException)
-     * 
+     *
      * @param context
      *            DSpace context
      * @param email
@@ -69,12 +69,12 @@ public class AccountManager
 
     /**
      * Email forgot password info to the given email address.
-     * 
+     *
      * Potential error conditions: No EPerson with that email (returns null)
      * Cannot create registration data in database (throws SQLException) Error
      * sending email (throws MessagingException) Error reading email template
      * (throws IOException) Authorization error (throws AuthorizeException)
-     * 
+     *
      * @param context
      *            DSpace context
      * @param email
@@ -93,11 +93,11 @@ public class AccountManager
      * person by either the sendRegistrationInfo or sendForgotPasswordInfo
      * methods.
      * </p>
-     * 
+     *
      * <p>
      * If the token is not found return null.
      * </p>
-     * 
+     *
      * @param context
      *            DSpace context
      * @param token
@@ -125,7 +125,7 @@ public class AccountManager
     /**
      * Return the e-mail address referred to by a token, or null if email
      * address can't be found ignores expiration of token
-     * 
+     *
      * @param context
      *            DSpace context
      * @param token
@@ -153,7 +153,7 @@ public class AccountManager
 
     /**
      * Delete token.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param token
@@ -171,16 +171,16 @@ public class AccountManager
     /*
      * THIS IS AN INTERNAL METHOD. THE SEND PARAMETER ALLOWS IT TO BE USED FOR
      * TESTING PURPOSES.
-     * 
+     *
      * Send an info to the EPerson with the given email address. If isRegister
      * is TRUE, this is registration email; otherwise, it is forgot-password
      * email. If send is TRUE, the email is sent; otherwise it is skipped.
-     * 
+     *
      * Potential error conditions: No EPerson with that email (returns null)
      * Cannot create registration data in database (throws SQLException) Error
      * sending email (throws MessagingException) Error reading email template
      * (throws IOException) Authorization error (throws AuthorizeException)
-     * 
+     *
      * @param context DSpace context @param email Email address to send the
      * forgot-password email to @param isRegister If true, this is for
      * registration; otherwise, it is for forgot-password @param send If true,
@@ -227,10 +227,10 @@ public class AccountManager
 
     /**
      * Send a DSpace message to the given email address.
-     * 
+     *
      * If isRegister is <code>true</code>, this is registration email;
      * otherwise, it is a forgot-password email.
-     * 
+     *
      * @param email
      *            The email address to mail to
      * @param isRegister
@@ -255,7 +255,7 @@ public class AccountManager
                 .append("token=").append(rd.getStringColumn("token"))
                 .toString();
         Locale locale = context.getCurrentLocale();
-        Email bean = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(locale, isRegister ? "register"
+        Email bean = Email.getEmail(I18nUtil.getEmailFilename(locale, isRegister ? "register"
                 : "change_password"));
         bean.addRecipient(email);
         bean.addArgument(specialLink);

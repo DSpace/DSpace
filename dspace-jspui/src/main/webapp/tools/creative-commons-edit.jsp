@@ -56,7 +56,7 @@
    <td>
     <h1><fmt:message key="jsp.tools.creative-commons-edit.heading1"/></h1>
     <form name="ccform" id="license_form" action="" method="get">
-	<iframe src="http://creativecommons.org/license/?partner=dspace&amp;stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&amp;exit_url=<%= java.net.URLEncoder.encode(exitURL) %><%= jurisdiction %>" width="100%" height="540">Your browser must support IFrames to use this feature
+	<iframe src="http://creativecommons.org/license/?partner=dspace&amp;stylesheet=<%= java.net.URLEncoder.encode(ssURL, "UTF-8") %>&amp;exit_url=<%= java.net.URLEncoder.encode(exitURL, "UTF-8") %><%= jurisdiction %>" width="100%" height="540">Your browser must support IFrames to use this feature
 	</iframe>
 
         <input type="hidden" name="item_id" value='<%=request.getParameter("item_id")%>' />

@@ -100,7 +100,7 @@ public class XMLUtil
 
         }
 
-        // Create an empy DOMResult object for the output.
+        // Create an empty DOMResult object for the output.
         DocumentBuilderFactory dFactory = DocumentBuilderFactory.newInstance();
         dFactory.setNamespaceAware(true);
         DocumentBuilder dBuilder = dFactory.newDocumentBuilder();

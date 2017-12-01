@@ -8,9 +8,7 @@
 package org.dspace.sort;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,7 +52,12 @@ public class SortOption
     static {
         try
         {
-            Set<SortOption> newSortOptionsSet = new HashSet<SortOption>();
+            Set<SortOption> newSortOptionsSet = new TreeSet<SortOption>(new Comparator<SortOption>() {
+	            @Override
+	            public int compare(SortOption sortOption, SortOption sortOption1) {
+		            return Integer.valueOf(sortOption.getNumber()).compareTo(Integer.valueOf(sortOption1.getNumber()));
+	            }
+            });
             int idx = 1;
             String option;
 

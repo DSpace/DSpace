@@ -256,6 +256,7 @@
 			<XSLT>metadataFormats/uketd_dc.xsl</XSLT>
 			<Namespace>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/</Namespace>
 			<SchemaLocation>http://naca.central.cranfield.ac.uk/ethos-oai/2.0/uketd_dc.xsd</SchemaLocation>
+			<Filter refid="thesisFilter" />
 		</Format>
 		<Format id="doaj">
 			<Prefix>doaj</Prefix>
@@ -297,7 +298,7 @@
 		
 		<Filter id="titleexistsFilter">
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
-			<Parameter key="field">
+			<Parameter key="fields">
 				<Value>dc.title</Value>
 			</Parameter>
 		</Filter>
@@ -460,7 +461,19 @@
 				<Value>starts_with</Value>
 			</Parameter>
 			<Parameter key="value">
-				<Value>info:eurepo/grantAgreement/EC/FP</Value>
+				<Value>info:eu-repo/grantAgreement/EC/FP</Value>
+			</Parameter>
+		</Filter>
+		<Filter id="thesisFilter">
+			<Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+			<Parameter key="field">
+				<Value>dc.type</Value>
+			</Parameter>
+			<Parameter key="operator">
+				<Value>contains</Value>
+			</Parameter>
+			<Parameter key="value">
+				<Value>Thesis</Value>
 			</Parameter>
 		</Filter>
 		

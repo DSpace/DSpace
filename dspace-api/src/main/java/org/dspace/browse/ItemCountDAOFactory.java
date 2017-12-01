@@ -15,36 +15,46 @@ import org.dspace.core.ConfigurationManager;
  * item count information
  * 
  * @author Richard Jones
+ * @author Ivan Masár
  *
  */
 public class ItemCountDAOFactory
 {
-	/**
-	 * Get an instance of ItemCountDAO which supports the correct database
-	 * for the specific DSpace instance.
-	 * 
-	 * @param context
-	 * @throws ItemCountException
-	 */
-	public static ItemCountDAO getInstance(Context context)
-		throws ItemCountException
-	{
-		String db = ConfigurationManager.getProperty("db.name");
-		ItemCountDAO dao;
-		if ("postgres".equals(db))
-		{
-			dao = new ItemCountDAOPostgres();
-		}
-		else if ("oracle".equals(db))
-		{
-			dao = new ItemCountDAOOracle();
-		}
-		else
-		{
-			throw new ItemCountException("Database type: " + db + " is not currently supported");
-		}
-		
-		dao.setContext(context);
-		return dao;
-	}
+    /**
+     * Get an instance of ItemCountDAO which supports the correct storage backend
+     * for the specific DSpace instance.
+     * 
+     * @param context
+     * @throws ItemCountException
+     */
+    public static ItemCountDAO getInstance(Context context)
+        throws ItemCountException
+    {
+        
+        /** Log4j logger */
+        ItemCountDAO dao = null;
+        
+        String className = ConfigurationManager.getProperty("ItemCountDAO.class");
+        
+        // SOLR implementation is the default since DSpace 4.0
+        if (className == null)
+        {
+            dao = new ItemCountDAOSolr();
+        }
+        else
+        {
+            try
+            {
+                dao = (ItemCountDAO) Class
+                        .forName(className.trim()).newInstance();
+            }
+            catch (Exception e)
+            {
+                throw new ItemCountException("The configuration for ItemCountDAO is invalid: " + className, e);
+            }
+        }
+        
+        dao.setContext(context);
+        return dao;
+    }
 }

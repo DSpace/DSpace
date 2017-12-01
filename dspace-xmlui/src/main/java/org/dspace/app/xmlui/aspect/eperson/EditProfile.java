@@ -21,6 +21,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -33,6 +34,7 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
@@ -487,14 +489,14 @@ public class EditProfile extends AbstractDSpaceTransformer
 
     /**
      * get the available Locales for the User Interface as defined in dspace.cfg
-     * property xmlui.supported.locales
+     * property webui.supported.locales
      * returns an array of Locales or null
      *
      * @return an array of supported Locales or null
      */
     private static Locale[] getSupportedLocales()
     {
-        String ll = ConfigurationManager.getProperty("xmlui.supported.locales");
+        String ll = ConfigurationManager.getProperty("webui.supported.locales");
         if (ll != null)
         {
             return I18nUtil.parseLocales(ll);

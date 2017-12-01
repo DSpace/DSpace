@@ -80,9 +80,4 @@ input.ds-authority-lock.is-locked
 input.ds-authority-lock.is-unlocked
   { background-image: url(../../images/authority_control/unlock24.png); }
 
-
-/* Example of authority display: this makes authors with an authority
-   value show up as red in the item summary view: */
-span.ds-dc_contributor_author-authority { color: #982521; }
-
 #aspect_general_ChoiceLookupTransformer_div_lookup select {height: auto;}

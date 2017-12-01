@@ -59,12 +59,6 @@ public class CCLookup {
 	private List<CCLicense> licenses    = new ArrayList<CCLicense>();
 	private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
 	
-    	// SEDICI-BEGIN
-	// Idioma en el que se solicitará la información al sitio de Creative Commons
-	// Por defecto es el default.locale
-	private String language = ConfigurationManager.getProperty("default.locale");
-	// SEDICI-END
-
 	static {
 		String jurisProp = ConfigurationManager.getProperty("cc.license.jurisdiction");
 		jurisdiction = (jurisProp != null) ? jurisProp : "";
@@ -118,15 +112,11 @@ public class CCLookup {
 	 */
 	public Collection<CCLicense> getLicenses(String language) {
 
-    		// Cambia el idioma por defecto por el idioma indicado
-		this.language = language;
-	
 		// create XPath expressions
 		try {
 			JDOMXPath xp_Licenses = new JDOMXPath("//licenses/license");
 			JDOMXPath xp_LicenseID = new JDOMXPath("@id");
-        		// Incluye el idioma como parametro en el request al Web Service (?locale=) 
-			URL classUrl = new URL(this.cc_root + "/classes?locale="+this.language);
+			URL classUrl = new URL(this.cc_root + "/?locale=" + language);
 			Document classDoc = this.parser.build(classUrl);
 			// extract the identifiers and labels using XPath
 			List<Element> results = xp_Licenses.selectNodes(classDoc);
@@ -165,7 +155,7 @@ public class CCLookup {
 	 * @see CCLicense
 	 *
 	 */
-	public Collection<CCLicenseField> getLicenseFields(String license) {
+	public Collection<CCLicenseField> getLicenseFields(String license, String language) {
 
 		JDOMXPath xp_LicenseField;
 		JDOMXPath xp_LicenseID;
@@ -195,8 +185,7 @@ public class CCLookup {
 
 		// retrieve and parse the license class document
 		try {
-	        	// Incluye el idioma como parametro en el request al Web Service (?locale=) 
-			classUrl = new URL(this.cc_root + "/license/" + license + "?locale=" + this.language);
+			classUrl = new URL(this.cc_root + "/license/" + license + "?locale=" + language);
 		} catch (Exception err) {
 			// do nothing... but we should
 			return null;

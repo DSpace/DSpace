@@ -19,10 +19,9 @@
             //Instead of redirecting us to the page, first send us to the statistics logger
             //By doing this we ensure that we register the query to the result
             var form = $('form#aspect_discovery_SimpleSearch_div_main-form');
-            form.attr('action', form.attr('action').replace('/discover', '') + '/dso-display');
+            form.attr('action', $this.attr('href'));
             //Manipulate the fq boxes to all switch to query since the logging doesn't take into account filter queries
             form.find('input[name="fq"]').attr('name', 'query');
-            form.find('input[name="redirectUrl"]').val($this.attr('href'));
             form.submit();
             return false;
         });

@@ -25,6 +25,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.MetadataExport;
@@ -41,6 +42,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
@@ -56,6 +58,8 @@ import org.w3c.dom.Document;
 
 public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
 {
+    private static final int ITEMMAP_RESULT_PAGE_SIZE = 50;
+
     private static String msgKey = "org.dspace.app.webui.servlet.FeedServlet";
 
     /** log4j category */
@@ -64,11 +68,25 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
     // locale-sensitive metadata labels
     private Map<String, Map<String, String>> localeLabels = null;
 
+    private List<String> searchIndices = null;
+    
     public synchronized void init()
     {
         if (localeLabels == null)
         {
             localeLabels = new HashMap<String, Map<String, String>>();
+        }
+        
+        if (searchIndices == null)
+        {
+            searchIndices = new ArrayList<String>();
+            DiscoveryConfiguration discoveryConfiguration = SearchUtils
+                    .getDiscoveryConfiguration();
+            searchIndices.add("any");
+            for (DiscoverySearchFilter sFilter : discoveryConfiguration.getSearchFilters())
+            {
+                searchIndices.add(sFilter.getIndexFieldName());
+            }
         }
     }
 
@@ -233,6 +251,8 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         DiscoverQuery queryArgs = DiscoverUtility.getDiscoverQuery(context,
                 request, scope, true);
 
+        queryArgs.setSpellCheck(discoveryConfiguration.isSpellCheckEnabled()); 
+        
         List<DiscoverySearchFilterFacet> availableFacet = discoveryConfiguration
                 .getSidebarFacets();
         
@@ -321,6 +341,7 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
         {
             qResults = SearchUtils.getSearchService().search(context, scope,
                     queryArgs);
+            
             List<Community> resultsListComm = new ArrayList<Community>();
             List<Collection> resultsListColl = new ArrayList<Collection>();
             List<Item> resultsListItem = new ArrayList<Item>();
@@ -383,7 +404,8 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
             request.setAttribute("pagecurrent", new Long(pageCurrent));
             request.setAttribute("pagelast", new Long(pageLast));
             request.setAttribute("pagefirst", new Long(pageFirst));
-
+            request.setAttribute("spellcheck", qResults.getSpellCheckQuery());
+            
             request.setAttribute("queryresults", qResults);
 
             try
@@ -480,4 +502,72 @@ public class DiscoverySearchRequestProcessor implements SearchRequestProcessor
                 response.sendRedirect(request.getContextPath() + "/simple-search");
             }
 
+    /**
+     * Method for searching authors in item map
+     * 
+     * author: gam
+     */
+    @Override
+    public void doItemMapSearch(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws SearchProcessorException, ServletException, IOException
+    {
+        String queryString = (String) request.getParameter("query");
+        Collection collection = (Collection) request.getAttribute("collection");
+        int page = UIUtil.getIntParameter(request, "page")-1;
+        int offset = page > 0? page * ITEMMAP_RESULT_PAGE_SIZE:0;
+        String idx = (String) request.getParameter("index");
+        if (StringUtils.isNotBlank(idx) && !idx.equalsIgnoreCase("any"))
+        {
+            queryString = idx + ":(" + queryString + ")";
+        }
+        DiscoverQuery query = new DiscoverQuery();
+        query.setQuery(queryString);
+        query.addFilterQueries("-location:l"+collection.getID());
+        query.setMaxResults(ITEMMAP_RESULT_PAGE_SIZE);
+        query.setStart(offset);
+
+        DiscoverResult results = null;
+        try
+        {
+            results = SearchUtils.getSearchService().search(context, query);
+        }
+        catch (SearchServiceException e)
+        {
+            throw new SearchProcessorException(e.getMessage(), e);
+        }
+
+        Map<Integer, Item> items = new HashMap<Integer, Item>();
+
+        List<DSpaceObject> resultDSOs = results.getDspaceObjects();
+        for (DSpaceObject dso : resultDSOs)
+        {
+            if (dso != null && dso.getType() == Constants.ITEM)
+            {
+                // no authorization check is required as discovery is right aware
+                Item item = (Item) dso;
+                items.put(Integer.valueOf(item.getID()), item);
+            }
+        }
+
+        request.setAttribute("browsetext", queryString);
+        request.setAttribute("items", items);
+        request.setAttribute("more", results.getTotalSearchResults() > offset + ITEMMAP_RESULT_PAGE_SIZE);
+        request.setAttribute("browsetype", "Add");
+        request.setAttribute("page", page > 0 ? page + 1 : 1);
+        
+        JSPManager.showJSP(request, response, "itemmap-browse.jsp");
+    }
+    
+    @Override
+    public String getI18NKeyPrefix()
+    {
+        return "jsp.search.filter.";
+    }
+    
+    @Override
+    public List<String> getSearchIndices()
+    {
+        init();
+        return searchIndices;
+    }
 }

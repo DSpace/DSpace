@@ -78,12 +78,19 @@ select.multiple {
 
 #ds-user-box {
     right: 0;
-    top: 10px;
+    top: 17px;
     position: absolute;
     color: white;
 }
 
-#ds-user-box a{
+#ds-language-selection {
+    right: 0;
+    top: 40px;
+    position: absolute;
+    color: white;
+}
+
+#ds-user-box a, #ds-language-selection a {
     color: white;
 }
 
@@ -1372,4 +1379,17 @@ table.discovery-filters th.new-filter-header
 
 .searchTime{
     color: #999999;
+}
+
+.didYouMean{
+    font-size: 18px;
+}
+
+.didYouMean a{
+    font-weight: bold;
+}
+
+.recentSubmissionViewMore {
+    text-align: right;
+    font-size: 100%;
 }

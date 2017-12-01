@@ -13,6 +13,7 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
+import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
@@ -36,7 +37,9 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
      Context context=null;
 
     protected static final Message T_name =message("xmlui.Submission.submit.AccessStep.name");
-    protected static final Message T_reason = message("xmlui.Submission.submit.AccessStep.reason");
+	protected static final Message T_name_help = message("xmlui.Submission.submit.AccessStep.name_help");
+	protected static final Message T_reason = message("xmlui.Submission.submit.AccessStep.reason");
+	protected static final Message T_reason_help = message("xmlui.Submission.submit.AccessStep.reason_help");
     protected static final Message T_radios_embargo = message("xmlui.Submission.submit.AccessStep.embargo_visible");
     protected static final Message T_groups = message("xmlui.Submission.submit.AccessStep.list_assigned_groups");
     protected static final Message T_item_will_be_visible = message("xmlui.Submission.submit.AccessStep.open_access");
@@ -46,7 +49,9 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     protected static final Message T_error_duplicated_policy = message("xmlui.Submission.submit.AccessStep.error_duplicated_policy");
 
     // Policies Table
+    protected static final Message T_no_policies = message("xmlui.Submission.submit.AccessStep.no_policies");
     protected static final Message T_head_policies_table = message("xmlui.Submission.submit.AccessStep.table_policies");
+	protected static final Message T_policies_help = message("xmlui.Submission.submit.AccessStep.policies_help");
     protected static final Message T_column0 =message("xmlui.Submission.submit.AccessStep.column0");
     protected static final Message T_column1 =message("xmlui.Submission.submit.AccessStep.column1");
     protected static final Message T_column2 =message("xmlui.Submission.submit.AccessStep.column2");
@@ -54,6 +59,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     protected static final Message T_column4 =message("xmlui.Submission.submit.AccessStep.column4");
     protected static final Message T_table_submit_edit =message("xmlui.Submission.submit.AccessStep.table_edit_button");
     protected static final Message T_table_submit_delete =message("xmlui.Submission.submit.AccessStep.table_delete_button");
+	protected static final Message T_policy = message("xmlui.Submission.submit.AccessStep.review_policy_line");
 
     private static final Message T_label_date_help =
             message("xmlui.administrative.authorization.AccessStep.label_date_help");
@@ -67,14 +73,16 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     private boolean isAdvancedFormEnabled=false;
 
     public AccessStepUtil(Context c){
-        isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         context=c;
     }
 
     public void addName(String name_, List form, int errorFlag) throws WingException {
         if(isAdvancedFormEnabled){
             Text name = form.addItem().addText("name");
+	        name.setSize(0, 30);
             name.setLabel(T_name);
+	        name.setHelp(T_name_help);
 
             if(name_!=null && errorFlag != org.dspace.submit.step.AccessStep.STATUS_COMPLETE)
                 name.setValue(name_);
@@ -84,6 +92,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
     public void addReason(String reason_, List form, int errorFlag) throws WingException {
         TextArea reason = form.addItem("reason", null).addTextArea("reason");
         reason.setLabel(T_reason);
+	    reason.setHelp(T_reason_help);
 
         if(!isAdvancedFormEnabled){
             if(globalReason!=null)
@@ -106,7 +115,7 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
             Group[] loadedGroups = null;
 
             // retrieve groups
-            String name = ConfigurationManager.getProperty("xmlui.submission.restrictstep.groups");
+            String name = ConfigurationManager.getProperty("webui.submission.restrictstep.groups");
             if(name!=null){
                 Group uiGroup = Group.findByName(context, name);
                 if(uiGroup!=null)
@@ -118,13 +127,13 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
 
             // if no group selected for default set anonymous
             if(groupID==null || groupID.equals("")) groupID= "0";
+	        // when we're just loading the main step, also default to anonymous
+	        if (errorFlag == AccessStep.STATUS_COMPLETE) {
+		        groupID = "0";
+	        }
             for (Group group : loadedGroups){
-                if(Integer.parseInt(groupID) == group.getID() && errorFlag != org.dspace.submit.step.AccessStep.STATUS_COMPLETE){
-                    groupSelect.addOption(true, group.getID(), group.getName());
-
-                }else{
-                    groupSelect.addOption(false, group.getID(), group.getName());
-                }
+	            boolean selectGroup = Integer.parseInt(groupID) == group.getID();
+	            groupSelect.addOption(selectGroup, group.getID(), group.getName());
             }
 
             if (errorFlag == AccessStep.STATUS_DUPLICATED_POLICY || errorFlag == AccessStep.EDIT_POLICY_STATUS_DUPLICATED_POLICY
@@ -212,70 +221,131 @@ public class AccessStepUtil extends AbstractDSpaceTransformer {
         startDate.setHelp(T_label_date_help);
     }
 
-    public void addTablePolicies(Division div, DSpaceObject dso) throws WingException, SQLException {
-        if(isAdvancedFormEnabled){
-            java.util.List<ResourcePolicy> resourcePolicies = AuthorizeManager.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
+    public void addTablePolicies(Division parent, DSpaceObject dso, Collection owningCollection) throws WingException, SQLException {
+	    if (!isAdvancedFormEnabled) {
+		    return;
+	    }
+	    Division div = parent.addDivision("access-existing-policies");
+	    div.setHead(T_head_policies_table);
+	    div.addPara(T_policies_help.parameterize(owningCollection));
 
-            int cols = resourcePolicies.size();
-            if(cols==0) cols=1;
-            Table policies = div.addTable("policies", 6, cols);
-            policies.setHead(T_head_policies_table);
-            Row header = policies.addRow(Row.ROLE_HEADER);
+	    java.util.List<ResourcePolicy> resourcePolicies = AuthorizeManager.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
 
-            header.addCellContent(T_column0); // name
-            header.addCellContent(T_column1); // action
-            header.addCellContent(T_column2); // group
-            header.addCellContent(T_column3); // start_date
-            header.addCellContent(T_column4); // end_date
+	    if (resourcePolicies.isEmpty())
+	    {
+		    div.addPara(T_no_policies);
+		    return;
+	    }
+
+	    int cols = resourcePolicies.size();
+	    if(cols==0) cols=1;
+	    Table policies = div.addTable("policies", 6, cols);
+	    Row header = policies.addRow(Row.ROLE_HEADER);
+
+	    header.addCellContent(T_column0); // name
+	    header.addCellContent(T_column1); // action
+	    header.addCellContent(T_column2); // group
+	    header.addCellContent(T_column3); // start_date
+	    header.addCellContent(T_column4); // end_date
 
 
-            for (ResourcePolicy rp : resourcePolicies){
-                int id = rp.getID();
+	    for (ResourcePolicy rp : resourcePolicies){
+	        int id = rp.getID();
 
-                String name = "";
-                if(rp.getRpName()!=null) name=rp.getRpName();
+	        String name = "";
+	        if(rp.getRpName()!=null) name=rp.getRpName();
 
-                String action = rp.getActionText();
+	        String action = rp.getActionText();
 
-                // if it is the default policy for the Submitter don't show it.
-                if(dso instanceof org.dspace.content.Item){
-                    org.dspace.content.Item item = (org.dspace.content.Item)dso;
-                    if(rp.getEPersonID()!=-1 && rp.getEPersonID()!=0){
-                        if(item.getSubmitter().getID()==rp.getEPersonID())
-                            continue;
-                    }
-                }
+	        // if it is the default policy for the Submitter don't show it.
+	        if(dso instanceof org.dspace.content.Item){
+	            org.dspace.content.Item item = (org.dspace.content.Item)dso;
+	            if(rp.getEPersonID()!=-1 && rp.getEPersonID()!=0){
+	                if(item.getSubmitter().getID()==rp.getEPersonID())
+	                    continue;
+	            }
+	        }
 
-                String group = "";
-                if(rp.getGroup()!=null)
-                    group = rp.getGroup().getName();
+	        String group = "";
+	        if(rp.getGroup()!=null)
+	            group = rp.getGroup().getName();
 
-                Row row = policies.addRow();
+	        Row row = policies.addRow();
 
-                row.addCellContent(name);
-                row.addCellContent(action);
-                row.addCellContent(group);
+	        row.addCellContent(name);
+	        row.addCellContent(action);
+	        row.addCellContent(group);
 
-                // start
-                String startDate = "";
-                if(rp.getStartDate() != null){
-                    startDate = DateFormatUtils.format(rp.getStartDate(), "yyyy-MM-dd");
-                }
-                row.addCellContent(startDate);
+	        // start
+	        String startDate = "";
+	        if(rp.getStartDate() != null){
+	            startDate = DateFormatUtils.format(rp.getStartDate(), "yyyy-MM-dd");
+	        }
+	        row.addCellContent(startDate);
 
-                // endDate
-                String endDate = "";
-                if(rp.getEndDate() != null){
-                    endDate = DateFormatUtils.format(rp.getEndDate(), "yyyy-MM-dd");
-                }
-                row.addCellContent(endDate);
+	        // endDate
+	        String endDate = "";
+	        if(rp.getEndDate() != null){
+	            endDate = DateFormatUtils.format(rp.getEndDate(), "yyyy-MM-dd");
+	        }
+	        row.addCellContent(endDate);
 
-                Button edit = row.addCell().addButton("submit_edit_edit_policies_"+id);
-                edit.setValue(T_table_submit_edit);
+	        Button edit = row.addCell().addButton("submit_edit_edit_policies_"+id);
+	        edit.setValue(T_table_submit_edit);
 
-                Button delete = row.addCell().addButton("submit_delete_edit_policies_"+id);
-                delete.setValue(T_table_submit_delete);
-            }
-        }
+	        Button delete = row.addCell().addButton("submit_delete_edit_policies_"+id);
+	        delete.setValue(T_table_submit_delete);
+	    }
     }
+
+	public void addListPolicies(List parent, DSpaceObject dso, Collection owningCollection) throws WingException, SQLException {
+		if (!isAdvancedFormEnabled) {
+			return;
+		}
+		parent.addLabel(T_head_policies_table);
+
+		java.util.List<ResourcePolicy> resourcePolicies = AuthorizeManager.findPoliciesByDSOAndType(context, dso, ResourcePolicy.TYPE_CUSTOM);
+		if (resourcePolicies.isEmpty()) {
+			parent.addItem(T_no_policies);
+			return;
+		}
+
+
+		for (ResourcePolicy rp : resourcePolicies){
+			int id = rp.getID();
+
+			String name = "";
+			if(rp.getRpName()!=null) name=rp.getRpName();
+
+			String action = rp.getActionText();
+
+			// if it is the default policy for the Submitter don't show it.
+			if(dso instanceof org.dspace.content.Item){
+				org.dspace.content.Item item = (org.dspace.content.Item)dso;
+				if(rp.getEPersonID()!=-1 && rp.getEPersonID()!=0){
+					if(item.getSubmitter().getID()==rp.getEPersonID())
+						continue;
+				}
+			}
+
+			String group = "";
+			if(rp.getGroup()!=null)
+				group = rp.getGroup().getName();
+
+			// start
+			String startDate = "";
+			if(rp.getStartDate() != null){
+				startDate = DateFormatUtils.format(rp.getStartDate(), "yyyy-MM-dd");
+			}
+
+			// endDate
+			String endDate = "";
+			if(rp.getEndDate() != null){
+				endDate = DateFormatUtils.format(rp.getEndDate(), "yyyy-MM-dd");
+			}
+
+			parent.addItem(T_policy.parameterize(name, action, group, startDate, endDate));
+		}
+
+	}
 }

@@ -23,22 +23,24 @@ import java.util.Enumeration;
 
 /**
  * Class to initialize / cleanup resources used by DSpace when the web application
- * is started or stopped
+ * is started or stopped.
  */
 public class DSpaceContextListener implements ServletContextListener
 {
     private static Logger log = Logger.getLogger(DSpaceContextListener.class);
 
     /**
-     * The DSpace config parameter, this is where the path to the DSpace
-     * configuration file can be obtained
+     * Name of the context parameter giving the path to the DSpace configuration file.
      */
     public static final String DSPACE_CONFIG_PARAMETER = "dspace-config";
-    
+
+    private AbstractDSpaceWebapp webApp;
+
     /**
-     * Initialize any resources required by the application
+     * Initialize any resources required by the application.
      * @param event
      */
+    @Override
     public void contextInitialized(ServletContextEvent event)
     {
 
@@ -114,6 +116,23 @@ public class DSpaceContextListener implements ServletContextListener
                     "either the local servlet or global context.\n\n",e);
         }
 
+        /**
+         * Stage 3
+         *
+         * Register that this application is running.
+         */
+
+        try {
+            Class webappClass = Class.forName("org.dspace.utils.DSpaceWebapp");
+            webApp = (AbstractDSpaceWebapp) webappClass.newInstance();
+            webApp.register();
+        } catch (ClassNotFoundException ex) {
+            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
+        } catch (InstantiationException ex) {
+            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
+        } catch (IllegalAccessException ex) {
+            event.getServletContext().log("Can't create webapp MBean:  " + ex.getMessage());
+        }
     }
 
     /**
@@ -121,8 +140,11 @@ public class DSpaceContextListener implements ServletContextListener
      * 
      * @param event
      */
+    @Override
     public void contextDestroyed(ServletContextEvent event)
     {
+        webApp.deregister();
+
         try
         {
             // Remove the database pool

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 
+
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -49,7 +50,15 @@ import org.xml.sax.SAXException;
  * place. Possibly the sitemap configuration.
  * 
  * @author Scott Phillips
+ * 
+ * @deprecated Since DSpace 4 the system use an abstraction layer named
+ *             Discovery to provide access to different search provider. The
+ *             legacy system build upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in use Lucene as backend
+ *             for the DSpace search system please consider to build a Lucene
+ *             implementation of the Discovery interfaces
  */
+@Deprecated
 public class AdvancedSearch extends AbstractSearch implements CacheableProcessingComponent
 {
     /** Language string used: */

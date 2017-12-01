@@ -28,7 +28,7 @@
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.tools.upload-bitstream.title"
+<dspace:layout style="submission" titlekey="jsp.tools.upload-bitstream.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -39,17 +39,17 @@
 	<h1><fmt:message key="jsp.tools.upload-bitstream.title"/></h1>
     
     <%-- <p>Select the bitstream to upload</p> --%>
-	<p><fmt:message key="jsp.tools.upload-bitstream.info"/></p>
+	<p class="alert alert-info"><fmt:message key="jsp.tools.upload-bitstream.info"/></p>
     
     <form method="post" enctype="multipart/form-data" action="">
-        <p align="center">
-            <input type="file" size="40" name="file"/>
-        </p>
+        <div class="container row">        	
+            <input class="form-control" type="file" size="40" name="file"/>
+        </div>
         
         <input type="hidden" name="item_id" value="<%= item.getID() %>"/>
-
+		<br/>
         <!-- <p align="center"><input type="submit" name="submit" value="Upload"></p> -->
-		<p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload"/>" /></p>
+		<div class="container row col-md-offset-5"><input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.tools.upload-bitstream.upload"/>" /></div>
     </form>
     
 </dspace:layout>

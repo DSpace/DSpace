@@ -10,6 +10,7 @@ package org.dspace.sword2;
 import org.dspace.core.PluginManager;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
+import org.swordapp.server.UriRegistry;
 
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,7 @@ public class SwordDisseminatorFactory
 
             if (disseminator == null)
             {
-                throw new SwordError(DSpaceUriRegistry.NOT_ACCEPTABLE, 406, "No plugin can disseminate the requested formats");
+                throw new SwordError(UriRegistry.ERROR_CONTENT, 406, "No plugin can disseminate the requested formats");
             }
 
             disseminator.setPackaging(acceptPackaging);
@@ -126,7 +127,7 @@ public class SwordDisseminatorFactory
 
 		if (disseminator == null)
 		{
-			throw new SwordError(DSpaceUriRegistry.NOT_ACCEPTABLE, 406, "No plugin can disseminate the requested formats");
+			throw new SwordError(UriRegistry.ERROR_CONTENT, 406, "No plugin can disseminate the requested formats");
 		}
 
 		return disseminator;

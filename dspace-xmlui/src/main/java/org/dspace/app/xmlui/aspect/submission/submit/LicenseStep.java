@@ -83,7 +83,7 @@ public class LicenseStep extends AbstractSubmissionStep
 	UIException, SQLException, IOException, AuthorizeException
 	{
 
-        // Get the full text for the actuial licese
+		// Get the full text for the actual licese
 		Collection collection = submission.getCollection();
 		String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 		String licenseText = LicenseUtils.getLicenseText(context
@@ -112,7 +112,7 @@ public class LicenseStep extends AbstractSubmissionStep
 		decision.setLabel(T_decision_label);
 		decision.addOption("accept",T_decision_checkbox);
 
-		// If user did not check "I accept" checkbox 
+		// If user did not check the "I accept" checkbox 
 		if(this.errorFlag==org.dspace.submit.step.LicenseStep.STATUS_LICENSE_REJECTED)
 		{
 			log.info(LogManager.getHeader(context, "reject_license", submissionInfo.getSubmissionLogInfo()));

@@ -101,7 +101,7 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
     @Required(percentile95 = 2000, average= 1800)
     public void testCountItems() throws SQLException, AuthorizeException
     {
-        //make it an even number, not to high to reduce time during testing
+        //make it an even number, not too high to reduce time during testing
         int totalitems = 4;
 
         //we create the structure

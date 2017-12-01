@@ -43,7 +43,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Renders the side bar filters in discovery
+ * Renders the sidebar filters in Discovery
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
@@ -106,7 +106,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
      * <p/>
      * The validity object will include the collection being viewed and
      * all recently submitted items. This does not include the community / collection
-     * hierarch, when this changes they will not be reflected in the cache.
+     * hierarchy, when this changes they will not be reflected in the cache.
      */
     public SourceValidity getValidity() {
         if (this.validity == null) {
@@ -203,7 +203,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                     if (facetValues != null && 0 < facetValues.size()) {
 
                         if(browse == null){
-                            //Since we have a value it is save to add the sidebar (doing it this way will ensure that we do not end up with an empty sidebar)
+                            //Since we have a value it is safe to add the sidebar (doing it this way will ensure that we do not end up with an empty sidebar)
                             browse = options.addList("discovery");
 
                             browse.setHead(T_FILTER_HEAD);
@@ -219,7 +219,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
                             if (!iter.hasNext())
                             {
-                                //When we have an hierarchical facet always show the view more they may want to filter the children of the top nodes
+                                //When we have an hierarchical facet always show the "view more" they may want to filter the children of the top nodes
                                 if(field.getType().equals(DiscoveryConfigurationParameters.TYPE_HIERARCHICAL)){
                                     addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
                                 }
@@ -249,7 +249,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                     );
                                 }
                             }
-                            //Show a view more url should there be more values, unless we have a date
+                            //Show a "view more" url should there be more values, unless we have a date
                             if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
                                 addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
                             }
@@ -292,7 +292,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
             }
 
         }
-        //Join all our parameters by using an "&" sign
+        //Join all our parameters using an "&" sign
         String parametersString = StringUtils.join(parameters.toArray(new String[parameters.size()]), "&");
         if(StringUtils.isNotEmpty(parametersString)){
             parametersString += "&";
@@ -336,7 +336,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                 if(facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)){
                     String dateFacet = facet.getIndexFieldName() + ".year";
                     try{
-                        //Get a range query so we can create facet queries ranging from out first to our last date
+                        //Get a range query so we can create facet queries ranging from our first to our last date
                         //Attempt to determine our oldest & newest year by checking for previously selected filters
                         int oldestYear = -1;
                         int newestYear = -1;
@@ -349,7 +349,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 if(hasPattern){
                                     filterQuery = matcher.group(0);
                                     //We have a range
-                                    //Resolve our range to a first & endyear
+                                    //Resolve our range to a first & last year
                                     int tempOldYear = Integer.parseInt(filterQuery.split(" TO ")[0].replace("[", "").trim());
                                     int tempNewYear = Integer.parseInt(filterQuery.split(" TO ")[1].replace("]", "").trim());
 
@@ -372,7 +372,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 }
                             }
                         }
-                        //Check if we have found a range, if not then retrieve our first & last year by using solr
+                        //Check if we have found a range, if not then retrieve our first & last year using Solr
                         if(oldestYear == -1 && newestYear == -1){
 
                             DiscoverQuery yearRangeQuery = new DiscoverQuery();
@@ -410,7 +410,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                         }
 
                         int gap = 1;
-                        //Attempt to retrieve our gap by the algorithm below
+                        //Attempt to retrieve our gap using the algorithm below
                         int yearDifference = newestYear - oldestYear;
                         if(yearDifference != 0){
                             while (10 < ((double)yearDifference / gap)){
@@ -428,7 +428,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10, facet.getSortOrder()));
                         }else{
                             java.util.List<String> facetQueries = new ArrayList<String>();
-                            //Create facet queries but limit then to 11 (11 == when we need to show a show more url)
+                            //Create facet queries but limit them to 11 (11 == when we need to show a "show more" url)
                             for(int year = topYear; year > oldestYear && (facetQueries.size() < 11); year-=gap){
                                 //Add a filter to remove the last year only if we aren't the last year
                                 int bottomYear = year - gap;
@@ -456,11 +456,11 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             }
                         }
                     }catch (Exception e){
-                        log.error(LogManager.getHeader(context, "Error in discovery while setting up date facet range", "date facet: " + dateFacet), e);
+                        log.error(LogManager.getHeader(context, "Error in Discovery while setting up date facet range", "date facet: " + dateFacet), e);
                     }
                 }else{
                     int facetLimit = facet.getFacetLimit();
-                    //Add one to our facet limit to make sure that if we have more then the shown facets that we show our show more url
+                    //Add one to our facet limit to make sure that if we have more then the shown facets that we show our "show more" url
                     facetLimit++;
                     queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), facetLimit, facet.getSortOrder()));
                 }

@@ -40,6 +40,14 @@ public class LogoutServlet extends DSpaceServlet
 
         Authenticate.loggedOut(context, request);
 
+        // if the user still logged in (i.e. it was a login as)?
+        if (context.getCurrentUser() != null)
+        {
+            // redirect to the admin home page
+            response.sendRedirect(request.getContextPath()+"/dspace-admin/");
+            return;
+        }
+        
         // Display logged out message
         JSPManager.showJSP(request, response, "/login/logged-out.jsp");
     }

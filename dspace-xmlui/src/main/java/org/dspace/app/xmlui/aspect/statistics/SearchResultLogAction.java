@@ -42,11 +42,13 @@ public class SearchResultLogAction extends AbstractAction {
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel, String source, Parameters parameters) throws Exception {
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
-        DSpaceObject scope = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject result = HandleUtil.obtainHandle(objectModel);
 
-        String redirectUrl = request.getParameter("redirectUrl");
-        String resultHandle = StringUtils.substringAfter(redirectUrl, "/handle/");
-        DSpaceObject result = HandleManager.resolveToObject(ContextUtil.obtainContext(request), resultHandle);
+        DSpaceObject scope = null;
+        if(StringUtils.isNotBlank(request.getParameter("current-scope")))
+        {
+            scope = HandleManager.resolveToObject(context, request.getParameter("current-scope"));
+        }
 
         //Fire an event to log our search result
         UsageSearchEvent searchEvent = new UsageSearchEvent(
@@ -71,9 +73,6 @@ public class SearchResultLogAction extends AbstractAction {
 
         new DSpace().getEventService().fireEvent(
                 searchEvent);
-
-        HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-        httpResponse.sendRedirect(redirectUrl);
 
         return new HashMap();
     }

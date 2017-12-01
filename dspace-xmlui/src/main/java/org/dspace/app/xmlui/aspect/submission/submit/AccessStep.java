@@ -20,13 +20,9 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
-import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.eperson.Group;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -42,6 +38,10 @@ public class AccessStep extends AbstractSubmissionStep
     protected static final Message T_submit_add_policy = message("xmlui.Submission.submit.AccessStep.submit_add_policy");
     protected static final Message T_private_settings = message("xmlui.Submission.submit.AccessStep.private_settings");
     protected static final Message T_private_settings_help = message("xmlui.Submission.submit.AccessStep.private_settings_help");
+	protected static final Message T_private_label = message("xmlui.Submission.submit.AccessStep.private_settings_label");
+	protected static final Message T_private_item = message("xmlui.Submission.submit.AccessStep.review_private_item");
+	protected static final Message T_public_item = message("xmlui.Submission.submit.AccessStep.review_public_item");
+	protected static final Message T_policy_head = message("xmlui.Submission.submit.AccessStep.new_policy_head");
 
     public static final int CHECKBOX_PRIVATE_ITEM=1;
     public static final int RADIO_OPEN_ACCESS_ITEM_VISIBLE=0;
@@ -50,7 +50,7 @@ public class AccessStep extends AbstractSubmissionStep
     private EditPolicyStep editPolicy= null;
 
 
-    /**
+	/**
      * Establish our required parameters, abstractStep will enforce these.
      */
     public AccessStep(){
@@ -74,7 +74,8 @@ public class AccessStep extends AbstractSubmissionStep
     }
 
 
-    public void addPageMeta(PageMeta pageMeta) throws WingException{
+    public void addPageMeta(PageMeta pageMeta) throws WingException, SAXException, SQLException, AuthorizeException, IOException {
+	    super.addPageMeta(pageMeta);
         pageMeta.addMetadata("javascript", "static").addContent("static/js/accessFormUtil.js");
     }
 
@@ -99,26 +100,30 @@ public class AccessStep extends AbstractSubmissionStep
 
         AccessStepUtil asu = new AccessStepUtil(context);
 
-        // list Policies already added
-        asu.addTablePolicies(div, item);
-
         List form = div.addList("submit-access-settings", List.TYPE_FORM);
         form.setHead(T_head);
 
         addPrivateCheckBox(request, form, item);
 
-        asu.addName(request.getParameter("name"), form, errorFlag);
+	    // list Policies already added
+	    asu.addTablePolicies(div, item, collection);
+
+	    form = div.addList("submit-add-item-policy", List.TYPE_FORM);
+	    form.setHead(T_policy_head);
+
         asu.addListGroups(request.getParameter("group_id"), form, errorFlag, collection);
 
         // radio buttons: Item will be visible / Embargo Access + date
 
         asu.addAccessRadios(request.getParameter("open_access_radios"), request.getParameter("embargo_until_date"), form, errorFlag, item);
 
+	    asu.addName(request.getParameter("name"), form, errorFlag);
+
         // Reason
         asu.addReason(request.getParameter("reason"), form, errorFlag);
 
         // Add Policy Button
-        boolean isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         if(isAdvancedFormEnabled){
             Button addPolicy = form.addItem().addButton(org.dspace.submit.step.AccessStep.FORM_ACCESS_BUTTON_ADD);
             addPolicy.setValue(T_submit_add_policy);
@@ -133,9 +138,9 @@ public class AccessStep extends AbstractSubmissionStep
         privateCheckbox.setLabel(T_private_settings);
         privateCheckbox.setHelp(T_private_settings_help);
         if(request.getParameter("private_option")!=null || !item.isDiscoverable())
-            privateCheckbox.addOption(true, CHECKBOX_PRIVATE_ITEM, "");
+            privateCheckbox.addOption(true, CHECKBOX_PRIVATE_ITEM, T_private_label);
         else
-            privateCheckbox.addOption(false, CHECKBOX_PRIVATE_ITEM, "");
+            privateCheckbox.addOption(false, CHECKBOX_PRIVATE_ITEM, T_private_label);
     }
 
     private Division addMainDivision(Body body, Collection collection) throws WingException {
@@ -172,7 +177,17 @@ public class AccessStep extends AbstractSubmissionStep
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
-        // License step doesn't require reviewing
-        return null;
+	    List accessSection = reviewList.addList("submit-review-" + this.stepAndPage, List.TYPE_FORM);
+	    accessSection.setHead(T_head);
+
+	    Item item = submission.getItem();
+
+	    accessSection.addLabel(T_private_settings);
+	    accessSection.addItem(item.isDiscoverable() ? T_public_item : T_private_item);
+
+	    AccessStepUtil asu = new AccessStepUtil(context);
+	    asu.addListPolicies(accessSection, item, item.getOwningCollection());
+
+	    return accessSection;
     }
 }

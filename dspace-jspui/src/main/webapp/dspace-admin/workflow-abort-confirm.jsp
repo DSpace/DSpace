@@ -30,7 +30,8 @@
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.workflow-abort-confirm.title"
+<dspace:layout style="submission" 
+			   titlekey="jsp.dspace-admin.workflow-abort-confirm.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -43,36 +44,33 @@
 </fmt:message></h1>   
     <%-- <p>Are you sure you want to abort this workflow?  It will return to the user's personal workspace</p> --%>
     <p><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.warning"/></p>
-    <ul>
+    	<div class="row">
         <%-- <li>Collection: <%= workflow.getCollection().getMetadata("name") %></li> --%>
-        <li><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.collection">
+        <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.collection">
             <fmt:param><%= workflow.getCollection().getMetadata("name") %></fmt:param>
-        </fmt:message></li>
+        </fmt:message></span>
+        </div>
+        <div class="row">
         <%-- <li>Submitter: <%= WorkflowManager.getSubmitterName(workflow) %></li> --%>
-        <li><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.submitter">
+        <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.submitter">
             <fmt:param><%= WorkflowManager.getSubmitterName(workflow) %></fmt:param>
-        </fmt:message></li>
+        </fmt:message></span>
+        </div>
+        <div class="row">
         <%-- <li>Title: <%= WorkflowManager.getItemTitle(workflow) %></li> --%>
-        <li><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.item-title">
+        <span class="col-md-4"><fmt:message key="jsp.dspace-admin.workflow-abort-confirm.item-title">
             <fmt:param><%= WorkflowManager.getItemTitle(workflow) %></fmt:param>
-        </fmt:message></li>
-    </ul>
+        </fmt:message></span>
+    	</div>
     <form method="post" action="">
         <input type="hidden" name="workflow_id" value="<%= workflow.getID() %>"/> 
-        <center>
-            <table width="70%">
-                <tr>
-                    <td align="left">
+
                         <%-- <input type="submit" name="submit_abort_confirm" value="Abort"/> --%>
-                        <input type="submit" name="submit_abort_confirm" value="<fmt:message key="jsp.dspace-admin.workflow-abort-confirm.button"/>" />
-                    </td>
-                    <td align="right">
+                        <input class="btn btn-default" type="submit" name="submit_abort_confirm" value="<fmt:message key="jsp.dspace-admin.workflow-abort-confirm.button"/>" />
+                    
                         <%-- <input type="submit" name="submit_cancel" value="Cancel"/> --%>
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
-                    </td>
-                </tr>
-            </table>
-        </center>
+                        <input class="btn btn-default" type="submit" name="submit_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+                    
     </form>
 </dspace:layout>
 

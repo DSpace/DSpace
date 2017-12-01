@@ -20,18 +20,19 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.I18nUtil; 
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LicenseManager;
 
 /**
  * Servlet for editing the default license
- * 
+ *
  * @author Stuart Lewis
  */
 public class LicenseEditServlet extends DSpaceServlet
 {
     /**
      * Handle GET requests. This does nothing but forwards
-     * the request on to the POST handler. 
+     * the request on to the POST handler.
      */
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
@@ -59,7 +60,7 @@ public class LicenseEditServlet extends DSpaceServlet
         else if (!button.equals("submit_save"))
         {
             // Get the existing text from the ConfigurationManager
-            String license = ConfigurationManager.getLicenseText(I18nUtil.getDefaultLicense(c)); 
+            String license = LicenseManager.getLicenseText(I18nUtil.getDefaultLicense(c));
 
             // Pass the existing license back to the JSP
             request.setAttribute("license", license);
@@ -76,11 +77,11 @@ public class LicenseEditServlet extends DSpaceServlet
             if (license.trim().equals(""))
             {
             	// Get the existing text from the ConfigurationManager
-                license = ConfigurationManager.getLicenseText(I18nUtil.getDefaultLicense(c)); 
+                license = LicenseManager.getLicenseText(I18nUtil.getDefaultLicense(c));
 
                 // Pass the existing license back to the JSP
                 request.setAttribute("license", license);
-                
+
                 // Pass the 'empty' message back
 	            request.setAttribute("empty", "true");
 
@@ -90,14 +91,14 @@ public class LicenseEditServlet extends DSpaceServlet
             else
             {
 	            // Write the string out to file
-            	ConfigurationManager.writeLicenseFile(I18nUtil.getDefaultLicense(c), license); 
-	
+            	LicenseManager.writeLicenseFile(I18nUtil.getDefaultLicense(c), license);
+
 	            // Pass the existing license back to the JSP
 	            request.setAttribute("license", license);
-	            
+
 	            // Pass the 'edited' message back
 	            request.setAttribute("edited", "true");
-	            
+
 	            // Show edit page
 	            JSPManager.showJSP(request, response, "/dspace-admin/license-edit.jsp");
             }

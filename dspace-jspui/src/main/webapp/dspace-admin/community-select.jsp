@@ -38,7 +38,7 @@
     request.setAttribute("LanguageSwitch", "hide");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.community-select.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.community-select.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
@@ -49,34 +49,25 @@
 
     <form method="post" action="">
 
-    <table class="miscTable" align="center" summary="Community selection table">
-        <tr>
-            <td>
-                    <select size="12" name="community_id">
+				<div class="row col-md-4 col-md-offset-4">
+                    <select class="form-control" size="12" name="community_id">
                         <%  for (int i = 0; i < communities.length; i++) { %>
                             <option value="<%= communities[i].getID()%>">
                                 <%= communities[i].getMetadata("name")%>
                             </option>
                         <%  } %>
                     </select>
-            </td>
-        </tr>
-    </table>
-
-    <center>
-        <table width="70%">
-            <tr>
-                <td align="left">
+				</div>
+				<br/>
+				<div class="btn-group pull-right col-md-7">
                     <%-- <input type="submit" name="submit_community_select" value="Edit Policies"> --%>
-                    <input type="submit" name="submit_community_select" value="<fmt:message key="jsp.dspace-admin.general.editpolicy"/>" />
-                </td>
-                <td align="right">
+
+                    	<input class="btn btn-primary" type="submit" name="submit_community_select" value="<fmt:message key="jsp.dspace-admin.general.editpolicy"/>" />
+	
                     <%-- <input type="submit" name="submit_community_select_cancel" value="Cancel"> --%>
-                    <input type="submit" name="submit_community_select_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
-                </td>
-            </tr>
-        </table>
-    </center>        
+                    	<input class="btn btn-default" type="submit" name="submit_community_select_cancel" value="<fmt:message key="jsp.dspace-admin.general.cancel"/>" />
+
+				</div>
 
     </form>
 </dspace:layout>

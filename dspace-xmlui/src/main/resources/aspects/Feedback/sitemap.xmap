@@ -44,7 +44,7 @@ and searching the repository.
             <map:generate/>
             
             <!-- 
-                    Add the basic navigation content to everypage. This includes:
+                    Add the basic navigation content to every page. This includes:
                     
                     1) Metadata about the current page (really just what the current 
                        context path is)

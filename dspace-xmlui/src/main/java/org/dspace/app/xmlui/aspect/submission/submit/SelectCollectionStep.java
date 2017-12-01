@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
 
 import ar.edu.unlp.sedici.util.CollectionSearchSedici;
 import ar.edu.unlp.sedici.util.CollectionsWithCommunities;
-
+import org.dspace.app.util.CollectionDropDown;
 /**
  * Allow the user to select a collection they wish to submit an item to, 
  * this step is sort-of but not officialy part of the item submission 
@@ -75,22 +75,22 @@ public class SelectCollectionStep extends AbstractSubmissionStep
             UIException, SQLException, IOException, AuthorizeException
     {     
 		CollectionsWithCommunities collections; // List of possible collections.
-		String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
-		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-
-		if (dso instanceof Community)
-		{
-			collections = CollectionSearchSedici.findAuthorizedWithCommunitiesName(context, ((Community) dso), Constants.ADD);   
-		} 
-		else
-		{
-			collections = CollectionSearchSedici.findAuthorizedWithCommunitiesName(context, null, Constants.ADD);
-		}
+        String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
+        DSpaceObject dso = HandleManager.resolveToObject(context, handle);
         
-		// Basic form with a drop down list of all the collections
-		// you can submit too.
+        if (dso instanceof Community)
+        {
+            collections = CollectionSearchSedici.findAuthorizedWithCommunitiesName(context, ((Community) dso), Constants.ADD);   
+        } 
+        else
+        {
+            collections = CollectionSearchSedici.findAuthorizedWithCommunitiesName(context, null, Constants.ADD);
+        }
+        
+        // Basic form with a drop down list of all the collections
+        // you can submit too.
         Division div = body.addInteractiveDivision("select-collection",actionURL,Division.METHOD_POST,"primary submission");
-		div.setHead(T_submission_head);
+        div.setHead(T_submission_head);
         
         List list = div.addList("select-collection", List.TYPE_FORM);
         list.setHead(T_head);       

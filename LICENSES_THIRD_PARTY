@@ -52,22 +52,30 @@ Apache Software License, Version 2.0 (http://opensource.org/licenses/apache2.0)
   * Databene ContiPerf (org.databene:contiperf) - http://databene.org/contiperf
   * Ehcache (net.sf.ehcache:*) - http://ehcache.org/about/license
   * ElasticSearch (org.elasticsearch:*) - http://www.elasticsearch.org/
+  * Evo Inflector (org.atteo:*) - http://www.atteo.org/evo-framework/inflector/
   * flexjson (net.sf.flexjson:*) - http://sourceforge.net/projects/flexjson/
   * Google GSON (com.google.code.gson:*) - http://code.google.com/p/google-gson/
   * Google Guava (com.google.guava:*) - http://code.google.com/p/guava-libraries/
+  * Jackson (org.codehaus.jackson:*) - http://jackson.codehaus.org/
+  * Jettison (org.codejaus.jettison:*) - http://jettison.codehaus.org/
   * Jetty (org.mortbay.jetty:*) - http://jetty.codehaus.org/jetty/license.html
   * Lyncode XOAI (com.lyncode:xoai) - http://www.lyncode.com/
+  * noggit (org.noggit:noggit) - http://noggit.org/
+  * oai4j (se.kb:oai4j) - http://oai4j-client.sourceforge.net/
   * OpenCSV (net.sf.opencsv:*) - http://opencsv.sourceforge.net/
   * Rome (net.java.dev.rome:*, org.rometools:*, rome:*) - http://rometools.org/
+  * spatial4j (com.spatial4j:*) - http://spatial4j.com/
   * Spring Framework  (org.springframework:*) - http://www.springsource.org/spring-framework
   * SWORD Libraries (org.swordapp:*) - http://mvnrepository.com/artifact/org.swordapp/server/2.0
   * Woodstox (org.codehaus.woodstox:*) - http://woodstox.codehaus.org/Download
 
 BSD License (http://www.opensource.org/licenses/BSD-3-Clause)
+  * asm (asm:*) - http://asm.ow2.org/
   * Biblio Transformation Engine (gr.ekt:biblio-transformation-engine) - http://code.google.com/p/biblio-transformation-engine/
   * DNSJava (org.dspace.dnsjava:dnsjava)- http://www.xbill.org/dnsjava/dnsjava-current/README
   * dom4j (dom4j:*, maven:dom4j) - http://dom4j.sourceforge.net/dom4j-1.6.1/license.html
   * Foresite Toolkit (com.googlecode.foresite-toolkit:*) - http://code.google.com/p/foresite-toolkit/
+  * jargon (org.dspace:jargon) - http://www.sdsc.edu/srb/index.php/Jargon
   * Java BibTeX Parser (org.jbibtex:*) - https://code.google.com/p/java-bibtex/
   * Jaxen (jaxen:*) -  http://jaxen.codehaus.org/license.html
   * JLine (jline:*) - http://jline.sourceforge.net/
@@ -81,15 +89,19 @@ Common Development and Distribution License (CDDL) v1.0 (http://www.opensource.o
   * JavaBeans Activation Framework (javax.activation:*) - http://www.opensource.org/licenses/CDDL-1.0  
   * Java Mail (javax.mail:*) - http://www.opensource.org/licenses/CDDL-1.0
   * JAX-RPC (javax.xml:jaxrpc-api) - http://java.net/projects/jax-rpc/
-  * JAXB (com.sun.xml.bind:jaxb-impl) - http://jaxb.java.net/
-  
+
+Common Development and Distribution License (CDDL) v1.1 (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+  * JAXB (com.sun.xml.bind:*) - http://jaxb.java.net/
+  * Jersey (com.sun.jersey.*) - https://jersey.java.net/
+
 Common Public License v1.0 (http://www.opensource.org/licenses/cpl1.0)
   * JUnit (junit:*) - http://junit.org/license   
   * WSDL4J (wsdl4j:*) - http://sourceforge.net/projects/wsdl4j/
-  
+
 Lesser GPL (http://www.opensource.org/licenses/LGPL-2.1)
   * JExcelAPI (net.sourceforge.jexcelapi:*) - http://sourceforge.net/projects/jexcelapi/
   * MaxMind GeoIP (org.dspace.dependencies:dspace-geoip) - http://geoip.cvs.sourceforge.net/viewvc/geoip/java/LICENSE
+  * METS Java Toolkit (org.dspace.mets:*) - http://hul.harvard.edu/mets/
   * Text-mining (org.dspace.dependencies:dspace-tm-extractors) - http://code.google.com/p/text-mining/
   * XOM (xom:*) - http://www.xom.nu/
 
@@ -100,11 +112,18 @@ MIT / X11 License (or adaptations) (http://www.opensource.org/licenses/MIT)
   
 Mozilla Public License (http://www.opensource.org/licenses/MPL-2.0)
   * H2 database (com.h2database:*) - http://www.h2database.com/html/license.html
+
+New BSD License (http://opensource.org/licenses/bsd-license.php)
+  * Biblio-Transformation Engine (gr.ekt.bte:*) - http://github.com/EKT/Biblio-Transformation-Engine
   
 Other Open Source Licenses:
   * AOP Alliance (aopalliance:*) - Public Domain: http://aopalliance.sourceforge.net/
+  * backport-util-concurrent (backport-util-concurrent:*) - Public Domain: http://creativecommons.org/licenses/publicdomain
+  * coverity-escapers (com.coverity.security:*) - Modified BSD
+  * Handle API (org.dspace:handle) - Handle Public License Agreement: http://www.handle.net/HSj/hdlnet-2-LICENSE.pdf
   * ICU4J (com.ibm.icu:icu4j) - ICU License : http://source.icu-project.org/repos/icu/icu/trunk/license.html
   * JDOM  (jdom:*) - JDOM License : https://github.com/hunterhacker/jdom/blob/master/LICENSE.txt
+  * OCLC Harvester2 (org.dspace:oclc-harvester2) - OCLC Research Public License: http://www.oclc.org/research/activities/software/license/v2final.html
   * PostgreSQL (postgresql:*) - PostgreSQL License (BSD-based): http://www.postgresql.org/about/licence/
   * Pull-parser / XPP3 (pull-parser:*, xpp3:*) - Indiana University Extreme! Lab Software License (BSD-based): http://www.extreme.indiana.edu/xgws/xsoap/xpp/download/PullParser2/LICENSE.txt
   

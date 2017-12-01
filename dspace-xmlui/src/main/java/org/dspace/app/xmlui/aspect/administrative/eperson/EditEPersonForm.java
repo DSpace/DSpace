@@ -310,7 +310,7 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	       
 	        Button submitLoginAs = special.addButton("submit_login_as");
 	        submitLoginAs.setValue(T_submit_login_as);
-	        if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
+	        if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
             {
                 submitLoginAs.setDisabled();
             }

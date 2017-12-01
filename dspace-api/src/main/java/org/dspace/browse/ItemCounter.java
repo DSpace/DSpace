@@ -110,7 +110,8 @@ public class ItemCounter
 	public int getCount(DSpaceObject dso)
 		throws ItemCountException
 	{
-		boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
+		boolean useCache = ConfigurationManager.getBooleanProperty(
+				"webui.strengths.cache", true);
 		
 		if (useCache)
 		{

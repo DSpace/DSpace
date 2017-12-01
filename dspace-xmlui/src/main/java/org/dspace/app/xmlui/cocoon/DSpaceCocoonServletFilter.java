@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.cocoon;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -257,22 +258,34 @@ public class DSpaceCocoonServletFilter implements Filter
                     realResponse.sendRedirect(locationWithTrailingSlash);
                 }    
 	        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
-                else if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
-	                StringBuffer location = new StringBuffer("https://");
-	                location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
-	                        realRequest.getQueryString() == null ? ""
-	                                : ("?" + realRequest.getQueryString()));
-	                realResponse.sendRedirect(location.toString());
+                else if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl"))
+                        && (AuthenticationUtil.isLoggedIn(realRequest))
+                        && (!realRequest.isSecure()))
+                {
+                    StringBuffer location = new StringBuffer("https://");
+                    location.append(ConfigurationManager.getProperty("dspace.hostname"))
+                            .append(realRequest.getContextPath())
+                            .append(realRequest.getServletPath())
+                            .append(realRequest.getQueryString() == null ? ""
+                                    : ("?" + realRequest.getQueryString()));
+                    realResponse.sendRedirect(location.toString());
 	        }
                 else
                 {   // invoke the next filter
                     arg2.doFilter(realRequest, realResponse);
                 }
-
-        } catch (RuntimeException e) {
-            ContextUtil.abortContext(realRequest);
-            LOG.error("Serious Runtime Error Occurred Processing Request!", e);
-            throw e;
+    } catch (IOException e) {
+        ContextUtil.abortContext(realRequest);
+        if (LOG.isDebugEnabled()) {
+              LOG.debug("The connection was reset", e);
+            }
+        else {
+            LOG.error("Client closed the connection before file download was complete");
+        }
+    } catch (RuntimeException e) {
+        ContextUtil.abortContext(realRequest);
+        LOG.error("Serious Runtime Error Occurred Processing Request!", e);
+        throw e;
 	} catch (Exception e) {
 	    ContextUtil.abortContext(realRequest);
             LOG.error("Serious Error Occurred Processing Request!", e);

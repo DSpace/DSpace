@@ -9,19 +9,31 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Locale;
 
+import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.jsp.jstl.core.Config;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.DSpaceServlet;
+import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
+import org.dspace.core.LogManager;
+import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.EPersonDeletionException;
+import org.dspace.eperson.Group;
 
 /**
  * Servlet for editing and creating e-people
@@ -31,6 +43,10 @@ import org.dspace.eperson.EPersonDeletionException;
  */
 public class EPersonAdminServlet extends DSpaceServlet
 {
+        
+    /** Logger */
+    private static Logger log = Logger.getLogger(EPersonAdminServlet.class);
+    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -86,7 +102,7 @@ public class EPersonAdminServlet extends DSpaceServlet
 	            context.complete();
             }
         }
-        else if (button.equals("submit_save"))
+        else if (button.equals("submit_save") || button.equals("submit_resetpassword"))
         {
             // Update the metadata for an e-person
             EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
@@ -143,6 +159,20 @@ public class EPersonAdminServlet extends DSpaceServlet
 
                     e.update();
 
+                    if (button.equals("submit_resetpassword"))
+                    {                        
+                        try
+                        {
+                            resetPassword(context, request, response, e);
+                        }
+                        catch (MessagingException e1)
+                        {
+                            JSPManager
+                                    .showJSP(request, response,
+                                            "/dspace-admin/eperson-resetpassword-error.jsp");
+                            return;
+                        }
+                    }
                     showMain(context, request, response);
                     context.complete();
                 }
@@ -197,9 +227,27 @@ public class EPersonAdminServlet extends DSpaceServlet
 
                 e.update();
 
+                if (button.equals("submit_resetpassword"))
+                {
+                    try
+                    {
+                        resetPassword(context, request, response, e);
+                    }
+                    catch (MessagingException e1)
+                    {
+                        JSPManager
+                                .showJSP(request, response,
+                                        "/dspace-admin/eperson-resetpassword-error.jsp");
+                        return;
+                    }                   
+                }
+                
                 showMain(context, request, response);
                 context.complete();
             }
+            
+
+
         }
         else if (button.equals("submit_delete"))
         {
@@ -242,11 +290,95 @@ public class EPersonAdminServlet extends DSpaceServlet
             showMain(context, request, response);
             context.complete();
         }
+        else if (button.equals("submit_login_as"))
+        {
+            if (!ConfigurationManager.getBooleanProperty("webui.user.assumelogin", false))
+            {
+                throw new AuthorizeException("Turn on webui.user.assumelogin to activate Login As feature");                
+            }
+            EPerson e = EPerson.find(context, UIUtil.getIntParameter(request,
+                    "eperson_id"));
+            // Check the EPerson exists
+            if (e == null)
+            {
+                request.setAttribute("no_eperson_selected", new Boolean(true));
+                showMain(context, request, response);
+            }
+            // Only super administrators can login as someone else.
+            else if (!AuthorizeManager.isAdmin(context))
+            {                
+                throw new AuthorizeException("Only site administrators may assume login as another user.");
+            }
+            else
+            {
+                
+                log.info(LogManager.getHeader(context, "login-as",
+                        "current_eperson="
+                                + context.getCurrentUser().getFullName()
+                                + ", id=" + context.getCurrentUser().getID()
+                                + ", as_eperson=" + e.getFullName() + ", id="
+                                + e.getID()));
+                
+                // Just to be double be sure, make sure the administrator
+                // is the one who actually authenticated himself.
+                HttpSession session = request.getSession(false);
+                Integer authenticatedID = (Integer) session.getAttribute("dspace.current.user.id"); 
+                if (context.getCurrentUser().getID() != authenticatedID)
+                {                                         
+                    throw new AuthorizeException("Only authenticated users who are administrators may assume the login as another user.");                    
+                }
+                
+                // You may not assume the login of another super administrator
+                Group administrators = Group.find(context,1);
+                if (administrators.isMember(e))
+                {                    
+                    JSPManager.showJSP(request, response,
+                            "/dspace-admin/eperson-loginas-error.jsp");
+                    return;
+                }
+                               
+                // store a reference to the authenticated admin
+                session.setAttribute("dspace.previous.user.id", authenticatedID);
+                
+                // Logged in OK.
+                Authenticate.loggedIn(context, request, e);
+
+                // Set the Locale according to user preferences
+                Locale epersonLocale = I18nUtil.getEPersonLocale(context
+                        .getCurrentUser());
+                context.setCurrentLocale(epersonLocale);
+                Config.set(request.getSession(), Config.FMT_LOCALE,
+                        epersonLocale);
+
+                // Set any special groups - invoke the authentication mgr.
+                int[] groupIDs = AuthenticationManager.getSpecialGroups(
+                        context, request);
+
+                for (int i = 0; i < groupIDs.length; i++)
+                {
+                    context.setSpecialGroup(groupIDs[i]);
+                    log.debug("Adding Special Group id="
+                            + String.valueOf(groupIDs[i]));
+                }
+
+                response.sendRedirect(request.getContextPath() + "/mydspace");
+            }
+        }
         else
         {
             // Cancel etc. pressed - show list again
             showMain(context, request, response);
         }
+    }
+
+    private void resetPassword(Context context, HttpServletRequest request,
+            HttpServletResponse response, EPerson e) throws SQLException,
+            IOException, AuthorizeException, ServletException,
+            MessagingException
+    {
+        // Note, this may throw an error is the email is bad.
+        AccountManager.sendForgotPasswordInfo(context, e.getEmail());
+        request.setAttribute("reset_password", Boolean.TRUE);
     }
 
     private void showMain(Context c, HttpServletRequest request,

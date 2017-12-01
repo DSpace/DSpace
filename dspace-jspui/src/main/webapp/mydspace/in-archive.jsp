@@ -25,7 +25,8 @@
     String handle = (String) request.getAttribute("handle");
 %>
 
-<dspace:layout locbar="link"
+<dspace:layout style="submission"
+			   locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.in-archive.title">

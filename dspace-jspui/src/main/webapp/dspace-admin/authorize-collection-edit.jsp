@@ -50,43 +50,30 @@
         (List<ResourcePolicy>) request.getAttribute("policies");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.authorize-collection-edit.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-collection-edit.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
 
-  <table width="95%">
-    <tr>
-      <td align="left">
-            <h1><fmt:message key="jsp.dspace-admin.authorize-collection-edit.policies">
+		<h1><fmt:message key="jsp.dspace-admin.authorize-collection-edit.policies">
             <fmt:param><%= collection.getMetadata("name") %></fmt:param>
             <fmt:param>hdl:<%= collection.getHandle() %></fmt:param>
             <fmt:param><%= collection.getID() %></fmt:param>
-        </fmt:message></h1>
-      </td>
-      <td align="right" class="standard">
+        </fmt:message>
         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#collectionpolicies\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-      </td>
-    </tr>
-  </table>
+       	</h1>
+
 
  <form action="<%= request.getContextPath() %>/tools/authorize" method="post"> 
-    <p align="center">
+	<div class="row"> 
             <input type="hidden" name="collection_id" value="<%=collection.getID()%>" />
-            <input type="submit" name="submit_collection_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
-    </p>
+            <input class="btn btn-success col-md-2 col-md-offset-5"  type="submit" name="submit_collection_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
+    </div>
  </form>
-
-<%
-    String row = "even";
-
-    for (ResourcePolicy rp : policies)
-    {
-%>
-      <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
-        <table class="miscTable" align="center" summary="Collection Policy Edit Form">
+ <br/>
+         <table class="table" summary="Collection Policy Edit Form">
             <tr>
                <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
                <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
@@ -94,7 +81,13 @@
                <th class="oddRowEvenCol">&nbsp;</th>
                <th class="oddRowOddCol">&nbsp;</th>
             </tr>
+ 
+<%
+    String row = "even";
 
+    for (ResourcePolicy rp : policies)
+    {
+%>
             <tr>
                <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
                <td class="<%= row %>RowEvenCol">
@@ -104,19 +97,24 @@
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>
                </td>
                <td class="<%= row %>RowEvenCol">
+               <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
-                    <input type="submit" name="submit_collection_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
+                    <input class="btn btn-primary" type="submit" name="submit_collection_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
+               </form>
                </td>
                <td class="<%= row %>RowOddCol">
-                    <input type="submit" name="submit_collection_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+               <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
+                    <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
+                    <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
+                    <input class="btn btn-danger" type="submit" name="submit_collection_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+               </form>
                </td>
             </tr>
-       </table>
-     </form>
 
 <%
         row = (row.equals("odd") ? "even" : "odd");
     }
 %>
+	</table>
 </dspace:layout>

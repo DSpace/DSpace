@@ -175,6 +175,21 @@ public class DCInputsReader
         {
                 throw new DCInputsReaderException("No form designated as default");
         }
+        return getInputsByFormName(formName);
+	}
+                
+	/**
+	 * Returns the set of DC inputs used for a particular input form
+	 *
+	 * @param formName
+	 *            input form unique name
+	 * @return DC input set
+	 * @throws DCInputsReaderException
+	 *             if not found
+	 */
+    public DCInputSet getInputsByFormName(String formName)
+                throws DCInputsReaderException
+        {
         // check mini-cache, and return if match
         if ( lastInputSet != null && lastInputSet.getFormName().equals( formName ) )
         {

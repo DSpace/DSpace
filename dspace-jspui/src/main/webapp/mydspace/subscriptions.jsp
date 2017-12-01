@@ -27,48 +27,60 @@
 
 <%@ page import="org.dspace.content.Community" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="org.dspace.app.util.CollectionDropDown" %>
 
 <%
+    Collection[] availableSubscriptions =
+        (Collection[]) request.getAttribute("availableSubscriptions");
     Collection[] subscriptions =
         (Collection[]) request.getAttribute("subscriptions");
     boolean updated =
         ((Boolean) request.getAttribute("updated")).booleanValue();
 %>
 
-<dspace:layout locbar="link"
+<dspace:layout style="submission" locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.subscriptions.title">
 
-    <table width="100%" border="0">
-        <tr>
-            <td align="left">
                 <%-- <h1>Your Subscriptions</h1> --%>
-				<h1><fmt:message key="jsp.mydspace.subscriptions.title"/></h1>
-            </td>
-            <td align="right" class="standard">
-		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
-            </td>
-        </tr>
-    </table>
- 
+<h1><fmt:message key="jsp.mydspace.subscriptions.title"/>
+	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") +\"#subscribe\" %>"><fmt:message key="jsp.help"/></dspace:popup>
+</h1>
 <%
     if (updated)
     {
 %>
 	<p><strong><fmt:message key="jsp.mydspace.subscriptions.info1"/></strong></p>
+	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
 <%
     }
 %>
-	<p><fmt:message key="jsp.mydspace.subscriptions.info2"/></p>
+        <form class="form-group" action="<%= request.getContextPath() %>/subscribe" method="post">
+        	<div class="col-md-6">
+            <select id="available-subscriptions" class="form-control" name="collection">
+                <option value="-1"><fmt:message key="jsp.mydspace.subscriptions.select_collection" /></option>
+<%
+    for (int i = 0; i < availableSubscriptions.length; i++)
+    {
+%>
+                <option value="<%= availableSubscriptions[i].getID() %>"><%= CollectionDropDown.collectionPath(availableSubscriptions[i], 0) %></option>
+<%
+    }
+%>
+            </select>
+            </div>
+            <input class="btn btn-success" type="submit" name="submit_subscribe" value="<fmt:message key="jsp.collection-home.subscribe"/>" />
+ 			<input class="btn btn-danger" type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
+	</form>
+        
 <%
     if (subscriptions.length > 0)
     {
 %>
 	<p><fmt:message key="jsp.mydspace.subscriptions.info3"/></p>
     
-    <center>
-        <table class="miscTable" summary="Table displaying your subscriptions">
+        <table class="table" summary="Table displaying your subscriptions">
 <%
         String row = "odd";
 
@@ -82,12 +94,12 @@
                   --%>
 
                  <td class="<%= row %>RowOddCol">
-                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= subscriptions[i].getMetadata("name") %></a>
+                      <a href="<%= request.getContextPath() %>/handle/<%= subscriptions[i].getHandle() %>"><%= CollectionDropDown.collectionPath(subscriptions[i],0) %></a>
                  </td>
                  <td class="<%= row %>RowEvenCol">
                     <form method="post" action=""> 
                         <input type="hidden" name="collection" value="<%= subscriptions[i].getID() %>" />
-			<input type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
+			<input class="btn btn-warning" type="submit" name="submit_unsubscribe" value="<fmt:message key="jsp.mydspace.subscriptions.unsub.button"/>" />
                     </form>
                  </td>
             </tr>
@@ -96,15 +108,9 @@
         }
 %>
         </table>
-    </center>
 
     <br/>
 
-    <center>
-        <form method="post" action="">
-    	    <input type="submit" name="submit_clear" value="<fmt:message key="jsp.mydspace.subscriptions.remove.button"/>" />
-        </form>
-    </center>
 <%
     }
     else

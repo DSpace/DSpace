@@ -20,7 +20,7 @@ import org.apache.commons.logging.Log;
 
 public class WingContext
 {
-    /** The nameing divider */
+    /** The naming divider */
     public static final char DIVIDER = '.';
 
     /**
@@ -34,7 +34,7 @@ public class WingContext
 
 
     /**
-     * The repository specefic object manager.
+     * The repository-specific object manager.
      */
     private ObjectManager objectManager;
 
@@ -125,7 +125,7 @@ public class WingContext
     }
 
     /**
-     * Generate a specialized name based on the callers name. This is typically
+     * Generate a specialized name based on the caller's name. This is typically
      * used in situations where two namespaces are being merged together so that
      * each namespace is prepended with the current scope's name.
      * 

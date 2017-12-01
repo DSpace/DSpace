@@ -183,12 +183,6 @@
                 </map:match>
             </map:match>
 
-            <map:match pattern="dso-display">
-                <map:act type="SearchResultLogAction"/>
-            </map:match>
-
-
-
             <map:match pattern="search">
                 <map:transform type="IncludePageMeta">
                     <map:parameter name="javascript.static.statistics#1" value="loadJQuery.js"/>
@@ -227,13 +221,26 @@
 
             <!-- Handle specific features -->
             <map:match pattern="handle/*/**">
+                <!-- Logging in case of a search result -->
+               <map:match pattern="handle/*/*">
+                   <!-- Make sure we have a search result by checking the parameter -->
+                   <map:match type="request-parameter" pattern="search-result">
+                       <map:match type="HandleAuthorizedMatcher" pattern="READ">
+                           <map:match type="HandleTypeMatcher" pattern="community">
+                               <map:act type="SearchResultLogAction"/>
+                           </map:match>
+                           <map:match type="HandleTypeMatcher" pattern="collection">
+                               <map:act type="SearchResultLogAction"/>
+                           </map:match>
+                           <map:match type="HandleTypeMatcher" pattern="item">
+                               <map:act type="SearchResultLogAction"/>
+                           </map:match>
+                       </map:match>
+                   </map:match>
+                </map:match>
                 <!-- Scoped browse by features -->
                 <map:match type="HandleAuthorizedMatcher" pattern="READ">
                     <map:match type="HandleTypeMatcher" pattern="community,collection">
-
-                        <map:match pattern="handle/*/*/dso-display">
-                            <map:act type="SearchResultLogAction"/>
-                        </map:match>
 
                         <!-- Simple search -->
                         <map:match pattern="handle/*/*/search">
@@ -282,8 +289,8 @@
             <!-- End match handle/*/** -->
 
 
-			<map:serialize type="xml"/>
+        <map:serialize type="xml"/>
 
-		</map:pipeline>
+        </map:pipeline>
 	</map:pipelines>
 </map:sitemap>

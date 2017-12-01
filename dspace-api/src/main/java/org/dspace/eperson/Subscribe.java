@@ -34,7 +34,9 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
@@ -48,7 +50,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 /**
  * Class defining methods for sending new item e-mail alerts to users
- * 
+ *
  * @author Robert Tansley
  * @version $Revision$
  */
@@ -60,7 +62,7 @@ public class Subscribe
     /**
      * Subscribe an e-person to a collection. An e-mail will be sent every day a
      * new item appears in the collection.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param eperson
@@ -76,10 +78,10 @@ public class Subscribe
                 || ((context.getCurrentUser() != null) && (context
                         .getCurrentUser().getID() == eperson.getID())))
         {
-            // already subscribed?          
+            // already subscribed?
             TableRowIterator r = DatabaseManager.query(context,
                     "SELECT * FROM subscription WHERE eperson_id= ? " +
-                    " AND collection_id= ? ", 
+                    " AND collection_id= ? ",
                     eperson.getID(),collection.getID());
 
             try
@@ -117,7 +119,7 @@ public class Subscribe
      * Unsubscribe an e-person to a collection. Passing in <code>null</code>
      * for the collection unsubscribes the e-person from all collections they
      * are subscribed to.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param eperson
@@ -141,10 +143,10 @@ public class Subscribe
                         eperson.getID());
             }
             else
-            {       
+            {
                 DatabaseManager.updateQuery(context,
                         "DELETE FROM subscription WHERE eperson_id= ? " +
-                        "AND collection_id= ? ", 
+                        "AND collection_id= ? ",
                         eperson.getID(),collection.getID());
 
                 log.info(LogManager.getHeader(context, "unsubscribe",
@@ -161,7 +163,7 @@ public class Subscribe
 
     /**
      * Find out which collections an e-person is subscribed to
-     * 
+     *
      * @param context
      *            DSpace context
      * @param eperson
@@ -195,15 +197,56 @@ public class Subscribe
                 tri.close();
             }
         }
-        
+
         Collection[] collArray = new Collection[collections.size()];
 
         return (Collection[]) collections.toArray(collArray);
     }
 
     /**
+     * Find out which collections the currently logged in e-person can subscribe to
+     *
+     * @param context
+     *            DSpace context
+     * @param eperson
+     *            EPerson
+     * @return array of collections the currently logged in e-person can subscribe to
+     */
+    public static Collection[] getAvailableSubscriptions(Context context)
+            throws SQLException
+    {
+        return getAvailableSubscriptions(context, null);
+    }
+    
+    /**
+     * Find out which collections an e-person can subscribe to
+     *
+     * @param context
+     *            DSpace context
+     * @param eperson
+     *            EPerson
+     * @return array of collections e-person can subscribe to
+     */
+    public static Collection[] getAvailableSubscriptions(Context context, EPerson eperson)
+            throws SQLException
+    {
+        Collection[] collections;
+        
+        if (eperson != null)
+        {
+            context.setCurrentUser(eperson);
+        }
+        
+        Site site = (Site) Site.find(context, 0);
+        
+        collections = Collection.findAuthorized(context, null, Constants.ADD);
+
+        return collections;
+    }
+
+    /**
      * Is that e-person subscribed to that collection?
-     * 
+     *
      * @param context
      *            DSpace context
      * @param eperson
@@ -217,7 +260,7 @@ public class Subscribe
     {
     	TableRowIterator tri = DatabaseManager.query(context,
                 "SELECT * FROM subscription WHERE eperson_id= ? " +
-                "AND collection_id= ? ", 
+                "AND collection_id= ? ",
                 eperson.getID(),collection.getID());
 
         try
@@ -246,10 +289,10 @@ public class Subscribe
      * <P>
      * For example, if today's date is 2002-10-10 (in UTC) items made available
      * during 2002-10-09 (UTC) will be included.
-     * 
+     *
      * @param context
      *            DSpace context object
-     * @param test 
+     * @param test
      */
     public static void processDaily(Context context, boolean test) throws SQLException,
             IOException
@@ -306,7 +349,7 @@ public class Subscribe
                 tri.close();
             }
         }
-        
+
         // Process the last person
         if (currentEPerson != null)
         {
@@ -327,36 +370,36 @@ public class Subscribe
      * Sends an email to the given e-person with details of new items in the
      * given collections, items that appeared yesterday. No e-mail is sent if
      * there aren't any new items in any of the collections.
-     * 
+     *
      * @param context
      *            DSpace context object
      * @param eperson
      *            eperson to send to
      * @param collections
      *            List of collection IDs (Integers)
-     * @param test 
+     * @param test
      */
     public static void sendEmail(Context context, EPerson eperson,
             List<Collection> collections, boolean test) throws IOException, MessagingException,
             SQLException
     {
         // Get a resource bundle according to the eperson language preferences
-        Locale supportedLocale = I18nUtil.getEPersonLocale(eperson); 
+        Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
         ResourceBundle labels =  ResourceBundle.getBundle("Messages", supportedLocale);
-        
+
         // Get the start and end dates for yesterday
 
-        // The date should reflect the timezone as well. Otherwise we stand to lose that information 
+        // The date should reflect the timezone as well. Otherwise we stand to lose that information
         // in truncation and roll to an earlier date than intended.
         Calendar cal = Calendar.getInstance(TimeZone.getDefault());
         cal.setTime(new Date());
-        
+
         // What we actually want to pass to Harvest is "Midnight of yesterday in my current timezone"
         // Truncation will actually pass in "Midnight of yesterday in UTC", which will be,
         // at least in CDT, "7pm, the day before yesterday, in my current timezone".
         cal.add(Calendar.HOUR, -24);
         Date thisTimeYesterday = cal.getTime();
-        
+
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
@@ -374,7 +417,7 @@ public class Subscribe
 
             try {
                 boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
-                
+
                 // we harvest all the changed item from yesterday until now
                 List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, new DCDate(midnightYesterday).toString(), null, 0, // Limit
                                                                                     // and
@@ -386,7 +429,7 @@ public class Subscribe
                         false, // But not containers
                         false, // Or withdrawals
                         includeAll);
-    
+
                 if (ConfigurationManager.getBooleanProperty("eperson.subscription.onlynew", false))
                 {
                     // get only the items archived yesterday
@@ -394,7 +437,7 @@ public class Subscribe
                 }
                 else
                 {
-                    // strip out the item archived today or 
+                    // strip out the item archived today or
                     // not archived yesterday and modified today
                     itemInfos = filterOutToday(itemInfos);
                 }
@@ -411,19 +454,19 @@ public class Subscribe
                     {
                         isFirst = false;
                     }
-    
+
                     emailText.append(labels.getString("org.dspace.eperson.Subscribe.new-items")).append(" ").append(
                             c.getMetadata("name")).append(": ").append(
                             itemInfos.size()).append("\n\n");
-    
+
                     for (int j = 0; j < itemInfos.size(); j++)
                     {
                         HarvestedItemInfo hii = (HarvestedItemInfo) itemInfos
                                 .get(j);
-    
+
                         DCValue[] titles = hii.item.getDC("title", null, Item.ANY);
                         emailText.append("      ").append(labels.getString("org.dspace.eperson.Subscribe.title")).append(" ");
-    
+
                         if (titles.length > 0)
                         {
                             emailText.append(titles[0].value);
@@ -432,22 +475,22 @@ public class Subscribe
                         {
                             emailText.append(labels.getString("org.dspace.eperson.Subscribe.untitled"));
                         }
-    
+
                         DCValue[] authors = hii.item.getDC("contributor", Item.ANY,
                                 Item.ANY);
-    
+
                         if (authors.length > 0)
                         {
                             emailText.append("\n    ").append(labels.getString("org.dspace.eperson.Subscribe.authors")).append(" ").append(
                                     authors[0].value);
-    
+
                             for (int k = 1; k < authors.length; k++)
                             {
                                 emailText.append("\n             ").append(
                                         authors[k].value);
                             }
                         }
-    
+
                         emailText.append("\n         ").append(labels.getString("org.dspace.eperson.Subscribe.id")).append(" ").append(
                                 HandleManager.getCanonicalForm(hii.handle)).append(
                                 "\n\n");
@@ -463,47 +506,47 @@ public class Subscribe
         // Send an e-mail if there were any new items
         if (emailText.length() > 0)
         {
-            
+
             if(test)
             {
                 log.info(LogManager.getHeader(context, "subscription:", "eperson=" + eperson.getEmail() ));
                 log.info(LogManager.getHeader(context, "subscription:", "text=" + emailText.toString() ));
 
             } else {
-                
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscription"));
+
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "subscription"));
                 email.addRecipient(eperson.getEmail());
                 email.addArgument(emailText.toString());
                 email.send();
-                
+
                 log.info(LogManager.getHeader(context, "sent_subscription", "eperson_id=" + eperson.getID() ));
-                
+
             }
 
-            
+
         }
     }
 
     /**
      * Method for invoking subscriptions via the command line
-     * 
+     *
      * @param argv
      *            command-line arguments, none used yet
      */
-    public static void main(String[] argv) 
+    public static void main(String[] argv)
     {
         String usage = "org.dspace.eperson.Subscribe [-t] or nothing to send out subscriptions.";
-        
+
         Options options = new Options();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine line = null;
-        
+
         {
             Option opt = new Option("t", "test", false, "Run test session");
             opt.setRequired(false);
             options.addOption(opt);
         }
-        
+
         {
             Option opt = new Option("h", "help", false, "Print this help message");
             opt.setRequired(false);
@@ -527,14 +570,14 @@ public class Subscribe
             formatter.printHelp(usage, options);
             System.exit(1);
         }
-        
+
         boolean test = line.hasOption("t");
 
         if(test)
         {
             log.setLevel(Level.DEBUG);
         }
-        
+
         Context context = null;
 
         try
@@ -556,7 +599,7 @@ public class Subscribe
             }
         }
     }
-    
+
     private static List<HarvestedItemInfo> filterOutToday(List<HarvestedItemInfo> completeList)
     {
         log.debug("Filtering out all today item to leave new items list size="
@@ -614,7 +657,7 @@ public class Subscribe
             }
             else
             {
-                // the item has been modified yesterday... 
+                // the item has been modified yesterday...
                 filteredList.add(infoObject);
             }
         }
@@ -632,11 +675,11 @@ public class Subscribe
         Date thisTimeYesterday = new Date(System.currentTimeMillis()
                 - (24 * 60 * 60 * 1000));
         String yesterday = sdf.format(thisTimeYesterday);
-        
+
         for (HarvestedItemInfo infoObject : completeList)
         {
             DCValue[] dateAccArr = infoObject.item.getMetadata("dc", "date", "accessioned", Item.ANY);
-            
+
             if (dateAccArr != null && dateAccArr.length > 0)
             {
                 for(DCValue date : dateAccArr)
@@ -656,9 +699,9 @@ public class Subscribe
                         }
                     }
                 }
-                
 
-                
+
+
             }
             else
             {

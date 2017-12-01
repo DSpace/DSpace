@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
-		<version>3.0</version>
+		<version>4.0</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -61,6 +61,15 @@
             </activation>
             <modules>
                 <module>jspui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>dspace-rest</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>rest</module>
             </modules>
         </profile>
         <profile>

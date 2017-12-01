@@ -33,41 +33,35 @@
         (Group[]) request.getAttribute("groups");
 %>
 
-<dspace:layout titlekey="jsp.tools.group-list.title"
+<dspace:layout style="submission" titlekey="jsp.tools.group-list.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
 
-  <table width="95%">
-    <tr>
-      <td align="left">
     <%--  <h1>Group Editor</h1> --%>
-    <h1><fmt:message key="jsp.tools.group-list.title"/></h1>
-      </td>
-      <td align="right" class="standard">
-        <%-- <dspace:popup page="/help/site-admin.html#groups">Help...</dspace:popup> --%>
-		<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#groups\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-      </td>
-    </tr>
-  </table>
-
-	<p><fmt:message key="jsp.tools.group-list.note1"/></p>
-	<p><fmt:message key="jsp.tools.group-list.note2"/></p>
-   
+    <h1><fmt:message key="jsp.tools.group-list.title"/>
+    <%-- <dspace:popup page="/help/site-admin.html#groups">Help...</dspace:popup> --%>
+	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#groups\"%>"><fmt:message key="jsp.help"/></dspace:popup>
+    </h1>
+    
+  	
+	<p class="alert alert-info"><fmt:message key="jsp.tools.group-list.note1"/></p>	
+	<p class="alert alert-warning"><fmt:message key="jsp.tools.group-list.note2"/></p>
+   	
     <form method="post" action="">
-        <p align="center">
-	    <input type="submit" name="submit_add" value="<fmt:message key="jsp.tools.group-list.create.button"/>" />
-        </p>
+        <div class="row col-md-offset-5">
+	    	<input class="btn btn-success" type="submit" name="submit_add" value="<fmt:message key="jsp.tools.group-list.create.button"/>" />
+        </div>
     </form>
-
-    <table class="miscTable" align="center" summary="Group data display table">
+	<br/>
+	
+    <table class="table" summary="Group data display table">
         <tr>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.tools.group-list.id" /></strong></th>
 			<th class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.group-list.name"/></strong></th>
             <th class="oddRowOddCol">&nbsp;</th>
-            <th class="oddRowEvenCol">&nbsp;</th>
         </tr>
 
 <%
@@ -88,21 +82,18 @@
 %>                  
                     <form method="post" action="">
                         <input type="hidden" name="group_id" value="<%= groups[i].getID() %>"/>
-  		        <input type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>" />
+  		        <input class="btn btn-default col-md-6" type="submit" name="submit_edit" value="<fmt:message key="jsp.tools.general.edit"/>" />
                    </form>
 <%
 	}
-%>                   
-                </td>
-                <td class="<%= row %>RowEvenCol">
-<%
+
 	// no delete button for group Anonymous 0 and Administrator 1 to avoid accidental deletion
 	if (groups[i].getID() > 1 )
 	{
 %>   
                     <form method="post" action="">
                         <input type="hidden" name="group_id" value="<%= groups[i].getID() %>"/>
-	                <input type="submit" name="submit_group_delete" value="<fmt:message key="jsp.tools.general.delete"/>" />
+	                <input class="btn btn-danger col-md-6" type="submit" name="submit_group_delete" value="<fmt:message key="jsp.tools.general.delete"/>" />
 <%
 	}
 %>	                

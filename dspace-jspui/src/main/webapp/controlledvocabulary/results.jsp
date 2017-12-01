@@ -133,7 +133,7 @@ else
     String prevURL =  request.getContextPath()
                     + searchScope 
                     + "/simple-search?query="
-                    + URLEncoder.encode(query)
+                    + URLEncoder.encode(query, "UTF-8")
                     + "&amp;start=";
 
     String nextURL = prevURL;
@@ -157,7 +157,7 @@ for( int q = pageFirst; q <= pageLast; q++ )
                     + request.getContextPath()
                     + searchScope 
                     + "/simple-search?query="
-                    + URLEncoder.encode(query)
+                    + URLEncoder.encode(query, "UTF-8")
                     + "&amp;start=";
 
 

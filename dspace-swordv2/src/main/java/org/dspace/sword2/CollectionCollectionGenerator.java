@@ -28,10 +28,10 @@ public class CollectionCollectionGenerator implements AtomCollectionGenerator
 	private static Logger log = Logger.getLogger(CommunityCollectionGenerator.class);
 
 	/**
-	 * Build the collection for the given DSpaceObject.  In this
-	 * implementation, if the object is not a DSpace Collection, it will
-	 * throw an exception.
+	 * Build the collection for the given DSpaceObject.  In this implementation,
+	 * if the object is not a DSpace COllection, it will throw an exception
 	 * @param dso
+	 * @return
 	 * @throws DSpaceSwordException
 	 */
 	public SwordCollection buildCollection(Context context, DSpaceObject dso, SwordConfigurationDSpace swordConfig)

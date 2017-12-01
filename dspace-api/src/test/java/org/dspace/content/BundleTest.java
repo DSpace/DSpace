@@ -66,7 +66,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
-            fail("SQL Error in init");
+            fail("SQL Error in init: " + ex.getMessage());
         }
     }
 
@@ -215,7 +215,7 @@ public class BundleTest extends AbstractDSpaceObjectTest
         b.addBitstream(bs);
         assertThat("testGetHandle 1", b.getBitstreamByName(name), notNullValue());
         assertThat("testGetHandle 2", b.getBitstreamByName(name), equalTo(bs));
-        assertThat("testGetHandle 3", b.getBitstreamByName(name).getName(), equalTo(name));
+        assertThat("testGetHandle 3", b.getBitstreamByName(name).getName(), equalTo(name));    
         context.commit();
     }
 

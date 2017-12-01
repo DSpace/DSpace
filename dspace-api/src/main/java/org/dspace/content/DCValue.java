@@ -40,4 +40,12 @@ public class DCValue
 
     /** Authority control confidence  */
     public int confidence = Choices.CF_UNSET;
+
+    /**
+     * Get the field in dot notation. i.e. schema.element.qualifier, as in dc.date.issued
+     * @return
+     */
+    public String getField() {
+        return schema + "." + element + (qualifier==null?"":("." + qualifier));
+    }
 }

@@ -14,6 +14,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.PluginManager;
 import org.jaxen.function.FalseFunction;
 import org.swordapp.server.SwordConfiguration;
 import org.swordapp.server.SwordError;
@@ -168,7 +169,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
 	public boolean returnStackTraceInError()
 	{
-		return true;
+		return ConfigurationManager.getBooleanProperty("swordv2-server", "verbose-description.error.enable");
 	}
 
 	public boolean returnErrorBody()
@@ -206,7 +207,17 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 		return this.getStringProperty("swordv2-server", "upload.tempdir", null);
 	}
 
-	///////////////////////////////////////////////////////////////////////////////////
+    public String getAlternateUrl()
+    {
+        return ConfigurationManager.getProperty("swordv2-server", "error.alternate.url");
+    }
+
+    public String getAlternateUrlContentType()
+    {
+        return ConfigurationManager.getProperty("swordv2-server", "error.alternate.content-type");
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////
 	// Required by DSpace-side implementation
 	///////////////////////////////////////////////////////////////////////////////////
 
@@ -216,6 +227,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	public List<String> getDisseminatePackaging()
+            throws DSpaceSwordException, SwordError
 	{
 		List<String> dps = new ArrayList<String>();
 		Properties props = ConfigurationManager.getProperties("swordv2-server");
@@ -237,7 +249,23 @@ public class SwordConfigurationDSpace implements SwordConfiguration
             }
 
 			String value = props.getProperty((key));
-			dps.add(value);
+
+            // now we want to ensure that the packaging format we offer has a disseminator
+            // associated with it
+            boolean disseminable = true;
+            try
+            {
+                SwordContentDisseminator disseminator = SwordDisseminatorFactory.getContentInstance(null, value);
+            }
+            catch (SwordError e)
+            {
+                disseminable = false;
+            }
+
+            if (disseminable)
+            {
+			    dps.add(value);
+            }
 		}
 		return dps;
 	}
@@ -253,8 +281,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	}
 
 	/**
-	 * Get the bundle name that SWORD will store its original deposit
-	 * packages in, when storing them inside an item.
+	 * Get the bundle name that sword will store its original deposit packages in, when
+	 * storing them inside an item
+	 * @return
 	 */
 	public String getSwordBundle()
 	{
@@ -594,8 +623,48 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 			throws DSpaceSwordException
 	{
 		List<String> accepts = this.getAccepts(context, dso);
+        for (String acc : accepts)
+        {
+            if (this.contentTypeMatches(type, acc))
+            {
+                return true;
+            }
+        }
 		return accepts.contains(type);
 	}
+
+    private boolean contentTypeMatches(String type, String pattern)
+    {
+        if ("*/*".equals(pattern.trim()))
+        {
+            return true;
+        }
+
+        // get the prefix and suffix match patterns
+        String[] bits = pattern.trim().split("/");
+        String prefixPattern = bits.length > 0 ? bits[0] : "*";
+        String suffixPattern = bits.length > 1 ? bits[1] : "*";
+
+        // get the incoming type prefix and suffix
+        String[] tbits = type.trim().split("/");
+        String typePrefix = tbits.length > 0 ? tbits[0] : "*";
+        String typeSuffix = tbits.length > 1 ? tbits[1] : "*";
+
+        boolean prefixMatch = false;
+        boolean suffixMatch = false;
+
+        if ("*".equals(prefixPattern) || prefixPattern.equals(typePrefix))
+        {
+            prefixMatch = true;
+        }
+
+        if ("*".equals(suffixPattern) || suffixPattern.equals(typeSuffix))
+        {
+            suffixMatch = true;
+        }
+
+        return prefixMatch && suffixMatch;
+    }
 
 	public String getStateUri(String state)
 	{
@@ -606,4 +675,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	{
 		return ConfigurationManager.getProperty("swordv2-server", "state." + state + ".description");
 	}
+
+    public boolean allowUnauthenticatedMediaAccess()
+    {
+        return false;
+    }
 }

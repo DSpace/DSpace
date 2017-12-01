@@ -41,40 +41,37 @@
         (MetadataSchema[]) request.getAttribute("schemas");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.list-metadata-fields.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.list-metadata-fields.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-  <table width="95%">
-    <tr>
-      <td align="left">
-        <h1><fmt:message key="jsp.dspace-admin.list-metadata-fields.title"/></h1>
-      </td>
-      <td align="right" class="standard">
-              <a href="<%=request.getContextPath()%>/dspace-admin/metadata-schema-registry">
-                <fmt:message key="jsp.dspace-admin.list-metadata-fields.schemas"/>
-              </a> |
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#dublincore\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-      </td>
-    </tr>
-  </table>
+  
+       <h1><fmt:message key="jsp.dspace-admin.list-metadata-fields.title"/>
+       	 <a href="<%=request.getContextPath()%>/dspace-admin/metadata-schema-registry">
+        	<fmt:message key="jsp.dspace-admin.list-metadata-fields.schemas"/>
+        </a> |
+         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#dublincore\"%>"><fmt:message key="jsp.help"/></dspace:popup>
+       </h1>
+      
+
+
 
 <%
 String error = (String)request.getAttribute("error");
 if (error!=null) {
 %>
-    <p align="center">
-    <font color="red"><%=error%></font>
+    <p class="alert alert-danger">
+    	<%=error%>
     </p>
 <% } %>
 
-    <p align="center">
+    <p class="alert alert-info">
         <fmt:message key="jsp.dspace-admin.list-metadata-fields.note"/>
     </p>
 
-        <table width="70%" class="miscTable" align="center" summary="Dublic Core Type Registry data table">
+        <table class="table" summary="Dublic Core Type Registry data table">
            <tr>
               <th class="oddRowOddCol">
                  <strong>
@@ -93,29 +90,29 @@ if (error!=null) {
 %>
       <tr>
          <td>
-             <form method="post" action="">
-                 <table>
-                     <tr>
-                <td class="<%= row %>RowOddCol"><%= types[i].getFieldID() %></td>
-                         <td class="<%= row %>RowEvenCol">
-                             <input type="text" name="element" value="<%= types[i].getElement() %>" size="12"/>
-                         </td>
-                         <td class="<%= row %>RowOddCol">
-                             <input type="text" name="qualifier" value="<%= (types[i].getQualifier() == null ? "" : types[i].getQualifier()) %>" size="12"/>
-                         </td>
-                         <td class="<%= row %>RowEvenCol">
-                             <textarea name="scope_note" rows="3" cols="40"><%= (types[i].getScopeNote() == null ? "" : types[i].getScopeNote()) %></textarea>
-                         </td>
-                         <td class="<%= row %>RowOddCol">
+             <form class="form-inline" method="post" action="">
+                 <span class="col-md-1"><%= types[i].getFieldID() %></span>
+
+                    <div class="form-group">
+                    	<label class="sr-only" for="element"><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/></label>
+                		<input class="form-control" type="text" name="element" value="<%= types[i].getElement() %>" size="12" placeholder="<fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>"/>
+                	</div>
+                    <div class="form-group">
+                    	<label class="sr-only" for="qualifier"><fmt:message key="jsp.dspace-admin.list-metadata-fields.qualifier"/></label>
+                		<input class="form-control" type="text" name="qualifier" value="<%= (types[i].getQualifier() == null ? "" : types[i].getQualifier()) %>" size="12" placeholder="<fmt:message key="jsp.dspace-admin.list-metadata-fields.qualifier"/>"/>
+                	</div>                         
+                    <div class="form-group">
+                    	<label class="sr-only" for="scope_note"><fmt:message key="jsp.dspace-admin.list-metadata-fields.scope"/></label>
+                		<textarea class="form-control" name="scope_note" rows="3" cols="40"><%= (types[i].getScopeNote() == null ? "" : types[i].getScopeNote()) %></textarea>
+                	</div>                             
+                         
+					<div class="btn-group pull-right">                             
+                         
                             <input type="hidden" name="dc_type_id" value="<%= types[i].getFieldID() %>"/>
-                            <input type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>"/>
-                         </td>
-                         <td class="<%= row %>RowEvenCol">
-                            <input type="hidden" name="dc_type_id" value="<%= types[i].getFieldID() %>"/>
-                            <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
-                         </td>
-                     </tr>
-                 </table>
+                            <input class="btn btn-primary" type="submit" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>"/>             
+                         
+                            <input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
+                    </div>     
              </form>
          </td>
       </tr>
@@ -128,39 +125,33 @@ if (error!=null) {
 
       <form method="post" action="">
         <input type="hidden" name="dc_schema_id" value="<%= schema.getSchemaID() %>"/>
-        <table align="center" width="650">
-              <tr><td colspan="2"><h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfield"/></h2></td></tr>
-              <tr>
-                      <td colspan="2"><p><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfieldnote"/><br/><br/>
-                      </p></td>
-              </tr>
-              <tr>
-                      <td><p><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>:</p></td>
-                      <td><input type="text" name="element"/></td>
-              </tr>
-              <tr>
-                      <td><p><fmt:message key="jsp.dspace-admin.list-metadata-fields.qualifier"/>:</p></td>
-                      <td><input type="text" name="qualifier"/></td>
-              </tr>
-              <tr>
-                      <td valign="top"><p><fmt:message key="jsp.dspace-admin.list-metadata-fields.scope"/>:</p></td>
-                      <td><textarea name="scope_note" rows="3" cols="40"></textarea></td>
-              </tr>
-            <tr><td></td><td><input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.addnew"/>"/></td></tr>
-        </table>
+        	 <h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfield"/></h2>
+              <p class="alert alert-info"><fmt:message key="jsp.dspace-admin.list-metadata-fields.addfieldnote"/></p>
+                      
+			<p><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>:</p>
+                      <input class="form-control" type="text" name="element"/>
+
+                      <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.qualifier"/>:</p>
+                      <input class="form-control" type="text" name="qualifier"/>
+              
+                      <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.scope"/>:</p>
+                      <textarea class="form-control" name="scope_note" rows="3" cols="40"></textarea>
+              
+            <input class="btn btn-primary" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.addnew"/>"/>
+        
       </form>
 
 
     <form method="post" action="">
-      <table align="center" width="650">
-              <tr><td colspan="2"><h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.move"/></h2></td></tr>
+      
+      <h2><fmt:message key="jsp.dspace-admin.list-metadata-fields.move"/></h2>
 <% if (schemas.length > 1) { %>
-        <tr><td colspan="2"><p>
+        <p class="alert alert-info">
         <fmt:message key="jsp.dspace-admin.list-metadata-fields.movenote"/></p>
-      </td></tr>
-      <tr>
-         <td valign="top"><p><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>:</p></td><td>
-      <select name="dc_field_id" multiple="multiple" size="5">
+      
+      
+       <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.element"/>:</p>
+      <select class="form-control" name="dc_field_id" multiple="multiple" size="5">
 <%
     for (int i = 0; i < types.length; i++)
     {
@@ -168,9 +159,9 @@ if (error!=null) {
 %>     <option value="<%= types[i].getFieldID() %>"><%= types[i].getElement()+qualifier %></option>
 <%  }
 %>
-      </select></td></tr>
-      <tr><td><p><fmt:message key="jsp.dspace-admin.list-metadata-fields.schema"/>: </p></td><td>
-      <select name="dc_dest_schema_id">
+      </select>
+      <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.schema"/>: </p>
+      <select class="form-control" name="dc_dest_schema_id">
 <%
     for (int i = 0; i < schemas.length; i++)
     {
@@ -180,15 +171,15 @@ if (error!=null) {
 <%            }
     }
 %>
-      </select></td></tr>
-        <tr><td></td><td><p><input type="submit" name="submit_move" value="<fmt:message key="jsp.dspace-admin.list-metadata-fields.movesubmit"/>"/></p></td></tr>
+      </select>
+        <p><input class="btn btn-primary" type="submit" name="submit_move" value="<fmt:message key="jsp.dspace-admin.list-metadata-fields.movesubmit"/>"/></p>
 <% } else { %>
-        <tr><td colspan="2">
-              <p><fmt:message key="jsp.dspace-admin.list-metadata-fields.moveformnote"/><br/><br/>
+      
+              <p class="alert alert-info"><fmt:message key="jsp.dspace-admin.list-metadata-fields.moveformnote"/><br/><br/>
               </p>
-      </td></tr>
+      
 <% } %>
-      </table>
+      
    </form>
 
 </dspace:layout>

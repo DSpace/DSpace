@@ -63,6 +63,7 @@ public class SiteRecentSubmissions extends AbstractRecentSubmissionTransformer {
                     lastSubmitted.addReference(dso);
                 }
             }
+            addViewMoreLink(lastSubmittedDiv, null);
         }
 
     }

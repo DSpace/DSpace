@@ -21,7 +21,7 @@ import java.util.List;
 public class BrowseItemDAOPostgres implements BrowseItemDAO
 {
     /** query to obtain all the items from the database */
-    private String findAll = "SELECT item_id, in_archive, withdrawn FROM item WHERE in_archive = true OR withdrawn = true";
+    private String findAll = "SELECT item_id, in_archive, withdrawn, discoverable FROM item WHERE in_archive = true OR withdrawn = true";
 
     /** query to get the text value of a metadata element only (qualifier is NULL) */
     private String getByMetadataElement = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
@@ -74,7 +74,8 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
                 TableRow row = tri.next();
                 items.add(new BrowseItem(context, row.getIntColumn("item_id"),
                                                   row.getBooleanColumn("in_archive"),
-                                                  row.getBooleanColumn("withdrawn")));
+                                                  row.getBooleanColumn("withdrawn"),
+                                                  row.getBooleanColumn("discoverable")));
             }
         }
         finally

@@ -65,12 +65,12 @@
        <xsl:text>ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;</xsl:text>
        <xsl:for-each select=".//dim:field[@element = 'identifier']">
             <xsl:text>rft_id=</xsl:text>
-            <xsl:value-of select="encoder:encode(string(.))"/>
+            <xsl:value-of select="encoder:encode(string(.), 'UTF-8')"/>
             <xsl:text>&amp;</xsl:text>
         </xsl:for-each>
         <xsl:text>rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;</xsl:text>
         <xsl:for-each select=".//dim:field[@element != 'description' and @mdschema !='dc' and @qualifier != 'provenance']">
-            <xsl:value-of select="concat('rft.', @element,'=',encoder:encode(string(.))) "/>
+            <xsl:value-of select="concat('rft.', @element,'=',encoder:encode(string(.), 'UTF-8')) "/>
             <xsl:if test="position()!=last()">
                 <xsl:text>&amp;</xsl:text>
             </xsl:if>

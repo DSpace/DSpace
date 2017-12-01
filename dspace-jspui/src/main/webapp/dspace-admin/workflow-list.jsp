@@ -37,25 +37,17 @@
         (WorkflowItem[]) request.getAttribute("workflows");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.workflow-list.title"
+<dspace:layout style="submission" 
+			   titlekey="jsp.dspace-admin.workflow-list.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
   
-<table width="95%">
-    <tr>
-      <%-- <td align="left">    <h1>Currently Active Workflows</h1> --%>
-      <td align="left"><h1><fmt:message key="jsp.dspace-admin.workflow-list.heading"/></h1>   
-      </td>
-      <td align="right" class="standard">
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#workflow\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-      </td>
-    </tr>
-  </table>
+	<h1><fmt:message key="jsp.dspace-admin.workflow-list.heading"/><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#workflow\"%>"><fmt:message key="jsp.help"/></dspace:popup></h1>   
 
-   <table class="miscTable" align="center" summary="Table displaying list of currently active workflows">
+   <table class="table" align="center" summary="Table displaying list of currently active workflows">
        <tr>
            <th class="oddRowOddCol"> <strong>ID</strong></th>
            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.workflow-list.collection"/></strong></th>
@@ -82,7 +74,7 @@
             <td class="<%= row %>RowOddCol">
                <form method="post" action="">
                    <input type="hidden" name="workflow_id" value="<%= workflows[i].getID() %>"/>
-                   <input type="submit" name="submit_abort" value="<fmt:message key="jsp.dspace-admin.general.abort-w-confirm"/>" />
+                   <input class="btn btn-default" type="submit" name="submit_abort" value="<fmt:message key="jsp.dspace-admin.general.abort-w-confirm"/>" />
               </form>
             </td>
         </tr>

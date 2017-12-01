@@ -25,5 +25,5 @@
 <script type="text/javascript">
 the_form = parent.document.getElementById("license_form");
 the_form.cc_license_url.value = "<%= cc_license_url %>";
-the_form.submit();
+parent.document.getElementById("submit_grant").click();
 </script>

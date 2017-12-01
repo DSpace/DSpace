@@ -41,28 +41,20 @@
   <%-- ====================================================== --%>
   <%--                  INITIAL QUESTIONS                     --%>
   <%-- ====================================================== --%>
-
-                      <table>
-                           <tr>
-                               <td width="100%">
-                                   <table>
-                                       <tr>
-                                           <td class="metadataFieldLabel"><fmt:message key="jsp.submit.review.init-question1"/></td>
-                                           <td class="metadataFieldValue"><%= (si.hasMultipleTitles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
-                                       </tr>
-                                       <tr>
-                                           <td class="metadataFieldLabel"><fmt:message key="jsp.submit.review.init-question2"/></td>
-                                           <td class="metadataFieldValue"><%= (si.isPublishedBefore() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
-                                       </tr>
-                                       <tr>
-                                           <td class="metadataFieldLabel"><fmt:message key="jsp.submit.review.init-question3"/></td>
-                                           <td class="metadataFieldValue"><%= (si.hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></td>
-                                       </tr>
-                                   </table>
-                               </td>
-                               <td valign="middle">
-                                       <input type="submit" name="submit_jump_<%=stepJump%>" value="<fmt:message key="jsp.submit.review.button.correct"/>" />
-                               </td>
-                           </tr>
-                       </table>
-
+	<div class="col-md-10">
+         <div class="row">
+             <span class="metadataFieldLabel col-md-4"><fmt:message key="jsp.submit.review.init-question1"/></span>
+             <span class="metadataFieldValue col-md-8"><%= (si.hasMultipleTitles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></span>
+         </div>
+         <div class="row">
+             <span class="metadataFieldLabel col-md-4"><fmt:message key="jsp.submit.review.init-question2"/></span>
+             <span class="metadataFieldValue col-md-8"><%= (si.isPublishedBefore() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></span>
+         </div>
+         <div class="row">
+             <span class="metadataFieldLabel col-md-4"><fmt:message key="jsp.submit.review.init-question3"/></span>
+             <span class="metadataFieldValue col-md-8"><%= (si.hasMultipleFiles() ? LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state1") : LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.state2")) %></span>
+         </div>
+    </div>
+	<div class="col-md-2">
+            <input class="btn btn-default" type="submit" name="submit_jump_<%=stepJump%>" value="<fmt:message key="jsp.submit.review.button.correct"/>" />
+    </div>

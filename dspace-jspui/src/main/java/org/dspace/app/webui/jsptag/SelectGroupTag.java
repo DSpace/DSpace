@@ -104,7 +104,7 @@ public class SelectGroupTag extends TagSupport
 			JspWriter out = pageContext.getOut();
 			HttpServletRequest req = (HttpServletRequest) pageContext.getRequest();
 			
-			out.print("<table><tr><td colspan=\"2\" align=\"center\"><select multiple=\"multiple\" name=\"group_ids\" size=\"");
+			out.print("<select class=\"form-control\" multiple=\"multiple\" name=\"group_ids\" size=\"");
 			out.print(multiple ? "10" : "1");
 			out.println("\">");
             
@@ -124,37 +124,27 @@ public class SelectGroupTag extends TagSupport
 				}
 			}
 			
-			out.print("</select></td>");
-			
-			if (multiple)
-			{
-				out.print("</tr><tr><td width=\"50%\" align=\"center\">");
-			}
-			else
-			{
-				out.print("<td>");
-			}
-			
+			out.print("</select>");
+			out.print("<br/><div class=\"row container\">");
             String p = (multiple ? 
                     LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.SelectGroupTag.selectGroups")
                     : LocaleSupport.getLocalizedMessage(pageContext,
                             "org.dspace.app.webui.jsptag.SelectGroupTag.selectGroup") );
-			out.print("<input type=\"button\" value=\"" + p 
-                            + "\" onclick=\"javascript:popup_window('"
-                            + req.getContextPath() + "/tools/group-select-list?multiple=" 
-                            + multiple + "', 'group_popup');\" />");
-			
-			if (multiple)
+            
+            if (multiple)
 			{
-				out.print("</td><td width=\"50%\" align=\"center\">");
-                out.print("<input type=\"button\" value=\""
+                out.print("<input class=\"btn btn-danger\" type=\"button\" value=\""
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                 "org.dspace.app.webui.jsptag.SelectGroupTag.removeSelected")
                                 + "\" onclick=\"javascript:removeSelected(window.document.epersongroup.group_ids);\"/>");
 			}
-
-            out.println("</td></tr></table>");
+            
+            out.print("<input class=\"btn btn-primary pull-right\" type=\"button\" value=\"" + p 
+                            + "\" onclick=\"javascript:popup_window('"
+                            + req.getContextPath() + "/tools/group-select-list?multiple=" 
+                            + multiple + "', 'group_popup');\" />");
+            out.print("</div>");
 		}
 		catch (IOException ie)
 		{

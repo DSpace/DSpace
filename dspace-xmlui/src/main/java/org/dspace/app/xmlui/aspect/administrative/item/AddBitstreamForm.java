@@ -76,7 +76,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
 	public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException
 	{
-            isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+            isAdvancedFormEnabled=ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
 
             int itemID = parameters.getParameterAsInteger("itemID", -1);
             org.dspace.content.Item item = org.dspace.content.Item.find(context, itemID);

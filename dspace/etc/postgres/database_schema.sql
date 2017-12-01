@@ -93,6 +93,7 @@ CREATE SEQUENCE collection2item_seq;
 CREATE SEQUENCE resourcepolicy_seq;
 CREATE SEQUENCE epersongroup2eperson_seq;
 CREATE SEQUENCE handle_seq;
+CREATE SEQUENCE doi_seq;
 CREATE SEQUENCE workspaceitem_seq;
 CREATE SEQUENCE workflowitem_seq;
 CREATE SEQUENCE tasklistitem_seq;
@@ -109,6 +110,8 @@ CREATE SEQUENCE harvested_collection_seq;
 CREATE SEQUENCE harvested_item_seq;
 CREATE SEQUENCE versionitem_seq;
 CREATE SEQUENCE versionhistory_seq;
+CREATE SEQUENCE webapp_seq;
+CREATE SEQUENCE requestitem_seq;
 
 -------------------------------------------------------
 -- BitstreamFormatRegistry table
@@ -485,6 +488,23 @@ CREATE INDEX handle_handle_idx ON Handle(handle);
 CREATE INDEX handle_resource_id_and_type_idx ON handle(resource_id, resource_type_id);
 
 -------------------------------------------------------
+-- Doi table
+-------------------------------------------------------
+CREATE TABLE Doi
+(
+  doi_id           INTEGER PRIMARY KEY,
+  doi              VARCHAR(256) UNIQUE,
+  resource_type_id INTEGER,
+  resource_id      INTEGER,
+  status           INTEGER
+);
+
+-- index by handle, commonly looked up
+CREATE INDEX doi_doi_idx ON Doi(doi);
+-- index by resource id and resource type id
+CREATE INDEX doi_resource_id_and_type_idx ON Doi(resource_id, resource_type_id);
+
+-------------------------------------------------------
 --  WorkspaceItem table
 -------------------------------------------------------
 CREATE TABLE WorkspaceItem
@@ -798,9 +818,28 @@ CREATE TABLE versionitem
   versionhistory_id INTEGER REFERENCES VersionHistory(versionhistory_id)
 );
 
+CREATE TABLE Webapp
+(
+    webapp_id INTEGER NOT NULL PRIMARY KEY,
+    AppName VARCHAR(32),
+    URL VARCHAR,
+    Started TIMESTAMP,
+    isUI INTEGER
+);
 
-
-
-
-
-
+CREATE TABLE requestitem
+(
+  requestitem_id int4 NOT NULL,
+  token varchar(48),
+  item_id int4,
+  bitstream_id int4,
+  allfiles bool,
+  request_email varchar(64),
+  request_name varchar(64),
+  request_date timestamp,
+  accept_request bool,
+  decision_date timestamp,
+  expires timestamp,
+  CONSTRAINT requestitem_pkey PRIMARY KEY (requestitem_id),
+  CONSTRAINT requestitem_token_key UNIQUE (token)
+);

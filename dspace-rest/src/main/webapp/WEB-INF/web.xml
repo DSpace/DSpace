@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+         id="WebApp_ID" version="2.5">
+    <servlet>
+        <servlet-name>DSpace REST API</servlet-name>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <init-param>
+            <!--
+             The jersey ServletContainer will look for our Root Resource Class
+             (i.e. our HelloWorld class) in the foo.bar package
+             There are other ways to register this; see the jersey documentation for
+             more details
+            -->
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>org.dspace.rest</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <!--
+        Load the ServletContainer at startup.  A value of 1 indicates the ServletContainer
+        is a high priority servlet to load
+         -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DSpace REST API</servlet-name>
+        <!--
+        The url-pattern can be used to define your URL.
+        Example, running local host with a context of "hello" and path annotation of "world"
+        on the HelloWorld class:
+
+         <url-pattern>/*</url-pattern>
+          The web service will be available at: http://localhost:8080/hello/world
+
+
+         <url-pattern>/jersey/*</url-pattern>
+        The web service will be available at http://localhost:8080/hello/jersey/world
+        -->
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- DSpace Configuration Information -->
+    <context-param>
+        <param-name>dspace-config</param-name>
+        <param-value>${dspace.dir}/config/dspace.cfg</param-value>
+    </context-param>
+
+    <!-- new ConfigurationService initialization for dspace.dir -->
+    <context-param>
+        <description>
+            The location of the main DSpace configuration file
+        </description>
+        <param-name>dspace.dir</param-name>
+        <param-value>${dspace.dir}</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            /WEB-INF/applicationContext.xml
+        </param-value>
+        <!--
+            Add this context if using Spring Security
+            /WEB-INF/applicationContext-security.xml
+        -->
+    </context-param>
+
+    <listener>
+        <listener-class>org.dspace.app.util.DSpaceContextListener</listener-class>
+    </listener>
+
+    <!-- kernel start listener (from impl)
+    	The following listener can be used instead of the filter below, it is simpler, cleaner
+    	and eliminates the need for a DSpaceKernelServletFilter filter to be involved with the
+    	request cycle.
+    -->
+    <listener>
+        <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
+    </listener>
+    
+    <listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+
+
+
+</web-app>

@@ -70,12 +70,12 @@ public class MetadataFieldTest extends AbstractUnitTest
         catch (AuthorizeException ex)
         {
             log.error("Authorize Error in init", ex);
-            fail("Authorize Error in init");
+            fail("Authorize Error in init: " + ex.getMessage());
         }
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
-            fail("SQL Error in init");
+            fail("SQL Error in init: " + ex.getMessage());
         }
     }
 

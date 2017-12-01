@@ -10,7 +10,7 @@ package org.dspace.statistics.util;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
@@ -191,7 +191,7 @@ public class StatisticsDataGenerator {
 		// We got all our parameters now get the rest
 		Context context = new Context();
 		// Find our solr server
-		CommonsHttpSolrServer solr = new CommonsHttpSolrServer(
+		HttpSolrServer solr = new HttpSolrServer(
 				ConfigurationManager.getProperty("solr-statistics", "server"));
 		solr.deleteByQuery("*:*");
 		solr.commit();

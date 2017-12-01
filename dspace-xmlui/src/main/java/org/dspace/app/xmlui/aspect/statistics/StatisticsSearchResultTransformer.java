@@ -47,10 +47,18 @@ public class StatisticsSearchResultTransformer extends AbstractDSpaceTransformer
         if(scope != null){
             formUrl.append("/handle/").append(scope.getHandle());
         }
-        formUrl.append("/dso-display");
+        if(parameters.getParameterAsBoolean("advanced-search", false))
+        {
+            formUrl.append("/advanced-search");
+        } else {
+            formUrl.append("/search");
+        }
 
         Division mainForm = body.addInteractiveDivision("dso-display", formUrl.toString(), Division.METHOD_POST, "");
 
+        mainForm.addHidden("current-scope").setValue(scope == null ? "" : scope.getHandle());
+        //Indicate that the form we are submitting lists search results
+        mainForm.addHidden("search-result").setValue(Boolean.TRUE.toString());
         mainForm.addHidden("query").setValue(getQuery());
         if(!StringUtils.isBlank(request.getParameter("rpp"))){
             mainForm.addHidden("rpp").setValue(Integer.parseInt(request.getParameter("rpp")));
@@ -64,10 +72,6 @@ public class StatisticsSearchResultTransformer extends AbstractDSpaceTransformer
         if(!StringUtils.isBlank(request.getParameter("page"))){
             mainForm.addHidden("page").setValue(Integer.parseInt(request.getParameter("page")));
         }
-
-
-        //This hidden input will contain the resulting url to which we redirect once our work has been completed
-        mainForm.addHidden("redirectUrl");
     }
 
     private String getQuery() throws UIException {

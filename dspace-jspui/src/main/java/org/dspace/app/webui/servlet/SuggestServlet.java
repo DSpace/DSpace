@@ -77,7 +77,7 @@ public class SuggestServlet extends DSpaceServlet
 
         // Obtain information from request
         String handle = request.getParameter("handle");
-        
+
         // Lookup Item title & collection
         String title = null;
         String collName = null;
@@ -85,7 +85,7 @@ public class SuggestServlet extends DSpaceServlet
         {
             Item item = (Item) HandleManager.resolveToObject(context, handle);
             if (item != null)
-            {   
+            {
                 DCValue[] titleDC = item.getDC("title", null, Item.ANY);
                 if (titleDC != null && titleDC.length > 0)
                 {
@@ -111,18 +111,18 @@ public class SuggestServlet extends DSpaceServlet
         	collName = "";
         }
         request.setAttribute("suggest.title", title);
-          
+
         // User email from context
         EPerson currentUser = context.getCurrentUser();
         String authEmail = null;
         String userName = null;
-        
+
         if (currentUser != null)
         {
             authEmail = currentUser.getEmail();
             userName = currentUser.getFullName();
-        }       
-        
+        }
+
         if (request.getParameter("submit") != null)
         {
         	String recipAddr = request.getParameter("recip_email");
@@ -177,13 +177,13 @@ public class SuggestServlet extends DSpaceServlet
             }
             String itemUri = HandleManager.getCanonicalForm(handle);
             String itemUrl = HandleManager.resolveToURL(context,handle);
-            String message = request.getParameter("message");          
+            String message = request.getParameter("message");
             String siteName = ConfigurationManager.getProperty("dspace.name");
 
             // All data is there, send the email
             try
             {
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "suggest"));
+                Email email = Email.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "suggest"));
                 email.addRecipient(recipAddr);	 // recipient address
                 email.addArgument(recipName);    // 1st arg - recipient name
                 email.addArgument(senderName);   // 2nd arg - sender name
@@ -192,14 +192,14 @@ public class SuggestServlet extends DSpaceServlet
                 email.addArgument(itemUri);      // 5th arg - item handle URI
                 email.addArgument(itemUrl);      // 6th arg - item local URL
                 email.addArgument(collName);     // 7th arg - collection name
-                email.addArgument(message);      // 8th arg - user comments     
-                
+                email.addArgument(message);      // 8th arg - user comments
+
                 // Set sender's address as 'reply-to' address if supplied
                 if ( senderAddr != null && ! "".equals(senderAddr))
                 {
                 	email.setReplyTo(senderAddr);
                 }
-                
+
                 // Only actually send the email if feature is enabled
                 if (ConfigurationManager.getBooleanProperty("webui.suggest.enable", false))
                 {
@@ -226,7 +226,7 @@ public class SuggestServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "show_suggest_form", "problem=false"));
             request.setAttribute("authenticated.email", authEmail);
             request.setAttribute("eperson.name", userName);
-            JSPManager.showJSP(request, response, "/suggest/suggest.jsp"); //asd 
+            JSPManager.showJSP(request, response, "/suggest/suggest.jsp"); //asd
         }
    }
 
@@ -236,5 +236,5 @@ public class SuggestServlet extends DSpaceServlet
     {
         // Treat as a GET
         doDSGet(context, request, response);
-    } 
+    }
 }

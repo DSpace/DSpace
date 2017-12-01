@@ -142,7 +142,7 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
                      *
                      */
 
-                   if(this.request.getSession().getAttribute("dspace.current.user.id")!=null) {
+                   if(AuthenticationUtil.isLoggedIn(request)) {
                       String redictURL = request.getContextPath() + "/restricted-resource";
                         HttpServletResponse httpResponse = (HttpServletResponse)
             		objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);

@@ -25,7 +25,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Map;
 
 
@@ -83,8 +82,6 @@ public class EditPolicyStep extends AbstractStep
 
         AccessStepUtil asu = new AccessStepUtil(context);
 
-        asu.addName(resourcePolicy.getRpName(), edit, errorFlag);
-
         asu.addListGroups(Integer.toString(resourcePolicy.getGroupID()), edit, errorFlag, collection);
 
         // radio buttons: Item will be visible / Embargo Access + date
@@ -98,6 +95,8 @@ public class EditPolicyStep extends AbstractStep
             dateValue = DateFormatUtils.format(resourcePolicy.getStartDate(), "yyyy-MM-dd");
         }
         asu.addAccessRadios(selectedRadio, dateValue, edit, errorFlag, null);
+
+	    asu.addName(resourcePolicy.getRpName(), edit, errorFlag);
 
         // Reason
         asu.addReason(resourcePolicy.getRpDescription(), edit, errorFlag);

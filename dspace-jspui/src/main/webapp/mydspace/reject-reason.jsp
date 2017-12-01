@@ -31,7 +31,7 @@
         (WorkflowItem) request.getAttribute("workflow.item");
 %>
 
-<dspace:layout locbar="link"
+<dspace:layout style="submission" locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                title="reject-reason.title"
@@ -48,21 +48,14 @@
     <form action="<%= request.getContextPath() %>/mydspace" method="post">
         <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>"/>
         <input type="hidden" name="step" value="<%= MyDSpaceServlet.REJECT_REASON_PAGE %>"/>
-        <center>
-            <textarea rows="6" cols="50" name="reason"></textarea>
-        </center>
-
-        <table border="0" width="90%" cellpadding="10" align="center">
-            <tr>
-                <td align="left">
-                    <%-- <input type="submit" name="submit_send" value="Reject Item" /> --%>
-					 <input type="submit" name="submit_send" value="<fmt:message key="jsp.mydspace.reject-reason.reject.button"/>" />
-                </td>
-                <td align="right">
-                    <%-- <input type="submit" name="submit_cancel" value="Cancel Rejection" /> --%>
-					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.reject-reason.cancel.button"/>" />
-                </td>
-            </tr>
-        </table>
+        <textarea class="form-control" rows="6" cols="50" name="reason"></textarea>
+		<br/>
+		<div class="row container">
+		<%-- <input type="submit" name="submit_cancel" value="Cancel Rejection" /> --%>
+		<input class="btn btn-default" type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.reject-reason.cancel.button"/>" />
+					
+        <%-- <input type="submit" name="submit_send" value="Reject Item" /> --%>
+	 	<input class="btn btn-danger pull-right" type="submit" name="submit_send" value="<fmt:message key="jsp.mydspace.reject-reason.reject.button"/>" />
+	 	</div>
     </form>
 </dspace:layout>

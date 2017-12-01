@@ -142,8 +142,8 @@ public class Constants
             "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "ADMIN" };
 
     /**
-     * constants for the relevance array generating dynamicallis is simple: just
-     * 1 < < TYPE
+     * generating constants for the relevance array dynamically is simple: just
+     * 1 << TYPE
      */
     public static final int RBITSTREAM = 1 << BITSTREAM;
 
@@ -157,10 +157,10 @@ public class Constants
 
     /**
      * Array of relevances of actions to objects - used by the UI to only
-     * display actions that are relevant to an object type To see if an action
+     * display actions that are relevant to an object type; To see if an action
      * is relevant to an object, just OR the relevance type above with the value
      * in actionTypeRelevance[] (To see if READ is relevant to community, just
-     * test actionTypeRelevance[READ] | RCOMMUNITY, 0 = irrelevant
+     * test actionTypeRelevance[READ] | RCOMMUNITY, 0 = irrelevant)
      */
     public static final int[] actionTypeRelevance = {
             RBITSTREAM | RBUNDLE | RITEM | RCOLLECTION | RCOMMUNITY, // 0 - READ

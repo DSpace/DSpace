@@ -344,8 +344,6 @@ public class FlowItemUtils
 
         Item item = Item.find(context, itemID);
         item.setDiscoverable(false);
-        // private item is withdrawn as well
-        item.withdraw();
         item.update();
         context.commit();
 
@@ -370,8 +368,6 @@ public class FlowItemUtils
 
         Item item = Item.find(context, itemID);
         item.setDiscoverable(true);
-        // since private Items are withdrawn they are reinstated during "make it public" process
-        item.reinstate();
         item.update();
         context.commit();
 

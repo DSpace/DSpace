@@ -84,12 +84,12 @@ public class SupervisedItemTest extends AbstractUnitTest
         }
         catch (IOException ex) {
             log.error("IO Error in init", ex);
-            fail("IO Error in init");
+            fail("IO Error in init: " + ex.getMessage());
         }
         catch (AuthorizeException ex)
         {
             log.error("Authorization Error in init", ex);
-            fail("Authorization Error in init");
+            fail("Authorization Error in init: " + ex.getMessage());
         }
         catch (SQLException ex)
         {

@@ -927,7 +927,7 @@ ul.ds-progress-list #aspect_submission_StepTransformer_field_submit_jump_6_1
 }
 
 /* The next few entries were motivated by the item submission pages.  If undesirable changes are produced elsewhere, let's use the id instead of the fieldset tag name and class ds-form-list.thick to apply these entries*/
-fieldset.ds-form-list.thick .ds-composite-component.last,
+fieldset.ds-form-list.thick .ds-composite-component.last
 {
     display: block;
 }
@@ -1982,4 +1982,8 @@ height: 100%;
 background-color: rgb(255, 255, 255);
 margin: 2px 2px 0px 2px;
 /* border: 1px solid rgb(240, 240, 210); */
+}
+
+#ds-language-selection {
+text-align: right;
 }

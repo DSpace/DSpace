@@ -35,7 +35,7 @@
     <%-- <p>Thank you, your profile information
     <%= (passwordUpdated ? "and password have" : "has") %>
     been updated.</p> --%>   
-	<p>
+	<p class="alert alert-info">
 <% if(passwordUpdated)
    { %>
     <fmt:message key="jsp.register.profile-updated.info1"/>

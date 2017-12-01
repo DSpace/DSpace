@@ -38,11 +38,11 @@
     LinkedList processedItems = (LinkedList)request.getAttribute("processedItems");
 %>
 
-<dspace:layout titlekey="jsp.tools.itemmap-info.title">
+<dspace:layout style="submission" titlekey="jsp.tools.itemmap-info.title">
 
     <h2><fmt:message key="jsp.tools.itemmap-info.heading"/></h2>
 
-    <p>
+    <div class="alert">
     <% if (message.equals("none-selected")) { %>
         <fmt:message key="jsp.tools.itemmap-info.msg.none-selected" />
     <% } else if (message.equals("none-removed")) { %>
@@ -62,10 +62,10 @@
                     </fmt:message><br/>
             <% } %>
     <% } %>
-    </p>
+    </div>
     
     <form method="post">
         <input type="hidden" name="cid" value="<%=collection.getID()%>"/>
-        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.itemmap-info.button.continue"/>"/>
+        <input class="btn btn-default" type="submit" name="submit" value="<fmt:message key="jsp.tools.itemmap-info.button.continue"/>"/>
     </form>
 </dspace:layout>

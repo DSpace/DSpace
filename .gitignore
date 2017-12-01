@@ -11,6 +11,7 @@ target/
 *.ipr
 *.iws
 .idea/
+overlays/
 
 ## Ignore project files created by NetBeans
 nbproject/private/
@@ -22,9 +23,12 @@ nbactions.xml
 nb-configuration.xml
 META-INF/
 
-## Ignore all *.properties file, EXCEPT build.properties (the default)
-*.properties
-!build.properties
+## Ignore all *.properties file in root folder, EXCEPT build.properties (the default)
+/*.properties
+!/build.properties
+
+##Mac noise
+.DS_Store
 
 ##Omito los datos relativos a la configuración local de dspace
 install/

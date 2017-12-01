@@ -51,7 +51,7 @@ public class MetadataSchemaTest extends AbstractUnitTest
         catch (SQLException ex)
         {
             log.error("SQL Error in init", ex);
-            fail("SQL Error in init");
+            fail("SQL Error in init: " + ex.getMessage());
         }
     }
 

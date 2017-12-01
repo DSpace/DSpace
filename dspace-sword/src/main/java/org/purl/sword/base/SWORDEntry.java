@@ -32,7 +32,7 @@ public class SWORDEntry extends Entry
    protected SwordNoOp swordNoOp;
 
    /**
-    * Use to supply a verbose description. 
+    * Used to supply a verbose description. 
     */
    protected SwordVerboseDescription swordVerboseDescription;
    
@@ -49,7 +49,7 @@ public class SWORDEntry extends Entry
    protected SwordUserAgent swordUserAgent;
    
    /** 
-    * The packaging infomation
+    * The packaging information
     */
    private SwordPackaging swordPackaging;
    

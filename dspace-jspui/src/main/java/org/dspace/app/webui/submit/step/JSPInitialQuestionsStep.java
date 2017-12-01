@@ -39,9 +39,9 @@ import org.dspace.submit.step.InitialQuestionsStep;
  * <li>If showJSP() was specified from doPreProcessing(), then the JSP
  * specified will be displayed</li>
  * <li>If showJSP() was not specified from doPreProcessing(), then the
- * doProcessing() method is called an the step completes immediately</li>
- * <li>Call doProcessing() method on appropriate AbstractProcessingStep after the user returns from the JSP, in order
- * to process the user input</li>
+ * doProcessing() method is called and the step completes immediately</li>
+ * <li>Call doProcessing() method on appropriate AbstractProcessingStep after
+ * the user returns from the JSP, in order to process the user input</li>
  * <li>Call doPostProcessing() method to determine if more user interaction is
  * required, and if further JSPs need to be called.</li>
  * <li>If there are more "pages" in this step then, the process begins again

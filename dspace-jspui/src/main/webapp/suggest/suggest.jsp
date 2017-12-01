@@ -78,55 +78,52 @@
     }
 %>
 
-<dspace:layout locbar="off" navbar="off" titlekey="jsp.suggest.title">
+<dspace:layout style="submission" locbar="off" navbar="off" titlekey="jsp.suggest.title">
 
 <br/>
 <h1><fmt:message key="jsp.suggest.heading"/>
     <a href="<%= request.getContextPath() %>/handle/<%= handle %>"><%= title %></a>
 </h1>
-<p><fmt:message key="jsp.suggest.invitation"/></p>
+<p class="alert alert-info"><fmt:message key="jsp.suggest.invitation"/></p>
 
     <form name="form1" method="post" action="">
-        <center>
-            <table>
+
 <%
     if (problem)
     {
 %>
-        		<tr>
-            		<td class="submitFormWarn"><fmt:message key="jsp.suggest.warning"/></td>
-        		</tr>
+        		
+            	<span class="alert alert-warning"><fmt:message key="jsp.suggest.warning"/></span>
+        		
 <%
     }
 %>
-				<tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.suggest.recipname"/></td>
-                    <td><input type="text" name="recip_name" size="50" value="<%=StringEscapeUtils.escapeHtml(recip_name)%>" /></td>
-                </tr>
-				<tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.suggest.recipemail"/></td>
-                    <td><input type="text" name="recip_email" size="50" value="<%=StringEscapeUtils.escapeHtml(recip_email)%>"/></td>
-                </tr>
-				<tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.suggest.sendername"/></td>
-                    <td><input type="text" name="sender_name" size="50" value="<%=StringEscapeUtils.escapeHtml(sender_name)%>"/></td>
-                </tr>
-                <tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.suggest.senderemail"/></td>
-                    <td><input type="text" name="sender_email" size="50" value="<%=StringEscapeUtils.escapeHtml(sender_email)%>"/></td>
-                </tr>
-                <tr>
-                    <td class="submitFormLabel"><fmt:message key="jsp.suggest.message"/></td>
-                    <td><textarea name="message" rows="6" cols="46"><%=StringEscapeUtils.escapeHtml(message)%></textarea></td>
-                </tr>
+				<div class="form-group"><div class="input-group-addon">
+                    <span class="col-md-2"><label for="recip_name"><fmt:message key="jsp.suggest.recipname"/></label></span>                                        
+                    <span class="col-md-5"><input class="form-control" type="text" name="recip_name" size="50" value="<%=StringEscapeUtils.escapeHtml(recip_name)%>" /></span>
+                </div></div>
+				<div class="form-group"><div class="input-group-addon">
+                    <span class="col-md-2"><label for="recip_email"><fmt:message key="jsp.suggest.recipemail"/></label></span>
+                    <span class="col-md-5"><input class="form-control" type="text" name="recip_email" size="50" value="<%=StringEscapeUtils.escapeHtml(recip_email)%>"/></span>
+                </div></div>
+				<div class="form-group"><div class="input-group-addon">
+                    <span class="col-md-2"><label for="sender_name"><fmt:message key="jsp.suggest.sendername"/></label></span>
+                    <span class="col-md-5"><input class="form-control" type="text" name="sender_name" size="50" value="<%=StringEscapeUtils.escapeHtml(sender_name)%>"/></span>
+                </div></div>
+                <div class="form-group"><div class="input-group-addon">
+                    <span class="col-md-2"><label for="sender_email"><fmt:message key="jsp.suggest.senderemail"/></label></span>
+                    <span class="col-md-5"><input class="form-control" type="text" name="sender_email" size="50" value="<%=StringEscapeUtils.escapeHtml(sender_email)%>"/></span>
+                </div></div>
+                <div class="form-group"><div class="input-group-addon">
+                    <span class="col-md-2"><label for="message"><fmt:message key="jsp.suggest.message"/></label></span>
+                    <span class="col-md-5"><textarea class="form-control" name="message" rows="6" cols="46"><%=StringEscapeUtils.escapeHtml(message)%></textarea></span>
+                </div></div>
 
-                <tr>
-                    <td colspan="2" align="center">
+                <div class="btn-group">
                     <input type="hidden" name="handle" value='<%= handle %>'/>
-                    <input type="submit" name="submit" value="<fmt:message key="jsp.suggest.button.send"/>" />
-                    <input type="button" name="cancel" onclick="window.close();" value="<fmt:message key="jsp.suggest.button.cancel"/>" />
-                    </td>
-                </tr>
+                    <input class="btn btn-primary" type="submit" name="submit" value="<fmt:message key="jsp.suggest.button.send"/>" />
+                    <input class="btn btn-default" type="button" name="cancel" onclick="window.close();" value="<fmt:message key="jsp.suggest.button.cancel"/>" />
+                </div>
             </table>
         </center>
     </form>

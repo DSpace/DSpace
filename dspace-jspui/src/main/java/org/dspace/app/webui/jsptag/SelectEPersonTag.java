@@ -108,7 +108,7 @@ public class SelectEPersonTag extends TagSupport
             HttpServletRequest req = (HttpServletRequest) pageContext
                     .getRequest();
 
-            out.print("<table><tr><td colspan=\"2\" align=\"center\"><select multiple=\"multiple\" name=\"eperson_id\" size=\"");
+            out.print("<select class=\"form-control\" multiple=\"multiple\" name=\"eperson_id\" size=\"");
             out.print(multiple ? "10" : "1");
             out.println("\">");
             // ensure that if no eperson is selected that a blank option is displayed - xhtml compliance 
@@ -129,37 +129,27 @@ public class SelectEPersonTag extends TagSupport
             }
             // add blank option value if no person selected to ensure that code is xhtml compliant 
             //out.print("<option/>");
-            out.print("</select></td>");
-
-            if (multiple)
-            {
-                out.print("</tr><tr><td width=\"50%\" align=\"center\">");
-            }
-            else
-            {   
-                out.print("<td>");
-            }
-
+            out.print("</select>");
+            out.print("<br/><div class=\"row container\">");
             String p = (multiple ? 
                             LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.SelectEPersonTag.selectPeople")
                             : LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.SelectEPersonTag.selectPerson") );
-            out.print("<input type=\"button\" value=\"" + p
-                    + "\" onclick=\"javascript:popup_window('"
-                    + req.getContextPath() + "/tools/eperson-list?multiple="
-                    + multiple + "', 'eperson_popup');\" />");
 
             if (multiple)
             {
-                out.print("</td><td width=\"50%\" align=\"center\">");
-                out.print("<input type=\"button\" value=\""
+                out.print("<input class=\"btn btn-danger\" type=\"button\" value=\""
                                         + LocaleSupport.getLocalizedMessage(pageContext,
                                                 "org.dspace.app.webui.jsptag.SelectEPersonTag.removeSelected")
                                         + "\" onclick=\"javascript:removeSelected(window.document.epersongroup.eperson_id);\"/>");
             }
-
-            out.println("</td></tr></table>");
+            
+            out.print("<input class=\"btn btn-primary pull-right\" type=\"button\" value=\"" + p
+                    + "\" onclick=\"javascript:popup_window('"
+                    + req.getContextPath() + "/tools/eperson-list?multiple="
+                    + multiple + "', 'eperson_popup');\" />");
+            out.print("</div>");
         }
         catch (IOException ie)
         {

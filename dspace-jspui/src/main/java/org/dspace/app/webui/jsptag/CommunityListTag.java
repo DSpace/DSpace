@@ -42,7 +42,7 @@ public class CommunityListTag extends TagSupport
 
         try
         {
-            out.println("<table align=\"center\" class=\"miscTable\" title=\"Community List\">");
+            out.println("<table align=\"center\" class=\"table\" title=\"Community List\">");
 
             // Write column headings
             out.print("<tr><th id=\"t5\" class=\"oddRowOddCol\">"

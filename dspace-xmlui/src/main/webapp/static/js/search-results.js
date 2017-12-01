@@ -22,7 +22,7 @@
             //Instead of redirecting us to the page, first send us to the statistics logger
             //By doing this we ensure that we register the query to the result
             var form = $('form#aspect_statistics_StatisticsSearchResultTransformer_div_dso-display');
-            form.find('input[name="redirectUrl"]').val($this.attr('href'));
+            form.attr('action', $this.attr('href'));
             form.submit();
             return false;
         });

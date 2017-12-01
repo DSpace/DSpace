@@ -28,6 +28,7 @@
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
+<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@ page import="org.dspace.eperson.EPerson" %>
 <%@ page import="org.dspace.core.Utils" %>
 
@@ -281,23 +282,24 @@ function clearEPeople()
     {
         EPerson e = epeople[i];
 		// Make sure no quotes in full name will mess up our Javascript
-        String fullname = e.getFullName().replace('\'', ' ');
+        String fullname = StringEscapeUtils.escapeXml(StringEscapeUtils.escapeJavaScript(e.getFullName()));
+        String email = StringEscapeUtils.escapeXml(StringEscapeUtils.escapeJavaScript(e.getEmail()));
 %>
         <tr>
 			<td headers="t1" class="<%= row %>RowOddCol">
 			    <input type="button" value="<%
 	if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
-	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= e.getEmail().replaceAll("'", "\\\\'") %>', '<%= Utils.addEntities(fullname) %>');<%= closeWindow %>"/></td>
+	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addEPerson(<%= e.getID() %>, '<%= email %>', '<%= fullname %>');<%= closeWindow %>"/></td>
 			<td headers="t2" class="<%= row %>RowEvenCol"><%= e.getID() %></td>
-			<td headers="t3" class="<%= row %>RowOddCol"><%= e.getEmail() %></td>
+			<td headers="t3" class="<%= row %>RowOddCol"><%= (e.getEmail() == null ? "" : Utils.addEntities(e.getEmail())) %></td>
             <td headers="t4" class="<%= row %>RowEvenCol">
-                <%= (e.getLastName() == null ? "" : e.getLastName()) %>
+                <%= (e.getLastName() == null ? "" : Utils.addEntities(e.getLastName())) %>
             </td>
             <td headers="t5" class="<%= row %>RowOddCol">
-                <%= (e.getFirstName() == null ? "" : e.getFirstName()) %>
+                <%= (e.getFirstName() == null ? "" : Utils.addEntities(e.getFirstName())) %>
             </td>
             <td headers="t6" class="<%= row %>RowOddCol">
-                <%= (e.getLanguage() == null ? "" : e.getLanguage()) %>
+                <%= (e.getLanguage() == null ? "" : Utils.addEntities(e.getLanguage())) %>
             </td>
         </tr>
 <%

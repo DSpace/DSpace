@@ -100,7 +100,8 @@ public class CCLicenseStep extends AbstractProcessingStep
         session.setAttribute("inProgress", "TRUE");
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
-        if (buttonPressed.equals("submit_grant"))
+		if ("submit_grant".equalsIgnoreCase(buttonPressed)
+				|| "submit_no_cc".equalsIgnoreCase(buttonPressed))
         {
             return processCC(context, request, response, subInfo);
         }
@@ -247,7 +248,7 @@ public class CCLicenseStep extends AbstractProcessingStep
     	CCLookup ccLookup = new CCLookup();
     	CreativeCommons.MdField uriField = CreativeCommons.getCCField("uri");
     	CreativeCommons.MdField nameField = CreativeCommons.getCCField("name");
-    	ccLookup.issue(licenseclass, map, ConfigurationManager.getProperty("default.locale"));
+    	ccLookup.issue(licenseclass, map, ConfigurationManager.getProperty("cc.license.locale"));
     	Item item = subInfo.getSubmissionItem().getItem();
     	if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.no_license")) 
     	{

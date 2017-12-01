@@ -10,10 +10,11 @@
     This file was created to add mobile-friendly properties for DSpace elements 
 	that sc-mobile.min.css cannot control.
 	
-    Last update by Elias Tzoc <tzoce@muohio.edu>
-    September 29, 2012	
+    Last update by Elias Tzoc <tzoce@miamioh.edu>
+    September 30, 2013	
 
 */
+
 
 /* setting up general margin properties */
 div#ds-body {
@@ -66,6 +67,10 @@ border: 1px solid #ccc;
 
 div.artifact-description {
 margin-top: -20px;
+}
+
+div#featured-items {
+display:none;
 }
 
 div#aspect_artifactbrowser_ItemViewer_div_item-view h2 {
@@ -256,7 +261,6 @@ div#aspect_artifactbrowser_ItemViewer_div_item-view p {
 display: none;
 }
 
-
 form#aspect_artifactbrowser_CommunityViewer_div_community-search {
 margin-top: -15px;
 margin-bottom: 40px;
@@ -265,6 +269,20 @@ margin-bottom: 40px;
 form#aspect_artifactbrowser_CollectionViewer_div_collection-search {
 margin-top: -15px;
 margin-bottom: 40px;
+}
+
+/* new mobile-optimized advanced search */
+#aspect_artifactbrowser_AdvancedSearch_list_search-query {
+margin-left: -25px;
+}
+
+#aspect_artifactbrowser_AdvancedSearch_table_search-query .ui-select .ui-btn {
+width: 110px;
+}
+
+table#aspect_artifactbrowser_AdvancedSearch_table_search-query,
+table#aspect_artifactbrowser_AdvancedSearch_table_search-controls {
+margin-left: 0px;
 }
 
 /* A-Z browse on author, title and subject pages */

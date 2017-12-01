@@ -68,9 +68,7 @@
 %>
 
 <!--Progress Bar-->
-<center>
-    <table class="submitProgressTable" border="0" cellspacing="0" cellpadding="0">
-        <tr>
+<div class="row container btn-group">
 <%    
     //get progress bar info, used to build progress bar
 	HashMap progressBarInfo = (HashMap) subInfo.getProgressBarInfo();
@@ -110,14 +108,14 @@
 			 {
 			   // Show "Complete" step as the current step
     %>
-               <td><input class="submitProgressButtonCurrent" disabled="disabled" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" /></td>
+               <input class="submitProgressButtonCurrent btn btn-primary" disabled="disabled" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" />
     <%
              }
         	 else
         	 {
 			   // submission is completed, so cannot jump back to any steps
     %>
-               <td><input class="submitProgressButtonDone" disabled="disabled" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" /></td>
+               <input class="submitProgressButtonDone btn btn-success" disabled="disabled" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" />
     <%
         	 }
            }
@@ -125,32 +123,30 @@
 		   else if((stepNum == currentStepConfig.getStepNumber()) && (pageNum == currentPage))
            {
 	         %>
-		     <td><input class="submitProgressButtonCurrent" disabled="disabled" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" /></td>
+		     <input class="submitProgressButtonCurrent btn btn-primary" disabled="disabled" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" />
         	 <%
            }
 		   else if(workflowMode) //if in workflow mode, can jump to any step/page
     	   {
 		     %>
-            <td><input class="submitProgressButtonDone" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" /></td>
+            <input class="submitProgressButtonDone btn btn-success" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" />
 			 <%
     	   }
 		  //else if this step & page has been completed
 		  else if( (stepNum < stepReached) || ((stepNum == stepReached) && (pageNum <= pageReached)) )
     	  {
 %>
-            <td><input class="submitProgressButtonDone" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" /></td>
+            <input class="submitProgressButtonDone btn btn-info" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" />
 <%
           }
 		  else //else this is a step that has not been done, yet
           {
             // Stage hasn't been completed yet (can't be jumped to)
 %>
-		    <td><input class="submitProgressButtonNotDone" disabled="disabled" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" /></td>
+		    <input class="submitProgressButtonNotDone btn btn-default" disabled="disabled" type="submit" name="<%=AbstractProcessingStep.PROGRESS_BAR_PREFIX + stepAndPage%>" value="<%=heading%>" />
 <%
           }
 	   }//end while
    }
 %>
-        </tr>
-    </table>
-</center>
+        </div>

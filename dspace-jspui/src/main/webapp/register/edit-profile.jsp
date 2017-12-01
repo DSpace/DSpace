@@ -44,17 +44,19 @@
     boolean ldap_eperson = (ldap_enabled && (eperson.getNetid() != null) && (eperson.getNetid().equals("") == false));
 %>
 
-<dspace:layout titlekey="jsp.register.edit-profile.title" nocache="true">
+<dspace:layout style="submission" titlekey="jsp.register.edit-profile.title" nocache="true">
 
     <%-- <h1>Edit Your Profile</h1> --%>
-	<h1><fmt:message key="jsp.register.edit-profile.title"/></h1>
+	<h1><fmt:message key="jsp.register.edit-profile.title"/>
+	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#editprofile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup>
+	</h1>
     
 <%
     if (missingFields)
     {
 %>
     <%-- <p><strong>Please fill out all of the required fields.</strong></p> --%>
-	<p><strong><fmt:message key="jsp.register.edit-profile.info1"/></strong></p>
+	<p class="alert alert-info"><fmt:message key="jsp.register.edit-profile.info1"/></p>
 <%
     }
 
@@ -63,15 +65,14 @@
 %>
     <%-- <p><strong>The passwords you enter below must match, and need to be at
     least 6 characters long.</strong></p> --%>
-	<p><strong><fmt:message key="jsp.register.edit-profile.info2"/></strong></p>
+	<p class="alert alert-warning"><fmt:message key="jsp.register.edit-profile.info2"/></p>
 <%
     }
 %>
 
-	<div><fmt:message key="jsp.register.edit-profile.info3"/>
-    	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#editprofile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
+	<div class="alert alert-info"><fmt:message key="jsp.register.edit-profile.info3"/></div>
     
-    <form action="<%= request.getContextPath() %>/profile" method="post">
+    <form class="form-horizontal" action="<%= request.getContextPath() %>/profile" method="post">
 
         <dspace:include page="/register/profile-form.jsp" />
 
@@ -83,30 +84,27 @@
 %>
         <%-- <p><strong>Optionally</strong>, you can choose a new password and enter it into the box below, and confirm it by typing it
         again into the second box for verification.  It should be at least six characters long.</p> --%>
-		<p><fmt:message key="jsp.register.edit-profile.info5"/></p>
-
-        <table class="misc" align="center">
-            <tr>
-                <td class="oddRowEvenCol">
-                    <table border="0" cellpadding="5">
-                        <tr>
+		<p class="alert"><fmt:message key="jsp.register.edit-profile.info5"/></p>
+			<div class="form-group">
                             <%-- <td align="right" class="standard"><label for="tpassword"><strong>New Password:</strong></label></td> --%>
-							<td align="right" class="standard"><label for="tpassword"><strong><fmt:message key="jsp.register.edit-profile.pswd.field"/></strong></label></td>
-                            <td class="standard"><input type="password" name="password" id="tpassword" /></td>
-                        </tr>
-                        <tr>
-                           <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
-							<td align="right" class="standard"><label for="tpassword_confirm"><strong><fmt:message key="jsp.register.edit-profile.confirm.field"/></strong></label></td>
-                            <td class="standard"><input type="password" name="password_confirm" id="tpassword_confirm" /></td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+							<label class="col-md-offset-3 col-md-2 control-label" for="tpassword"><fmt:message key="jsp.register.edit-profile.pswd.field"/></label>
+							<div class="col-md-3">
+                            	<input class="form-control" type="password" name="password" id="tpassword" />
+                            </div>
+            </div>
+            <div class="form-group">
+	                           <%-- <td align="right" class="standard"><strong>Again to Confirm:</strong></td> --%>
+							<label class="col-md-offset-3 col-md-2 control-label" for="tpassword_confirm"><fmt:message key="jsp.register.edit-profile.confirm.field"/></label>
+							<div class="col-md-3">
+                            	<input class="form-control" type="password" name="password_confirm" id="tpassword_confirm" /></td>
+                            </div>
+            </div>
 <%
   }
 %>
+	<div class="col-md-offset-5">
        <%-- <p align="center"><input type="submit" name="submit" value="Update Profile"></p> --%>
-	   <p align="center"><input type="submit" name="submit" value="<fmt:message key="jsp.register.edit-profile.update.button"/>" /></p>
+	   <input class="btn btn-success col-md-4" type="submit" name="submit" value="<fmt:message key="jsp.register.edit-profile.update.button"/>" />
+	 </div>
     </form>
 </dspace:layout>

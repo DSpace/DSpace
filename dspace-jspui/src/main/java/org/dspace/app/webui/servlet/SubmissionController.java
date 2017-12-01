@@ -21,21 +21,24 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.FileUploadRequest;
+import org.dspace.app.webui.util.JSONUploadResponse;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.submit.AbstractProcessingStep;
+
+import com.google.gson.Gson;
 
 /**
  * Submission Manager servlet for DSpace. Handles the initial submission of
@@ -226,7 +229,22 @@ public class SubmissionController extends DSpaceServlet
             } catch (FileSizeLimitExceededException e)
             {
                 log.warn("Upload exceeded upload.max");
-                JSPManager.showFileSizeLimitExceededError(request, response, e.getMessage(), e.getActualSize(), e.getPermittedSize());
+                if (ConfigurationManager.getBooleanProperty("webui.submit.upload.progressbar", true))
+                {
+                    Gson gson = new Gson();
+                    // old browser need to see this response as html to work            
+                    response.setContentType("text/html");
+                    JSONUploadResponse jsonResponse = new JSONUploadResponse();
+                    jsonResponse.addUploadFileSizeLimitExceeded(
+                            e.getActualSize(), e.getPermittedSize());
+                    response.getWriter().print(gson.toJson(jsonResponse));
+                    response.flushBuffer();                    
+                }
+                else
+                {
+                    JSPManager.showFileSizeLimitExceededError(request, response, e.getMessage(), e.getActualSize(), e.getPermittedSize());                    
+                }
+                return;
             }
             
             //also, upload any files and save their contents to Request (for later processing by UploadStep)
@@ -513,7 +531,7 @@ public class SubmissionController extends DSpaceServlet
         
         if (!subInfo.isInWorkflow())
         {
-            stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+            stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
         }
         
         if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
@@ -670,14 +688,13 @@ public class SubmissionController extends DSpaceServlet
 
             int currStep = currentStepConfig.getStepNumber();
             int currPage = AbstractProcessingStep.getCurrentPage(request);
-            double currStepAndPage = Float
-                    .parseFloat(currStep + "." + currPage);
+            double currStepAndPage = Double.parseDouble(currStep + "." + currPage);
             // default value if we are in workflow
             double stepAndPageReached = -1;
             
             if (!subInfo.isInWorkflow())
             {
-                stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+                stepAndPageReached = Double.parseDouble(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
             }
             
             if (result != AbstractProcessingStep.STATUS_COMPLETE

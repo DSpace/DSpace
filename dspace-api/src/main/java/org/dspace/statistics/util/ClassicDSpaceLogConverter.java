@@ -27,6 +27,9 @@ import java.text.ParsePosition;
  * by log4j) files into an intermediate format for ingestion into
  * the new solr stats.
  *
+ * @see StatisticsImporter
+ * @see StatisticsImporterElasticSearch
+ *
  * @author Stuart Lewis
  */
 public class ClassicDSpaceLogConverter {
@@ -130,7 +133,7 @@ public class ClassicDSpaceLogConverter {
 
             while ((line = input.readLine()) != null)
             {
-                // Read inthe line and covnert it to a LogLine
+                // Read in the line and convert it to a LogLine
                 lines++;
                 if (verbose)
                 {

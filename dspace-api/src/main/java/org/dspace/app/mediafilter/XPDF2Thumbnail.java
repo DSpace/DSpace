@@ -8,7 +8,10 @@
 package org.dspace.app.mediafilter;
 
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+import java.awt.Color;
+import java.awt.image.*;
+import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -88,10 +91,10 @@ public class XPDF2Thumbnail extends MediaFilter
         "^Page\\s+\\d+\\s+MediaBox:\\s+([\\.\\d-]+)\\s+([\\.\\d-]+)\\s+([\\.\\d-]+)\\s+([\\.\\d-]+)");
 
     // also from thumbnail.maxwidth in config
-    private int maxwidth = 0;
+    private int xmax = 0;
 
     // backup default for size, on the large side.
-    private static final int DEFAULT_MAXWIDTH = 500;
+    private static final int DEFAULT_XMAX = 500;
 
     public String getFilteredName(String oldFilename)
     {
@@ -117,6 +120,16 @@ public class XPDF2Thumbnail extends MediaFilter
     public InputStream getDestinationStream(InputStream sourceStream)
             throws Exception
     {
+        // get config params
+        float xmax = (float) ConfigurationManager
+                .getIntProperty("thumbnail.maxwidth");
+        float ymax = (float) ConfigurationManager
+                .getIntProperty("thumbnail.maxheight");
+        boolean blurring = (boolean) ConfigurationManager
+                .getBooleanProperty("thumbnail.blurring");
+        boolean hqscaling = (boolean) ConfigurationManager
+                .getBooleanProperty("thumbnail.hqscaling");
+        
         // sanity check: xpdf paths are required. can cache since it won't change
         if (pdftoppmPath == null || pdfinfoPath == null)
         {
@@ -130,10 +143,10 @@ public class XPDF2Thumbnail extends MediaFilter
             {
                 throw new IllegalStateException("No value for key \"xpdf.path.pdfinfo\" in DSpace configuration!  Should be path to XPDF pdfinfo executable.");
             }
-            maxwidth = ConfigurationManager.getIntProperty("thumbnail.maxwidth");
-            if (maxwidth == 0)
+                
+            if (xmax == 0)
             {
-                maxwidth = DEFAULT_MAXWIDTH;
+                xmax = DEFAULT_XMAX;
             }
         }
 
@@ -278,41 +291,224 @@ public class XPDF2Thumbnail extends MediaFilter
         {
             throw new IOException("Unknown failure while transforming file to preview: no image produced.");
         }
+        
+        // read in bitstream's image
+        BufferedImage buf = source;
 
-        // Scale image and return in-memory stream
-        BufferedImage toenail = scaleImage(source, maxwidth*3/4, maxwidth);
+        // now get the image dimensions
+        float xsize = (float) buf.getWidth(null);
+        float ysize = (float) buf.getHeight(null);
+        
+        // if verbose flag is set, print out dimensions
+        // to STDOUT
+        if (MediaFilterManager.isVerbose)
+        {
+            System.out.println("original size: " + xsize + "," + ysize);
+        }
+        
+        // scale by x first if needed
+        if (xsize > xmax)
+        {
+            // calculate scaling factor so that xsize * scale = new size (max)
+            float scale_factor = xmax / xsize;
+
+            // if verbose flag is set, print out extracted text
+            // to STDOUT
+            if (MediaFilterManager.isVerbose)
+            {
+                System.out.println("x scale factor: " + scale_factor);
+            }
+
+            // now reduce x size
+            // and y size
+            xsize = xsize * scale_factor;
+            ysize = ysize * scale_factor;
+
+            // if verbose flag is set, print out extracted text
+            // to STDOUT
+            if (MediaFilterManager.isVerbose)
+            {
+                System.out.println("new size: " + xsize + "," + ysize);
+            }
+        }
+
+        // scale by y if needed
+        if (ysize > ymax)
+        {
+            float scale_factor = ymax / ysize;
+
+            // now reduce x size
+            // and y size
+            xsize = xsize * scale_factor;
+            ysize = ysize * scale_factor;
+        }
+
+        // if verbose flag is set, print details to STDOUT
+        if (MediaFilterManager.isVerbose)
+        {
+            System.out.println("created thumbnail size: " + xsize + ", "
+                    + ysize);
+        }
+
+        // create an image buffer for the thumbnail with the new xsize, ysize
+        BufferedImage thumbnail = new BufferedImage((int) xsize, (int) ysize,
+                BufferedImage.TYPE_INT_RGB);
+
+        // Use blurring if selected in config.
+        // a little blur before scaling does wonders for keeping moire in check.
+        if (blurring)
+        {
+                // send the buffered image off to get blurred.
+                buf = getBlurredInstance((BufferedImage) buf);
+        }
+
+        // Use high quality scaling method if selected in config.
+        // this has a definite performance penalty.
+        if (hqscaling)
+        {
+                // send the buffered image off to get an HQ downscale.
+                buf = getScaledInstance((BufferedImage) buf, (int) xsize, (int) ysize,
+                        (Object) RenderingHints.VALUE_INTERPOLATION_BICUBIC, (boolean) true);
+        }
+
+        // now render the image into the thumbnail buffer
+        Graphics2D g2d = thumbnail.createGraphics();
+        g2d.drawImage(buf, 0, 0, (int) xsize, (int) ysize, null);
+
+        // now create an input stream for the thumbnail buffer and return it
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(toenail, "jpeg", baos);
-        return new ByteArrayInputStream(baos.toByteArray());
-    }
 
-    // scale the image, preserving aspect ratio, if at least one
-    // dimension is not between min and max.
-    private static BufferedImage scaleImage(BufferedImage source,
-                                            int min, int max)
+        ImageIO.write(thumbnail, "jpeg", baos);
+
+        // now get the array
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+
+        return bais; // hope this gets written out before its garbage collected!
+    }
+    
+   public String[] getInputMIMETypes()
     {
-        int xsize = source.getWidth(null);
-        int ysize = source.getHeight(null);
-        int msize = Math.max(xsize, ysize);
-        BufferedImage result = null;
-
-        // scale the image if it's outside of requested range.
-        // ALSO pass through if min and max are both 0
-        if ((min == 0 && max == 0) ||
-            (msize >= min && Math.min(xsize, ysize) <= max))
-        {
-            return source;
-        }
-        else
-        {
-            int xnew = xsize * max / msize;
-            int ynew = ysize * max / msize;
-            result = new BufferedImage(xnew, ynew, BufferedImage.TYPE_INT_RGB);
-            Graphics2D g2d = result.createGraphics();
-            g2d.drawImage(source, 0, 0, xnew, ynew, null);
-            return result;
-        }
+        return ImageIO.getReaderMIMETypes();
     }
-}
 
- 	  	 
+    public String[] getInputDescriptions()
+    {
+        return null;
+    }
+
+    public String[] getInputExtensions()
+    {
+        // Temporarily disabled as JDK 1.6 only
+        // return ImageIO.getReaderFileSuffixes();
+        return null;
+    }
+
+    public BufferedImage getNormalizedInstance(BufferedImage buf)
+    {
+     int type = (buf.getTransparency() == Transparency.OPAQUE) ?
+            BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB_PRE;
+     int w, h;
+     w = buf.getWidth();
+     h = buf.getHeight();
+     BufferedImage normal = new BufferedImage(w, h, type);
+     Graphics2D g2d = normal.createGraphics();
+     g2d.drawImage(buf, 0, 0, w, h, Color.WHITE, null);
+     g2d.dispose();
+     return normal;
+    }
+
+    public BufferedImage getBlurredInstance(BufferedImage buf)
+    {
+    /**
+     * Convenience method that returns a blurred instance of the
+     * provided {@code BufferedImage}.
+     *
+     */
+
+     buf = getNormalizedInstance(buf);
+
+     // kernel for blur op
+     float[] matrix = {
+        0.111f, 0.111f, 0.111f,
+        0.111f, 0.111f, 0.111f,
+        0.111f, 0.111f, 0.111f,
+      };
+
+     // perform the blur and return the blurred version.
+     BufferedImageOp blur = new ConvolveOp( new Kernel(3, 3, matrix) );
+     BufferedImage blurbuf = blur.filter(buf, null);
+     return blurbuf;
+    }
+
+    /**
+     * Convenience method that returns a scaled instance of the
+     * provided {@code BufferedImage}.
+     *
+     * @param buf the original image to be scaled
+     * @param targetWidth the desired width of the scaled instance,
+     *    in pixels
+     * @param targetHeight the desired height of the scaled instance,
+     *    in pixels
+     * @param hint one of the rendering hints that corresponds to
+     *    {@code RenderingHints.KEY_INTERPOLATION} (e.g.
+     *    {@code RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR},
+     *    {@code RenderingHints.VALUE_INTERPOLATION_BILINEAR},
+     *    {@code RenderingHints.VALUE_INTERPOLATION_BICUBIC})
+     * @param higherQuality if true, this method will use a multi-step
+     *    scaling technique that provides higher quality than the usual
+     *    one-step technique (only useful in downscaling cases, where
+     *    {@code targetWidth} or {@code targetHeight} is
+     *    smaller than the original dimensions, and generally only when
+     *    the {@code BILINEAR} hint is specified)
+     * @return a scaled version of the original {@code BufferedImage}
+     */
+    public BufferedImage getScaledInstance(BufferedImage buf,
+                                           int targetWidth,
+                                           int targetHeight,
+                                           Object hint,
+                                           boolean higherQuality)
+    {
+        int type = (buf.getTransparency() == Transparency.OPAQUE) ?
+            BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+        BufferedImage scalebuf = (BufferedImage)buf;
+        int w, h;
+        if (higherQuality) {
+            // Use multi-step technique: start with original size, then
+            // scale down in multiple passes with drawImage()
+            // until the target size is reached
+            w = buf.getWidth();
+            h = buf.getHeight();
+        } else {
+            // Use one-step technique: scale directly from original
+            // size to target size with a single drawImage() call
+            w = targetWidth;
+            h = targetHeight;
+        }
+
+        do {
+            if (higherQuality && w > targetWidth) {
+                w /= 2;
+                if (w < targetWidth) {
+                    w = targetWidth;
+                }
+            }
+
+            if (higherQuality && h > targetHeight) {
+                h /= 2;
+                if (h < targetHeight) {
+                    h = targetHeight;
+                }
+            }
+
+            BufferedImage tmp = new BufferedImage(w, h, type);
+            Graphics2D g2d = tmp.createGraphics();
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
+            g2d.drawImage(scalebuf, 0, 0, w, h, Color.WHITE, null);
+            g2d.dispose();
+
+            scalebuf = tmp;
+        } while (w != targetWidth || h != targetHeight);
+
+        return scalebuf;
+    }    
+}

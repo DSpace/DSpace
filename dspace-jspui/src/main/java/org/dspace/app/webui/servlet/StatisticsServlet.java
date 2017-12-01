@@ -166,6 +166,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
             if (reportFile == null)
             {
                 JSPManager.showJSP(request, response, "statistics/no-report.jsp");
+                return;
             }
 
             // finally, build the list of report dates

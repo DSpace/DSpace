@@ -13,13 +13,13 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.eperson.EPerson;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.AbstractUnitTest;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.dspace.core.LicenseManager;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
@@ -81,7 +81,7 @@ public class LicenseUtilsTest extends AbstractUnitTest
         String templateLong = "Template license: %1$s %2$s %3$s %5$s %6$s %8$s %9$s %10$s %11$s";
         String templateResult = "Template license: first name last name test@email.com  ";
         String templateLongResult = "Template license: first name last name test@email.com   arg1 arg2 arg3 arg4";
-        String defaultLicense = ConfigurationManager.getDefaultSubmissionLicense();
+        String defaultLicense = LicenseManager.getDefaultSubmissionLicense();
 
         context.turnOffAuthorisationSystem();
         //TODO: the tested method doesn't verify the input, will throw NPE if any parameter is null
@@ -154,10 +154,10 @@ public class LicenseUtilsTest extends AbstractUnitTest
         additionalInfo = new LinkedHashMap<String, Object>();
         additionalInfo.put("arg1", "arg1");
         additionalInfo.put("arg2", "arg2");
-        additionalInfo.put("arg3", "arg3");        
+        additionalInfo.put("arg3", "arg3");
         additionalInfo.put("arg4", "arg4");
         assertThat("testGetLicenseText_5args 5", LicenseUtils.getLicenseText(locale, collection, item, person, additionalInfo), equalTo(templateLongResult));
-        
+
         context.restoreAuthSystemState();
     }
 
@@ -175,7 +175,7 @@ public class LicenseUtilsTest extends AbstractUnitTest
 
         String template = "Template license: %1$s %2$s %3$s %5$s %6$s";
         String templateResult = "Template license: first name last name test@email.com  ";
-        String defaultLicense = ConfigurationManager.getDefaultSubmissionLicense();
+        String defaultLicense = LicenseManager.getDefaultSubmissionLicense();
 
         context.turnOffAuthorisationSystem();
         //TODO: the tested method doesn't verify the input, will throw NPE if any parameter is null
@@ -207,7 +207,7 @@ public class LicenseUtilsTest extends AbstractUnitTest
         person = EPerson.create(context);
         person.setFirstName("first name");
         person.setLastName("last name");
-        person.setEmail("test@email.com");        
+        person.setEmail("test@email.com");
         assertThat("testGetLicenseText_5args 3", LicenseUtils.getLicenseText(locale, collection, item, person), equalTo(templateResult));
 
         locale = Locale.GERMAN;
@@ -227,11 +227,11 @@ public class LicenseUtilsTest extends AbstractUnitTest
      * Test of grantLicense method, of class LicenseUtils.
      */
     @Test
-    public void testGrantLicense() throws Exception 
+    public void testGrantLicense() throws Exception
     {
         context.turnOffAuthorisationSystem();
         Item item = Item.create(context);
-        String defaultLicense = ConfigurationManager.getDefaultSubmissionLicense();
+        String defaultLicense = LicenseManager.getDefaultSubmissionLicense();
 
         LicenseUtils.grantLicense(context, item, defaultLicense);
 

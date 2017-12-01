@@ -64,6 +64,7 @@ DROP TABLE TasklistItem;
 DROP TABLE WorkflowItem;
 DROP TABLE WorkspaceItem;
 DROP TABLE Handle;
+DROP TABLE Doi;
 DROP TABLE EPersonGroup2EPerson;
 DROP TABLE ResourcePolicy;
 DROP TABLE Collection2Item;
@@ -114,6 +115,7 @@ DROP SEQUENCE collection2item_seq;
 DROP SEQUENCE resourcepolicy_seq;
 DROP SEQUENCE epersongroup2eperson_seq;
 DROP SEQUENCE handle_seq;
+DROP SEQUENCE doi_seq;
 DROP SEQUENCE workspaceitem_seq;
 DROP SEQUENCE workflowitem_seq;
 DROP SEQUENCE tasklistitem_seq;
@@ -132,4 +134,4 @@ DROP SEQUENCE versionhistory_seq;
 DROP SEQUENCE versionitem_seq;
 
 -- Drop the getnextid() function
-DROP FUNCTION getnextid(VARCHAR(40));
+DROP FUNCTION getnextid;

@@ -9,6 +9,7 @@ package org.dspace.statistics;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.Ostermiller.util.ExcelCSVPrinter;
+import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -235,31 +236,21 @@ public class Dataset {
 
     public ByteArrayOutputStream exportAsCSV() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ExcelCSVPrinter ecsvp = new ExcelCSVPrinter(baos);
-        ecsvp.changeDelimiter(';');
-        ecsvp.setAlwaysQuote(true);
+        CSVWriter ecsvp = new CSVWriter(new OutputStreamWriter(baos), ';');
         //Generate the item row
         List<String> colLabels = getColLabels();
-        ecsvp.write("");
-        for (String colLabel : colLabels) {
-            ecsvp.write(colLabel);
-        }
-        ecsvp.writeln();
+        colLabels.add(0, "");
+        ecsvp.writeNext(colLabels.toArray(new String[colLabels.size()]));
         List<String> rowLabels = getRowLabels();
 
         String[][] matrix = getMatrix();
         for (int i = 0; i < rowLabels.size(); i++) {
             String rowLabel = rowLabels.get(i);
-            ecsvp.write(rowLabel);
-            for (int j = 0; j < matrix[i].length; j++) {
-                ecsvp.write(matrix[i][j]);
-            }
-            ecsvp.writeln();
+            ecsvp.writeNext((String[]) ArrayUtils.addAll(new String[]{rowLabel}, matrix[i]));
         }
         ecsvp.flush();
         ecsvp.close();
         return baos;
-
     }
 
 }

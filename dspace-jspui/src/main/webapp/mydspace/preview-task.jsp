@@ -35,7 +35,8 @@
     Item item = workflowItem.getItem();
 %>
 
-<dspace:layout locbar="link"
+<dspace:layout style="submission"
+			   locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.preview-task.title"
@@ -75,15 +76,7 @@
     <form action="<%= request.getContextPath() %>/mydspace" method="post">
         <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>"/>
         <input type="hidden" name="step" value="<%= MyDSpaceServlet.PREVIEW_TASK_PAGE %>"/>
-        <table border="0" width="90%" cellpadding="10" align="center">
-            <tr>
-                <td align="left">
-		    <input type="submit" name="submit_start" value="<fmt:message key="jsp.mydspace.preview-task.accept.button"/>" />
-                </td>
-                <td align="right">
-	  	    <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.general.cancel"/>" />
-                </td>
-            </tr>
-        </table>
+		<input class="btn btn-default col-md-2" type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.general.cancel"/>" />
+		<input class="btn btn-primary col-md-2 pull-right" type="submit" name="submit_start" value="<fmt:message key="jsp.mydspace.preview-task.accept.button"/>" />
     </form>
 </dspace:layout>

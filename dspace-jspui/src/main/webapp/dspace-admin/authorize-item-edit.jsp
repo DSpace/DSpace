@@ -69,39 +69,36 @@
     Map bitstream_policies = (Map)request.getAttribute("bitstream_policies");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.authorize-item-edit.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.authorize-item-edit.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
 
-  <table width="95%">
-    <tr>
-      <td align="left">
+
 	<h1><fmt:message key="jsp.dspace-admin.authorize-item-edit.policies">
         <fmt:param><%= item.getHandle() %></fmt:param>
         <fmt:param><%= item.getID() %></fmt:param>
-    </fmt:message></h1>
-      </td>
-      <td align="right" class="standard">
-        <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#itempolicies\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-      </td>
-    </tr>
-  </table>
+    </fmt:message>
+	<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#itempolicies\"%>"><fmt:message key="jsp.help"/></dspace:popup>
+    </h1>
 
-  <p><fmt:message key="jsp.dspace-admin.authorize-item-edit.text1"/></p>
-  <p><fmt:message key="jsp.dspace-admin.authorize-item-edit.text2"/></p>
+  <p class="help-block"><fmt:message key="jsp.dspace-admin.authorize-item-edit.text1"/></p>
+  <p class="help-block"><fmt:message key="jsp.dspace-admin.authorize-item-edit.text2"/></p>
 
-  <h3><fmt:message key="jsp.dspace-admin.authorize-item-edit.item"/></h3>
+  <div class="panel panel-primary">
+  <div class="panel-heading"><fmt:message key="jsp.dspace-admin.authorize-item-edit.item"/></div>
+  <div class="panel-body">
     <form method="post" action="">
-      <p align="center">
+      <div class="row col-md-offset-4">
           <input type="hidden" name="item_id" value="<%=item.getID()%>" />
-          <input type="submit" name="submit_item_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
-      </p>
+          <input class="btn btn-success col-md-4" type="submit" name="submit_item_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
+      </div>
     </form>
+    <br/>
 
-    <table class="miscTable" align="center" summary="Item Policy Edit Form">
+    <table class="table" summary="Item Policy Edit Form">
         <tr>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
@@ -129,8 +126,8 @@
                  <form method="post" action=""> 
                      <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                      <input type="hidden" name="item_id" value="<%= item.getID() %>" />
-                     <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
-                     <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                     <input class="btn btn-primary col-md-4" type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
+                     <input class="btn btn-danger col-md-4 col-md-offset-1" type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
                 </form>  
             </td>
         </tr>
@@ -139,6 +136,8 @@
     }
 %>
     </table>
+    </div>
+ </div>
 <%
     for( int b = 0; b < bundles.length; b++ )
     {
@@ -148,21 +147,23 @@
         // display add policy
         // display bundle header w/ID
 
-%>                
-        <h3><fmt:message key="jsp.dspace-admin.authorize-item-edit.bundle">
+%>
+	<div class="panel panel-info">
+  		<div class="panel-heading">    
+        <fmt:message key="jsp.dspace-admin.authorize-item-edit.bundle">
             <fmt:param><%=myBun.getName()%></fmt:param>
             <fmt:param><%=myBun.getID()%></fmt:param>
-        </fmt:message></h3>
-
+        </fmt:message></div>
+		<div class="panel-body">
         <form method="post" action="">
-            <p align="center">
+      		<div class="row col-md-offset-4">
                 <input type="hidden" name="item_id" value="<%=item.getID()%>" />
                 <input type="hidden" name="bundle_id" value="<%=myBun.getID()%>" />
-                <input type="submit" name="submit_bundle_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
-            </p>
-        </form>      
-        
-    <table class="miscTable" align="center" summary="Bundle Policy Edit Form">
+                <input class="btn btn-success col-md-4" type="submit" name="submit_bundle_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
+            </div>
+        </form>
+        <br/> 
+    <table class="table" summary="Bundle Policy Edit Form">
         <tr>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
@@ -192,8 +193,8 @@
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="item_id" value="<%= item.getID() %>" />
                     <input type="hidden" name="bundle_id" value="<%= myBun.getID() %>" />
-                    <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
-                    <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                    <input class="btn btn-primary col-md-4" type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
+                    <input class="btn btn-danger col-md-4 col-md-offset-1" type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
                 </form>
             </td>
          </tr>
@@ -202,7 +203,6 @@
     }
 %>
     </table>
-
 <%
         Bitstream [] bitstreams = myBun.getBitstreams();
                 
@@ -215,18 +215,23 @@
             // 'add policy'
             // display bitstream's policies
 %>                        
-            <p><fmt:message key="jsp.dspace-admin.authorize-item-edit.bitstream">
+	<div class="panel panel-success">
+  		<div class="panel-heading">  
+            <fmt:message key="jsp.dspace-admin.authorize-item-edit.bitstream">
                 <fmt:param><%=myBits.getID()%></fmt:param>
                 <fmt:param><%=myBits.getName()%></fmt:param>
-            </fmt:message></p>
+            </fmt:message></div>
+            
+        <div class="panel-body">    
             <form method="post" action="">
-                <p align="center">
+                <div class="row col-md-offset-4">
                     <input type="hidden" name="item_id"value="<%=item.getID()%>" />
                     <input type="hidden" name="bitstream_id" value="<%=myBits.getID()%>" />
-                    <input type="submit" name="submit_bitstream_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
-                </p>
+                    <input class="btn btn-success col-md-4" type="submit" name="submit_bitstream_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
+                </div>
             </form>
-            <table class="miscTable" align="center" summary="This table displays the bitstream data">
+            <br/>
+            <table class="table" summary="This table displays the bitstream data">
             <tr>
                 <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
                 <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.general.action"/></strong></th>
@@ -256,8 +261,8 @@
                     <input type="hidden" name="policy_id" value="<%= rp.getID()     %>" />
                     <input type="hidden" name="item_id" value="<%= item.getID()   %>" />
                     <input type="hidden" name="bitstream_id" value="<%= myBits.getID() %>" />
-                    <input type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
-                    <input type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
+                    <input class="btn btn-primary col-md-4" type="submit" name="submit_item_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
+                    <input class="btn btn-danger col-md-4 col-md-offset-1" type="submit" name="submit_item_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />
                  </form>  
             </td>
         </tr>
@@ -266,9 +271,15 @@
             }
 %>
     </table>
+    </div>
+  </div>  
 <%
 
         }
+        %>
+   </div>
+</div>        
+        <%
     }
 %>
 </dspace:layout>

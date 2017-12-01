@@ -136,7 +136,7 @@ public class EditFileStep extends AbstractStep
         description.setValue(bitstream.getDescription());
 
         // if AdvancedAccessPolicy=false: add simmpleFormEmbargo in UploadStep
-        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("xmlui.submission.restrictstep.enableAdvancedForm", false);
+        boolean isAdvancedFormEnabled= ConfigurationManager.getBooleanProperty("webui.submission.restrictstep.enableAdvancedForm", false);
         if(!isAdvancedFormEnabled){
             AccessStepUtil asu = new AccessStepUtil(context);
             // this step is possible only in case of AdvancedForm

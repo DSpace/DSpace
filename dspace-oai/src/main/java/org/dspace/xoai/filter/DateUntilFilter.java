@@ -45,7 +45,6 @@ public class DateUntilFilter extends DSpaceFilter
     @Override
     public SolrFilterResult getQuery()
     {
-    	System.out.println("HEYYYY!!!!");
         return new SolrFilterResult("item.lastmodified:[* TO "
                 + ClientUtils.escapeQueryChars(DateUtils.formatToSolr(_date, false)) + "]");
     }

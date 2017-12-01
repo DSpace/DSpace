@@ -26,7 +26,7 @@
     Community community = (Community) request.getAttribute("community");
 %>
 
-<dspace:layout titlekey="jsp.tools.confirm-delete-community.title"
+<dspace:layout style="submission" titlekey="jsp.tools.confirm-delete-community.title"
 						navbar="admin"
 						locbar="link"
 						parentlink="/tools"
@@ -53,17 +53,8 @@
     <form method="post" action="">
         <input type="hidden" name="community_id" value="<%= community.getID() %>" />
         <input type="hidden" name="action" value="<%= EditCommunitiesServlet.CONFIRM_DELETE_COMMUNITY %>" />
-        <center>
-            <table width="70%">
-                <tr>
-                    <td align="left">
-                        <input type="submit" name="submit" value="<fmt:message key="jsp.tools.general.delete"/>"/>
-                    </td>
-                    <td align="right">
-                        <input type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>"/>
-                    </td>
-                </tr>
-            </table>
-        </center>
+
+		<input class="btn btn-default col-md-2" type="submit" name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>"/>
+        <input class="btn btn-danger col-md-2 pull-right" type="submit" name="submit" value="<fmt:message key="jsp.tools.general.delete"/>"/>
     </form>
 </dspace:layout>

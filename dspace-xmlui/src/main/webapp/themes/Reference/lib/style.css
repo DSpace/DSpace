@@ -1235,11 +1235,6 @@ input.ds-authority-lock.is-locked
 input.ds-authority-lock.is-unlocked
   { background-image: url(../images/unlock24.png); }
 
-
-/* Example of authority display: this makes authors with an authority
-   value show up as red in the item summary view: */
-span.ds-dc_contributor_author-authority { color: #982521; }
-
 /* Prevent display of COinS span - nonspacing break in span to fix closing tag
 also causes a newline in some browsers */
 span.Z3988 {
@@ -1455,3 +1450,11 @@ div.vocabulary-container li.error{
     color: #c22121;
 }
 /* Controlled vocabulary support css END*/
+
+.didYouMean{
+    font-size: 18px;
+}
+
+.didYouMean a{
+    font-weight: bold;
+}

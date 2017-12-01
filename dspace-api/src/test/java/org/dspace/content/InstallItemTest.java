@@ -87,7 +87,7 @@ public class InstallItemTest extends AbstractUnitTest
         String handle = "1345/567";
         Collection col = Collection.create(context);
         WorkspaceItem is = WorkspaceItem.create(context, col, false);
-
+      
         //Test assigning a specified handle to an item
         // (this handle should not already be used by system, as it doesn't start with "1234567689" prefix)
         Item result = InstallItem.installItem(context, is, handle);
@@ -198,4 +198,87 @@ public class InstallItemTest extends AbstractUnitTest
         assertThat("testGetBitstreamProvenanceMessage 0", InstallItem.getBitstreamProvenanceMessage(item), equalTo(testMessage));
     }
 
+    /**
+     * Test passing in "today" as an issued date to InstallItem.
+     */
+    @Test
+    public void testInstallItem_todayAsIssuedDate() throws Exception
+    {
+        //create a dummy WorkspaceItem
+        context.turnOffAuthorisationSystem();
+        String handle = "1345/567";
+        Collection col = Collection.create(context);
+        WorkspaceItem is = WorkspaceItem.create(context, col, false);
+
+        // Set "today" as "dc.date.issued"
+        is.getItem().addMetadata("dc", "date", "issued", Item.ANY, "today");
+        is.getItem().addMetadata("dc", "date", "issued", Item.ANY, "2011-01-01");
+
+        //get current date
+        DCDate now = DCDate.getCurrent();
+        String dayAndTime = now.toString();
+        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
+        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+
+        Item result = InstallItem.installItem(context, is, handle);
+        context.restoreAuthSystemState();
+
+        //Make sure the string "today" was replaced with today's date
+        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+
+        assertThat("testInstallItem_todayAsIssuedDate 0", issuedDates[0].value, equalTo(date));
+        assertThat("testInstallItem_todayAsIssuedDate 1", issuedDates[1].value, equalTo("2011-01-01"));
+    }
+
+    /**
+     * Test null issue date (when none set) in InstallItem
+     */
+    @Test
+    public void testInstallItem_nullIssuedDate() throws Exception
+    {
+        //create a dummy WorkspaceItem with no dc.date.issued
+        context.turnOffAuthorisationSystem();
+        String handle = "1345/567";
+        Collection col = Collection.create(context);
+        WorkspaceItem is = WorkspaceItem.create(context, col, false);
+
+        Item result = InstallItem.installItem(context, is, handle);
+        context.restoreAuthSystemState();
+
+        //Make sure dc.date.issued is NOT set
+        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+        assertThat("testInstallItem_nullIssuedDate 0", issuedDates.length, equalTo(0));
+    }
+
+    /**
+     * Test passing in "today" as an issued date to restoreItem.
+     */
+    @Test
+    public void testRestoreItem_todayAsIssuedDate() throws Exception
+    {
+        //create a dummy WorkspaceItem
+        context.turnOffAuthorisationSystem();
+        String handle = "1345/567";
+        Collection col = Collection.create(context);
+        WorkspaceItem is = WorkspaceItem.create(context, col, false);
+
+        // Set "today" as "dc.date.issued"
+        is.getItem().addMetadata("dc", "date", "issued", Item.ANY, "today");
+        is.getItem().addMetadata("dc", "date", "issued", Item.ANY, "2011-01-01");
+
+        //get current date
+        DCDate now = DCDate.getCurrent();
+        String dayAndTime = now.toString();
+        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
+        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+
+        Item result = InstallItem.restoreItem(context, is, handle);
+        context.restoreAuthSystemState();
+
+        //Make sure the string "today" was replaced with today's date
+        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+
+        assertThat("testRestoreItem_todayAsIssuedDate 0", issuedDates[0].value, equalTo(date));
+        assertThat("testRestoreItem_todayAsIssuedDate 1", issuedDates[1].value, equalTo("2011-01-01"));
+    }
 }

@@ -2,26 +2,26 @@
 INSERT INTO cwf_collectionrole (role_id, group_id, collection_id)
 SELECT
 'reviewer' AS role_id,
-eperson_group_id AS group_id,
-replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_1', '')::INTEGER AS collection_id
-FROM epersongroup
-WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_1';
+collection.workflow_step_1 AS group_id,
+collection.collection_id AS collection_id
+FROM collection
+WHERE collection.workflow_step_1 IS NOT NULL;
 
 INSERT INTO cwf_collectionrole  (role_id, group_id, collection_id)
 SELECT
 'editor' AS role_id,
-eperson_group_id AS group_id,
-replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_2', '')::INTEGER AS collection_id
-FROM epersongroup
-WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_2';
+collection.workflow_step_2 AS group_id,
+collection.collection_id AS collection_id
+FROM collection
+WHERE collection.workflow_step_2 IS NOT NULL;
 
 INSERT INTO cwf_collectionrole  (role_id, group_id, collection_id)
 SELECT
 'finaleditor' AS role_id,
-eperson_group_id AS group_id,
-replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_3', '')::INTEGER AS collection_id
-FROM epersongroup
-WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_3';
+collection.workflow_step_3 AS group_id,
+collection.collection_id AS collection_id
+FROM collection
+WHERE collection.workflow_step_3 IS NOT NULL;
 
 
 -- Migrate workflow items

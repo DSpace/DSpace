@@ -680,12 +680,10 @@ public final class BrowseIndex
         while ( ((definition = ConfigurationManager.getProperty("webui.browse.index." + idx))) != null)
         {
             BrowseIndex bi = new BrowseIndex(definition, idx);
-            
-            //Load the frequency configuration
-            String freqDefinition = ConfigurationManager.getProperty("webui.browse.metadata.show-freq." + idx);
-            if (freqDefinition!=null)
-            	bi.displayFrequencies = Boolean.valueOf(freqDefinition);
-            
+			bi.displayFrequencies = Boolean.valueOf(ConfigurationManager
+					.getBooleanProperty("webui.browse.metadata.show-freq."
+							+ idx, true));
+
             browseIndices.add(bi);
             idx++;
         }

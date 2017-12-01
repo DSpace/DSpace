@@ -13,7 +13,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     <!--
-		Package DSpace's common testing environment (configuration, etc.)
+        Package DSpace's common testing environment (configuration, etc.)
 	-->
     <id>testEnvironment</id>
     <formats>
@@ -29,29 +29,31 @@
                     <fileSet> <!-- installable DSpace files -->
                         <directory />
                         <outputDirectory />
+                        <!-- Copy necessary DSpace subdirectories into Test environment -->
+                        <includes>
+                            <include>bin/**</include>
+                            <include>config/**</include>
+                            <include>etc/**</include>
+                            <include>solr/**</include>
+                        </includes>
+                        <!-- Exclude specific configs (which require filtering) -->
                         <excludes>
                             <exclude>config/dspace.cfg</exclude>
-                        </excludes>
-                        <includes>
-                            <include>bin/**/*</include>
-                            <include>config/**/*</include>
-                            <include>etc/**/*</include>
-                            <include>modules/**/*</include>
-                            <include>solr/**/*</include>
-                        </includes>
+                            <exclude>config/log4j.properties</exclude>
+                            <exclude>config/modules/**</exclude>
+                        </excludes> 
                     </fileSet>
-                    <fileSet> <!-- installable DSpace files needing filtering -->
+                    <fileSet> <!-- Copy specific configs (filtering their content) also into Test environment -->
                         <includes>
+                            <include>config/modules/**</include>
                             <include>config/dspace.cfg</include>
+                            <include>config/log4j.properties</include>
                         </includes>
                         <filtered>true</filtered>
                     </fileSet>
                     <fileSet> <!-- test data -->
                         <directory>src/test/data/dspaceFolder</directory>
                         <outputDirectory />
-                        <includes>
-                            <include>assetstore/**/*</include>
-                        </includes>
                     </fileSet>
                 </fileSets>
             </sources>

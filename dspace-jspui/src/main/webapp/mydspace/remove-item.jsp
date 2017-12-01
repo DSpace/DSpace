@@ -33,8 +33,7 @@
                parenttitlekey="jsp.mydspace"
                titlekey="jsp.mydspace.remove-item.title"
                nocache="true">
-
-<h1><fmt:message key="jsp.mydspace.remove-item.title"/></h1>
+<h2><fmt:message key="jsp.mydspace.remove-item.title"/></h2>
     
     <%-- <p>Are you sure you want to remove the following incomplete item?</p> --%>
     <p><fmt:message key="jsp.mydspace.remove-item.confirmation"/></p>
@@ -45,17 +44,9 @@
         <input type="hidden" name="workspace_id" value="<%= wi.getID() %>"/>
         <input type="hidden" name="step" value="<%= MyDSpaceServlet.REMOVE_ITEM_PAGE %>"/>
 
-        <table align="center" border="0" width="90%">
-            <tr>
-                <td align="left">
-                    <%-- <input type="submit" name="submit_delete" value="Remove the Item" /> --%>
-					<input type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.remove-item.remove.button"/>" />
-                </td>
-                <td align="right">
-                    <%-- <input type="submit" name="submit_cancel" value="Cancel Removal" /> --%>
-					<input type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.remove-item.cancel.button"/>" />
-                </td>
-            </tr>
-        </table>
+		<div class="pull-right">
+			<input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.mydspace.remove-item.remove.button"/>" />
+			<input class="btn btn-success" type="submit" name="submit_cancel" value="<fmt:message key="jsp.mydspace.remove-item.cancel.button"/>" />
+		</div>
     </form>
 </dspace:layout>

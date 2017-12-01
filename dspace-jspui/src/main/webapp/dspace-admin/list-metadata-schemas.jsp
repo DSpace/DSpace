@@ -34,34 +34,28 @@
         (MetadataSchema[]) request.getAttribute("schemas");
 %>
 
-<dspace:layout titlekey="jsp.dspace-admin.list-metadata-schemas.title"
+<dspace:layout style="submission" titlekey="jsp.dspace-admin.list-metadata-schemas.title"
                navbar="admin"
                locbar="link"
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin">
 
-  <table width="95%">
-    <tr>
-      <td align="left">
-        <h1><fmt:message key="jsp.dspace-admin.list-metadata-schemas.title"/></h1>
-      </td>
-      <td align="right" class="standard">
+
+        <h1><fmt:message key="jsp.dspace-admin.list-metadata-schemas.title"/>
         <dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#dublincore\"%>"><fmt:message key="jsp.help"/></dspace:popup>
-      </td>
-    </tr>
-  </table>
+		</h1>
   
 <%
 String error = (String)request.getAttribute("error");
 if (error!=null) { 
 %>
-    <p align="center">
-    <font color="red"><%=error%></font>
+    <p class="alert alert-danger">
+    	<%=error%>
     </p>
 <% } %>
   
 
-    <table class="miscTable" align="center" width="500">
+    <table class="table" width="500">
         <tr>
             <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>
             <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.list-metadata-schemas.namespace"/></strong></th> 
@@ -86,8 +80,8 @@ if (error!=null) {
 		<% if ( schemas[i].getSchemaID() != 1 ) { %>
                 <form method="post" action="">
                     <input type="hidden" name="dc_schema_id" value="<%= schemas[i].getSchemaID() %>"/>
-                    <input type="button" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>" onclick="javascript:document.schema.namespace.value='<%= schemas[i].getNamespace() %>';document.schema.short_name.value='<%= schemas[i].getName() %>';document.schema.dc_schema_id.value='<%= schemas[i].getSchemaID() %>';return null;"/>
-                    <input type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
+                    <input class="btn btn-primary" type="button" name="submit_update" value="<fmt:message key="jsp.dspace-admin.general.update"/>" onclick="javascript:document.schema.namespace.value='<%= schemas[i].getNamespace() %>';document.schema.short_name.value='<%= schemas[i].getName() %>';document.schema.dc_schema_id.value='<%= schemas[i].getSchemaID() %>';return null;"/>
+                    <input class="btn btn-danger" type="submit" name="submit_delete" value="<fmt:message key="jsp.dspace-admin.general.delete-w-confirm"/>"/>
                 </form>
 		    <% } %>
                 </td>
@@ -100,26 +94,26 @@ if (error!=null) {
         
   <form method="post" name="schema" action="">
   <input type="hidden" name="dc_schema_id" value=""/>
-  <table align="center" width="600">
-    <tr>
-      <td align="left" colspan="2">
-         <p>
-             <br/><fmt:message key="jsp.dspace-admin.list-metadata-schemas.instruction"/>
-             <br/><br/>
+  	
+         <p class="alert alert-info">
+             <fmt:message key="jsp.dspace-admin.list-metadata-schemas.instruction"/>
          </p>
-       </td>
-       </tr>
-       <tr>
-          <td><p><fmt:message key="jsp.dspace-admin.list-metadata-schemas.namespace"/>:</p></td>
-          <td><input type="text" name="namespace" value=""/></td>
-       </tr>
-       <tr>
-          <td><p><fmt:message key="jsp.dspace-admin.list-metadata-schemas.name"/>:</p></td>
-          <td><input type="text" name="short_name" value=""/></td>
-       </tr>
-       <tr>
-         <td><p><input type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.save"/>"/></p></td>
-	</tr>
-  </table>
+         <div class="input-group col-md-6">
+	     	<div class="input-group-addon">
+		 		<span class="col-md-2"><fmt:message key="jsp.dspace-admin.list-metadata-schemas.namespace"/>:</span>
+		 	</div>
+          	<input class="form-control" type="text" name="namespace" value=""/>
+		</div>
+       <div class="input-group col-md-6">
+       		<div class="input-group-addon">
+       			<span class="col-md-2"><fmt:message key="jsp.dspace-admin.list-metadata-schemas.name"/>:</span>
+    	   </div>			
+       		<input class="form-control" type="text" name="short_name" value=""/>
+	    </div>
+        <br/><br/><br/>
+       <div class="row col-md-offset-5">
+       		<input class="btn btn-success col-md-3" type="submit" name="submit_add" value="<fmt:message key="jsp.dspace-admin.general.save"/>"/>
+       </div>
+	
   </form>
 </dspace:layout>

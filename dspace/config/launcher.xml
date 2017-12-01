@@ -120,16 +120,24 @@
     </command>
 
     <command>
-        <name>index</name>
-        <description>General index command (requires extra parameters)</description>
+        <name>index-db-browse</name>
+        <description>General browse index command (requires extra parameters)</description>
         <step>
             <class>org.dspace.browse.IndexBrowse</class>
         </step>
     </command>
+
+    <command>
+        <name>index-discovery</name>
+        <description>Update Discovery Solr Search Index</description>
+        <step>
+            <class>org.dspace.discovery.IndexClient</class>
+        </step>
+    </command>
     
     <command>
-        <name>index-init</name>
-        <description>Initialise the search and browse indexes</description>
+        <name>index-lucene-init</name>
+        <description>Initialise the Lucene search and browse indexes</description>
         <step passuserargs="false">
             <class>org.dspace.browse.IndexBrowse</class>
             <argument>-f</argument>
@@ -145,8 +153,8 @@
     </command>
 
     <command>
-        <name>index-update</name>
-        <description>Update the search and browse indexes</description>
+        <name>index-lucene-update</name>
+        <description>Update the Lucene search and browse indexes</description>
         <step passuserargs="false">
             <class>org.dspace.browse.IndexBrowse</class>
             <argument>-i</argument>
@@ -199,6 +207,14 @@
         </step>
     </command>
 
+      <command>
+        <name>doi-organiser</name>
+        <description>Run the DOI organiser</description>
+        <step>
+            <class>org.dspace.identifier.doi.DOIOrganiser</class>
+        </step>
+    </command>
+
     <command>
         <name>packager</name>
         <description>Execute a packager</description>
@@ -212,6 +228,14 @@
         <description>Load entries into a registry</description>
         <step>
             <class>org.dspace.administer.RegistryLoader</class>
+        </step>
+    </command>
+
+    <command>
+        <name>read</name>
+        <description>Execute a stream of 'dspace' commands from a file or pipe</description>
+        <step>
+            <class>org.dspace.app.launcher.CommandRunner</class>
         </step>
     </command>
 
@@ -331,7 +355,7 @@
         </step>
     </command>
 
-     <command>
+    <command>
         <name>setup-database</name>
         <description>Create the database tables</description>
         <step>
@@ -364,10 +388,10 @@
     </command>
 
     <command>
-        <name>update-discovery-index</name>
-        <description>Update Discovery Solr Search Index</description>
+        <name>user</name>
+        <description>Manipulate a normal user account</description>
         <step>
-            <class>org.dspace.discovery.IndexClient</class>
+            <class>org.dspace.eperson.EPerson</class>
         </step>
     </command>
      <command>
@@ -405,6 +429,14 @@
         <description>OAI script manager</description>
         <step>
             <class>org.dspace.xoai.app.XOAI</class>
+        </step>
+    </command>
+
+    <command>
+        <name>version</name>
+        <description>Display the version of DSpace and other troubleshooting information</description>
+        <step>
+            <class>org.dspace.app.util.Version</class>
         </step>
     </command>
 

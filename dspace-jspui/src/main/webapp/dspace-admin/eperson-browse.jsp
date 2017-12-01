@@ -27,6 +27,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="org.dspace.eperson.EPerson" %>
+<%@ page import="org.dspace.core.Utils" %>
 
 <%
     EPerson[] epeople =
@@ -115,10 +116,10 @@
                     <%= (e.getEmail() == null ? "" : e.getEmail()) %>
                 </td>
                 <td headers="t3" class="<%= row %>RowOddCol">
-                    <%= (e.getLastName() == null ? "" : e.getLastName()) %>
+                    <%= (e.getLastName() == null ? "" : Utils.addEntities(e.getLastName())) %>
                 </td>
                 <td headers="t4" class="<%= row %>RowEvenCol">
-                    <%= (e.getFirstName() == null ? "" : e.getFirstName()) %>
+                    <%= (e.getFirstName() == null ? "" : Utils.addEntities(e.getFirstName())) %>
                 </td>
                 <td headers="t5" class="<%= row %>RowOddCol" align="center">
                     <%= e.canLogIn() ? "yes" : "no" %>
@@ -130,7 +131,7 @@
                     <%= e.getSelfRegistered() ? "yes" : "no" %>
                 </td>
                 <td headers="t8" class="<%= row %>RowEvenCol">
-                    <%= (e.getMetadata("phone") == null ? "" : e.getMetadata("phone")) %>
+                    <%= (e.getMetadata("phone") == null ? "" : Utils.addEntities(e.getMetadata("phone"))) %>
                 </td>
                 <td headers="t9" class="<%= row %>RowOddCol">
                     <input type="hidden" name="eperson_id" value="<%= e.getID() %>"/>

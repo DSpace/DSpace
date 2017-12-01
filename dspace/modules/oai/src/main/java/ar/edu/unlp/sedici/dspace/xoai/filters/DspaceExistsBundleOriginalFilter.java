@@ -1,20 +1,15 @@
 package ar.edu.unlp.sedici.dspace.xoai.filters;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
-import org.dspace.xoai.data.DSpaceDatabaseItem;
 import org.dspace.xoai.data.DSpaceItem;
-import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.filter.DSpaceFilter;
 import org.dspace.xoai.filter.DatabaseFilterResult;
 import org.dspace.xoai.filter.SolrFilterResult;
-import org.dspace.xoai.util.MetadataFieldManager;
+
 import com.lyncode.xoai.dataprovider.xml.xoai.Element;
 import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
 

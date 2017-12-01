@@ -69,14 +69,12 @@ public class InstallItem
                 identifierService.register(c, item, suppliedHandle);
             }
         } catch (IdentifierException e) {
-            throw new RuntimeException("Can't create an Identifier!");
+            throw new RuntimeException("Can't create an Identifier!", e);
         }
-
 
         populateMetadata(c, item);
 
         return finishItem(c, item, is);
-
     }
 
     /**
@@ -115,28 +113,38 @@ public class InstallItem
         }
 
         // Even though we are restoring an item it may not have the proper dates. So let's
-        // double check that it has a date accessioned and date issued, and if either of those dates
-        // are not set then set them to today.
+        // double check its associated date(s)
         DCDate now = DCDate.getCurrent();
         
-        // If the item doesn't have a date.accessioned, create one.
+        // If the item doesn't have a date.accessioned, set it to today
         DCValue[] dateAccessioned = item.getDC("date", "accessioned", Item.ANY);
         if (dateAccessioned.length == 0)
         {
 	        item.addDC("date", "accessioned", null, now.toString());
         }
         
-        // create issue date if not present
+        // If issue date is set as "today" (literal string), then set it to current date
+        // In the below loop, we temporarily clear all issued dates and re-add, one-by-one,
+        // replacing "today" with today's date.
+        // NOTE: As of DSpace 4.0, DSpace no longer sets an issue date by default
         DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
-        if (currentDateIssued.length == 0)
+        item.clearDC("date", "issued", Item.ANY);
+        for (DCValue dcv : currentDateIssued)
         {
-            DCDate issued = new DCDate(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
-            item.addDC("date", "issued", null, issued.toString());
+            if(dcv.value!=null && dcv.value.equalsIgnoreCase("today"))
+            {
+                DCDate issued = new DCDate(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
+                item.addDC(dcv.element, dcv.qualifier, dcv.language, issued.toString());
+            }
+            else if(dcv.value!=null)
+            {
+                item.addDC(dcv.element, dcv.qualifier, dcv.language, dcv.value);
+            }
         }
         
         // Record that the item was restored
-		String provDescription = "Restored into DSpace on "+ now + " (GMT).";
-		item.addDC("description", "provenance", "en", provDescription);
+        String provDescription = "Restored into DSpace on "+ now + " (GMT).";
+        item.addDC("description", "provenance", "en", provDescription);
 
         return finishItem(c, item, is);
     }
@@ -158,23 +166,39 @@ public class InstallItem
              item.addDC("date", "available", null, now.toString());
         }
 
-        // create issue date if not present
+        // If issue date is set as "today" (literal string), then set it to current date
+        // In the below loop, we temporarily clear all issued dates and re-add, one-by-one,
+        // replacing "today" with today's date.
+        // NOTE: As of DSpace 4.0, DSpace no longer sets an issue date by default
         DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
-
-        if (currentDateIssued.length == 0)
+        item.clearDC("date", "issued", Item.ANY);
+        for (DCValue dcv : currentDateIssued)
         {
-            DCDate issued = new DCDate(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
-            item.addDC("date", "issued", null, issued.toString());
+            if(dcv.value!=null && dcv.value.equalsIgnoreCase("today"))
+            {
+                DCDate issued = new DCDate(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
+                item.addDC(dcv.element, dcv.qualifier, dcv.language, issued.toString());
+            }
+            else if(dcv.value!=null)
+            {
+                item.addDC(dcv.element, dcv.qualifier, dcv.language, dcv.value);
+            }
         }
 
          String provDescription = "Made available in DSpace on " + now
                 + " (GMT). " + getBitstreamProvenanceMessage(item);
 
+        // If an issue date was passed in and it wasn't set to "today" (literal string)
+        // then note this previous issue date in provenance message
         if (currentDateIssued.length != 0)
         {
-            DCDate d = new DCDate(currentDateIssued[0].value);
-            provDescription = provDescription + "  Previous issue date: "
-                    + d.toString();
+            String previousDateIssued = currentDateIssued[0].value;
+            if(previousDateIssued!=null && !previousDateIssued.equalsIgnoreCase("today"))
+            {
+                DCDate d = new DCDate(previousDateIssued);
+                provDescription = provDescription + "  Previous issue date: "
+                        + d.toString();
+            }
         }
 
         // Add provenance description
@@ -192,14 +216,9 @@ public class InstallItem
         // set owning collection
         item.setOwningCollection(is.getCollection());
 
-        // set in_archive=true only if the user didn't specify that it is a private item
-        if(item.isDiscoverable()){
-            item.setArchived(true);
-        }
-        else{ // private item is withdrawn as well
-            item.withdraw();
-        }
-
+        // set in_archive=true
+        item.setArchived(true);
+        
         // save changes ;-)
         item.update();
 
