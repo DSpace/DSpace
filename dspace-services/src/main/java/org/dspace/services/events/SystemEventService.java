@@ -7,7 +7,10 @@
  */
 package org.dspace.services.events;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -15,15 +18,13 @@ import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.services.CachingService;
 import org.dspace.services.EventService;
 import org.dspace.services.RequestService;
-import org.dspace.services.SessionService;
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
+import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.services.model.Event;
+import org.dspace.services.model.Event.Scope;
 import org.dspace.services.model.EventListener;
 import org.dspace.services.model.RequestInterceptor;
-import org.dspace.services.model.Session;
-import org.dspace.services.model.CacheConfig.CacheScope;
-import org.dspace.services.model.Event.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,17 +48,15 @@ public final class SystemEventService implements EventService, ShutdownService {
     private Map<String, EventListener> listenersMap = new ConcurrentHashMap<String, EventListener>();
 
     private final RequestService requestService;
-    private final SessionService sessionService;
     private final CachingService cachingService;
     private EventRequestInterceptor requestInterceptor;
 
     @Autowired(required=true)
-    public SystemEventService(RequestService requestService, SessionService sessionService, CachingService cachingService) {
-        if (requestService == null || cachingService == null || sessionService == null) {
+    public SystemEventService(RequestService requestService, CachingService cachingService) {
+        if (requestService == null || cachingService == null) {
             throw new IllegalArgumentException("requestService, cachingService, and all inputs must not be null");
         }
         this.requestService = requestService;
-        this.sessionService = sessionService;
         this.cachingService = cachingService;
 
         // register interceptor
@@ -222,7 +221,7 @@ public final class SystemEventService implements EventService, ShutdownService {
         }
         if (event.getUserId() == null || "".equals(event.getUserId()) ) {
             // set to the current user
-            String userId = this.sessionService.getCurrentUserId();
+            String userId = this.requestService.getCurrentUserId();
             event.setUserId(userId);
         }
         if (event.getScopes() == null) {
@@ -303,14 +302,14 @@ public final class SystemEventService implements EventService, ShutdownService {
         /* (non-Javadoc)
          * @see org.dspace.services.model.RequestInterceptor#onStart(java.lang.String, org.dspace.services.model.Session)
          */
-        public void onStart(String requestId, Session session) {
+        public void onStart(String requestId) {
             // nothing to really do here unless we decide we should purge out any existing events? -AZ
         }
 
         /* (non-Javadoc)
          * @see org.dspace.services.model.RequestInterceptor#onEnd(java.lang.String, org.dspace.services.model.Session, boolean, java.lang.Exception)
          */
-        public void onEnd(String requestId, Session session, boolean succeeded, Exception failure) {
+        public void onEnd(String requestId, boolean succeeded, Exception failure) {
             if (succeeded) {
                 int fired = fireQueuedEvents();
                 log.debug("Fired "+fired+" events at the end of the request ("+requestId+")");

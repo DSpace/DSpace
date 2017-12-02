@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.junit.Test;
 
-
 /**
  * Integration test for the {@link RootRestResourceController}
  */
@@ -41,6 +40,7 @@ public class RootRestResourceControllerIT extends AbstractControllerIntegrationT
                 .andExpect(jsonPath("$._links.metadatafields.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.metadataschemas.href", startsWith(REST_SERVER_URL)))
                 .andExpect(jsonPath("$._links.sites.href", startsWith(REST_SERVER_URL)))
+                .andExpect(jsonPath("$._links.authn.href", startsWith(REST_SERVER_URL)))
                 ;
     }
 

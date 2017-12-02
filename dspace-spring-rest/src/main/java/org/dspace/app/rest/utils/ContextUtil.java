@@ -7,11 +7,12 @@
  */
 package org.dspace.app.rest.utils;
 
-import java.sql.SQLException;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
+
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import java.sql.SQLException;
 
 /**
  * Miscellaneous UI utility methods methods for managing DSpace context.
@@ -53,14 +54,19 @@ public class ContextUtil
      * 
      * @return a context object
      */
-    public static Context obtainContext(ServletRequest request) throws SQLException
+    public static Context obtainContext(ServletRequest request)
     {
         Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
         if (context == null)
         {
-            context = ContextUtil.intializeContext();
-            
+            try {
+                context = ContextUtil.intializeContext();
+            } catch (SQLException e) {
+                log.error("Unable to initialize context", e);
+                return null;
+            }
+
             // Store the context in the request
             request.setAttribute(DSPACE_CONTEXT, context);
         }

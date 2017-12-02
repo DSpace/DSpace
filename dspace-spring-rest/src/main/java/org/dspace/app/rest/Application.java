@@ -8,11 +8,13 @@
 package org.dspace.app.rest;
 
 import java.io.File;
+import java.sql.SQLException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.Filter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dspace.app.rest.filter.DSpaceRequestContextFilter;
 import org.dspace.app.rest.model.hateoas.DSpaceRelProvider;
 import org.dspace.app.rest.utils.ApplicationConfig;
@@ -79,7 +81,9 @@ public class Application extends SpringBootServletInitializer {
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(Application.class)
-                .initializers(new DSpaceKernelInitializer());
+                .initializers(
+                        new DSpaceKernelInitializer(),
+                        new FlywayDatabaseMigrationInitializer());
     }
 
     @Bean
@@ -126,7 +130,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     @Bean
-    public RequestContextListener requestContextListener() {
+    public RequestContextListener requestContextListener(){
         return new RequestContextListener();
     }
 
@@ -233,6 +237,30 @@ public class Application extends SpringBootServletInitializer {
                 }
             }
             return providedHome;
+        }
+    }
+
+    private class FlywayDatabaseMigrationInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            //Run the Flyway migrations by create a Context and Database connection
+            org.dspace.core.Context context = new org.dspace.core.Context();
+            boolean failed = false;
+
+            try {
+                if(context.getDBConfig() == null || StringUtils.isBlank(context.getDBConfig().getDatabaseUrl())) {
+                    failed = true;
+                }
+
+                context.complete();
+
+            } catch (SQLException e) {
+                failed = true;
+            }
+
+            if(failed) {
+                throw new RuntimeException("Unable to initialize the database");
+            }
         }
     }
 }

@@ -7,15 +7,16 @@
  */
 package org.dspace.authenticate.service;
 
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-
-import javax.servlet.http.HttpServletRequest;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Access point for the stackable authentication methods.
@@ -158,6 +159,11 @@ public interface AuthenticationService {
                             EPerson eperson)
             throws SQLException;
 
+    /**
+     * Update the last active (login) timestamp on the current authenticated user
+     * @param context The authenticated context
+     */
+    public void updateLastActiveDate(Context context);
 
     /**
      * Get list of extra groups that user implicitly belongs to.
