@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public abstract class AbstractDSpaceRestRepository {
+
 	@Autowired
 	protected Utils utils;
 
@@ -30,12 +31,6 @@ public abstract class AbstractDSpaceRestRepository {
 
 	protected Context obtainContext() {
 		Request currentRequest = requestService.getCurrentRequest();
-		Context context = (Context) currentRequest.getAttribute(ContextUtil.DSPACE_CONTEXT);
-		if (context != null && context.isValid()) {
-			return context;
-		}
-		context = new Context();
-		currentRequest.setAttribute(ContextUtil.DSPACE_CONTEXT, context);
-		return context;
+		return ContextUtil.obtainContext(currentRequest.getServletRequest());
 	}
 }

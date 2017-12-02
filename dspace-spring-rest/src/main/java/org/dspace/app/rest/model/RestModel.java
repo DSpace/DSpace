@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.atteo.evo.inflector.English;
 
 /**
  * Methods to implement to make a REST resource addressable
@@ -28,6 +29,11 @@ public interface RestModel extends Serializable {
 	public String getCategory();
 	
 	public String getType();
+
+	@JsonIgnore
+	default public String getTypePlural() {
+		return English.plural(getType());
+	}
 
 	@JsonIgnore
 	public Class getController();

@@ -7,21 +7,18 @@
  */
 package org.dspace.services.sessions.model;
 
-import org.dspace.services.model.Request;
-import org.dspace.services.model.Session;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.dspace.services.model.Request;
 
 public final class HttpRequestImpl extends AbstractRequestImpl implements Request {
 
     private transient ServletRequest  servletRequest  = null;
     private transient ServletResponse servletResponse = null;
 
-    private Session session = null;
-    
     public HttpRequestImpl(ServletRequest request, ServletResponse response) {
         if (request == null || response == null) {
             throw new IllegalArgumentException("Cannot create a request without an http request or response");
@@ -29,11 +26,6 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
 
         this.servletRequest = request;
         this.servletResponse = response;
-        if (servletRequest instanceof HttpServletRequest) {
-            this.session = new SessionImpl((HttpServletRequest)servletRequest);
-        } else {
-            this.session = new SessionImpl();
-        }
     }
 
     public ServletRequest getServletRequest() {
@@ -46,10 +38,6 @@ public final class HttpRequestImpl extends AbstractRequestImpl implements Reques
         }
 
         return null;
-    }
-
-    public Session getSession() {
-        return session;
     }
 
     public ServletResponse getServletResponse() {

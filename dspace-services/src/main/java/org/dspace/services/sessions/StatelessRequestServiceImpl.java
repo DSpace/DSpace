@@ -7,16 +7,26 @@
  */
 package org.dspace.services.sessions;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.services.ConfigurationService;
 import org.dspace.services.RequestService;
-import org.dspace.services.SessionService;
 import org.dspace.services.model.Request;
 import org.dspace.services.model.RequestInterceptor;
 import org.dspace.services.model.RequestInterceptor.RequestInterruptionException;
-import org.dspace.services.model.Session;
 import org.dspace.services.sessions.model.HttpRequestImpl;
 import org.dspace.services.sessions.model.InternalRequestImpl;
 import org.dspace.utils.servicemanager.OrderedServiceComparator;
@@ -25,27 +35,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
  * Implementation of the session service.
  * <p>
- * This depends on having something (a filter typically) which is 
+ * This depends on having something (a filter typically) which is
  * placing the current requests into a request storage cache.
  * <p>
- * TODO use a HttpSessionListener to keep track of all sessions?
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
+ * @author Atmire
  */
-public final class SessionRequestServiceImpl implements SessionService, RequestService, InitializedService, ShutdownService {
+public final class StatelessRequestServiceImpl implements RequestService, InitializedService, ShutdownService {
 
-    private static Logger log = LoggerFactory.getLogger(SessionRequestServiceImpl.class);
+    private static Logger log = LoggerFactory.getLogger(StatelessRequestServiceImpl.class);
 
     private ConfigurationService configurationService;
+
     @Autowired
     @Required
     public void setConfigurationService(ConfigurationService configurationService) {
@@ -102,7 +108,7 @@ public final class SessionRequestServiceImpl implements SessionService, RequestS
         for (RequestInterceptor requestInterceptor : interceptors) {
             if (requestInterceptor != null) {
                 try {
-                    requestInterceptor.onStart(req.getRequestId(), req.getSession());
+                    requestInterceptor.onStart(req.getRequestId());
                 } catch (RequestInterruptionException e) {
                     String message = "Request stopped from starting by exception from the interceptor ("+requestInterceptor+"): " + e.getMessage();
                     log.warn(message);
@@ -138,17 +144,11 @@ public final class SessionRequestServiceImpl implements SessionService, RequestS
 
     private void endRequest(String requestId, Exception failure) {
         if (requestId != null) {
-            Session session = null;
-            Request req = requests.get(requestId);
-            if (req != null) {
-                session = req.getSession();
-            }
-            
             List<RequestInterceptor> interceptors = getInterceptors(true); // reverse
             for (RequestInterceptor requestInterceptor : interceptors) {
                 if (requestInterceptor != null) {
                     try {
-                        requestInterceptor.onEnd(requestId, session, (failure == null), failure);
+                        requestInterceptor.onEnd(requestId, (failure == null), failure);
                     } catch (RequestInterruptionException e) {
                         log.warn("Attempt to stop request from ending by an exception from the interceptor ("+requestInterceptor+"), cannot stop requests from ending though so request end continues, this may be an error: " + e.getMessage());
                     } catch (Exception e) {
@@ -189,48 +189,26 @@ public final class SessionRequestServiceImpl implements SessionService, RequestS
         this.interceptorsMap.put(key, interceptor);
     }
 
-    /**
-     * Makes a session from the existing HTTP session stuff in the 
-     * current request, or creates a new session of non-HTTP related 
-     * sessions.
-     * 
-     * @return the new session object which is placed into the request
-     * @throws IllegalStateException if not session can be created
-     */
-    public Session getCurrentSession() {
-        Request req = requests.getCurrent();
-        if (req != null) {
-            return req.getSession();
-        }
-
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.dspace.services.SessionService#getCurrentSessionId()
-     */
-    public String getCurrentSessionId() {
-        Request req = requests.getCurrent();
-        if (req != null) {
-            Session session = req.getSession();
-            if (session != null) {
-                return session.getSessionId();
-            }
-        }
-
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.dspace.services.SessionService#getCurrentUserId()
+    /** (non-Javadoc)
+     * @see org.dspace.services.RequestService#getCurrentUserId()
      */
     public String getCurrentUserId() {
-        String userId = null;
-        Session session = getCurrentSession();
-        if (session != null) {
-            userId = session.getUserId();
+        Request currentRequest = getCurrentRequest();
+        if(currentRequest == null) {
+            return null;
+        } else {
+            return Objects.toString(currentRequest.getAttribute(AUTHENTICATED_EPERSON));
         }
-        return userId;
+    }
+
+    /** (non-Javadoc)
+     * @see org.dspace.services.RequestService#setCurrentUserId()
+     */
+    public void setCurrentUserId(UUID epersonId) {
+        Request currentRequest = getCurrentRequest();
+        if(currentRequest != null) {
+            getCurrentRequest().setAttribute(AUTHENTICATED_EPERSON, epersonId);
+        }
     }
 
     /* (non-Javadoc)

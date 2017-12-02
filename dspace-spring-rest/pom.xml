@@ -181,18 +181,24 @@
 			<artifactId>spring-boot-starter-data-rest</artifactId>
 			<version>${spring-boot.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<version>${spring-boot.version}</version>
-			<scope>test</scope>
-		</dependency>
-        <!-- <dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <scope>test</scope>
             <version>${json-path.version}</version>
-        </dependency> -->
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path-assert</artifactId>
+            <version>${json-path.version}</version>
+            <scope>test</scope>
+        </dependency>
 		
 		<!-- The HAL Browser -->
  		<dependency>
@@ -206,10 +212,11 @@
 		</dependency>
 
          <!-- Add in Spring Security for AuthN and AuthZ -->
-        <!-- <dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency> -->
+            <version>${spring-boot.version}</version>
+        </dependency>
 
         <!-- Add in log4j support by excluding default logging, and using starter-log4j -->
         <!-- See: http://docs.spring.io/spring-boot/docs/current/reference/html/howto-logging.html#howto-configure-log4j-for-logging -->
@@ -256,6 +263,11 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>4.23</version>
+        </dependency>
 
         <!-- TEST DEPENDENCIES -->
         <dependency> <!-- Keep jmockit before junit -->
@@ -286,11 +298,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path-assert</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
