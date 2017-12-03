@@ -7,10 +7,6 @@
  */
 package org.dspace.app.rest.builder;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -20,14 +16,7 @@ import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BundleService;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.InstallItemService;
-import org.dspace.content.service.ItemService;
-import org.dspace.content.service.WorkspaceItemService;
+import org.dspace.content.service.*;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
@@ -41,8 +30,15 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.MutablePeriod;
 import org.joda.time.format.PeriodFormat;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+
 /**
  * Abstract builder to construct DSpace Objects
+ *
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public abstract class AbstractBuilder<T extends DSpaceObject> {
 
@@ -55,6 +51,7 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
     static GroupService groupService;
     static BundleService bundleService;
     static BitstreamService bitstreamService;
+    static BitstreamFormatService bitstreamFormatService;
     static AuthorizeService authorizeService;
     static ResourcePolicyService resourcePolicyService;
     static IndexingService indexingService;
@@ -74,6 +71,7 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
         groupService = EPersonServiceFactory.getInstance().getGroupService();
         bundleService = ContentServiceFactory.getInstance().getBundleService();
         bitstreamService = ContentServiceFactory.getInstance().getBitstreamService();
+        bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
         authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         indexingService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);

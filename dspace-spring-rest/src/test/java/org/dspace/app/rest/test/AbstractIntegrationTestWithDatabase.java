@@ -143,8 +143,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * but no execution order is guaranteed
      */
     @After
-    public void destroy()
-    {
+    public void destroy() throws Exception {
         // Cleanup our global context object
         try {
             if(context == null || !context.isValid()){

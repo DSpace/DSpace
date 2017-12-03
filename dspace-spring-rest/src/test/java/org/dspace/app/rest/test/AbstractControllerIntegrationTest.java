@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.support.ErrorPageFilter;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -46,6 +47,8 @@ import org.springframework.web.context.WebApplicationContext;
 /**
  * Abstract controller integration test class that will take care of setting up the
  * environment to run the integration test
+ *
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class})
@@ -92,9 +95,10 @@ public class AbstractControllerIntegrationTest extends AbstractIntegrationTestWi
         }
 
         DefaultMockMvcBuilder mockMvcBuilder = webAppContextSetup(webApplicationContext)
-                //Always log the repsonse to debug
+                //Always log the response to debug
                 .alwaysDo(MockMvcResultHandlers.log())
                 //Add all filter implementations
+                .addFilters(new ErrorPageFilter())
                 .addFilters(requestFilters.toArray(new Filter[requestFilters.size()]));
 
         if(StringUtils.isNotBlank(authToken)) {
