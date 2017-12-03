@@ -16,6 +16,9 @@ import org.junit.Test;
 
 /**
  * Integration test for the {@link RootRestResourceController}
+ *
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class RootRestResourceControllerIT extends AbstractControllerIntegrationTest {
 
