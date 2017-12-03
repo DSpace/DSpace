@@ -7,12 +7,20 @@
  */
 package org.dspace.app.rest.matcher;
 
-import org.hamcrest.Matcher;
-
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.hasJsonPath;
 import static org.dspace.app.rest.test.AbstractControllerIntegrationTest.REST_SERVER_URL;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
 
+import org.hamcrest.Matcher;
+
+/**
+ * Class to match JSON browse entries in ITs
+ *
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
+ */
 public class BrowseEntryResourceMatcher {
     public static Matcher<? super Object> matchBrowseEntry(String value, int expectedCount) {
         return allOf(

@@ -453,4 +453,8 @@ public class BitstreamServiceImpl extends DSpaceObjectServiceImpl<Bitstream> imp
     public List<Bitstream> getNotReferencedBitstreams(Context context) throws SQLException {
         return bitstreamDAO.getNotReferencedBitstreams(context);
     }
+
+    public Long getLastModified(Bitstream bitstream) {
+       return bitstreamStorageService.getLastModified(bitstream);
+    }
 }

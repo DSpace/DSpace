@@ -6,9 +6,17 @@
  * http://www.dspace.org/license/
  */
 package org.dspace.app.rest;
-import static org.hamcrest.Matchers.*;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -28,6 +36,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 /**
  * Integration test to test the /api/discover/browses endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
+ *
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTest {
 
@@ -121,31 +132,31 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
@@ -200,32 +211,32 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Two public items with the same subject and another public item that contains that same subject, but also another one
         //   All of the items are readable by an Anonymous user
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("zPublic item more")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry").withSubject("AnotherTest")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("AnotherTest")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 3")
                 .withIssueDate("2016-02-14")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
@@ -274,24 +285,24 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Two public items that are readable by Anonymous
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("Java").withSubject("Unit Testing")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
@@ -299,7 +310,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .build();
 
         //3. An item that has been made private
-        Item privateItem = new ItemBuilder().createItem(context, col1)
+        Item privateItem = ItemBuilder.createItem(context, col1)
                 .withTitle("This is a private item")
                 .withIssueDate("2015-03-12")
                 .withAuthor("Duck, Donald")
@@ -308,7 +319,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .build();
 
         //4. An item with an item-level embargo
-        Item embargoedItem = new ItemBuilder().createItem(context, col2)
+        Item embargoedItem = ItemBuilder.createItem(context, col2)
                 .withTitle("An embargoed publication")
                 .withIssueDate("2017-08-10")
                 .withAuthor("Mouse, Mickey")
@@ -317,11 +328,11 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .build();
 
         //5. An item that is only readable for an internal groups
-        Group internalGroup = new GroupBuilder().createGroup(context)
+        Group internalGroup = GroupBuilder.createGroup(context)
                 .withName("Internal Group")
                 .build();
 
-        Item internalItem = new ItemBuilder().createItem(context, col2)
+        Item internalItem = ItemBuilder.createItem(context, col2)
                 .withTitle("Internal publication")
                 .withIssueDate("2016-09-19")
                 .withAuthor("Doe, John")
@@ -368,7 +379,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
         ;
 
         //** CLEANUP **
-        new GroupBuilder().delete(internalGroup);
+        GroupBuilder.cleaner().delete(internalGroup);
     }
 
     @Test
@@ -377,47 +388,47 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous
-        Item item1 = new ItemBuilder().createItem(context, col1)
+        Item item1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Item 1")
                 .withIssueDate("2017-10-17")
                 .build();
 
-        Item item2 = new ItemBuilder().createItem(context, col2)
+        Item item2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Item 2")
                 .withIssueDate("2016-02-13")
                 .build();
 
-        Item item3 = new ItemBuilder().createItem(context, col1)
+        Item item3 = ItemBuilder.createItem(context, col1)
                 .withTitle("Item 3")
                 .withIssueDate("2016-02-12")
                 .build();
 
-        Item item4 = new ItemBuilder().createItem(context, col2)
+        Item item4 = ItemBuilder.createItem(context, col2)
                 .withTitle("Item 4")
                 .withIssueDate("2016-02-11")
                 .build();
 
-        Item item5 = new ItemBuilder().createItem(context, col1)
+        Item item5 = ItemBuilder.createItem(context, col1)
                 .withTitle("Item 5")
                 .withIssueDate("2016-02-10")
                 .build();
 
-        Item item6 = new ItemBuilder().createItem(context, col2)
+        Item item6 = ItemBuilder.createItem(context, col2)
                 .withTitle("Item 6")
                 .withIssueDate("2016-01-13")
                 .build();
 
-        Item item7 = new ItemBuilder().createItem(context, col1)
+        Item item7 = ItemBuilder.createItem(context, col1)
                 .withTitle("Item 7")
                 .withIssueDate("2016-01-12")
                 .build();
