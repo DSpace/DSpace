@@ -7,24 +7,40 @@
  */
 package org.dspace.app.rest.builder;
 
-import org.dspace.content.*;
+import org.dspace.content.Collection;
+import org.dspace.content.DCDate;
+import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
 /**
  * Builder to construct Item objects
+ *
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class ItemBuilder extends AbstractBuilder<Item> {
 
     private WorkspaceItem workspaceItem;
     private Group readerGroup = null;
 
-    public ItemBuilder createItem(final Context context, final Collection col1) {
+    protected ItemBuilder() {
+
+    }
+
+    public static ItemBuilder createItem(final Context context, final Collection col) {
+        ItemBuilder builder = new ItemBuilder();
+        return builder.create(context, col);
+    }
+
+    private ItemBuilder create(final Context context, final Collection col) {
         this.context = context;
 
         try {
-            workspaceItem = workspaceItemService.create(context, col1, false);
+            workspaceItem = workspaceItemService.create(context, col, false);
         } catch (Exception e) {
             return handleException(e);
         }

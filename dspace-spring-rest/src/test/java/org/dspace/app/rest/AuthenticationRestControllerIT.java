@@ -117,7 +117,7 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
 
         //The group we try to add to our token
         context.turnOffAuthorisationSystem();
-        Group internalGroup = new GroupBuilder().createGroup(context)
+        Group internalGroup = GroupBuilder.createGroup(context)
                 .withName("Internal Group")
                 .build();
         context.restoreAuthSystemState();
