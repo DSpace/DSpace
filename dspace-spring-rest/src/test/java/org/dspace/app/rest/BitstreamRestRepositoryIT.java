@@ -351,9 +351,10 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
 
 
         //TODO This test fails in the current code. Authorization error
-//        getClient().perform(get("/api/core/bitstreams/"+bitstream.getID()+"/content"))
-//                .andExpect(status().isOk())
-//        ;
+        getClient().perform(get("/api/core/bitstreams/"+bitstream.getID()+"/content"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("ThisIsSomeDummyText"))
+        ;
 
     }
 

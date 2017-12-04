@@ -7,8 +7,10 @@
  */
 package org.dspace.app.rest;
 
+import org.dspace.app.rest.builder.MetadataSchemaBuilder;
 import org.dspace.app.rest.matcher.MetadataschemaMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.MetadataSchema;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,6 +25,9 @@ public class MetadataschemaRestRepositoryIT extends AbstractControllerIntegratio
 
     @Test
     public void findAll() throws Exception{
+
+        context.turnOffAuthorisationSystem();
+        MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "ANamespace").build();
 
         getClient().perform(get("/api/core/metadataschemas"))
                 .andExpect(status().isOk())
@@ -40,7 +45,13 @@ public class MetadataschemaRestRepositoryIT extends AbstractControllerIntegratio
     @Ignore
     public void findOne() throws Exception{
 
-        getClient().perform(get("/api/core/metadataschemas/1"))
-                .andExpect(status().isOk());
+        context.turnOffAuthorisationSystem();
+        MetadataSchema metadataSchema = MetadataSchemaBuilder.createMetadataSchema(context, "ATest", "ANamespace").build();
+
+        getClient().perform(get("/api/core/metadataschemas/" + metadataSchema.getID()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(
+                        MetadataschemaMatcher.matchEntry(metadataSchema)
+                )));
     }
 }

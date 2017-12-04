@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.rest.builder;
 
 import org.apache.log4j.Logger;
@@ -52,6 +59,9 @@ public abstract class AbstractBuilder<T, S> {
     static InProgressUserService inProgressUserService;
     static PoolTaskService poolTaskService;
     static WorkflowItemRoleService workflowItemRoleService;
+    static MetadataFieldService metadataFieldService;
+    static MetadataSchemaService metadataSchemaService;
+    static SiteService siteService;
 
     protected Context context;
 
@@ -81,6 +91,9 @@ public abstract class AbstractBuilder<T, S> {
         bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
         registrationDataService = EPersonServiceFactory.getInstance().getRegistrationDataService();
         versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+        metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+        metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+        siteService = ContentServiceFactory.getInstance().getSiteService();
 
         // Temporarily disabled
         // TODO find a way to be able to test the XML and "default" workflow at the same time
@@ -111,6 +124,9 @@ public abstract class AbstractBuilder<T, S> {
         inProgressUserService = null;
         poolTaskService = null;
         workflowItemRoleService = null;
+        metadataFieldService = null;
+        metadataSchemaService = null;
+        siteService = null;
     }
 
     public static void cleanupObjects() throws Exception {

@@ -12,6 +12,7 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
+import org.dspace.service.DSpaceCRUDService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -23,7 +24,7 @@ import java.util.List;
  *
  * @author kevinvandevelde at atmire.com
  */
-public interface MetadataFieldService {
+public interface MetadataFieldService{
 
     /**
      * Creates a new metadata field.

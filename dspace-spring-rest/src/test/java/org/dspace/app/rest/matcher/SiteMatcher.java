@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.matcher;
 
+import org.dspace.content.Site;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -17,13 +18,12 @@ import static org.hamcrest.Matchers.is;
 
 public class SiteMatcher {
 
-    public static Matcher<? super Object> matchEntry(){
+    public static Matcher<? super Object> matchEntry(Site site){
         return allOf(
-                hasJsonPath("$.uuid", Matchers.not(Matchers.empty())),
-                hasJsonPath("$.name", Matchers.not(Matchers.empty())),
-                hasJsonPath("$.handle", Matchers.not(Matchers.empty())),
+                hasJsonPath("$.uuid", is(site.getID().toString())),
+                hasJsonPath("$.name", is(site.getName())),
                 hasJsonPath("$.type", is("site")),
-                hasJsonPath("$._links.self.href", containsString("/api/core/sites/"))
+                hasJsonPath("$._links.self.href", containsString("/api/core/sites/" + site.getID()))
 
         );
     }
