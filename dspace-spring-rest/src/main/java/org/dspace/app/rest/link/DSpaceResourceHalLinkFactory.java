@@ -26,6 +26,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * This class' purpose is to provide a means to add links to the HalResources
+ *
+ * @author Andrea Bollini (andrea.bollini at 4science.it)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Component
 public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource, RestResourceController> {
@@ -51,7 +54,15 @@ public class DSpaceResourceHalLinkFactory extends HalLinkFactory<DSpaceResource,
                         Link linkToSubResource = utils.linkToSubResource(data, name);
                         // no method is specified to retrieve the linked object(s) so check if it is already here
                         if (StringUtils.isBlank(linkAnnotation.method())) {
-                            halResource.add(linkToSubResource);
+                            Object linkedObject = readMethod.invoke(data);
+
+                            if(linkedObject instanceof RestModel && linkAnnotation.linkClass().isAssignableFrom(linkedObject.getClass())) {
+                                linkToSubResource = utils.linkToSingleResource((RestModel) linkedObject, name);
+                            }
+
+                            if (linkedObject != null || !linkAnnotation.optional()) {
+                                halResource.add(linkToSubResource);
+                            }
                         }
 
                     } else if (RestModel.class.isAssignableFrom(readMethod.getReturnType())) {

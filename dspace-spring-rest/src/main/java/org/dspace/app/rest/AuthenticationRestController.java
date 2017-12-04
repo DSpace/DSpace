@@ -13,6 +13,7 @@ import java.util.Arrays;
 import javax.servlet.http.HttpServletRequest;
 
 import org.dspace.app.rest.converter.EPersonConverter;
+import org.dspace.app.rest.link.HalLinkService;
 import org.dspace.app.rest.model.AuthnRest;
 import org.dspace.app.rest.model.EPersonRest;
 import org.dspace.app.rest.model.AuthenticationStatusRest;
@@ -53,6 +54,9 @@ public class AuthenticationRestController implements InitializingBean {
     private EPersonConverter ePersonConverter;
 
     @Autowired
+    private HalLinkService halLinkService;
+
+    @Autowired
     private Utils utils;
 
     @Override
@@ -62,7 +66,9 @@ public class AuthenticationRestController implements InitializingBean {
 
     @RequestMapping(method = RequestMethod.GET)
     public AuthnResource authn() throws SQLException {
-        return new AuthnResource(new AuthnRest(), utils);
+        AuthnResource authnResource = new AuthnResource(new AuthnRest(), utils);
+        halLinkService.addLinks(authnResource);
+        return authnResource;
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.GET)
@@ -73,6 +79,7 @@ public class AuthenticationRestController implements InitializingBean {
             ePersonRest = ePersonConverter.fromModel(context.getCurrentUser());
         }
         AuthenticationStatusResource authenticationStatusResource = new AuthenticationStatusResource( new AuthenticationStatusRest(ePersonRest), utils);
+        halLinkService.addLinks(authenticationStatusResource);
         return authenticationStatusResource;
     }
 

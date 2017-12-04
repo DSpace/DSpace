@@ -103,9 +103,7 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 									RestModel linkedRM = (RestModel) linkedObject; 
 									wrapObject = utils.getResourceRepository(linkedRM.getCategory(), linkedRM.getType())
 											.wrapResource(linkedRM);
-									if(linkAnnotation.linkClass() != null && linkAnnotation.linkClass().isAssignableFrom(linkedRM.getClass())) {
-										linkToSubResource = utils.linkToSingleResource(linkedRM, name);
-									}
+
 								}
 								else {
 									if (linkedObject instanceof List) {
@@ -127,16 +125,8 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 										}
 									}
 								}
-								if (linkedObject != null) {
-									embedded.put(name, wrapObject);
-									this.add(linkToSubResource);
-								} else if(!linkAnnotation.optional()) {
-									embedded.put(name, null);
-									this.add(linkToSubResource);
-								}
 
-								Method writeMethod = pd.getWriteMethod();
-								writeMethod.invoke(data, new Object[] { null });
+								embedded.put(name, wrapObject);
 							}
 							else {
 								// call the link repository
@@ -173,9 +163,6 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 							} else {
 								embedded.put(name, null);
 							}
-
-							Method writeMethod = pd.getWriteMethod();
-							writeMethod.invoke(data, new Object[] { null });
 						}
 					}
 				}
@@ -184,10 +171,6 @@ public abstract class DSpaceResource<T extends RestModel> extends HALResource<T>
 				throw new RuntimeException(e.getMessage(), e);
 			}
 		}
-	}
-
-	public Map<String, Object> getEmbedded() {
-		return embedded;
 	}
 
 	//Trick to make Java Understand that our content extends RestModel
