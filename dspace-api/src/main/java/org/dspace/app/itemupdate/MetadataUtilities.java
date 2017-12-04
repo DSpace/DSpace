@@ -216,7 +216,7 @@ public class MetadataUtilities {
 		}
 
 		// Get the nodes corresponding to formats
-		NodeList dcNodes = XPathAPI.selectNodeList(document, "/dublin_core/Metadatum");
+		NodeList dcNodes = XPathAPI.selectNodeList(document, "/dublin_core/dcvalue");
 		
 		for (int i = 0; i < dcNodes.getLength(); i++)
 		{
