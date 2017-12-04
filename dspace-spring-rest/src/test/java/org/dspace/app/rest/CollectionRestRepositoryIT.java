@@ -14,6 +14,7 @@ import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -178,6 +179,4 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 ;
 
     }
-
-    //TODO Search doesn't exist yet for this endpoint. Write tests when it does.
 }

@@ -28,7 +28,14 @@ public class CollectionMatcher {
                 hasJsonPath("$.metadata", Matchers.contains(
                         CollectionMetadataMatcher.matchTitle(name)
                 )),
-                matchLinks(uuid)
+                matchLinks(uuid),
+                matchLogo()
+        );
+    }
+
+    private static Matcher<? super Object> matchLogo() {
+        return allOf(
+                hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty()))
         );
     }
 
