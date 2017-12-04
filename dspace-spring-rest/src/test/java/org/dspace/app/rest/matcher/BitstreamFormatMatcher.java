@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 /**
- * Created by jonas - jonas@atmire.com on 01/12/17.
+ * @author Jonas Van Goolen - (jonas@atmire.com)
  */
 public class BitstreamFormatMatcher {
 
