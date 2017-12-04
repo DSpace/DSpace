@@ -10,6 +10,7 @@ package org.dspace.app.rest;
 import org.dspace.app.rest.matcher.MetadataschemaMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,5 +30,15 @@ public class MetadataschemaRestRepositoryIT extends AbstractControllerIntegratio
                         MetadataschemaMatcher.matchEntry()
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadataschemas")));
+    }
+
+
+    //TODO This test fails, reactivate when endpoint is fixed
+    @Test
+    @Ignore
+    public void findOne() throws Exception{
+
+        getClient().perform(get("/api/core/metadataschemas/1"))
+                .andExpect(status().isOk());
     }
 }
