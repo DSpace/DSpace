@@ -20,13 +20,28 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
 
     protected AuthorityValue nextValue;
 
-    protected LinkedList<AuthorityValue> authorities = null;
+    protected LinkedList<AuthorityValue> authorities = new LinkedList<AuthorityValue>();
     private static Boolean journals_cached = false;
 
     public void init() {
-        if (authorities == null) {
-            authorities = new LinkedList<AuthorityValue>();
+    }
+
+    @Override
+    public void init(Context context, Item item) {
+        DCValue[] dcValues = item.getMetadata("prism.publicationName");
+        if (dcValues != null && dcValues.length > 0) {
+            // look up concept by name:
+            DryadJournalConcept journalConcept = JournalUtils.getJournalConceptByJournalName(dcValues[0].value);
+            if (journalConcept != null) {
+                if (journalConcept.isAccepted()) {
+                    authorities.addAll(createAuthorityValues(journalConcept));
+                }
+            }
         }
+    }
+
+    @Override
+    public void init(Context context) {
         if (!journals_cached) {
             DryadJournalConcept[] dryadJournalConcepts = JournalUtils.getAllJournalConcepts();
             for (DryadJournalConcept concept : dryadJournalConcepts) {
@@ -36,18 +51,6 @@ public class JournalConceptIndexer implements AuthorityIndexerInterface {
             }
             journals_cached = true;
         }
-    }
-
-    @Override
-    public void init(Context context, Item item) {
-        init();
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void init(Context context) {
-        init();
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

@@ -19,12 +19,10 @@ public class SponsorIndexer extends JournalConceptIndexer implements AuthorityIn
     private static Boolean sponsors_cached = false;
 
     @Override
-    public void init() {
-        super.init();
+    public void init(Context context) {
+        super.init(context);
         if (!sponsors_cached) {
-            Context context = null;
             try {
-                context = new Context();
                 Concept[] concepts = Concept.findAll(context, AuthorityObject.ID);
                 for (Concept concept : concepts) {
                     DryadOrganizationConcept organizationConcept = DryadOrganizationConcept.getOrganizationConceptMatchingConceptID(context, concept.getID());
@@ -32,11 +30,8 @@ public class SponsorIndexer extends JournalConceptIndexer implements AuthorityIn
                         authorities.addAll(createAuthorityValues(organizationConcept));
                     }
                 }
-                context.complete();
             } catch (SQLException e) {
-                if (context != null) {
-                    context.abort();
-                }
+
             }
             sponsors_cached = true;
         }
