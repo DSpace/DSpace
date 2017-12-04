@@ -27,7 +27,7 @@ import java.sql.SQLException;
  *
  * @author Atmire NV (info at atmire dot com)
  */
-public class CollectionBuilder extends AbstractBuilder<Collection> {
+public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 
     private Collection collection;
 
@@ -85,7 +85,7 @@ public class CollectionBuilder extends AbstractBuilder<Collection> {
     }
 
     @Override
-    protected DSpaceObjectService<Collection> getDsoService() {
+    protected DSpaceObjectService<Collection> getService() {
         return collectionService;
     }
 }

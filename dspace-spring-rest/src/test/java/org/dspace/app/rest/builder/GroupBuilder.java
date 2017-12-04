@@ -17,7 +17,7 @@ import org.dspace.eperson.Group;
  *
  * @author Atmire NV (info at atmire dot com)
  */
-public class GroupBuilder extends AbstractBuilder<Group> {
+public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
 
     private Group group;
 
@@ -46,7 +46,7 @@ public class GroupBuilder extends AbstractBuilder<Group> {
     }
 
     @Override
-    protected DSpaceObjectService<Group> getDsoService() {
+    protected DSpaceObjectService<Group> getService() {
         return groupService;
     }
 

@@ -1,59 +1,29 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.app.rest.builder;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BundleService;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.InstallItemService;
-import org.dspace.content.service.ItemService;
-import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.Constants;
+import org.dspace.content.service.*;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
-import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.MutablePeriod;
-import org.joda.time.format.PeriodFormat;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * Abstract builder to construct DSpace Objects
- *
- * @author Atmire NV (info at atmire dot com)
+ * Created by jonas - jonas@atmire.com on 04/12/17.
  */
-public abstract class AbstractBuilder<T extends DSpaceObject> {
+public abstract class AbstractBuilder<T, S> {
 
     static CommunityService communityService;
     static CollectionService collectionService;
@@ -74,7 +44,7 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
 
     private static List<AbstractBuilder> builders = new LinkedList<>();
     /** log4j category */
-    private static final Logger log = Logger.getLogger(AbstractBuilder.class);
+    private static final Logger log = Logger.getLogger(AbstractDSpaceObjectBuilder.class);
 
     protected AbstractBuilder(Context context){
         this.context = context;
@@ -116,82 +86,15 @@ public abstract class AbstractBuilder<T extends DSpaceObject> {
 
     public static void cleanupObjects() throws Exception {
         for (AbstractBuilder builder : builders) {
-
             builder.cleanup();
-
         }
     }
 
     protected abstract void cleanup() throws Exception;
 
-
-    protected <B> B handleException(final Exception e) {
-        log.error(e.getMessage(), e);
-        return null;
-    }
-
-    protected abstract DSpaceObjectService<T> getDsoService();
-
-    protected <B extends AbstractBuilder<T>> B addMetadataValue(final T dso, final String schema, final String element, final String qualifier, final String value) {
-        try {
-            getDsoService().addMetadata(context, dso, schema, element, qualifier, Item.ANY, value);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-        return (B) this;
-    }
-
-    protected <B extends AbstractBuilder<T>> B setMetadataSingleValue(final T dso, final String schema, final String element, final String qualifier, final String value) {
-        try {
-            getDsoService().setMetadataSingleValue(context, dso, schema, element, qualifier, Item.ANY, value);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-
-        return (B) this;
-    }
-
-    protected <B extends AbstractBuilder<T>> B setEmbargo(String embargoPeriod, DSpaceObject dso) {
-        // add policy just for anonymous
-        try {
-            MutablePeriod period = PeriodFormat.getDefault().parseMutablePeriod(embargoPeriod);
-            Date embargoDate = DateTime.now(DateTimeZone.UTC).plus(period).toDate();
-
-            return setOnlyReadPermission(dso, groupService.findByName(context, Group.ANONYMOUS), embargoDate);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    protected <B extends AbstractBuilder<T>> B setOnlyReadPermission(DSpaceObject dso, Group group, Date startDate) {
-        // add policy just for anonymous
-        try {
-            authorizeService.removeAllPolicies(context, dso);
-
-            ResourcePolicy rp = authorizeService.createOrModifyPolicy(null, context, null, group,
-                    null, startDate, Constants.READ, "Integration Test", dso);
-            if (rp != null) {
-                resourcePolicyService.update(context, rp);
-            }
-        } catch (Exception e) {
-            return handleException(e);
-        }
-        return (B) this;
-    }
-
     public abstract T build();
 
-    public void delete(T dso) throws Exception {
+    public abstract void delete(T dso) throws Exception;
 
-        try(Context c = new Context()) {
-            c.turnOffAuthorisationSystem();
-            T attachedDso = c.reloadEntity(dso);
-            if (attachedDso != null) {
-                getDsoService().delete(c, attachedDso);
-            }
-            c.complete();
-        }
-
-        indexingService.commit();
-    }
+    protected abstract S getService();
 }

@@ -36,7 +36,7 @@ public class BitstreamFormatBuilder extends AbstractCRUDBuilder<BitstreamFormat>
     }
 
     @Override
-    protected DSpaceCRUDService<BitstreamFormat> getCRUDService() {
+    protected DSpaceCRUDService<BitstreamFormat> getService() {
         return bitstreamFormatService;
     }
 

@@ -19,6 +19,10 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * @author Jonas Van Goolen - (jonas@atmire.com)
+ */
+
 public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
 
     @Test

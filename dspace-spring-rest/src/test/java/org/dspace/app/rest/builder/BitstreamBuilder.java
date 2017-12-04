@@ -7,11 +7,6 @@
  */
 package org.dspace.app.rest.builder;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -21,10 +16,15 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.List;
+
 /**
  * Builder class to build bitstreams in test cases
  */
-public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
+public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
     public static final String ORIGINAL = "ORIGINAL";
 
@@ -134,7 +134,7 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
         }
     }
 
-    protected DSpaceObjectService<Bitstream> getDsoService() {
+    protected DSpaceObjectService<Bitstream> getService() {
         return bitstreamService;
     }
 }

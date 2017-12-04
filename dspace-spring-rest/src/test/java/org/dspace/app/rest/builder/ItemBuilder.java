@@ -21,7 +21,7 @@ import org.dspace.eperson.Group;
  *
  * @author Atmire NV (info at atmire dot com)
  */
-public class ItemBuilder extends AbstractBuilder<Item> {
+public class ItemBuilder extends AbstractDSpaceObjectBuilder<Item> {
 
     private WorkspaceItem workspaceItem;
     private Item item;
@@ -104,7 +104,7 @@ public class ItemBuilder extends AbstractBuilder<Item> {
     }
 
     @Override
-    protected DSpaceObjectService<Item> getDsoService() {
+    protected DSpaceObjectService<Item> getService() {
         return itemService;
     }
 

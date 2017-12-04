@@ -19,6 +19,9 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * @author Jonas Van Goolen - (jonas@atmire.com)
+ */
 
 public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrationTest {
 
