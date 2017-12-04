@@ -29,10 +29,10 @@ public class CommunityMatcher {
                         CommunityMetadataMatcher.matchTitle(name)
                 )),
                 hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
+                hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
                 matchLinks(uuid)
         );
     }
-
 
     public static Matcher<? super Object> matchLinks(UUID uuid){
         return allOf(
