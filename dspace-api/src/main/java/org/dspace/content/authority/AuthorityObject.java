@@ -229,8 +229,9 @@ public abstract class AuthorityObject extends DSpaceObject {
                 if (field == null) {
                     throw new SQLException("no such field " + schemaName + "." + element + "." + qualifier);
                 } else {
-                    if (getCachedMetadata().get(field.getFieldID()) != null) {
-                        resultMetadataValues.addAll(getCachedMetadata().get(field.getFieldID()));
+                    ArrayList<AuthorityMetadataValue> amvs = getCachedMetadata().get(field.getFieldID());
+                    if (amvs != null) {
+                        resultMetadataValues.addAll(amvs);
                     }
                 }
             }
