@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.is;
 
 public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -77,6 +78,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         ItemMatcher.matchItemWithTitleAndDateIssued(publicItem3, "Public item 3", "2016-02-13")
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(3)))
         ;
     }
 
@@ -146,6 +149,8 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
                         )
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/items")))
+                .andExpect(jsonPath("$.page.size", is(2)))
+                .andExpect(jsonPath("$.page.totalElements", is(3)))
         ;
     }
 
