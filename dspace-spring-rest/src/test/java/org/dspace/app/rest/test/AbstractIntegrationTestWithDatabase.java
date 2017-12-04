@@ -187,7 +187,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
         }
     }
 
-    public void runDSpaceScript(String[] args) throws Exception {
+    public void runDSpaceScript(String... args) throws Exception {
         int status = 0;
         try {
             // Load up the ScriptLauncher's configuration

@@ -237,15 +237,16 @@
 
         <!-- DSpace dependencies -->
         <dependency>
-        <groupId>org.dspace</groupId>
-        <artifactId>dspace-api</artifactId>
-        <exclusions>
-            <exclusion>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-api</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<groupId>com.fasterxml.jackson.core</groupId>
+            		<artifactId>jackson-core</artifactId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
@@ -261,6 +262,11 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>4.23</version>
         </dependency>
 
         <!-- TEST DEPENDENCIES -->
@@ -292,11 +298,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path-assert</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
