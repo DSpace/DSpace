@@ -19,6 +19,7 @@ public class MetadataschemaMatcher {
     public static Matcher<? super Object> matchEntry(){
         return allOf(
                 hasJsonPath("$.prefix", Matchers.not(Matchers.empty())),
+                hasJsonPath("$.namespace", Matchers.not(Matchers.empty())),
                 hasJsonPath("$.type", is("metadataschema")),
                 hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/metadataschemas"))
         );
