@@ -68,6 +68,7 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
+
                 .andExpect(jsonPath("$.page.totalElements", is(3)));
 
     }
