@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.is;
 
 public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -31,7 +32,8 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/core/metadatafields")))
                     .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields")))
                     .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/core/metadatafields")))
-                    .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")));
+                    .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")))
 
+                    .andExpect(jsonPath("$.page.size", is(20)));
     }
 }
