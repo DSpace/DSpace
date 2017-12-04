@@ -9,7 +9,6 @@ package org.dspace.app.rest.test;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.builder.AbstractBuilder;
-import org.dspace.app.rest.builder.AbstractCRUDBuilder;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.AfterClass;
@@ -72,7 +71,6 @@ public class AbstractDSpaceIntegrationTest
                 kernelImpl.start(getDspaceDir()); // init the kernel
             }
             AbstractBuilder.init();
-            AbstractCRUDBuilder.init();
         }
         catch (IOException ex)
         {
@@ -92,7 +90,6 @@ public class AbstractDSpaceIntegrationTest
         testProps = null;
 
         AbstractBuilder.destroy();
-        AbstractCRUDBuilder.destroy();
 
         //Also clear out the kernel & nullify (so JUnit will clean it up)
         if (kernelImpl != null) {

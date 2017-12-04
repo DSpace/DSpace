@@ -10,7 +10,6 @@ package org.dspace.app.rest.builder;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharEncoding;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Community;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.DSpaceObjectService;
@@ -25,7 +24,7 @@ import java.sql.SQLException;
  *
  * @author Atmire NV (info at atmire dot com)
  */
-public class CommunityBuilder extends AbstractBuilder<Community> {
+public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
 
     private Community community;
 
@@ -89,7 +88,7 @@ public class CommunityBuilder extends AbstractBuilder<Community> {
     }
 
     @Override
-    protected DSpaceObjectService<Community> getDsoService() {
+    protected DSpaceObjectService<Community> getService() {
         return communityService;
     }
 }

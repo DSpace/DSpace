@@ -15,7 +15,7 @@ import org.dspace.eperson.EPerson;
 
 import java.sql.SQLException;
 
-public class EPersonBuilder extends AbstractBuilder<EPerson> {
+public class EPersonBuilder extends AbstractDSpaceObjectBuilder<EPerson> {
 
     private EPerson ePerson;
 
@@ -27,7 +27,7 @@ public class EPersonBuilder extends AbstractBuilder<EPerson> {
         delete(ePerson);
     }
 
-    protected DSpaceObjectService<EPerson> getDsoService() {
+    protected DSpaceObjectService<EPerson> getService() {
         return ePersonService;
     }
 
