@@ -17,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.is;
 
 public class MetadataschemaRestRepositoryIT extends AbstractControllerIntegrationTest {
 
@@ -29,7 +30,8 @@ public class MetadataschemaRestRepositoryIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$._embedded.metadataschemas", Matchers.hasItem(
                         MetadataschemaMatcher.matchEntry()
                 )))
-                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadataschemas")));
+                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadataschemas")))
+                .andExpect(jsonPath("$.page.size", is(20)));
     }
 
 
