@@ -179,4 +179,61 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
                 ;
 
     }
+
+
+    //TODO Populate the two tests when we know how to populate these endpoints
+
+    @Test
+    public void findAuthorizedTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community Two")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+
+
+        getClient().perform(get("/api/core/collections/search/findAuthorized"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType));
+    }
+
+
+    @Test
+    public void findAuthorizedByCommunityTest() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community Two")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+
+
+        getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType));
+    }
+
 }

@@ -7,9 +7,12 @@
  */
 package org.dspace.app.rest;
 
+import org.dspace.app.rest.builder.MetadataFieldBuilder;
 import org.dspace.app.rest.matcher.MetadataFieldMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.content.MetadataField;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -23,6 +26,9 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
     @Test
     public void findAll() throws Exception{
 
+        context.turnOffAuthorisationSystem();
+        MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, "AnElement", "AQualifier", "AScopeNote").build();
+
         getClient().perform(get("/api/core/metadatafields"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(contentType))
@@ -35,5 +41,22 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                     .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")))
 
                     .andExpect(jsonPath("$.page.size", is(20)));
+    }
+
+    @Test
+    @Ignore
+    public void findOne() throws Exception{
+
+        context.turnOffAuthorisationSystem();
+        MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, "AnElement", "AQualifier", "AScopeNote").build();
+
+        getClient().perform(get("/api/core/metadatafields/" + metadataField.getID()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
+                        MetadataFieldMatcher.matchMetadataField(metadataField)
+                )))
+
+                .andExpect(jsonPath("$.page.size", is(20)));
     }
 }
