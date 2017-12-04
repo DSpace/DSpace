@@ -19,4 +19,11 @@ public class BitstreamFormatMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchBitstreamFormatMimeType(String mimetype) {
+        return allOf(
+                hasJsonPath("$.mimetype", is(mimetype)),
+                hasJsonPath("$.type", is("bitstreamformat"))
+        );
+    }
+
 }
