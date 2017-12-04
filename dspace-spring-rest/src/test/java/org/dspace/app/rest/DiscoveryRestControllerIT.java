@@ -94,31 +94,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects and authors
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -163,31 +163,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
@@ -230,31 +230,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John").withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Doe, John").withAuthor("Smith, Donald")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -300,31 +300,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -376,31 +376,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2000-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -442,31 +442,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Public item 1")
                 .withIssueDate("2017-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Doe, John")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2016-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
@@ -534,59 +534,59 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 7 public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("1940-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem4 = new ItemBuilder().createItem(context, col2)
+        Item publicItem4 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("1950-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem5 = new ItemBuilder().createItem(context, col2)
+        Item publicItem5 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("1960-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem6 = new ItemBuilder().createItem(context, col2)
+        Item publicItem6 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("1970-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem7 = new ItemBuilder().createItem(context, col2)
+        Item publicItem7 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("1980-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -632,31 +632,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -735,31 +735,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -809,31 +809,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works").withAuthor("a1, a1").withAuthor("b, b").withAuthor("c, c").withAuthor("d, d").withAuthor("e, e").withAuthor("f, f").withAuthor("g, g")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -886,17 +886,17 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
@@ -908,14 +908,14 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .withSubject("j").withSubject("k")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -966,31 +966,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1040,31 +1040,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1117,31 +1117,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1187,31 +1187,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("Testing, Works")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Testing")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1271,65 +1271,65 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         context.turnOffAuthorisationSystem();
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. 9 public items that are readable by Anonymous with different subjects
-        Item publicItem6 = new ItemBuilder().createItem(context, col2)
+        Item publicItem6 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("2017-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-        Item publicItem7 = new ItemBuilder().createItem(context, col2)
+        Item publicItem7 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-        Item publicItem8 = new ItemBuilder().createItem(context, col2)
+        Item publicItem8 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-        Item publicItem9 = new ItemBuilder().createItem(context, col2)
+        Item publicItem9 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("1970-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-        Item publicItem10 = new ItemBuilder().createItem(context, col2)
+        Item publicItem10 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("1950-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-        Item publicItem11 = new ItemBuilder().createItem(context, col2)
+        Item publicItem11 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("1930-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-        Item publicItem12 = new ItemBuilder().createItem(context, col2)
+        Item publicItem12 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("1910-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-        Item publicItem13 = new ItemBuilder().createItem(context, col2)
+        Item publicItem13 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("1890-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
                 .withSubject("AnotherTest").withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
-        Item publicItem14 = new ItemBuilder().createItem(context, col2)
+        Item publicItem14 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public")
                 .withIssueDate("1866-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1371,31 +1371,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald").withAuthor("t, t").withAuthor("t, y").withAuthor("t, r").withAuthor("t, e").withAuthor("t, z").withAuthor("t, a").withAuthor("t, tq").withAuthor("t, ts").withAuthor("t, td").withAuthor("t, tf").withAuthor("t, tg").withAuthor("t, th").withAuthor("t, tj").withAuthor("t, tk")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1446,31 +1446,31 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1487,8 +1487,8 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         }
 
         //Run the filter media to make the text in the bitstream searchable through the query
-        String[] args = {"filter-media", "-f", "-i", publicItem1.getHandle()};
-        runDSpaceScript(args);
+        runDSpaceScript("filter-media", "-f", "-i", publicItem1.getHandle());
+
         //** WHEN **
         //An anonymous user browses this endpoint to find the the objects in the system
         //With a query stating 'ThisIsSomeDummyText'
@@ -1529,17 +1529,17 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
 
         //2. Three items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
@@ -1547,7 +1547,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .build();
 
         //Make this one public to make sure that it doesn't show up in the search
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
@@ -1555,7 +1555,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
                 .makePrivate()
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1603,11 +1603,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
     }
 
-
-
-
-    //TODO Enable when solr fulltext indexing is policy-aware
-
+    //TODO Enable when solr fulltext indexing is policy-aware, see https://jira.duraspace.org/browse/DS-3758
     @Test
     @Ignore
     public void discoverSearchObjectsTestWithContentInAPrivateBitstream() throws Exception{
@@ -1616,16 +1612,16 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         //2. one public item that is readable by Anonymous
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
@@ -1635,9 +1631,10 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
         String bitstreamContent = "ThisIsSomeDummyText";
 
         //Make the group that anon doesn't have access to
-        Group internalGroup = new GroupBuilder().createGroup(context)
+        Group internalGroup = GroupBuilder.createGroup(context)
                 .withName("Internal Group")
                 .build();
+
         //Add this bitstream with the internal group as the reader group
         try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
             Bitstream bitstream = BitstreamBuilder.
@@ -1651,8 +1648,7 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
 
         //Run the filter media to be able to search on the text in the bitstream
-        String[] args = {"filter-media", "-f", "-i", publicItem1.getHandle()};
-        runDSpaceScript(args);
+        runDSpaceScript("filter-media", "-f", "-i", publicItem1.getHandle());
 
         //Turn on the authorization again to make sure that private/inaccessible items don't get show/used
         context.restoreAuthSystemState();
@@ -1698,30 +1694,30 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1770,30 +1766,30 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         //2. Two items that are readable by Anonymous with different subjects and one private item
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("Testing, Works")
                 .withSubject("TestingForMore").withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane").withAuthor("test,test").withAuthor("test2, test2").withAuthor("Maybe, Maybe")
@@ -1847,30 +1843,30 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         //2. Three public items that are readable by Anonymous with different subjects
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
@@ -1918,30 +1914,30 @@ public class DiscoveryRestControllerIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and two collections.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .build();
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
-        Collection col2 = new CollectionBuilder().createCollection(context, child1).withName("Collection 2").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
         //2. Two public items that are readable by Anonymous with different subjects and one private item
-        Item publicItem1 = new ItemBuilder().createItem(context, col1)
+        Item publicItem1 = ItemBuilder.createItem(context, col1)
                 .withTitle("Test")
                 .withIssueDate("2010-10-17")
                 .withAuthor("Smith, Donald")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem2 = new ItemBuilder().createItem(context, col2)
+        Item publicItem2 = ItemBuilder.createItem(context, col2)
                 .withTitle("Test 2")
                 .withIssueDate("1990-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")
                 .withSubject("ExtraEntry")
                 .build();
 
-        Item publicItem3 = new ItemBuilder().createItem(context, col2)
+        Item publicItem3 = ItemBuilder.createItem(context, col2)
                 .withTitle("Public item 2")
                 .withIssueDate("2010-02-13")
                 .withAuthor("Smith, Maria").withAuthor("Doe, Jane")

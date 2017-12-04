@@ -10,6 +10,7 @@ package org.dspace.app.rest.model;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.atteo.evo.inflector.English;
 
 /**
  * Methods to implement to make a REST resource addressable
