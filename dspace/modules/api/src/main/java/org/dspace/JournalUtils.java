@@ -67,14 +67,23 @@ public class JournalUtils {
     private static HashMap<String, DryadJournalConcept> journalConceptHashMapByISSN = new HashMap<String, DryadJournalConcept>();
 
     static {
+        initializeJournalConcepts();
+    }
+
+    private static void initializeJournalConcepts() {
         Context context = null;
 
         try {
             context = new Context();
             Scheme scheme = Scheme.findByIdentifier(context, ConfigurationManager.getProperty("solrauthority.searchscheme.prism_publicationName"));
             Concept[] concepts = scheme.getConcepts(context);
-            for (Concept concept : concepts) {
-                addJournalConcept(context, concept);
+            for (Concept newConcept : concepts) {
+                DryadJournalConcept journalConcept = new DryadJournalConcept(context, newConcept);
+                // add this concept to the main index if it's not already there.
+                if (!journalConceptHashMapByConceptIdentifier.containsValue(journalConcept)) {
+                    journalConceptHashMapByConceptIdentifier.put(journalConcept.getIdentifier(), journalConcept);
+                    updateDryadJournalConcept(journalConcept);
+                }
             }
             context.complete();
         } catch (Exception e) {
@@ -91,16 +100,13 @@ public class JournalUtils {
             try {
                 Concept newConcept = Concept.findByIdentifier(context, concept.getIdentifier()).get(0);
                 journalConcept = new DryadJournalConcept(context, newConcept);
-                context.commit();
-            } catch (Exception e) {
-                throw new StorageException("couldn't add a journal concept " + concept.getID() + ": " + e.getMessage());
-            }
-            if (journalConcept != null) {
                 // add this concept to the main index if it's not already there.
                 if (!journalConceptHashMapByConceptIdentifier.containsValue(journalConcept)) {
                     journalConceptHashMapByConceptIdentifier.put(journalConcept.getIdentifier(), journalConcept);
                     updateDryadJournalConcept(journalConcept);
                 }
+            } catch (Exception e) {
+                throw new StorageException("couldn't add a journal concept " + concept.getID() + ": " + e.getMessage());
             }
         }
     }
@@ -193,6 +199,7 @@ public class JournalUtils {
     }
 
     public static DryadJournalConcept[] getAllJournalConcepts() {
+        initializeJournalConcepts();
         ArrayList<DryadJournalConcept> journalConcepts = new ArrayList<DryadJournalConcept>();
         journalConcepts.addAll(journalConceptHashMapByConceptIdentifier.values());
         Collections.sort(journalConcepts);
