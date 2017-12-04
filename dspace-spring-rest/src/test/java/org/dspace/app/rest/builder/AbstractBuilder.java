@@ -11,7 +11,14 @@ import org.dspace.discovery.IndexingService;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
 import org.dspace.eperson.service.GroupService;
+import org.dspace.eperson.service.RegistrationDataService;
 import org.dspace.services.factory.DSpaceServicesFactory;
+import org.dspace.versioning.factory.VersionServiceFactory;
+import org.dspace.versioning.service.VersionHistoryService;
+import org.dspace.xmlworkflow.storedcomponents.service.ClaimedTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.InProgressUserService;
+import org.dspace.xmlworkflow.storedcomponents.service.PoolTaskService;
+import org.dspace.xmlworkflow.storedcomponents.service.WorkflowItemRoleService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +28,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 /**
- * Created by jonas - jonas@atmire.com on 04/12/17.
+ * @author Jonas Van Goolen - (jonas@atmire.com)
  */
 public abstract class AbstractBuilder<T, S> {
 
@@ -39,6 +46,12 @@ public abstract class AbstractBuilder<T, S> {
     static ResourcePolicyService resourcePolicyService;
     static IndexingService indexingService;
     static BitstreamFormatService bitstreamFormatService;
+    static RegistrationDataService registrationDataService;
+    static VersionHistoryService versionHistoryService;
+    static ClaimedTaskService claimedTaskService;
+    static InProgressUserService inProgressUserService;
+    static PoolTaskService poolTaskService;
+    static WorkflowItemRoleService workflowItemRoleService;
 
     protected Context context;
 
@@ -66,7 +79,17 @@ public abstract class AbstractBuilder<T, S> {
         resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         indexingService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
         bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
+        registrationDataService = EPersonServiceFactory.getInstance().getRegistrationDataService();
+        versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+
+        // Temporarily disabled
+        // TODO find a way to be able to test the XML and "default" workflow at the same time
+        //claimedTaskService = XmlWorkflowServiceFactoryImpl.getInstance().getClaimedTaskService();
+        //inProgressUserService = XmlWorkflowServiceFactoryImpl.getInstance().getInProgressUserService();
+        //poolTaskService = XmlWorkflowServiceFactoryImpl.getInstance().getPoolTaskService();
+        //workflowItemRoleService = XmlWorkflowServiceFactoryImpl.getInstance().getWorkflowItemRoleService();
     }
+
 
     public static void destroy() {
         communityService = null;
@@ -82,6 +105,12 @@ public abstract class AbstractBuilder<T, S> {
         resourcePolicyService = null;
         indexingService = null;
         bitstreamFormatService = null;
+        registrationDataService = null;
+        versionHistoryService = null;
+        claimedTaskService = null;
+        inProgressUserService = null;
+        poolTaskService = null;
+        workflowItemRoleService = null;
     }
 
     public static void cleanupObjects() throws Exception {
