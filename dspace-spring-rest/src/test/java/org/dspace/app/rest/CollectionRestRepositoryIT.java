@@ -11,11 +11,17 @@ import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.matcher.CollectionMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
+import org.dspace.authorize.factory.AuthorizeServiceFactory;
+import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -202,8 +208,6 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
-
-
         getClient().perform(get("/api/core/collections/search/findAuthorized"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType));
@@ -229,11 +233,34 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
         Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
 
-
-
         getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType));
+    }
+
+    @Test
+    public void findOneCollectionTestWrongUUID() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community Two")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child2).withName("Collection 2").build();
+
+
+
+        getClient().perform(get("/api/core/collections/" + UUID.randomUUID()))
+                .andExpect(status().isNotFound());
     }
 
 }

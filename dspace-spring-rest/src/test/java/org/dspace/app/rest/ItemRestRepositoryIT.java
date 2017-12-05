@@ -23,6 +23,7 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -281,6 +282,28 @@ public class ItemRestRepositoryIT extends AbstractControllerIntegrationTest {
 
         getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/templateItemOf"))
                 .andExpect(status().isOk())
+        ;
+    }
+
+
+
+    @Test
+    public void findOneTestWrongUUID() throws Exception{
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and two collections.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+        Collection col2 = CollectionBuilder.createCollection(context, child1).withName("Collection 2").build();
+
+        getClient().perform(get("/api/core/items/" + UUID.randomUUID()))
+                .andExpect(status().isNotFound());
         ;
     }
 

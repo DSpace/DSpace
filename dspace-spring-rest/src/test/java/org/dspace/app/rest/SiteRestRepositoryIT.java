@@ -14,6 +14,8 @@ import org.dspace.content.Site;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,6 +55,18 @@ public class SiteRestRepositoryIT extends AbstractControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", SiteMatcher.matchEntry(site)))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/sites")));
+
+    }
+
+
+    @Test
+    public void findOneWrongUUID() throws Exception{
+
+
+        context.turnOffAuthorisationSystem();
+
+        getClient().perform(get("/api/core/sites/" + UUID.randomUUID()))
+                .andExpect(status().isNotFound());
 
     }
 }
