@@ -514,9 +514,6 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
             } catch (ClassCastException details) {
                 throw new RuntimeException(details);
             } catch (SQLException details) {
-                if (context != null) {
-                    context.abort();
-                }
                 throw new RuntimeException(details);
             } catch (Exception details) {
                 throw new RuntimeException(details);

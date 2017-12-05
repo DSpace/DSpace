@@ -34,7 +34,6 @@ public class CDLDataCiteConsumer implements Consumer {
         int et = event.getEventType();
 
         try {
-            ctx = new Context();
             ctx.turnOffAuthorisationSystem();
             switch (st) {
 
@@ -63,20 +62,15 @@ public class CDLDataCiteConsumer implements Consumer {
 
                             if(response.contains("error"))
                                 log.error("Problem during the Item synchronization against DataCite : " + response);
-
-                            ctx.commit();
                         }
                     }
                     break;
                 }
             }
+            ctx.restoreAuthSystemState();
         }
         catch (Exception e) {
-            ctx.abort();
-	    log.error("Problem updating DataCite settings for an item based on event " + event, e);
-        }
-        finally {
-            ctx.complete();
+            log.error("Problem updating DataCite settings for an item based on event " + event, e);
         }
 
     }

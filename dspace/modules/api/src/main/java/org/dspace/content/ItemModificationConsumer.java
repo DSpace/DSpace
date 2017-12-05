@@ -28,7 +28,6 @@ public class ItemModificationConsumer implements Consumer {
         int st = event.getSubjectType();
 
         try {
-            ctx = new Context();
             ctx.turnOffAuthorisationSystem();
 
             switch (st) {
@@ -55,9 +54,8 @@ public class ItemModificationConsumer implements Consumer {
                 }
                 break;
             }
-            ctx.complete();
         } catch (Exception e) {
-            ctx.abort();
+            log.error("Exception consuming event: " + e.getMessage());
         }
     }
 }

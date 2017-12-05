@@ -111,7 +111,6 @@ public class PluggableVersioningService implements VersioningService{
                 versionDAO.delete(c, previous.getVersionId());
             }
         }catch (Exception e) {
-            c.abort();
             throw new RuntimeException(e.getMessage(), e);
         }
     }

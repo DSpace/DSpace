@@ -9,13 +9,7 @@ package org.dspace.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
@@ -77,7 +71,7 @@ public class Context
     private List<Integer> specialGroups;
 
     /** Content events */
-    private List<Event> events = null;
+    private Set<Event> events = null;
 
     /** Event dispatcher name */
     private String dispName = null;
@@ -377,7 +371,7 @@ public class Context
     {
         if (events == null)
         {
-            events = new ArrayList<Event>();
+            events = new HashSet<>();
         }
 
         events.add(event);
@@ -395,7 +389,10 @@ public class Context
      */
     public List<Event> getEvents()
     {
-        return events;
+        ArrayList<Event> eventArrayList = new ArrayList<>();
+        eventArrayList.addAll(events);
+        events = null;
+        return eventArrayList;
     }
 
     /**

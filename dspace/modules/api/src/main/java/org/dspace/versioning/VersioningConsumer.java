@@ -55,7 +55,6 @@ public class VersioningConsumer implements Consumer {
         int et = event.getEventType();
 
         try {
-            ctx = new Context();
             ctx.turnOffAuthorisationSystem();
 
             switch (st) {
@@ -84,10 +83,9 @@ public class VersioningConsumer implements Consumer {
                 }
                 break;
             }
-            ctx.complete();
         }
         catch (Exception e) {
-            ctx.abort();
+            log.error("Exception consuming event: " + e.getMessage());
         }
     }
 

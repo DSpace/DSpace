@@ -75,7 +75,7 @@ public class AuthorityItemConsumer implements Consumer {
             }
         }
         catch (Exception e) {
-            ctx.abort();
+            log.error("Exception was thrown: " + e.getMessage());
         }
 
     }
