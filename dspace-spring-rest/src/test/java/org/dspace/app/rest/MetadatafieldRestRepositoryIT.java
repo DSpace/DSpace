@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest;
 
+import org.dspace.app.rest.repository.MetadataFieldRestRepository;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.dspace.app.rest.builder.MetadataFieldBuilder;
 import org.dspace.app.rest.matcher.MetadataFieldMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
@@ -16,7 +19,9 @@ import org.dspace.core.Context;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.sql.SQLException;
 
@@ -63,33 +68,6 @@ public class MetadatafieldRestRepositoryIT extends AbstractControllerIntegration
                 .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
                         MetadataFieldMatcher.matchMetadataField(metadataField)
                 )))
-
-                .andExpect(jsonPath("$.page.size", is(20)));
-    }
-
-
-    @Test
-    public void findAllSqlException() throws Exception{
-
-
-        context.turnOffAuthorisationSystem();
-        MetadataField metadataField = MetadataFieldBuilder.createMetadataField(context, "AnElement", "AQualifier", "AScopeNote").build();
-
-        MetadataFieldService metadataFieldService = org.mockito.Mockito.mock(MetadataFieldService.class);
-
-        when(metadataFieldService.findAll(Mockito.any(Context.class))).thenThrow(new SQLException());
-
-
-        getClient().perform(get("/api/core/metadatafields"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$._embedded.metadatafields", Matchers.hasItem(
-                        MetadataFieldMatcher.matchMetadataField()
-                )))
-                .andExpect(jsonPath("$._links.first.href", Matchers.containsString("/api/core/metadatafields")))
-                .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/metadatafields")))
-                .andExpect(jsonPath("$._links.next.href", Matchers.containsString("/api/core/metadatafields")))
-                .andExpect(jsonPath("$._links.last.href", Matchers.containsString("/api/core/metadatafields")))
 
                 .andExpect(jsonPath("$.page.size", is(20)));
     }

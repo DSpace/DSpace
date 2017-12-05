@@ -23,6 +23,8 @@ import org.junit.Test;
 
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -135,11 +137,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", Matchers.is(
+                .andExpect(jsonPath("$", is(
                         CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                 )))
                 .andExpect(jsonPath("$", Matchers.not(
-                        Matchers.is(
+                        is(
                                 CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                 ))));
     }
@@ -166,11 +168,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
         getClient().perform(get("/api/core/collections/" + col1.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$", Matchers.is(
+                .andExpect(jsonPath("$", is(
                         CollectionMatcher.matchCollectionEntry(col1.getName(), col1.getID(), col1.getHandle())
                 )))
                 .andExpect(jsonPath("$", Matchers.not(
-                        Matchers.is(
+                        is(
                                 CollectionMatcher.matchCollectionEntry(col2.getName(), col2.getID(), col2.getHandle())
                         )))
                 )
@@ -186,9 +188,7 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
     }
 
-
-    //TODO Populate the two tests when we know how to populate these endpoints
-
+    
     @Test
     public void findAuthorizedTest() throws Exception {
 
@@ -210,7 +210,11 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient().perform(get("/api/core/collections/search/findAuthorized"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType));
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", is(0)))
+                .andExpect(jsonPath("$._embedded").doesNotExist())
+        ;
+
     }
 
 
@@ -235,7 +239,9 @@ public class CollectionRestRepositoryIT extends AbstractControllerIntegrationTes
 
         getClient().perform(get("/api/core/collections/search/findAuthorizedByCommunity"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType));
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.page.totalElements", is(0)))
+                .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     @Test
