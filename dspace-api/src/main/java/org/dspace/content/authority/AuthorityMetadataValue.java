@@ -77,8 +77,7 @@ public class AuthorityMetadataValue {
      * @param row database row to use for contents
      */
 
-    public AuthorityMetadataValue(TableRow row)
-    {
+    public AuthorityMetadataValue(TableRow row) {
         if (row != null)
         {
             tableName = row.getTable();
@@ -92,10 +91,6 @@ public class AuthorityMetadataValue {
             confidence = row.getIntColumn("confidence");
             this.row = row;
         }
-    }
-
-    public AuthorityMetadataValue(Context context, TableRow row) {
-        this(row);
         try {
             MetadataField field = MetadataField.find(fieldId);
             MetadataSchema thisSchema = MetadataSchema.find(field.getSchemaID());
