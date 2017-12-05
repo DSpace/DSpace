@@ -13,6 +13,7 @@ import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
+import org.dspace.app.rest.matcher.BitstreamFormatMatcher;
 import org.dspace.app.rest.matcher.BitstreamMatcher;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
 import org.dspace.content.Bitstream;
@@ -230,7 +231,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.bitstreams", contains(
-                        BitstreamMatcher.matchBitstreamEntry(bitstream.getName(), bitstream.getID())
+                        BitstreamMatcher.matchBitstreamEntry(bitstream)
                 )))
 
         ;
@@ -342,7 +343,7 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/"+bitstream.getID()+"/format"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-        //TODO add matcher on bitstream format
+                .andExpect(jsonPath("$", BitstreamFormatMatcher.matchBitstreamFormatMimeType("text/plain")))
         ;
 
 
@@ -351,15 +352,12 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         ;
 
 
-        //TODO This test fails in the current code. Authorization error
         getClient().perform(get("/api/core/bitstreams/"+bitstream.getID()+"/content"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("ThisIsSomeDummyText"))
         ;
 
     }
-
-
 
     @Test
     public void findOneWrongUUID() throws Exception {
@@ -377,7 +375,6 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
                 .build();
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-        //TODO This test fails in the current code. Authorization error
         getClient().perform(get("/api/core/bitstreams/"+ UUID.randomUUID()))
                 .andExpect(status().isNotFound())
         ;

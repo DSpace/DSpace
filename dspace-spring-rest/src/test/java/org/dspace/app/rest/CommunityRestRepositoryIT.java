@@ -190,24 +190,24 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .withLogo("ThisIsSomeDummyText")
                 .build();
 
-        Community parentCommunity2 = new CommunityBuilder().createCommunity(context)
+        Community parentCommunity2 = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community 2")
                 .withLogo("SomeTest")
                 .build();
 
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
 
-        Community child12 = new CommunityBuilder().createSubCommunity(context, child1)
+        Community child12 = CommunityBuilder.createSubCommunity(context, child1)
                 .withName("Sub Sub Community")
                 .build();
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
 
         getClient().perform(get("/api/core/communities/search/top"))
@@ -239,29 +239,29 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         //** GIVEN **
         //1. A community-collection structure with one parent community with sub-community and one collection.
-        parentCommunity = new CommunityBuilder().createCommunity(context)
+        parentCommunity = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community")
                 .withLogo("ThisIsSomeDummyText")
                 .build();
 
-        Community parentCommunity2 = new CommunityBuilder().createCommunity(context)
+        Community parentCommunity2 = CommunityBuilder.createCommunity(context)
                 .withName("Parent Community 2")
                 .withLogo("SomeTest")
                 .build();
 
-        Community child1 = new CommunityBuilder().createSubCommunity(context, parentCommunity)
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
 
-        Community child12 = new CommunityBuilder().createSubCommunity(context, child1)
+        Community child12 = CommunityBuilder.createSubCommunity(context, child1)
                 .withName("Sub Sub Community")
                 .build();
 
-        Community child2 = new CommunityBuilder().createSubCommunity(context, parentCommunity2)
+        Community child2 = CommunityBuilder.createSubCommunity(context, parentCommunity2)
                 .withName("Sub2 Community")
                 .build();
 
-        Collection col1 = new CollectionBuilder().createCollection(context, child1).withName("Collection 1").build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
         getClient().perform(get("/api/core/communities/search/subCommunities"))
                 .andExpect(status().isOk())
