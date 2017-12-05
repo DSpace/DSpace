@@ -18,7 +18,8 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * Custom Authentication for use with DSpace
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class DSpaceAuthentication implements Authentication {
 

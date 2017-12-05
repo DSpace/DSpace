@@ -25,7 +25,8 @@ import java.sql.SQLException;
 /**
  * Builder to construct Collection objects
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class CollectionBuilder extends AbstractDSpaceObjectBuilder<Collection> {
 

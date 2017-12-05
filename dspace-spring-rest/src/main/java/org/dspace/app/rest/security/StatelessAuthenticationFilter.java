@@ -31,7 +31,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  * Custom Spring authentication filter for Stateless authentication, intercepts requests to check for valid
  * authentication
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class StatelessAuthenticationFilter extends BasicAuthenticationFilter{
 

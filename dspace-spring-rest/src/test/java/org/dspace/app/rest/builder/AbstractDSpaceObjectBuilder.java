@@ -25,7 +25,8 @@ import java.util.Date;
 /**
  * Abstract builder to construct DSpace Objects
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
+ * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public abstract class AbstractDSpaceObjectBuilder<T extends DSpaceObject> extends AbstractBuilder<T, DSpaceObjectService> {
 
