@@ -23,7 +23,8 @@ import org.springframework.stereotype.Component;
 /**
  * Custom logout handler to support stateless sessions
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Component
 public class CustomLogoutHandler implements LogoutHandler {

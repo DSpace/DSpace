@@ -37,7 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
  * Rest controller that handles authentication on the REST API together with the Spring Security filters
  * configured in {@link org.dspace.app.rest.security.WebSecurityConfiguration}
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @RequestMapping(value = "/api/" + AuthnRest.CATEGORY)
 @RestController

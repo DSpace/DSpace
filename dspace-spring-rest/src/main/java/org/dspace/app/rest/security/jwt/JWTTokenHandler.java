@@ -51,7 +51,8 @@ import org.springframework.stereotype.Component;
 /**
  * Class responsible for creating and parsing JWTs, supports both JWS and JWE
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Component
 public class JWTTokenHandler implements InitializingBean {

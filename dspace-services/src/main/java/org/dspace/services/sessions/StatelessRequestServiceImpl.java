@@ -44,7 +44,7 @@ import org.springframework.beans.factory.annotation.Required;
  * <p>
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
- * @author Atmire
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public final class StatelessRequestServiceImpl implements RequestService, InitializedService, ShutdownService {
 
