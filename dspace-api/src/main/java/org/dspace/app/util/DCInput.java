@@ -463,5 +463,12 @@ public class DCInput
 	public String getFieldName() {
 		return Utils.standardize(this.getSchema(), this.getElement(), this.getQualifier(), ".");
 	}
+
+	public boolean isQualdropValue() {
+		if("qualdrop_value".equals(getInputType())) {
+			return true;
+		}
+		return false;
+	}
 	
 }
