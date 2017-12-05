@@ -82,8 +82,4 @@ public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
         return this;
     }
 
-    public static AbstractBuilder<Group> cleaner() {
-        return new GroupBuilder();
-    }
-
 }

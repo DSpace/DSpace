@@ -35,6 +35,8 @@ import java.sql.SQLException;
 import java.util.Date;
 
 /**
+ * Abstract builder class that holds references to all available services
+ *
  * @author Jonas Van Goolen - (jonas@atmire.com)
  */
 public abstract class AbstractBuilder<T, S> {
@@ -52,7 +54,6 @@ public abstract class AbstractBuilder<T, S> {
     static AuthorizeService authorizeService;
     static ResourcePolicyService resourcePolicyService;
     static IndexingService indexingService;
-    static BitstreamFormatService bitstreamFormatService;
     static RegistrationDataService registrationDataService;
     static VersionHistoryService versionHistoryService;
     static ClaimedTaskService claimedTaskService;
@@ -88,7 +89,6 @@ public abstract class AbstractBuilder<T, S> {
         authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         indexingService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
-        bitstreamFormatService = ContentServiceFactory.getInstance().getBitstreamFormatService();
         registrationDataService = EPersonServiceFactory.getInstance().getRegistrationDataService();
         versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
         metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
