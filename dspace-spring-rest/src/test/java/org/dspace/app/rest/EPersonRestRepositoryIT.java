@@ -14,6 +14,8 @@ import org.dspace.eperson.EPerson;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -136,5 +138,25 @@ public class EPersonRestRepositoryIT extends AbstractControllerIntegrationTest{
                         )
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/eperson/epersons/" + ePerson2.getID())));
+    }
+
+
+    @Test
+    public void findOneTestWrongUUID() throws Exception{
+        context.turnOffAuthorisationSystem();
+
+        EPerson ePerson = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("John", "Doe")
+                .withEmail("Johndoe@gmail.com")
+                .build();
+
+        EPerson ePerson2 = EPersonBuilder.createEPerson(context)
+                .withNameInMetadata("Jane", "Smith")
+                .withEmail("janesmith@gmail.com")
+                .build();
+
+        getClient().perform(get("/api/eperson/epersons/" + UUID.randomUUID()))
+                .andExpect(status().isNotFound());
+
     }
 }

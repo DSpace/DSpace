@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -354,6 +355,31 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
         getClient().perform(get("/api/core/bitstreams/"+bitstream.getID()+"/content"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("ThisIsSomeDummyText"))
+        ;
+
+    }
+
+
+
+    @Test
+    public void findOneWrongUUID() throws Exception {
+
+        //We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        //** GIVEN **
+        //1. A community-collection structure with one parent community with sub-community and one collection.
+        parentCommunity = CommunityBuilder.createCommunity(context)
+                .withName("Parent Community")
+                .build();
+        Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
+                .withName("Sub Community")
+                .build();
+        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        //TODO This test fails in the current code. Authorization error
+        getClient().perform(get("/api/core/bitstreams/"+ UUID.randomUUID()))
+                .andExpect(status().isNotFound())
         ;
 
     }

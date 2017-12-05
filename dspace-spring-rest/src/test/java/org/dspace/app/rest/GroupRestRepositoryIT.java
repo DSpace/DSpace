@@ -14,6 +14,8 @@ import org.dspace.eperson.Group;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -108,6 +110,23 @@ public class GroupRestRepositoryIT extends AbstractControllerIntegrationTest {
                         )
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/eperson/groups/" + group2.getID())));
+    }
+
+    @Test
+    public void findOneTestWrongUUID() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        String testGroupName = "Test group";
+        Group group = GroupBuilder.createGroup(context)
+                .withName(testGroupName)
+                .build();
+
+        String generatedGroupId = group.getID().toString();
+        String groupIdCall = "/api/eperson/groups/" + UUID.randomUUID();
+        getClient().perform(get(groupIdCall))
+                //The status has to be 200 OK
+                .andExpect(status().isNotFound())
+        ;
     }
 
 }
