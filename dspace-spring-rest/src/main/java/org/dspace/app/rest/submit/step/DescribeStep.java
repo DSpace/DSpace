@@ -50,23 +50,45 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 		try {
 			DCInputSet inputConfig = inputReader.getInputsByFormName(config.getId());
 			for(DCInput input : inputConfig.getFields()) {
-				List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(), input.getFieldName());
-				for(MetadataValue md : mdv) {
-					MetadataValueRest dto = new MetadataValueRest();
-					dto.setAuthority(md.getAuthority());
-					dto.setConfidence(md.getConfidence());
-					dto.setLanguage(md.getLanguage());
-					dto.setPlace(md.getPlace());
-					dto.setValue(md.getValue());
-					
-					String[] metadataToCheck = Utils.tokenize(md.getMetadataField().toString());					
-					if(data.getMetadata().containsKey(Utils.standardize(metadataToCheck[0], metadataToCheck[1], metadataToCheck[2], "."))) {
-						data.getMetadata().get(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(), md.getMetadataField().getElement(), md.getMetadataField().getQualifier(), ".")).add(dto);
+				
+				List<String> fieldsName = new ArrayList<String>();
+				if(input.isQualdropValue()) {
+					for(Object qualifier : input.getPairs()) {
+						fieldsName.add(input.getFieldName()+"."+(String)qualifier);
 					}
-					else {
-						List<MetadataValueRest> listDto = new ArrayList<>();
-						listDto.add(dto);
-						data.getMetadata().put(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(), md.getMetadataField().getElement(), md.getMetadataField().getQualifier(), "."), listDto);
+				}
+				else {
+					fieldsName.add(input.getFieldName());
+				}
+				
+				
+				for (String fieldName : fieldsName) {
+					List<MetadataValue> mdv = itemService.getMetadataByMetadataString(obj.getItem(),
+							fieldName);
+					for (MetadataValue md : mdv) {
+						MetadataValueRest dto = new MetadataValueRest();
+						dto.setAuthority(md.getAuthority());
+						dto.setConfidence(md.getConfidence());
+						dto.setLanguage(md.getLanguage());
+						dto.setPlace(md.getPlace());
+						dto.setValue(md.getValue());
+
+						String[] metadataToCheck = Utils.tokenize(md.getMetadataField().toString());
+						if (data.getMetadata().containsKey(
+								Utils.standardize(metadataToCheck[0], metadataToCheck[1], metadataToCheck[2], "."))) {
+							data.getMetadata()
+									.get(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(),
+											md.getMetadataField().getElement(), md.getMetadataField().getQualifier(),
+											"."))
+									.add(dto);
+						} else {
+							List<MetadataValueRest> listDto = new ArrayList<>();
+							listDto.add(dto);
+							data.getMetadata()
+									.put(Utils.standardize(md.getMetadataField().getMetadataSchema().getName(),
+											md.getMetadataField().getElement(), md.getMetadataField().getQualifier(),
+											"."), listDto);
+						}
 					}
 				}
 			}
