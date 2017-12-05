@@ -46,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Context
 {
     private static final Logger log = Logger.getLogger(Context.class);
-    private static final AtomicBoolean databaseUpdated = new AtomicBoolean(false);
+    protected static final AtomicBoolean databaseUpdated = new AtomicBoolean(false);
 
     /** Current user - null means anonymous access */
     private EPerson currentUser;
