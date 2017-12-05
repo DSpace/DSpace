@@ -174,7 +174,7 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 //We expect the content type to be "application/hal+json;charset=UTF-8"
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                //Check that there are indeed 8 different subjects
+                //Check that there are indeed 3 different subjects
                 .andExpect(jsonPath("$.page.totalElements", is(3)))
                 //Check the embedded resources and that they're sorted alphabetically
                 //Check that the subject matches as expected
@@ -377,9 +377,6 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$._embedded.items[*].metadata[?(@.key=='dc.title')].value",
                         not(hasItem("Internal publication"))))
         ;
-
-        //** CLEANUP **
-//        GroupBuilder.cleaner().delete(internalGroup);
     }
 
     @Test
