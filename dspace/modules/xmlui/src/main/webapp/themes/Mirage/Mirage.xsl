@@ -406,6 +406,9 @@
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
 
+                        <!-- Neurology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aneurology%5C%7C%5C%7C%5C%7CNeurology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-neurology.png" alt="Neurology" /></a>
+
                         <!-- Limnology and Oceanography Letters -->
                         <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Alimnology%5C+and%5C+oceanography%5C+letters%5C%7C%5C%7C%5C%7CLimnology%5C+and%5C+Oceanography%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-LOL.png" alt="Limnology and Oceanography Letters" /></a>
 
@@ -414,9 +417,6 @@
 
                         <!-- Journal of the American Medical Informatics Association -->
 		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+the%5C+american%5C+medical%5C+informatics%5C+association%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+the%5C+American%5C+Medical%5C+Informatics%5C+Association"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAMIA.png" alt="Journal of the American Medical Informatics Association" /></a>
-
-                        <!-- Insect Systematics and Diversity -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ainsect%5C+systematics%5C+and%5C+diversity%5C%7C%5C%7C%5C%7CInsect%5C+Systematics%5C+and%5C+Diversity"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ISDIVE.png" alt="Insect Systematics and Diversity" /></a>
 
                     </div>
                 </div>
