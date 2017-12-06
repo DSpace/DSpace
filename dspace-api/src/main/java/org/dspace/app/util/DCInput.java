@@ -10,10 +10,14 @@ package org.dspace.app.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class representing a line in an input form.
@@ -22,6 +26,9 @@ import org.dspace.core.Utils;
  */
 public class DCInput
 {
+	
+	private static final Logger log = LoggerFactory.getLogger(DCInput.class);
+	
     /** the DC element name */
     private String dcElement = null;
 
@@ -470,5 +477,29 @@ public class DCInput
 		}
 		return false;
 	}
-	
+
+    public boolean validate(String value)
+    {
+        if (StringUtils.isNotBlank(value))
+        {
+            try
+            {
+                if (StringUtils.isNotBlank(regex))
+                {
+                    Pattern pattern = Pattern.compile(regex);
+                    if (!pattern.matcher(value).matches())
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (PatternSyntaxException ex)
+            {
+                log.error("Regex validation failed!", ex.getMessage());
+            }
+
+        }
+
+        return true;
+    }
 }

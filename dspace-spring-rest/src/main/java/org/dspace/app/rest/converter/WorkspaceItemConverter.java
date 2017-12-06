@@ -8,10 +8,11 @@
 package org.dspace.app.rest.converter;
 
 import java.sql.SQLException;
+import java.util.List;
 
-import javax.servlet.ServletException;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.model.ErrorRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
 import org.dspace.app.rest.model.WorkspaceItemRest;
@@ -23,7 +24,6 @@ import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.eperson.EPerson;
-import org.dspace.services.factory.DSpaceServicesFactory;
 import org.dspace.submit.AbstractProcessingStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -110,6 +110,9 @@ public class WorkspaceItemConverter
 						// load the JSPStep interface for this step
 						AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
 								.newInstance();
+						for(ErrorRest error : stepProcessing.validate(submissionService, obj, stepConfig)) {
+							addError(witem.getErrors(),error);
+						}
 						witem.getSections().put(sections.getId(), stepProcessing.getData(submissionService, obj, stepConfig));
 					} else {
 						throw new Exception("The submission step class specified by '"
@@ -132,4 +135,22 @@ public class WorkspaceItemConverter
 		return null;
 	}
 
+	
+	public void addError(List<ErrorRest> errors, ErrorRest toAdd) {
+		
+		boolean found = false;
+		String i18nKey = toAdd.getMessage();
+		if (StringUtils.isNotBlank(i18nKey)) {
+			for (ErrorRest error : errors) {
+				if (i18nKey.equals(error.getMessage())) {
+					error.getPaths().addAll(toAdd.getPaths());
+					found = true;
+					break;
+				}
+			}
+		}
+		if(!found) {			
+			errors.add(toAdd);
+		}
+	}
 }
