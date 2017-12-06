@@ -110,6 +110,15 @@
     </init-param>
   </filter>
 
+  <!--
+       Declare a filter to do content negotiation in combination for our
+       Linked Data support.
+    -->
+  <filter>
+      <filter-name>rdf-content-negotiation</filter-name>
+      <filter-class>org.dspace.rdf.negotiation.NegotiationFilter</filter-class>
+  </filter>
+
 
   <!-- Filter mappings ================================================ -->
 
@@ -135,6 +144,11 @@
   <filter-mapping>
     <filter-name>SetCharacterEncoding</filter-name>
     <servlet-name>spring</servlet-name>
+  </filter-mapping>
+
+  <filter-mapping>
+      <filter-name>rdf-content-negotiation</filter-name>
+      <url-pattern>/handle/*</url-pattern>
   </filter-mapping>
   
   <!--

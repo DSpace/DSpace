@@ -9,7 +9,7 @@ package org.dspace.content.crosswalk;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -174,7 +174,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
         Item item = (Item) dso;
         String handle = item.getHandle();
         List<Element> metas = new ArrayList<Element>();
-        DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 
         // Add in schema URLs e.g. <link rel="schema.DC" href="...." />
         Iterator<String> schemaIterator = schemaURLs.keySet().iterator();
@@ -190,7 +190,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
 
         for (int i = 0; i < values.length; i++)
         {
-            DCValue v = values[i];
+            Metadatum v = values[i];
 
             // Work out the key for the Maps that will tell us which metadata
             // name + scheme to use

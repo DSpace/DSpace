@@ -7,13 +7,10 @@
  */
 package org.dspace.authenticate;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,6 +31,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 
+import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
+import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.authenticate.AuthenticationManager;
@@ -179,7 +180,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		}
 
 		// Initialize the additional EPerson metadata.
-		initialize();
+        initialize(context);
 
 		// Log all headers received if debugging is turned on. This is enormously
 		// helpful when debugging shibboleth related problems.
@@ -893,8 +894,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	 * the field will be automatically created.
 	 * 
 	 * It is safe to call this methods multiple times.
+     * @param context
 	 */
-	private synchronized static void initialize() throws SQLException {
+    private synchronized static void initialize(Context context) throws SQLException {
 
 		if (metadataHeaderMap != null)
 			return;
@@ -930,10 +932,10 @@ public class ShibAuthentication implements AuthenticationMethod
 			String header = metadataParts[0].trim();
 			String name = metadataParts[1].trim().toLowerCase();
 
-			boolean valid = checkIfEpersonMetadataFieldExists(name);
+            boolean valid = checkIfEpersonMetadataFieldExists(name,context);
 
 			if ( ! valid && autoCreate) {
-				valid = autoCreateEpersonMetadataField(name);
+                valid = autoCreateEpersonMetadataField(name,context);
 			}
 
 			if (valid) {
@@ -952,18 +954,13 @@ public class ShibAuthentication implements AuthenticationMethod
 	}
 
 	/**
-	 * Check the EPerson table definition to see if the metadata field name is supported. It
-	 * checks for three things 1) that the field exists and 2) that the field is of the correct
-	 * type, varchar, and 3) that the field's size is sufficient.
+     * Check if a MetadataField for an eperson is available.
 	 * 
-	 * If either of these checks fail then false is returned.
-	 *
-	 * If all these checks pass then true is returned, otherwise false.
-	 *
 	 * @param metadataName The name of the metadata field.
+     * @param context
 	 * @return True if a valid metadata field, otherwise false.
 	 */
-	private static synchronized boolean checkIfEpersonMetadataFieldExists(String metadataName) throws SQLException {
+    private static synchronized boolean checkIfEpersonMetadataFieldExists(String metadataName, Context context) throws SQLException {
 
 		if (metadataName == null)
 			return false;
@@ -972,47 +969,23 @@ public class ShibAuthentication implements AuthenticationMethod
 			// The phone is a predefined field
 			return true;
 
-		// Get a list of all the columns on the eperson table.
-		Connection dbConnection = null;
-		try {
-			dbConnection = DatabaseManager.getConnection();
-			DatabaseMetaData dbMetadata = dbConnection.getMetaData();
-			String dbCatalog = dbConnection.getCatalog();
-			ResultSet rs = dbMetadata.getColumns(dbCatalog,null,"eperson","%");
+        MetadataSchema schemaObj = MetadataSchema.find(context, "eperson");
 
-			// Loop through all the columns looking for our metadata field and check
-			// it's definition.
-			boolean foundColumn = false;
-			boolean columnValid = false;
-			while (rs.next()) {
-				String columnName = rs.getString("COLUMN_NAME");
-				String columnType = rs.getString("TYPE_NAME");
-				int size = rs.getInt("COLUMN_SIZE");
+        if (schemaObj == null)
+        {
+            log.error("Schema eperson is not registered and does not exist.");
+        } else
+        {
+            MetadataField eperson = MetadataField.findByElement(context, schemaObj.getSchemaID(), metadataName, null);
 
-				if (metadataName.equalsIgnoreCase(columnName)) {
-					foundColumn = true;
-
-					if ("varchar".equals(columnType) && size >= METADATA_MAX_SIZE)
-						columnValid = true;
-
-					break; // skip out on loop after we found our column.
+            if ( eperson!=null) {
+                return true;
 				}
+            else {
+                log.error("Unable to find eperson named: '" + metadataName + "'");
+            }
+        }
 
-			} // while rs.next()
-			rs.close();
-
-			if ( foundColumn && columnValid)
-				// The finally statement below will close the connection.
-				return true;
-			else if (!foundColumn)
-				log.error("Unable to find eperson column for additional metadata named: '"+metadataName+"'");
-			else if (!columnValid)
-				log.error("The eperson column for additional metadata, '"+metadataName+"', is not defined as a varchar with at least a length of "+METADATA_MAX_SIZE);
-
-		} finally {
-			if (dbConnection != null)
-				dbConnection.close();
-		}
 		return false;
 	}
 
@@ -1020,13 +993,12 @@ public class ShibAuthentication implements AuthenticationMethod
 	private static final String COLUMN_NAME_REGEX = "^[_A-Za-z0-9]+$";
 	
 	/**
-	 * Automattically create a new column in the EPerson table to support the additional
-	 * metadata field. All additional fields are created with type varchar( METADATA_MAX_SIZE )
+     * Automattically create a new metadataField for an eperson
 	 * 
 	 * @param metadataName The name of the new metadata field.
 	 * @return True if successful, otherwise false.
 	 */
-	private static synchronized boolean autoCreateEpersonMetadataField(String metadataName) throws SQLException {
+    private static synchronized boolean autoCreateEpersonMetadataField(String metadataName, Context context) throws SQLException {
 
 		if (metadataName == null)
 			return false;
@@ -1038,29 +1010,33 @@ public class ShibAuthentication implements AuthenticationMethod
 		if ( ! metadataName.matches(COLUMN_NAME_REGEX))
 			return false;
 
-		// Create a new column for the metadata field. Note the metadataName variable is embedded because we can't use 
-		// paramaterization for column names. However the string comes from the dspace.cfg and at the top of this method
-		// we run a regex on it to validate it.
-		String sql = "ALTER TABLE eperson ADD COLUMN "+metadataName+" varchar("+METADATA_MAX_SIZE+")";
 
-		Connection dbConnection = null;
+        MetadataSchema schemaObj = MetadataSchema.find(context, "eperson");
+
+        if (schemaObj == null)
+        {
+            log.error("Schema eperson is not registered and does not exist.");
+        } else {
+            MetadataField metadataField = new MetadataField(schemaObj, metadataName, null, null);
 		try {
-			dbConnection = DatabaseManager.getConnection();
-			Statement alterStatement = dbConnection.createStatement();
-			alterStatement.execute(sql);
-			alterStatement.close();
-			dbConnection.commit();
+                metadataField.create(context);
+            } catch (IOException e) {
+                log.error("Unable to auto-create the eperson MetadataField with MetadataName " + metadataName ,e);
+                return false;
+            } catch (AuthorizeException e) {
+                log.error("Unauthorized to auto-create the eperson MetadataField with MetadataName " + metadataName + " MetadataField", e);
+                return false;
+            } catch (NonUniqueMetadataException e) {
+                log.error("The eperson MetadataField with MetadataName " + metadataName +" already exists",e);
+                return false;
+            }
 
-			log.info("Auto created the eperson column for additional metadata: '"+metadataName+"'");
+
+            log.info("Auto created the eperson metadataField: '" + metadataName + "'");
 			return true;
 
-		} catch (SQLException sqle) {
-			log.error("Unable to auto-create the eperson column for additional metadata '"+metadataName+"', because of error: ",sqle);
+        }
 			return false;
-		} finally {
-			if (dbConnection != null)
-				dbConnection.close();
-		}
 	}
 
 
@@ -1094,6 +1070,22 @@ public class ShibAuthentication implements AuthenticationMethod
 			value = request.getHeader(name.toLowerCase());
 		if (StringUtils.isEmpty(value))
 			value = request.getHeader(name.toUpperCase());
+                
+                boolean reconvertAttributes = 
+                        ConfigurationManager.getBooleanProperty(
+                            "authentication-shibboleth",
+                            "reconvert.attributes",
+                            false);
+                
+                if (!StringUtils.isEmpty(value) && reconvertAttributes)
+                {
+                    try {
+                        value = new String(value.getBytes("ISO-8859-1"), "UTF-8");
+                    } catch (UnsupportedEncodingException ex) {
+                        log.warn("Failed to reconvert shibboleth attribute ("
+                                + name + ").", ex);
+                    }
+                }
 		
 		return value;
 	}

@@ -51,7 +51,12 @@ public class SHERPASubmitService
         }
     }
 
-    private Set<String> getISSNs(Context context, Item item)
+    public SHERPAResponse searchRelatedJournalsByISSN(String issn)
+    {
+        return sherpaService.searchByJournalISSN(issn);
+    }
+
+    public Set<String> getISSNs(Context context, Item item)
     {
         Set<String> issns = new LinkedHashSet<String>();
         if (configuration.getIssnItemExtractors() == null)

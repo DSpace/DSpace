@@ -34,7 +34,7 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
 	
 	public SeDiCI2003AuthorityProvider() {
 		String dspaceDir = ConfigurationManager.getProperty("dspace.dir");
-		SeDiCI2003Manager.prepare(dspaceDir+"/config/sedici2003.properties");
+		SeDiCI2003Manager.prepare(dspaceDir+"/config/modules/sedici2003.properties");
 	}
 	
     /**

@@ -8,7 +8,7 @@
 
   <map:components> 
     <map:selectors>
-      <map:selector name="AuthenticatedSelector" src="ar.edu.unlp.sedici.aspect.extraSubmission.AuthenticatedSelector"/>
+      <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
     </map:selectors>
     
 	<map:transformers>

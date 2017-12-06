@@ -7,7 +7,7 @@
  */
 package org.dspace.sword2;
 
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -43,14 +43,14 @@ public class AtomStatementDisseminator extends GenericStatementDisseminator impl
 			return null;
 		}
 
-		DCValue[] dcvs = item.getMetadata(field);
+		Metadatum[] dcvs = item.getMetadataByMetadataString(field);
 		if (dcvs == null || dcvs.length == 0)
 		{
 			return null;
 		}
 
 		StringBuilder md = new StringBuilder();
-		for (DCValue dcv : dcvs)
+		for (Metadatum dcv : dcvs)
 		{
 			if (md.length() > 0)
 			{

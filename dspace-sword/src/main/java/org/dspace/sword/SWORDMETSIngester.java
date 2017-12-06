@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.packager.PackageIngester;
@@ -179,7 +179,7 @@ public class SWORDMETSIngester implements SWORDIngester
 			throw new DSpaceSWORDException("No configuration, or configuration is invalid for: sword.updated.field");
 		}
 		
-		DCValue dc = this.configToDC(field, null);
+		Metadatum dc = this.configToDC(field, null);
 		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
 		DCDate date = new DCDate(new Date());
 		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, date.toString());
@@ -212,7 +212,7 @@ public class SWORDMETSIngester implements SWORDIngester
 			throw new DSpaceSWORDException("No configuration, or configuration is invalid for: sword.slug.field");
 		}
 		
-		DCValue dc = this.configToDC(field, null);
+		Metadatum dc = this.configToDC(field, null);
 		item.clearMetadata(dc.schema, dc.element, dc.qualifier, Item.ANY);
 		item.addMetadata(dc.schema, dc.element, dc.qualifier, null, slugVal);
 
@@ -221,19 +221,19 @@ public class SWORDMETSIngester implements SWORDIngester
 	
 	/**
 	 * utility method to turn given metadata fields of the form
-	 * schema.element.qualifier into DCValue objects which can be 
-	 * used to access metadata in items.
+ schema.element.qualifier into Metadatum objects which can be 
+ used to access metadata in items.
 	 * 
 	 * The def parameter should be null, * or "" depending on how
-	 * you intend to use the DCValue object
+ you intend to use the Metadatum object
 	 * 
 	 * @param config
 	 * @param def
 	 * @return
 	 */
-	private DCValue configToDC(String config, String def)
+	private Metadatum configToDC(String config, String def)
 	{
-		DCValue dcv = new DCValue();
+		Metadatum dcv = new Metadatum();
 		dcv.schema = def;
 		dcv.element= def;
 		dcv.qualifier = def;

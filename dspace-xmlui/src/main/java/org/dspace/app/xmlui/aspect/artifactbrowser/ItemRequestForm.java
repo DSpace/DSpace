@@ -11,30 +11,33 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
+import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Radio;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.app.xmlui.wing.element.TextArea;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Display to the user a simple form letting the user to request a protected item.
@@ -46,6 +49,8 @@ import org.xml.sax.SAXException;
  */
 public class ItemRequestForm extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+    private static Logger log = Logger.getLogger(ItemRequestForm.class);
+
     /** Language Strings */
     private static final Message T_title =
         message("xmlui.ArtifactBrowser.ItemRequestForm.title");
@@ -61,6 +66,12 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
     
     private static final Message T_para1 =
         message("xmlui.ArtifactBrowser.ItemRequestForm.para1");
+
+    private static final Message T_login_para =
+            message("xmlui.ArtifactBrowser.ItemRequestForm.login_para");
+
+    private static final Message T_login =
+            message("xmlui.ArtifactBrowser.ItemRequestForm.login");
     
     private static final Message T_requesterEmail =
         message("xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail");
@@ -145,8 +156,43 @@ public class ItemRequestForm extends AbstractDSpaceTransformer implements Cachea
 				request.getRequestURI(), Division.METHOD_POST, "primary");
 		itemRequest.setHead(T_head);
 
-		itemRequest.addPara(T_para1);
-		DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+        // add a login link if user !loggedIn
+        if (context.getCurrentUser() == null)
+        {
+            Para loginPara = itemRequest.addPara();
+            loginPara.addContent(T_login_para);
+            itemRequest.addPara().addXref(contextPath + "/login", T_login);
+
+            // Interrupt request if the user is not authenticated, so they may come back to
+            // the restricted resource afterwards.
+            String header = parameters.getParameter("header", null);
+            String message = parameters.getParameter("message", null);
+            String characters = parameters.getParameter("characters", null);
+
+            // Interrupt this request
+            AuthenticationUtil.interruptRequest(objectModel, header, message, characters);
+        } else {
+            //If user has read permissions to bitstream, redirect them to bitstream, instead of restrict page
+            try {
+                int bitstreamID = parameters.getParameterAsInteger("bitstreamId");
+                Bitstream bitstream = Bitstream.find(context, bitstreamID);
+
+                if(AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ)) {
+                    String redirectURL = request.getContextPath() + "/bitstream/handle/" + item.getHandle() + "/"
+                            + bitstream.getName() + "?sequence=" + bitstream.getSequenceID();
+
+                    HttpServletResponse httpResponse = (HttpServletResponse)
+                            objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+                    httpResponse.sendRedirect(redirectURL);
+                }
+            } catch (ParameterException e) {
+                log.error(e.getMessage());
+            }
+        }
+
+        itemRequest.addPara(T_para1);
+
+		Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
 		if (titleDC != null && titleDC.length > 0)
 			itemRequest.addPara(titleDC[0].value);
 

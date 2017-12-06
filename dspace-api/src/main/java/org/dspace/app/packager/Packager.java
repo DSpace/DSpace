@@ -512,12 +512,12 @@ public class Packager
             System.out.println("This may take a while, please check your logs for ongoing status while we process each package.");
 
             //ingest first package & recursively ingest anything else that package references (child packages, etc)
-            List<DSpaceObject> dsoResults = sip.ingestAll(context, parent, pkgFile, pkgParams, null);
+            List<String> hdlResults = sip.ingestAll(context, parent, pkgFile, pkgParams, null);
 
-            if(dsoResults!=null)
+            if(hdlResults!=null)
             {
                 //Report total objects created
-                System.out.println("\nCREATED a total of " + dsoResults.size() + " DSpace Objects.");
+                System.out.println("\nCREATED a total of " + hdlResults.size() + " DSpace Objects.");
 
                 String choiceString = null;
                 //Ask if user wants full list printed to command line, as this may be rather long.
@@ -538,17 +538,22 @@ public class Packager
                 if (choiceString.equalsIgnoreCase("y"))
                 {
                     System.out.println("\n\n");
-                    for(DSpaceObject result : dsoResults)
+                    for(String result : hdlResults)
                     {
-                        if(pkgParams.restoreModeEnabled())
+                        DSpaceObject dso = HandleManager.resolveToObject(context, result);
+                        
+                        if(dso!=null)
                         {
-                            System.out.println("RESTORED DSpace " + Constants.typeText[result.getType()] +
-                                    " [ hdl=" + result.getHandle() + ", dbID=" + result.getID() + " ] ");
-                        }
-                        else
-                        {
-                            System.out.println("CREATED new DSpace " + Constants.typeText[result.getType()] +
-                                    " [ hdl=" + result.getHandle() + ", dbID=" + result.getID() + " ] ");
+                            if(pkgParams.restoreModeEnabled())
+                            {
+                                System.out.println("RESTORED DSpace " + Constants.typeText[dso.getType()] +
+                                        " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
+                            }
+                            else
+                            {
+                                System.out.println("CREATED new DSpace " + Constants.typeText[dso.getType()] +
+                                        " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
+                            }
                         }
                     }
                 }
@@ -724,12 +729,12 @@ public class Packager
         if(pkgParams.recursiveModeEnabled())
         {
             //ingest first object using package & recursively replace anything else that package references (child objects, etc)
-            List<DSpaceObject> dsoResults = sip.replaceAll(context, objToReplace, pkgFile, pkgParams);
+            List<String> hdlResults = sip.replaceAll(context, objToReplace, pkgFile, pkgParams);
 
-            if(dsoResults!=null)
+            if(hdlResults!=null)
             {
                 //Report total objects replaced
-                System.out.println("\nREPLACED a total of " + dsoResults.size() + " DSpace Objects.");
+                System.out.println("\nREPLACED a total of " + hdlResults.size() + " DSpace Objects.");
 
                 String choiceString = null;
                 //Ask if user wants full list printed to command line, as this may be rather long.
@@ -750,10 +755,15 @@ public class Packager
                 if (choiceString.equalsIgnoreCase("y"))
                 {
                     System.out.println("\n\n");
-                    for(DSpaceObject result : dsoResults)
+                    for(String result : hdlResults)
                     {
-                        System.out.println("REPLACED DSpace " + Constants.typeText[result.getType()] +
-                                    " [ hdl=" + result.getHandle() + " ] ");
+                        DSpaceObject dso = HandleManager.resolveToObject(context, result);
+                        
+                        if(dso!=null)
+                        {
+                            System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
+                                        " [ hdl=" + dso.getHandle() + " ] ");
+                        }
                     }
                 }
 

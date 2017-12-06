@@ -31,7 +31,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.content.Item;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 
 
 /**
@@ -86,7 +86,7 @@ public class SuggestServlet extends DSpaceServlet
             Item item = (Item) HandleManager.resolveToObject(context, handle);
             if (item != null)
             {
-                DCValue[] titleDC = item.getDC("title", null, Item.ANY);
+                Metadatum[] titleDC = item.getDC("title", null, Item.ANY);
                 if (titleDC != null && titleDC.length > 0)
                 {
                     title = titleDC[0].value;

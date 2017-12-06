@@ -62,7 +62,11 @@ public class MailReporter {
 	 * @throws MessagingException 
 	 */
 	private static void sendMail(Context context, String recipient, String mailTemplateName, List<String> args) throws MessagingException{
-	
+		if (ConfigurationManager.getBooleanProperty("mail.template."+mailTemplateName+".disabled", false))
+		{
+			log.info("Se generó un correo basado en el template "+mailTemplateName+" pero no se envio porque estos correos están deshabilitados");
+			return;
+		}
 		Email email = getEmailTemplate(context, mailTemplateName);
 		
 		email.addRecipient(recipient);

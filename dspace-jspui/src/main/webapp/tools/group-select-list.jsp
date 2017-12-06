@@ -75,7 +75,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css"/>
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
-
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap.min.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/bootstrap-theme.min.css" type="text/css" />
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/static/css/bootstrap/dspace-theme.css" type="text/css" />
+        <script type='text/javascript' src='<%= request.getContextPath() %>/static/js/bootstrap/bootstrap.min.js'></script>
+		
 <script type="text/javascript">
 <!-- Begin
 
@@ -116,35 +120,27 @@ function clearGroups()
 <%  } %>
     
 <%-- Controls for jumping around list--%>
-	<table width="99%">
-		<tr>
-			<%-- <td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0">First</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td>
-			--%>
-		
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.group-select-list.jump.first"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.group-select-list.jump.five-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.group-select-list.jump.one-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.group-select-list.jump.one-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.group-select-list.jump.five-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.group-select-list.jump.last"/></a></strong></small></td>
-		</tr>
-	</table>
+<div class="span12" style="text-align:center">
+	<ul class="pagination">			
+			<li><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.group-select-list.jump.first"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.group-select-list.jump.five-back"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.group-select-list.jump.one-back"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.group-select-list.jump.one-forward"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.group-select-list.jump.five-forward"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.group-select-list.jump.last"/></a></li>
+	</ul>
+</div>
 <br/>
 
 	<form method="get" action=""> <%-- Will never actually be posted, it's just so buttons will appear --%>
 
-    <table class="miscTable" align="center" summary="Group list">
+    <table class="table table-striped" align="center" summary="Group list">
         <tr>
             <th id="t1" class="oddRowOddCol">&nbsp;</th>
 			<th id="t2" class="oddRowEvenCol"><%
                 if (sortBy == Group.ID)
                 {
-                    %><strong><fmt:message key="jsp.tools.group-select-list.th.id.sortedby" /></strong><%
+                    %><fmt:message key="jsp.tools.group-select-list.th.id"/><span class="glyphicon glyphicon-arrow-down"><%
                 }
                 else
                 {
@@ -154,7 +150,7 @@ function clearGroups()
             <th id="t3" class="oddRowOddCol"><%
                 if (sortBy == Group.NAME)
                 {
-                    %><strong><fmt:message key="jsp.tools.group-select-list.th.name.sortedby" /></strong><%
+                    %><fmt:message key="jsp.tools.group-select-list.th.name" /><span class="glyphicon glyphicon-arrow-down"><%
                 }
                 else
                 {
@@ -180,12 +176,12 @@ function clearGroups()
         String fullname = g.getName().replace('\'', ' ');
 %>
         <tr>
-			<td headers="t1" class="<%= row %>RowOddCol">
-				<input type="button" value="<%
+			<td headers="t1" class="">
+				<input type="button" class="btn btn-success" value="<%
 	if (multiple) { %><fmt:message key="jsp.tools.general.add"/><% }
 	else {          %><fmt:message key="jsp.tools.general.select"/><% } %>" onclick="javascript:<%= clearList %>addGroup('<%= g.getID() %>', '<%= Utils.addEntities(fullname) %>');<%= closeWindow %>"/></td>
-			<td headers="t2" class="<%= row %>RowEvenCol"><%= g.getID() %></td>
-			<td headers="t3" class="<%= row %>RowOddCol"> <%= g.getName()%></td>
+			<td headers="t2" class=""><%= g.getID() %></td>
+			<td headers="t3" class=""> <%= g.getName()%></td>
         </tr>
 <%
         row = (row.equals("odd") ? "even" : "odd");
@@ -196,27 +192,19 @@ function clearGroups()
 <br/>
 
 <%-- Controls for jumping around list--%>
-	<table width="99%">
-		<tr>
-			<%-- <td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0">First</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>">&lt; 5 Pages</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>">&lt; 1 Page</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>">1 Page &gt;</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>">5 Pages &gt;</A></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>">Last</A></strong></small></td>
-			--%>
-		
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.group-select-list.jump.first"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.group-select-list.jump.five-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.group-select-list.jump.one-back"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.group-select-list.jump.one-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.group-select-list.jump.five-forward"/></a></strong></small></td>
-			<td width="17%" align="center"><small><strong><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.group-select-list.jump.last"/></a></strong></small></td>
-		</tr>
-	</table>
+<div class="span12" style="text-align:center">
+	<ul class="pagination">	
+			<li><a href="<%= jumpLink %>0"><fmt:message key="jsp.tools.group-select-list.jump.first"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpFiveBack %>"><fmt:message key="jsp.tools.group-select-list.jump.five-back"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpOneBack %>"><fmt:message key="jsp.tools.group-select-list.jump.one-back"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpOneForward %>"><fmt:message key="jsp.tools.group-select-list.jump.one-forward"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpFiveForward %>"><fmt:message key="jsp.tools.group-select-list.jump.five-forward"/></a></li>
+			<li><a href="<%= jumpLink %><%= jumpEnd %>"><fmt:message key="jsp.tools.group-select-list.jump.last"/></a></li>
+	</ul>
+</div>
 
 	<%-- <p align="center"><input type="button" value="Close" onClick="window.close();"></p> --%>
-	<p align="center"><input type="button" value="<fmt:message key="jsp.tools.group-select-list.close.button"/>" onclick="window.close();"/></p>
+	<p align="center"><input type="button" class="btn btn-danger" value="<fmt:message key="jsp.tools.group-select-list.close.button"/>" onclick="window.close();"/></p>
 
 	</form>
 	

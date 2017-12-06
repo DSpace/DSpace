@@ -891,7 +891,7 @@
             <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-table</xsl:with-param>
             </xsl:call-template>
-            <!-- rows and cols atributes are not allowed in strict
+            <!-- rows and cols attributes are not allowed in strict
             <xsl:attribute name="rows"><xsl:value-of select="@rows"/></xsl:attribute>
             <xsl:attribute name="cols"><xsl:value-of select="@cols"/></xsl:attribute>
 
@@ -1740,6 +1740,10 @@
                 <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
             </xsl:if>
 
+            <xsl:if test="@onclick">
+                <xsl:attribute name="onclick"><xsl:value-of select="@onclick"/></xsl:attribute>
+            </xsl:if>
+
             <xsl:apply-templates />
         </a>
     </xsl:template>
@@ -2568,7 +2572,7 @@
     
     
     
-    <!-- Help elementns are turning into tooltips. There might be a better way to do this -->
+    <!-- Help elements are turning into tooltips. There might be a better way to do this -->
     <xsl:template match="dri:help">
         <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
         <xsl:if test="i18n:text">

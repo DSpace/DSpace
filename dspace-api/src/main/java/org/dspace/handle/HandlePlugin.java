@@ -228,7 +228,7 @@ public class HandlePlugin implements HandleStorage
 
             if (url == null)
             {
-                throw new HandleException(HandleException.HANDLE_DOES_NOT_EXIST);
+                return null;
             }
 
             HandleValue value = new HandleValue();

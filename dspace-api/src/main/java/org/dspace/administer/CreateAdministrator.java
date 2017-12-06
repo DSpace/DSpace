@@ -7,8 +7,8 @@
  */
 package org.dspace.administer;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.Console;
+import java.util.Arrays;
 import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
@@ -103,8 +103,7 @@ public final class CreateAdministrator
     private void negotiateAdministratorDetails()
     	throws Exception
     {
-    	// For easier reading of typing
-    	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        Console console = System.console();
     	
     	System.out.println("Creating an initial administrator account");
     	
@@ -113,8 +112,8 @@ public final class CreateAdministrator
     	String email = null;
     	String firstName = null;
     	String lastName = null;
-    	String password1 = null;
-    	String password2 = null;
+        char[] password1 = null;
+        char[] password2 = null;
     	String language = I18nUtil.DEFAULTLOCALE.getLanguage();
     	
     	while (!dataOK)
@@ -122,7 +121,7 @@ public final class CreateAdministrator
     		System.out.print("E-mail address: ");
     		System.out.flush();
     		
-    		email = input.readLine();
+    		email = console.readLine();
             if (!StringUtils.isBlank(email))
             {
                 email = email.trim();
@@ -136,7 +135,7 @@ public final class CreateAdministrator
     		System.out.print("First name: ");
     		System.out.flush();
     		
-    		firstName = input.readLine();
+    		firstName = console.readLine();
 
             if (firstName != null)
             {
@@ -146,7 +145,7 @@ public final class CreateAdministrator
     		System.out.print("Last name: ");
     		System.out.flush();
     		
-    		lastName = input.readLine();
+    		lastName = console.readLine();
 
             if (lastName != null)
             {
@@ -159,7 +158,7 @@ public final class CreateAdministrator
                 System.out.print("Language: ");
                 System.out.flush();
             
-    		    language = input.readLine();
+    		    language = console.readLine();
 
                 if (language != null)
                 {
@@ -168,34 +167,25 @@ public final class CreateAdministrator
                 }
             }
             
-    		System.out.println("WARNING: Password will appear on-screen.");
+    		System.out.println("Password will not display on screen.");
     		System.out.print("Password: ");
     		System.out.flush();
-    		
-    		password1 = input.readLine();
 
-            if (password1 != null)
-            {
-                password1 = password1.trim();
-            }
+    		password1 = console.readPassword();
     		
     		System.out.print("Again to confirm: ");
     		System.out.flush();
     		
-    		password2 = input.readLine();
+    		password2 = console.readPassword();
 
-            if (password2 != null)
-            {
-                password2 = password2.trim();
-            }
-    		
-    		if (!StringUtils.isEmpty(password1) && StringUtils.equals(password1, password2))
+            //TODO real password validation
+            if (password1.length > 1 && Arrays.equals(password1, password2))
     		{
     			// password OK
     			System.out.print("Is the above data correct? (y or n): ");
     			System.out.flush();
     			
-    			String s = input.readLine();
+    			String s = console.readLine();
 
                 if (s != null)
                 {
@@ -213,7 +203,11 @@ public final class CreateAdministrator
     	}
     	
     	// if we make it to here, we are ready to create an administrator
-    	createAdministrator(email, firstName, lastName, language, password1);
+    	createAdministrator(email, firstName, lastName, language, String.valueOf(password1));
+
+        //Cleaning arrays that held password
+        Arrays.fill(password1, ' ');
+        Arrays.fill(password2, ' ');
     }
     
     /**
@@ -223,7 +217,8 @@ public final class CreateAdministrator
      * @param email	the email for the user
      * @param first	user's first name
      * @param last	user's last name
-     * @param ps	desired password
+     * @param language preferred language
+     * @param pw	desired password
      * 
      * @throws Exception
      */

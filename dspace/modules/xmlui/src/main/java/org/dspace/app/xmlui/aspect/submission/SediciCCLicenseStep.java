@@ -19,28 +19,13 @@ import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
- * This is an optional page of the item submission processes. The Creative 
- * Commons license may be added to an item in addition to the standard distribution 
- * license. This step will allow the user to go off to the creative commons website 
- * select a license and then when returned view what license was added to the item.
- * <P>
- * This class is called by org.dspace.app.xmlui.submission.step.LicenseStep
- * when the Creative Commons license is enabled
- * <P>
- * The form is divided into three major divisions: 1) A global div surrounds the 
- * whole page, 2) a specific interactive div displays the button that goes off to the 
- * creative commons website to select a license, and 3) a local division that displays 
- * the selected license and standard action bar.
- * 
- * @author Scott Phillips
- * @author Tim Donohue (updated for Configurable Submission)
- * @author Wendy Bossons (updated for DSpace 1.8)
+ * basado en org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep
  */
 public class SediciCCLicenseStep extends AbstractSubmissionStep
 {
@@ -87,7 +72,7 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 	    Item item = submission.getItem();
 	    Collection collection=submission.getCollection();
 	    String ccUri=ConfigurationManager.getProperty("cc.license.uri");
-	    DCValue[] carga=item.getMetadata(ccUri);
+	    Metadatum[] carga=item.getMetadataByMetadataString(ccUri);
 	    String dato;
 	    String commercial="y";
 	    String derivatives="y";

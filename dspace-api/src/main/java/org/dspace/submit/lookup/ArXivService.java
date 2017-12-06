@@ -9,10 +9,8 @@ package org.dspace.submit.lookup;
 
 import gr.ekt.bte.core.Record;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,14 +18,18 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.HttpParams;
 import org.dspace.app.util.XMLUtils;
-import org.dspace.core.ConfigurationManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -41,6 +43,11 @@ public class ArXivService
 {
     private int timeout = 1000;
 
+    /**
+     * How long to wait for a connection to be established.
+     *
+     * @param timeout milliseconds
+     */
     public void setTimeout(int timeout)
     {
         this.timeout = timeout;
@@ -79,21 +86,28 @@ public class ArXivService
     		throws IOException, HttpException
     		{
     	List<Record> results = new ArrayList<Record>();
-    	GetMethod method = null;
+    	HttpGet method = null;
     	try
     	{
-    		HttpClient client = new HttpClient();
-    		client.setTimeout(timeout);
-    		method = new GetMethod("http://export.arxiv.org/api/query");
-    		NameValuePair id = new NameValuePair("id_list", arxivid);
-    		NameValuePair queryParam = new NameValuePair("search_query",
-    				query);
-    		NameValuePair count = new NameValuePair("max_results",
-    				String.valueOf(max_result));
-    		method.setQueryString(new NameValuePair[] { id, queryParam,
-    				count });
-    		// Execute the method.
-    		int statusCode = client.executeMethod(method);
+    		HttpClient client = new DefaultHttpClient();
+            HttpParams params = client.getParams();
+            params.setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
+
+            try {
+                URIBuilder uriBuilder = new URIBuilder("http://export.arxiv.org/api/query");
+                uriBuilder.addParameter("id_list", arxivid);
+                uriBuilder.addParameter("search_query", query);
+                uriBuilder.addParameter("max_results", String.valueOf(max_result));
+                method = new HttpGet(uriBuilder.build());
+            } catch (URISyntaxException ex)
+            {
+                throw new HttpException(ex.getMessage());
+            }
+
+            // Execute the method.
+    		HttpResponse response = client.execute(method);
+            StatusLine responseStatus = response.getStatusLine();
+            int statusCode = responseStatus.getStatusCode();
 
     		if (statusCode != HttpStatus.SC_OK)
     		{
@@ -101,7 +115,7 @@ public class ArXivService
     				throw new RuntimeException("arXiv query is not valid");
     			else
     				throw new RuntimeException("Http call failed: "
-    						+ method.getStatusLine());
+    						+ responseStatus);
     		}
 
     		try
@@ -113,7 +127,7 @@ public class ArXivService
     			factory.setIgnoringElementContentWhitespace(true);
 
     			DocumentBuilder db = factory.newDocumentBuilder();
-    			Document inDoc = db.parse(method.getResponseBodyAsStream());
+    			Document inDoc = db.parse(response.getEntity().getContent());
 
     			Element xmlRoot = inDoc.getDocumentElement();
     			List<Element> dataRoots = XMLUtils.getElementList(xmlRoot,

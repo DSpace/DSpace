@@ -29,7 +29,7 @@ import com.maxmind.geoip.LookupService;
 import com.maxmind.geoip.Location;
 
 /**
- * Class to load intermediate statistics files (produced from log files by <code>ClassicDSpaceLogConverter</code>) into Solr
+ * Class to load intermediate statistics files (produced from log files by {@link ClassicDSpaceLogConverter}) into Solr.
  *
  * @see ClassicDSpaceLogConverter
  *
@@ -40,16 +40,13 @@ public class StatisticsImporter
     private static final Logger log = Logger.getLogger(StatisticsImporter.class);
 
     /** Date format (for solr) */
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
     /** Solr server connection */
     private static HttpSolrServer solr;
 
     /** GEOIP lookup service */
     private static LookupService geoipLookup;
-
-    /** Metadata storage information */
-    private static Map<String, String> metadataStorageInfo;
 
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
@@ -67,7 +64,7 @@ public class StatisticsImporter
     private List<Integer> localBitstreams;
 
     /** Whether or not to replace item IDs with local values (for testing) */
-    private boolean useLocal;
+    private final boolean useLocal;
 
     /**
      * Constructor. Optionally loads local data to replace foreign data
@@ -339,24 +336,6 @@ public class StatisticsImporter
                     sid.addField("dns", dns.toLowerCase());
                 }
 
-                if (dso instanceof Item) {
-                    Item item = (Item) dso;
-                    // Store the metadata
-                    for (String storedField : metadataStorageInfo.keySet()) {
-                        String dcField = metadataStorageInfo.get(storedField);
-
-                        DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
-                                dcField.split("\\.")[1], dcField.split("\\.")[2],
-                                Item.ANY);
-                        for (DCValue val1 : vals) {
-                            String val = val1.value;
-                            sid.addField(String.valueOf(storedField), val);
-                            sid.addField(String.valueOf(storedField + "_search"),
-                                    val.toLowerCase());
-                        }
-                    }
-                }
-
                 SolrLogger.storeParents(sid, dso);
                 solr.add(sid);
                 errors--;
@@ -471,7 +450,6 @@ public class StatisticsImporter
         }
 		solr = new HttpSolrServer(sserver);
 
-		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
         try
         {
@@ -495,6 +473,7 @@ public class StatisticsImporter
             File dir = sample.getParentFile();
             FilenameFilter filter = new FilenameFilter()
             {
+                @Override
                 public boolean accept(File dir, String name)
                 {
                     return name.startsWith(sample.getName());
@@ -522,7 +501,7 @@ public class StatisticsImporter
      */
     static class DNSCache<K,V> extends LinkedHashMap<K,V>
     {
-        private int maxCapacity;
+        private final int maxCapacity;
 
         public DNSCache(int initialCapacity, float loadFactor, int maxCapacity)
         {

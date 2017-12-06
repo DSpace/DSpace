@@ -8,16 +8,13 @@
 package org.dspace.statistics.util;
 
 import mockit.Mock;
-import mockit.MockClass;
-import mockit.Mockit;
+import mockit.MockUp;
 import org.dspace.statistics.SolrLogger;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * @author mwood
@@ -25,18 +22,6 @@ import static org.junit.Assert.fail;
 public class SpiderDetectorTest
 {
     private static final String NOT_A_BOT_ADDRESS = "192.168.0.1";
-
-    @BeforeClass
-    static public void beforeClass()
-    {
-        Mockit.setUpMocks(MockSolrLogger.class); // Don't test SolrLogger here
-    }
-    @AfterClass
-
-    static public void afterClass()
-    {
-        Mockit.tearDownMocks(SolrLogger.class);
-    }
 
     /**
      * Test method for {@link org.dspace.statistics.util.SpiderDetector#readPatterns(java.io.File)}.
@@ -92,6 +77,8 @@ public class SpiderDetectorTest
         candidate = "wiki.dspace.org";
         req.setRemoteHost(candidate);
         assertFalse(candidate + " matched DNS patterns", SpiderDetector.isSpider(req));
+        
+        req = null;
     }
 
     /**
@@ -152,8 +139,8 @@ public class SpiderDetectorTest
      * Dummy SolrLogger for testing.
      * @author mwood
      */
-    @MockClass (realClass = org.dspace.statistics.SolrLogger.class)
     static public class MockSolrLogger
+            extends MockUp<SolrLogger>
     {
         @Mock
         public void $init() {}

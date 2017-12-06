@@ -71,7 +71,13 @@ public class DSpaceTest {
         assertNotNull(o);
         assertEquals(o, kernel.getServiceManager());
 
-        kernelImpl.destroy(); // cleanup the kernel
+        //trash the references
+        kernelImpl.destroy();
+        kernelImpl = null;
+        kernel = null;
+        dspace = null;
+        dspace2 = null;
+        o = null;
     }
     
 /*********

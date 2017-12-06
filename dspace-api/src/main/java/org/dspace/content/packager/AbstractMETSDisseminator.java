@@ -73,6 +73,7 @@ import org.dspace.content.crosswalk.StreamDisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
 import org.dspace.core.Utils;
 import org.dspace.license.CreativeCommons;
@@ -257,6 +258,14 @@ public abstract class AbstractMETSDisseminator
                 // make a Zip-based package
                 writeZipPackage(context, dso, params, outStream);
             }//end if/else
+            
+            // Assuming no errors, log this dissemination
+            log.info(LogManager.getHeader(context, "package_disseminate",
+                    "Disseminated package file=" + pkgFile.getName() + 
+                            " for Object, type="
+                                + Constants.typeText[dso.getType()] + ", handle="
+                                + dso.getHandle() + ", dbID="
+                                + String.valueOf(dso.getID())));
         }//end try
         catch (MetsException e)
         {

@@ -129,7 +129,7 @@ public class LicenseUtils
         // + DCDate.getCurrent().toString() + " (GMT):\n\n" + license;
 
         // Store text as a bitstream
-        byte[] licenseBytes = licenseText.getBytes();
+        byte[] licenseBytes = licenseText.getBytes("UTF-8");
         ByteArrayInputStream bais = new ByteArrayInputStream(licenseBytes);
         Bitstream b = item.createSingleBitstream(bais, "LICENSE");
 

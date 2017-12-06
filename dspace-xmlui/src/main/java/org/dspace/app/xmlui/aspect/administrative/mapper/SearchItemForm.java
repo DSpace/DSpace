@@ -23,7 +23,7 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -108,23 +108,23 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 			if (owningCollection != null)
 				owning = owningCollection.getMetadata("name");
 			String author = "unknown";
-			DCValue[] dcCreators = item.getMetadata("sedici","creator",Item.ANY,Item.ANY);
+			Metadatum[] dcCreators = item.getMetadata("sedici","creator",Item.ANY,Item.ANY);
 			if (dcCreators != null && dcCreators.length >= 1)
             {
                 author = dcCreators[0].value;
             } else {
             	// Do a fall back look for contributors
-				DCValue[] dcContributors = item.getMetadata("sedici","contributor",Item.ANY,Item.ANY);
+				Metadatum[] dcContributors = item.getMetadata("sedici","contributor",Item.ANY,Item.ANY);
 				if (dcContributors != null && dcContributors.length >= 1)
 	            {
 	                author = dcContributors[0].value;
 	            }else{
-	            	DCValue[] dcCompiler = item.getMetadata("sedici","compiler",Item.ANY,Item.ANY);
+	            	Metadatum[] dcCompiler = item.getMetadata("sedici","compiler",Item.ANY,Item.ANY);
 					if (dcCompiler != null && dcCompiler.length >= 1)
 		            {
 		                author = dcCompiler[0].value;
 		            }else{
-		            	DCValue[] dcEditor = item.getMetadata("sedici","editor",Item.ANY,Item.ANY);
+		            	Metadatum[] dcEditor = item.getMetadata("sedici","editor",Item.ANY,Item.ANY);
 						if (dcEditor != null && dcEditor.length >= 1)
 			            {
 			                author = dcEditor[0].value;
@@ -136,7 +136,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 			}
 			
 			String title = "untitled";
-			DCValue[] dcTitles = item.getDC("title",null,Item.ANY);
+			Metadatum[] dcTitles = item.getDC("title",null,Item.ANY);
 			if (dcTitles != null && dcTitles.length >= 1)
             {
                 title = dcTitles[0].value;

@@ -7,25 +7,24 @@
  */
 package org.dspace.xoai.data;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.lyncode.xoai.dataprovider.data.About;
+import com.lyncode.xoai.dataprovider.data.Item;
+import com.lyncode.xoai.dataprovider.xml.xoai.Element;
+import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
+import org.dspace.core.ConfigurationManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.dspace.core.ConfigurationManager;
-import org.dspace.xoai.util.MetadataNamePredicate;
-
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.lyncode.xoai.dataprovider.data.AbstractAbout;
-import com.lyncode.xoai.dataprovider.data.AbstractItem;
-import com.lyncode.xoai.dataprovider.xml.xoai.Element;
-import com.lyncode.xoai.dataprovider.xml.xoai.Element.Field;
 
 /**
  * 
  * @author Lyncode Development Team <dspace@lyncode.com>
  */
-public abstract class DSpaceItem extends AbstractItem
+public abstract class DSpaceItem implements Item
 {
 	private static List<Element> filter (List<Element> input, String name) {
     	return Lists.newArrayList(Collections2.filter(input, new MetadataNamePredicate(name)));
@@ -87,9 +86,9 @@ public abstract class DSpaceItem extends AbstractItem
     }
     
     @Override
-    public List<AbstractAbout> getAbout()
+    public List<About> getAbout()
     {
-        return new ArrayList<AbstractAbout>();
+        return new ArrayList<About>();
     }
     
     protected abstract String getHandle ();
@@ -98,5 +97,20 @@ public abstract class DSpaceItem extends AbstractItem
     public String getIdentifier()
     {
     	return buildIdentifier(getHandle());
+    }
+
+    private static class MetadataNamePredicate implements Predicate<Element> {
+        private String name;
+
+        public MetadataNamePredicate (String n) {
+            name = n;
+        }
+
+        @Override
+        public boolean apply(Element arg0) {
+            if (name == null) return false;
+            else if (name.equals(org.dspace.content.Item.ANY)) return true;
+            else return (name.toLowerCase().equals(arg0.getName().toLowerCase()));
+        }
     }
 }

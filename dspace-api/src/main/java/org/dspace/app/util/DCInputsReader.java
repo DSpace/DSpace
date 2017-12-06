@@ -8,6 +8,7 @@
 package org.dspace.app.util;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.*;
 
 import org.xml.sax.SAXException;
@@ -15,6 +16,7 @@ import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 
@@ -154,29 +156,59 @@ public class DCInputsReader
      * @throws DCInputsReaderException
      *             if no default set defined
      */
+    public DCInputSet getInputs(String collectionHandle)
+                throws DCInputsReaderException
+    {
+    	throw new DCInputsReaderException("Not implemented");
+    	
+    }
     public DCInputSet getInputs(Collection collection)
                 throws DCInputsReaderException
     {
-    	String formName;
+        	String formName;
     	try
     	{
-    		formName = Util.findDefinitionInMap(collection, whichForms);
+    		formName = getFormNameForCollection(collection);
     	}
     	catch(Exception e)
     	{
-    		throw new DCInputsReaderException("Couldn't get the form definition for collection "+collection.getID(), e);
+    		throw new DCInputsReaderException("Couldn't get the form definition for collection id "+collection.getID(), e);
     	}
-    	
-        if (formName == null)
-        {
-                formName = whichForms.get(DEFAULT_COLLECTION);
-        }
         if (formName == null)
         {
                 throw new DCInputsReaderException("No form designated as default");
         }
         return getInputsByFormName(formName);
 	}
+    
+    /**
+     * Look for a form definition for a collection or its parents communities.
+     * @param whichForms2 
+     * 
+     * @return The form name that should be used or null if it could not find any match
+     * @throws SQLException when an error occurs getting parent communities
+     */
+    public String getFormNameForCollection(Collection collection) throws SQLException
+    {
+    	// Tries the collection first
+    	if(whichForms.containsKey(collection.getHandle()))
+    	{
+    		return whichForms.get(collection.getHandle());
+    	}
+    	else
+    	{
+			// Search through the community hierarchy in ascending order
+    		Community[] communities = collection.getCommunities();
+
+    		for(int i = 0 ; i < communities.length ; i++)
+    		{
+    	    	if(whichForms.containsKey(communities[i].getHandle()))
+    	    		return whichForms.get(communities[i].getHandle());
+    		}
+    	}
+    	return whichForms.get(DEFAULT_COLLECTION);
+    }
+
                 
 	/**
 	 * Returns the set of DC inputs used for a particular input form
@@ -211,10 +243,10 @@ public class DCInputsReader
      * @return number of pages of input
      * @throws DCInputsReaderException if no default set defined
      */
-    public int getNumberInputPages(Collection collection)
+    public int getNumberInputPages(String collectionHandle)
         throws DCInputsReaderException
     {
-        return getInputs(collection).getNumberPages();
+        return getInputs(collectionHandle).getNumberPages();
     }
     
     /**

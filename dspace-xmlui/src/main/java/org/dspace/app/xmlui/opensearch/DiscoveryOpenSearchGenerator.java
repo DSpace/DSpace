@@ -92,7 +92,9 @@ public class DiscoveryOpenSearchGenerator extends AbstractOpenSearchGenerator
                 
             	// Sets the query
                 queryArgs.setQuery(query);
-                queryArgs.setStart(start);
+                // start -1 because Solr indexing starts at 0 and OpenSearch
+                // indexing starts at 1.
+                queryArgs.setStart(start - 1);
                 queryArgs.setMaxResults(rpp);
 
                 // we want Items only

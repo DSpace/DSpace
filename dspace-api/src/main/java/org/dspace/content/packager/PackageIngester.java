@@ -86,7 +86,8 @@ public interface PackageIngester
      * collection-level package, and also create an Item for every item-level
      * package referenced by the collection-level package.
      * <p>
-     * The output of this method is one or more newly created <code>DspaceObject<code>s.
+     * The output of this method is one or more newly created DSpaceObject Identifiers
+     * (i.e. Handles).
      * <p>
      * The packager <em>may</em> choose not to implement <code>ingestAll</code>,
      * or simply forward the call to <code>ingest</code> if it is unable to support
@@ -104,14 +105,14 @@ public interface PackageIngester
      * @param pkgFile  The initial package file to ingest
      * @param params Properties-style list of options (interpreted by each packager).
      * @param license  may be null, which takes default license.
-     * @return List of DSpaceObjects created
+     * @return List of Identifiers of DSpaceObjects created
      *
      * @throws PackageValidationException if initial package (or any referenced package)
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>ingestAll</code>
      */
-    List<DSpaceObject> ingestAll(Context context, DSpaceObject parent, File pkgFile,
+    List<String> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                 PackageParameters params, String license)
         throws PackageException, UnsupportedOperationException,
                CrosswalkException, AuthorizeException,
@@ -158,7 +159,8 @@ public interface PackageIngester
      * initial object to replace, any additional objects to replace must be
      * determined based on the referenced packages (or initial package itself).
      * <p>
-     * The output of this method is one or more replaced <code>DspaceObject<code>s.
+     * The output of this method is one or more replaced DSpaceObject Identifiers
+     * (i.e. Handles).
      * <p>
      * The packager <em>may</em> choose not to implement <code>replaceAll</code>,
      * since it somewhat contradicts the archival nature of DSpace. It also
@@ -170,14 +172,14 @@ public interface PackageIngester
      *            if object to replace can be determined from package
      * @param pkgFile  The package file to ingest.
      * @param params Properties-style list of options specific to this packager
-     * @return List of DSpaceObjects replaced
+     * @return List of Identifiers of DSpaceObjects replaced
      *
      * @throws PackageValidationException if initial package (or any referenced package)
      *          is unacceptable or there is a fatal error in creating a DSpaceObject
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>replaceAll</code>
      */
-    List<DSpaceObject> replaceAll(Context context, DSpaceObject dso,
+    List<String> replaceAll(Context context, DSpaceObject dso,
                                 File pkgFile, PackageParameters params)
         throws PackageException, UnsupportedOperationException,
                CrosswalkException, AuthorizeException,

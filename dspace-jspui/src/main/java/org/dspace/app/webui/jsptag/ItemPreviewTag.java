@@ -11,7 +11,7 @@ import org.dspace.app.webui.util.UIUtil;
 
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 
 import org.dspace.core.ConfigurationManager;
@@ -98,7 +98,7 @@ public class ItemPreviewTag extends TagSupport
             String s = ConfigurationManager.getProperty("webui.preview.dc");
             if (s != null)
             {
-            	DCValue[] dcValue;
+            	Metadatum[] dcValue;
             	
             	int i = s.indexOf('.');
             	

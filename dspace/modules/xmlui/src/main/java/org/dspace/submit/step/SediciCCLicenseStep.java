@@ -7,38 +7,25 @@
  */
 package org.dspace.submit.step;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Map;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
-
-import javax.servlet.http.HttpSession;
-
-import org.apache.cocoon.util.StringUtils;
-import org.apache.log4j.Logger;
-
-import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.util.Util;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.license.CreativeCommons;
-import org.dspace.license.CCLookup;
-import org.dspace.submit.AbstractProcessingStep;
-
-import com.ibm.icu.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.SQLException;
-import org.dspace.app.xmlui.wing.Message;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.dspace.app.util.SubmissionInfo;
+import org.dspace.app.util.Util;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.dspace.submit.AbstractProcessingStep;
 
 /**
  * CCLicense step for DSpace Submission Process. 
@@ -74,8 +61,6 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(CCLicenseStep.class);
-    
-
     
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -283,8 +268,6 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 	    	   return STATUS_LICENSE_REJECTED;
 	       }
        }
-
-    	
     }
 	
 	private void removeRequiredAttributes(HttpSession session) {

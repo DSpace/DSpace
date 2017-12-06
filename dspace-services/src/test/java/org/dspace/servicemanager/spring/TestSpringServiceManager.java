@@ -53,6 +53,7 @@ public class TestSpringServiceManager {
             ssm.shutdown();
         }
         ssm = null;
+        configurationService = null;
     }
 
     /**
@@ -91,10 +92,12 @@ public class TestSpringServiceManager {
         ConcreteExample concrete = ssm.getServiceByName(ConcreteExample.class.getName(), ConcreteExample.class);
         assertNotNull(concrete);
         assertEquals("azeckoski", concrete.getName());
+        concrete = null;
 
         SampleAnnotationBean sab = ssm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         assertEquals(null, sab.getSampleValue());
+        sab = null;
     }
 
     @Test
@@ -104,16 +107,19 @@ public class TestSpringServiceManager {
         ConcreteExample concrete = ssm.getServiceByName(ConcreteExample.class.getName(), ConcreteExample.class);
         assertNotNull(concrete);
         assertEquals("azeckoski", concrete.getName());
+        concrete = null;
 
         SampleAnnotationBean sab = ssm.getServiceByName(SampleAnnotationBean.class.getName(), SampleAnnotationBean.class);
         assertNotNull(sab);
         assertEquals("beckyz", sab.getSampleValue());
+        sab = null;
 
         SpringAnnotationBean spr = ssm.getServiceByName(SpringAnnotationBean.class.getName(), SpringAnnotationBean.class);
         assertNotNull(spr);
         assertEquals("azeckoski", spr.getConcreteName());
         assertEquals("aaronz", spr.getExampleName());
         assertEquals(null, spr.getSampleValue());
+        spr = null;
     }
 
     /**
@@ -127,14 +133,17 @@ public class TestSpringServiceManager {
         assertNotNull(l);
         assertEquals(1, l.size());
         assertEquals("azeckoski", l.get(0).getName());
+        l = null;
 
         List<SampleAnnotationBean> l2 = ssm.getServicesByType(SampleAnnotationBean.class);
         assertNotNull(l2);
         assertEquals(1, l2.size());
+        l2 = null;
 
         List<ServiceConfig> l3 = ssm.getServicesByType(ServiceConfig.class);
         assertNotNull(l3);
         assertEquals(0, l3.size());
+        l3 = null;
     }
 
     /**
@@ -146,10 +155,12 @@ public class TestSpringServiceManager {
 
         SampleAnnotationBean sab = ssm.registerServiceClass("newAnnote", SampleAnnotationBean.class);
         assertNotNull(sab);
+        sab = null;
 
         List<SampleAnnotationBean> l = ssm.getServicesByType(SampleAnnotationBean.class);
         assertNotNull(l);
         assertEquals(2, l.size());
+        l = null;
 
         try {
             ssm.registerService("fakey", (Class<?>)null);
@@ -172,8 +183,6 @@ public class TestSpringServiceManager {
         assertNotNull(service);
         assertEquals("AZ", service);
 
-        List<String> names = ssm.getServicesNames();
-        
         try {
             ssm.registerService("fakey", (Object)null);
             fail("should have thrown exception");
@@ -202,6 +211,7 @@ public class TestSpringServiceManager {
         List<String> names = ssm.getServicesNames();
         assertNotNull(names);
         assertTrue(names.size() >= 3);
+        names = null;
     }
 
     @Test

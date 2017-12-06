@@ -7,71 +7,36 @@
  */
 package org.dspace.search;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.lang.reflect.Constructor;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.miscellaneous.LimitTokenCountAnalyzer;
+import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.DateTools;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.DocsEnum;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.MultiFields;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.index.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.Version;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCValue;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.MetadataAuthorityManager;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.handle.HandleManager;
-import org.dspace.sort.SortOption;
-import org.dspace.sort.OrderFormat;
 import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
+import org.dspace.content.*;
+import org.dspace.content.Collection;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.core.*;
+import org.dspace.handle.HandleManager;
+import org.dspace.sort.OrderFormat;
+import org.dspace.sort.SortOption;
+
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * DSIndexer contains the methods that index Items and their metadata,
@@ -94,10 +59,10 @@ import org.dspace.app.util.Util;
  * @author Graham Triggs
  * 
  * @deprecated Since DSpace 4 the system use an abstraction layer named
- *             Discovery to provide access to different search provider. The
- *             legacy system build upon Apache Lucene is likely to be removed in
- *             a future version. If you are interested in use Lucene as backend
- *             for the DSpace search system please consider to build a Lucene
+ *             Discovery to provide access to different search providers. The
+ *             legacy system built upon Apache Lucene is likely to be removed in
+ *             a future version. If you are interested in using Lucene as backend
+ *             for the DSpace search system, please consider to build a Lucene
  *             implementation of the Discovery interfaces
  */
 @Deprecated
@@ -115,7 +80,7 @@ public class DSIndexer
 
     private static int batchFlushAfterDocuments = ConfigurationManager.getIntProperty("search.batch.documents", 20);
     private static boolean batchProcessingMode = false;
-    static final Version luceneVersion = Version.LUCENE_44;
+    static final Version luceneVersion = Version.LATEST;
 
     // Class to hold the index configuration (one instance per config line)
     private static class IndexConfig
@@ -1080,7 +1045,7 @@ public class DSIndexer
         int j;
         if (indexConfigArr.length > 0)
         {
-            DCValue[] mydc;
+            Metadatum[] mydc;
 
             for (int i = 0; i < indexConfigArr.length; i++)
             {
@@ -1246,7 +1211,7 @@ public class DSIndexer
             for (SortOption so : SortOption.getSortOptions())
             {
                 String[] somd = so.getMdBits();
-                DCValue[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
+                Metadatum[] dcv = item.getMetadata(somd[0], somd[1], somd[2], Item.ANY);
                 if (dcv.length > 0)
                 {
                     String value = OrderFormat.makeSortString(dcv[0].value, dcv[0].language, so.getType());

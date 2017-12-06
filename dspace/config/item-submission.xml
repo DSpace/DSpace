@@ -137,7 +137,7 @@
       <!--Step sediciUploadItem will be to Upload the item.-->
       <step id="sediciUploadItem">
         <heading>submit.progressbar.upload</heading>
-        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.UploadStep</processing-class>
+        <processing-class>org.dspace.submit.step.UploadStep</processing-class>
         <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
         <workflow-editable>true</workflow-editable>

@@ -205,7 +205,8 @@ public class SpiderDetector {
 
             for (Pattern candidate : agents)
             {
-                if (candidate.matcher(agent).find())
+                // prevent matcher() invocation from a null Pattern object
+                if (null != candidate && candidate.matcher(agent).find())
                 {
                     return true;
                 }
@@ -236,7 +237,8 @@ public class SpiderDetector {
 
             for (Pattern candidate : domains)
             {
-                if (candidate.matcher(hostname).find())
+                // prevent matcher() invocation from a null Pattern object
+                if (null != candidate && candidate.matcher(hostname).find())
                 {
                     return true;
                 }

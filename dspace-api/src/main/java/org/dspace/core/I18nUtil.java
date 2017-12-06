@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.ResourceBundle.Control;
 import java.util.StringTokenizer;
 import java.util.List;
 import java.util.ArrayList;
@@ -237,7 +238,7 @@ public class I18nUtil
         return fileName;
     }
     /**
-     * et the i18n message string for a given key and use the default Locale
+     * Get the i18n message string for a given key and use the default Locale.
      *
      * @param key
      *        String - name of the key to get the message for
@@ -247,12 +248,9 @@ public class I18nUtil
      *
      *
      */
-    public static String getMessage(String key) throws MissingResourceException
+    public static String getMessage(String key)
     {
-        
-        String message = getMessage(key.trim(), DEFAULTLOCALE);
-      
-        return message;
+        return getMessage(key.trim(), DEFAULTLOCALE);
     }
     
     /**
@@ -265,20 +263,26 @@ public class I18nUtil
      *
      * @return message
      *         String of the message
-     *
-     *
      */
-    public static String getMessage(String key, Locale locale) throws MissingResourceException
+    public static String getMessage(String key, Locale locale)
     {
-        String message = "";
         if (locale == null)
         {
             locale = DEFAULTLOCALE;
         }
-        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale);
-        message = messages.getString(key.trim());
-        
-        return message;
+        ResourceBundle.Control control = 
+            ResourceBundle.Control.getNoFallbackControl(
+            ResourceBundle.Control.FORMAT_DEFAULT);
+
+        ResourceBundle messages = ResourceBundle.getBundle("Messages", locale, control);
+        try {
+            String message = messages.getString(key.trim());
+            return message;
+        } catch (MissingResourceException e) {
+            log.error("'" + key + "' translation undefined in locale '"
+                    + locale.toString() + "'");
+            return key;
+        }
     }
     
     /**
@@ -294,7 +298,7 @@ public class I18nUtil
      *
      *
      */
-    public static String getMessage(String key, Context c) throws MissingResourceException
+    public static String getMessage(String key, Context c)
     {
         return getMessage(key.trim(), c.getCurrentLocale());
     }

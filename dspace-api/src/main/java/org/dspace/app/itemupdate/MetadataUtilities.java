@@ -40,7 +40,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
@@ -59,10 +59,10 @@ public class MetadataUtilities {
 	
     /**      
      * 
-     *  Working around Item API to delete a value-specific DCValue
-     *  For a given element/qualifier/lang:
-     *      get all DCValues
-     *      clear (i.e. delete) all of these DCValues
+     *  Working around Item API to delete a value-specific Metadatum
+  For a given element/qualifier/lang:
+      get all DCValues
+      clear (i.e. delete) all of these DCValues
      *      add them back, minus the one to actually delete
      *  
      * 
@@ -74,7 +74,7 @@ public class MetadataUtilities {
      */
     public static boolean deleteMetadataByValue(Item item, DtoMetadata dtom, boolean isLanguageStrict)
     {   	
-    	DCValue[] ar = null;
+    	Metadatum[] ar = null;
     	
     	if (isLanguageStrict)
     	{   // get all for given type
@@ -89,7 +89,7 @@ public class MetadataUtilities {
     	
     	//build new set minus the one to delete
     	List<String> vals = new ArrayList<String>();
-    	for (DCValue dcv : ar)
+    	for (Metadatum dcv : ar)
     	{
     		if (dcv.value.equals(dtom.value))
     		{
@@ -130,7 +130,7 @@ public class MetadataUtilities {
     		String textToAppend)
     throws IllegalArgumentException
     {   	
-    	DCValue[] ar = null;
+    	Metadatum[] ar = null;
     	
     	// get all values for given element/qualifier
     	if (isLanguageStrict)  // get all for given element/qualifier
@@ -472,12 +472,12 @@ public class MetadataUtilities {
     }
 
     /**
-     *    Get display of DCValue    
+     *    Get display of Metadatum    
 	 *
      * @param dcv
-     * @return string displaying elements of the DCValue
+     * @return string displaying elements of the Metadatum
      */
-    public static String getDCValueString(DCValue dcv)
+    public static String getDCValueString(Metadatum dcv)
     {
     	return "schema: " + dcv.schema + "; element: " + dcv.element + "; qualifier: " + dcv.qualifier +
     	       "; language: " + dcv.language + "; value: " + dcv.value;

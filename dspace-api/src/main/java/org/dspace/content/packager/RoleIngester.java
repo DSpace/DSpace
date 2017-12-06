@@ -215,6 +215,7 @@ public class RoleIngester implements PackageIngester
         {
             Element group = (Element) groups.item(groupx);
             String name = group.getAttribute(RoleDisseminator.NAME);
+            log.debug("Processing group {}", name);
 
             try
             {
@@ -234,6 +235,7 @@ public class RoleIngester implements PackageIngester
                          "If you are performing an AIP restore, you can ignore this warning as the Community/Collection AIP will likely create this group once it is processed.");
                 continue;
             }
+            log.debug("Translated group name:  {}", name);
 
             Group groupObj = null; // The group to restore
             Group collider = Group.findByName(context, name); // Existing group?
@@ -273,9 +275,11 @@ public class RoleIngester implements PackageIngester
             else
             { // No such group exists  -- so, we'll need to create it!
 
+                log.debug("Creating group for a {}", parent.getTypeText());
                 // First Check if this is a "typed" group (i.e. Community or Collection associated Group)
                 // If so, we'll create it via the Community or Collection
                 String type = group.getAttribute(RoleDisseminator.TYPE);
+                log.debug("Group type is {}", type);
                 if(type!=null && !type.isEmpty() && parent!=null)
                 {
                     //What type of dspace object is this group associated with
@@ -356,10 +360,12 @@ public class RoleIngester implements PackageIngester
         {
             Element group = (Element) groups.item(groupx);
             String name = group.getAttribute(RoleDisseminator.NAME);
+            log.debug("Processing group {}", name);
             try
             {
                 // Translate Group name back to internal ID format (e.g. COLLECTION_<ID>_ADMIN)
                 name = PackageUtils.translateGroupNameForImport(context, name);
+                log.debug("Translated group name:  {}", name);
             }
             catch(PackageException pe)
             {
@@ -373,6 +379,7 @@ public class RoleIngester implements PackageIngester
 
             // Find previously created group
             Group groupObj = Group.findByName(context, name);
+            log.debug("Looked up the group and found {}", groupObj);
             NodeList members = group
                     .getElementsByTagName(RoleDisseminator.MEMBER_GROUP);
             for (int memberx = 0; memberx < members.getLength(); memberx++)
@@ -483,7 +490,7 @@ public class RoleIngester implements PackageIngester
      * org.dspace.content.packager.PackageParameters, java.lang.String)
      */
     @Override
-    public List<DSpaceObject> ingestAll(Context context, DSpaceObject parent,
+    public List<String> ingestAll(Context context, DSpaceObject parent,
             File pkgFile, PackageParameters params, String license)
             throws PackageException, UnsupportedOperationException,
             CrosswalkException, AuthorizeException, SQLException, IOException
@@ -519,7 +526,7 @@ public class RoleIngester implements PackageIngester
      * org.dspace.content.packager.PackageParameters)
      */
     @Override
-    public List<DSpaceObject> replaceAll(Context context, DSpaceObject dso,
+    public List<String> replaceAll(Context context, DSpaceObject dso,
             File pkgFile, PackageParameters params) throws PackageException,
             UnsupportedOperationException, CrosswalkException,
             AuthorizeException, SQLException, IOException

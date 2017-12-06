@@ -117,7 +117,7 @@ public class InstallItem
         DCDate now = DCDate.getCurrent();
         
         // If the item doesn't have a date.accessioned, set it to today
-        DCValue[] dateAccessioned = item.getDC("date", "accessioned", Item.ANY);
+        Metadatum[] dateAccessioned = item.getDC("date", "accessioned", Item.ANY);
         if (dateAccessioned.length == 0)
         {
 	        item.addDC("date", "accessioned", null, now.toString());
@@ -127,9 +127,9 @@ public class InstallItem
         // In the below loop, we temporarily clear all issued dates and re-add, one-by-one,
         // replacing "today" with today's date.
         // NOTE: As of DSpace 4.0, DSpace no longer sets an issue date by default
-        DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
+        Metadatum[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
         item.clearDC("date", "issued", Item.ANY);
-        for (DCValue dcv : currentDateIssued)
+        for (Metadatum dcv : currentDateIssued)
         {
             if(dcv.value!=null && dcv.value.equalsIgnoreCase("today"))
             {
@@ -170,9 +170,9 @@ public class InstallItem
         // In the below loop, we temporarily clear all issued dates and re-add, one-by-one,
         // replacing "today" with today's date.
         // NOTE: As of DSpace 4.0, DSpace no longer sets an issue date by default
-        DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
+        Metadatum[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
         item.clearDC("date", "issued", Item.ANY);
-        for (DCValue dcv : currentDateIssued)
+        for (Metadatum dcv : currentDateIssued)
         {
             if(dcv.value!=null && dcv.value.equalsIgnoreCase("today"))
             {
@@ -224,7 +224,7 @@ public class InstallItem
 
         // Notify interested parties of newly archived Item
         c.addEvent(new Event(Event.INSTALL, Constants.ITEM, item.getID(),
-                item.getHandle()));
+                item.getHandle(), item.getIdentifiers(c)));
 
         // remove in-progress submission
         is.deleteWrapper();

@@ -34,8 +34,14 @@
             <ref bean="dspace.eventService"/>
         </property>
     </bean>
-          
-             
+
+    <!-- Google Analytics recording  -->
+    <bean class="org.dspace.google.GoogleRecorderEventListener">
+        <property name="eventService" >
+            <ref bean="dspace.eventService"/>
+        </property>
+    </bean>
+
     <!-- 
     Uncomment to enable TabFileUsageEventListener 
     <bean class="org.dspace.app.statistics.TabFileUsageEventListener">

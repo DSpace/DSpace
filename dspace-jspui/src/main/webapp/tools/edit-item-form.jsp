@@ -41,7 +41,7 @@
 <%@ page import="org.dspace.content.Bundle" %>
 <%@ page import="org.dspace.content.Collection" %>
 <%@ page import="org.dspace.content.DCDate" %>
-<%@ page import="org.dspace.content.DCValue" %>
+<%@ page import="org.dspace.content.Metadatum" %>
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="org.dspace.eperson.EPerson" %>
@@ -106,7 +106,7 @@
      StringBuffer doAuthority(MetadataAuthorityManager mam, ChoiceAuthorityManager cam,
             PageContext pageContext,
             String contextPath, String fieldName, String idx,
-            DCValue dcv, int collectionID)
+            Metadatum dcv, int collectionID)
     {
         StringBuffer sb = new StringBuffer();
         if (cam.isChoicesConfigured(fieldName))
@@ -422,7 +422,7 @@
 <%
     MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
     ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
-    DCValue[] dcv = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+    Metadatum[] dcv = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
     String row = "even";
     
     // Keep a count of the number of values of each element+qualifier

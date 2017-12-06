@@ -311,6 +311,9 @@ public class Context
      * Close the context object after all of the operations performed in the
      * context have completed successfully. Any transaction with the database is
      * committed.
+     * <p>
+     * Calling complete() on a Context which is no longer valid (isValid()==false),
+     * is a no-op.
      * 
      * @exception SQLException
      *                if there was an error completing the database transaction
@@ -318,19 +321,25 @@ public class Context
      */
     public void complete() throws SQLException
     {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if(!isValid())
+            log.info("complete() was called on a closed Context object. No changes to commit.");
+
         // FIXME: Might be good not to do a commit() if nothing has actually
         // been written using this connection
         try
         {
-            // Commit any changes made as part of the transaction
-            if (! isReadOnly())
+            // As long as we have a valid, writeable database connection,
+            // commit any changes made as part of the transaction
+            if (isValid() && !isReadOnly())
             {
                 commit();
             }
         }
         finally
         {
-            // Free the connection
+            // Free the DB connection
+            // If connection is closed or null, this is a no-op
             DatabaseManager.freeConnection(connection);
             connection = null;
             clearCache();
@@ -344,17 +353,25 @@ public class Context
      * @exception SQLException
      *                if there was an error completing the database transaction
      *                or closing the connection
+     * @exception IllegalStateException
+     *                if the Context is read-only or is no longer valid
      */
     public void commit() throws SQLException
     {
-        /* 
-         * invalid condition if in read-only mode: no valid
-         * transactions can be committed: no recourse but to bail
-         */
+        // Invalid Condition. The Context is Read-Only, and transactions cannot
+        // be committed.
         if (isReadOnly())
         {
             throw new IllegalStateException("Attempt to commit transaction in read-only context");
         }
+
+        // Invalid Condition. The Context has been either completed or aborted
+        // and is no longer valid
+        if (!isValid())
+        {
+            throw new IllegalStateException("Attempt to commit transaction to a completed or aborted context");
+        }
+
         // Commit any changes made as part of the transaction
         Dispatcher dispatcher = null;
 
@@ -462,17 +479,22 @@ public class Context
      * there is an error freeing the database connection, since this method may
      * be called as part of an error-handling routine where an SQLException has
      * already been thrown.
+     * <p>
+     * Calling abort() on a Context which is no longer valid (isValid()==false),
+     * is a no-op.
      */
     public void abort()
     {
+        // If Context is no longer open/valid, just note that it has already been closed
+        if(!isValid())
+            log.info("abort() was called on a closed Context object. No changes to abort.");
+
         try
         {
-            if (!connection.isClosed())
+            // Rollback if we have a database connection, and it is NOT Read Only
+            if (isValid() && !connection.isClosed() && !isReadOnly())
             {
-                if (! isReadOnly())
-                {
-                    connection.rollback();
-                }
+                connection.rollback();
             }
         }
         catch (SQLException se)
@@ -483,10 +505,9 @@ public class Context
         {
             try
             {
-                if (!connection.isClosed())
-                {
-                    DatabaseManager.freeConnection(connection);
-                }
+                // Free the DB connection
+                // If connection is closed or null, this is a no-op
+                DatabaseManager.freeConnection(connection);
             }
             catch (Exception ex)
             {

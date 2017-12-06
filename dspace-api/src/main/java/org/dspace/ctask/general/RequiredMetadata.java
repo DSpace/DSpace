@@ -18,8 +18,7 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.content.Collection;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
@@ -80,9 +79,9 @@ public class RequiredMetadata extends AbstractCurationTask
                     handle = "in workflow";
                 }
                 sb.append("Item: ").append(handle);
-                for (String req : getReqList(item.getOwningCollection()))
+                for (String req : getReqList(item.getOwningCollection().getHandle()))
                 {
-                    DCValue[] vals = item.getMetadata(req);
+                    Metadatum[] vals = item.getMetadataByMetadataString(req);
                     if (vals.length == 0)
                     {
                         sb.append(" missing required field: ").append(req);
@@ -113,13 +112,17 @@ public class RequiredMetadata extends AbstractCurationTask
         }
     }
     
-    private List<String> getReqList(Collection collection) throws DCInputsReaderException
+    private List<String> getReqList(String handle) throws DCInputsReaderException
     {
-        List<String> reqList = reqMap.get(collection.getHandle());
+        List<String> reqList = reqMap.get(handle);
+        if (reqList == null)
+        {
+            reqList = reqMap.get("default");
+        }
         if (reqList == null)
         {
             reqList = new ArrayList<String>();
-            DCInputSet inputs = reader.getInputs(collection);
+            DCInputSet inputs = reader.getInputs(handle);
             for (int i = 0; i < inputs.getNumberPages(); i++)
             {
                 for (DCInput input : inputs.getPageRows(i, true, true))
@@ -139,7 +142,7 @@ public class RequiredMetadata extends AbstractCurationTask
                     }
                 }
             }
-            reqMap.put(collection.getHandle(), reqList);
+            reqMap.put(inputs.getFormName(), reqList);
         }
         return reqList;
     }

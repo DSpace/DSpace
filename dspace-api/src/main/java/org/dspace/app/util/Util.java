@@ -24,8 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 
@@ -92,6 +92,11 @@ public class Util {
          */
         public static String encodeBitstreamName(String stringIn, String encoding) throws java.io.UnsupportedEncodingException {
             // FIXME: This should be moved elsewhere, as it is used outside the UI
+            if (stringIn == null)
+            {
+                return "";
+            }
+
             StringBuffer out = new StringBuffer();
         
             final String[] pctEncoding = { "%00", "%01", "%02", "%03", "%04",
@@ -361,15 +366,14 @@ public class Util {
     }
     
     /**
-     * SEDICI-BEGIN
      *Tries to find a config definition according to a matching handle based on a collection's handle
      * or its parent communities's handle.
      * 
      * @param collection Collection to start the searching from
-     * @return The config map's content associated to the matched handle 
-     * @throws Exception when an SQLException occurs getting parent communities (couldn't find any more specific exception)
+     * @return The config map's content associated to the matched handle or null if it could not find any match
+     * @throws SQLException when an error occurs getting parent communities
      */
-    public static <T> T findDefinitionInMap(Collection collection, Map<String,T> configMap) throws Exception
+    public static String findDefinitionInMap(Collection collection, Map<String,String> configMap) throws SQLException
     {
     	if(collection == null)
     		return null;
@@ -382,15 +386,7 @@ public class Util {
     	else
     	{
 			// Search through the community hierarchy in ascending order
-    		Community[] communities;
-    		try 
-    		{
-    			communities = collection.getCommunities();
-			}
-			catch (SQLException e)
-			{
-				throw new Exception("Error getting communities from collection "+collection.getID(), e);
-			}
+    		Community[] communities = collection.getCommunities();
 
     		for(int i = 0 ; i < communities.length ; i++)
     		{
@@ -398,11 +394,9 @@ public class Util {
     	    		return configMap.get(communities[i].getHandle());
     		}
     		
-    		// Couldn't find any match
     		return null;
     	}
     }
-    /* SEDICI-END */
 
     /**
      * Get a list of all the respective "displayed-value(s)" from the given
@@ -412,7 +406,7 @@ public class Util {
      * @param item
      *            The Dspace Item
      * @param values
-     *            A DCValue[] array of the specific "stored-value(s)"
+     *            A Metadatum[] array of the specific "stored-value(s)"
      * @param schema
      *            A String with the schema name of the metadata field
      * @param element
@@ -423,7 +417,7 @@ public class Util {
      */
 
     public static List<String> getControlledVocabulariesDisplayValueLocalized(
-            Item item, DCValue[] values, String schema, String element,
+            Item item, Metadatum[] values, String schema, String element,
             String qualifier, Locale locale) throws SQLException,
             DCInputsReaderException
     {
@@ -440,7 +434,7 @@ public class Util {
 
         DCInputSet inputSet = inputsReader.getInputs(collection);
 
-        // Replace the values of DCValue[] with the correct ones in case of
+        // Replace the values of Metadatum[] with the correct ones in case of
         // controlled vocabularies
         String currentField = schema + "." + element
                 + (qualifier == null ? "" : "." + qualifier);

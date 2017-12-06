@@ -136,7 +136,7 @@ public class JSPSelectCollectionStep extends JSPStep
             else
             {
                 // Show all collections
-                collections = Collection.findAuthorized(context, null,
+                collections = Collection.findAuthorizedOptimized(context,
                         Constants.ADD);
             }
 

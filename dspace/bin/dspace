@@ -61,12 +61,18 @@ else
 fi
 
 
+# If the user only wants the CLASSPATH, just give it now.
+if [ "$1" = "classpath" ]; then
+  echo $FULLPATH
+  exit 0
+fi
+
 
 
 #Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then
   #Default Java to use 256MB of memory
-  JAVA_OPTS=-Xmx256m
+  JAVA_OPTS="-Xmx256m -Dfile.encoding=UTF-8"
 fi
 
 # Now invoke Java

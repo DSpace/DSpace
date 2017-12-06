@@ -135,12 +135,6 @@
         <xsl:text>/themes/mobile/lib/cookies.js</xsl:text>
         </xsl:attribute>&#160;</script>
 
-        <script>
-        <xsl:attribute name="src">
-        <xsl:value-of select="$mobile-url"/>
-        <xsl:text>/themes/mobile/lib/m-tweaks.js</xsl:text>
-        </xsl:attribute>&#160;</script>
-
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
@@ -214,7 +208,7 @@
            <h3>
                <i18n:text>xmlui.mobile.search_all</i18n:text>
            </h3>
-           <form id="search" class="ds-interactive-div primary" action="search" method="get">
+           <form id="search" class="ds-interactive-div primary" action="{/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search' and @qualifier='advancedURL']}" method="get">
                <fieldset>
                <input id="search-basic" name="query" type="search" value="" />
                <input id="search" name="submit" type="submit" value="Go" />
@@ -694,7 +688,8 @@
                            </xsl:attribute>
                             <img alt="Thumbnail">
                                 <xsl:attribute name="src">
-                                <xsl:text>themes/mobile/lib/images/mobile-default-thumbnail.png</xsl:text>
+                                <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>
+                                <xsl:text>/themes/mobile/lib/images/default-thumbnail.png</xsl:text>
                                 </xsl:attribute>
                             </img>
                         </a>
@@ -789,7 +784,7 @@
 </xsl:template>
 
 <!-- ds-options -->
-<!-- the browse section is being implemented in the front page custoization -->
+<!-- the browse section is being implemented in the front page customization -->
 <xsl:template match="dri:options">&#160;
 </xsl:template>
 

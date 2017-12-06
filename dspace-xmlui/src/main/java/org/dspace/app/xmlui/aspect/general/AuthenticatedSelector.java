@@ -14,7 +14,9 @@ import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.selection.Selector;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -67,6 +69,9 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
             Context context = ContextUtil.obtainContext(objectModel);
 
             EPerson eperson = context.getCurrentUser();
+            
+            // Context Administrative options
+            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);          
 
             if (eperson == null)
             {
@@ -81,8 +86,7 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
             }
             else if (ADMINISTRATOR.equals(expression))
             {
-                // Is this eperson an administrator?
-                return AuthorizeManager.isAdmin(context);
+                return AuthorizeManager.isAdmin(context, dso);
             }
 
             // Otherwise return false;

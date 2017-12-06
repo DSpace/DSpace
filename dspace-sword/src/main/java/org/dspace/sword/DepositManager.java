@@ -177,6 +177,21 @@ public class DepositManager
             }
             throw e;
         }
+        catch(RuntimeException e)
+        {
+            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
+            {
+                try
+                {
+                    storePackageAsFile(deposit);
+                }
+                catch(IOException e2)
+                {
+                    log.warn("Unable to store SWORD package as file: " + e);
+                }
+            }
+            throw e;
+        }
 
 		// now construct the deposit response.  The response will be
 		// CREATED if the deposit is in the archive, or ACCEPTED if

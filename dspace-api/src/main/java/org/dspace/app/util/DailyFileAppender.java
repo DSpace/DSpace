@@ -299,7 +299,7 @@ public class DailyFileAppender extends FileAppender
 			        			if (curLog != null)
 			        			{
 			        				LogLog.debug("Deleting log " + curLog.getName());
-		        					if (curLog.delete())
+		        					if (! curLog.delete())
                                     {
                                         LogLog.error("Unable to delete log file");
                                     }

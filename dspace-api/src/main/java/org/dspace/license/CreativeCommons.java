@@ -20,12 +20,13 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -61,7 +62,7 @@ public class CreativeCommons
         String proxyHost = ConfigurationManager.getProperty("http.proxy.host");
         String proxyPort = ConfigurationManager.getProperty("http.proxy.port");
 
-        if ((proxyHost != null) && (proxyPort != null))
+        if (StringUtils.isNotBlank(proxyHost) && StringUtils.isNotBlank(proxyPort))
         {
             System.setProperty("http.proxyHost", proxyHost);
             System.setProperty("http.proxyPort", proxyPort);
@@ -489,8 +490,8 @@ public class CreativeCommons
     	 */
     	public String ccItemValue(Item item)
     	{
-            DCValue[] dcvalues = item.getMetadata(params[0], params[1], params[2], params[3]);
-            for (DCValue dcvalue : dcvalues)
+            Metadatum[] dcvalues = item.getMetadata(params[0], params[1], params[2], params[3]);
+            for (Metadatum dcvalue : dcvalues)
             {
                 if ((dcvalue.value).indexOf(ccShib) != -1) 
                 {
@@ -515,8 +516,8 @@ public class CreativeCommons
     		 CCLookup ccLookup = new CCLookup();
              ccLookup.issue(key);
              String matchValue = ccLookup.getLicenseName();
-             DCValue[] dcvalues = item.getMetadata(params[0], params[1], params[2], params[3]);
-             for (DCValue dcvalue : dcvalues)
+             Metadatum[] dcvalues = item.getMetadata(params[0], params[1], params[2], params[3]);
+             for (Metadatum dcvalue : dcvalues)
              {
             	 if (dcvalue.value.equals(matchValue))
             	 {
@@ -537,9 +538,9 @@ public class CreativeCommons
     	{
     		if (value != null)
     		{
-    			 DCValue[] dcvalues  = item.getMetadata(params[0], params[1], params[2], params[3]);
+    			 Metadatum[] dcvalues  = item.getMetadata(params[0], params[1], params[2], params[3]);
                  ArrayList<String> arrayList = new ArrayList<String>();
-                 for (DCValue dcvalue : dcvalues)
+                 for (Metadatum dcvalue : dcvalues)
                  {
                      if (! dcvalue.value.equals(value))
                      {

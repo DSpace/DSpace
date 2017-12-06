@@ -592,7 +592,7 @@ public class XmlWorkflowManager {
             String handle = HandleManager.findHandle(c, i);
 
             // Get title
-            DCValue[] titles = i.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+            Metadatum[] titles = i.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
             String title = "";
             try {
                 title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
@@ -1080,7 +1080,7 @@ public class XmlWorkflowManager {
         String lift_element = sa[1];
         String lift_qualifier = sa.length > 2 ? sa[2] : null;
 
-        DCValue[] liftDate = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
+        Metadatum[] liftDate = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
         return liftDate.length==0?null:new DCDate(liftDate[0].value);
         
     }
@@ -1104,7 +1104,7 @@ public class XmlWorkflowManager {
     }
 
     public static boolean isWorkflowEdited(Item item) {
-    	DCValue[] values = item.getMetadata(wf_edited_schema, wf_edited_element, null, "es");
+    	Metadatum[] values = item.getMetadata(wf_edited_schema, wf_edited_element, null, "es");
     	if(values.length > 0)
     		return "true".equals( values[0].value );
     	return false;

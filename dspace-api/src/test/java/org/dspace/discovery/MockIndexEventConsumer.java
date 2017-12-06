@@ -8,7 +8,7 @@
 package org.dspace.discovery;
 
 import mockit.Mock;
-import mockit.MockClass;
+import mockit.MockUp;
 import org.dspace.core.Context;
 import org.dspace.event.Event;
 
@@ -18,13 +18,9 @@ import org.dspace.event.Event;
  *
  * @author tdonohue
  */
-@MockClass(realClass=IndexEventConsumer.class)
-public class MockIndexEventConsumer {
-   
-    //public void initialize() throws Exception {
-        //do nothing
-    //}
-    
+public class MockIndexEventConsumer
+        extends MockUp<IndexEventConsumer>
+{
     @Mock
     public void consume(Context ctx, Event event) throws Exception {
         //do nothing - Solr is not running during unit testing, so we cannot index test content in Solr
@@ -34,8 +30,4 @@ public class MockIndexEventConsumer {
     public void end(Context ctx) throws Exception {
         //do nothing - Solr is not running during unit testing, so we cannot index test content in Solr
     }
-    
-    //public void finish(Context ctx) throws Exception {
-        //do nothing
-    //}
 }

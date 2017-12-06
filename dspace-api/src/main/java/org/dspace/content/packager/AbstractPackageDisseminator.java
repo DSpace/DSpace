@@ -34,9 +34,21 @@ import java.util.List;
  * <P>
  * All Package disseminators should either extend this abstract class
  * or implement <code>PackageDisseminator</code> to better suit their needs.
+ * <P>
+ * WARNING: If you choose to extend this Abstract class, you must DISABLE
+ * plugin instance caching for your new class in dspace.cfg. This will ensure
+ * that "packageFileList" and any other global instance variables are RESET
+ * for each package dissemination. To DISABLE plugin instance caching, just place
+ * the following configuration in your dspace.cfg:
+ * <code>
+ * plugin.reusable.[full-class-name] = false
+ * </code>
+ * For more information see the org.dspace.core.PluginManager cacheMe() method,
+ * which defaults to caching all plugin class instances.
  *
  * @author Tim Donohue
  * @see PackageDisseminator
+ * @see PluginManager
  */
 public abstract class AbstractPackageDisseminator
         implements PackageDisseminator
@@ -82,8 +94,14 @@ public abstract class AbstractPackageDisseminator
             params.setRecursiveModeEnabled(true);
         }
 
-        //try to disseminate the first object using provided PackageDisseminator
-        disseminate(context, dso, params, pkgFile);
+        // If this object package has NOT already been disseminated
+        // NOTE: This ensures we don't accidentally disseminate the same object
+        // TWICE, e.g. when an Item is mapped into multiple Collections.
+        if(!getPackageList().contains(pkgFile))
+        {
+            // Disseminate the object using provided PackageDisseminator
+            disseminate(context, dso, params, pkgFile);
+        }
 
         //check if package was disseminated
         if(pkgFile.exists())

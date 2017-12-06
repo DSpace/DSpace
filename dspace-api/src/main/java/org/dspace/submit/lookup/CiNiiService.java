@@ -9,24 +9,22 @@ package org.dspace.submit.lookup;
 
 import gr.ekt.bte.core.Record;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.XMLUtils;
 import org.w3c.dom.Document;
@@ -38,7 +36,7 @@ import org.w3c.dom.Element;
 public class CiNiiService
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(CiNiiService.class);
+    private static final Logger log = Logger.getLogger(CiNiiService.class);
 
     private int timeout = 1000;
 
@@ -82,14 +80,16 @@ public class CiNiiService
     private Record search(String id, String appId)
         throws IOException, HttpException
     {
-        GetMethod method = null;
+        HttpGet method = null;
         try
         {
-            HttpClient client = new HttpClient();
-            client.setTimeout(timeout);
-            method = new GetMethod("http://ci.nii.ac.jp/naid/"+id+".rdf?appid="+appId);
+            HttpClient client = new DefaultHttpClient();
+            client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
+            method = new HttpGet("http://ci.nii.ac.jp/naid/"+id+".rdf?appid="+appId);
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpResponse response = client.execute(method);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
 
             if (statusCode != HttpStatus.SC_OK)
             {
@@ -97,7 +97,7 @@ public class CiNiiService
                     throw new RuntimeException("CiNii RDF is not valid");
                 else
                     throw new RuntimeException("CiNii RDF Http call failed: "
-                            + method.getStatusLine());
+                            + statusLine);
             }
 
             try
@@ -109,7 +109,7 @@ public class CiNiiService
                 factory.setIgnoringElementContentWhitespace(true);
 
                 DocumentBuilder db = factory.newDocumentBuilder();
-                Document inDoc = db.parse(method.getResponseBodyAsStream());
+                Document inDoc = db.parse(response.getEntity().getContent());
 
                 Element xmlRoot = inDoc.getDocumentElement();
 
@@ -144,12 +144,12 @@ public class CiNiiService
             return null;
         }
 
-        GetMethod method = null;
+        HttpGet method = null;
         List<String> ids = new ArrayList<String>();
         try
         {
-            HttpClient client = new HttpClient();
-            client.setTimeout(timeout);
+            HttpClient client = new DefaultHttpClient();
+            client.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
             StringBuilder query = new StringBuilder();
             query.append("format=rss&appid=").append(appId)
                  .append("&count=").append(maxResults);
@@ -166,16 +166,18 @@ public class CiNiiService
                 query.append("&year_from=").append(String.valueOf(year));
                 query.append("&year_to=").append(String.valueOf(year));
             }
-            method = new GetMethod("http://ci.nii.ac.jp/opensearch/search?"+query.toString());
+            method = new HttpGet("http://ci.nii.ac.jp/opensearch/search?"+query.toString());
             // Execute the method.
-            int statusCode = client.executeMethod(method);
+            HttpResponse response = client.execute(method);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
             if (statusCode != HttpStatus.SC_OK)
             {
                 if (statusCode == HttpStatus.SC_BAD_REQUEST)
                     throw new RuntimeException("CiNii OpenSearch query is not valid");
                 else
                     throw new RuntimeException("CiNii OpenSearch call failed: "
-                            + method.getStatusLine());
+                            + statusLine);
             }
 
             try
@@ -187,7 +189,7 @@ public class CiNiiService
                 factory.setIgnoringElementContentWhitespace(true);
 
                 DocumentBuilder db = factory.newDocumentBuilder();
-                Document inDoc = db.parse(method.getResponseBodyAsStream());
+                Document inDoc = db.parse(response.getEntity().getContent());
 
                 Element xmlRoot = inDoc.getDocumentElement();
                 List<Element> items = XMLUtils.getElementList(xmlRoot, "item");

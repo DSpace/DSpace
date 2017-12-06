@@ -29,6 +29,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.curate.Curator;
+import org.dspace.eperson.Group;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -125,6 +126,15 @@ public class UploadStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+    	// BEGIN SeDiCI: determina si el archivo es requerido dependiendo del Grupo del usuario
+    	fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
+    	if(fileRequired) {
+    		String excludedGroupName = ConfigurationManager.getProperty("webui.submit.upload.excluded_group");
+    		Group excludedGroup = Group.findByName(context, excludedGroupName);
+    		fileRequired = excludedGroup == null || !Group.isMember(context, excludedGroup.getID());
+    	}
+    	// END SeDiCI
+    	
         // get button user pressed
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
@@ -435,7 +445,7 @@ public class UploadStep extends AbstractProcessingStep
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-    protected int processUploadFile(Context context, HttpServletRequest request,
+    public int processUploadFile(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException

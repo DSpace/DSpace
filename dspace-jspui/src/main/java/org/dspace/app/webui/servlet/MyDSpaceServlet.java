@@ -7,12 +7,18 @@
  */
 package org.dspace.app.webui.servlet;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,6 +26,9 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.itemexport.ItemExportException;
+import org.dspace.app.itemimport.BTEBatchImportService;
+import org.dspace.app.itemimport.BatchUpload;
+import org.dspace.app.itemimport.ItemImport;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.webui.util.UIUtil;
@@ -37,6 +46,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.utils.DSpace;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
 
@@ -73,6 +83,9 @@ public class MyDSpaceServlet extends DSpaceServlet
     /** The "request export migrate archive for download" page */
     public static final int REQUEST_MIGRATE_ARCHIVE = 6;
 
+    public static final int REQUEST_BATCH_IMPORT_ACTION = 7;
+    
+    
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -124,6 +137,11 @@ public class MyDSpaceServlet extends DSpaceServlet
 
             break;
 
+        case REQUEST_BATCH_IMPORT_ACTION:
+            processBatchImportAction(context, request, response);
+
+            break;
+            
         default:
             log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
                     .getRequestLogInfo(request)));
@@ -674,6 +692,85 @@ public class MyDSpaceServlet extends DSpaceServlet
     	
     	
     }
+    
+    private void processBatchImportAction(Context context, HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException,
+            SQLException, AuthorizeException
+    {
+    	String buttonPressed = UIUtil.getSubmitButton(request, "submit_mapfile");
+
+    	String uploadId = request.getParameter("uploadid");
+    	
+    	if (buttonPressed.equals("submit_mapfile")){
+    		
+    		String mapFilePath = null;
+    		try {
+    			mapFilePath = ItemImport.getImportUploadableDirectory(context.getCurrentUser().getID()) + File.separator + uploadId + File.separator + "mapfile";
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				
+				showMainPage(context, request, response);
+				return;
+			}
+    		
+    		File file = new File(mapFilePath);
+    		int length   = 0;
+    		ServletOutputStream outStream = response.getOutputStream();
+    		String mimetype ="application/octet-stream";
+    		
+    		response.setContentType(mimetype);
+    		response.setContentLength((int)file.length());
+    		String fileName = file.getName();
+
+    		// sets HTTP header
+    		response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+
+    		byte[] byteBuffer = new byte[1024];
+    		DataInputStream in = new DataInputStream(new FileInputStream(file));
+
+    		// reads the file's bytes and writes them to the response stream
+    		while ((in != null) && ((length = in.read(byteBuffer)) != -1))
+    		{
+    			outStream.write(byteBuffer,0,length);
+    		}
+
+    		in.close();
+    		outStream.close();
+    	}
+    	else if (buttonPressed.equals("submit_delete")){
+    		ItemImport itemImport = new ItemImport();
+    		try {
+				itemImport.deleteBatchUpload(context, uploadId);
+				showMainPage(context, request, response);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	else if (buttonPressed.equals("submit_resume")){
+    		// Set attributes
+            request.setAttribute("uploadId", uploadId);
+        	
+        	//Get all collections
+    		List<Collection> collections = Arrays.asList(Collection.findAll(context));
+    		request.setAttribute("collections", collections);
+
+    		//Get all the possible data loaders from the Spring configuration
+    		BTEBatchImportService dls  = new DSpace().getSingletonService(BTEBatchImportService.class);
+    		List<String> inputTypes = dls.getFileDataLoaders();
+    		request.setAttribute("input-types", inputTypes);
+    		
+            // Forward to main mydspace page
+            JSPManager.showJSP(request, response, "/dspace-admin/batchimport.jsp");
+    	}
+    	else {
+    		showMainPage(context, request, response);
+    	}
+    }
+    
+    
     // ****************************************************************
     // ****************************************************************
     // METHODS FOR SHOWING FORMS
@@ -728,6 +825,15 @@ public class MyDSpaceServlet extends DSpaceServlet
 			// nothing to do they just have no export archives available for download
 		}
         
+        // imports available for view
+        List<BatchUpload> importUploads = null;
+        try{
+        	importUploads = ItemImport.getImportsAvailable(currentUser);
+        }
+        catch (Exception e) {
+			// nothing to do they just have no export archives available for download
+		}
+        
         
         // Set attributes
         request.setAttribute("mydspace.user", currentUser);
@@ -739,6 +845,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("display.groupmemberships", Boolean.valueOf(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
         request.setAttribute("export.archives", exportArchives);
+        request.setAttribute("import.uploads", importUploads);
 
         // Forward to main mydspace page
         JSPManager.showJSP(request, response, "/mydspace/main.jsp");

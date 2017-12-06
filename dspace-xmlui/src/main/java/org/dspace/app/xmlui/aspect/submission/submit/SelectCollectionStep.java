@@ -9,7 +9,6 @@ package org.dspace.app.xmlui.aspect.submission.submit;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
@@ -29,9 +28,8 @@ import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
-import ar.edu.unlp.sedici.util.CollectionSearchSedici;
-import ar.edu.unlp.sedici.util.CollectionsWithCommunities;
 import org.dspace.app.util.CollectionDropDown;
+
 /**
  * Allow the user to select a collection they wish to submit an item to, 
  * this step is sort-of but not officialy part of the item submission 
@@ -74,17 +72,17 @@ public class SelectCollectionStep extends AbstractSubmissionStep
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {     
-		CollectionsWithCommunities collections; // List of possible collections.
+        Collection[] collections; // List of possible collections.
         String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
         DSpaceObject dso = HandleManager.resolveToObject(context, handle);
         
         if (dso instanceof Community)
         {
-            collections = CollectionSearchSedici.findAuthorizedWithCommunitiesName(context, ((Community) dso), Constants.ADD);   
+            collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);   
         } 
         else
         {
-            collections = CollectionSearchSedici.findAuthorizedWithCommunitiesName(context, null, Constants.ADD);
+            collections = Collection.findAuthorizedOptimized(context, Constants.ADD);
         }
         
         // Basic form with a drop down list of all the collections
@@ -100,21 +98,10 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         select.setHelp(T_collection_help);
         
         select.addOption("",T_collection_default);
-        String communityName, collectionName;
-        Collection collection;
-        for (int i = 0; i < collections.getCollections().size(); i++) {
-        	collection=collections.getCollections().get(i);
-        	
-        	communityName=collections.getCommunitiesName().get(i);
-        	collectionName=collection.getName();
-
-   		   	if (communityName.length() > 40){
-   		   		communityName = communityName.substring(0, 39);
-            } 
-   		   	if (collectionName.length() > 40){
-   		   		collectionName = collectionName.substring(0, 39);
-            }
-        	select.addOption(collection.getHandle(),communityName+" > "+collectionName);
+	    CollectionDropDown.CollectionPathEntry[] collectionPaths = CollectionDropDown.annotateWithPaths(collections);
+        for (CollectionDropDown.CollectionPathEntry entry : collectionPaths)
+        {
+            select.addOption(entry.collection.getHandle(), entry.path);
         }
         
         Button submit = list.addItem().addButton("submit");

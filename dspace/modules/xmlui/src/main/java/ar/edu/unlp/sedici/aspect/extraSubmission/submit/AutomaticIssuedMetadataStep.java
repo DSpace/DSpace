@@ -2,25 +2,17 @@ package ar.edu.unlp.sedici.aspect.extraSubmission.submit;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
-import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.content.LicenseUtils;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
-import org.dspace.eperson.EPerson;
-import org.dspace.license.CreativeCommons;
 import org.dspace.submit.AbstractProcessingStep;
 
 @Deprecated /* No se usa más desde #2183. Se deja como ejemplo de step*/
@@ -66,7 +58,7 @@ public class AutomaticIssuedMetadataStep extends AbstractProcessingStep {
         if (item.getMetadata("dc", "date", "issued", null).length == 0){
         	
         	//recupero sedici.date.exposure
-        	DCValue[] exposure=item.getMetadata("sedici", "date", "exposure", null);
+        	Metadatum[] exposure=item.getMetadata("sedici", "date", "exposure", null);
         	//si exposure esta cargado lo copio en date issued
         	if (exposure.length !=0){
         		item.addMetadata("dc", "date", "issued", null, exposure[0].value);

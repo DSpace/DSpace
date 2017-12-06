@@ -1,0 +1,4 @@
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+@prefix bibo:       <http://purl.org/ontology/bibo/> .
+@prefix dc:         <http://purl.org/dc/elements/1.1/> .
+@prefix dcterms:    <http://purl.org/dc/terms/> .

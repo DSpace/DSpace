@@ -8,7 +8,7 @@
 package org.dspace.ctask.general;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -89,7 +89,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask
             String handle = item.getHandle();
             log.debug("Translating metadata for " + handle);
 
-            DCValue[] authLangs = item.getMetadata(authLangField);
+            Metadatum[] authLangs = item.getMetadataByMetadataString(authLangField);
             if(authLangs.length > 0)
             {
                 /* Assume the first... multiple
@@ -107,11 +107,11 @@ public abstract class AbstractTranslator extends AbstractCurationTask
                     boolean translated = false;
                     field = field.trim();
                     String[] fieldSegments = field.split("\\.");
-                    DCValue[] fieldMetadata = null;
+                    Metadatum[] fieldMetadata = null;
                     
                     if(fieldSegments.length > 2) {
                         // First, check to see if we've already got this in the target language
-                        DCValue[] checkMetadata = item.getMetadata(fieldSegments[0], fieldSegments[1], fieldSegments[2], lang);
+                        Metadatum[] checkMetadata = item.getMetadata(fieldSegments[0], fieldSegments[1], fieldSegments[2], lang);
                         if(checkMetadata.length > 0)
                         {
                             // We've already translated this, move along
@@ -126,7 +126,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask
                     }
                     else {
                         // First, check to see if we've already got this in the target language
-                        DCValue[] checkMetadata = item.getMetadata(fieldSegments[0], fieldSegments[1], null, lang);
+                        Metadatum[] checkMetadata = item.getMetadata(fieldSegments[0], fieldSegments[1], null, lang);
                         if(checkMetadata.length > 0)
                         {
                             // We've already translated this, move along
@@ -143,7 +143,7 @@ public abstract class AbstractTranslator extends AbstractCurationTask
 
                     if(!translated && fieldMetadata.length > 0)
                     {
-                        for(DCValue metadataValue : fieldMetadata) {
+                        for(Metadatum metadataValue : fieldMetadata) {
                             String value = metadataValue.value;
                             String translatedText = translateText(authLang, lang, value);
                             if(translatedText != null && !"".equals(translatedText))

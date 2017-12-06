@@ -3,8 +3,8 @@ package ar.edu.unlp.sedici.dspace.curation.preservationHierarchy.preservationRul
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 
 import ar.edu.unlp.sedici.dspace.curation.preservationHierarchy.Reporter;
 
@@ -24,7 +24,7 @@ public class HandleValidationRule extends Rule {
 	 */
 	@Override
 	public int evaluate(Item item, Reporter reporter) {
-		DCValue[] dcHandle = item.getMetadata("dc.identifier.uri");
+		Metadatum[] dcHandle = item.getMetadataByMetadataString("dc.identifier.uri");
 		String handle = item.getHandle();
 		if(dcHandle.length == 0){
 		String Msg = "El ítem: "+item.getID()+" fue evaluado con 0 porque no posee Handle";

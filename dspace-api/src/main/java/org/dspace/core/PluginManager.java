@@ -7,22 +7,25 @@
  */
 package org.dspace.core;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Enumeration;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.regex.Matcher;
-import java.lang.reflect.Array;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.File;
-import java.io.IOException;
- 
+import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 /**
@@ -56,7 +59,6 @@ import org.apache.log4j.Logger;
  *  names in the configuration entry.
  *
  * @author Larry Stone
- * @version $Revision$
  * @see SelfNamedPlugin
  */
 public class PluginManager
@@ -73,17 +75,44 @@ public class PluginManager
     private static final String SELFNAMED_PREFIX = "plugin.selfnamed.";
     private static final String REUSABLE_PREFIX = "plugin.reusable.";
 
+    /** Configuration name of paths to search for third-party plugins. */
+    private static final String CLASSPATH = "plugin.classpath";
+
     // Separator character (from perl $;) to make "two dimensional"
     // hashtable key out of interface classname and plugin name;
     // this character separates the words.
     private static final String SEP = "\034";
 
+    /** Paths to search for third-party plugins. */
+    private static final String[] classPath;
+    static {
+        String path = ConfigurationManager.getProperty(CLASSPATH);
+        if (null == path)
+            classPath = new String[0];
+        else
+            classPath = path.split(":");
+    }
+
+    /** Custom class loader to search for third-party plugins. */
+    private static final PathsClassLoader loader
+            = new PathsClassLoader(PluginManager.class.getClassLoader(), classPath);
+
     // Map of plugin class to "reusable" metric (as Boolean, must be Object)
     // Key is Class, value is Boolean (true by default).
     private static Map<Class<Object>, Boolean> cacheMeCache = new HashMap<Class<Object>, Boolean>();
 
-    // Predicate -- whether or not to cache this class.  Ironically,
-    // the cacheability information is itself cached.
+    /**
+     * Whether or not to cache instances of this class. Ironically,
+     * the cacheability information is itself cached.
+     * <P>
+     * By default, all plugin class instances ARE cached. To disable instance
+     * caching for a specific plugin class, you must add a configuration similar
+     * to this in your dspace.cfg:
+     * <code>
+     * plugin.reusable.[full-class-name] = false
+     * </code>
+     * @return true if class instances should be cached in memory, false otherwise.
+     */
     private static boolean cacheMe(String module, Class implClass)
     {
         if (cacheMeCache.containsKey(implClass))
@@ -120,7 +149,7 @@ public class PluginManager
     {
         return getSinglePlugin(null, interfaceClass);
     }
-    
+
     /**
      * Returns an instance of the singleton (single) plugin implementing
      * the given interface.  There must be exactly one single plugin
@@ -136,14 +165,14 @@ public class PluginManager
      * @return instance of plugin
      * @throws PluginConfigurationError
      */
-    public static Object getSinglePlugin(String module, Class interfaceClass) 
+    public static Object getSinglePlugin(String module, Class interfaceClass)
         throws PluginConfigurationError, PluginInstantiationException
     {
         String iname = interfaceClass.getName();
 
         // configuration format is  prefix.<interface> = <classname>
         String classname = getConfigProperty(module, SINGLE_PREFIX+iname);
-        
+
         if (classname != null)
         {
             return getAnonymousPlugin(module, classname.trim());
@@ -153,7 +182,7 @@ public class PluginManager
             throw new PluginConfigurationError("No Single Plugin configured for interface \""+iname+"\"");
         }
     }
-        
+
     // cache of config data for Sequence Plugins; format its
     // <interface-name> -> [ <classname>.. ]  (value is Array)
     private static Map<String, String[]> sequenceConfig = new HashMap<String, String[]>();
@@ -175,7 +204,7 @@ public class PluginManager
     {
         return getPluginSequence(null, intfc);
     }
-    
+
     /**
      * Returns instances of all plugins that implement the interface
      * intface, in an Array.  Returns an empty array if no there are no
@@ -220,7 +249,7 @@ public class PluginManager
         }
         return result;
     }
-        
+
 
     // Map of cached (reusable) single plugin instances - class -> instance.
     private static Map<Serializable, Object> anonymousInstanceCache = new HashMap<Serializable, Object>();
@@ -232,7 +261,7 @@ public class PluginManager
     {
         try
         {
-            Class pluginClass = Class.forName(classname);
+            Class pluginClass = Class.forName(classname, true, loader);
             if (cacheMe(module, pluginClass))
             {
                 Object cached = anonymousInstanceCache.get(pluginClass);
@@ -326,7 +355,7 @@ public class PluginManager
                 {
                     try
                     {
-                    	Class pluginClass = Class.forName(classnames[i]);
+                        Class pluginClass = Class.forName(classnames[i], true, loader);
                         String names[] = (String[])pluginClass.getMethod("getPluginNames").
                                                    invoke(null);
                         if (names == null || names.length == 0)
@@ -394,7 +423,7 @@ public class PluginManager
     {
         return getNamedPlugin(null, intfc, name);
     }
-    
+
     /**
      * Returns an instance of a plugin that implements the interface
      * intface and is bound to a name matching name.  If there is no
@@ -421,16 +450,16 @@ public class PluginManager
             }
             else
             {
-                Class pluginClass = Class.forName(cname);
+                Class pluginClass = Class.forName(cname, true, loader);
                 if (cacheMe(module, pluginClass))
                 {
                     String nkey = pluginClass.getName() + SEP + name;
                     Object cached = namedInstanceCache.get(nkey);
                     if (cached == null)
                     {
-                    	log.debug("Creating cached instance of: " + cname + 
-                    			  " for interface=" + iname + 
-                    			  " pluginName=" + name );
+                        log.debug("Creating cached instance of: " + cname +
+                                          " for interface=" + iname +
+                                          " pluginName=" + name );
                         cached = pluginClass.newInstance();
                         if (cached instanceof SelfNamedPlugin)
                         {
@@ -442,9 +471,9 @@ public class PluginManager
                 }
                 else
                 {
-                	log.debug("Creating UNcached instance of: " + cname + 
-              			  " for interface=" + iname + 
-              			  " pluginName=" + name );
+                        log.debug("Creating UNcached instance of: " + cname +
+                                  " for interface=" + iname +
+                                  " pluginName=" + name );
                     Object result = pluginClass.newInstance();
                     if (result instanceof SelfNamedPlugin)
                     {
@@ -485,7 +514,7 @@ public class PluginManager
     {
         return hasNamedPlugin(null, intfc, name);
     }
-    
+
    /**
      * Returns whether a plugin exists which implements the specified interface
      * and has a specified name.  If a matching plugin is found to be configured,
@@ -512,7 +541,7 @@ public class PluginManager
             		                               e.toString(), e);
         }
     }
-    
+
     /**
      * Returns all of the names under which a named plugin implementing
      * the interface intface can be requested (with getNamedPlugin()).
@@ -530,7 +559,7 @@ public class PluginManager
     {
             return getAllPluginNames(null, intfc);
     }
-    
+
     /**
      * Returns all of the names under which a named plugin implementing
      * the interface intface can be requested (with getNamedPlugin()).
@@ -614,7 +643,7 @@ public class PluginManager
     {
         try
         {
-            if (Class.forName(iname) != null)
+            if (Class.forName(iname, true, loader) != null)
             {
                 return true;
             }
@@ -631,7 +660,7 @@ public class PluginManager
     {
         try
         {
-            if (!checkSelfNamed(Class.forName(iname)))
+            if (!checkSelfNamed(Class.forName(iname, true, loader)))
             {
                 log.error("The class \"" + iname + "\" is NOT a subclass of SelfNamedPlugin but it should be!");
             }
@@ -674,14 +703,14 @@ public class PluginManager
             // bogus classname should be old news by now.
         }
     }
-    
+
     // get module-specific, or generic configuration property
     private static String getConfigProperty(String module, String property)
     {
         if (module != null) {
             return ConfigurationManager.getProperty(module, property);
         }
-        return ConfigurationManager.getProperty(property);      
+        return ConfigurationManager.getProperty(property);
     }
 
     /**
@@ -708,7 +737,7 @@ public class PluginManager
         /*  XXX TODO:  (maybe) test that implementation class is really a
          *  subclass or impl of the plugin "interface"
          */
-         
+
         // tables of config keys for each type of config line:
         Map<String, String> singleKey = new HashMap<String, String>();
         Map<String, String> sequenceKey = new HashMap<String, String>();
@@ -852,7 +881,7 @@ public class PluginManager
         //  - plugin.selfnamed values are each  subclass of SelfNamedPlugin
         //  - save classname in allImpls
         Map<String, String> allImpls = new HashMap<String, String>();
-         
+
         // single plugins - just check that it has a valid impl. class
         ii = singleKey.keySet().iterator();
         while (ii.hasNext())
@@ -872,7 +901,7 @@ public class PluginManager
                 }
             }
         }
-         
+
         // sequence plugins - all values must be classes
         ii = sequenceKey.keySet().iterator();
         while (ii.hasNext())
@@ -974,4 +1003,5 @@ public class PluginManager
     {
         checkConfiguration();
     }
+
 }

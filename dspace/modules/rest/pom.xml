@@ -3,15 +3,16 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>rest</artifactId>
     <packaging>war</packaging>
-    <name>DSpace REST (JAX RS 1 - Jersey) :: Local Customizations</name>
+    <name>DSpace REST :: Local Customizations</name>
     <description>
-        Overlay REST customizations
+        This project allows you to overlay your own local REST customizations
+        on top of the default REST API provided with DSpace.
     </description>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>modules</artifactId>
-        <version>4.0</version>
+        <version>5.0</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -94,7 +95,12 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
             <type>war</type>
-            <version>4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-rest</artifactId>
+            <type>jar</type>
+            <classifier>classes</classifier>
         </dependency>
 
         <dependency>

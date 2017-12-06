@@ -15,13 +15,13 @@ import org.dspace.core.Context;
 
 import java.io.FileInputStream;
 import java.io.File;
-import java.sql.SQLException;
 
 import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
 import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
+import org.junit.rules.ExpectedException;
 
 
 /**
@@ -34,33 +34,9 @@ public class InstallItemTest extends AbstractUnitTest
     /** log4j category */
     private static final Logger log = Logger.getLogger(InstallItemTest.class);
 
-    /**
-     * This method will be run before every test as per @Before. It will
-     * initialize resources required for the tests.
-     *
-     * Other methods can be annotated with @Before here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @Before
-    @Override
-    public void init()
-    {
-        super.init();
-    }
-
-    /**
-     * This method will be run after every test as per @After. It will
-     * clean resources initialized by the @Before methods.
-     *
-     * Other methods can be annotated with @After here or in subclasses
-     * but no execution order is guaranteed
-     */
-    @After
-    @Override
-    public void destroy()
-    {
-        super.destroy();
-    }
+    /** Used to check/verify thrown exceptions in below tests **/
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     /**
      * Test of installItem method, of class InstallItem.
@@ -99,19 +75,18 @@ public class InstallItemTest extends AbstractUnitTest
     /**
      * Test of installItem method (with an invalid handle), of class InstallItem.
      */
-    @Test(expected=SQLException.class)
+    @Test
     public void testInstallItem_invalidHandle() throws Exception
     {
         //Default to Full-Admin rights
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
-                        Constants.ADD); result = false;
-                AuthorizeManager.isAdmin((Context) any); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Deny Community ADD perms
+            AuthorizeManager.authorizeActionBoolean((Context) any, (Community) any,
+                    Constants.ADD); result = false;
+            // Allow full Admin perms
+            AuthorizeManager.isAdmin((Context) any); result = true;
+        }};
 
         String handle = "1345/567";
         Collection col = Collection.create(context);
@@ -119,9 +94,12 @@ public class InstallItemTest extends AbstractUnitTest
         WorkspaceItem is2 = WorkspaceItem.create(context, col, false);
         
         //Test assigning the same Handle to two different items
-        // this should throw an exception
-        Item result1 = InstallItem.installItem(context, is, handle);
-        Item result2 = InstallItem.installItem(context, is2, handle);
+        InstallItem.installItem(context, is, handle);
+
+        // Assigning the same handle again should throw a RuntimeException
+        thrown.expect(RuntimeException.class);
+        thrown.expectMessage("Error while attempting to create identifier");
+        InstallItem.installItem(context, is2, handle);
         fail("Exception expected");
     }
 
@@ -154,9 +132,9 @@ public class InstallItemTest extends AbstractUnitTest
         assertThat("testRestoreItem 0", result, equalTo(is.getItem()));
 
         //Make sure that restore did NOT insert a new provenance message with today's date
-        DCValue[] provMsgValues = result.getMetadata("dc", "description", "provenance", Item.ANY);
+        Metadatum[] provMsgValues = result.getMetadata("dc", "description", "provenance", Item.ANY);
         int i = 1;
-        for(DCValue val : provMsgValues)
+        for(Metadatum val : provMsgValues)
         {
             assertFalse("testRestoreItem " + i, val.value.startsWith(provDescriptionBegins));
             i++;
@@ -224,7 +202,7 @@ public class InstallItemTest extends AbstractUnitTest
         context.restoreAuthSystemState();
 
         //Make sure the string "today" was replaced with today's date
-        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+        Metadatum[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
 
         assertThat("testInstallItem_todayAsIssuedDate 0", issuedDates[0].value, equalTo(date));
         assertThat("testInstallItem_todayAsIssuedDate 1", issuedDates[1].value, equalTo("2011-01-01"));
@@ -246,7 +224,7 @@ public class InstallItemTest extends AbstractUnitTest
         context.restoreAuthSystemState();
 
         //Make sure dc.date.issued is NOT set
-        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+        Metadatum[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
         assertThat("testInstallItem_nullIssuedDate 0", issuedDates.length, equalTo(0));
     }
 
@@ -276,7 +254,7 @@ public class InstallItemTest extends AbstractUnitTest
         context.restoreAuthSystemState();
 
         //Make sure the string "today" was replaced with today's date
-        DCValue[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
+        Metadatum[] issuedDates = result.getMetadata("dc", "date", "issued", Item.ANY);
 
         assertThat("testRestoreItem_todayAsIssuedDate 0", issuedDates[0].value, equalTo(date));
         assertThat("testRestoreItem_todayAsIssuedDate 1", issuedDates[1].value, equalTo("2011-01-01"));

@@ -9,6 +9,7 @@ package org.dspace.discovery.configuration;
 
 import org.dspace.utils.DSpace;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import java.util.Map;
 public class DiscoveryConfigurationService {
 
     private Map<String, DiscoveryConfiguration> map;
-    private Map<Integer, List<String>> toIgnoreMetadataFields;
+    private Map<Integer, List<String>> toIgnoreMetadataFields = new HashMap<>();
 
     public Map<String, DiscoveryConfiguration> getMap() {
         return map;

@@ -545,7 +545,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     protected String getCanonical(Item item)
     {
         String canonical = item.getHandle();
-        if( canonical.lastIndexOf(DOT)!=-1)
+        if( canonical.matches(".*/.*\\.\\d+") && canonical.lastIndexOf(DOT)!=-1)
         {
             canonical =  canonical.substring(0, canonical.lastIndexOf(DOT));
         }
@@ -556,7 +556,7 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
     protected String getCanonical(String identifier)
     {
         String canonical = identifier;
-        if( canonical.lastIndexOf(DOT)!=-1)
+        if( canonical.matches(".*/.*\\.\\d+") && canonical.lastIndexOf(DOT)!=-1)
         {
             canonical =  canonical.substring(0, canonical.lastIndexOf(DOT));
         }
@@ -633,8 +633,8 @@ public class VersionedHandleIdentifierProvider extends IdentifierProvider {
         // Add handle as identifier.uri DC value.
         // First check that identifier doesn't already exist.
         boolean identifierExists = false;
-        DCValue[] identifiers = item.getDC("identifier", "uri", Item.ANY);
-        for (DCValue identifier : identifiers)
+        Metadatum[] identifiers = item.getDC("identifier", "uri", Item.ANY);
+        for (Metadatum identifier : identifiers)
         {
             if (handleref.equals(identifier.value))
             {

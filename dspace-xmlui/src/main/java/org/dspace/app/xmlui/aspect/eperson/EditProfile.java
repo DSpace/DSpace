@@ -36,15 +36,12 @@ import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.xml.sax.SAXException;
 
-import ar.edu.unlp.sedici.util.CollectionSearchSedici;
-import ar.edu.unlp.sedici.util.CollectionsWithCommunities;
 
 /**
  * Display a form that allows the user to edit their profile.
@@ -369,7 +366,7 @@ public class EditProfile extends AbstractDSpaceTransformer
            subscribe.addItem(T_subscriptions_help);
            
            Collection[] currentList = Subscribe.getSubscriptions(context, context.getCurrentUser());
-           CollectionsWithCommunities possibleList = CollectionSearchSedici.findAllWithCommunitiesName(context);
+           Collection[] possibleList = Collection.findAll(context);
            
            Select subscriptions = subscribe.addItem().addSelect("subscriptions");
            subscriptions.setLabel(T_email_subscriptions);
@@ -378,28 +375,15 @@ public class EditProfile extends AbstractDSpaceTransformer
            subscriptions.enableDeleteOperation();
            
            subscriptions.addOption(-1,T_select_collection);
-           
-           String communityName, collectionName;
-           Collection collection;
-           for (int i = 0; i < possibleList.getCollections().size(); i++) {
-           	collection=possibleList.getCollections().get(i);
-           	
-           	communityName=possibleList.getCommunitiesName().get(i);
-           	collectionName=collection.getName();
-
-      		   	if (communityName.length() > 40){
-      		   		communityName = communityName.substring(0, 39);
-               } 
-      		   	if (collectionName.length() > 40){
-      		   		collectionName = collectionName.substring(0, 39);
-               }
-      		   	
-      		  subscriptions.addOption(collection.getID(),communityName+" > "+collectionName);
-           }
-                   
-           for (Collection collectionAux: currentList)
+	       CollectionDropDown.CollectionPathEntry[] possibleEntries = CollectionDropDown.annotateWithPaths(possibleList);
+           for (CollectionDropDown.CollectionPathEntry possible : possibleEntries)
            {
-               subscriptions.addInstance().setOptionSelected(collectionAux.getID());
+               subscriptions.addOption(possible.collection.getID(), possible.path);
+           }
+
+           for (Collection collection: currentList)
+           {
+               subscriptions.addInstance().setOptionSelected(collection.getID());
            }
        }
        

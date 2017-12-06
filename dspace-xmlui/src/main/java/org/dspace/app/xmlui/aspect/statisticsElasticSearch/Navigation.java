@@ -32,7 +32,7 @@ import java.sql.SQLException;
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent {
 
     private static final Message T_statistics_head = message("xmlui.statistics.Navigation.title");
-    private static final Message T_statistics_view = message("xmlui.statistics.Navigation.usage.view");
+    private static final Message T_statistics_view = message("xmlui.statistics.Navigation.usage-Elasticsearch.view");
 
     public Serializable getKey() {
         //TODO: DO THIS

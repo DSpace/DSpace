@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.dspace.modules</groupId>
    <artifactId>solr</artifactId>
-   <version>4.0</version>
+   <version>5.0</version>
    <packaging>war</packaging>
    <name>DSpace SOLR :: Local Customizations</name>
    <description>
@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>4.0</version>
+      <version>5.0</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -39,7 +39,7 @@
                      need to take precedence over the solr-core, the solr-core will still be loaded in the solr-core.jar
                      -->
                      <excludes>
-                         <exclude>WEB-INF/lib/apache-solr-core-4.4.0.jar</exclude>
+                         <exclude>WEB-INF/lib/apache-solr-core-4.10.2.jar</exclude>
                          <!--Also ensure we use the DSpace solr web.xml file else our localhost filter will not work !-->
                          <exclude>WEB-INF/web.xml</exclude>
                      </excludes>
@@ -54,11 +54,31 @@
          </plugin>
       </plugins>
    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers-common</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-queryparser</artifactId>
+                <version>${solr.version}</version>
+            </dependency>
+        </dependencies>
+
+    </dependencyManagement>
    <dependencies>
        <dependency>
            <groupId>org.dspace</groupId>
            <artifactId>dspace-solr</artifactId>
-           <version>4.0</version>
            <classifier>skinny</classifier>
            <type>war</type>
        </dependency>
@@ -66,7 +86,6 @@
        <dependency>
            <groupId>org.dspace</groupId>
            <artifactId>dspace-solr</artifactId>
-           <version>4.0</version>
            <classifier>classes</classifier>
            <type>jar</type>
        </dependency>
@@ -75,7 +94,58 @@
        <dependency>
            <groupId>org.apache.solr</groupId>
            <artifactId>solr-analysis-extras</artifactId>
-           <version>${lucene.version}</version>
+           <version>${solr.version}</version>
+           <exclusions>
+               <exclusion>
+                   <artifactId>javax.servlet</artifactId>
+                   <groupId>org.eclipse.jetty.orbit</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-continuation</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-deploy</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-http</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-io</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-jmx</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-security</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-server</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-servlet</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-util</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-webapp</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+               <exclusion>
+                   <artifactId>jetty-xml</artifactId>
+                   <groupId>org.eclipse.jetty</groupId>
+               </exclusion>
+
+           </exclusions>
        </dependency>
 
        <dependency>
@@ -83,22 +153,25 @@
            <artifactId>icu4j</artifactId>
        </dependency>
 
+
        <dependency>
            <groupId>org.apache.lucene</groupId>
            <artifactId>lucene-analyzers-icu</artifactId>
-           <version>${lucene.version}</version>
+           <version>${solr.version}</version>
+
        </dependency>
+
 		
        <dependency>
            <groupId>org.apache.lucene</groupId>
            <artifactId>lucene-analyzers-smartcn</artifactId>
-           <version>${lucene.version}</version>
+           <version>${solr.version}</version>
        </dependency>
        
        <dependency>
            <groupId>org.apache.lucene</groupId>
            <artifactId>lucene-analyzers-stempel</artifactId>
-           <version>${lucene.version}</version>
+           <version>${solr.version}</version>
        </dependency>
        
        <!-- support odd cases where JAXP cannot be found in JVM -->

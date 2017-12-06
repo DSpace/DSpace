@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>4.0</version>
+      <version>5.0</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -53,8 +53,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <!--Exclude license check for JSPUI files which don't need it-->
                     <excludes>
@@ -64,6 +64,9 @@
                         <exclude>**/readme*</exclude>
                         <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
+                        <exclude>**/bootstrap/**</exclude>
+                        <exclude>**/fonts/**</exclude>
+                        <exclude>**/resumable.js</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -131,7 +134,17 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.1</version>
+            <type>jar</type>
+        </dependency>
+		<dependency>
+    		<groupId>org.mcavallo</groupId>
+    		<artifactId>opencloud</artifactId>
+    		<version>0.3</version>
+		</dependency>
     </dependencies>
 
 </project>

@@ -7,6 +7,8 @@
  */
 package org.dspace.app.requestitem;
 
+import org.dspace.eperson.EPerson;
+
 /**
  * Simple DTO to transfer data about the corresponding author for the Request
  * Copy feature
@@ -23,6 +25,12 @@ public class RequestItemAuthor {
 		this.fullName = fullName;
 		this.email = email;
 	}
+
+    public RequestItemAuthor(EPerson ePerson) {
+        super();
+        this.fullName = ePerson.getFullName();
+        this.email = ePerson.getEmail();
+    }
 
 	public String getEmail() {
 		return email;

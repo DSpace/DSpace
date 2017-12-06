@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>4.0</version>
+        <version>5.0</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -29,52 +29,91 @@
             <!-- Filter using the properties file defined by dspace-parent POM -->
             <filter>${filters.file}</filter>
         </filters>
-    
-        <plugins>
-            <!--  Default project assembly. Calls 'assembly.xml', which
-                  generates the DSpace build directory. -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <!-- Don't "attach" the assembly results to this project. As
-                         this assembly builds a directory, setting this to "true"
-                         (default value) will just result in a WARNING message.-->
-                    <attach>false</attach>
-                    <descriptors>
-                        <descriptor>src/main/assembly/assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <profiles>
 
-        <!-- Default Profile. This builds all Overlay modules for DSpace -->
+        <!-- Build Profile. This builds all Overlay modules for DSpace -->   
         <profile>
-            <id>default</id>
+            <id>build</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <!-- Enabled as long as we are NOT creating a zip/tarball distribution -->
+                <property>
+                    <name>!distributions</name>
+                </property>
             </activation>
-            <!--
-                Builds Overlay Modules for DSpace
-            -->
+            <!-- Build all Overlay submodules -->
             <modules>
                 <module>modules</module>
-            </modules>
+            </modules> 
         </profile>
+
+        <!--
+            DSpace Assembly profile. By default this is enabled.
+            This profile actually builds all submodules and then assembles
+            the 'dspace-installer' from the resulting JARs/WARs.
+            See 'assembly.xml' for more info.
+            This profile can be optionally deactivated by passing '-P!assembly'.
+        -->
+        <profile>
+            <id>assembly</id>
+            <activation>
+                <!-- Enabled as long as we are NOT creating a zip/tarball distribution -->
+                <property>
+                    <name>!distributions</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                   <!-- Assemble 'target/dspace-installer' using 'assembly.xml' -->
+                   <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <!-- Don't "attach" the assembly results to this project. As
+                                 this assembly builds a directory, setting this to "true"
+                                (default value) will just result in a WARNING message.-->
+                            <attach>false</attach>
+                            <finalName>${project.artifactId}</finalName>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- This profile simply determines whether we are creating 
+             zip / tarball distributions to upload to SourceFore or similar. 
+             By running "mvn package -Ddistributions=true" you'll
+             SKIP normal build & assembly (see above profiles) and
+             INSTEAD just run the "distributions" profile below. -->
+        <profile>
+            <id>build-and-assembly</id>
+            <activation>
+                <!-- This profile should be active at all times, unless the user
+                     specifies a different value for "distributions" -->
+                <property>
+                    <name>!distributions</name>
+                </property>
+            </activation>
+            <properties>
+                <distributions>false</distributions>
+            </properties>
+        </profile> 
 
 
         <!--
-            Run this profile (e.g. 'mvn package -Pdistributions') to create
+            Run this profile (e.g. 'mvn package -Ddistributions=true') to create
             zip / tarball distributions to upload to SourceForge or similar.
             When this profile is run, DSpace is NOT compiled as normal.
             Instead, a zip/tarball is generated from the parent [dspace-src] directory.
@@ -82,7 +121,11 @@
         <profile>
            <id>distributions</id>
            <activation>
-              <activeByDefault>false</activeByDefault>
+              <!-- Only enabled if "distributions=true" was passed on commandline -->
+              <property>
+                  <name>distributions</name>
+                  <value>true</value>
+              </property>
            </activation>
            <build>
               <plugins>

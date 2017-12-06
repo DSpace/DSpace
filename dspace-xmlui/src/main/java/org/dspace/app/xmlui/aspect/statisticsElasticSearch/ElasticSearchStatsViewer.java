@@ -409,7 +409,7 @@ public class ElasticSearchStatsViewer extends AbstractDSpaceTransformer {
     }
     
     private String getFirstMetadataValue(Item item, String metadataKey) {
-        DCValue[] dcValue = item.getMetadata(metadataKey);
+        Metadatum[] dcValue = item.getMetadataByMetadataString(metadataKey);
         if(dcValue.length > 0) {
             return dcValue[0].value;
         } else {

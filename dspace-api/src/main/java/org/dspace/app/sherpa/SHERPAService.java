@@ -7,61 +7,99 @@
  */
 package org.dspace.app.sherpa;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpStatus;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 public class SHERPAService
 {
+    private CloseableHttpClient client = null;
+
+    private int maxNumberOfTries;
+    private long sleepBetweenTimeouts;
+    private int timeout;
+
+    /** log4j category */
+    private static final Logger log = Logger.getLogger(SHERPAService.class);
+
+    public SHERPAService() {
+        HttpClientBuilder custom = HttpClients.custom();
+        // httpclient 4.3+ doesn't appear to have any sensible defaults any more. Setting conservative defaults as not to hammer the SHERPA service too much.
+        client=custom.disableAutomaticRetries().setMaxConnTotal(5).setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(timeout).build()).build();
+
+    }
+
+
     public SHERPAResponse searchByJournalISSN(String query)
     {
         String endpoint = ConfigurationManager.getProperty("sherpa.romeo.url");
         String apiKey = ConfigurationManager.getProperty("sherpa.romeo.apikey");
-        
-        GetMethod method = null;
-        try
-        {
-            HttpClient client = new HttpClient();
-            method = new GetMethod(endpoint);
 
-            NameValuePair id = new NameValuePair("issn", query);
-            NameValuePair versions = new NameValuePair("versions", "all");
-            NameValuePair[] params = null;
-            if (StringUtils.isNotBlank(apiKey))
-            {
-                NameValuePair ak = new NameValuePair("ak", apiKey);
-                params = new NameValuePair[] { id, versions, ak };
-            }
-            else
-            {
-                params = new NameValuePair[] { id, versions };
-            }
-            method.setQueryString(params);
-            // Execute the method.
-            int statusCode = client.executeMethod(method);
+        HttpGet method = null;
+        SHERPAResponse sherpaResponse = null;
+        int numberOfTries = 0;
 
-            if (statusCode != HttpStatus.SC_OK)
-            {
-                return new SHERPAResponse("SHERPA/RoMEO return not OK status: "
-                        + statusCode);
-            }
+        while(numberOfTries<maxNumberOfTries && sherpaResponse==null) {
+            numberOfTries++;
 
-            return new SHERPAResponse(method.getResponseBodyAsStream());
+            try {
+                Thread.sleep(sleepBetweenTimeouts * (numberOfTries-1));
+
+                URIBuilder uriBuilder = new URIBuilder(endpoint);
+                uriBuilder.addParameter("issn", query);
+                uriBuilder.addParameter("versions", "all");
+                if (StringUtils.isNotBlank(apiKey))
+                    uriBuilder.addParameter("ak", apiKey);
+
+                method = new HttpGet(uriBuilder.build());
+
+                // Execute the method.
+
+                HttpResponse response = client.execute(method);
+                int statusCode = response.getStatusLine().getStatusCode();
+
+                if (statusCode != HttpStatus.SC_OK) {
+                    sherpaResponse = new SHERPAResponse("SHERPA/RoMEO return not OK status: "
+                            + statusCode);
+                }
+
+                HttpEntity responseBody = response.getEntity();
+
+                if (null != responseBody)
+                    sherpaResponse = new SHERPAResponse(responseBody.getContent());
+                else
+                    sherpaResponse = new SHERPAResponse("SHERPA/RoMEO returned no response");
+            } catch (Exception e) {
+                log.error(e.getMessage(),e);
+            }
         }
-        catch (Exception e)
-        {
-            return new SHERPAResponse(
+
+        if(sherpaResponse==null){
+            sherpaResponse = new SHERPAResponse(
                     "Error processing the SHERPA/RoMEO answer");
         }
-        finally
-        {
-            if (method != null)
-            {
-                method.releaseConnection();
-            }
-        }
+
+        return sherpaResponse;
+    }
+
+    public void setMaxNumberOfTries(int maxNumberOfTries) {
+        this.maxNumberOfTries = maxNumberOfTries;
+    }
+
+    public void setSleepBetweenTimeouts(long sleepBetweenTimeouts) {
+        this.sleepBetweenTimeouts = sleepBetweenTimeouts;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 }

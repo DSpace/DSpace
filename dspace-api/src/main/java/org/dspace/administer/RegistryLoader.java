@@ -57,7 +57,7 @@ public class RegistryLoader
     public static void main(String[] argv) throws Exception
     {
         String usage = "Usage: " + RegistryLoader.class.getName()
-                + " (-bitstream | -dc) registry-file.xml";
+                + " (-bitstream | -metadata) registry-file.xml";
 
         Context context = null;
 
@@ -67,22 +67,24 @@ public class RegistryLoader
 
             // Can't update registries anonymously, so we need to turn off
             // authorisation
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
 
             // Work out what we're loading
             if (argv[0].equalsIgnoreCase("-bitstream"))
             {
                 RegistryLoader.loadBitstreamFormats(context, argv[1]);
             }
-            else if (argv[0].equalsIgnoreCase("-dc"))
+            else if (argv[0].equalsIgnoreCase("-metadata"))
             {
-                loadDublinCoreTypes(context, argv[1]);
+                // Call MetadataImporter, as it handles Metadata schema updates
+                MetadataImporter.loadRegistry(argv[1], true);
             }
             else
             {
                 System.err.println(usage);
             }
 
+            // Commit changes and close Context
             context.complete();
 
             System.exit(0);
@@ -91,11 +93,6 @@ public class RegistryLoader
         {
             System.err.println(usage);
 
-            if (context != null)
-            {
-                context.abort();
-            }
-
             System.exit(1);
         }
         catch (Exception e)
@@ -103,13 +100,14 @@ public class RegistryLoader
             log.fatal(LogManager.getHeader(context, "error_loading_registries",
                     ""), e);
 
-            if (context != null)
-            {
-                context.abort();
-            }
-
             System.err.println("Error: \n - " + e.getMessage());
             System.exit(1);
+        }
+        finally
+        {
+            // Clean up our context, if it still exists & it was never completed
+            if(context!=null && context.isValid())
+                context.abort();
         }
     }
 
@@ -168,124 +166,32 @@ public class RegistryLoader
 
         String[] extensions = getRepeatedElementData(node, "extension");
 
-        // Create the format object
-        BitstreamFormat format = BitstreamFormat.create(context);
-
-        // Fill it out with the values
-        format.setMIMEType(mimeType);
-        format.setShortDescription(shortDesc);
-        format.setDescription(desc);
-        format.setSupportLevel(supportLevel);
-        format.setInternal(internal);
-        format.setExtensions(extensions);
-
-        // Write to database
-        format.update();
-    }
-
-    /**
-     * Load Dublin Core types
-     * 
-     * @param context
-     *            DSpace context object
-     * @param filename
-     *            the filename of the XML file to load
-     * @throws NonUniqueMetadataException
-     */
-    public static void loadDublinCoreTypes(Context context, String filename)
-            throws SQLException, IOException, ParserConfigurationException,
-            SAXException, TransformerException, AuthorizeException,
-            NonUniqueMetadataException
-    {
-        Document document = loadXML(filename);
-
-        // Get the nodes corresponding to schemas
-        NodeList schemaNodes = XPathAPI.selectNodeList(document,
-                "/dspace-dc-types/dc-schema");
-
-        // Add each schema
-        for (int i = 0; i < schemaNodes.getLength(); i++)
-        {
-            Node n = schemaNodes.item(i);
-            loadMDSchema(context, n);
-        }
+        // Check if this format already exists in our registry (by mime type)
+        BitstreamFormat exists = BitstreamFormat.findByMIMEType(context, mimeType);
         
-        // Get the nodes corresponding to fields
-        NodeList typeNodes = XPathAPI.selectNodeList(document,
-                "/dspace-dc-types/dc-type");
-
-        // Add each one as a new field to the schema
-        for (int i = 0; i < typeNodes.getLength(); i++)
-        {
-            Node n = typeNodes.item(i);
-            loadDCType(context, n);
+        // If not found by mimeType, check by short description (since this must also be unique)
+        if(exists==null)
+        {    
+            exists = BitstreamFormat.findByShortDescription(context, shortDesc);
         }
-
-        log.info(LogManager.getHeader(context, "load_dublin_core_types",
-                "number_loaded=" + typeNodes.getLength()));
-    }
-
-    /**
-     * Load Dublin Core Schemas
-     * 
-     * @param context
-     * @param node
-     */
-    private static void loadMDSchema(Context context, Node node) 
-    		throws TransformerException, SQLException, AuthorizeException, 
-    		NonUniqueMetadataException
-    {
-    	// Get the values
-        String shortname = getElementData(node, "name");
-        String namespace = getElementData(node, "namespace");
-
-        // Check if the schema exists already
-        MetadataSchema schema = MetadataSchema.find(context, shortname);
-        if (schema == null)
+            
+        // If it doesn't exist, create it..otherwise skip it.
+        if(exists==null)
         {
-        	// If not create it.
-        	schema = new MetadataSchema();
-        	schema.setNamespace(namespace);
-        	schema.setName(shortname);
-        	schema.create(context);
-        }
-    }
-    
-    /**
-     * Process a node in the bitstream format registry XML file. The node must
-     * be a "bitstream-type" node
-     * 
-     * @param context
-     *            DSpace context object
-     * @param node
-     *            the node in the DOM tree
-     * @throws NonUniqueMetadataException
-     */
-    private static void loadDCType(Context context, Node node)
-            throws SQLException, IOException, TransformerException,
-            AuthorizeException, NonUniqueMetadataException
-    {
-        // Get the values
-        String schema = getElementData(node, "schema");
-        String element = getElementData(node, "element");
-        String qualifier = getElementData(node, "qualifier");
-        String scopeNote = getElementData(node, "scope_note");
+            // Create the format object
+            BitstreamFormat format = BitstreamFormat.create(context);
 
-        // If the schema is not provided default to DC
-        if (schema == null)
-        {
-            schema = MetadataSchema.DC_SCHEMA;
-        }
+            // Fill it out with the values
+            format.setMIMEType(mimeType);
+            format.setShortDescription(shortDesc);
+            format.setDescription(desc);
+            format.setSupportLevel(supportLevel);
+            format.setInternal(internal);
+            format.setExtensions(extensions);
 
-        // Find the matching schema object
-        MetadataSchema schemaObj = MetadataSchema.find(context, schema);
-        
-        MetadataField field = new MetadataField();
-        field.setSchemaID(schemaObj.getSchemaID());
-        field.setElement(element);
-        field.setQualifier(qualifier);
-        field.setScopeNote(scopeNote);
-        field.create(context);
+            // Write to database
+            format.update();
+        }
     }
 
     // ===================== XML Utility Methods =========================

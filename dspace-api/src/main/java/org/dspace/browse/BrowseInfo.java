@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
@@ -888,7 +888,7 @@ public class BrowseInfo
     				sb.append("{{ NULL METADATA }}");
     				break;
     			}
-				DCValue[] values = bi.getMetadata(md[0], md[1], md[2], Item.ANY);
+				Metadatum[] values = bi.getMetadata(md[0], md[1], md[2], Item.ANY);
 				StringBuffer value = new StringBuffer();
 				if (values != null)
 				{

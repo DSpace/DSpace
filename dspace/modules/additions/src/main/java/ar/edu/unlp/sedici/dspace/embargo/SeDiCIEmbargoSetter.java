@@ -6,9 +6,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
-import org.dspace.curate.Curator;
+import org.dspace.content.Metadatum;
 
 /**
 
@@ -29,20 +28,20 @@ public class SeDiCIEmbargoSetter extends DaysEmbargoSetter {
 	}
 
 	protected Date getEmbargoStartDate(Item item) {
-		DCValue docTypes[] = item.getMetadata(typeMetadata);
+		Metadatum docTypes[] = item.getMetadataByMetadataString(typeMetadata);
 		
-		if (item.getMetadata("sedici2003.identifier").length != 0){
+		if (item.getMetadataByMetadataString("sedici2003.identifier").length != 0){
 			//Es un doc importado
-			DCValue embargosViejos[] = item.getMetadata("sedici2003.fecha-hora-creacion");
+			Metadatum embargosViejos[] = item.getMetadataByMetadataString("sedici2003.fecha-hora-creacion");
 			if (embargosViejos.length > 0){
 				try{
         			return new DCDate(sediciDatetimeFormat.parse(embargosViejos[0].value)).toDate();
         		}catch(ParseException e){
-        			log.warn("Error de parseo de fecha al procesar (sedici2003.fecha-hora-creacion)==("+embargosViejos[0].value+") del documento importado con id "+item.getMetadata("sedici2003.identifier")[0]);
+        			log.warn("Error de parseo de fecha al procesar (sedici2003.fecha-hora-creacion)==("+embargosViejos[0].value+") del documento importado con id "+item.getMetadataByMetadataString("sedici2003.identifier")[0]);
                 } 
 			}
 			
-			throw new IllegalArgumentException("No se pudo procesar la fecha de creacion (sedici2003.fecha-creacion) del documento importado con id "+item.getMetadata("sedici2003.identifier")[0].value);
+			throw new IllegalArgumentException("No se pudo procesar la fecha de creacion (sedici2003.fecha-creacion) del documento importado con id "+item.getMetadataByMetadataString("sedici2003.identifier")[0].value);
 		}
 		
 		if (docTypes.length == 0){
@@ -54,7 +53,7 @@ public class SeDiCIEmbargoSetter extends DaysEmbargoSetter {
 			return null;
 		}
 		
-		DCValue exposureDates[] = item.getMetadata(exposureDateMetadata);
+		Metadatum exposureDates[] = item.getMetadataByMetadataString(exposureDateMetadata);
 		if (exposureDates.length == 0){
 			log.trace("No se encontro un campo "+exposureDateMetadata+" para el doc "+item.getHandle());
 			return null;

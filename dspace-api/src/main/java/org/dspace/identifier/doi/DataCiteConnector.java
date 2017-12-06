@@ -490,7 +490,7 @@ implements DOIConnector
             log.error("Caught an AuthorizeException while disseminating DSO "
                     + "with type " + dso.getType() + " and ID " + dso.getID()
                     + ". Giving up to reserve DOI " + doi + ".", ae);
-            throw new DOIIdentifierException("AuthorizeException occured while "
+            throw new DOIIdentifierException("AuthorizeException occurred while "
                     + "converting " + dso.getTypeText() + "/" + dso.getID()
                     + " using crosswalk " + this.CROSSWALK_NAME + ".", ae,
                     DOIIdentifierException.CONVERSION_ERROR);
@@ -500,7 +500,7 @@ implements DOIConnector
             log.error("Caught an CrosswalkException while reserving a DOI ("
                     + doi + ") for DSO with type " + dso.getType() + " and ID " 
                     + dso.getID() + ". Won't reserve the doi.", ce);
-            throw new DOIIdentifierException("CrosswalkException occured while "
+            throw new DOIIdentifierException("CrosswalkException occurred while "
                     + "converting " + dso.getTypeText() + "/" + dso.getID()
                     + " using crosswalk " + this.CROSSWALK_NAME + ".", ce,
                     DOIIdentifierException.CONVERSION_ERROR);

@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>dspace-xmlui-mirage2</artifactId>
+    <packaging>war</packaging>
+    <name>DSpace XML-UI Mirage2 Theme</name>
+    <description>
+      DSpace Mirage2 Theme for the XMLUI (Cocoon based interface).
+    </description>
+
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>5.0</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <properties>
+        <!-- This is the path to the root [dspace-src] directory. -->
+        <root.basedir>${basedir}/..</root.basedir>
+    </properties>
+
+    <build>
+        <filters>
+            <!-- Filter using the properties file defined by dspace-parent POM -->
+            <filter>${filters.file}</filter>
+        </filters>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <archiveClasses>false</archiveClasses>
+                    <warSourceExcludes>themes/**</warSourceExcludes>
+                    <webResources>
+                        <resource>
+                            <filtering>false</filtering>
+                            <directory>${basedir}/src/main/webapp</directory>
+                        </resource>
+                    </webResources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Exclude license check for essential config files, these files cannot have a license comment or Mirage 2 will not compile -->
+                    <excludes>
+                        <exclude>**/*.json</exclude>
+                        <exclude>**/*.LICENSE</exclude>
+                        <exclude>**/*.svg</exclude>
+                        <exclude>**/readme.txt</exclude>
+                        <exclude>**/.bowerrc</exclude>
+                        <exclude>**/dataTables.jqueryui.js</exclude>
+                    </excludes>
+                    <mapping>
+                        <!-- File extensions which are not recognized by license-maven-plugin:
+                             *.hbs, *.scss -->
+                        <hbs>XML_STYLE</hbs>
+                        <scss>JAVADOC_STYLE</scss>
+                    </mapping>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

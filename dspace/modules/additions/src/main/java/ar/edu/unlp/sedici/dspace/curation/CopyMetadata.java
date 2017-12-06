@@ -5,9 +5,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
@@ -39,7 +39,7 @@ public class CopyMetadata extends AbstractCurationTask {
 			
             
             //copio el metadato fecha_hora_creacion
-            DCValue[] metadata=item.getMetadata("sedici2003.fecha-hora-creacion");
+            Metadatum[] metadata=item.getMetadataByMetadataString("sedici2003.fecha-hora-creacion");
             Boolean creacion_bool=true;
             Boolean disponibilidad_bool=true;        	
         	if (metadata.length>0){
@@ -54,7 +54,7 @@ public class CopyMetadata extends AbstractCurationTask {
             	report("El item no posee el metadato sedici2003.fecha-hora-creacion");
             };
             //copio el metadato fecha_disponiblidad
-            metadata=item.getMetadata("sedici2003.fecha-disponibilidad");                   	
+            metadata=item.getMetadataByMetadataString("sedici2003.fecha-disponibilidad");                   	
             if (metadata.length>0){
         		DCDate fDisponibilidad= new DCDate(sediciDateFormat.parse(metadata[0].value));
             	item.clearMetadata("dc", "date", "available", null);

@@ -315,7 +315,7 @@ public class UploadWithEmbargoStep extends UploadStep
      *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-    protected int processUploadFile(Context context, HttpServletRequest request,
+    public int processUploadFile(Context context, HttpServletRequest request,
                                     HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException

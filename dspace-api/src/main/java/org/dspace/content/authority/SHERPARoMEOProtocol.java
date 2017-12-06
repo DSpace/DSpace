@@ -8,6 +8,7 @@
 package org.dspace.content.authority;
 
 import java.io.IOException;
+import java.util.List;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,11 +23,12 @@ import org.apache.log4j.Logger;
 
 import org.dspace.core.ConfigurationManager;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.util.EncodingUtil;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 /**
  * Choice Authority based on SHERPA/RoMEO - for Publishers and Journals
@@ -50,7 +52,7 @@ import org.apache.commons.httpclient.HttpException;
  */
 public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
 {
-    private static Logger log = Logger.getLogger(SHERPARoMEOProtocol.class);
+    private static final Logger log = Logger.getLogger(SHERPARoMEOProtocol.class);
 
     // contact URL from configuration
     private static String url = null;
@@ -72,6 +74,7 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
     // this implements the specific RoMEO API args and XML tag naming
     public abstract Choices getMatches(String text, int collection, int start, int limit, String locale);
 
+    @Override
     public Choices getBestMatch(String field, String text, int collection, String locale)
     {
         return getMatches(field, text, collection, 0, 2, locale);
@@ -79,6 +82,7 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
 
     // XXX FIXME just punt, returning value, never got around to
     //  implementing a reverse query.
+    @Override
     public String getLabel(String field, String key, String locale)
     {
         return key;
@@ -86,18 +90,18 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
 
     // NOTE - ignore limit and start for now
     protected Choices query(String result, String label, String authority,
-                            NameValuePair[] args, int start, int limit)
+                            List<BasicNameValuePair> args, int start, int limit)
     {
-        HttpClient hc = new HttpClient();
-        String srUrl = url + "?" + EncodingUtil.formUrlEncode(args, "UTF8");
-        GetMethod get = new GetMethod(srUrl);
+        HttpClient hc = new DefaultHttpClient();
+        String srUrl = url + "?" + URLEncodedUtils.format(args, "UTF8");
+        HttpGet get = new HttpGet(srUrl);
 
-        log.debug("Trying SHERPA/RoMEO Query, URL="+srUrl);
+        log.debug("Trying SHERPA/RoMEO Query, URL=" + srUrl);
 
         try
         {
-            int status = hc.executeMethod(get);
-            if (status == 200)
+            HttpResponse response = hc.execute(get);
+            if (response.getStatusLine().getStatusCode() == 200)
             {
                 SAXParserFactory spf = SAXParserFactory.newInstance();
                 SAXParser sp = spf.newSAXParser();
@@ -109,7 +113,7 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
                 xr.setFeature("http://xml.org/sax/features/namespaces", true);
                 xr.setContentHandler(handler);
                 xr.setErrorHandler(handler);
-                xr.parse(new InputSource(get.getResponseBodyAsStream()));
+                xr.parse(new InputSource(response.getEntity().getContent()));
                 int confidence;
                 if (handler.total == 0)
                 {
@@ -125,11 +129,6 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
                 }
                 return new Choices(handler.result, start, handler.total, confidence, false);
             }
-        }
-        catch (HttpException e)
-        {
-            log.error("SHERPA/RoMEO query failed: ", e);
-            return null;
         }
         catch (IOException e)
         {
@@ -185,6 +184,7 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
         // BEWARE:  subclass's startElement method should call super()
         // to null out 'value'.  (Don't you miss the method combination
         // options of a real object system like CLOS?)
+        @Override
         public void characters(char[] ch, int start, int length)
             throws SAXException
         {
@@ -203,6 +203,7 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
         }
 
         // if this was the FIRST "numhits" element, it's size of results:
+        @Override
         public void endElement(String namespaceURI, String localName,
                                  String qName)
             throws SAXException
@@ -248,6 +249,7 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
         }
 
         // subclass overriding this MUST call it with super()
+        @Override
         public void startElement(String namespaceURI, String localName,
                                  String qName, Attributes atts)
             throws SAXException
@@ -255,12 +257,14 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
             textValue = null;
         }
 
+        @Override
         public void error(SAXParseException exception)
             throws SAXException
         {
             throw new SAXException(exception);
         }
 
+        @Override
         public void fatalError(SAXParseException exception)
             throws SAXException
         {

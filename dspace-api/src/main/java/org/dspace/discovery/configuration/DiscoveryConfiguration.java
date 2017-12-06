@@ -23,6 +23,8 @@ public class DiscoveryConfiguration implements InitializingBean{
     /** The configuration for the sidebar facets **/
     private List<DiscoverySearchFilterFacet> sidebarFacets = new ArrayList<DiscoverySearchFilterFacet>();
 
+    private TagCloudFacetConfiguration tagCloudFacetConfiguration = new TagCloudFacetConfiguration();
+    
     /** The default filter queries which will be applied to any search & the recent submissions **/
     private List<String> defaultFilterQueries;
 
@@ -58,7 +60,15 @@ public class DiscoveryConfiguration implements InitializingBean{
         this.sidebarFacets = sidebarFacets;
     }
 
-    public List<String> getDefaultFilterQueries() {
+    public TagCloudFacetConfiguration getTagCloudFacetConfiguration() {
+		return tagCloudFacetConfiguration;
+	}
+
+	public void setTagCloudFacetConfiguration(TagCloudFacetConfiguration tagCloudFacetConfiguration) {
+		this.tagCloudFacetConfiguration = tagCloudFacetConfiguration;
+	}
+
+	public List<String> getDefaultFilterQueries() {
         //Since default filter queries are not mandatory we will return an empty list
         if(defaultFilterQueries == null){
             return new ArrayList<String>();
@@ -154,6 +164,21 @@ public class DiscoveryConfiguration implements InitializingBean{
 
             throw new DiscoveryConfigurationException(error.toString());
         }
+        
+        Collection missingTagCloudSearchFilters = CollectionUtils.subtract(getTagCloudFacetConfiguration().getTagCloudFacets(), getSearchFilters());
+        if(CollectionUtils.isNotEmpty(missingTagCloudSearchFilters))
+        {
+            StringBuilder error = new StringBuilder();
+            error.append("The following tagCloud facet configurations are not present in the search filters list: ");
+            for (Object missingSearchFilter : missingTagCloudSearchFilters)
+            {
+                DiscoverySearchFilter searchFilter = (DiscoverySearchFilter) missingSearchFilter;
+                error.append(searchFilter.getIndexFieldName()).append(" ");
 
+            }
+            error.append("all the tagCloud facets MUST be a part of the search filters list.");
+
+            throw new DiscoveryConfigurationException(error.toString());
+        }
     }   
 }

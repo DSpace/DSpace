@@ -11,48 +11,29 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Para;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.Metadatum;
 import org.xml.sax.SAXException;
 
-/**
- * Display a single collection. This includes a full text search, browse by
- * list, community display and a list of recent submissions.
- * 
- * @author Scott Phillips
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
- */
+
 public class AddItemCollections extends AbstractDSpaceTransformer implements CacheableProcessingComponent 
 {
 	/** Cached validity object */
@@ -165,7 +146,7 @@ public class AddItemCollections extends AbstractDSpaceTransformer implements Cac
      */
     public static String getItemTitle(Item item)
     {
-        DCValue[] titles = item.getDC("title", Item.ANY, Item.ANY);
+        Metadatum[] titles = item.getDC("title", Item.ANY, Item.ANY);
 
         String title;
         if (titles != null && titles.length > 0)

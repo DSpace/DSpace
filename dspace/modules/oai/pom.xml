@@ -3,16 +3,16 @@
     <groupId>org.dspace.modules</groupId>
     <artifactId>oai</artifactId>
     <packaging>war</packaging>
-    <name>DSpace OAI 2.0 :: Local Customizations</name>
+    <name>DSpace OAI-PMH :: Local Customizations</name>
     <description>
         This project allows you to overlay your own local OAI customizations
-        on top of the default OAI 2.0 web application provided with DSpace.
+        on top of the default OAI-PMH web application provided with DSpace.
     </description>
 
     <parent>
         <artifactId>modules</artifactId>
         <groupId>org.dspace</groupId>
-        <version>4.0</version>
+        <version>5.0</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -94,17 +94,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-core</artifactId>
-            <version>${solr.version}</version>
-            <exclusions>
-				<exclusion>
-					<groupId>jdk.tools</groupId>
-					<artifactId>jdk.tools</artifactId>
-				</exclusion>
-			</exclusions> 
-        </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>

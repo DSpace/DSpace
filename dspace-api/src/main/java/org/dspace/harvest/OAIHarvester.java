@@ -29,6 +29,7 @@ import java.util.TimeZone;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import ORG.oclc.oai.harvester2.verb.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -37,7 +38,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.InstallItem;
@@ -63,12 +64,6 @@ import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
-
-import ORG.oclc.oai.harvester2.verb.GetRecord;
-import ORG.oclc.oai.harvester2.verb.Identify;
-import ORG.oclc.oai.harvester2.verb.ListMetadataFormats;
-import ORG.oclc.oai.harvester2.verb.ListRecords;
-import ORG.oclc.oai.harvester2.verb.ListSets;
 
 
 /**
@@ -139,13 +134,9 @@ public class OAIHarvester {
         // Set the ORE options
 		Namespace ORESerializationNamespace = OAIHarvester.getORENamespace();
 
-        if (ORESerializationNamespace == null) {
-        	log.error("No ORE serialization namespace declared; see dspace.cfg option \"harvester.oai.oreSerializationFormat.{ORESerialKey} = {ORESerialNS}\"");
-        	throw new HarvestingException("No ORE serialization namespace specified");
-        } else {
-        	ORESerialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
-        	ORESerialKey = ORESerializationNamespace.getPrefix();
-        }
+        //No need to worry about ORESerializationNamespace, this can never be null
+        ORESerialNS = Namespace.getNamespace(ORESerializationNamespace.getURI());
+        ORESerialKey = ORESerializationNamespace.getPrefix();
 
         // Set the metadata options
         metadataKey = harvestRow.getHarvestMetadataConfig();
@@ -373,13 +364,19 @@ public class OAIHarvester {
 				else {
 					listRecords = new ListRecords(oaiSource, resumptionToken);
 				}
-				targetCollection.update();
+                ourContext.turnOffAuthorisationSystem();
+                try {
+                    targetCollection.update();
+                } finally {
+                    //In case of an exception, make sure to restore our authentication state to the previous state
+                    ourContext.restoreAuthSystemState();
+                }
 				ourContext.commit();
 			}
 		}
 		catch (HarvestingException hex) {
-			log.error("Harvesting error occured while processing an OAI record: " + hex.getMessage());
-			harvestRow.setHarvestMessage("Error occured while processing an OAI record");
+			log.error("Harvesting error occurred while processing an OAI record: " + hex.getMessage());
+			harvestRow.setHarvestMessage("Error occurred while processing an OAI record");
 
 			// if the last status is also an error, alert the admin
 			if (harvestRow.getHarvestMessage().contains("Error")) {
@@ -389,15 +386,16 @@ public class OAIHarvester {
 			return;
 		}
 		catch (Exception ex) {
-			harvestRow.setHarvestMessage("Unknown error occured while generating an OAI response");
+			harvestRow.setHarvestMessage("Unknown error occurred while generating an OAI response");
 			harvestRow.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
 			alertAdmin(HarvestedCollection.STATUS_UNKNOWN_ERROR, ex);
-			log.error("Error occured while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
+			log.error("Error occurred while generating an OAI response: " + ex.getMessage() + " " + ex.getCause());
 			ex.printStackTrace();
 			return;
 		}
 		finally {
 			harvestRow.update();
+            ourContext.turnOffAuthorisationSystem();
 			targetCollection.update();
 			ourContext.commit();
 			ourContext.restoreAuthSystemState();
@@ -559,13 +557,25 @@ public class OAIHarvester {
     	// Now create the special ORE bundle and drop the ORE document in it
 		if (harvestRow.getHarvestType() == 2 || harvestRow.getHarvestType() == 3)
 		{
-			Bundle OREBundle = item.createBundle("ORE");
+			Bundle OREBundle = null;
+            Bundle[] OREBundles = item.getBundles("ORE");
+			Bitstream OREBitstream = null;
+
+            if ( OREBundles.length > 0 )
+                OREBundle = OREBundles[0];
+            else
+                OREBundle = item.createBundle("ORE");
 
 			XMLOutputter outputter = new XMLOutputter();
 			String OREString = outputter.outputString(oreREM);
 			ByteArrayInputStream OREStream = new ByteArrayInputStream(OREString.getBytes());
 
-			Bitstream OREBitstream = OREBundle.createBitstream(OREStream);
+            OREBitstream = OREBundle.getBitstreamByName("ORE.xml");
+
+            if ( OREBitstream != null )
+                OREBundle.removeBitstream(OREBitstream);
+
+            OREBitstream = OREBundle.createBitstream(OREStream);
 			OREBitstream.setName("ORE.xml");
 
 			BitstreamFormat bf = FormatIdentifier.guessFormat(ourContext, OREBitstream);
@@ -617,14 +627,14 @@ public class OAIHarvester {
             rejectedHandlePrefixString = "123456789";
         }
 
-    	DCValue[] values = item.getMetadata("dc", "identifier", Item.ANY, Item.ANY);
+    	Metadatum[] values = item.getMetadata("dc", "identifier", Item.ANY, Item.ANY);
 
     	if (values.length > 0 && !acceptedHandleServersString.equals(""))
     	{
     		String[] acceptedHandleServers = acceptedHandleServersString.split(",");
     		String[] rejectedHandlePrefixes = rejectedHandlePrefixString.split(",");
 
-    		for (DCValue value : values)
+    		for (Metadatum value : values)
     		{
     			//     0   1       2         3   4
     			//   http://hdl.handle.net/1234/12
@@ -674,8 +684,8 @@ public class OAIHarvester {
 
     	List<String> clearList = new ArrayList<String>();
 
-    	DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-    	for (DCValue value : values)
+    	Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+    	for (Metadatum value : values)
     	{
     		// Verify that the schema exists
     		MetadataSchema mdSchema = MetadataSchema.find(ourContext, value.schema);
@@ -932,7 +942,7 @@ public class OAIHarvester {
         String DMDOAIPrefix = null;
 
         try {
-            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, ORE_NS.getURI());
+            OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, getORENamespace().getURI());
             DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
     	}
     	catch (Exception ex) {
@@ -958,29 +968,21 @@ public class OAIHarvester {
     	try {
             //If we do not want to harvest from one set, then skip this.
     		if(!"all".equals(oaiSetId)){
-                ListSets ls = new ListSets(oaiSource);
+                ListIdentifiers ls = new ListIdentifiers(oaiSource, null, null, oaiSetId, DMDOAIPrefix);
 
                 // The only error we can really get here is "noSetHierarchy"
                 if (ls.getErrors() != null && ls.getErrors().getLength() > 0) {
                     for (int i=0; i<ls.getErrors().getLength(); i++) {
                         String errorCode = ls.getErrors().item(i).getAttributes().getNamedItem("code").getTextContent();
-                        errorSet.add(errorCode);
+                        errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec (" + errorCode + ")");
                     }
                 }
                 else {
                     // Drilling down to /OAI-PMH/ListSets/set
                     Document reply = db.build(ls.getDocument());
                     Element root = reply.getRootElement();
-                    List<Element> sets= root.getChild("ListSets",OAI_NS).getChildren("set",OAI_NS);
-
-                    for (Element set : sets)
-                    {
-                        String setSpec = set.getChildText("setSpec", OAI_NS);
-                        if (setSpec.equals(oaiSetId)) {
-                            foundSet = true;
-                            break;
-                        }
-                    }
+                    //Check if we can find items, if so this indicates that we have children and our sets exist
+                    foundSet = 0 < root.getChild("ListIdentifiers",OAI_NS).getChildren().size();
 
                     if (!foundSet) {
                         errorSet.add(OAI_SET_ERROR + ": The OAI server does not have a set with the specified setSpec");
@@ -1198,22 +1200,22 @@ public class OAIHarvester {
                 try
                 {
                     synchronized (HarvestScheduler.class) {
-                        switch (interrupt)
-                        {
-                        case HARVESTER_INTERRUPT_NONE:
-                            break;
-                        case HARVESTER_INTERRUPT_INSERT_THREAD:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            addThread(interruptValue);
-                            interruptValue = 0;
-                            break;
-                        case HARVESTER_INTERRUPT_PAUSE:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            status = HARVESTER_STATUS_PAUSED;
-                        case HARVESTER_INTERRUPT_STOP:
-                            interrupt = HARVESTER_INTERRUPT_NONE;
-                            status = HARVESTER_STATUS_STOPPED;
-                            return;
+                        switch (interrupt) {
+                            case HARVESTER_INTERRUPT_NONE:
+                                break;
+                            case HARVESTER_INTERRUPT_INSERT_THREAD:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                addThread(interruptValue);
+                                interruptValue = 0;
+                                break;
+                            case HARVESTER_INTERRUPT_PAUSE:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                status = HARVESTER_STATUS_PAUSED;
+                                break;
+                            case HARVESTER_INTERRUPT_STOP:
+                                interrupt = HARVESTER_INTERRUPT_NONE;
+                                status = HARVESTER_STATUS_STOPPED;
+                                return;
                         }
                     }
 
@@ -1221,8 +1223,8 @@ public class OAIHarvester {
                         while(interrupt != HARVESTER_INTERRUPT_RESUME && interrupt != HARVESTER_INTERRUPT_STOP) {
                             Thread.sleep(1000);
                         }
-                        if (interrupt != HARVESTER_INTERRUPT_STOP)
-                        {
+
+                        if (interrupt != HARVESTER_INTERRUPT_STOP) {
                             break;
                         }
                     }
@@ -1380,13 +1382,13 @@ public class OAIHarvester {
             catch (RuntimeException e) {
                 log.error("Runtime exception in thread: " + this.toString());
                 log.error(e.getMessage() + " " + e.getCause());
-                hc.setHarvestMessage("Runtime error occured while generating an OAI response");
+                hc.setHarvestMessage("Runtime error occurred while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             }
             catch (Exception ex) {
                 log.error("General exception in thread: " + this.toString());
                 log.error(ex.getMessage() + " " + ex.getCause());
-                hc.setHarvestMessage("Error occured while generating an OAI response");
+                hc.setHarvestMessage("Error occurred while generating an OAI response");
                 hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
             }
             finally

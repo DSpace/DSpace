@@ -20,7 +20,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
@@ -116,8 +116,8 @@ public class OREDisseminationCrosswalk
         aggregation.addContent(atomId);
         
         Element aggLink;
-        DCValue[] uris = item.getMetadata(MetadataSchema.DC_SCHEMA,"identifier","uri",Item.ANY);
-        for (DCValue uri : uris) {
+        Metadatum[] uris = item.getMetadata(MetadataSchema.DC_SCHEMA,"identifier","uri",Item.ANY);
+        for (Metadatum uri : uris) {
         	aggLink = new Element("link",ATOM_NS);
         	aggLink.setAttribute("rel", "alternate");
         	aggLink.setAttribute("href", uri.value);
@@ -153,7 +153,7 @@ public class OREDisseminationCrosswalk
         
         // Information about the aggregation (item) itself 
         Element aggTitle = new Element("title",ATOM_NS);
-        DCValue[] titles = item.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
+        Metadatum[] titles = item.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
         if (titles != null && titles.length>0)
         {
             aggTitle.addContent(titles[0].value);
@@ -166,8 +166,8 @@ public class OREDisseminationCrosswalk
         
         Element aggAuthor;
         Element aggAuthorName;
-        DCValue[] authors = item.getMetadata(MetadataSchema.DC_SCHEMA,"contributor","author",Item.ANY);
-        for (DCValue author : authors) {
+        Metadatum[] authors = item.getMetadata(MetadataSchema.DC_SCHEMA,"contributor","author",Item.ANY);
+        for (Metadatum author : authors) {
         	aggAuthor = new Element("author",ATOM_NS);
         	aggAuthorName = new Element("name",ATOM_NS);
         	aggAuthorName.addContent(author.value);

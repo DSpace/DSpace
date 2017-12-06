@@ -264,8 +264,7 @@ public class DSpaceCocoonServletFilter implements Filter
                 {
                     StringBuffer location = new StringBuffer("https://");
                     location.append(ConfigurationManager.getProperty("dspace.hostname"))
-                            .append(realRequest.getContextPath())
-                            .append(realRequest.getServletPath())
+                        .append(realRequest.getRequestURI())
                             .append(realRequest.getQueryString() == null ? ""
                                     : ("?" + realRequest.getQueryString()));
                     realResponse.sendRedirect(location.toString());

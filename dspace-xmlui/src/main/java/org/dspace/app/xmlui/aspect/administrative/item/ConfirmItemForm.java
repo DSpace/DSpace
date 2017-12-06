@@ -22,7 +22,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 
 
@@ -78,7 +78,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 		// Get our parameters and state
 		int itemID = parameters.getParameterAsInteger("itemID",-1);
 		Item item = Item.find(context, itemID);
-		final DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+		final Metadatum[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
 		Arrays.sort(values, new DCValueComparator());
 
 		String confirm = parameters.getParameter("confirm",null);
@@ -109,7 +109,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 		header.addCell().addContent(T_column1);
 		header.addCell().addContent(T_column2);
 		header.addCell().addContent(T_column3);
-		for(final DCValue value:values){
+		for(final Metadatum value:values){
 			final String dcValue = value.schema + ". " + value.element + (value.qualifier==null?"":(". " + value.qualifier));
 			final Row row = table.addRow();
 			row.addCell().addContent(dcValue);
@@ -153,8 +153,8 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 	 */
 	static class DCValueComparator implements Comparator, Serializable {
 		public int compare(Object arg0, Object arg1) {
-			final DCValue o1 = (DCValue)arg0;
-			final DCValue o2 = (DCValue)arg1;
+			final Metadatum o1 = (Metadatum)arg0;
+			final Metadatum o2 = (Metadatum)arg1;
 			final String s1 = o1.schema + o1.element + (o1.qualifier==null?"":("." + o1.qualifier));
 			final  String s2 = o2.schema + o2.element + (o2.qualifier==null?"":("." + o2.qualifier));
 			return s1.compareTo(s2);

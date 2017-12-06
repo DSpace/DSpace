@@ -11,7 +11,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>4.0</version>
+      <version>5.0</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -51,8 +51,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
                 <configuration>
                     <!--Exclude license check for XMLUI files which don't need it-->
                     <excludes>
@@ -63,6 +63,7 @@
                         <exclude>**/cocoon/**</exclude>
                         <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
+                        <exclude>**/Datatables/**</exclude>
                         <exclude>**/modernizr*</exclude>
                         <exclude>**/DD_belated*</exclude>
                         <exclude>**/detectmobile*</exclude>

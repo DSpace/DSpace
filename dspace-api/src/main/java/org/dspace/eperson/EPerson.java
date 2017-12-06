@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
@@ -25,7 +24,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.DSpaceObject;
+import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -60,19 +59,13 @@ public class EPerson extends DSpaceObject
     public static final int LANGUAGE = 5;
     
     /** log4j logger */
-    private static Logger log = Logger.getLogger(EPerson.class);
-
-    /** Our context */
-    private Context myContext;
+    private static final Logger log = Logger.getLogger(EPerson.class);
 
     /** The row in the table representing this eperson */
-    private TableRow myRow;
+    private final TableRow myRow;
 
     /** Flag set when data is modified, for events */
     private boolean modified;
-
-    /** Flag set when metadata is modified, for events */
-    private boolean modifiedMetadata;
 
     /**
      * Construct an EPerson
@@ -82,15 +75,18 @@ public class EPerson extends DSpaceObject
      * @param row
      *            the corresponding row in the table
      */
-    EPerson(Context context, TableRow row)
-    {
-        myContext = context;
+    EPerson(Context context, TableRow row) throws SQLException {
+        super(context);
+
+        // Ensure that my TableRow is typed.
+        if (null == row.getTable())
+            row.setTable("eperson");
+
         myRow = row;
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("eperson_id"));
         modified = false;
-        modifiedMetadata = false;
         clearDetails();
     }
 
@@ -291,11 +287,20 @@ public class EPerson extends DSpaceObject
 	{
 		String params = "%"+query.toLowerCase()+"%";
         StringBuffer queryBuf = new StringBuffer();
-        queryBuf.append("SELECT * FROM eperson WHERE eperson_id = ? OR ");
-        queryBuf.append("LOWER(firstname) LIKE LOWER(?) OR LOWER(lastname) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) ORDER BY lastname, firstname ASC ");
+        queryBuf.append("select e.* from eperson e " +
+                " LEFT JOIN metadatavalue fn on (resource_id=e.eperson_id AND fn.resource_type_id=? and fn.metadata_field_id=?) " +
+                " LEFT JOIN metadatavalue ln on (ln.resource_id=e.eperson_id AND ln.resource_type_id=? and ln.metadata_field_id=?) " +
+                " WHERE e.eperson_id = ? OR " +
+                "LOWER(fn.text_value) LIKE LOWER(?) OR LOWER(ln.text_value) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) ORDER BY  ");
+
+        if(DatabaseManager.isOracle()) {
+            queryBuf.append(" dbms_lob.substr(ln.text_value), dbms_lob.substr(fn.text_value) ASC");
+        }else{
+            queryBuf.append(" ln.text_value, fn.text_value ASC");
+        }
 
         // Add offset and limit restrictions - Oracle requires special code
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             // First prepare the query to generate row numbers
             if (limit > 0 || offset > 0)
@@ -342,23 +347,28 @@ public class EPerson extends DSpaceObject
 		try {
 			int_param = Integer.valueOf(query);
 		}
+
 		catch (NumberFormatException e) {
 			int_param = Integer.valueOf(-1);
 		}
 
+
+        Integer f = MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "firstname", null).getFieldID();
+        Integer l = MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "lastname", null).getFieldID();
+
         // Create the parameter array, including limit and offset if part of the query
-        Object[] paramArr = new Object[] {int_param,params,params,params};
+        Object[] paramArr = new Object[] {Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params};
         if (limit > 0 && offset > 0)
         {
-            paramArr = new Object[]{int_param, params, params, params, limit, offset};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, limit, offset};
         }
         else if (limit > 0)
         {
-            paramArr = new Object[]{int_param, params, params, params, limit};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, limit};
         }
         else if (offset > 0)
         {
-            paramArr = new Object[]{int_param, params, params, params, offset};
+            paramArr = new Object[]{Constants.EPERSON,f, Constants.EPERSON,l, int_param,params,params,params, offset};
         }
 
         // Get all the epeople that match the query
@@ -423,15 +433,32 @@ public class EPerson extends DSpaceObject
 		catch (NumberFormatException e) {
 			int_param = Integer.valueOf(-1);
 		}
-		
+
 		// Get all the epeople that match the query
 		TableRow row = DatabaseManager.querySingle(context,
-		        "SELECT count(*) as epcount FROM eperson WHERE eperson_id = ? OR " +
-		        "LOWER(firstname) LIKE LOWER(?) OR LOWER(lastname) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?)",
-		        new Object[] {int_param,dbquery,dbquery,dbquery});
+		        "SELECT count(*) as epcount FROM eperson " +
+                "WHERE eperson_id = ? OR " +
+		        "LOWER((select text_value from metadatavalue where resource_id=? and resource_type_id=? and metadata_field_id=?)) LIKE LOWER(?) " +
+                "OR LOWER((select text_value from metadatavalue where resource_id=? and resource_type_id=? and metadata_field_id=?)) LIKE LOWER(?) " +
+                "OR LOWER(eperson.email) LIKE LOWER(?)",
+		        new Object[] {
+                        int_param,
+
+                        int_param,
+                        Constants.EPERSON,
+                        MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "firstname", null).getFieldID(),
+                        dbquery,
+
+                        int_param,
+                        Constants.EPERSON,
+                        MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), "lastname", null).getFieldID(),
+                        dbquery,
+
+                        dbquery
+                });
 				
 		// use getIntColumn for Oracle count data
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             count = Long.valueOf(row.getIntColumn("epcount"));
         }
@@ -459,33 +486,46 @@ public class EPerson extends DSpaceObject
     public static EPerson[] findAll(Context context, int sortField)
             throws SQLException
     {
-        String s;
+        String s, t = "", theQuery = "";
 
         switch (sortField)
         {
         case ID:
-            s = "eperson_id";
+            s = "e.eperson_id";
             break;
 
         case EMAIL:
-            s = "email";
+            s = "e.email";
             break;
 
         case LANGUAGE:
-            s = "language";
+            s = "m_text_value";
+            t = "language";
             break;
         case NETID:
-            s = "netid";
+            s = "e.netid";
             break;
 
         default:
-            s = "lastname";
+            s = "m_text_value";
+            t = "lastname";
         }
 
-        // NOTE: The use of 's' in the order by clause can not cause an SQL 
+        // NOTE: The use of 's' in the order by clause can not cause an SQL
         // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.query(context, 
-                "SELECT * FROM eperson ORDER BY "+s);
+        TableRowIterator rows = DatabaseManager.query(context, "SELECT * FROM eperson e ORDER BY ?",s);
+        if(!t.equals("")) {
+            rows = DatabaseManager.query(context,
+                    "SELECT * FROM eperson e " +
+                            "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
+                            "ORDER BY ?",
+                    Constants.EPERSON,
+                    MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), t, null).getFieldID(),
+                    s
+            );
+        }
+
+
 
         try
         {
@@ -546,7 +586,8 @@ public class EPerson extends DSpaceObject
         log.info(LogManager.getHeader(context, "create_eperson", "eperson_id="
                 + e.getID()));
 
-        context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(), null));
+        context.addEvent(new Event(Event.CREATE, Constants.EPERSON, e.getID(), 
+                null, e.getIdentifiers(context)));
 
         return e;
     }
@@ -559,7 +600,7 @@ public class EPerson extends DSpaceObject
             EPersonDeletionException
     {
         // authorized?
-        if (!AuthorizeManager.isAdmin(myContext))
+        if (!AuthorizeManager.isAdmin(ourContext))
         {
             throw new AuthorizeException(
                     "You must be an admin to delete an EPerson");
@@ -576,28 +617,31 @@ public class EPerson extends DSpaceObject
             throw new EPersonDeletionException(constraintList);
         }
 
-        myContext.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail()));
+        // Delete the Dublin Core
+        removeMetadataFromDatabase();
+
+        ourContext.addEvent(new Event(Event.DELETE, Constants.EPERSON, getID(), getEmail(), getIdentifiers(ourContext)));
 
         // Remove from cache
-        myContext.removeCached(this, getID());
+        ourContext.removeCached(this, getID());
 
         // XXX FIXME: This sidesteps the object model code so it won't
         // generate  REMOVE events on the affected Groups.
 
         // Remove any group memberships first
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM EPersonGroup2EPerson WHERE eperson_id= ? ",
                 getID());
 
         // Remove any subscriptions
-        DatabaseManager.updateQuery(myContext,
+        DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM subscription WHERE eperson_id= ? ",
                 getID());
 
         // Remove ourself
-        DatabaseManager.delete(myContext, myRow);
+        DatabaseManager.delete(ourContext, myRow);
 
-        log.info(LogManager.getHeader(myContext, "delete_eperson",
+        log.info(LogManager.getHeader(ourContext, "delete_eperson",
                 "eperson_id=" + getID()));
     }
 
@@ -618,7 +662,7 @@ public class EPerson extends DSpaceObject
      */
      public String getLanguage()
      {
-         return myRow.getStringColumn("language");
+         return getMetadataFirstValue("eperson", "language", null, Item.ANY);
      }
      
      /**
@@ -629,9 +673,8 @@ public class EPerson extends DSpaceObject
      * @param language
      *            language code
      */
-     public void setLanguage(String language)
-     {
-         myRow.setColumn("language", language);
+     public void setLanguage(String language) {
+         setMetadataSingleValue("eperson", "language", null, null, language);
      }
   
 
@@ -689,8 +732,7 @@ public class EPerson extends DSpaceObject
      * @param s
      *            the new netid
      */
-    public void setNetid(String s)
-    {
+    public void setNetid(String s) {
         myRow.setColumn("netid", s);
         modified = true;
     }
@@ -703,8 +745,8 @@ public class EPerson extends DSpaceObject
      */
     public String getFullName()
     {
-        String f = myRow.getStringColumn("firstname");
-        String l = myRow.getStringColumn("lastname");
+        String f = getFirstName();
+        String l= getLastName();
 
         if ((l == null) && (f == null))
         {
@@ -727,7 +769,7 @@ public class EPerson extends DSpaceObject
      */
     public String getFirstName()
     {
-        return myRow.getStringColumn("firstname");
+        return getMetadataFirstValue("eperson", "firstname", null, Item.ANY);
     }
 
     /**
@@ -736,9 +778,8 @@ public class EPerson extends DSpaceObject
      * @param firstname
      *            the person's first name
      */
-    public void setFirstName(String firstname)
-    {
-        myRow.setColumn("firstname", firstname);
+    public void setFirstName(String firstname) {
+        setMetadataSingleValue("eperson", "firstname", null, null, firstname);
         modified = true;
     }
 
@@ -749,7 +790,7 @@ public class EPerson extends DSpaceObject
      */
     public String getLastName()
     {
-        return myRow.getStringColumn("lastname");
+        return getMetadataFirstValue("eperson", "lastname", null, Item.ANY);
     }
 
     /**
@@ -758,9 +799,8 @@ public class EPerson extends DSpaceObject
      * @param lastname
      *            the person's last name
      */
-    public void setLastName(String lastname)
-    {
-        myRow.setColumn("lastname", lastname);
+    public void setLastName(String lastname) {
+        setMetadataSingleValue("eperson", "lastname", null, null, lastname);
         modified = true;
     }
 
@@ -832,18 +872,20 @@ public class EPerson extends DSpaceObject
 
     /**
      * Get the value of a metadata field
-     * 
+     *
      * @param field
      *            the name of the metadata field to get
-     * 
+     *
      * @return the value of the metadata field (or null if the column is an SQL NULL)
-     * 
+     *
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
+    @Deprecated
     public String getMetadata(String field)
     {
-        return myRow.getStringColumn(field);
+        String[] MDValue = getMDValueByLegacyField(field);
+        return getMetadataFirstValue(MDValue[0], MDValue[1], MDValue[2], Item.ANY);
     }
 
     /**
@@ -857,11 +899,11 @@ public class EPerson extends DSpaceObject
      * @exception IllegalArgumentException
      *                if the requested metadata field doesn't exist
      */
+    @Deprecated
     public void setMetadata(String field, String value)
     {
-        myRow.setColumn(field, value);
-        modifiedMetadata = true;
-        addDetails(field);
+        String[] MDValue = getMDValueByLegacyField(field);
+        setMetadataSingleValue(MDValue[0], MDValue[1], MDValue[2], null, value);
     }
 
     /**
@@ -950,14 +992,14 @@ public class EPerson extends DSpaceObject
             log.info("Upgrading password hash for EPerson " + getID());
             setPassword(attempt);
             try {
-                myContext.turnOffAuthorisationSystem();
+                ourContext.turnOffAuthorisationSystem();
                 update();
             } catch (SQLException ex) {
                 log.error("Could not update password hash", ex);
             } catch (AuthorizeException ex) {
                 log.error("Could not update password hash", ex);
             } finally {
-                myContext.restoreAuthSystemState();
+                ourContext.restoreAuthSystemState();
             }
         }
 
@@ -991,27 +1033,27 @@ public class EPerson extends DSpaceObject
     {
         // Check authorisation - if you're not the eperson
         // see if the authorization system says you can
-        if (!myContext.ignoreAuthorization()
-                && ((myContext.getCurrentUser() == null) || (getID() != myContext
+        if (!ourContext.ignoreAuthorization()
+                && ((ourContext.getCurrentUser() == null) || (getID() != ourContext
                         .getCurrentUser().getID())))
         {
-            AuthorizeManager.authorizeAction(myContext, this, Constants.WRITE);
+            AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
 
-        DatabaseManager.update(myContext, myRow);
+        DatabaseManager.update(ourContext, myRow);
 
-        log.info(LogManager.getHeader(myContext, "update_eperson",
+        log.info(LogManager.getHeader(ourContext, "update_eperson",
                 "eperson_id=" + getID()));
 
         if (modified)
         {
-            myContext.addEvent(new Event(Event.MODIFY, Constants.EPERSON, getID(), null));
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.EPERSON,
+                    getID(), null, getIdentifiers(ourContext)));
             modified = false;
         }
         if (modifiedMetadata)
         {
-            myContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.EPERSON, getID(), getDetails()));
-            modifiedMetadata = false;
+            updateMetadata();
             clearDetails();
         }
     }
@@ -1039,7 +1081,7 @@ public class EPerson extends DSpaceObject
         List<String> tableList = new ArrayList<String>();
 
         // check for eperson in item table
-        TableRowIterator tri = DatabaseManager.query(myContext, 
+        TableRowIterator tri = DatabaseManager.query(ourContext,
                 "SELECT * from item where submitter_id= ? ",
                 getID());
 
@@ -1073,7 +1115,7 @@ public class EPerson extends DSpaceObject
     private void getXMLWorkflowConstraints(List<String> tableList) throws SQLException {
          TableRowIterator tri;
         // check for eperson in claimtask table
-        tri = DatabaseManager.queryTable(myContext, "cwf_claimtask",
+        tri = DatabaseManager.queryTable(ourContext, "cwf_claimtask",
                 "SELECT * from cwf_claimtask where owner_id= ? ",
                 getID());
 
@@ -1094,7 +1136,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in pooltask table
-        tri = DatabaseManager.queryTable(myContext, "cwf_pooltask",
+        tri = DatabaseManager.queryTable(ourContext, "cwf_pooltask",
                 "SELECT * from cwf_pooltask where eperson_id= ? ",
                 getID());
 
@@ -1115,7 +1157,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in workflowitemrole table
-        tri = DatabaseManager.queryTable(myContext, "cwf_workflowitemrole",
+        tri = DatabaseManager.queryTable(ourContext, "cwf_workflowitemrole",
                 "SELECT * from cwf_workflowitemrole where eperson_id= ? ",
                 getID());
 
@@ -1140,7 +1182,7 @@ public class EPerson extends DSpaceObject
     private void getOriginalWorkflowConstraints(List<String> tableList) throws SQLException {
         TableRowIterator tri;
         // check for eperson in workflowitem table
-        tri = DatabaseManager.query(myContext, 
+        tri = DatabaseManager.query(ourContext,
                 "SELECT * from workflowitem where owner= ? ",
                 getID());
 
@@ -1161,7 +1203,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in tasklistitem table
-        tri = DatabaseManager.query(myContext, 
+        tri = DatabaseManager.query(ourContext,
                 "SELECT * from tasklistitem where eperson_id= ? ",
                 getID());
 
@@ -1220,8 +1262,7 @@ public class EPerson extends DSpaceObject
      * Tool for manipulating user accounts.
      */
     public static void main(String argv[])
-            throws ParseException, SQLException
-    {
+            throws ParseException, SQLException, AuthorizeException {
         final OptionGroup VERBS = new OptionGroup();
         VERBS.addOption(VERB_ADD);
         VERBS.addOption(VERB_DELETE);
@@ -1281,8 +1322,7 @@ public class EPerson extends DSpaceObject
     }
 
     /** Command to create an EPerson. */
-    private static int cmdAdd(Context context, String[] argv)
-    {
+    private static int cmdAdd(Context context, String[] argv) throws AuthorizeException {
         Options options = new Options();
 
         options.addOption(VERB_ADD);
@@ -1452,8 +1492,7 @@ public class EPerson extends DSpaceObject
     }
 
     /** Command to modify an EPerson. */
-    private static int cmdModify(Context context, String[] argv)
-    {
+    private static int cmdModify(Context context, String[] argv) throws AuthorizeException {
         Options options = new Options();
 
         options.addOption(VERB_MODIFY);

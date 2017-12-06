@@ -8,7 +8,7 @@
 package org.dspace.ctask.general;
 
 import org.apache.log4j.Logger;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.curate.AbstractCurationTask;
@@ -101,9 +101,9 @@ public class BasicLinkChecker extends AbstractCurationTask
     protected List<String> getURLs(Item item)
     {
         // Get URIs from anyschema.anyelement.uri.*
-        DCValue[] urls = item.getMetadata(Item.ANY, Item.ANY, "uri", Item.ANY);
+        Metadatum[] urls = item.getMetadata(Item.ANY, Item.ANY, "uri", Item.ANY);
         ArrayList<String> theURLs = new ArrayList<String>();
-        for (DCValue url : urls)
+        for (Metadatum url : urls)
         {
             theURLs.add(url.value);
         }

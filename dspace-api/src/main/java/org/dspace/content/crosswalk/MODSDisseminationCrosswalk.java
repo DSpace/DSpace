@@ -23,7 +23,7 @@ import java.util.Properties;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -328,7 +328,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        DCValue[] dcvs = null;
+        Metadatum[] dcvs = null;
         if (dso.getType() == Constants.ITEM)
         {
             dcvs = item2Metadata((Item) dso);
@@ -446,9 +446,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param site
      *            The site to derive metadata from
      */
-    protected DCValue[] site2Metadata(Site site)
+    protected Metadatum[] site2Metadata(Site site)
     {
-        List<DCValue> metadata = new ArrayList<DCValue>();
+        List<Metadatum> metadata = new ArrayList<Metadatum>();
 
         String identifier_uri = "http://hdl.handle.net/"
                 + site.getHandle();
@@ -471,7 +471,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             metadata.add(createDCValue("title", null, title));
         }
 
-        return (DCValue[]) metadata.toArray(new DCValue[metadata.size()]);
+        return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
     }
     /**
      * Generate a list of metadata elements for the given DSpace
@@ -480,9 +480,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param community
      *            The community to derive metadata from
      */
-    protected DCValue[] community2Metadata(Community community)
+    protected Metadatum[] community2Metadata(Community community)
     {
-        List<DCValue> metadata = new ArrayList<DCValue>();
+        List<Metadatum> metadata = new ArrayList<Metadatum>();
 
         String description = community.getMetadata("introductory_text");
         String description_abstract = community
@@ -523,7 +523,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             metadata.add(createDCValue("title", null, title));
         }
 
-        return (DCValue[]) metadata.toArray(new DCValue[metadata.size()]);
+        return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
     }
 
     /**
@@ -533,9 +533,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param collection
      *            The collection to derive metadata from
      */
-    protected DCValue[] collection2Metadata(Collection collection)
+    protected Metadatum[] collection2Metadata(Collection collection)
     {
-        List<DCValue> metadata = new ArrayList<DCValue>();
+        List<Metadatum> metadata = new ArrayList<Metadatum>();
 
         String description = collection.getMetadata("introductory_text");
         String description_abstract = collection
@@ -588,7 +588,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             metadata.add(createDCValue("title", null, title));
         }
 
-        return (DCValue[]) metadata.toArray(new DCValue[metadata.size()]);
+        return (Metadatum[]) metadata.toArray(new Metadatum[metadata.size()]);
     }
 
     /**
@@ -597,16 +597,16 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      * @param item
      *            The item to derive metadata from
      */
-    protected DCValue[] item2Metadata(Item item)
+    protected Metadatum[] item2Metadata(Item item)
     {
-        DCValue[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
+        Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
                 Item.ANY);
 
         return dcvs;
     }
 
-    private DCValue createDCValue(String element, String qualifier, String value) {
-        DCValue dcv = new DCValue();
+    private Metadatum createDCValue(String element, String qualifier, String value) {
+        Metadatum dcv = new Metadatum();
         dcv.schema = "dc";
         dcv.element = element;
         dcv.qualifier = qualifier;

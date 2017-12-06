@@ -19,10 +19,13 @@
             //Instead of redirecting us to the page, first send us to the statistics logger
             //By doing this we ensure that we register the query to the result
             var form = $('form#aspect_discovery_SimpleSearch_div_main-form');
+            var saved_action = form.attr('action');
             form.attr('action', $this.attr('href'));
             //Manipulate the fq boxes to all switch to query since the logging doesn't take into account filter queries
             form.find('input[name="fq"]').attr('name', 'query');
             form.submit();
+            //restore the original action, that way, if you use the browser's back button later on, the form still works as it should.
+            form.attr('action', saved_action);
             return false;
         });
 

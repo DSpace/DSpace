@@ -22,7 +22,7 @@ import java.util.Properties;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
+import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
@@ -98,7 +98,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
     // map of qdc to JDOM Element
     private Map<String, Element> qdc2element = new HashMap<String, Element>();
 
-    // map of JDOM Element to qdc DCValue
+    // map of JDOM Element to qdc Metadatum
     private Map<String, String> element2qdc = new HashMap<String, String>();
 
     // the XML namespaces from config file for this name.
@@ -352,7 +352,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         Item item = (Item)dso;
         init();
 
-        DCValue[] dc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        Metadatum[] dc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         List<Element> result = new ArrayList<Element>(dc.length);
         for (int i = 0; i < dc.length; i++)
         {

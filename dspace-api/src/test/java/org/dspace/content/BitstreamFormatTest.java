@@ -194,13 +194,11 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test
     public void testCreateAdmin() throws SQLException,AuthorizeException
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin((Context)any); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full Admin perms
+            AuthorizeManager.isAdmin((Context)any); result = true;
+        }};
         
         BitstreamFormat found =  BitstreamFormat.create(context);
         assertThat("testCreate 0", found, notNullValue());
@@ -216,13 +214,11 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testCreateNotAdmin() throws SQLException,AuthorizeException
     {
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin((Context)any); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full Admin perms
+            AuthorizeManager.isAdmin((Context)any); result = false;
+        }};
 
         BitstreamFormat found =  BitstreamFormat.create(context);
         fail("Exception should have been thrown");
@@ -451,14 +447,11 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testUpdateNotAdmin() throws SQLException, AuthorizeException
     {
-
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin((Context)any); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full Admin perms
+            AuthorizeManager.isAdmin((Context)any); result = false;
+        }};
 
         bf.update();
         fail("Exception should have been thrown");
@@ -470,14 +463,11 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test
     public void testUpdateAdmin() throws SQLException, AuthorizeException
     {
-
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin((Context)any); result = true;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full Admin perms
+            AuthorizeManager.isAdmin((Context)any); result = true;
+        }};
 
         String desc = "Test description";
         bf.setDescription(desc);
@@ -493,14 +483,11 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test(expected=AuthorizeException.class)
     public void testDeleteNotAdmin() throws SQLException, AuthorizeException
     {
-
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin((Context)any); result = false;
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Disallow full Admin perms
+            AuthorizeManager.isAdmin((Context)any); result = false;
+        }};
 
         bf.delete();
         fail("Exception should have been thrown");
@@ -512,15 +499,11 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test
     public void testDeleteAdmin() throws SQLException, AuthorizeException
     {
-
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            BitstreamFormat unknown;
-            {
-                AuthorizeManager.isAdmin((Context)any); result = true;                
-            }
-        };
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full Admin perms
+            AuthorizeManager.isAdmin((Context)any); result = true;
+        }};
 
         bf.delete();
         BitstreamFormat b =  BitstreamFormat.find(context, 5);
@@ -533,15 +516,12 @@ public class BitstreamFormatTest extends AbstractUnitTest
     @Test(expected=IllegalArgumentException.class)
     public void testDeleteUnknown() throws SQLException, AuthorizeException
     {
+        new NonStrictExpectations(AuthorizeManager.class)
+        {{
+            // Allow full Admin perms
+            AuthorizeManager.isAdmin((Context)any); result = true;
+        }};
 
-        new NonStrictExpectations()
-        {
-            AuthorizeManager authManager;
-            {
-                AuthorizeManager.isAdmin((Context)any); result = true;
-            }
-        };
-        
         bunknown.delete();
         fail("Exception should have been thrown");
     }
@@ -561,7 +541,7 @@ public class BitstreamFormatTest extends AbstractUnitTest
      * Test of setExtensions method, of class BitstreamFormat.
      */
     @Test
-    public void setExtensions(String[] exts)
+    public void setExtensions()
     {
         assertThat("setExtensions 0", bf.getExtensions()[0], equalTo("xml"));
 

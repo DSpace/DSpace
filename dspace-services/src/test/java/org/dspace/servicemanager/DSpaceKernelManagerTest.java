@@ -41,6 +41,7 @@ public class DSpaceKernelManagerTest {
             kernelImpl.destroy();
         }
         kernelImpl = null;
+        kernelManager = null;
     }
 
     /**
@@ -53,6 +54,8 @@ public class DSpaceKernelManagerTest {
         DSpaceKernel k2 = kernelManager.getKernel();
         assertNotNull(k2);
         assertEquals(kernel, k2);
+        
+        kernel = k2 = null;
     }
 
 }

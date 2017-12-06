@@ -1,21 +1,16 @@
 package ar.edu.unlp.sedici.dspace.embargo;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.embargo.DefaultEmbargoSetter;
-import org.dspace.embargo.EmbargoManager;
 
 /**
  * Plugin implementation of the embargo setting function. The parseTerms()
@@ -88,17 +83,13 @@ public class DaysSinceStartDateEmbargoSetter extends DaysEmbargoSetter {
 			e.printStackTrace();
 			context.abort();
 			throw new IllegalStateException(e);
-		} catch (AuthorizeException e) {
-			e.printStackTrace();
-			context.abort();
-			throw new IllegalStateException(e);
 		}
 	    
 	    log.info("Se inicialza correctamente el EmbargoSetter del módulo de embargo. Se usa el campo ("+startDate+") como Fecha de inicio de los embargos.");
 	}
 
 	protected Date getEmbargoStartDate(Item item) {
-		DCValue embargoStartDates[] = item.getMetadata(startDate);
+		Metadatum embargoStartDates[] = item.getMetadataByMetadataString(startDate);
 		if (embargoStartDates.length > 0)
 			return new DCDate(embargoStartDates[0].value).toDate();
 		else 

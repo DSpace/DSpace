@@ -5,10 +5,9 @@ import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.Constants;
 import org.dspace.curate.AbstractCurationTask;
@@ -68,9 +67,9 @@ public class LinkControlledMetadata extends AbstractCurationTask {
 	}
 	
 	private void processSchema(Item item, String schema) {
-        DCValue[] metadata = item.getMetadata(schema, Item.ANY, Item.ANY, Item.ANY);
+        Metadatum[] metadata = item.getMetadata(schema, Item.ANY, Item.ANY, Item.ANY);
         item.clearMetadata(schema, Item.ANY, Item.ANY, Item.ANY);
-        for (DCValue m : metadata) {
+        for (Metadatum m : metadata) {
         	Matcher matcher = pattern.matcher(m.value);
         	if(matcher.matches()) {
         		String old_value = m.value;
