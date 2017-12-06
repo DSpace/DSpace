@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInput;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
@@ -261,7 +262,7 @@ public class WorkspaceItemServiceImpl implements WorkspaceItemService {
     }
 
 	@Override
-	public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection) throws Exception {
+	public void move(Context context, WorkspaceItem source, Collection fromCollection, Collection toCollection) throws DCInputsReaderException {
 		source.setCollection(toCollection);
 		
 		List<MetadataValue> remove = new ArrayList<>();
