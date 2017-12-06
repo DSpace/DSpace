@@ -813,20 +813,20 @@
      },
      {
         "sponsor" : "$120",
-        "title" : "Neurology: Neuroimmunology & Neuroinflammation",
-        "integrated" : "Y",
-        "hidden" : "Y",
-        "submission" : "R",
-        "issn" : "2332-7812",
-        "embargo" : "N"
-     },
-     {
-        "sponsor" : "$120",
         "title" : "Neurology: Genetics",
         "integrated" : "Y",
         "hidden" : "Y",
         "submission" : "R",
         "issn" : "2376-7839",
+        "embargo" : "N"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Neurology: Neuroimmunology & Neuroinflammation",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "submission" : "R",
+        "issn" : "2332-7812",
         "embargo" : "N"
      },
      {
