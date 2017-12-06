@@ -18,6 +18,7 @@ import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
 import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.step.UploadStatusResponse;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.data.domain.Page;
@@ -160,13 +161,13 @@ extends AbstractDSpaceRestRepository
 		try {
 			patch(context, request, apiCategory, model, id, patch);	
 			context.commit();
-		} catch (SQLException | AuthorizeException e) {
+		} catch (SQLException | AuthorizeException | DCInputsReaderException e) {
 			throw new PatchUnprocessableEntityException(e.getMessage());
 		}
 		return findOne(id);
 	}
 	
-	protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) throws HttpRequestMethodNotSupportedException, SQLException, AuthorizeException {
+	protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) throws HttpRequestMethodNotSupportedException, SQLException, AuthorizeException, DCInputsReaderException {
 		throw new HttpRequestMethodNotSupportedException("No implementation found; Method not allowed!");
 	}
 

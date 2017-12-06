@@ -547,7 +547,7 @@ public class Util {
         return toReturn;
     }
 
-	public static List<String> diff(Collection fromCollection, Collection toCollection) throws Exception {
+	public static List<String> diff(Collection fromCollection, Collection toCollection) throws DCInputsReaderException {
 		DCInputsReader reader = new DCInputsReader();
 		List<DCInputSet> from = reader.getInputsByCollectionHandle(fromCollection.getHandle());
 		List<DCInputSet> to = reader.getInputsByCollectionHandle(toCollection.getHandle());

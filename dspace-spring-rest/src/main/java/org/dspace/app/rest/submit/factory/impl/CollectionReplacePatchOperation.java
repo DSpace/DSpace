@@ -7,6 +7,9 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import java.sql.SQLException;
+
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
@@ -35,7 +38,7 @@ public class CollectionReplacePatchOperation extends ReplacePatchOperation<Strin
 
 	@Override
 	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
-			throws Exception {
+			throws SQLException, DCInputsReaderException {
 		String uuid = (String) value;
 
 		Collection fromCollection = source.getCollection();
