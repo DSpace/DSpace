@@ -24,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.exception.PaginationException;
+import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
 import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.exception.RepositoryNotFoundException;
 import org.dspace.app.rest.exception.RepositorySearchMethodNotFoundException;
@@ -264,12 +266,22 @@ public class RestResourceController implements InitializingBean {
 			JsonPatchPatchConverter patchConverter = new JsonPatchPatchConverter(mapper);
 			Patch patch = patchConverter.convert(jsonNode);
 			modelObject = repository.patch(request, apiCategory, model, id, patch);
-		} catch (Exception e) {
+		} 
+		catch (HttpRequestMethodNotSupportedException e) {
+			log.error(e.getMessage(), e);
+			throw e;
+		}
+		catch (PatchUnprocessableEntityException e) {
+			log.error(e.getMessage(), e);
+			throw e;
+		}
+		catch (PatchBadRequestException e) {
+			log.error(e.getMessage(), e);
+			throw e;
+		}
+		catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return ControllerUtils.toEmptyResponse(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		if (modelObject == null) {
-			throw new HttpRequestMethodNotSupportedException(RequestMethod.PATCH.toString());
 		}
 		DSpaceResource result = repository.wrapResource(modelObject);
 		//TODO manage HTTPHeader
