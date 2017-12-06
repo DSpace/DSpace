@@ -794,6 +794,42 @@
         "embargo" : "Y"
      },
      {
+        "sponsor" : "$120",
+        "title" : "Neurology",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "submission" : "R",
+        "issn" : "0028-3878",
+        "embargo" : "N"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Neurology: Clinical Practice",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "submission" : "R",
+        "issn" : "2163-0402",
+        "embargo" : "N"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Neurology: Neuroimmunology & Neuroinflammation",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "submission" : "R",
+        "issn" : "2332-7812",
+        "embargo" : "N"
+     },
+     {
+        "sponsor" : "$120",
+        "title" : "Neurology: Genetics",
+        "integrated" : "Y",
+        "hidden" : "Y",
+        "submission" : "R",
+        "issn" : "2376-7839",
+        "embargo" : "N"
+     },
+     {
         "title" : "Nordic Journal of Botany",
         "sponsor" : "Nordic Society Oikos",
         "embargo" : "Y",
