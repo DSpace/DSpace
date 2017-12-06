@@ -13,12 +13,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
+import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
@@ -28,6 +28,7 @@ import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -48,7 +49,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 import org.springframework.data.rest.webmvc.json.patch.Patch;
 import org.springframework.data.rest.webmvc.json.patch.PatchOperation;
 import org.springframework.stereotype.Component;
@@ -63,6 +63,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Component(WorkspaceItemRest.CATEGORY + "." + WorkspaceItemRest.NAME)
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer> {
+
+	public static final String OPERATION_PATH_SECTIONS = "sections";
 
 	private static final Logger log = Logger.getLogger(WorkspaceItemRestRepository.class);
 	
@@ -239,14 +241,14 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 	}
 
 	@Override
-	public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch) throws Exception {
+	public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch) throws SQLException, AuthorizeException {
 		List<PatchOperation> operations = patch.getOperations();
 		WorkspaceItemRest wsi = findOne(id);
 		WorkspaceItem source = wis.find(context, id);
 		for(PatchOperation op : operations) {
 			//the value in the position 0 is a null value
 			String[] path = op.getPath().substring(1).split("/",3);
-			if("sections".equals(path[0])) {
+			if(OPERATION_PATH_SECTIONS.equals(path[0])) {
 				String section = path[1];
 				String absolutePath = "";
 				if(path.length>2) {
@@ -256,12 +258,15 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 				
 				evaluatePatch(context, request, source, wsi, operation, section, absolutePath, op.getValue());
 			}
+			else {
+				throw new PatchBadRequestException("Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
+			}
 		}
 		wis.update(context, source);
 	}
 
 	private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi, String operation, String section, String path,
-			Object value) throws Exception {
+			Object value) {
 		SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
 		for(int stepNum = 0; stepNum<submissionConfig.getNumberOfSteps(); stepNum++) {
 			
@@ -285,7 +290,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 								.newInstance();
 						stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, operation, path, value);
 					} else {
-						throw new Exception("The submission step class specified by '"
+						throw new PatchBadRequestException("The submission step class specified by '"
 								+ stepConfig.getProcessingClassName()
 								+ "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
 								+ " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");

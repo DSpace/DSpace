@@ -8,19 +8,24 @@
 package org.dspace.app.rest.repository;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
 import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.step.UploadStatusResponse;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.webmvc.json.patch.Patch;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -150,19 +155,19 @@ extends AbstractDSpaceRestRepository
 		throw new RuntimeException("No implementation found; Method not allowed!"); 
 	}
 
-	public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) {
+	public T patch(HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) throws HttpRequestMethodNotSupportedException, PatchUnprocessableEntityException, PatchBadRequestException {
 		Context context = obtainContext();		
 		try {
-			patch(context, request, apiCategory, model, id, patch);		
+			patch(context, request, apiCategory, model, id, patch);	
 			context.commit();
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
+		} catch (SQLException | AuthorizeException e) {
+			throw new PatchUnprocessableEntityException(e.getMessage());
 		}
 		return findOne(id);
 	}
 	
-	protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) throws Exception {
-		throw new RuntimeException("No implementation found; Method not allowed!");
+	protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) throws HttpRequestMethodNotSupportedException, SQLException, AuthorizeException {
+		throw new HttpRequestMethodNotSupportedException("No implementation found; Method not allowed!");
 	}
 
 }
