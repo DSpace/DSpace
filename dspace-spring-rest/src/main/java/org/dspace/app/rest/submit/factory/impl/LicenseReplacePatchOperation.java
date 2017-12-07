@@ -42,9 +42,15 @@ public class LicenseReplacePatchOperation extends ReplacePatchOperation<String> 
 		LicenseUtils.grantLicense(context, item, license, (String)value);
 	}
 
+
 	@Override
-	protected Class<String[]> getClassForEvaluation() {
+	protected Class<String[]> getArrayClassForEvaluation() {
 		return String[].class;
+	}
+
+	@Override
+	protected Class<String> getClassForEvaluation() {
+		return String.class;
 	}
 
 

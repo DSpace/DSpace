@@ -7,30 +7,32 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.model.MetadataValueRest;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataValue;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.Utils;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
+import org.springframework.util.Assert;
 
 /**
- * Submission "add" operation to add metadata in the Bitstream
+ * Submission "add" PATCH operation at metadata Bitstream level.
+ * 
+ * See {@link ItemMetadataValueAddPatchOperation}
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class BitstreamMetadataValueAddPatchOperation extends AddPatchOperation<MetadataValueRest> {
+public class BitstreamMetadataValueAddPatchOperation extends MetadataValueAddPatchOperation<Bitstream> {
 
 	@Autowired
 	BitstreamService bitstreamService;
@@ -47,7 +49,39 @@ public class BitstreamMetadataValueAddPatchOperation extends AddPatchOperation<M
 			int idx = 0;
 			for(Bitstream b : bb.getBitstreams()) {
 				if(idx==Integer.parseInt(split[0])) {
-					addValue(context, b, split[2], evaluateObject((LateObjectEvaluator)value));
+					
+					if (split.length == 2) {
+						List<MetadataValueRest> list = evaluateArrayObject((LateObjectEvaluator) value);
+						replaceValue(context, b, split[2], list);
+
+					} else {
+						// call with "-" or "index-based" we should receive only single
+						// object member
+						MetadataValueRest object = evaluateSingleObject((LateObjectEvaluator) value);
+						// check if is not empty
+						List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),
+								split[0]);
+						Assert.notEmpty(metadataByMetadataString);
+						if (split.length > 2) {
+							String controlChar = split[3];
+							switch (controlChar) {
+							case "-":
+								addValue(context, b, split[2], object, -1);
+								break;
+							default:
+								// index based
+
+								int index = Integer.parseInt(controlChar);
+								if (index > metadataByMetadataString.size()) {
+									throw new IllegalArgumentException(
+											"The specified index MUST NOT be greater than the number of elements in the array");
+								}
+								addValue(context, b, split[2], object, index);
+
+								break;
+							}
+						}
+					}
 				}
 				idx++;
 			}
@@ -56,14 +90,7 @@ public class BitstreamMetadataValueAddPatchOperation extends AddPatchOperation<M
 	}
 
 	@Override
-	protected Class<MetadataValueRest[]> getClassForEvaluation() {
-		return MetadataValueRest[].class;
-	}
-
-	private void addValue(Context context, Bitstream source, String target, MetadataValueRest[] list) throws SQLException {
-		String[] metadata = Utils.tokenize(target);
-		for(MetadataValueRest ll : list) {
-			bitstreamService.addMetadata(context, source, metadata[0], metadata[1], metadata[2], ll.getLanguage(), ll.getValue(), ll.getAuthority(), ll.getConfidence());
-		}
+	protected BitstreamService getDSpaceObjectService() {
+		return bitstreamService;
 	}
 }

@@ -13,7 +13,7 @@ import org.dspace.services.model.Request;
 
 /**
  * 
- * Class to manage HTTP PATCH method operation ADD
+ * Class to manage HTTP PATCH method operation ADD. Please see https://tools.ietf.org/html/rfc6902
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *

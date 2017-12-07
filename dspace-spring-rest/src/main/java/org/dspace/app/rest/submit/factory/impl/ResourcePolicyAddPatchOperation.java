@@ -63,7 +63,7 @@ public class ResourcePolicyAddPatchOperation extends AddPatchOperation<ResourceP
 			int idx = 0;
 			for (Bitstream b : bb.getBitstreams()) {
 				if (idx == Integer.parseInt(split[0])) {
-					ResourcePolicyRest[] newAccessConditions = evaluateObject((LateObjectEvaluator) value);
+					List<ResourcePolicyRest> newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
 					for (ResourcePolicyRest newAccessCondition : newAccessConditions) {
 						String name = newAccessCondition.getName();
 						String description = newAccessCondition.getDescription();
@@ -90,8 +90,12 @@ public class ResourcePolicyAddPatchOperation extends AddPatchOperation<ResourceP
 	}
 
 	@Override
-	protected Class<ResourcePolicyRest[]> getClassForEvaluation() {
+	protected Class<ResourcePolicyRest[]> getArrayClassForEvaluation() {
 		return ResourcePolicyRest[].class;
 	}
 
+	@Override
+	protected Class<ResourcePolicyRest> getClassForEvaluation() {
+		return ResourcePolicyRest.class;
+	}
 }

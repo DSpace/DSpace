@@ -80,8 +80,12 @@ public class ResourcePolicyRemovePatchOperation extends RemovePatchOperation<Res
 	}
 
 	@Override
-	protected Class<ResourcePolicyRest[]> getClassForEvaluation() {
+	protected Class<ResourcePolicyRest[]> getArrayClassForEvaluation() {
 		return ResourcePolicyRest[].class;
 	}
 
+	@Override
+	protected Class<ResourcePolicyRest> getClassForEvaluation() {
+		return ResourcePolicyRest.class;
+	}
 }
