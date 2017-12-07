@@ -7,13 +7,16 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
- * Class to abstract the HTTP PATCH method operation 
+ * Class to abstract the HTTP PATCH method operation
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
@@ -21,18 +24,44 @@ import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
  */
 public abstract class PatchOperation<T extends Object> {
 
-	public abstract void perform(Context context, Request currentRequest, WorkspaceItem source, String path, Object value) throws Exception;
-	
-	//FIXME manage only single value
-	public T[] evaluateObject(LateObjectEvaluator value) {
+	public abstract void perform(Context context, Request currentRequest, WorkspaceItem source, String path,
+			Object value) throws Exception;
+
+	public List<T> evaluateArrayObject(LateObjectEvaluator value) {
+		List<T> results = new ArrayList<T>();
 		T[] list = null;
-		if(value!=null) {
-			LateObjectEvaluator object = (LateObjectEvaluator)value;
-			list = (T[])object.evaluate(getClassForEvaluation());
+		if (value != null) {
+			LateObjectEvaluator object = (LateObjectEvaluator) value;
+			list = (T[]) object.evaluate(getArrayClassForEvaluation());
 		}
-		return list;
+
+		for (T t : list) {
+			results.add(t);
+		}
+		return results;
 	}
 
-	protected abstract Class<T[]> getClassForEvaluation();
+	public T evaluateSingleObject(LateObjectEvaluator value) {
+		T single = null;
+		if (value != null) {
+			LateObjectEvaluator object = (LateObjectEvaluator) value;
+			single = (T) object.evaluate(getClassForEvaluation());
+		}
+		return single;
+	}
+
+	public String evaluateString(LateObjectEvaluator value) {
+		String single = null;
+		if (value != null) {
+			LateObjectEvaluator object = (LateObjectEvaluator) value;
+			single = (String) object.evaluate(String.class);
+		}
+		return single;
+	}
+
 	
+	protected abstract Class<T[]> getArrayClassForEvaluation();
+
+	protected abstract Class<T> getClassForEvaluation();
+
 }

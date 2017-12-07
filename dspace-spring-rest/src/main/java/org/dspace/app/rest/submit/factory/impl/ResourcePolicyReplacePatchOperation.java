@@ -64,7 +64,7 @@ public class ResourcePolicyReplacePatchOperation extends ReplacePatchOperation<R
 			for (Bitstream b : bb.getBitstreams()) {
 				if (idx == Integer.parseInt(split[0])) {
 					authorizeService.removeAllPolicies(context, b);
-					ResourcePolicyRest[] newAccessConditions = evaluateObject((LateObjectEvaluator) value);
+					List<ResourcePolicyRest> newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
 					for (ResourcePolicyRest newAccessCondition : newAccessConditions) {
 						String name = newAccessCondition.getName();
 						String description = newAccessCondition.getDescription();
@@ -85,8 +85,13 @@ public class ResourcePolicyReplacePatchOperation extends ReplacePatchOperation<R
 	}
 
 	@Override
-	protected Class<ResourcePolicyRest[]> getClassForEvaluation() {
+	protected Class<ResourcePolicyRest[]> getArrayClassForEvaluation() {
 		return ResourcePolicyRest[].class;
+	}
+
+	@Override
+	protected Class<ResourcePolicyRest> getClassForEvaluation() {
+		return ResourcePolicyRest.class;
 	}
 
 }

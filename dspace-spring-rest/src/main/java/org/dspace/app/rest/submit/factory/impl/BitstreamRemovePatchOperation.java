@@ -70,8 +70,12 @@ public class BitstreamRemovePatchOperation extends RemovePatchOperation<String>{
 	}
 
 	@Override
-	protected Class<String[]> getClassForEvaluation() {
+	protected Class<String[]> getArrayClassForEvaluation() {
 		return String[].class;
 	}
 
+	@Override
+	protected Class<String> getClassForEvaluation() {
+		return String.class;
+	}
 }
