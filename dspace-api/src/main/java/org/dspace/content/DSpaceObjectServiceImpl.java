@@ -7,6 +7,15 @@
  */
 package org.dspace.content;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -24,9 +33,6 @@ import org.dspace.handle.service.HandleService;
 import org.dspace.identifier.service.IdentifierService;
 import org.dspace.utils.DSpace;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Service implementation class for the DSpaceObject.
@@ -613,5 +619,24 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
             default:
                 return new String[]{null, null, null};
         }
+    }
+    
+    @Override
+    public void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException {
+
+    	List<MetadataValue> list = dso.getMetadata();
+		
+		clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
+
+		int idx = 0;
+		for(MetadataValue rr : list) {
+			if(idx==index) {
+				addMetadata(context, dso, schema, element, qualifier,
+					lang, value, authority, confidence);
+			}
+			addMetadata(context, dso, schema, element, qualifier,
+					rr.getLanguage(), rr.getValue(), rr.getAuthority(), rr.getConfidence());
+			idx++;
+		}
     }
 }
