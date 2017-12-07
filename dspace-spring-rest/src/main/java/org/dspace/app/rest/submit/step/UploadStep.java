@@ -57,11 +57,11 @@ public class UploadStep extends org.dspace.submit.step.UploadStep implements Abs
 		
 		String[] split = path.split("/");
 		String instance = "";
-		if("remove".equals(operation) && NumberUtils.isNumber(path)) {
+		if("remove".equals(operation)) {
 			instance = "bitstreamremove";
 		}
 		else {
-			instance = split[1];
+			instance = split[2];
 		}
 		PatchOperation<?> patchOperation = new PatchOperationFactory().instanceOf(instance, operation);
 		patchOperation.perform(context, currentRequest, source, path, value);
