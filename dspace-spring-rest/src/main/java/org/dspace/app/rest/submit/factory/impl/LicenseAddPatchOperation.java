@@ -7,9 +7,6 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import java.util.List;
-
-import org.dspace.content.Bundle;
 import org.dspace.content.Item;
 import org.dspace.content.LicenseUtils;
 import org.dspace.content.WorkspaceItem;
@@ -18,30 +15,46 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 
 /**
- * Submission "replace" patch operation
+ * Submission "add" PATCH operation
  * 
- * The replace operation allows to replace existent information with new one.
- * Attempt to use the replace operation without a previous accepted license must
- * return an error.
+ * To accept a license the timestamp of the acceptance the client must send a
+ * JSON Patch ADD operation as follow. 
+ * 
+ * Example: <code>
+ * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * Content-Type: application/json" -d '[{ "op": "add", "path": "
+ * /sections/license/acceptanceDate", "value": "2017-11-20T10:32:42Z"}]'
+ * </code>
+ * 
+ * Please note that according to the JSON Patch specification RFC6902 a
+ * subsequent add operation on the acceptanceDate will have the effect to
+ * replace the previous granted license with a new one.
+ * 
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class LicenseReplacePatchOperation extends ReplacePatchOperation<String> {
+public class LicenseAddPatchOperation extends AddPatchOperation<String> {
 
 	@Autowired
 	ItemService itemService;
 
 	@Override
-	void replace(Context context, Request currentRequest, WorkspaceItem source, String string, Object value)
+	protected Class<String[]> getArrayClassForEvaluation() {
+		return String[].class;
+	}
+
+	@Override
+	protected Class<String> getClassForEvaluation() {
+		return String.class;
+	}
+
+	@Override
+	void add(Context context, Request currentRequest, WorkspaceItem source, String string, Object value)
 			throws Exception {
 		Item item = source.getItem();
-		List<Bundle> bunds = itemService.getBundles(item, "LICENSE");
-		Assert.notEmpty(bunds);
-
 		EPerson submitter = context.getCurrentUser();
 
 		// remove any existing DSpace license (just in case the user
@@ -52,16 +65,6 @@ public class LicenseReplacePatchOperation extends ReplacePatchOperation<String> 
 				submitter);
 
 		LicenseUtils.grantLicense(context, item, license, (String) value);
-	}
-
-	@Override
-	protected Class<String[]> getArrayClassForEvaluation() {
-		return String[].class;
-	}
-
-	@Override
-	protected Class<String> getClassForEvaluation() {
-		return String.class;
 	}
 
 }

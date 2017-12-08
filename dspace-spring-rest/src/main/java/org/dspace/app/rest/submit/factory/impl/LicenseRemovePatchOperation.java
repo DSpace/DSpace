@@ -15,7 +15,15 @@ import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Submission License "remove" patch operation
+ * Submission License "remove" patch operation.
+ * 
+ * To remove a previous granted license:
+ * 
+ * Example: <code>
+ * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * Content-Type: application/json" -d '[{ "op": "remove", "path": "
+ * /sections/license/acceptanceDate"}]'
+ * </code>
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
