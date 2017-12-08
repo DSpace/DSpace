@@ -177,6 +177,35 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Used to validate all code style rules in source code via the Checkstyle config in checkstyle.xml -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.17</version>
+                    <executions>
+                        <execution>
+                            <id>verify-style</id>
+                            <phase>process-classes</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <configLocation>${root.basedir}/checkstyle.xml</configLocation>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <logViolationsToConsole>true</logViolationsToConsole>
+                        <linkXRef>false</linkXRef>
+                    </configuration>
+                    <dependencies>
+                        <!-- Override dependencies to use latest version of checkstyle -->
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>8.5</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>findbugs-maven-plugin</artifactId>
