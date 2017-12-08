@@ -25,7 +25,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 /**
- * Submission "replace" operation to replace metadata in the Item
+ * Submission "replace" PATCH operation.
+ * 
+ * The replace operation allows to replace existent information with new one.
+ * Attempt to use the replace operation to set not yet initialized information
+ * must return an error.
+ * 
+ * Example: <code>
+ * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * Content-Type: application/json" -d '[{ "op": "replace", "path": "
+ * /sections/traditionalpageone/dc.title/0", "value": {"value": "Add new
+ * title", "language": "en"}}]'
+ * </code>
+ * 
+ * It is also possible to change only a single attribute of the {@link MetadataValueRest} (except the "place").
+ * 
+ * Example: <code>
+ * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
+ * Content-Type: application/json" -d '[{ "op": "replace", "path": "
+ * /sections/traditionalpageone/dc.title/0/language", "value": "it"}]'
+ * </code>
  * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
