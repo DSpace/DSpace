@@ -422,13 +422,35 @@ public class ContextTest extends AbstractUnitTest
     public void testFinalize() throws Throwable {
         // We need a new Context object
         Context instance = new Context();
-        
+
         instance.finalize();
-        
+
         // Finalize is like abort()...should invalidate our context
         assertThat("testSetSpecialGroup 0", instance.isValid(), equalTo(false));
 
         // Cleanup our context
         cleanupContext(instance);
     }
+
+    /**
+     * Test of updateDatabase method, of class Context.
+     */
+    @Test
+    public void testUpdateDatabase() throws Throwable {
+        // We create a new Context object and force the databaseUpdated flag to false
+        Context instance = new Context() {
+            @Override
+            protected void init() {
+                super.init();
+                databaseUpdated.set(false);
+            }
+        };
+
+        // Finalize is like abort()...should invalidate our context
+        assertThat("updateDatabase 0", Context.updateDatabase(), equalTo(true));
+
+        // Cleanup our context
+        cleanupContext(instance);
+    }
+
 }
