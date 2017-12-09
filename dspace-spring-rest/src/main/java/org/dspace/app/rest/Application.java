@@ -243,22 +243,8 @@ public class Application extends SpringBootServletInitializer {
     private class FlywayDatabaseMigrationInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
-            //Run the Flyway migrations by create a Context and Database connection
-            org.dspace.core.Context context = new org.dspace.core.Context();
-            boolean failed = false;
-
-            try {
-                if(context.getDBConfig() == null || StringUtils.isBlank(context.getDBConfig().getDatabaseUrl())) {
-                    failed = true;
-                }
-
-                context.complete();
-
-            } catch (SQLException e) {
-                failed = true;
-            }
-
-            if(failed) {
+            //If we fail to update the database, throw an exception
+            if(!org.dspace.core.Context.updateDatabase()) {
                 throw new RuntimeException("Unable to initialize the database");
             }
         }
