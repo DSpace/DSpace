@@ -23,6 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.atteo.evo.inflector.English;
+import org.dspace.app.rest.converter.JsonPatchConverter;
 import org.dspace.app.rest.exception.PaginationException;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
@@ -35,6 +36,7 @@ import org.dspace.app.rest.model.LinkRest;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.hateoas.EmbeddedPage;
+import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.step.UploadStatusResponse;
 import org.dspace.app.rest.repository.DSpaceRestRepository;
 import org.dspace.app.rest.repository.LinkRestRepository;
@@ -49,8 +51,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ControllerUtils;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.data.rest.webmvc.json.patch.JsonPatchPatchConverter;
-import org.springframework.data.rest.webmvc.json.patch.Patch;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
@@ -263,7 +263,7 @@ public class RestResourceController implements InitializingBean {
 		DSpaceRestRepository<DirectlyAddressableRestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
 		DirectlyAddressableRestModel modelObject = null;
 		try {
-			JsonPatchPatchConverter patchConverter = new JsonPatchPatchConverter(mapper);
+			JsonPatchConverter patchConverter = new JsonPatchConverter(mapper);
 			Patch patch = patchConverter.convert(jsonNode);
 			modelObject = repository.patch(request, apiCategory, model, id, patch);
 		} 

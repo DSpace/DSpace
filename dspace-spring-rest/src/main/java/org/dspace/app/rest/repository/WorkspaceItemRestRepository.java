@@ -21,6 +21,8 @@ import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
+import org.dspace.app.rest.model.patch.Operation;
+import org.dspace.app.rest.model.patch.Patch;
 import org.dspace.app.rest.model.step.UploadBitstreamRest;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -49,8 +51,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.webmvc.json.patch.Patch;
-import org.springframework.data.rest.webmvc.json.patch.PatchOperation;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -242,10 +242,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
 	@Override
 	public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch) throws SQLException, AuthorizeException {
-		List<PatchOperation> operations = patch.getOperations();
+		List<Operation> operations = patch.getOperations();
 		WorkspaceItemRest wsi = findOne(id);
 		WorkspaceItem source = wis.find(context, id);
-		for(PatchOperation op : operations) {
+		for(Operation op : operations) {
 			//the value in the position 0 is a null value
 			String[] path = op.getPath().substring(1).split("/",3);
 			if(OPERATION_PATH_SECTIONS.equals(path[0])) {
