@@ -231,7 +231,6 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
     //TODO The test fails, 404 resource not found. remove @Ignore when this is implemented
     @Test
-    @Ignore
     public void findAllSubCommunities() throws Exception{
 
         //We turn off the authorization system in order to create the structure as defined below
@@ -263,17 +262,17 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
 
         Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
 
-        getClient().perform(get("/api/core/communities/search/subCommunities"))
+        getClient().perform(get("/api/core/communities/search/subCommunities/" + parentCommunity.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(child12.getName(), child12.getID(), child12.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(child2.getName(), child2.getID(), child2.getHandle())
+                        CommunityMatcher.matchCommunityEntry(child12.getName(), child12.getID(), child12.getHandle())
                 )))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.not(Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(parentCommunity2.getName(), parentCommunity2.getID(), parentCommunity2.getHandle())
+                        CommunityMatcher.matchCommunityEntry(parentCommunity2.getName(), parentCommunity2.getID(), parentCommunity2.getHandle()),
+                        CommunityMatcher.matchCommunityEntry(child2.getName(), child2.getID(), child2.getHandle())
                 ))))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities/search/subCommunities")))
                 .andExpect(jsonPath("$.page.size", is(20)))
