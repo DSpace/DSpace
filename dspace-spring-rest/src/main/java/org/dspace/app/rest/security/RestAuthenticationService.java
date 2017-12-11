@@ -19,7 +19,8 @@ import org.springframework.stereotype.Service;
 /**
  * Interface for a service that can provide authentication for the REST API
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Service
 public interface RestAuthenticationService {

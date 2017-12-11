@@ -24,7 +24,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 /**
  * This class will filter login requests to try and authenticate them
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public class StatelessLoginFilter extends AbstractAuthenticationProcessingFilter {
 

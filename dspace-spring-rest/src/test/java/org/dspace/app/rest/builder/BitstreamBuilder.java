@@ -7,11 +7,6 @@
  */
 package org.dspace.app.rest.builder;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.List;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -21,13 +16,15 @@ import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.List;
+
 /**
  * Builder class to build bitstreams in test cases
- *
- * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
-public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
+public class BitstreamBuilder extends AbstractDSpaceObjectBuilder<Bitstream> {
 
     public static final String ORIGINAL = "ORIGINAL";
 
@@ -35,12 +32,13 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
     private Item item;
     private Group readerGroup;
 
-    protected BitstreamBuilder() {
+    protected BitstreamBuilder(Context context) {
+        super(context);
 
     }
 
     public static BitstreamBuilder createBitstream(Context context, Item item, InputStream is) throws SQLException, AuthorizeException, IOException {
-        BitstreamBuilder builder = new BitstreamBuilder();
+        BitstreamBuilder builder = new BitstreamBuilder(context);
         return builder.create(context, item, is);
     }
 
@@ -66,8 +64,7 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
     }
 
     public BitstreamBuilder withMimeType(String mimeType) throws SQLException {
-        BitstreamFormat bf = bitstreamFormatService
-                .findByMIMEType(context, mimeType);
+        BitstreamFormat bf = bitstreamFormatService.findByMIMEType(context, mimeType);
 
         if (bf != null) {
             bitstream.setFormat(context, bf);
@@ -124,7 +121,20 @@ public class BitstreamBuilder extends AbstractBuilder<Bitstream>{
         return bitstream;
     }
 
-    protected DSpaceObjectService<Bitstream> getDsoService() {
+    protected void cleanup() throws Exception {
+        delete(bitstream);
+
+        try(Context c = new Context()) {
+            bitstream = c.reloadEntity(bitstream);
+            c.turnOffAuthorisationSystem();
+            if (bitstream != null) {
+                bitstreamService.expunge(c, bitstream);
+            }
+            c.complete();
+        }
+    }
+
+    protected DSpaceObjectService<Bitstream> getService() {
         return bitstreamService;
     }
 }

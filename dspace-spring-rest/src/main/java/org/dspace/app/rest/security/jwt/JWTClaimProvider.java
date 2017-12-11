@@ -18,7 +18,8 @@ import org.dspace.core.Context;
  * Interface to be implemented if you want to add a custom claim to a JSON Web Token, annotate with @Component
  * to include it's implementation in the token
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 public interface JWTClaimProvider {
 

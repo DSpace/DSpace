@@ -7,10 +7,17 @@
  */
 package org.dspace.app.rest.builder;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.CharEncoding;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
 
 /**
  * Builder to construct Community objects
@@ -18,16 +25,16 @@ import org.dspace.core.Context;
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
-public class CommunityBuilder extends AbstractBuilder<Community> {
+public class CommunityBuilder extends AbstractDSpaceObjectBuilder<Community> {
 
     private Community community;
 
-    protected CommunityBuilder() {
-
+    protected CommunityBuilder(Context context) {
+        super(context);
     }
 
     public static CommunityBuilder createCommunity(final Context context) {
-        CommunityBuilder builder = new CommunityBuilder();
+        CommunityBuilder builder = new CommunityBuilder(context);
         return builder.create(context);
     }
 
@@ -36,7 +43,7 @@ public class CommunityBuilder extends AbstractBuilder<Community> {
     }
 
     public static CommunityBuilder createSubCommunity(final Context context, final Community parent) {
-        CommunityBuilder builder = new CommunityBuilder();
+        CommunityBuilder builder = new CommunityBuilder(context);
         return builder.createSub(context, parent);
     }
 
@@ -56,6 +63,13 @@ public class CommunityBuilder extends AbstractBuilder<Community> {
         return setMetadataSingleValue(community, MetadataSchema.DC_SCHEMA, "title", null, communityName);
     }
 
+    public CommunityBuilder withLogo(String content) throws AuthorizeException, IOException, SQLException {
+        try(InputStream is = IOUtils.toInputStream(content, CharEncoding.UTF_8)) {
+            communityService.setLogo(context, community, is);
+        }
+        return this;
+    }
+
     @Override
     public Community build() {
         try {
@@ -70,8 +84,12 @@ public class CommunityBuilder extends AbstractBuilder<Community> {
         return community;
     }
 
+    protected void cleanup() throws Exception {
+        delete(community);
+    }
+
     @Override
-    protected DSpaceObjectService<Community> getDsoService() {
+    protected DSpaceObjectService<Community> getService() {
         return communityService;
     }
 }

@@ -25,7 +25,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @RunWith(MockitoJUnitRunner.class)
 public class EPersonRestAuthenticationProviderTest {
