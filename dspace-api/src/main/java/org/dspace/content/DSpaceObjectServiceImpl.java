@@ -624,19 +624,25 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException {
 
-    	List<MetadataValue> list = dso.getMetadata();
+    	List<MetadataValue> list = getMetadata(dso, schema, element, qualifier, lang);
 		
 		clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
 
 		int idx = 0;
+		boolean last = true;
 		for(MetadataValue rr : list) {
 			if(idx==index) {
 				addMetadata(context, dso, schema, element, qualifier,
 					lang, value, authority, confidence);
+				last = false;
 			}
 			addMetadata(context, dso, schema, element, qualifier,
 					rr.getLanguage(), rr.getValue(), rr.getAuthority(), rr.getConfidence());
 			idx++;
+		}
+		if(last) {
+			addMetadata(context, dso, schema, element, qualifier,
+					lang, value, authority, confidence);
 		}
     }
 }
