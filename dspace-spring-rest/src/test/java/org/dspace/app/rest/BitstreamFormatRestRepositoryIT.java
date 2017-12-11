@@ -73,11 +73,20 @@ public class BitstreamFormatRestRepositoryIT extends AbstractControllerIntegrati
     @Test
     @Ignore
     public void findOne() throws Exception {
-        getClient().perform(get("/api/core/bitstreamformats/1"))
+        context.turnOffAuthorisationSystem();
+        BitstreamFormat bitstreamFormat = BitstreamFormatBuilder.createBitstreamFormat(context)
+                .withMimeType("application/octet-stream")
+                .withDescription("Description")
+                .build();
+
+        getClient().perform(get("/api/core/bitstreamformats/" + bitstreamFormat.getID()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.description", is(bitstreamFormat.getDescription())))
+                .andExpect(jsonPath("$.mimetype", is(bitstreamFormat.getMIMEType())))
+                .andExpect(jsonPath("$.type", is("bitstreamformat")))
                 .andExpect(jsonPath("$._links.self.href", startsWith(REST_SERVER_URL)))
-                .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats/1")))
+                .andExpect(jsonPath("$._links.self.href", endsWith("/api/core/bitstreamformats/"+bitstreamFormat.getID())))
         ;
     }
 }
