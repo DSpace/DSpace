@@ -29,7 +29,8 @@ import org.springframework.stereotype.Component;
 /**
  * JWT claim provider to read and set the special groups of an eperson on a JWT token
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Component
 public class SpecialGroupClaimProvider implements JWTClaimProvider {

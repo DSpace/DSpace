@@ -18,16 +18,21 @@ import org.dspace.eperson.Group;
  * @author Tom Desair (tom dot desair at atmire dot com)
  * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
-public class GroupBuilder extends AbstractBuilder<Group> {
+public class GroupBuilder extends AbstractDSpaceObjectBuilder<Group> {
 
     private Group group;
 
-    protected GroupBuilder() {
+    protected GroupBuilder(Context context) {
+        super(context);
 
     }
 
+    protected void cleanup() throws Exception {
+        delete(group);
+    }
+
     public static GroupBuilder createGroup(final Context context) {
-        GroupBuilder builder = new GroupBuilder();
+        GroupBuilder builder = new GroupBuilder(context);
         return builder.create(context);
     }
 
@@ -42,7 +47,7 @@ public class GroupBuilder extends AbstractBuilder<Group> {
     }
 
     @Override
-    protected DSpaceObjectService<Group> getDsoService() {
+    protected DSpaceObjectService<Group> getService() {
         return groupService;
     }
 
@@ -76,10 +81,6 @@ public class GroupBuilder extends AbstractBuilder<Group> {
             return handleException(e);
         }
         return this;
-    }
-
-    public static AbstractBuilder<Group> cleaner() {
-        return new GroupBuilder();
     }
 
 }

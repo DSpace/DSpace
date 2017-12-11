@@ -22,7 +22,8 @@ import org.springframework.stereotype.Component;
 /**
  * Provides a claim for a JSON Web Token, this claim is responsible for adding the EPerson ID to it
  *
- * @author Atmire NV (info at atmire dot com)
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
+ * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @Component
 public class EPersonClaimProvider implements JWTClaimProvider{

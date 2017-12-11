@@ -7,14 +7,10 @@
  */
 package org.dspace.app.rest.test;
 
-import static org.junit.Assert.fail;
-
-import java.sql.SQLException;
-
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
-import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
@@ -24,6 +20,10 @@ import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+
+import java.sql.SQLException;
+
+import static org.junit.Assert.fail;
 
 /**
  * Abstract Test class that will initialize the in-memory database
@@ -146,16 +146,13 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
     public void destroy() throws Exception {
         // Cleanup our global context object
         try {
+            AbstractBuilder.cleanupObjects();
             if(context == null || !context.isValid()){
                 context = new Context();
             }
-            parentCommunity = context.reloadEntity(parentCommunity);
             eperson = context.reloadEntity(eperson);
 
             context.turnOffAuthorisationSystem();
-            if(parentCommunity != null) {
-                ContentServiceFactory.getInstance().getCommunityService().delete(context, parentCommunity);
-            }
             if(eperson != null) {
                 EPersonServiceFactory.getInstance().getEPersonService().delete(context, eperson);
             }

@@ -288,9 +288,6 @@ public class BitstreamContentRestControllerIT extends AbstractControllerIntegrat
             //An unauthorized request should not log statistics
             checkNumberOfStatsRecords(bitstream, 0);
 
-        } finally {
-            //** CLEANUP **
-            GroupBuilder.cleaner().delete(internalGroup);
         }
     }
 

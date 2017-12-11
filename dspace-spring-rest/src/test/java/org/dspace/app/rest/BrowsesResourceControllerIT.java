@@ -37,8 +37,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
  * Integration test to test the /api/discover/browses endpoint
  * (Class has to start or end with IT to be picked up by the failsafe plugin)
  *
+ * @author Frederic Van Reet (frederic dot vanreet at atmire dot com)
  * @author Tom Desair (tom dot desair at atmire dot com)
- * @author Raf Ponsaerts (raf dot ponsaerts at atmire dot com)
  */
 public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTest {
 
@@ -377,9 +377,6 @@ public class BrowsesResourceControllerIT extends AbstractControllerIntegrationTe
                 .andExpect(jsonPath("$._embedded.items[*].metadata[?(@.key=='dc.title')].value",
                         not(hasItem("Internal publication"))))
         ;
-
-        //** CLEANUP **
-        GroupBuilder.cleaner().delete(internalGroup);
     }
 
     @Test
