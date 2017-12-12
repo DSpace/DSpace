@@ -12,7 +12,6 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -53,6 +52,7 @@ public class DryadBlogFeed extends AbstractDSpaceTransformer implements
 			GetMethod get = new GetMethod("https://blog.datadryad.org/feed/");
 
 			int responseCode = new HttpClient().executeMethod(get);
+			LOGGER.debug("response code is " + responseCode);
 			switch (responseCode) {
 			case 200:
 			case 201:
