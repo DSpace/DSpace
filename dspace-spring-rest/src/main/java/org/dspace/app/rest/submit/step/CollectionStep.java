@@ -41,7 +41,7 @@ public class CollectionStep extends org.dspace.submit.step.SelectCollectionStep 
 			throws Exception {
 
 		PatchOperation<String> patchOperation = new PatchOperationFactory().instanceOf(COLLECTION_STEP_OPERATION_ENTRY, op.getOp());
-		patchOperation.perform(context, currentRequest, source, op.getPath(), op.getValue());
+		patchOperation.perform(context, currentRequest, source, op);
 
 	}
 }
