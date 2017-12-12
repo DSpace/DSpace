@@ -50,7 +50,7 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
 		if(op.getPath().endsWith(LICENSE_STEP_OPERATION_ENTRY)) {
 			
 			PatchOperation<String> patchOperation = new PatchOperationFactory().instanceOf(LICENSE_STEP_OPERATION_ENTRY, op.getOp());
-			patchOperation.perform(context, currentRequest, source, op.getPath(), op.getValue());
+			patchOperation.perform(context, currentRequest, source, op);
 				
 		}
 	}

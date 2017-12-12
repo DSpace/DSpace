@@ -64,7 +64,7 @@ public class UploadStep extends org.dspace.submit.step.UploadStep implements Abs
 			}
 		}
 		PatchOperation<?> patchOperation = new PatchOperationFactory().instanceOf(instance, op.getOp());
-		patchOperation.perform(context, currentRequest, source, op.getPath(), op.getValue());
+		patchOperation.perform(context, currentRequest, source, op);
 
 	}
 
