@@ -20,12 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Submission "add" PATCH operation
  * 
  * To accept a license the timestamp of the acceptance the client must send a
- * JSON Patch ADD operation as follow. 
+ * JSON Patch ADD operation as follow.
  * 
  * Example: <code>
- * curl -X PATCH http://${dspace.url}/api/submission/workspaceitems/<:id-workspaceitem> -H "
- * Content-Type: application/json" -d '[{ "op": "add", "path": "
- * /sections/license/acceptanceDate", "value": "2017-11-20T10:32:42Z"}]'
+ * curl -X PATCH http://${dspace.url}/dspace-spring-rest/api/submission/workspaceitems/31599 -H "Content-Type: application/json" -d '[{ "op": "add", "path": "/sections/license/granted", "value":"true"}]'
  * </code>
  * 
  * Please note that according to the JSON Patch specification RFC6902 a
@@ -64,7 +62,7 @@ public class LicenseAddPatchOperation extends AddPatchOperation<String> {
 		String license = LicenseUtils.getLicenseText(context.getCurrentLocale(), source.getCollection(), item,
 				submitter);
 
-		LicenseUtils.grantLicense(context, item, license, (String) value);
+		LicenseUtils.grantLicense(context, item, license, null);
 	}
 
 }
