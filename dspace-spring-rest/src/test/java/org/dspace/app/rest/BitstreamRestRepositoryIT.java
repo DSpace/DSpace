@@ -360,6 +360,50 @@ public class BitstreamRestRepositoryIT extends AbstractControllerIntegrationTest
     }
 
     @Test
+    public void findOneLogoBitstreamTest() throws Exception {
+
+        // We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community with a logo
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").withLogo("logo_community")
+                .build();
+
+        // 2. A collection with a logo
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
+                .withLogo("logo_collection").build();
+
+        getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID()))
+                .andExpect(status().isOk());
+
+        getClient().perform(get("/api/core/bitstreams/" + col.getLogo().getID())).andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void findOneLogoBitstreamRelsTest() throws Exception {
+
+        // We turn off the authorization system in order to create the structure as defined below
+        context.turnOffAuthorisationSystem();
+
+        // ** GIVEN **
+        // 1. A community with a logo
+        parentCommunity = CommunityBuilder.createCommunity(context).withName("Community").withLogo("logo_community")
+                .build();
+
+        // 2. A collection with a logo
+        Collection col = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection")
+                .withLogo("logo_collection").build();
+
+        getClient().perform(get("/api/core/bitstreams/" + parentCommunity.getLogo().getID() + "/content"))
+                .andExpect(status().isOk()).andExpect(content().string("logo_community"));
+
+        getClient().perform(get("/api/core/bitstreams/" + col.getLogo().getID() + "/content"))
+                .andExpect(status().isOk()).andExpect(content().string("logo_collection"));
+    }
+
+    @Test
     public void findOneWrongUUID() throws Exception {
 
         //We turn off the authorization system in order to create the structure as defined below
