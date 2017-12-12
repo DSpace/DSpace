@@ -24,6 +24,7 @@ import org.dspace.app.rest.utils.MultipartFileSender;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
 import org.dspace.content.service.BitstreamService;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -74,15 +75,24 @@ public class BitstreamContentRestController {
         }
 
         Long lastModified = bitstreamService.getLastModified(bit);
-        String mimetype = bit.getFormat(context).getMIMEType();
+        BitstreamFormat format = bit.getFormat(context);
+        String mimetype = format.getMIMEType();
 
 		// Pipe the bits
 		try(InputStream is = bitstreamService.retrieve(context, bit)) {
 
-			MultipartFileSender sender = MultipartFileSender
+            String name = bit.getName();
+            if (name == null) {
+                // give a default name to the file based on the UUID and the primary extension of the format
+                name = bit.getID().toString();
+                if (format != null && format.getExtensions() != null && format.getExtensions().size() > 0) {
+                    name += "." + format.getExtensions().get(0);
+                }
+            }
+            MultipartFileSender sender = MultipartFileSender
 					.fromInputStream(is)
 					.withBufferSize(BUFFER_SIZE)
-					.withFileName(bit.getName())
+					.withFileName(name)
 					.withLength(bit.getSize())
 					.withChecksum(bit.getChecksum())
 					.withMimetype(mimetype)
