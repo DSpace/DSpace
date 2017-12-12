@@ -74,7 +74,7 @@ public class ItemMetadataValueAddPatchOperation extends MetadataValueAddPatchOpe
 	@Override
 	void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws SQLException {
-		String[] split = path.split("/");
+		String[] split = getAbsolutePath(path).split("/");
 		// if split size is one so we have a call to initialize or replace
 		if (split.length == 1) {
 			List<MetadataValueRest> list = evaluateArrayObject((LateObjectEvaluator) value);

@@ -46,7 +46,7 @@ public class ItemMetadataValueRemovePatchOperation extends MetadataValueRemovePa
 	@Override
 	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
-		String[] split = path.split("/");
+		String[] split = getAbsolutePath(path).split("/");
 		if (split.length == 1) {
 			deleteValue(context, source.getItem(), split[0], -1);
 		} else {

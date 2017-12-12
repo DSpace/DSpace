@@ -19,7 +19,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Submission "move" PATCH operation.
@@ -38,9 +37,9 @@ public class BitstreamMetadataValueMovePatchOperation extends MetadataValueMoveP
 	ItemService itemService;
 
 	@Override
-	void move(Context context, Request currentRequest, WorkspaceItem source, String path, Object from)
+	void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
 			throws Exception {
-		String[] splitTo = path.split("/");
+		String[] splitTo = getAbsolutePath(path).split("/");
 		Item item = source.getItem();
 		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 		for (Bundle bb : bundle) {
@@ -48,7 +47,7 @@ public class BitstreamMetadataValueMovePatchOperation extends MetadataValueMoveP
 			for (Bitstream b : bb.getBitstreams()) {
 				if (idx == Integer.parseInt(splitTo[0])) {
 
-					String evalFrom = evaluateString((LateObjectEvaluator) from);
+					String evalFrom = getAbsolutePath(from);			
 					String[] splitFrom = evalFrom.split("/");
 					String metadata = splitFrom[0];
 

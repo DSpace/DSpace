@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.model.MetadataValueRest;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataDescribe;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -99,11 +100,10 @@ public class DescribeStep extends org.dspace.submit.step.DescribeStep implements
 	}
 
 	@Override
-	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
-			String path, Object value) throws Exception {
+	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, Operation op) throws Exception {
 		
-		PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory().instanceOf("metadatavalue", operation);
-		patchOperation.perform(context, currentRequest, source, path, value);
+		PatchOperation<MetadataValueRest> patchOperation = new PatchOperationFactory().instanceOf(DESCRIBE_STEP_METADATA_OPERATION_ENTRY, op.getOp());
+		patchOperation.perform(context, currentRequest, source, op);
 		
 	}
 

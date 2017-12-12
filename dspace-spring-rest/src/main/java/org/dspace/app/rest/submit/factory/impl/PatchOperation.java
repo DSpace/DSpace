@@ -10,6 +10,7 @@ package org.dspace.app.rest.submit.factory.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
@@ -24,8 +25,7 @@ import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
  */
 public abstract class PatchOperation<T extends Object> {
 
-	public abstract void perform(Context context, Request currentRequest, WorkspaceItem source, String path,
-			Object value) throws Exception;
+	public abstract void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation) throws Exception;
 
 	public List<T> evaluateArrayObject(LateObjectEvaluator value) {
 		List<T> results = new ArrayList<T>();
@@ -59,6 +59,14 @@ public abstract class PatchOperation<T extends Object> {
 		return single;
 	}
 
+	public String getAbsolutePath(String fullpath) {
+		String[] path = fullpath.substring(1).split("/", 3);
+		String absolutePath = "";
+		if (path.length > 2) {
+			absolutePath = path[2];
+		}
+		return absolutePath;
+	}
 	
 	protected abstract Class<T[]> getArrayClassForEvaluation();
 

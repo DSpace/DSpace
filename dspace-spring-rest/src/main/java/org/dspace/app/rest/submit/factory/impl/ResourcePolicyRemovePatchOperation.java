@@ -43,7 +43,7 @@ public class ResourcePolicyRemovePatchOperation extends RemovePatchOperation<Res
 	@Override
 	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
-		String[] split = path.split("/");
+		String[] split = getAbsolutePath(path).split("/");
 		String bitstreamIdx = split[0];
 		String rpIdx = split[2];
 		

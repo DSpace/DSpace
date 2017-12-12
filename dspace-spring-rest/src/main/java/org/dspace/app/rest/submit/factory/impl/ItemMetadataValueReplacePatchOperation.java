@@ -57,7 +57,7 @@ public class ItemMetadataValueReplacePatchOperation extends MetadataValueReplace
 	@Override
 	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
-		String[] split = path.split("/");
+		String[] split = getAbsolutePath(path).split("/");
 
 		List<MetadataValue> metadataByMetadataString = itemService.getMetadataByMetadataString(source.getItem(),
 				split[0]);

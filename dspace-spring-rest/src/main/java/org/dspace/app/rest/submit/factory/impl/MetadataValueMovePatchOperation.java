@@ -40,22 +40,8 @@ public abstract class MetadataValueMovePatchOperation<DSO extends DSpaceObject>
 
 	protected void moveValue(Context context, DSO source, String target, int from, int to) throws SQLException {
 		String[] metadata = Utils.tokenize(target);
-		List<MetadataValue> metadataList = getDSpaceObjectService().getMetadataByMetadataString(source, target);
-		
-		int idx = 0;
-		MetadataValueRest object = new MetadataValueRest();
-		for (MetadataValue md : metadataList) {
-			if (idx == from) {				
-				object.setAuthority(md.getAuthority());
-				object.setConfidence(md.getConfidence());
-				object.setLanguage(md.getLanguage());
-				object.setPlace(md.getPlace());
-				object.setValue(md.getValue());
-				break;
-			}
-		}
-		getDSpaceObjectService().addAndShiftRightMetadata(context, source, metadata[0], metadata[1], metadata[2],
-				object.getLanguage(), object.getValue(), object.getAuthority(), object.getConfidence(), to);
+		getDSpaceObjectService().moveMetadata(context, source, metadata[0], metadata[1], metadata[2],
+				from, to);
 	}
 
 	protected abstract DSpaceObjectService<DSO> getDSpaceObjectService();

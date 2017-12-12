@@ -9,6 +9,7 @@ package org.dspace.app.rest.submit.step;
 
 import org.atteo.evo.inflector.English;
 import org.dspace.app.rest.model.BitstreamRest;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.model.step.DataLicense;
 import org.dspace.app.rest.submit.AbstractRestProcessingStep;
 import org.dspace.app.rest.submit.SubmissionService;
@@ -44,13 +45,12 @@ public class LicenseStep extends org.dspace.submit.step.LicenseStep implements A
 	}
 
 	@Override
-	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
-			String path, Object value) throws Exception {
+	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, Operation op) throws Exception {
         
-		if("acceptanceDate".equals(path)) {
+		if(op.getPath().endsWith(LICENSE_STEP_OPERATION_ENTRY)) {
 			
-			PatchOperation<String> patchOperation = new PatchOperationFactory().instanceOf(path, operation);
-			patchOperation.perform(context, currentRequest, source, path, value);
+			PatchOperation<String> patchOperation = new PatchOperationFactory().instanceOf(LICENSE_STEP_OPERATION_ENTRY, op.getOp());
+			patchOperation.perform(context, currentRequest, source, op.getPath(), op.getValue());
 				
 		}
 	}

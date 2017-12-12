@@ -65,7 +65,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceItemRest, Integer> {
 
 	public static final String OPERATION_PATH_SECTIONS = "sections";
-
+	
 	private static final Logger log = Logger.getLogger(WorkspaceItemRestRepository.class);
 	
 	@Autowired
@@ -250,13 +250,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 			String[] path = op.getPath().substring(1).split("/",3);
 			if(OPERATION_PATH_SECTIONS.equals(path[0])) {
 				String section = path[1];
-				String absolutePath = "";
-				if(path.length>2) {
-					absolutePath = path[2];
-				}
-				String operation = op.getOp();							
-				
-				evaluatePatch(context, request, source, wsi, operation, section, absolutePath, op.getValue());
+				evaluatePatch(context, request, source, wsi, section, op);
 			}
 			else {
 				throw new PatchBadRequestException("Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
@@ -265,8 +259,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 		wis.update(context, source);
 	}
 
-	private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi, String operation, String section, String path,
-			Object value) {
+	private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi, String section, Operation op) {
 		SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
 		for(int stepNum = 0; stepNum<submissionConfig.getNumberOfSteps(); stepNum++) {
 			
@@ -288,7 +281,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 						// load the JSPStep interface for this step
 						AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
 								.newInstance();
-						stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, operation, path, value);
+						stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
 					} else {
 						throw new PatchBadRequestException("The submission step class specified by '"
 								+ stepConfig.getProcessingClassName()

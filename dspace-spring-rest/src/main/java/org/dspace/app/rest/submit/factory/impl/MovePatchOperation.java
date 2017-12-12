@@ -7,6 +7,8 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import org.dspace.app.rest.model.patch.MoveOperation;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
@@ -22,10 +24,10 @@ import org.dspace.services.model.Request;
 public abstract class MovePatchOperation<T extends Object> extends PatchOperation<T> {
 	
 	@Override
-	public void perform(Context context, Request currentRequest, WorkspaceItem source, String path, Object from) throws Exception {
-		move(context, currentRequest, source, path, from);
+	public void perform(Context context, Request currentRequest, WorkspaceItem source, Operation operation) throws Exception {
+		move(context, currentRequest, source, operation.getPath(), ((MoveOperation)operation).getFrom());
 	}
 
-	abstract void move(Context context, Request currentRequest, WorkspaceItem source, String path, Object from) throws Exception;
+	abstract void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from) throws Exception;
 	
 }

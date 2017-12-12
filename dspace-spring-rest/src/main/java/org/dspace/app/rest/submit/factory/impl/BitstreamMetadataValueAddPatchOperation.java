@@ -42,7 +42,7 @@ public class BitstreamMetadataValueAddPatchOperation extends MetadataValueAddPat
 	
 	@Override
 	void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value) throws Exception {
-		String[] split = path.split("/");
+		String[] split = getAbsolutePath(path).split("/");
 		Item item = source.getItem();
 		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);;
 		for(Bundle bb : bundle) {
