@@ -52,7 +52,7 @@ public class LicenseAddPatchOperation extends AddPatchOperation<String> {
 	}
 
 	@Override
-	void add(Context context, Request currentRequest, WorkspaceItem source, String string, Object value)
+	void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
 		Item item = source.getItem();
 		EPerson submitter = context.getCurrentUser();

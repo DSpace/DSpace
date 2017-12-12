@@ -47,7 +47,7 @@ public class BitstreamMetadataValueReplacePatchOperation extends MetadataValueRe
 	@Override
 	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
-		String[] split = path.split("/");
+		String[] split = getAbsolutePath(path).split("/");
 		Item item = source.getItem();
 		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 		for (Bundle bb : bundle) {

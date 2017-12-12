@@ -36,7 +36,7 @@ public class LicenseReplacePatchOperation extends ReplacePatchOperation<String> 
 	ItemService itemService;
 
 	@Override
-	void replace(Context context, Request currentRequest, WorkspaceItem source, String string, Object value)
+	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
 		Item item = source.getItem();
 		List<Bundle> bunds = itemService.getBundles(item, "LICENSE");

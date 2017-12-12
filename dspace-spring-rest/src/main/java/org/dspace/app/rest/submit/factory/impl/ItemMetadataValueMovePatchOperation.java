@@ -13,7 +13,6 @@ import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Submission "move" PATCH operation.
@@ -37,11 +36,11 @@ public class ItemMetadataValueMovePatchOperation extends MetadataValueMovePatchO
 	ItemService itemService;
 
 	@Override
-	void move(Context context, Request currentRequest, WorkspaceItem source, String path, Object from)
+	void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
 			throws Exception {
-		String[] splitTo = path.split("/");
+		String[] splitTo = getAbsolutePath(path).split("/");
 		
-		String evalFrom = (String)from;
+		String evalFrom = getAbsolutePath(from);
 		String[] splitFrom = evalFrom.split("/");
 		String metadata = splitFrom[0];
 

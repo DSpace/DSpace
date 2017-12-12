@@ -45,7 +45,7 @@ public class BitstreamRemovePatchOperation extends RemovePatchOperation<String>{
 		external : for(Bundle bb : bbb) {
 			int idx = 0;
 			for(Bitstream b : bb.getBitstreams()) {
-				if(idx==Integer.parseInt(path)) {
+				if(idx==Integer.parseInt(getAbsolutePath(path))) {
 					bitstream = b;
 					break external;
 				}

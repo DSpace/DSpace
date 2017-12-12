@@ -19,15 +19,27 @@
 	<bean id="patchConfigurationService" class="org.dspace.app.rest.submit.PatchConfigurationService">
 		<property name="map">
 			<map>
+				<entry key="move">
+					<map>
+						<!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->							
+						<entry key="itemmetadata">
+							<bean
+								class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueMovePatchOperation" />
+						</entry>
+						<entry key="bitstreammetadata">
+							<bean
+								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueMovePatchOperation" />
+						</entry>
+					</map>
+				</entry>			
 				<entry key="add">
 					<map>
-						<!-- WARNING do not change "metadatavalue" it is used in the Java logic; 
-							the other key are dynamic discover from PATCH path -->
-						<entry key="metadatavalue">
+						<!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->
+						<entry key="itemmetadata">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueAddPatchOperation" />
 						</entry>
-						<entry key="metadata">
+						<entry key="bitstreammetadata">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueAddPatchOperation" />
 						</entry>
@@ -39,13 +51,12 @@
 				</entry>
 				<entry key="remove">
 					<map>
-						<!-- WARNING do not change "metadatavalue" it is used in the Java logic; 
-							the other key are dynamic discover from PATCH path -->
-						<entry key="metadatavalue">
+						<!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->
+						<entry key="itemmetadata">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueRemovePatchOperation" />
 						</entry>
-						<entry key="metadata">
+						<entry key="bitstreammetadata">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueRemovePatchOperation" />
 						</entry>
@@ -53,8 +64,6 @@
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.LicenseRemovePatchOperation" />
 						</entry>
-						<!-- WARNING do not change "bitstreamremove" it is used in the Java 
-							logic -->
 						<entry key="bitstreamremove">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamRemovePatchOperation" />
@@ -67,13 +76,12 @@
 				</entry>
 				<entry key="replace">
 					<map>
-						<!-- WARNING do not change "metadatavalue" it is used in the Java logic; 
-							the other key are dynamic discover from PATCH path -->
-						<entry key="metadatavalue">
+						<!-- WARNING do not change "key" it match with Java code (TODO dynamic discover from PATCH operation); -->
+						<entry key="itemmetadata">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.ItemMetadataValueReplacePatchOperation" />
 						</entry>
-						<entry key="metadata">
+						<entry key="bitstreammetadata">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueReplacePatchOperation" />
 						</entry>

@@ -34,7 +34,7 @@ public class LicenseRemovePatchOperation extends RemovePatchOperation<String> {
 	ItemService itemService;
 	
 	@Override
-	void remove(Context context, Request currentRequest, WorkspaceItem source, String string, Object value) throws Exception {
+	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value) throws Exception {
 		Item item = source.getItem();
 		itemService.removeDSpaceLicense(context, item);
 	}

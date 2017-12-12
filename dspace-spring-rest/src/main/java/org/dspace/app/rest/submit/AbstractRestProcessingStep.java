@@ -11,8 +11,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.ErrorRest;
+import org.dspace.app.rest.model.patch.Operation;
 import org.dspace.app.rest.submit.step.validation.Validation;
 import org.dspace.app.util.SubmissionStepConfig;
 import org.dspace.content.WorkspaceItem;
@@ -28,6 +28,13 @@ import org.dspace.services.model.Request;
  */
 public interface AbstractRestProcessingStep {
 
+	public static final String DESCRIBE_STEP_METADATA_OPERATION_ENTRY = "itemmetadata";	
+	public static final String COLLECTION_STEP_OPERATION_ENTRY = "collection";
+	public static final String UPLOAD_STEP_METADATA_OPERATION_ENTRY = "bitstreammetadata";
+	public static final String UPLOAD_STEP_REMOVE_OPERATION_ENTRY = "bitstreamremove";
+	public static final String UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY = "accessConditions";
+	public static final String LICENSE_STEP_OPERATION_ENTRY = "acceptanceDate";
+	
 	public <T extends Serializable> T getData(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config) throws Exception;
 	
 	default public List<ErrorRest> validate(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config) throws Exception
@@ -44,7 +51,6 @@ public interface AbstractRestProcessingStep {
 		return errors;
 	}
 
-	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, String operation,
-			String path, Object value) throws Exception;
+	public void doPatchProcessing(Context context, Request currentRequest, WorkspaceItem source, Operation op) throws Exception;
 
 }
