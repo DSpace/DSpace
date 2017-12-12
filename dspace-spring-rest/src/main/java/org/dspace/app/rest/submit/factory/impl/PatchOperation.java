@@ -50,15 +50,6 @@ public abstract class PatchOperation<T extends Object> {
 		return single;
 	}
 
-	public String evaluateString(LateObjectEvaluator value) {
-		String single = null;
-		if (value != null) {
-			LateObjectEvaluator object = (LateObjectEvaluator) value;
-			single = (String) object.evaluate(String.class);
-		}
-		return single;
-	}
-
 	public String getAbsolutePath(String fullpath) {
 		String[] path = fullpath.substring(1).split("/", 3);
 		String absolutePath = "";
