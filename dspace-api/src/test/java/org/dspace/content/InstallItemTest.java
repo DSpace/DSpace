@@ -15,6 +15,12 @@ import org.dspace.core.Context;
 
 import java.io.FileInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
@@ -22,7 +28,6 @@ import org.junit.*;
 import static org.junit.Assert.* ;
 import static org.hamcrest.CoreMatchers.*;
 import org.junit.rules.ExpectedException;
-
 
 /**
  * Unit Tests for class InstallItem
@@ -193,10 +198,13 @@ public class InstallItemTest extends AbstractUnitTest
         is.getItem().addMetadata("dc", "date", "issued", Item.ANY, "2011-01-01");
 
         //get current date
-        DCDate now = DCDate.getCurrent();
-        String dayAndTime = now.toString();
-        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
-        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+       
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        String date = sdf.format(calendar.getTime());
 
         Item result = InstallItem.installItem(context, is, handle);
         context.restoreAuthSystemState();
@@ -245,10 +253,11 @@ public class InstallItemTest extends AbstractUnitTest
         is.getItem().addMetadata("dc", "date", "issued", Item.ANY, "2011-01-01");
 
         //get current date
-        DCDate now = DCDate.getCurrent();
-        String dayAndTime = now.toString();
-        //parse out just the date, remove the time (format: yyyy-mm-ddT00:00:00Z)
-        String date = dayAndTime.substring(0, dayAndTime.indexOf("T"));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String date = sdf.format(calendar.getTime());
 
         Item result = InstallItem.restoreItem(context, is, handle);
         context.restoreAuthSystemState();

@@ -17,6 +17,9 @@ import org.dspace.utils.DSpace;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 
 /**
  *
@@ -84,6 +87,15 @@ public class DefaultItemVersionProvider extends AbstractVersionProvider implemen
             } catch (IdentifierException e) {
                 throw new RuntimeException("Can't create Identifier!");
             }
+            // DSpace knows several types of resource policies (see the class
+            // org.dspace.authorize.ResourcePolicy): Submission, Workflow, Custom
+            // and inherited. Submission, Workflow and Inherited policies will be
+            // set automatically as neccessary. We need to copy the custom policies
+            // only to preserve customly set policies and embargos (which are
+            // realized by custom policies with a start date).
+            List<ResourcePolicy> policies = 
+                    AuthorizeManager.findPoliciesByDSOAndType(c, previousItem, ResourcePolicy.TYPE_CUSTOM);
+            AuthorizeManager.addPolicies(c, policies, itemNew);
             itemNew.update();
             return itemNew;
         }catch (SQLException e) {

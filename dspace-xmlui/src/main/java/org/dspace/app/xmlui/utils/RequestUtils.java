@@ -45,7 +45,7 @@ public class RequestUtils {
 		int i = -1;
 
 		// Iterate through the values in the form.
-		valueLoop: while (1 == 1)
+		valueLoop: while (true)
 		{
 			i++;
 			String value = null;
@@ -117,7 +117,7 @@ public class RequestUtils {
 		int i = -1;
 
 		// Iterate through the values in the form.
-		valueLoop: while (1 == 1)
+		valueLoop: while (true)
 		{
 			i++;
 			String value = null;
@@ -181,16 +181,18 @@ public class RequestUtils {
     public static int getIntParameter(Request request, String param)
     {
         String val = request.getParameter(param);
-
-        try
-        {
-            return Integer.parseInt(val.trim());
-        }
-        catch (Exception e)
-        {
-            // Problem with parameter
-            return -1;
-        }
+		if (val != null)
+		{
+			try
+			{
+				return Integer.parseInt(val.trim());
+			}
+			catch (Exception e)
+			{
+				// Problem with parameter -- ignore
+			}
+		}
+		return -1;
     }
 	
 	

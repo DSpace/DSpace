@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Collections;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import org.dspace.core.ConfigurationManager;
@@ -42,10 +43,10 @@ public class SpiderDetector {
     private static IPTable table = null;
 
     /** Collection of regular expressions to match known spiders' agents. */
-    private static List<Pattern> agents = new ArrayList<Pattern>();
+    private static List<Pattern> agents = Collections.synchronizedList(new ArrayList<Pattern>());
 
     /** Collection of regular expressions to match known spiders' domain names. */
-    private static List<Pattern> domains = new ArrayList<Pattern>();
+    private static List<Pattern> domains = Collections.synchronizedList(new ArrayList<Pattern>());
 
     /**
      * Utility method which reads lines from a file & returns them in a Set.
@@ -199,13 +200,15 @@ public class SpiderDetector {
     {
         // See if any agent patterns match
         if (null != agent)
-        {
-            if (agents.isEmpty())
-                loadPatterns("agents", agents);
-
+        {   
+            synchronized(agents)
+            {
+                if (agents.isEmpty())
+                    loadPatterns("agents", agents);
+            }
             for (Pattern candidate : agents)
             {
-                // prevent matcher() invocation from a null Pattern object
+		// prevent matcher() invocation from a null Pattern object
                 if (null != candidate && candidate.matcher(agent).find())
                 {
                     return true;
@@ -230,15 +233,15 @@ public class SpiderDetector {
         // No.  See if any DNS names match
         if (null != hostname)
         {
-            if (domains.isEmpty())
+            synchronized(domains) 
             {
-                loadPatterns("domains", domains);
+                if (domains.isEmpty())
+                    loadPatterns("domains", domains);
             }
-
             for (Pattern candidate : domains)
             {
-                // prevent matcher() invocation from a null Pattern object
-                if (null != candidate && candidate.matcher(hostname).find())
+		// prevent matcher() invocation from a null Pattern object
+		if (null != candidate && candidate.matcher(hostname).find())
                 {
                     return true;
                 }

@@ -74,10 +74,9 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
+			context.turnOffAuthorisationSystem();
 			item.update();
-			context.setIgnoreAuthorization(ignore);
+			context.restoreAuthSystemState();
 
 			verboseDescription.append("Ingest successful");
 			verboseDescription.append("Item created with internal identifier: " + item.getID());
@@ -139,10 +138,9 @@ public class BinaryContentIngester extends AbstractSwordContentIngester
 			// authorisation briefly, because although the user may be
 			// able to add stuff to the repository, they may not have
 			// WRITE permissions on the archive.
-			boolean ignore = context.ignoreAuthorization();
-			context.setIgnoreAuthorization(true);
+			context.turnOffAuthorisationSystem();
 			item.update();
-			context.setIgnoreAuthorization(ignore);
+			context.restoreAuthSystemState();
 
 			verboseDescription.append("ingest successful");
 

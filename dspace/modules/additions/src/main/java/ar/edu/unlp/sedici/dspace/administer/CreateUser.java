@@ -248,7 +248,7 @@ public final class CreateUser
     {
     	// Of course we aren't an user yet so we need to
     	// circumvent authorisation
-    	context.setIgnoreAuthorization(true);
+    	context.turnOffAuthorisationSystem();
     	
     	
     	// Find user group

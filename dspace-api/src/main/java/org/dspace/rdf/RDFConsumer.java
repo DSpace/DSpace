@@ -20,6 +20,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.event.Consumer;
@@ -52,6 +53,8 @@ public class RDFConsumer implements Consumer
         }
         
         int sType = event.getSubjectType();
+        log.debug(event.getEventTypeAsString() + " for " 
+                + event.getSubjectTypeAsString() + ":" + event.getSubjectID());
         switch (sType)
         {
             case (Constants.BITSTREAM) :
@@ -100,7 +103,7 @@ public class RDFConsumer implements Consumer
             Bitstream bitstream = Bitstream.find(ctx, event.getSubjectID());
             if (bitstream == null)
             {
-                log.warn("Cannot find bitstream " + event.getSubjectID() + "! "
+                log.debug("Cannot find bitstream " + event.getSubjectID() + "! "
                         + "Ignoring, as it is likely it was deleted "
                         + "and we'll cover it by a REMOVE event on its bundle.");
                 return;
@@ -111,6 +114,11 @@ public class RDFConsumer implements Consumer
                 Item[] items = b.getItems();
                 for (Item i : items)
                 {
+                    if (WorkspaceItem.findByItem(ctx, i) != null)
+                    {
+                        log.debug("Ignoring Item " + i.getID() + " as a corresponding workspace item exists.");
+                        continue;
+                    }
                     DSOIdentifier id = new DSOIdentifier(i, ctx);
                     if (!this.toDelete.contains(id) && !this.toConvert.contains(id))
                     {
@@ -148,7 +156,7 @@ public class RDFConsumer implements Consumer
             Bundle bundle = Bundle.find(ctx, event.getSubjectID());
             if (bundle == null)
             {
-                log.warn("Cannot find bundle " + event.getSubjectID() + "! "
+                log.debug("Cannot find bundle " + event.getSubjectID() + "! "
                         + "Ignoring, as it is likely it was deleted "
                         + "and we'll cover it by a REMOVE event on its item.");
                 return;
@@ -156,6 +164,11 @@ public class RDFConsumer implements Consumer
             Item[] items = bundle.getItems();
             for (Item i : items)
             {
+                if (WorkspaceItem.findByItem(ctx, i) != null)
+                {
+                    log.debug("Ignoring Item " + i.getID() + " as a corresponding workspace item exists.");
+                    continue;
+                }
                 DSOIdentifier id = new DSOIdentifier(i, ctx);
                 if (!this.toDelete.contains(id) && !this.toConvert.contains(id))
                 {
@@ -216,14 +229,24 @@ public class RDFConsumer implements Consumer
             DSpaceObject dso = event.getSubject(ctx);
             if (dso == null)
             {
-                log.warn("Cannot find " + event.getSubjectTypeAsString() + " " 
+                log.debug("Cannot find " + event.getSubjectTypeAsString() + " " 
                         + event.getSubjectID() + "! " + "Ignoring, as it is "
                         + "likely it was deleted and we'll cover it by another "
                         + "event with the type REMOVE.");
                 return;
             }
-            DSOIdentifier id = new DSOIdentifier(dso, ctx);
+            
+            // ignore unfinished submissions here. Every unfinished submission
+            // has an workspace item. The item flag "in_archive" doesn't help us
+            // here as this is also set to false if a newer version was submitted.
+            if (dso instanceof Item
+                    && WorkspaceItem.findByItem(ctx, (Item) dso) != null)
+            {
+                log.debug("Ignoring Item " + dso.getID() + " as a corresponding workspace item exists.");
+                return;
+            }
 
+            DSOIdentifier id = new DSOIdentifier(dso, ctx);
             // If an item gets withdrawn, a MODIFIY event is fired. We have to
             // delete the item from the triple store instead of converting it.
             // we don't have to take care for reinstantions of items as they can

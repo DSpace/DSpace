@@ -93,7 +93,7 @@
 
   <dc-type>
 	<schema>dcterms</schema>
-    <element>comformsTo</element>
+    <element>conformsTo</element>
     <scope_note>An established standard to which the described resource conforms.</scope_note>
   </dc-type>
 

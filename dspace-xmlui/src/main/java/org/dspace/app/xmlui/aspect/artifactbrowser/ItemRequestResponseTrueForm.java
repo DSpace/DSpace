@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -19,6 +18,8 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.requestitem.RequestItem;
+import org.dspace.app.requestitem.RequestItemAuthor;
+import org.dspace.app.requestitem.RequestItemAuthorExtractor;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.UIException;
@@ -39,6 +40,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 /**
@@ -125,14 +127,18 @@ public class ItemRequestResponseTrueForm extends AbstractDSpaceTransformer imple
 		else
 			title = "untitled";
 		
-		EPerson submitter = item.getSubmitter();
+		RequestItemAuthor author = new DSpace()
+				.getServiceManager()
+				.getServiceByName(RequestItemAuthorExtractor.class.getName(),
+						RequestItemAuthorExtractor.class)
+				.getRequestItemAuthor(context, item);
 
 		Object[] args = new String[]{
-					requestItem.getReqName(),
-					HandleManager.getCanonicalForm(item.getHandle()), // User
+					requestItem.getReqName(), // User
+					HandleManager.getCanonicalForm(item.getHandle()), // URL
 					title, // request item title
-					submitter.getFullName(), // # submmiter name
-					submitter.getEmail() // # submmiter email
+					author.getFullName(),
+					author.getEmail()
 				};
 		
 		String subject = I18nUtil.getMessage("itemRequest.response.subject.approve", context);

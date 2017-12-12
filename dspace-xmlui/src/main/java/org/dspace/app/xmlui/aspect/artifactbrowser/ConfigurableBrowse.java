@@ -123,7 +123,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
-    
+    private int currentOffset = 0;
+
     /** Cached validity object */
     private SourceValidity validity;
 
@@ -214,7 +215,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     // Add the metadata to the validity
                     for (String[] singleEntry : browseInfo.getStringResults())
                     {
-                        validity.add(singleEntry[0]+"#"+singleEntry[1]);
+                        validity.add(StringUtils.join(singleEntry,"#"));
                     }
                 }
 
@@ -292,7 +293,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         // If there are items to browse, add the pagination
         int itemsTotal = info.getTotal();
-        if (itemsTotal > 0) 
+        currentOffset=info.getOffset();
+
+        if (itemsTotal > 0)
         {
             //results.setSimplePagination(itemsTotal, firstItemIndex, lastItemIndex, previousPage, nextPage)
             results.setSimplePagination(itemsTotal, browseInfo.getOverallPosition() + 1,
@@ -727,8 +730,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             
             params.scope.setJumpToItem(RequestUtils.getIntParameter(request, BrowseParams.JUMPTO_ITEM));
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
-            int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
-            params.scope.setOffset(offset > 0 ? offset : 0);
+            updateOffset(request, params);
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
             String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
@@ -789,6 +791,20 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         this.userParams = params;
         return params;
+    }
+
+    private void updateOffset(Request request, BrowseParams params) {
+        int configuredOffset=-1;
+        boolean retainOffset = false;
+        if (request.getParameters().containsKey("update")) {
+            configuredOffset = currentOffset;
+            retainOffset=true;
+        }
+        int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
+        params.scope.setOffset(offset > 0 ? offset : 0);
+        if (retainOffset) {
+            params.scope.setOffset(configuredOffset);
+        }
     }
 
     /**

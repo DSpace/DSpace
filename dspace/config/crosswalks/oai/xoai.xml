@@ -33,7 +33,7 @@
             <Format ref="uketd_dc"/>
             <Format ref="junii2" />-->
             <Description>
-                This is the default context of the DSpace data provider.
+                This is the default context of the DSpace OAI-PMH data provider.
             </Description>
         </Context>
 
@@ -63,7 +63,7 @@
         <!--
             OpenAIRE Guidelines 1.1:
 
-            - http://www.openaire.eu/en/component/attachments/download/79%E2%8C%A9=en
+            - https://guidelines.openaire.eu/en/latest/
 
             There is a limitation over the embargoedEndDate parameter:
 
@@ -87,35 +87,35 @@
 		<Context baseurl="snrd">
 		
 			<!-- Date format, field prefixes, etc are ensured by the transformer -->
-			<Transformer refid="snrdTransformer" />
+			<Transformer ref="snrdTransformer" />
             
             <!-- The snrd filter -->
             <Filter ref="snrdFilter"/>
 
 			<!-- Just an alias, if fact it returns all items within the driver context -->
-			<Set refid="snrdSet" />
+			<Set ref="snrdSet" />
 			
 			<!-- Metadata Formats -->
-			<Format refid="oaidc" />
+			<Format ref="oaidc" />
+		    <Description>
+		        This contexts complies with SNRD rules.
+		    </Description>
 		</Context>
 
 	<!-- Contexto para acceder a registros cosechables por DOAJ, en el formato de DOAJ. -->
 		<Context baseurl="doaj">
-			<Format refid="doaj" />
-			<Format refid="xoai"/>
-			<!-- Metadata mandatory : journalTitle, title, 
-				fullTextUrl (sedici/handle/10915/XX - exists always), publicationDate (dc.date.issued).  -->
-			<!-- JournalTitle : Mandatory-->
-			<Filter refid="journalTitleExists"/>
-			<!-- Pulication Date : Mandatory-->
-			<Filter refid="dateExistsFilter"/>
-			<!-- Title : Mandatory -->
-			<Filter refid="titleExistsCondition" />
+			<Transformer ref="doajTransformer"/>
+            
+            <Filter ref="doajFilter"/>
+
+            <Format ref="doaj" />
+            <!--<Format ref="xoai"/>-->
 			
-			<Transformer refid="doajTransformer"/>
+            <Description>
+                This contexts complies with DOAJ rules for exporting journal articles.
+            </Description>
 		</Context>
     </Contexts>
-
 
     <Formats>
         <Format id="oaidc">
@@ -224,6 +224,14 @@
 
 
     <Filters>
+        <!-- DRIVER filter for records returned by OAI-PMH.
+             By default, return an Item record:
+               * If a Title & Author field both exist
+               * AND a valid DRIVER Document Type exists
+               * AND Item is either publicly accessible OR Withdrawn (for tombstones)
+               * AND Driver "open access" condition is specified
+             This filter is only used in the DRIVER context ([oai]/driver)
+        -->
         <Filter id="driverFilter">
             <Definition>
                 <And>
@@ -247,9 +255,10 @@
                                     <LeftCondition>
                                         <Or>
                                             <LeftCondition>
-                                                <Custom ref="bitstreamAccessCondition"/>
+                                                <Custom ref="itemAccessCondition"/>
                                             </LeftCondition>
                                             <RightCondition>
+                                                <!--<Custom ref="itemWithdrawnCondition"/>-->
                                                 <Custom ref="externalResourceAccessCondition"/>
                                             </RightCondition>
                                         </Or>
@@ -265,6 +274,14 @@
             </Definition>
         </Filter>
 
+        <!-- OpenAIRE filter for records returned by OAI-PMH.
+             By default, return an Item record:
+               * If a Title & Author field both exist
+               * AND a valid DRIVER Document Type exists
+               * AND Item is either publicly accessible OR Withdrawn (for tombstones)
+               * AND the OpenAIRE "dc.relation" is specified
+             This filter is only used in the OpenAIRE context ([oai]/openaire).
+        -->
         <Filter id="openAireFilter">
             <Definition>
                 <And>
@@ -279,7 +296,28 @@
                         </And>
                     </LeftCondition>
                     <RightCondition>
-                        <Custom ref="driverDocumentTypeCondition"/>
+                        <And>
+                            <LeftCondition>
+                                <Custom ref="driverDocumentTypeCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <And>
+                                    <LeftCondition>
+                                        <Or>
+                                            <LeftCondition>
+                                                <Custom ref="itemAccessCondition"/>
+                                            </LeftCondition>
+                                            <RightCondition>
+                                                <Custom ref="itemWithdrawnCondition"/>
+                                            </RightCondition>
+                                        </Or>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="openaireRelationCondition"/>
+                                    </RightCondition>
+                                </And>
+                            </RightCondition>
+                        </And>
                     </RightCondition>
                 </And>
             </Definition>
@@ -290,13 +328,39 @@
 			-->
         </Filter>
 
+        <!-- UKETD Filter for records returned by OAI-PMH.
+             By default, return an Item record:
+                * If it is a "thesis"
+
+             This filter is appended to any existing filter
+             when "metadataPrefix=uketd_dc" is specified.
+        -->
         <Filter id="uketdDcFilter">
             <Definition>
                 <Custom ref="thesisDocumentTypeCondition"/>
             </Definition>
-		</Filter>
-		
-        <Filter id="snrdFilter">
+        </Filter>
+
+        <!-- Default filter for records returned by OAI-PMH. 
+             By default, return an Item record:
+                * If it is publicly accessible
+                * OR it has been withdrawn (in order to display a tombstone record).
+             This filter is used by the default context ([oai]/request).
+        -->
+        <Filter id="defaultFilter">
+            <Definition>
+                <Or>
+                    <LeftCondition>
+                        <Custom ref="itemAccessCondition"/>
+                    </LeftCondition>
+                    <RightCondition>
+                        <Custom ref="itemWithdrawnCondition"/>
+                    </RightCondition>
+                </Or>
+            </Definition>
+        </Filter>
+
+	<Filter id="snrdFilter">
             <Definition>
                 <And>
                     <LeftCondition>
@@ -317,45 +381,63 @@
                                 <Custom ref="snrdDocumentTypeCondition"/>
                             </LeftCondition>
                             <RightCondition>
-                                <And>
+                                <Or>
                                     <LeftCondition>
-                                        <Or>
-                                            <LeftCondition>
-                                                <Custom ref="bitstreamAccessCondition"/>
-                                            </LeftCondition>
-                                            <RightCondition>
-                                                <Custom ref="externalResourceAccessCondition"/>
-                                            </RightCondition>
-                                        </Or>
+                                        <Custom ref="itemAccessCondition"/>
                                     </LeftCondition>
                                     <RightCondition>
-                                        <Custom ref="driverAccessCondition"/>
+                                         <Custom ref="externalResourceAccessCondition"/>
                                     </RightCondition>
-                                </And>
+                                </Or>
                             </RightCondition>
                         </And>
                     </RightCondition>
                 </And>
                 <!-- OTROS TBD -->
                 <!-- Regla 3 
-				<Filter refid="fulltextOnlyFilter"/>-->
+				<Filter ref="fulltextOnlyFilter"/>-->
                 <!-- Regla 7 
-				<Filter refid="directorExisteParaTesisFilter"/> -->
+				<Filter ref="directorExisteParaTesisFilter"/> -->
             </Definition>
         </Filter>
-
-        <Filter id="uketdDcFilter">
+        
+        <Filter id="doajtFilter">
             <Definition>
-                <Custom ref="thesisDocumentTypeCondition"/>
+                <And>
+                    <LeftCondition>
+                         <And>
+                            <LeftCondition>
+                                <Or>
+                                    <LeftCondition>
+                                        <Custom ref="itemAccessCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="itemWithdrawnCondition"/>
+                                    </RightCondition>
+                                </Or>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="journalTitleExistsCondition"/>
+                            </RightCondition>
+                        </And>
+                    </LeftCondition>
+                    <RightCondition>
+                        <And>
+                            <LeftCondition>
+                                <Custom ref="titleExistsCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Custom ref="dateExistsCondition"/>
+                            </RightCondition>
+                        </And>
+                    </RightCondition>
+                </And>
             </Definition>
         </Filter>
 
-        <Filter id="defaultFilter">
-            <Definition>
-                <Custom ref="bitstreamAccessCondition"/>
-            </Definition>
-        </Filter>
 
+        <!-- This condition determines if an Item has a "dc.type" field
+             which contains "Thesis". -->
         <CustomCondition id="thesisDocumentTypeCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
@@ -365,22 +447,24 @@
             </Configuration>
         </CustomCondition>
 
+        <!-- This condition determines if an Item has a "dc.contributor.author" -->
         <CustomCondition id="authorExistsCondition">
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
             <Configuration>
                 <list name="fields">
-	    			<Value>dc.contributor.author</Value>
-                    <Value>sedici.creator.person</Value>
-				    <Value>sedici.creator.corporate</Value>
-				    <Value>sedici.creator.interprete</Value>
-				    <Value>sedici.contributor.compiler</Value>
-				    <Value>sedici.contributor.coordinator</Value>
-				    <Value>sedici.contributor.editor</Value>
-				    <Value>sedici.contributor.translator</Value>\
+	    			<string>dc.contributor.author</string>
+                    <string>sedici.creator.person</string>
+				    <string>sedici.creator.corporate</string>
+				    <string>sedici.creator.interprete</string>
+				    <string>sedici.contributor.compiler</string>
+				    <string>sedici.contributor.coordinator</string>
+				    <string>sedici.contributor.editor</string>
+				    <string>sedici.contributor.translator</string>\
                 </list>
             </Configuration>
         </CustomCondition>
 
+        <!-- This condition determines if an Item has a "dc.title" -->
         <CustomCondition id="titleExistsCondition">
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
             <Configuration>
@@ -388,7 +472,8 @@
             </Configuration>
         </CustomCondition>
 
-		<!-- Dejamos tanto objetos textuales como no textuales. Instrumento musical no se exporta -->
+        <!-- This condition determines if an Item has a "dc.type" field
+             specifying one of the valid DRIVER document types. -->
         <CustomCondition id="driverDocumentTypeCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
@@ -429,6 +514,9 @@
             </Configuration>
         </CustomCondition>
 
+        <!-- This condition determines if an Item has a "dc.rights" field
+             specifying "open access", which is required for DRIVER
+             OR "openAccess", which is required by OpenAIRE. -->
         <CustomCondition id="driverAccessCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
@@ -441,10 +529,21 @@
             </Configuration>
         </CustomCondition>
 
-        <CustomCondition id="bitstreamAccessCondition">
+        <!-- This condition determines if an Item is publicly accessible. -->
+        <CustomCondition id="itemAccessCondition">
             <Class>org.dspace.xoai.filter.DSpaceAuthorizationFilter</Class>
         </CustomCondition>
 
+        <!-- This condition determines if an Item is withdrawn. This condition
+             ensures a basic "tombstone" record is shown for withdrawn items,
+             as recommended by OAI-PMH spec. This "tombstone" doesn't display
+             any metadata or content files.  -->
+        <CustomCondition id="itemWithdrawnCondition">
+            <Class>org.dspace.xoai.filter.DSpaceWithdrawnFilter</Class>
+        </CustomCondition>
+
+        <!-- This condition determines if an Item has a "dc.relation" field
+             which specifies the openAIRE project ID. -->
         <CustomCondition id="openaireRelationCondition">
             <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
             <Configuration>
@@ -461,7 +560,7 @@
 			</Configuration>
 		</CustomCondition>
 		
-		<CustomCondition id="journalTitleExists">
+		<CustomCondition id="journalTitleExistsCondition">
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
 			<Configuration>
                 <string name="field">sedici.relation.journalTitle</string>
@@ -511,8 +610,8 @@
 			<Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
 			<Configuration>
                 <list name="fields">
-	    			<Value>sedici.date.exposure</Value>
-					<Value>dc.date.issued</Value>
+	    			<string>sedici.date.exposure</string>
+					<string>dc.date.issued</string>
 				</list>
 			</Configuration>
 		</CustomCondition>
@@ -523,8 +622,7 @@
                 <string name="field">sedici.identifier.uri</string>
             </Configuration>
         </CustomCondition>
-
-	</Filters>
+    </Filters>
 
     <Sets>
         <Set id="driverSet">
@@ -540,7 +638,6 @@
         <Set id="snrdSet">
             <Spec>snrd</Spec>
             <Name>Conjunto de recursos para Sistema Nacional de Repositorios Digitales, Argentina SNRD</Name>
-            <!-- Just an alias -->
         </Set>
     </Sets>
 </Configuration>

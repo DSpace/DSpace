@@ -127,6 +127,8 @@ public class Constants
      */
     public static final int ADMIN = 11;
     
+    public static final int WITHDRAWN_READ = 12;
+    
     /** Position of front page news item -- top box */
     public static final int NEWS_TOP = 0;
 
@@ -139,7 +141,7 @@ public class Constants
     public static final String[] actionText = { "READ", "WRITE",
             "OBSOLETE (DELETE)", "ADD", "REMOVE", "WORKFLOW_STEP_1",
             "WORKFLOW_STEP_2", "WORKFLOW_STEP_3", "WORKFLOW_ABORT",
-            "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "ADMIN" };
+            "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "ADMIN", "WITHDRAWN_READ" };
 
     /**
      * generating constants for the relevance array dynamically is simple: just
@@ -175,7 +177,9 @@ public class Constants
             0, // 8 - WORKFLOW_ABORT
             RCOLLECTION, // 9 - DEFAULT_BITSTREAM_READ
             RCOLLECTION, // 10 - DEFAULT_ITEM_READ
-            RITEM | RCOLLECTION | RCOMMUNITY // 11 - ADMIN
+            RITEM | RCOLLECTION | RCOMMUNITY, // 11 - ADMIN
+            RBITSTREAM | RBUNDLE | RITEM // 12 - WITHDRAWN_READ
+
     };
 
     public static final String DEFAULT_ENCODING = "UTF-8";

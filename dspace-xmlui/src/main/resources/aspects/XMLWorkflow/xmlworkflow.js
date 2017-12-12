@@ -153,12 +153,7 @@ function doWorkflow()
         }else if((cocoon.request.get("submit_full_item_info") && !cocoon.request.get("submit_full_item_info").equals("true")) || cocoon.request.get("submit_simple_item_info")){
             //Don't do anything just go back to the start of the loop
         }else{
-            try{
-                action = XmlWorkflowManager.doState(getDSContext(), getDSContext().getCurrentUser(), getHttpRequest(), workflowItemId, workflow, action);
-            }catch(exception){
-                sendPage("handle/"+handle+"/xmlworkflow/workflowexception",{"error":exception.toString()});
-                cocoon.exit();
-            }
+            action = XmlWorkflowManager.doState(getDSContext(), getDSContext().getCurrentUser(), getHttpRequest(), workflowItemId, workflow, action);
             if(action == null){
                 var contextPath = cocoon.request.getContextPath();
                 cocoon.sendPage("xmlworkflow/finalize");

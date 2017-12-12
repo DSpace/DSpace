@@ -7,9 +7,10 @@
  */
 package org.dspace.xoai.filter;
 
-import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterMap;
-import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
-import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dspace.core.Constants;
@@ -18,11 +19,9 @@ import org.dspace.xoai.data.DSpaceItem;
 import org.dspace.xoai.exceptions.InvalidMetadataFieldException;
 import org.dspace.xoai.filter.results.DatabaseFilterResult;
 import org.dspace.xoai.filter.results.SolrFilterResult;
-import org.dspace.xoai.services.api.database.FieldResolver;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.ParameterValue;
+import com.lyncode.xoai.dataprovider.xml.xoaiconfig.parameters.SimpleType;
 
 /**
  * This filter allows one to retrieve (from the data source) those items
@@ -38,14 +37,7 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
     private static Logger log = LogManager
             .getLogger(DSpaceMetadataExistsFilter.class);
 
-    private FieldResolver fieldResolver;
     private List<String> fields;
-    private ParameterMap configuration;
-
-    public DSpaceMetadataExistsFilter(FieldResolver fieldResolver, ParameterMap configuration) {
-        this.fieldResolver = fieldResolver;
-        this.configuration = configuration;
-    }
 
     private List<String> getFields() {
         if (this.fields == null) {
@@ -114,7 +106,4 @@ public class DSpaceMetadataExistsFilter extends DSpaceFilter {
         return new SolrFilterResult(cond.toString());
     }
 
-    public ParameterMap getConfiguration() {
-        return configuration;
-    }
 }

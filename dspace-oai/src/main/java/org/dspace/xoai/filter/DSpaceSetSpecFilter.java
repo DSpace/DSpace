@@ -48,10 +48,12 @@ public class DSpaceSetSpecFilter extends DSpaceFilter
         {
             try
             {
-                DSpaceObject dso = handleResolver.resolve(setSpec.replace("col_", ""));
-                return new DatabaseFilterResult(
-                        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id = ?)",
+                DSpaceObject dso = handleResolver.resolve(setSpec.replace("col_", "").replace("_", "/"));
+		if(dso != null){
+	                return new DatabaseFilterResult(
+        	                "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id = ?)",
                         dso.getID());
+		}
             }
             catch (Exception ex)
             {
@@ -62,12 +64,14 @@ public class DSpaceSetSpecFilter extends DSpaceFilter
         {
             try
             {
-                DSpaceObject dso = handleResolver.resolve(setSpec.replace("com_", ""));
-                List<Integer> list = collectionsService.getAllSubCollections(dso.getID());
-                String subCollections = StringUtils.join(list.iterator(), ",");
-                return new DatabaseFilterResult(
-                        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id IN ("
+                DSpaceObject dso = handleResolver.resolve(setSpec.replace("com_", "").replace("_", "/"));
+		if(dso != null){
+                	List<Integer> list = collectionsService.getAllSubCollections(dso.getID());
+	                String subCollections = StringUtils.join(list.iterator(), ",");
+        	        return new DatabaseFilterResult(
+                	        "EXISTS (SELECT tmp.* FROM collection2item tmp WHERE tmp.resource_id=i.item_id AND collection_id IN ("
                                 + subCollections + "))");
+		}
             }
             catch (Exception e)
             {

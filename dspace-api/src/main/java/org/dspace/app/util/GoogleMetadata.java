@@ -7,36 +7,30 @@
  */
 package org.dspace.app.util;
 
-import java.sql.SQLException;
-
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.ConfigurationManager;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
-
 import org.jdom.Element;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.Map.Entry;
 
 import ar.edu.unlp.sedici.util.SediciUtils;
 /**
@@ -133,6 +127,7 @@ public class GoogleMetadata
 
     private static final int ALL_FIELDS_IN_OPTION = 2;
 
+    private Context ourContext;
     // Load configured fields from google-metadata.properties
     static
     {
@@ -224,7 +219,11 @@ public class GoogleMetadata
         // Hold onto the item in case we need to refresh a stale parse
         this.item = item;
         itemURL = HandleManager.resolveToURL(context, item.getHandle());
+        ourContext=context;
+        EPerson currentUser = ourContext.getCurrentUser();
+        ourContext.setCurrentUser(null);
         parseItem();
+        ourContext.setCurrentUser(currentUser);
     }
 
     /**
@@ -770,16 +769,17 @@ public class GoogleMetadata
     }
 
     /**
-     * Fetch all metadata mappings
-     * 
+     * Fetch retaining the order of the values for any given key in which they
+     * where added (like authors).
+     *
      * Usage: GoogleMetadata gmd = new GoogleMetadata(item); for(Entry<String,
      * String> mapping : googlemd.getMappings()) { ... }
      * 
      * @return Iterable of metadata fields mapped to Google-formatted values
      */
-    public Set<Entry<String, String>> getMappings()
+    public Collection<Entry<String, String>> getMappings()
     {
-        return new HashSet<>(metadataMappings.entries());
+        return metadataMappings.entries();
     }
 
     /**
@@ -1061,7 +1061,6 @@ public class GoogleMetadata
 	 */
 	private Bitstream findLinkableFulltext(Item item) throws SQLException {
 		Bitstream bestSoFar = null;
-		int bitstreamCount = 0;
 		Bundle[] contentBundles = item.getBundles("ORIGINAL");
 		for (Bundle bundle : contentBundles) {
 			int primaryBitstreamId = bundle.getPrimaryBitstreamID();
@@ -1070,15 +1069,15 @@ public class GoogleMetadata
 				if (candidate.getID() == primaryBitstreamId) { // is primary -> use this one
 					if (isPublic(candidate)) {
 						return candidate;
+					}					
+				} else 
+					{
+						
+						if (bestSoFar == null && isPublic(candidate)) { //if bestSoFar is null but the candidate is not public you don't use it and try to find another
+						bestSoFar = candidate;
+						}					
 					}
-				} else if (bestSoFar == null) {
-					bestSoFar = candidate;
-				}
-				bitstreamCount++;
 			}
-		}
-		if (bitstreamCount > 1 || !isPublic(bestSoFar)) {
-			bestSoFar = null;
 		}
 
 		return bestSoFar;
@@ -1089,16 +1088,10 @@ public class GoogleMetadata
 			return false;
 		}
 		boolean result = false;
-		Context context = null;
 		try {
-			context = new Context();
-			result = AuthorizeManager.authorizeActionBoolean(context, bitstream, Constants.READ, true);
+            result = AuthorizeManager.authorizeActionBoolean(ourContext, bitstream, Constants.READ, true);
 		} catch (SQLException e) {
 			log.error("Cannot determine whether bitstream is public, assuming it isn't. bitstream_id=" + bitstream.getID(), e);
-		} finally {
-			if (context != null) {
-				context.abort();
-			}
 		}
 		return result;
 	}

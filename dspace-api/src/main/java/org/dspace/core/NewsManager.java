@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+
+import org.dspace.core.service.NewsService;
+import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +42,10 @@ public class NewsManager
      */
     public static String readNewsFile(String newsFile)
     {
+    	NewsService newsService = new DSpace().getSingletonService(NewsService.class);
+    	if (!newsService.validate(newsFile)) {
+    		throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
+    	}
         String fileName = getNewsFilePath();
 
         fileName += newsFile;
@@ -81,6 +88,10 @@ public class NewsManager
      */
     public static String writeNewsFile(String newsFile, String news)
     {
+    	NewsService newsService = new DSpace().getSingletonService(NewsService.class);
+    	if (!newsService.validate(newsFile)) {
+    		throw new IllegalArgumentException("The file "+ newsFile + " is not a valid news file");
+    	}
         String fileName = getNewsFilePath();
 
         fileName += newsFile;

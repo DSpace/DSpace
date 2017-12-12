@@ -96,4 +96,17 @@ public class DiscoveryUIUtils {
         }
         return new ArrayList<String>(result.values());
     }
+
+    /**
+     * Escape colon-space sequence in a user-entered query, based on the
+     * underlying search service. This is intended to let end users paste in a
+     * title containing colon-space without requiring them to escape the colon.
+     *
+     * @param query user-entered query string
+     * @return query with colon in colon-space sequence escaped
+     */
+    public static String escapeQueryChars(String query)
+    {
+        return StringUtils.replace(query, ": ", "\\: ");
+    }
 }

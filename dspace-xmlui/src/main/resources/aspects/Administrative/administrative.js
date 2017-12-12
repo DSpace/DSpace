@@ -2399,6 +2399,12 @@ function doEditPolicy(objectType,objectID,policyID)
         	if (cocoon.request.get("action_id"))
         		actionID = cocoon.request.get("action_id");
         	page = 0;
+
+        	name = cocoon.request.get("name");
+        	description = cocoon.request.get("description");
+        	startDate = cocoon.request.get("start_date");
+        	endDate = cocoon.request.get("end_date");
+			
         }
         else if (cocoon.request.get("submit_save"))
         {
@@ -2998,10 +3004,10 @@ function doCreateCommunity(parentCommunityID)
 /**
  * Edit a community.
  */
-function doEditCommunity(itemID)
+function doEditCommunity(communityID)
 {
 	// Always go to the status page first
-	doEditCommunityMetadata(itemID);
+	doEditCommunityMetadata(communityID);
 
 	do {
 	    if (cocoon.request.get("submit_return"))
@@ -3009,29 +3015,29 @@ function doEditCommunity(itemID)
 			return null;
 		}
                 else if (cocoon.request.get("submit_metadata")) {
-                    doEditCommunityMetadata(itemID);
+                    doEditCommunityMetadata(communityID);
                 }
 		else if (cocoon.request.get("submit_status"))
 		{
-			doEditItemStatus(itemID);
+			doEditItemStatus(communityID);
 		}
 		else if (cocoon.request.get("submit_bitstreams"))
 		{
-			doEditItemBitstreams(itemID);
+			doEditItemBitstreams(communityID);
 		}
 		else if (cocoon.request.get("submit_save") || cocoon.request.get("submit_delete") || cocoon.request.get("submit_delete_logo"))
 		{
-			doEditCommunityMetadata(itemID, -1);
+			doEditCommunityMetadata(communityID, -1);
 		}
                 else if (cocoon.request.get("submit_authorizations")) {
 			result = doAuthorizeCommunity(communityID);
 		}
 		else if (cocoon.request.get("submit_roles"))
 		{
-			doAssignCommunityRoles(itemID);
+			doAssignCommunityRoles(communityID);
 		}
 	        else if (cocoon.request.get("submit_curate"))  {
-                        doCurateCommunity(itemID, cocoon.request.get("curate_task"));
+                        doCurateCommunity(communityID, cocoon.request.get("curate_task"));
                 }
                 else
 		{

@@ -33,7 +33,7 @@ import java.util.zip.GZIPOutputStream;
  *   }
  *   g.finish();
  * </pre>
- * 
+ *
  * @author Robert Tansley
  */
 public abstract class AbstractGenerator
@@ -59,7 +59,7 @@ public abstract class AbstractGenerator
     /**
      * Initialize this generator to write to the given directory. This must be
      * called by any subclass constructor.
-     * 
+     *
      * @param outputDirIn
      *            directory to write sitemap files to
      */
@@ -73,7 +73,7 @@ public abstract class AbstractGenerator
 
     /**
      * Start writing a new sitemap file.
-     * 
+     *
      * @throws IOException
      *             if an error occurs creating the file
      */
@@ -97,7 +97,7 @@ public abstract class AbstractGenerator
 
     /**
      * Add the given URL to the sitemap.
-     * 
+     *
      * @param url
      *            Full URL to add
      * @param lastMod
@@ -129,7 +129,7 @@ public abstract class AbstractGenerator
 
     /**
      * Finish with the current sitemap file.
-     * 
+     *
      * @throws IOException
      *             if an error occurs writing
      */
@@ -144,15 +144,18 @@ public abstract class AbstractGenerator
      * Complete writing sitemap files and write the index files. This is invoked
      * when all calls to {@link AbstractGenerator#addURL(String, Date)} have
      * been completed, and invalidates the generator.
-     * 
+     *
      * @return number of sitemap files written.
-     * 
+     *
      * @throws IOException
      *             if an error occurs writing
      */
     public int finish() throws IOException
     {
-        closeCurrentFile();
+        if (null != currentOutput)
+        {
+            closeCurrentFile();
+        }
 
         OutputStream fo = new FileOutputStream(new File(outputDir,
                 getIndexFilename()));
@@ -165,13 +168,13 @@ public abstract class AbstractGenerator
         PrintStream out = new PrintStream(fo);
         writeIndex(out, fileCount);
         out.close();
-        
+
         return fileCount;
     }
 
     /**
      * Return marked-up text to be included in a sitemap about a given URL.
-     * 
+     *
      * @param url
      *            URL to add information about
      * @param lastMod
@@ -183,14 +186,14 @@ public abstract class AbstractGenerator
 
     /**
      * Return the boilerplate at the top of a sitemap file.
-     * 
+     *
      * @return The boilerplate markup.
      */
     public abstract String getLeadingBoilerPlate();
 
     /**
      * Return the boilerplate at the end of a sitemap file.
-     * 
+     *
      * @return The boilerplate markup.
      */
     public abstract String getTrailingBoilerPlate();
@@ -198,7 +201,7 @@ public abstract class AbstractGenerator
     /**
      * Return the maximum size in bytes that an individual sitemap file should
      * be.
-     * 
+     *
      * @return the size in bytes.
      */
     public abstract int getMaxSize();
@@ -206,7 +209,7 @@ public abstract class AbstractGenerator
     /**
      * Return the maximum number of URLs that an individual sitemap file should
      * contain.
-     * 
+     *
      * @return the maximum number of URLs.
      */
     public abstract int getMaxURLs();
@@ -214,7 +217,7 @@ public abstract class AbstractGenerator
     /**
      * Return whether the written sitemap files and index should be
      * GZIP-compressed.
-     * 
+     *
      * @return {@code true} if GZIP compression should be used, {@code false}
      *         otherwise.
      */
@@ -222,7 +225,7 @@ public abstract class AbstractGenerator
 
     /**
      * Return the filename a sitemap at the given index should be stored at.
-     * 
+     *
      * @param number
      *            index of the sitemap file (zero is first).
      * @return the filename to write the sitemap to.
@@ -231,14 +234,14 @@ public abstract class AbstractGenerator
 
     /**
      * Get the filename the index should be written to.
-     * 
+     *
      * @return the filename of the index.
      */
     public abstract String getIndexFilename();
 
     /**
      * Write the index file.
-     * 
+     *
      * @param output
      *            stream to write the index to
      * @param sitemapCount

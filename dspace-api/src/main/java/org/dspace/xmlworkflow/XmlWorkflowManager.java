@@ -14,13 +14,11 @@ import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.*;
-import org.dspace.embargo.EmbargoManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.usage.UsageWorkflowEvent;
 import org.dspace.utils.DSpace;
 import org.dspace.xmlworkflow.state.Step;
@@ -266,6 +264,15 @@ public class XmlWorkflowManager {
      * startWithoutNotify() starts the workflow normally, but disables
      * notifications (useful for large imports,) for the first workflow step -
      * subsequent notifications happen normally
+     * @param c
+     * @param wsi
+     * @return a new workflow item wrapping the item removed from the workspace.
+     * @throws java.sql.SQLException passed through
+     * @throws org.dspace.authorize.AuthorizeException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.xmlworkflow.WorkflowException passed through.
+     * @throws org.dspace.xmlworkflow.WorkflowConfigurationException passed through.
+     * @throws javax.mail.MessagingException passed through.
      */
     public static XmlWorkflowItem startWithoutNotify(Context c, WorkspaceItem wsi)
             throws SQLException, AuthorizeException, IOException, WorkflowException, WorkflowConfigurationException, MessagingException {
@@ -372,18 +379,36 @@ public class XmlWorkflowManager {
                     nextActionConfig = currentStep.getNextAction(currentActionConfig);
                 }
 
-            if (nextActionConfig != null) {
-                nextActionConfig.getProcessingAction().activate(c, wfi);
-                if (nextActionConfig.requiresUI() && !enteredNewStep) {
-                	//Antes de crear la nueva OwnedTask, eliminamos la anterior
-                    ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
-                    deleteClaimedTask(c, wfi, task);
-                    createOwnedTask(c, wfi, currentStep, nextActionConfig, user);
-                    return nextActionConfig;
-                } else if( nextActionConfig.requiresUI() && enteredNewStep){
-                    //We have entered a new step and have encountered a UI, return null since the current user doesn't have anything to do with this
-                    c.restoreAuthSystemState();
-                    return null;
+                if (nextActionConfig != null) {
+                    //We remain in the current step since an action is found
+                    nextStep = currentStep;
+                    nextActionConfig.getProcessingAction().activate(c, wfi);
+                    if (nextActionConfig.requiresUI() && !enteredNewStep) {
+	                	//Antes de crear la nueva OwnedTask, eliminamos la anterior
+	                    ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
+	                    deleteClaimedTask(c, wfi, task);
+                        createOwnedTask(c, wfi, currentStep, nextActionConfig, user);
+                        return nextActionConfig;
+                    } else if( nextActionConfig.requiresUI() && enteredNewStep){
+                        //We have entered a new step and have encountered a UI, return null since the current user doesn't have anything to do with this
+                        c.restoreAuthSystemState();
+                        return null;
+                    } else {
+                        ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, currentStep, null);
+                        return processOutcome(c, user, workflow, currentStep, nextActionConfig, newOutcome, wfi, enteredNewStep);
+                    }
+                }else
+                if(enteredNewStep){
+                    // If the user finished his/her step, we keep processing until there is a UI step action or no step at all
+                    nextStep = workflow.getNextStep(c, wfi, currentStep, currentOutcome.getResult());
+                    c.turnOffAuthorisationSystem();
+                    nextActionConfig = processNextStep(c, user, workflow, currentOutcome, wfi, nextStep);
+                    //If we require a user interface return null so that the user is redirected to the "submissions page"
+                    if(nextActionConfig == null || nextActionConfig.requiresUI()){
+                        return null;
+                    }else{
+                        return nextActionConfig;
+                    }
                 } else {
                     ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
 
@@ -417,10 +442,9 @@ public class XmlWorkflowManager {
                         return null;
                     }
                 }
-            }
-            }catch (Exception e){
-                log.error("error while processing workflow outcome", e);
-                e.printStackTrace();
+//            }catch (Exception e){
+//                log.error("error while processing workflow outcome", e);
+//                e.printStackTrace();
             }
             finally {
                 if((nextStep != null && nextActionConfig != null) || wfi.getItem().isArchived()){
@@ -430,7 +454,7 @@ public class XmlWorkflowManager {
 
         }
 
-        log.error(LogManager.getHeader(c, "Invalid step outcome", "Workflow item id: " + wfi.getID()));
+        log.error("Invalid step outcome? currentStep=" +currentStep.getId() + " currentOutcome.type=" + currentOutcome.getType() + " currentOutcome.Result=" + currentOutcome.getResult() + " Workflow item id=" + wfi.getID());
         throw new WorkflowException("Invalid step outcome");
     }
 
@@ -512,7 +536,12 @@ public class XmlWorkflowManager {
      * with the relevant collection, added to the search index, and any other
      * tasks such as assigning dates are performed.
      *
+     * @param c
+     * @param wfi
      * @return the fully archived item.
+     * @throws java.sql.SQLException passed through.
+     * @throws java.io.IOException passed through.
+     * @throws org.dspace.authorize.AuthorizeException passed through.
      */
     public static Item archive(Context c, XmlWorkflowItem wfi)
             throws SQLException, IOException, AuthorizeException {
@@ -1070,22 +1099,6 @@ public class XmlWorkflowManager {
     public static String getMyDSpaceLink() {
         return ConfigurationManager.getProperty("dspace.url") + "/submissions";
     }
-
-    private static DCDate getLiftDate(Item item ){
-        
-        String lift = ConfigurationManager.getProperty("embargo.field.lift");
-        String sa[] = lift.split("\\.", 3);
-        
-        String lift_schema = sa[0];
-        String lift_element = sa[1];
-        String lift_qualifier = sa.length > 2 ? sa[2] : null;
-
-        Metadatum[] liftDate = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
-        return liftDate.length==0?null:new DCDate(liftDate[0].value);
-        
-    }
-    
-    
     
     private static final String wf_edited_schema = "sedici";
     private static final String wf_edited_element = "workflowEdited";
@@ -1109,5 +1122,4 @@ public class XmlWorkflowManager {
     		return "true".equals( values[0].value );
     	return false;
     }
-
 }

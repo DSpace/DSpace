@@ -73,7 +73,11 @@ public class CommunityRecentSubmissions extends AbstractRecentSubmissionTransfor
                     lastSubmitted.addReference(resultObject);
                 }
             }
-            addViewMoreLink(lastSubmittedDiv, dso);
+
+            Community community = (Community) dso;
+
+            if (community.countItems() > maxRecentSubmissions)
+                addViewMoreLink(lastSubmittedDiv, dso);
         }
     }
 }

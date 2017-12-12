@@ -63,30 +63,7 @@ public class SelectCollectionTag extends TagSupport
         {
             HttpServletRequest hrq = (HttpServletRequest) pageContext.getRequest();
             Context context = UIUtil.obtainContext(hrq);
-            Map<Community, List<Collection>> commCollList = new LinkedHashMap<Community, List<Collection>>();
-
-            for (Community topcommunity : Community.findAllTop(context))
-            {
-                for (Collection collection : topcommunity.getCollections())
-                {
-                    List<Collection> clist = null;
-                    if (commCollList.containsKey(topcommunity))
-                    {
-                        clist = commCollList.get(topcommunity);
-                    }
-                    else
-                    {
-                        clist = new ArrayList<Collection>();
-                    }
-                    clist.add(collection);
-                    commCollList.put(topcommunity, clist);
-                }
-
-                for (Community subcommunity : topcommunity.getSubcommunities())
-                {
-                    addCommCollList(subcommunity, commCollList);
-                }
-            }
+            Collection[] collections = (Collection[]) hrq.getAttribute("collections");
 
             sb.append("<select");
             if (name != null)
@@ -109,22 +86,16 @@ public class SelectCollectionTag extends TagSupport
             if (collection == -1) sb.append(" selected=\"selected\"");
             sb.append(">").append(firstOption).append("</option>\n");
 
-            Iterator<Community> iter = commCollList.keySet().iterator();
-            while(iter.hasNext())
+            for (Collection coll : collections)
             {
-                Community comm = iter.next();
-                //sb.append("<optgroup label=\"").append(getCommName(comm)).append("\">\n");
-                for (Collection coll : commCollList.get(comm))
+                sb.append("<option value=\"").append(coll.getID()).append("\"");
+                if (collection == coll.getID())
                 {
-                    sb.append("<option value=\"").append(coll.getID()).append("\"");
-                    if (collection == coll.getID())
-                    {
-                        sb.append(" selected=\"selected\"");
-                    }
-                    sb.append(">").append(CollectionDropDown.collectionPath(coll)).append("</option>\n");
+                    sb.append(" selected=\"selected\"");
                 }
-                //sb.append("</optgroup>\n");
+                sb.append(">").append(CollectionDropDown.collectionPath(coll)).append("</option>\n");
             }
+
             sb.append("</select>\n");
 
             out.print(sb.toString());
@@ -140,45 +111,6 @@ public class SelectCollectionTag extends TagSupport
         
         return SKIP_BODY;
     }
-
-    private void addCommCollList(Community community, Map<Community, 
-        List<Collection>> commCollList) throws SQLException
-    {
-        for (Collection collection : community.getCollections())
-        {
-            List<Collection> clist = null;
-            if (commCollList.containsKey(community))
-            {
-                clist = commCollList.get(community);
-            }
-            else
-            {
-                clist = new ArrayList<Collection>();
-            }
-            clist.add(collection);
-            commCollList.put(community, clist);
-        }
-
-        for (Community subcommunity : community.getSubcommunities())
-        {
-            addCommCollList(subcommunity, commCollList);
-        }
-
-    }
-
-    private String getCommName(Community community) throws SQLException
-    {
-        StringBuffer sb = new StringBuffer("");
-        Community[] parents = community.getAllParents();
-        for (Community parent : parents)
-        {
-            sb.insert(0, parent.getMetadata("name")+"/");
-        }
-        sb.append(community.getMetadata("name"));
-
-        return sb.toString().substring(1);
-    }
-
 
     public String getKlass()
     {

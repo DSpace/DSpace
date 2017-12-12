@@ -8,6 +8,7 @@
 
 --%>
 
+<%@page import="org.apache.commons.lang.time.DateFormatUtils"%>
 <%--
   - policy editor - for new or existing policies
   -
@@ -25,8 +26,8 @@
   -   "id_name"     - name/value passed in from id_name/id above
   -   group_id      - set if user selected a group
   -   eperson_id    - set if user selected an eperson
-  -   start_date    - not set, unused
-  -   end_date      - not set, unused
+  -   start_date    - start date of a policy (e.g. for embargo feature)
+  -   end_date      - end date of a policy
   -   action_id     - set to whatever user chose
   -   (new policy)  - set to a the string passed in above if policy is a new one
   --%>
@@ -81,10 +82,10 @@
             
     <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
 
- 		<div class="input-group">
- 				<span class="col-md-2">
-            	<%-- <td>Group:</td> --%>
-            	<label for="tgroup_id"><fmt:message key="jsp.dspace-admin.general.group-colon"/></label>
+            <div class="input-group">
+                <span class="col-md-2">
+                    <%-- <td>Group:</td> --%>
+                    <label for="tgroup_id"><fmt:message key="jsp.dspace-admin.general.group-colon"/></label>
             	</span>
             	<span class="col-md-10">
                 <select class="form-control" size="15" name="group_id" id="tgroup_id">
@@ -101,24 +102,46 @@
         		<label for="taction_id"><fmt:message key="jsp.dspace-admin.general.action-colon"/></label>
         	</span>
         	<span class="col-md-10">
-                <input type="hidden" name="<%=id_name%>" value="<%=id%>" />
-                <input type="hidden" name="policy_id" value="<%=policy.getID()%>" />
-                <select class="form-control" name="action_id" id="taction_id">
-                    <%  for( int i = 0; i < Constants.actionText.length; i++ )
-                            {
-                                // only display if action i is relevant
-                                //  to resource type resourceRelevance                             
-                                if( (Constants.actionTypeRelevance[i]&resourceRelevance) > 0)
-                                { %>
-                                    <option value="<%= i %>"
-                                    <%=(policy.getAction() == i ? "selected=\"selected\"" : "")%>>
-                                    <%= Constants.actionText[i]%>
-                                    </option>
-                    <%          }
-                            } %>
-                </select>
-            </span>
-		</div>
+                    <input type="hidden" name="<%=id_name%>" value="<%=id%>" />
+                    <input type="hidden" name="policy_id" value="<%=policy.getID()%>" />
+                    <select class="form-control" name="action_id" id="taction_id">
+                        <%  for( int i = 0; i < Constants.actionText.length; i++ )
+                                {
+                                    // only display if action i is relevant
+                                    //  to resource type resourceRelevance                             
+                                    if( (Constants.actionTypeRelevance[i]&resourceRelevance) > 0)
+                                    { %>
+                                        <option value="<%= i %>"
+                                        <%=(policy.getAction() == i ? "selected=\"selected\"" : "")%>>
+                                        <%= Constants.actionText[i]%>
+                                        </option>
+                        <%          }
+                                } %>
+                    </select>
+                </span>
+                    <%
+                    // start and end dates are used for Items and Bitstreams only.
+                    if (resourceType == Constants.ITEM || resourceType == Constants.BITSTREAM)
+                    {
+                    %>
+                        <!-- policy start date -->
+                        <span class="col-md-2">
+                            <label for="t_start_date_id"><fmt:message key="jsp.dspace-admin.general.policy-start-date-colon"/></label>
+                        </span>
+                        <span class="col-md-10">
+                            <input class="form-control" name="policy_start_date" maxlength="10" size="10" type="text" 
+                                   value="<%= policy.getStartDate() != null ? DateFormatUtils.format(policy.getStartDate(), "yyyy-MM-dd") : "" %>" />
+                        </span>
+                        <!-- policy end date -->
+                        <span class="col-md-2">
+                            <label for="t_end_date_id"><fmt:message key="jsp.dspace-admin.general.policy-end-date-colon"/></label>
+                        </span>
+                        <span class="col-md-10">
+                            <input class="form-control" name="policy_end_date" maxlength="10" size="10" type="text" 
+                                   value="<%= policy.getEndDate() != null ? DateFormatUtils.format(policy.getEndDate(), "yyyy-MM-dd") : "" %>" />
+                        </span>
+                    <%} // if Item||Bitstream%>
+            </div>
     <% if( newpolicy != null ) { %> <input name="newpolicy" type="hidden" value="<%=newpolicy%>"/> <% } %>
     
 				<div class="btn-group pull-right col-md-2">

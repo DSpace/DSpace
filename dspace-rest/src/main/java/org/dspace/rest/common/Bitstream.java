@@ -76,7 +76,12 @@ public class Bitstream extends DSpaceObject {
 
         if(expandFields.contains("parent") || expandFields.contains("all")) {
             parentObject = new DSpaceObject(bitstream.getParentObject());
-        } else if(expandFields.contains("policies") || expandFields.contains("all")) {
+        } else {
+            this.addExpand("parent");
+        }
+
+        if(expandFields.contains("policies") || expandFields.contains("all")) {
+            // Find policies without context.
         	List<ResourcePolicy> tempPolicies = new ArrayList<ResourcePolicy>();
         	Bundle[] bundles = bitstream.getBundles();
 			for (Bundle bundle : bundles) {
@@ -90,7 +95,6 @@ public class Bitstream extends DSpaceObject {
 			
 			policies = tempPolicies.toArray(new ResourcePolicy[0]);
         } else {
-            this.addExpand("parent");
             this.addExpand("policies");
         }
 

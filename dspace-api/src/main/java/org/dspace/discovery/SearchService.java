@@ -113,4 +113,11 @@ public interface SearchService {
      * @return the indexed field
      */
     String toSortFieldIndex(String metadataField, String type);
+
+    /**
+     * Utility method to escape any special characters in a user's query
+     * @param query
+     * @return query with any special characters escaped
+     */
+    String escapeQueryChars(String query);
 }

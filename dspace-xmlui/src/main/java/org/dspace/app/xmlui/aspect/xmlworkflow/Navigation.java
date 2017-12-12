@@ -44,9 +44,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     /** Cached validity object */
 	private SourceValidity validity;
 
-	/** exports available for download */
-	java.util.List<String> availableExports = null;
-
 	 /**
      * Generate the unique cache key.
      *
@@ -71,15 +68,6 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         if (context.getCurrentUser() == null)
         {
             return HashUtil.hash("anonymous");
-        }
-
-        if (availableExports != null && availableExports.size()>0) {
-            StringBuilder key = new StringBuilder(context.getCurrentUser().getEmail());
-            for(String fileName : availableExports){
-                key.append(":").append(fileName);
-            }
-
-            return HashUtil.hash(key.toString());
         }
 
         return HashUtil.hash(context.getCurrentUser().getEmail());

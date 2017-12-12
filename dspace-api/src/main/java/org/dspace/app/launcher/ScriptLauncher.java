@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.TreeMap;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.servicemanager.DSpaceKernelImpl;
 import org.dspace.servicemanager.DSpaceKernelInit;
@@ -275,9 +276,21 @@ public class ScriptLauncher
      */
     private static void display()
     {
+        // List all command elements
         List<Element> commands = commandConfigs.getRootElement().getChildren("command");
-        System.out.println("Usage: dspace [command-name] {parameters}");
+
+        // Sort the commands by name.
+        // We cannot just use commands.sort() because it tries to remove and
+        // reinsert Elements within other Elements, and that doesn't work.
+        TreeMap<String, Element> sortedCommands = new TreeMap<>();
         for (Element command : commands)
+        {
+            sortedCommands.put(command.getChild("name").getValue(), command);
+        }
+
+        // Display the sorted list
+        System.out.println("Usage: dspace [command-name] {parameters}");
+        for (Element command : sortedCommands.values())
         {
             System.out.println(" - " + command.getChild("name").getValue() +
                                ": " + command.getChild("description").getValue());

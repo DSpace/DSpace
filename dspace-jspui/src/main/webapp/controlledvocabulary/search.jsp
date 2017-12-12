@@ -14,6 +14,7 @@
 	The add-on may be turn off in dspace.cfg
 --%>  
 
+<%@page import="org.dspace.core.Utils"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page  import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ taglib uri="/WEB-INF/dspace-tags.tld" prefix="dspace" %>
@@ -52,7 +53,7 @@
 	<form name="filterVocabulary" method="post" action="<%= request.getContextPath() %>/subject-search">
 	  <input style="border-width:1px;border-style:solid;" 
 	  		 name="filter" type="text" id="filter" 
-	  		 size="15" value="<%= filter %>" 
+	  		 size="15" value="<%= Utils.addEntities(filter) %>" 
 	  		 title="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.trimmessage") %>"/>
 	  <input type="submit" name="submit" value="<%= LocaleSupport.getLocalizedMessage(pageContext, "jsp.controlledvocabulary.search.trimbutton") %>"/>
 	  <input type="hidden" name="action" value="filter"/>

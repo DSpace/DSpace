@@ -8,7 +8,7 @@
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>5.0</version>
+        <version>5.8</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -16,7 +16,7 @@
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
         <spring.version>3.2.5.RELEASE</spring.version>
-        <xoai.version>3.2.9</xoai.version>
+        <xoai.version>3.2.10</xoai.version>
         <jtwig.version>2.0.1</jtwig.version>
     </properties>
 
@@ -84,7 +84,7 @@
     <dependencies>
         <!-- OAI Data Provider Framework -->
         <dependency>
-            <groupId>com.lyncode</groupId>
+            <groupId>org.dspace</groupId>
             <artifactId>xoai</artifactId>
             <version>${xoai.version}</version>
         </dependency>

@@ -21,15 +21,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
+import org.dspace.content.*;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.ConfigurationManager;
@@ -37,6 +29,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.jdom.Element;
 
 /**
@@ -324,18 +318,18 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         }
         else
         {
-            ZipFile zip = new ZipFile(pkgFile);
+            try(ZipFile zip = new ZipFile(pkgFile))
+            {
+                // Retrieve the manifest file entry (named mets.xml)
+                ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
 
-            // Retrieve the manifest file entry (named mets.xml)
-            ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
-
-            // parse the manifest and sanity-check it.
-            manifest = METSManifest.create(zip.getInputStream(manifestEntry),
-                    validate, getConfigurationName());
-
-            // close the Zip file for now
-            // (we'll extract the other files from zip when we need them)
-            zip.close();
+                if(manifestEntry!=null)
+                {
+                    // parse the manifest and sanity-check it.
+                    manifest = METSManifest.create(zip.getInputStream(manifestEntry),
+                        validate, getConfigurationName());
+                }
+            }
         }
 
         // return our parsed out METS manifest
@@ -660,8 +654,24 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             addBitstreams(context, item, manifest, pkgFile, params, callback);
 
             // have subclass manage license since it may be extra package file.
-            addLicense(context, item, license, (Collection) dso
-                    .getParentObject(), params);
+            Collection owningCollection = (Collection) dso.getParentObject();
+            if(owningCollection == null)
+            {
+                //We are probably dealing with an item that isn't archived yet
+                InProgressSubmission inProgressSubmission = WorkspaceItem.findByItem(context, item);
+                if(inProgressSubmission == null)
+                {
+                    if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow"))
+                    {
+                        inProgressSubmission = XmlWorkflowItem.findByItem(context, item);
+                    }else{
+                        inProgressSubmission = WorkflowItem.findByItem(context, item);
+                    }
+                }
+                owningCollection = inProgressSubmission.getCollection();
+            }
+
+            addLicense(context, item, license, owningCollection, params);
 
             // FIXME ?
             // should set lastModifiedTime e.g. when ingesting AIP.

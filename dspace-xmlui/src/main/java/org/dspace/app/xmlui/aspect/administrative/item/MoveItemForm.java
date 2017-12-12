@@ -9,6 +9,7 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.sql.SQLException;
 
+import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -80,7 +81,6 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         if (owningCollection == null) {
             select.addOption("",T_collection_default);
         }
-        
 
         String communityName, collectionName;
         Collection collection;

@@ -190,6 +190,10 @@ public class DCInputsReader
      */
     public String getFormNameForCollection(Collection collection) throws SQLException
     {
+    	if (collection == null)
+    	{
+    		return whichForms.get(DEFAULT_COLLECTION);
+    	}
     	// Tries the collection first
     	if(whichForms.containsKey(collection.getHandle()))
     	{
@@ -238,17 +242,16 @@ public class DCInputsReader
     }
     
     /**
-     * Return the number of pages the inputs span for a desginated collection
-     * @param  collectionHandle   collection's unique Handle
+     * Return the number of pages the inputs span for a desginated collection or for the default 
+     * @param  collection 
      * @return number of pages of input
      * @throws DCInputsReaderException if no default set defined
-     */
-    public int getNumberInputPages(String collectionHandle)
-        throws DCInputsReaderException
-    {
-        return getInputs(collectionHandle).getNumberPages();
-    }
-    
+     */ 
+    public int getNumberInputPages(Collection collection)
+            throws DCInputsReaderException
+        {
+            return getInputs(collection).getNumberPages();
+        }
     /**
      * Process the top level child nodes in the passed top-level node. These
      * should correspond to the collection-form maps, the form definitions, and

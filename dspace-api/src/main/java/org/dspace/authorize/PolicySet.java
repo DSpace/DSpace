@@ -63,7 +63,7 @@ public class PolicySet
         Context c = new Context();
 
         // turn off authorization
-        c.setIgnoreAuthorization(true);
+        c.turnOffAuthorisationSystem();
 
         //////////////////////
         // carnage begins here

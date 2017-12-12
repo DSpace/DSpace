@@ -33,17 +33,23 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.LogManager;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
+import org.dspace.workflow.WorkflowManager;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
 
 /**
  * This class provides all CRUD operation over collections.
  * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
+ * @author Adán Román Ruiz (arvo.es)
  */
 @Path("/collections")
 public class CollectionsResource extends Resource
@@ -270,6 +276,9 @@ public class CollectionsResource extends Resource
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
+                } else {
+                    //Advance the iterator to offset.
+                    dspaceItems.nextID();
                 }
             }
 
@@ -353,15 +362,19 @@ public class CollectionsResource extends Resource
                 }
             }
             workspaceItem.update();
-
-            // Index item to browse.
-            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse();
-            browse.indexItem(dspaceItem);
-
-            log.trace("Installing item to collection(id=" + collectionId + ").");
-            dspaceItem = org.dspace.content.InstallItem.installItem(context, workspaceItem);
-
-            returnItem = new Item(dspaceItem, "", context);
+            
+            // Must insert the item into workflow
+            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+                try{
+                    XmlWorkflowManager.start(context, workspaceItem);
+                }catch (Exception e){
+                    log.error(LogManager.getHeader(context, "Error while starting xml workflow", "Item id: " + dspaceItem.getID()), e);
+                    throw new ContextException("Error while starting xml workflow: Item id: " + dspaceItem.getID(),e);
+                }
+            }else{
+                WorkflowManager.start(context, (WorkspaceItem )workspaceItem);
+            }
+            returnItem=new Item(workspaceItem.getItem(),"",context);
 
             context.complete();
 
@@ -378,10 +391,6 @@ public class CollectionsResource extends Resource
         catch (IOException e)
         {
             processException("Could not add item into collection(id=" + collectionId + "), IOException. Message: " + e, context);
-        }
-        catch (BrowseException e)
-        {
-            processException("Could not add item into browse index, BrowseException. Message: " + e, context);
         }
         catch (ContextException e)
         {
@@ -533,8 +542,7 @@ public class CollectionsResource extends Resource
         {
             processException("Could not delete collection(id=" + collectionId + "), IOException. Message: " + e, context);
         }
-        finally
-        {
+        finally {
             processFinally(context);
         }
 
@@ -639,8 +647,7 @@ public class CollectionsResource extends Resource
             processException("Could not delete item(id=" + itemId + ") in collection(id=" + collectionId
                     + "), IOException. Message: " + e, context);
         }
-        finally
-        {
+        finally {
             processFinally(context);
         }
 

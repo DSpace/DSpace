@@ -8,6 +8,7 @@
 package org.dspace.rest.common;
 
 import org.atteo.evo.inflector.English;
+import org.dspace.rest.Resource;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -72,8 +73,7 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        //TODO, get actual contextPath of /rest/
-        return "/RESTapi/" + English.plural(getType()) + "/" + getId();
+        return Resource.getServletContextPath() + "/" + English.plural(getType()) + "/" + getId();
     }
 
     public String getType() {
