@@ -50,7 +50,7 @@ public class DryadBlogFeed extends AbstractDSpaceTransformer implements
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			GetMethod get = new GetMethod("http://blog.datadryad.org/feed/");
+			GetMethod get = new GetMethod("https://blog.datadryad.org/feed/");
 
 			int responseCode = new HttpClient().executeMethod(get);
 			switch (responseCode) {
