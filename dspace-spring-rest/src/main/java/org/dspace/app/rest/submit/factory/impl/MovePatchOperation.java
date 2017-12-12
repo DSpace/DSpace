@@ -22,10 +22,10 @@ import org.dspace.services.model.Request;
 public abstract class MovePatchOperation<T extends Object> extends PatchOperation<T> {
 	
 	@Override
-	public void perform(Context context, Request currentRequest, WorkspaceItem source, String string, Object value) throws Exception {
-		move(context, currentRequest, source, string, value);
+	public void perform(Context context, Request currentRequest, WorkspaceItem source, String path, Object from) throws Exception {
+		move(context, currentRequest, source, path, from);
 	}
 
-	abstract void move(Context context,Request currentRequest,WorkspaceItem source,String string,Object value) throws Exception;
+	abstract void move(Context context, Request currentRequest, WorkspaceItem source, String path, Object from) throws Exception;
 	
 }
