@@ -7,10 +7,12 @@
  */
 package org.dspace.app.rest.builder;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
+import org.dspace.content.Bitstream;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.*;
 import org.dspace.core.Context;
@@ -133,6 +135,20 @@ public abstract class AbstractBuilder<T, S> {
         for (AbstractBuilder builder : builders) {
             builder.cleanup();
         }
+
+        // Bitstreams still leave a trace when deleted, so we need to fully "expunge" them
+        try(Context c = new Context()) {
+            List<Bitstream> bitstreams = bitstreamService.findAll(c);
+            for (Bitstream bitstream : CollectionUtils.emptyIfNull(bitstreams)) {
+
+                // We expect tests to clean up all the objects they create. This means, all bitstreams we find here
+                // should have already been deleted. If that is not the case (e.g. when added functionality unexpectedly
+                // creates a new bitstream which was not deleted), this method will throw an exception and the developer
+                // should look into the unexpected creation of the bitstream.
+                expungeBitstream(c, bitstream);
+            }
+            c.complete();
+        }
     }
 
     protected abstract void cleanup() throws Exception;
@@ -142,4 +158,16 @@ public abstract class AbstractBuilder<T, S> {
     public abstract void delete(T dso) throws Exception;
 
     protected abstract S getService();
+
+    /**
+     * Method to completely delete a bitstream from the database and asset store.
+     * @param bit The deleted bitstream to remove completely
+     */
+    static void expungeBitstream(Context c, Bitstream bit) throws Exception {
+        bit = c.reloadEntity(bit);
+        c.turnOffAuthorisationSystem();
+        if (bit != null) {
+            bitstreamService.expunge(c, bit);
+        }
+    }
 }
