@@ -7,12 +7,13 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
-import org.dspace.app.rest.model.MetadataEntryRest;
+import org.dspace.content.Item;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
 import org.dspace.services.model.Request;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.json.patch.LateObjectEvaluator;
 
 /**
  * Submission "move" PATCH operation.
@@ -30,25 +31,36 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
-public class ItemMetadataValueMovePatchOperation extends MovePatchOperation<MetadataEntryRest> {
+public class ItemMetadataValueMovePatchOperation extends MetadataValueMovePatchOperation<Item> {
 
 	@Autowired
 	ItemService itemService;
 
 	@Override
-	void move(Context context, Request currentRequest, WorkspaceItem source, String string, Object value)
+	void move(Context context, Request currentRequest, WorkspaceItem source, String path, Object from)
 			throws Exception {
-		// TODO not yet implemented
+		String[] splitTo = path.split("/");
+		
+		String evalFrom = (String)from;
+		String[] splitFrom = evalFrom.split("/");
+		String metadata = splitFrom[0];
+
+		if (splitTo.length > 1) {
+			String stringTo = splitTo[1];
+			if(splitFrom.length > 1) {
+				String stringFrom = splitFrom[1];
+				
+				int intTo = Integer.parseInt(stringTo);
+				int intFrom = Integer.parseInt(stringFrom);
+				moveValue(context, source.getItem(), metadata, intFrom, intTo);
+			}
+		}
+		
 	}
 
 	@Override
-	protected Class<MetadataEntryRest[]> getArrayClassForEvaluation() {
-		return MetadataEntryRest[].class;
-	}
-
-	@Override
-	protected Class<MetadataEntryRest> getClassForEvaluation() {		
-		return MetadataEntryRest.class;
+	protected ItemService getDSpaceObjectService() {
+		return itemService;
 	}
 
 }
