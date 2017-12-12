@@ -72,9 +72,13 @@ public class ItemMetadataValueReplacePatchOperation extends MetadataValueReplace
 			if (split.length == 3) {
 				String namedField = split[2];
 				// check field
-				String raw = evaluateString((LateObjectEvaluator) value);
+				String raw = (String)value;
 				for (Field field : MetadataValueRest.class.getDeclaredFields()) {
-					if (!field.getDeclaredAnnotation(JsonProperty.class).access().equals(Access.READ_ONLY)) {
+					JsonProperty jsonP = field.getDeclaredAnnotation(JsonProperty.class);
+					if (jsonP!=null && jsonP.access().equals(Access.READ_ONLY)) {
+						continue;
+					}
+					else {
 						if (field.getName().equals(namedField)) {
 							int idx = 0;
 							MetadataValueRest obj = new MetadataValueRest();
@@ -88,7 +92,10 @@ public class ItemMetadataValueReplacePatchOperation extends MetadataValueReplace
 									if (field.getType().isAssignableFrom(Integer.class)) {
 										obj.setConfidence(Integer.parseInt(raw));
 									} else {
-										field.set(mv, raw);
+										boolean accessible = field.isAccessible();
+										field.setAccessible(true);
+										field.set(obj, raw);
+										field.setAccessible(accessible);
 									}
 									break;
 								}
