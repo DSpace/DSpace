@@ -27,6 +27,10 @@ import org.springframework.util.Assert;
  * Attempt to use the replace operation without a previous accepted license must
  * return an error.
  * 
+ * Example: <code>
+ * curl -X PATCH http://${dspace.url}/dspace-spring-rest/api/submission/workspaceitems/31599 -H "Content-Type: application/json" -d '[{ "op": "replace", "path": "/sections/license/granted", "value":"true"}]'
+ * </code>
+ * 
  * @author Luigi Andrea Pascarelli (luigiandrea.pascarelli at 4science.it)
  *
  */
@@ -51,7 +55,7 @@ public class LicenseReplacePatchOperation extends ReplacePatchOperation<String> 
 		String license = LicenseUtils.getLicenseText(context.getCurrentLocale(), source.getCollection(), item,
 				submitter);
 
-		LicenseUtils.grantLicense(context, item, license, (String) value);
+		LicenseUtils.grantLicense(context, item, license, null);
 	}
 
 	@Override

@@ -43,6 +43,10 @@
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueAddPatchOperation" />
 						</entry>
+						<entry key="granted">
+							<bean
+								class="org.dspace.app.rest.submit.factory.impl.LicenseAddPatchOperation" />
+						</entry>						
 						<entry key="accessConditions">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.ResourcePolicyAddPatchOperation" />
@@ -60,7 +64,7 @@
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueRemovePatchOperation" />
 						</entry>
-						<entry key="acceptanceDate">
+						<entry key="granted">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.LicenseRemovePatchOperation" />
 						</entry>
@@ -85,7 +89,7 @@
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueReplacePatchOperation" />
 						</entry>
-						<entry key="acceptanceDate">
+						<entry key="granted">
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.LicenseReplacePatchOperation" />
 						</entry>

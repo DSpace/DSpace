@@ -21,6 +21,7 @@ public class DataLicense implements SectionData {
 	@JsonProperty(access = Access.READ_ONLY)
 	private String url;
 	
+	@JsonProperty(access = Access.READ_ONLY)
 	private String acceptanceDate;
 	
 	public String getAcceptanceDate() {
