@@ -38,7 +38,4 @@ public interface RestModel extends Serializable {
 
 	@JsonIgnore
 	public Class getController();
-
-
-
 }

@@ -107,6 +107,5 @@ public class AbstractDSpaceIntegrationTest
         return System.getProperty("dspace.dir");
 
     }
-
 }
 

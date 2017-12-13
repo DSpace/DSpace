@@ -9,8 +9,9 @@ package org.dspace.app.rest.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.dspace.app.rest.RestResourceController;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The Group REST Resource

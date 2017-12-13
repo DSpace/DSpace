@@ -9,12 +9,12 @@ package org.dspace.app.rest.test;
 
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.launcher.ScriptLauncher;
+import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.core.Context;
@@ -27,10 +27,6 @@ import org.jdom.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
-import java.sql.SQLException;
-
-import static org.junit.Assert.fail;
 
 /**
  * Abstract Test class that will initialize the in-memory database
