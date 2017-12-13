@@ -8,6 +8,7 @@
 package org.dspace.app.rest.repository;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.WorkspaceItemConverter;
 import org.dspace.app.rest.exception.PatchBadRequestException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.WorkspaceItemRest;
 import org.dspace.app.rest.model.hateoas.WorkspaceItemResource;
 import org.dspace.app.rest.model.patch.Operation;
@@ -295,5 +297,19 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 			}
 		}
 	}
-	
+
+	@Override
+	protected void delete(Context context, Integer id) throws RepositoryMethodNotImplementedException {
+		WorkspaceItem witem = null;
+		try {
+			witem = wis.find(context, id);
+		} catch (SQLException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+		try {
+			wis.deleteAll(context, witem);
+		} catch (SQLException | AuthorizeException | IOException e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 }
