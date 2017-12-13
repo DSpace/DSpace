@@ -513,9 +513,15 @@ public class DatabaseUtils
                 log.info("Loading Flyway DB migrations from: " + StringUtils.join(scriptLocations, ", "));
                 flywaydb.setLocations(scriptLocations.toArray(new String[scriptLocations.size()]));
 
-                } catch (SQLException e) {
-                    log.error("Unable to setup Flyway against DSpace database", e);
-                }
+                // Set flyway callbacks (i.e. classes which are called post-DB migration and similar)
+                // In this situation, we have a Registry Updater that runs PRE-migration
+                // NOTE: DatabaseLegacyReindexer only indexes in Legacy Lucene & RDBMS indexes. It can be removed once those are obsolete.
+                List<FlywayCallback> flywayCallbacks = DSpaceServicesFactory.getInstance().getServiceManager().getServicesByType(FlywayCallback.class);
+                flywaydb.setCallbacks(flywayCallbacks.toArray(new FlywayCallback[flywayCallbacks.size()]));
+            }
+            catch(SQLException e)
+            {
+                log.error("Unable to setup Flyway against DSpace database", e);
             }
         }
 
@@ -600,11 +606,22 @@ public class DatabaseUtils
             // Setup Flyway API against our database
             Flyway flyway = setupFlyway(datasource);
 
+            // Set whethe Flyway will run migrations "out of order". By default, this is false,
+            // and Flyway ONLY runs migrations that have a higher version number.
+            flyway.setOutOfOrder(outOfOrder);
+
+            // If a target version was specified, tell Flyway to ONLY migrate to that version
+            // (i.e. all later migrations are left as "pending"). By default we always migrate to latest version.
+            if(!StringUtils.isBlank(targetVersion))
+            {
+                flyway.setTargetAsString(targetVersion);
+            }
+
             // Does the necessary Flyway table ("schema_version") exist in this database?
             // If not, then this is the first time Flyway has run, and we need to initialize
             // NOTE: search is case sensitive, as flyway table name is ALWAYS lowercase,
             // See: http://flywaydb.org/documentation/faq.html#case-sensitive
-            if (!tableExists(connection, flyway.getTable(), true))
+            if(!tableExists(connection, flyway.getTable(), true))
             {
                 // Try to determine our DSpace database version, so we know what to tell Flyway to do
                 String dbVersion = determineDBVersion(connection);
@@ -624,6 +641,7 @@ public class DatabaseUtils
                 }
             }
 
+            // Determine pending Database migrations
             MigrationInfo[] pending = flyway.info().pending();
 
             // As long as there are pending migrations, log them and run migrate()

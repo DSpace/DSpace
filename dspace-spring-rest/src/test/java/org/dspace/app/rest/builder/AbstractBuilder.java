@@ -12,16 +12,7 @@ import org.dspace.authorize.factory.AuthorizeServiceFactory;
 import org.dspace.authorize.service.AuthorizeService;
 import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.factory.ContentServiceFactory;
-import org.dspace.content.service.BitstreamFormatService;
-import org.dspace.content.service.BitstreamService;
-import org.dspace.content.service.BundleService;
-import org.dspace.content.service.CollectionService;
-import org.dspace.content.service.CommunityService;
-import org.dspace.content.service.DSpaceObjectService;
-import org.dspace.content.service.InstallItemService;
-import org.dspace.content.service.ItemService;
-import org.dspace.content.service.WorkspaceItemService;
-import org.dspace.core.Constants;
+import org.dspace.content.service.*;
 import org.dspace.core.Context;
 import org.dspace.discovery.IndexingService;
 import org.dspace.eperson.factory.EPersonServiceFactory;
@@ -63,6 +54,15 @@ public abstract class AbstractBuilder<T, S> {
     static AuthorizeService authorizeService;
     static ResourcePolicyService resourcePolicyService;
     static IndexingService indexingService;
+    static RegistrationDataService registrationDataService;
+    static VersionHistoryService versionHistoryService;
+    static ClaimedTaskService claimedTaskService;
+    static InProgressUserService inProgressUserService;
+    static PoolTaskService poolTaskService;
+    static WorkflowItemRoleService workflowItemRoleService;
+    static MetadataFieldService metadataFieldService;
+    static MetadataSchemaService metadataSchemaService;
+    static SiteService siteService;
 
     protected Context context;
 
@@ -89,6 +89,18 @@ public abstract class AbstractBuilder<T, S> {
         authorizeService = AuthorizeServiceFactory.getInstance().getAuthorizeService();
         resourcePolicyService = AuthorizeServiceFactory.getInstance().getResourcePolicyService();
         indexingService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
+        registrationDataService = EPersonServiceFactory.getInstance().getRegistrationDataService();
+        versionHistoryService = VersionServiceFactory.getInstance().getVersionHistoryService();
+        metadataFieldService = ContentServiceFactory.getInstance().getMetadataFieldService();
+        metadataSchemaService = ContentServiceFactory.getInstance().getMetadataSchemaService();
+        siteService = ContentServiceFactory.getInstance().getSiteService();
+
+        // Temporarily disabled
+        // TODO find a way to be able to test the XML and "default" workflow at the same time
+        //claimedTaskService = XmlWorkflowServiceFactoryImpl.getInstance().getClaimedTaskService();
+        //inProgressUserService = XmlWorkflowServiceFactoryImpl.getInstance().getInProgressUserService();
+        //poolTaskService = XmlWorkflowServiceFactoryImpl.getInstance().getPoolTaskService();
+        //workflowItemRoleService = XmlWorkflowServiceFactoryImpl.getInstance().getWorkflowItemRoleService();
     }
 
 
@@ -106,6 +118,15 @@ public abstract class AbstractBuilder<T, S> {
         resourcePolicyService = null;
         indexingService = null;
         bitstreamFormatService = null;
+        registrationDataService = null;
+        versionHistoryService = null;
+        claimedTaskService = null;
+        inProgressUserService = null;
+        poolTaskService = null;
+        workflowItemRoleService = null;
+        metadataFieldService = null;
+        metadataSchemaService = null;
+        siteService = null;
     }
 
     public static void cleanupObjects() throws Exception {
