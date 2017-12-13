@@ -7,21 +7,22 @@
  */
 package org.dspace.rest.common;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+import javax.ws.rs.WebApplicationException;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MetadataExposure;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bundle;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
-
-import javax.ws.rs.WebApplicationException;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -47,12 +48,12 @@ public class Item extends DSpaceObject {
 
     public Item(){}
 
-    public Item(org.dspace.content.Item item, String expand, Context context) throws SQLException, WebApplicationException{
-        super(item);
-        setup(item, expand, context);
+    public Item(org.dspace.content.Item item, String expand, Context context, ServletContext servletContext) throws SQLException, WebApplicationException{
+        super(item, servletContext);
+        setup(item, expand, context, servletContext);
     }
 
-    private void setup(org.dspace.content.Item item, String expand, Context context) throws SQLException{
+    private void setup(org.dspace.content.Item item, String expand, Context context, ServletContext servletContext) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -75,7 +76,7 @@ public class Item extends DSpaceObject {
         this.setLastModified(item.getLastModified().toString());
 
         if(expandFields.contains("parentCollection") || expandFields.contains("all")) {
-            this.parentCollection = new Collection(item.getOwningCollection(), null, context, null, null);
+            this.parentCollection = new Collection(item.getOwningCollection(), null, context, null, null, servletContext);
         } else {
             this.addExpand("parentCollection");
         }
@@ -84,7 +85,7 @@ public class Item extends DSpaceObject {
             this.parentCollectionList = new ArrayList<Collection>();
             org.dspace.content.Collection[] collections = item.getCollections();
             for(org.dspace.content.Collection collection : collections) {
-                this.parentCollectionList.add(new Collection(collection, null, context, null, null));
+                this.parentCollectionList.add(new Collection(collection, null, context, null, null, servletContext));
             }
         } else {
             this.addExpand("parentCollectionList");
@@ -94,7 +95,7 @@ public class Item extends DSpaceObject {
             this.parentCommunityList = new ArrayList<Community>();
             org.dspace.content.Community[] communities = item.getCommunities();
             for(org.dspace.content.Community community : communities) {
-                this.parentCommunityList.add(new Community(community, null, context));
+                this.parentCommunityList.add(new Community(community, null, context, servletContext));
             }
         } else {
             this.addExpand("parentCommunityList");
@@ -108,7 +109,7 @@ public class Item extends DSpaceObject {
                 org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
                 for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
                     if(AuthorizeManager.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
-                        bitstreams.add(new Bitstream(itemBitstream, null));
+                        bitstreams.add(new Bitstream(itemBitstream, null, servletContext));
                     }
                 }
             }

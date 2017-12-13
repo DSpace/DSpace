@@ -108,7 +108,7 @@ public class CollectionsResource extends Resource
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
-            collection = new Collection(dspaceCollection, expand, context, limit, offset);
+            collection = new Collection(dspaceCollection, expand, context, limit, offset, servletContext);
             context.complete();
 
         }
@@ -186,7 +186,7 @@ public class CollectionsResource extends Resource
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollection, org.dspace.core.Constants.READ))
                 {
                     Collection collection = new org.dspace.rest.common.Collection(dspaceCollection, null, context, limit,
-                            offset);
+                            offset, servletContext);
                     collections.add(collection);
                     writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
@@ -272,7 +272,7 @@ public class CollectionsResource extends Resource
                     org.dspace.content.Item dspaceItem = dspaceItems.next();
                     if (ItemService.isItemListedForUser(context, dspaceItem))
                     {
-                        items.add(new Item(dspaceItem, expand, context));
+                        items.add(new Item(dspaceItem, expand, context, servletContext));
                         writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
                                 headers, request, context);
                     }
@@ -374,7 +374,7 @@ public class CollectionsResource extends Resource
             }else{
                 WorkflowManager.start(context, (WorkspaceItem )workspaceItem);
             }
-            returnItem=new Item(workspaceItem.getItem(),"",context);
+            returnItem=new Item(workspaceItem.getItem(),"",context, servletContext);
 
             context.complete();
 
@@ -691,7 +691,7 @@ public class CollectionsResource extends Resource
                 {
                     if (dspaceCollection.getName().equals(name))
                     {
-                        collection = new Collection(dspaceCollection, "", context, 100, 0);
+                        collection = new Collection(dspaceCollection, "", context, 100, 0, servletContext);
                         break;
                     }
                 }

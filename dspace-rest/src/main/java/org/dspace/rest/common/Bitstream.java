@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
@@ -45,12 +46,12 @@ public class Bitstream extends DSpaceObject {
 
     }
 
-    public Bitstream(org.dspace.content.Bitstream bitstream, String expand) throws SQLException{
-        super(bitstream);
-        setup(bitstream, expand);
+    public Bitstream(org.dspace.content.Bitstream bitstream, String expand, ServletContext servletContext) throws SQLException{
+        super(bitstream, servletContext);
+        setup(bitstream, expand, servletContext);
     }
 
-    public void setup(org.dspace.content.Bitstream bitstream, String expand) throws SQLException{
+    public void setup(org.dspace.content.Bitstream bitstream, String expand, ServletContext servletContext) throws SQLException{
         List<String> expandFields = new ArrayList<String>();
         if(expand != null) {
             expandFields = Arrays.asList(expand.split(","));
@@ -75,7 +76,7 @@ public class Bitstream extends DSpaceObject {
         this.setCheckSum(checkSum);
 
         if(expandFields.contains("parent") || expandFields.contains("all")) {
-            parentObject = new DSpaceObject(bitstream.getParentObject());
+            parentObject = new DSpaceObject(bitstream.getParentObject(), servletContext);
         } else {
             this.addExpand("parent");
         }

@@ -7,14 +7,14 @@
  */
 package org.dspace.rest.common;
 
-import org.atteo.evo.inflector.English;
-import org.dspace.rest.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.atteo.evo.inflector.English;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,11 +41,12 @@ public class DSpaceObject {
 
     }
 
-    public DSpaceObject(org.dspace.content.DSpaceObject dso) {
+    public DSpaceObject(org.dspace.content.DSpaceObject dso, ServletContext servletContext) {
         setId(dso.getID());
         setName(dso.getName());
         setHandle(dso.getHandle());
         setType(dso.getTypeText().toLowerCase());
+        link = createLink(servletContext);
     }
 
     public Integer getId() {
@@ -73,9 +74,13 @@ public class DSpaceObject {
     }
 
     public String getLink() {
-        return Resource.getServletContextPath() + "/" + English.plural(getType()) + "/" + getId();
+        return link;
     }
 
+    public String createLink(ServletContext servletContext) {
+        return servletContext.getContextPath() + "/" + English.plural(getType()) + "/" + getId();
+    }
+    
     public String getType() {
         return this.type;
     }

@@ -89,7 +89,7 @@ public class CommunitiesResource extends Resource
             writeStats(dspaceCommunity, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                     request, context);
 
-            community = new Community(dspaceCommunity, expand, context);
+            community = new Community(dspaceCommunity, expand, context, servletContext);
             context.complete();
 
         }
@@ -165,7 +165,7 @@ public class CommunitiesResource extends Resource
             {
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
-                    Community community = new Community(dspaceCommunities[i], expand, context);
+                    Community community = new Community(dspaceCommunities[i], expand, context, servletContext);
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                     communities.add(community);
@@ -247,7 +247,7 @@ public class CommunitiesResource extends Resource
             {
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
-                    Community community = new Community(dspaceCommunities[i], expand, context);
+                    Community community = new Community(dspaceCommunities[i], expand, context, servletContext);
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                     communities.add(community);
@@ -332,7 +332,7 @@ public class CommunitiesResource extends Resource
             {
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCollections[i], org.dspace.core.Constants.READ))
                 {
-                    collections.add(new Collection(dspaceCollections[i], expand, context, 20, 0));
+                    collections.add(new Collection(dspaceCollections[i], expand, context, 20, 0, servletContext));
                     writeStats(dspaceCollections[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                 }
@@ -418,7 +418,7 @@ public class CommunitiesResource extends Resource
             {
                 if (AuthorizeManager.authorizeActionBoolean(context, dspaceCommunities[i], org.dspace.core.Constants.READ))
                 {
-                    communities.add(new Community(dspaceCommunities[i], expand, context));
+                    communities.add(new Community(dspaceCommunities[i], expand, context, servletContext));
                     writeStats(dspaceCommunities[i], UsageEvent.Action.VIEW, user_ip, user_agent,
                             xforwardedfor, headers, request, context);
                 }
@@ -499,7 +499,7 @@ public class CommunitiesResource extends Resource
             dspaceCommunity.setMetadata(org.dspace.content.Community.SIDEBAR_TEXT, community.getSidebarText());
             dspaceCommunity.update();
 
-            retCommunity = new Community(dspaceCommunity, "", context);
+            retCommunity = new Community(dspaceCommunity, "", context, servletContext);
             context.complete();
 
         }
@@ -577,7 +577,7 @@ public class CommunitiesResource extends Resource
             dspaceCollection.update();
             dspaceCommunity.update();
 
-            retCollection = new Collection(dspaceCollection, "", context, 100, 0);
+            retCollection = new Collection(dspaceCollection, "", context, 100, 0, servletContext);
             context.complete();
 
         }
@@ -659,7 +659,7 @@ public class CommunitiesResource extends Resource
             dspaceCommunity.update();
             dspaceParentCommunity.update();
 
-            retCommunity = new Community(dspaceCommunity, "", context);
+            retCommunity = new Community(dspaceCommunity, "", context, servletContext);
             context.complete();
 
         }
