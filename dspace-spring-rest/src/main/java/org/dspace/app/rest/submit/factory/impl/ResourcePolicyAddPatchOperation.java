@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -54,6 +55,7 @@ public class ResourcePolicyAddPatchOperation extends AddPatchOperation<ResourceP
 	@Override
 	void add(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
+		//"path": "/sections/upload/files/0/accessConditions"
 		String[] split = getAbsolutePath(path).split("/");
 		Item item = source.getItem();
 
@@ -62,8 +64,16 @@ public class ResourcePolicyAddPatchOperation extends AddPatchOperation<ResourceP
 		for (Bundle bb : bundle) {
 			int idx = 0;
 			for (Bitstream b : bb.getBitstreams()) {
-				if (idx == Integer.parseInt(split[0])) {
-					List<ResourcePolicyRest> newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
+				if (idx == Integer.parseInt(split[1])) {
+					
+					List<ResourcePolicyRest> newAccessConditions = new ArrayList<ResourcePolicyRest>();
+					if (split.length == 3) {
+						newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
+					} else if (split.length == 4) {
+						// contains "-", call index-based accessConditions it make not sense  
+						newAccessConditions.add(evaluateSingleObject((LateObjectEvaluator)value));
+					}
+					
 					for (ResourcePolicyRest newAccessCondition : newAccessConditions) {
 						String name = newAccessCondition.getName();
 						String description = newAccessCondition.getDescription();

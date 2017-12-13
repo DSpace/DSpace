@@ -53,7 +53,23 @@ public class UploadStep extends org.dspace.submit.step.UploadStep implements Abs
 		
 		String instance = "";
 		if("remove".equals(op.getOp())) {
-			instance = UPLOAD_STEP_REMOVE_OPERATION_ENTRY;
+			if(op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
+				instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
+			}
+			else if(op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {
+				instance = UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY;
+			}
+			else {
+				instance = UPLOAD_STEP_REMOVE_OPERATION_ENTRY;	
+			}			
+		}
+		else if("move".equals(op.getOp())) {
+			if(op.getPath().contains(UPLOAD_STEP_METADATA_PATH)) {
+				instance = UPLOAD_STEP_METADATA_OPERATION_ENTRY;
+			}
+			else {
+				instance = UPLOAD_STEP_MOVE_OPERATION_ENTRY;	
+			}		
 		}
 		else {
 			if(op.getPath().contains(UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY)) {

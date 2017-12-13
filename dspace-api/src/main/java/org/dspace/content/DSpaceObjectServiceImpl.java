@@ -160,7 +160,13 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         String element = tokens[1];
         String qualifier = tokens[2];
 
-        List<MetadataValue> values;
+        List<MetadataValue> values = getMetadata(dso, schema, element, qualifier);
+
+        return values;
+    }
+
+	private List<MetadataValue> getMetadata(T dso, String schema, String element, String qualifier) {
+		List<MetadataValue> values;
         if (Item.ANY.equals(qualifier))
         {
             values = getMetadata(dso, schema, element, Item.ANY, Item.ANY);
@@ -173,9 +179,8 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
         {
             values = getMetadata(dso, schema, element, qualifier, Item.ANY);
         }
-
-        return values;
-    }
+		return values;
+	}
 
     @Override
     public String getMetadata(T dso, String value) {
@@ -624,7 +629,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
     @Override
     public void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException {
 
-    	List<MetadataValue> list = getMetadata(dso, schema, element, qualifier, lang);
+    	List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
 		
 		clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
 
@@ -654,7 +659,7 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 			throw new IllegalArgumentException("The \"from\" location MUST be different from \"to\" location"); 
 		}
 		
-		List<MetadataValue> list = getMetadata(dso, schema, element, qualifier, Item.ANY);
+		List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
 		
 		if(from>=list.size()) {
 			throw new IllegalArgumentException("The \"from\" location MUST exist for the operation to be successful. Idx:" + from);
@@ -693,4 +698,25 @@ public abstract class DSpaceObjectServiceImpl<T extends DSpaceObject> implements
 			addMetadata(context, dso, schema, element, qualifier, moved.getLanguage(), moved.getValue(), moved.getAuthority(), moved.getConfidence());
 		}
 	}
+	
+    @Override
+    public void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException {
+
+    	List<MetadataValue> list = getMetadata(dso, schema, element, qualifier);
+		
+		clearMetadata(context, dso, schema, element, qualifier, Item.ANY);
+
+		int idx = 0;
+		for(MetadataValue rr : list) {
+			if(idx==index) {
+				addMetadata(context, dso, schema, element, qualifier,
+					lang, value, authority, confidence);
+			}
+			else {
+				addMetadata(context, dso, schema, element, qualifier,
+					rr.getLanguage(), rr.getValue(), rr.getAuthority(), rr.getConfidence());
+			}
+			idx++;
+		}
+    }
 }

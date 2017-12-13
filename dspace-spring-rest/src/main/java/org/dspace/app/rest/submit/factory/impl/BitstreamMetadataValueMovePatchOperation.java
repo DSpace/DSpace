@@ -39,22 +39,24 @@ public class BitstreamMetadataValueMovePatchOperation extends MetadataValueMoveP
 	@Override
 	void move(Context context, Request currentRequest, WorkspaceItem source, String path, String from)
 			throws Exception {
+		//"path": "/sections/upload/files/0/metadata/dc.title/2"
+		//"abspath": "/files/0/metadata/dc.title/2"
 		String[] splitTo = getAbsolutePath(path).split("/");
 		Item item = source.getItem();
 		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 		for (Bundle bb : bundle) {
 			int idx = 0;
 			for (Bitstream b : bb.getBitstreams()) {
-				if (idx == Integer.parseInt(splitTo[0])) {
+				if (idx == Integer.parseInt(splitTo[1])) {
 
 					String evalFrom = getAbsolutePath(from);			
 					String[] splitFrom = evalFrom.split("/");
-					String metadata = splitFrom[0];
+					String metadata = splitFrom[3];
 
-					if (splitTo.length > 1) {
-						String stringTo = splitTo[1];
-						if (splitFrom.length > 1) {
-							String stringFrom = splitFrom[1];
+					if (splitTo.length > 4) {
+						String stringTo = splitTo[4];
+						if (splitFrom.length > 4) {
+							String stringFrom = splitFrom[4];
 
 							int intTo = Integer.parseInt(stringTo);
 							int intFrom = Integer.parseInt(stringFrom);

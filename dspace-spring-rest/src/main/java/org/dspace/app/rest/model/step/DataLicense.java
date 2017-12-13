@@ -24,6 +24,8 @@ public class DataLicense implements SectionData {
 	@JsonProperty(access = Access.READ_ONLY)
 	private String acceptanceDate;
 	
+	private boolean granted = false;
+	
 	public String getAcceptanceDate() {
 		return acceptanceDate;
 	}
@@ -38,6 +40,14 @@ public class DataLicense implements SectionData {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public boolean isGranted() {
+		return granted;
+	}
+
+	public void setGranted(boolean granted) {
+		this.granted = granted;
 	}
 
 

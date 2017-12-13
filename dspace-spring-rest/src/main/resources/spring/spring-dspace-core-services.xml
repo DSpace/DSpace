@@ -30,6 +30,10 @@
 							<bean
 								class="org.dspace.app.rest.submit.factory.impl.BitstreamMetadataValueMovePatchOperation" />
 						</entry>
+						<entry key="bitstreammove">
+							<bean
+								class="org.dspace.app.rest.submit.factory.impl.BitstreamMovePatchOperation" />
+						</entry>						
 					</map>
 				</entry>			
 				<entry key="add">

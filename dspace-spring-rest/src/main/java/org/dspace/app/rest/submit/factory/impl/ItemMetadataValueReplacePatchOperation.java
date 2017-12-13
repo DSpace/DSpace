@@ -8,6 +8,7 @@
 package org.dspace.app.rest.submit.factory.impl;
 
 import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.dspace.app.rest.model.MetadataValueRest;
@@ -70,42 +71,7 @@ public class ItemMetadataValueReplacePatchOperation extends MetadataValueReplace
 			replaceValue(context, source.getItem(), split[0], metadataByMetadataString, obj, index);
 		} else {
 			if (split.length == 3) {
-				String namedField = split[2];
-				// check field
-				String raw = (String)value;
-				for (Field field : MetadataValueRest.class.getDeclaredFields()) {
-					JsonProperty jsonP = field.getDeclaredAnnotation(JsonProperty.class);
-					if (jsonP!=null && jsonP.access().equals(Access.READ_ONLY)) {
-						continue;
-					}
-					else {
-						if (field.getName().equals(namedField)) {
-							int idx = 0;
-							MetadataValueRest obj = new MetadataValueRest();
-							for (MetadataValue mv : metadataByMetadataString) {
-
-								if (idx == index) {
-									obj.setAuthority(mv.getAuthority());
-									obj.setConfidence(mv.getConfidence());
-									obj.setLanguage(mv.getLanguage());
-									obj.setValue(mv.getValue());
-									if (field.getType().isAssignableFrom(Integer.class)) {
-										obj.setConfidence(Integer.parseInt(raw));
-									} else {
-										boolean accessible = field.isAccessible();
-										field.setAccessible(true);
-										field.set(obj, raw);
-										field.setAccessible(accessible);
-									}
-									break;
-								}
-
-								idx++;
-							}
-							replaceValue(context, source.getItem(), split[0], metadataByMetadataString, obj, index);
-						}
-					}
-				}
+				setDeclaredField(context, source.getItem(), value, split[0], split[2], metadataByMetadataString, index);
 			}
 		}
 	}

@@ -39,13 +39,17 @@ public class BitstreamRemovePatchOperation extends RemovePatchOperation<String>{
 	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
 		
+		String absPath = getAbsolutePath(path);
+		String[] split = absPath.split("/");
+		int index = Integer.parseInt(split[1]);
+		
 		Item item = source.getItem();
 		List<Bundle> bbb = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 		Bitstream bitstream = null;
 		external : for(Bundle bb : bbb) {
 			int idx = 0;
 			for(Bitstream b : bb.getBitstreams()) {
-				if(idx==Integer.parseInt(getAbsolutePath(path))) {
+				if(idx==index) {
 					bitstream = b;
 					break external;
 				}

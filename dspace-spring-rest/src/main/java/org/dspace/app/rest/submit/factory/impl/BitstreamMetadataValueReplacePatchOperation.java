@@ -47,13 +47,15 @@ public class BitstreamMetadataValueReplacePatchOperation extends MetadataValueRe
 	@Override
 	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
+		//"path": "/sections/upload/files/0/metadata/dc.title/2"
+		//"abspath": "/files/0/metadata/dc.title/2"
 		String[] split = getAbsolutePath(path).split("/");
 		Item item = source.getItem();
 		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);
 		for (Bundle bb : bundle) {
 			int idx = 0;
 			for (Bitstream b : bb.getBitstreams()) {
-				if (idx == Integer.parseInt(split[0])) {
+				if (idx == Integer.parseInt(split[1])) {
 					replace(context, b, split, value);
 				}
 				idx++;
@@ -62,45 +64,19 @@ public class BitstreamMetadataValueReplacePatchOperation extends MetadataValueRe
 	}
 
 	private void replace(Context context, Bitstream b, String[] split, Object value) throws SQLException, IllegalArgumentException, IllegalAccessException {
-		List<MetadataValue> metadataByMetadataString = bitstreamService.getMetadataByMetadataString(b, split[0]);
+		String mdString = split[3];
+		List<MetadataValue> metadataByMetadataString = bitstreamService.getMetadataByMetadataString(b, mdString);
 		Assert.notEmpty(metadataByMetadataString);
 
-		int index = Integer.parseInt(split[2]);
+		int index = Integer.parseInt(split[4]);
 		// if split size is one so we have a call to initialize or replace
-		if (split.length == 1) {
+		if (split.length == 5) {
 			MetadataValueRest obj = evaluateSingleObject((LateObjectEvaluator) value);
-			replaceValue(context, b, split[1], metadataByMetadataString, obj, index);
+			replaceValue(context, b, mdString, metadataByMetadataString, obj, index);
 		} else {
-			if (split.length == 2) {
-				String namedField = split[3];
-				// check field
-				String raw = evaluateString((LateObjectEvaluator) value);
-				for (Field field : MetadataValueRest.class.getDeclaredFields()) {
-					if (!field.getDeclaredAnnotation(JsonProperty.class).access().equals(Access.READ_ONLY)) {
-						if (field.getName().equals(namedField)) {
-							int idx = 0;
-							MetadataValueRest obj = new MetadataValueRest();
-							for (MetadataValue mv : metadataByMetadataString) {
-
-								if (idx == index) {
-									obj.setAuthority(mv.getAuthority());
-									obj.setConfidence(mv.getConfidence());
-									obj.setLanguage(mv.getLanguage());
-									obj.setValue(mv.getValue());
-									if (field.getType().isAssignableFrom(Integer.class)) {
-										obj.setConfidence(Integer.parseInt(raw));
-									} else {
-										field.set(mv, raw);
-									}
-									break;
-								}
-
-								idx++;
-							}
-							replaceValue(context, b, split[1], metadataByMetadataString, obj, index);
-						}
-					}
-				}
+			//"path": "/sections/upload/files/0/metadata/dc.title/2/language"
+			if (split.length > 5) {
+				setDeclaredField(context, b, value, mdString, split[5], metadataByMetadataString, index);
 			}
 		}
 	}

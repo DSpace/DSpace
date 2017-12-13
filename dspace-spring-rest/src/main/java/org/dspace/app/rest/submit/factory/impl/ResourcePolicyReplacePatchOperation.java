@@ -13,6 +13,7 @@ import java.util.List;
 import org.dspace.app.rest.model.ResourcePolicyRest;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.authorize.service.AuthorizeService;
+import org.dspace.authorize.service.ResourcePolicyService;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -45,15 +46,19 @@ public class ResourcePolicyReplacePatchOperation extends ReplacePatchOperation<R
 
 	@Autowired
 	AuthorizeService authorizeService;
+	@Autowired
+	ResourcePolicyService resourcePolicyService;
 
 	@Autowired
 	GroupService groupService;
 	@Autowired
 	EPersonService epersonService;
-	
+
 	@Override
 	void replace(Context context, Request currentRequest, WorkspaceItem source, String path, Object value)
 			throws Exception {
+		// "path": "/sections/upload/files/0/accessConditions/0"
+		// "abspath": "/files/0/accessConditions/0"
 		String[] split = getAbsolutePath(path).split("/");
 		Item item = source.getItem();
 
@@ -62,21 +67,45 @@ public class ResourcePolicyReplacePatchOperation extends ReplacePatchOperation<R
 		for (Bundle bb : bundle) {
 			int idx = 0;
 			for (Bitstream b : bb.getBitstreams()) {
-				if (idx == Integer.parseInt(split[0])) {
-					authorizeService.removeAllPolicies(context, b);
-					List<ResourcePolicyRest> newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
-					for (ResourcePolicyRest newAccessCondition : newAccessConditions) {
+				if (idx == Integer.parseInt(split[1])) {
+					List<ResourcePolicy> policies = authorizeService.findPoliciesByDSOAndType(context, b,
+							ResourcePolicy.TYPE_CUSTOM);
+					String rpIdx = split[3];
+
+					int index = 0;
+					for (ResourcePolicy policy : policies) {
+						Integer toReplace = Integer.parseInt(rpIdx);
+						if (index == toReplace) {
+							b.getResourcePolicies().remove(policy);
+							break;
+						}
+						index++;
+					}
+
+					if (split.length == 4) {
+						ResourcePolicyRest newAccessCondition = evaluateSingleObject((LateObjectEvaluator) value);
 						String name = newAccessCondition.getName();
 						String description = newAccessCondition.getDescription();
-						
-						//TODO manage error on select group and eperson
-						Group group = groupService.find(context, newAccessCondition.getGroupUUID());
-						EPerson eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
 
+						//TODO manage error on select group and eperson
+						Group group = null;
+						if(newAccessCondition.getGroupUUID()!=null) {
+							group = groupService.find(context, newAccessCondition.getGroupUUID());
+						}
+						EPerson eperson = null;
+						if(newAccessCondition.getEpersonUUID()!=null) {
+							eperson = epersonService.find(context, newAccessCondition.getEpersonUUID());
+						}
+						
 						Date startDate = newAccessCondition.getStartDate();
 						Date endDate = newAccessCondition.getEndDate();
-						authorizeService.createResourcePolicy(context, b, group, eperson, Constants.READ, ResourcePolicy.TYPE_CUSTOM, name, description, startDate, endDate);
+						authorizeService.createResourcePolicy(context, b, group, eperson, Constants.READ,
+								ResourcePolicy.TYPE_CUSTOM, name, description, startDate, endDate);
 						// TODO manage duplicate policy
+					} else {
+						// "path":
+						// "/sections/upload/files/0/accessConditions/0/startDate"
+						// TODO
 					}
 				}
 				idx++;
