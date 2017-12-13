@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.submit.factory.impl;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ import org.dspace.content.MetadataValue;
 import org.dspace.content.service.DSpaceObjectService;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 /**
  * Submission "replace" common PATCH operation.
@@ -39,21 +43,49 @@ public abstract class MetadataValueReplacePatchOperation<DSO extends DSpaceObjec
 	protected void replaceValue(Context context, DSO source, String target, List<MetadataValue> list, MetadataValueRest object, int index)
 			throws SQLException {
 		String[] metadata = Utils.tokenize(target);
-		List<MetadataValue> values = new ArrayList<MetadataValue>();
-		int idx = 0;
-		for (MetadataValue ll : list) {
-			
-			if(idx==index) {
-				values.add(ll);
-			}
-			idx++;
-		}
-		
-		getDSpaceObjectService().removeMetadataValues(context, source, values);
-		
-		getDSpaceObjectService().addAndShiftRightMetadata(context, source, metadata[0], metadata[1], metadata[2],
+		getDSpaceObjectService().replaceMetadata(context, source, metadata[0], metadata[1], metadata[2],
 				object.getLanguage(), object.getValue(), object.getAuthority(), object.getConfidence(), index);
 	}
+	
+	protected void setDeclaredField(Context context, DSO source, Object value, String metadata, String namedField,
+			List<MetadataValue> metadataByMetadataString, int index) throws IllegalAccessException, SQLException {
+		// check field
+		String raw = (String)value;
+		for (Field field : MetadataValueRest.class.getDeclaredFields()) {
+			JsonProperty jsonP = field.getDeclaredAnnotation(JsonProperty.class);
+			if (jsonP!=null && jsonP.access().equals(Access.READ_ONLY)) {
+				continue;
+			}
+			else {
+				if (field.getName().equals(namedField)) {
+					int idx = 0;
+					MetadataValueRest obj = new MetadataValueRest();
+					for (MetadataValue mv : metadataByMetadataString) {
+
+						if (idx == index) {
+							obj.setAuthority(mv.getAuthority());
+							obj.setConfidence(mv.getConfidence());
+							obj.setLanguage(mv.getLanguage());
+							obj.setValue(mv.getValue());
+							if (field.getType().isAssignableFrom(Integer.class)) {
+								obj.setConfidence(Integer.parseInt(raw));
+							} else {
+								boolean accessible = field.isAccessible();
+								field.setAccessible(true);
+								field.set(obj, raw);
+								field.setAccessible(accessible);
+							}
+							break;
+						}
+
+						idx++;
+					}
+					replaceValue(context, source, metadata, metadataByMetadataString, obj, index);
+				}
+			}
+		}
+	}
+
 	
 	protected abstract DSpaceObjectService<DSO> getDSpaceObjectService();
 }

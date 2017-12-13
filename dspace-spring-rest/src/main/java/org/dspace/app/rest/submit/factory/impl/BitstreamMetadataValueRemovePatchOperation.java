@@ -38,19 +38,21 @@ public class BitstreamMetadataValueRemovePatchOperation extends MetadataValueRem
 	
 	@Override
 	void remove(Context context, Request currentRequest, WorkspaceItem source, String path, Object value) throws Exception {
+		//"path": "/sections/upload/files/0/metadata/dc.title/2"
+		//"abspath": "/files/0/metadata/dc.title/2"
 		String[] split = getAbsolutePath(path).split("/");
 		Item item = source.getItem();
 		List<Bundle> bundle = itemService.getBundles(item, Constants.CONTENT_BUNDLE_NAME);;
 		for(Bundle bb : bundle) {
 			int idx = 0;
 			for(Bitstream b : bb.getBitstreams()) {
-				if(idx==Integer.parseInt(split[0])) {
+				if(idx==Integer.parseInt(split[1])) {
 					
-					if (split.length == 2) {
-						deleteValue(context, b, split[2], -1);
+					if (split.length == 4) {
+						deleteValue(context, b, split[3], -1);
 					} else {
-						Integer toDelete = Integer.parseInt(split[3]);
-						deleteValue(context, b, split[2], toDelete);
+						Integer toDelete = Integer.parseInt(split[4]);
+						deleteValue(context, b, split[3], toDelete);
 					}
 				}
 				idx++;

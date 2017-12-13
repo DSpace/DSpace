@@ -32,8 +32,11 @@ public interface AbstractRestProcessingStep {
 	public static final String COLLECTION_STEP_OPERATION_ENTRY = "collection";
 	public static final String UPLOAD_STEP_METADATA_OPERATION_ENTRY = "bitstreammetadata";
 	public static final String UPLOAD_STEP_REMOVE_OPERATION_ENTRY = "bitstreamremove";
+	public static final String UPLOAD_STEP_MOVE_OPERATION_ENTRY = "bitstreammove";
 	public static final String UPLOAD_STEP_ACCESSCONDITIONS_OPERATION_ENTRY = "accessConditions";
 	public static final String LICENSE_STEP_OPERATION_ENTRY = "granted";
+	
+	public static final String UPLOAD_STEP_METADATA_PATH = "metadata";
 	
 	public <T extends Serializable> T getData(SubmissionService submissionService, WorkspaceItem obj, SubmissionStepConfig config) throws Exception;
 	

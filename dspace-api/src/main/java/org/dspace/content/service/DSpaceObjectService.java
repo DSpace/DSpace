@@ -402,5 +402,7 @@ public interface DSpaceObjectService<T extends DSpaceObject> {
 
     void addAndShiftRightMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException;
     
+    void replaceMetadata(Context context, T dso, String schema, String element, String qualifier, String lang, String value, String authority, int confidence, int index) throws SQLException;
+    
     void moveMetadata(Context context, T dso, String schema, String element, String qualifier, int from, int to) throws SQLException;
 }
