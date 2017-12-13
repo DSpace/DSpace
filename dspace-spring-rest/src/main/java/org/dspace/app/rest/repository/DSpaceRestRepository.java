@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.repository;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.exception.PatchBadRequestException;
 import org.dspace.app.rest.exception.PatchUnprocessableEntityException;
+import org.dspace.app.rest.exception.RepositoryMethodNotImplementedException;
 import org.dspace.app.rest.model.DirectlyAddressableRestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
 import org.dspace.app.rest.model.patch.Patch;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -97,16 +100,24 @@ extends AbstractDSpaceRestRepository
 
 	@Override
 	public void delete(ID id) {
-		// TODO Auto-generated method stub
-
+		Context context = obtainContext();		
+		try {
+			delete(context, id);	
+			context.commit();
+		} catch (Exception e) {
+			throw new PatchUnprocessableEntityException(e.getMessage());
+		}
 	}
 
+	protected void delete(Context context, ID id) throws RepositoryMethodNotImplementedException {
+		throw new RepositoryMethodNotImplementedException("No implementation found; Method not allowed!", "");
+	}
+	
 	@Override
 	public void delete(T entity) {
-		// TODO Auto-generated method stub
-
+		// TODO Auto-generated method stub		
 	}
-
+	
 	@Override
 	public void delete(Iterable<? extends T> entities) {
 		// TODO Auto-generated method stub
@@ -167,8 +178,8 @@ extends AbstractDSpaceRestRepository
 		return findOne(id);
 	}
 	
-	protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) throws HttpRequestMethodNotSupportedException, SQLException, AuthorizeException, DCInputsReaderException {
-		throw new HttpRequestMethodNotSupportedException("No implementation found; Method not allowed!");
+	protected void patch(Context context, HttpServletRequest request, String apiCategory, String model, ID id, Patch patch) throws RepositoryMethodNotImplementedException, SQLException, AuthorizeException, DCInputsReaderException {
+		throw new RepositoryMethodNotImplementedException(apiCategory, model);
 	}
 
 }

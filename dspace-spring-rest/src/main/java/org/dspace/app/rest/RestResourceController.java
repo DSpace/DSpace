@@ -267,15 +267,7 @@ public class RestResourceController implements InitializingBean {
 			Patch patch = patchConverter.convert(jsonNode);
 			modelObject = repository.patch(request, apiCategory, model, id, patch);
 		} 
-		catch (HttpRequestMethodNotSupportedException e) {
-			log.error(e.getMessage(), e);
-			throw e;
-		}
-		catch (PatchUnprocessableEntityException e) {
-			log.error(e.getMessage(), e);
-			throw e;
-		}
-		catch (PatchBadRequestException e) {
+		catch (RepositoryMethodNotImplementedException | PatchUnprocessableEntityException | PatchBadRequestException e) {
 			log.error(e.getMessage(), e);
 			throw e;
 		}
@@ -486,5 +478,24 @@ public class RestResourceController implements InitializingBean {
 
 		String selfLink = assembler.getSelfLinkFor(source).getHref();
 		headers.setLocation(new UriTemplate(selfLink).expand());
+	}
+
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{id:\\d+}")
+	public ResponseEntity<ResourceSupport> delete(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable Integer id) throws HttpRequestMethodNotSupportedException {		
+		return deleteInternal(apiCategory, model, id);
+	}
+	
+	@RequestMapping(method = RequestMethod.DELETE, value = "/{uuid:[0-9a-fxA-FX]{8}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{4}-[0-9a-fxA-FX]{12}}")
+	public ResponseEntity<ResourceSupport> delete(HttpServletRequest request, @PathVariable String apiCategory,
+			@PathVariable String model, @PathVariable UUID id) throws HttpRequestMethodNotSupportedException {		
+		return deleteInternal(apiCategory, model, id);
+	}
+	
+	private <ID extends Serializable> ResponseEntity<ResourceSupport> deleteInternal(String apiCategory, String model, ID id) {
+		checkModelPluralForm(apiCategory, model);
+		DSpaceRestRepository<DirectlyAddressableRestModel, ID> repository = utils.getResourceRepository(apiCategory, model);
+		repository.delete(id);
+		return ControllerUtils.toEmptyResponse(HttpStatus.NO_CONTENT);
 	}
 }

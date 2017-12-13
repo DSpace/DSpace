@@ -77,13 +77,11 @@ public class WorkspaceItemConverter
 			throw new RuntimeException(e.getMessage(), e);
 		}
 		
-		
 		witem.setId(obj.getID());
-		witem.setCollection(collectionConverter.convert(collection));
+		witem.setCollection(collection!=null?collectionConverter.convert(collection):null);
 		witem.setItem(itemConverter.convert(item));
 		witem.setSubmitter(epersonConverter.convert(submitter));
 		
-
 		// 1. retrieve the submission definition
 		// 2. iterate over the submission section to allow to plugin additional
 		// info
