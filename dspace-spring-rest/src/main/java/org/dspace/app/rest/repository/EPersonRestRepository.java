@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,6 +54,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public Page<EPersonRest> findAll(Context context, Pageable pageable) {
 		List<EPerson> epersons = null;
 		int total = 0;
