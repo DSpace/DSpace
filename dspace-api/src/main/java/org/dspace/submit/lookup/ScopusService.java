@@ -22,6 +22,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
@@ -104,12 +105,9 @@ public class ScopusService
                 if (StringUtils.isNotBlank(proxyHost)
                         && StringUtils.isNotBlank(proxyPort))
                 {
-                    HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort),
-                            "http");
-                    client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
-                            proxy);
-                    System.out.println(client.getParams()
-                            .getParameter(ConnRoutePNames.DEFAULT_PROXY));
+                    HostConfiguration hostCfg = client.getHostConfiguration();
+                    hostCfg.setProxy(proxyHost, Integer.parseInt(proxyPort));
+                    client.setHostConfiguration(hostCfg);
                 }
                 
                 int start =0;
