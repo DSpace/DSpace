@@ -34,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 
@@ -94,22 +96,25 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
     }
 
     @Override
-    public EPersonRest findOne(Context context, UUID id) {
+    @PreAuthorize("hasPermission(#id, 'EPERSON', 'READ')")
+    public EPersonRest findOne(UUID id) {
         EPerson eperson = null;
         try {
-            eperson = es.find(context, id);
+            eperson = es.find(obtainContext(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         if (eperson == null) {
-            return null;
+            throw new ResourceNotFoundException();
         }
         return converter.fromModel(eperson);
     }
 
     @Override
-    public Page<EPersonRest> findAll(Context context, Pageable pageable) {
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<EPersonRest> findAll(Pageable pageable) {
         List<EPerson> epersons = null;
+        Context context = obtainContext();
         int total = 0;
         try {
             if (!authorizeService.isAdmin(context)) {

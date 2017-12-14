@@ -23,11 +23,11 @@ import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.Collection;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,8 +48,9 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         submissionConfigReader = new SubmissionConfigReader();
     }
 
+    @PreAuthorize("hasAuthority('EPERSON')")
     @Override
-    public SubmissionDefinitionRest findOne(Context context, String submitName) {
+    public SubmissionDefinitionRest findOne(String submitName) {
         SubmissionConfig subConfig = submissionConfigReader.getSubmissionConfigByName(submitName);
         if (subConfig == null) {
             return null;
@@ -57,8 +58,9 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         return converter.convert(subConfig);
     }
 
+    @PreAuthorize("hasAuthority('EPERSON')")
     @Override
-    public Page<SubmissionDefinitionRest> findAll(Context context, Pageable pageable) {
+    public Page<SubmissionDefinitionRest> findAll(Pageable pageable) {
         List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
         int total = submissionConfigReader.countSubmissionConfigs();
         subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
@@ -66,6 +68,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
         return page;
     }
 
+    @PreAuthorize("hasAuthority('EPERSON')")
     @SearchRestMethod(name = "findByCollection")
     public SubmissionDefinitionRest findByCollection(@Parameter(value = "uuid", required = true) UUID collectionUuid)
             throws SQLException {

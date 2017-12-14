@@ -15,7 +15,6 @@ import org.dspace.app.rest.model.BrowseIndexRest;
 import org.dspace.app.rest.model.hateoas.BrowseIndexResource;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
-import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -33,7 +32,7 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
     BrowseIndexConverter converter;
 
     @Override
-    public BrowseIndexRest findOne(Context context, String name) {
+    public BrowseIndexRest findOne(String name) {
         BrowseIndexRest bi = null;
         BrowseIndex bix;
         try {
@@ -48,7 +47,7 @@ public class BrowseIndexRestRepository extends DSpaceRestRepository<BrowseIndexR
     }
 
     @Override
-    public Page<BrowseIndexRest> findAll(Context context, Pageable pageable) {
+    public Page<BrowseIndexRest> findAll(Pageable pageable) {
         List<BrowseIndexRest> it = null;
         List<BrowseIndex> indexesList = new ArrayList<BrowseIndex>();
         int total = 0;

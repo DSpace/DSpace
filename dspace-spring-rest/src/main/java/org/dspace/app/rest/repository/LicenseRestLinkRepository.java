@@ -43,6 +43,7 @@ public class LicenseRestLinkRepository extends AbstractDSpaceRestRepository
         return new LicenseResource(model);
     }
 
+    //TODO @PreAuthorize("hasAuthority('EPERSON')")
     public LicenseRest getLicenseCollection(HttpServletRequest request, UUID uuid, Pageable pageable, String projection)
         throws Exception {
         Context context = obtainContext();

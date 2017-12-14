@@ -21,6 +21,7 @@ import org.dspace.app.rest.repository.LinkRestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.convert.ConversionException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.TypeDescriptor;
@@ -96,8 +97,9 @@ public class RestRepositoryUtils {
      */
     public Method getSearchMethod(String searchMethodName, DSpaceRestRepository repository) {
         Method searchMethod = null;
-        for (Method method : repository.getClass().getMethods()) {
-            SearchRestMethod ann = method.getAnnotation(SearchRestMethod.class);
+        Method[] methods = org.springframework.util.ClassUtils.getUserClass(repository.getClass()).getMethods();
+        for (Method method : methods) {
+            SearchRestMethod ann = AnnotationUtils.findAnnotation(method, SearchRestMethod.class);
             if (ann != null) {
                 String name = ann.name();
                 if (name.isEmpty()) {

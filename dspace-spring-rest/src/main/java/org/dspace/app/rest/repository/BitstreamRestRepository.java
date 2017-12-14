@@ -28,6 +28,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 
@@ -51,10 +52,11 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
     }
 
     @Override
-    public BitstreamRest findOne(Context context, UUID id) {
+    @PreAuthorize("hasPermission(#id, 'BITSTREAM', 'READ')")
+    public BitstreamRest findOne(UUID id) {
         Bitstream bit = null;
         try {
-            bit = bs.find(context, id);
+            bit = bs.find(obtainContext(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -72,7 +74,9 @@ public class BitstreamRestRepository extends DSpaceRestRepository<BitstreamRest,
     }
 
     @Override
-    public Page<BitstreamRest> findAll(Context context, Pageable pageable) {
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<BitstreamRest> findAll(Pageable pageable) {
+        Context context = obtainContext();
         List<Bitstream> bit = new ArrayList<Bitstream>();
         Iterator<Bitstream> it = null;
         int total = 0;

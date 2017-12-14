@@ -37,9 +37,10 @@ public class EPersonMatcher {
     }
 
 
-    public static Matcher<? super Object> matchDefaultTestEPerson() {
+    public static Matcher<? super Object> matchEPersonOnEmail(String email) {
         return allOf(
-            hasJsonPath("$.type", is("eperson"))
-        );
+            hasJsonPath("$.type", is("eperson")),
+            hasJsonPath("$.email", is(email))
+            );
     }
 }
