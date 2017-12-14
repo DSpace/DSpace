@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,21 +48,23 @@ public class CommunityRestRepository extends DSpaceRestRepository<CommunityRest,
     }
 
     @Override
-    public CommunityRest findOne(Context context, UUID id) {
+    @PreAuthorize("hasPermission(#id, 'COMMUNITY', 'READ')")
+    public CommunityRest findOne(UUID id) {
         Community community = null;
         try {
-            community = cs.find(context, id);
+            community = cs.find(obtainContext(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         if (community == null) {
-            return null;
+            throw new ResourceNotFoundException();
         }
         return converter.fromModel(community);
     }
 
     @Override
-    public Page<CommunityRest> findAll(Context context, Pageable pageable) {
+    public Page<CommunityRest> findAll(Pageable pageable) {
+        Context context = obtainContext();
         List<Community> it = null;
         List<Community> communities = new ArrayList<Community>();
         int total = 0;

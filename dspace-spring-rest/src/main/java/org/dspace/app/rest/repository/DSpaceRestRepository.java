@@ -69,13 +69,6 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
         return null;
     }
 
-    @Override
-    public T findOne(ID id) {
-        Context context = obtainContext();
-        return findOne(context, id);
-    }
-
-    public abstract T findOne(Context context, ID id);
 
     @Override
     public boolean exists(ID id) {
@@ -133,18 +126,14 @@ public abstract class DSpaceRestRepository<T extends RestAddressableModel, ID ex
 
     }
 
+    public abstract T findOne(ID id);
+
+    public abstract Page<T> findAll(Pageable pageable);
+
     @Override
     public Iterable<T> findAll(Sort sort) {
         throw new RuntimeException("findAll MUST be paginated");
     }
-
-    @Override
-    public Page<T> findAll(Pageable pageable) {
-        Context context = obtainContext();
-        return findAll(context, pageable);
-    }
-
-    public abstract Page<T> findAll(Context context, Pageable pageable);
 
     public abstract Class<T> getDomainClass();
 

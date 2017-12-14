@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -93,11 +92,12 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         submissionConfigReader = new SubmissionConfigReader();
     }
 
+    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'READ')")
     @Override
-    public WorkspaceItemRest findOne(Context context, Integer id) {
+    public WorkspaceItemRest findOne(Integer id) {
         WorkspaceItem witem = null;
         try {
-            witem = wis.find(context, id);
+            witem = wis.find(obtainContext(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -107,8 +107,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return converter.fromModel(witem);
     }
 
+    //TODO @PreAuthorize("hasAuthority('ADMIN')")
     @Override
-    public Page<WorkspaceItemRest> findAll(Context context, Pageable pageable) {
+    public Page<WorkspaceItemRest> findAll(Pageable pageable) {
+        Context context = obtainContext();
         List<WorkspaceItem> witems = null;
         int total = 0;
         try {
@@ -121,6 +123,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return page;
     }
 
+    //TODO @PreAuthorize("hasPermission(#submitterID, 'EPERSON', 'READ')")
     @SearchRestMethod(name = "findBySubmitter")
     public Page<WorkspaceItemRest> findBySubmitter(@Parameter(value = "uuid", required = true) UUID submitterID,
             Pageable pageable) {
@@ -146,8 +149,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
 
     @Override
     protected WorkspaceItemRest save(Context context, WorkspaceItemRest wsi) {
-        SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
+        SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(submissionConfigReader.getDefaultSubmissionConfigName());
         WorkspaceItem source = converter.toModel(wsi);
         for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
 
@@ -166,14 +168,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                 if (stepInstance instanceof AbstractProcessingStep) {
                     // load the JSPStep interface for this step
                     AbstractProcessingStep stepProcessing = (AbstractProcessingStep) stepClass
-                        .newInstance();
+                            .newInstance();
                     stepProcessing.doProcessing(context, getRequestService().getCurrentRequest(), source);
                 } else {
                     throw new Exception("The submission step class specified by '"
-                                            + stepConfig.getProcessingClassName()
-                                            + "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
-                                            + " Therefore it cannot be used by the Configurable Submission as the " +
-                                            "<processing-class>!");
+                            + stepConfig.getProcessingClassName()
+                            + "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
+                            + " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
                 }
 
             } catch (Exception e) {
@@ -194,9 +195,10 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return new WorkspaceItemResource(witem, utils, rels);
     }
 
+    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
     public UploadBitstreamRest upload(HttpServletRequest request, String apiCategory, String model, Integer id,
-                                      String extraField, MultipartFile file) throws Exception {
+            String extraField, MultipartFile file) throws Exception {
 
         UploadBitstreamRest result;
         Bitstream source = null;
@@ -243,30 +245,28 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         return result;
     }
 
+    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'WRITE')")
     @Override
-    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id,
-                      Patch patch) throws SQLException, AuthorizeException {
+    public void patch(Context context, HttpServletRequest request, String apiCategory, String model, Integer id, Patch patch) throws SQLException, AuthorizeException {
         List<Operation> operations = patch.getOperations();
         WorkspaceItemRest wsi = findOne(id);
         WorkspaceItem source = wis.find(context, id);
         for (Operation op : operations) {
             //the value in the position 0 is a null value
-            String[] path = op.getPath().substring(1).split("/", 3);
+            String[] path = op.getPath().substring(1).split("/",3);
             if (OPERATION_PATH_SECTIONS.equals(path[0])) {
                 String section = path[1];
                 evaluatePatch(context, request, source, wsi, section, op);
-            } else {
-                throw new PatchBadRequestException(
-                    "Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
+            }
+            else {
+                throw new PatchBadRequestException("Patch path operation need to starts with '" + OPERATION_PATH_SECTIONS + "'");
             }
         }
         wis.update(context, source);
     }
 
-    private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi,
-                               String section, Operation op) {
-        SubmissionConfig submissionConfig = submissionConfigReader
-            .getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
+    private void evaluatePatch(Context context, HttpServletRequest request, WorkspaceItem source, WorkspaceItemRest wsi, String section, Operation op) {
+        SubmissionConfig submissionConfig = submissionConfigReader.getSubmissionConfigByName(wsi.getSubmissionDefinition().getName());
         for (int stepNum = 0; stepNum < submissionConfig.getNumberOfSteps(); stepNum++) {
 
             SubmissionStepConfig stepConfig = submissionConfig.getStep(stepNum);
@@ -286,15 +286,13 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
                     if (stepInstance instanceof AbstractRestProcessingStep) {
                         // load the JSPStep interface for this step
                         AbstractRestProcessingStep stepProcessing = (AbstractRestProcessingStep) stepClass
-                            .newInstance();
+                                .newInstance();
                         stepProcessing.doPatchProcessing(context, getRequestService().getCurrentRequest(), source, op);
                     } else {
                         throw new PatchBadRequestException("The submission step class specified by '"
-                                                               + stepConfig.getProcessingClassName()
-                                                               + "' does not extend the class org.dspace.submit" +
-                                                               ".AbstractProcessingStep!"
-                                                               + " Therefore it cannot be used by the Configurable " +
-                                                               "Submission as the <processing-class>!");
+                                + stepConfig.getProcessingClassName()
+                                + "' does not extend the class org.dspace.submit.AbstractProcessingStep!"
+                                + " Therefore it cannot be used by the Configurable Submission as the <processing-class>!");
                     }
 
                 } catch (Exception e) {
@@ -304,6 +302,7 @@ public class WorkspaceItemRestRepository extends DSpaceRestRepository<WorkspaceI
         }
     }
 
+    //TODO @PreAuthorize("hasPermission(#id, 'WORKSPACEITEM', 'DELETE')")
     @Override
     protected void delete(Context context, Integer id) throws AuthorizeException {
         WorkspaceItem witem = null;

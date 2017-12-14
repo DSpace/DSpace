@@ -16,7 +16,6 @@ import org.dspace.app.rest.model.hateoas.SubmissionFormResource;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,8 +40,9 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         inputReader = new DCInputsReader();
     }
 
+    //TODO @PreAuthorize("hasAuthority('EPERSON')")
     @Override
-    public SubmissionFormRest findOne(Context context, String submitName) {
+    public SubmissionFormRest findOne(String submitName) {
         DCInputSet inputConfig;
         try {
             inputConfig = inputReader.getInputsByFormName(submitName);
@@ -55,8 +55,9 @@ public class SubmissionFormRestRepository extends DSpaceRestRepository<Submissio
         return converter.convert(inputConfig);
     }
 
+    //TODO @PreAuthorize("hasAuthority('EPERSON')")
     @Override
-    public Page<SubmissionFormRest> findAll(Context context, Pageable pageable) {
+    public Page<SubmissionFormRest> findAll(Pageable pageable) {
         List<DCInputSet> subConfs = new ArrayList<DCInputSet>();
         int total = inputReader.countInputs();
         try {

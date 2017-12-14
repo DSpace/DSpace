@@ -34,8 +34,16 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
     @Test
     public void findAll() throws Exception {
-        //When we call the root endpoint
+        //When we call the root endpoint as anonymous user
         getClient().perform(get("/api/config/submissiondefinitions"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isForbidden());
+
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+
+        getClient(token).perform(get("/api/config/submissiondefinitions"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
@@ -56,7 +64,14 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
     @Test
     public void findDefault() throws Exception {
+
         getClient().perform(get("/api/config/submissiondefinitions/traditional"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isForbidden());
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissiondefinitions/traditional"))
                    //The status has to be 200 OK
                    .andExpect(status().isOk())
                    //We expect the content type to be "application/hal+json;charset=UTF-8"
@@ -80,6 +95,16 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
         Collection col1 = CollectionBuilder.createCollection(context, parentCommunity).withName("Collection 1").build();
 
         getClient().perform(get("/api/config/submissiondefinitions/search/findByCollection")
+                                    .param("uuid", col1.getID().toString()))
+                   //** THEN **
+                   //The status has to be 200
+                   .andExpect(status().isForbidden());
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+
+
+        getClient(token).perform(get("/api/config/submissiondefinitions/search/findByCollection")
                                 .param("uuid", col1.getID().toString()))
                    //** THEN **
                    //The status has to be 200
@@ -93,8 +118,17 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
     @Test
     public void findCollections() throws Exception {
+
         //Match only that a section exists with a submission configuration behind
         getClient().perform(get("/api/config/submissiondefinitions/traditional/collections"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isForbidden());
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+
+        //Match only that a section exists with a submission configuration behind
+        getClient(token).perform(get("/api/config/submissiondefinitions/traditional/collections"))
                    //TODO - this method should return an empty page
                    .andExpect(status().isNoContent());
                    //this is the expected result
@@ -104,7 +138,14 @@ public class SubmissionDefinitionsControllerIT extends AbstractControllerIntegra
 
     @Test
     public void findSections() throws Exception {
+
         getClient().perform(get("/api/config/submissiondefinitions/traditional/sections"))
+                   //The status has to be 403 Not Authorized
+                   .andExpect(status().isForbidden());
+
+        String token = getAuthToken(admin.getEmail(), password);
+
+        getClient(token).perform(get("/api/config/submissiondefinitions/traditional/sections"))
                    // The status has to be 200 OK
                    .andExpect(status().isOk())
                    // We expect the content type to be "application/hal+json;charset=UTF-8"

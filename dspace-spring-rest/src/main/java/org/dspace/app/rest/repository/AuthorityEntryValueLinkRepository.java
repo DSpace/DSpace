@@ -42,6 +42,7 @@ public class AuthorityEntryValueLinkRepository extends AbstractDSpaceRestReposit
         return new AuthorityEntryResource(model);
     }
 
+    //TODO @PreAuthorize("hasAuthority('EPERSON')")
     public AuthorityEntryRest getResource(HttpServletRequest request, String name, String relId,
                                           Pageable pageable, String projection) {
         Context context = obtainContext();

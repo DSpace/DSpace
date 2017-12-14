@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,10 +39,11 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
     GroupConverter converter;
 
     @Override
-    public GroupRest findOne(Context context, UUID id) {
+    @PreAuthorize("hasPermission(#id, 'GROUP', 'READ')")
+    public GroupRest findOne(UUID id) {
         Group group = null;
         try {
-            group = gs.find(context, id);
+            group = gs.find(obtainContext(), id);
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -51,8 +53,10 @@ public class GroupRestRepository extends DSpaceRestRepository<GroupRest, UUID> {
         return converter.fromModel(group);
     }
 
+    //TODO @PreAuthorize("hasAuthority('ADMIN')")
     @Override
-    public Page<GroupRest> findAll(Context context, Pageable pageable) {
+    public Page<GroupRest> findAll(Pageable pageable) {
+        Context context = obtainContext();
         List<Group> groups = null;
         int total = 0;
         try {
