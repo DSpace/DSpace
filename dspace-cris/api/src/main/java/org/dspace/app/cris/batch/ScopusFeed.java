@@ -324,6 +324,8 @@ public class ScopusFeed
             {
                 for (Record record : wosResult)
                 {
+                    if (record.getValues("eid").isEmpty())
+                        continue;
                     HashMap<String, Set<String>> map = new HashMap<String, Set<String>>();
                     HashSet<String> set = new HashSet<String>();
                     set.add(record.getValues("eid").get(0).getAsString());
