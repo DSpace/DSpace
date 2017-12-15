@@ -45,6 +45,8 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <!-- Maximum line length is 120 characters -->
         <module name="LineLength">
             <property name="max" value="120"/>
+            <!-- Only exceptions are packages, imports and URLs -->
+            <property name="ignorePattern" value="^package.*|^import.*|http://|https://"/>
         </module>
 
         <!-- Check for and report back any TODO or FIXME comments as info messages -->
@@ -63,6 +65,12 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <module name="RedundantImport"/>
         <!-- Unused import statements are NOT ALLOWED -->
         <module name="UnusedImports"/>
+        <!-- Ensure imports appear alphabetically and grouped -->
+        <module name="CustomImportOrder">
+            <property name="sortImportsInGroupAlphabetically" value="true"/>
+            <property name="separateLineBetweenGroups" value="true"/>
+            <property name="customImportOrderRules" value="STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE"/>
+        </module>
 
         <!-- ##### Javadocs requirements ##### -->
         <!-- Requirements for Javadocs for classes/interfaces -->
@@ -113,10 +121,20 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
              http://checkstyle.sourceforge.net/config_whitespace.html#GenericWhitespace -->
         <module name="GenericWhitespace"/>
 
+        <!-- ##### Requirements for "switch" statements ##### -->
+        <!-- "switch" statements MUST have a "default" clause -->
+        <module name="MissingSwitchDefault"/>
+        <!-- "case" clauses in switch statements MUST include break, return, throw or continue -->
+        <module name="FallThrough"/>
+
         <!-- ##### Other / Miscellaneous requirements ##### -->
         <!-- Require utility classes do not have a public constructor -->
         <module name="HideUtilityClassConstructor"/>
         <!-- Require each variable declaration is its own statement on its own line -->
         <module name="MultipleVariableDeclarations"/>
+        <!-- Each line of code can only include one statement -->
+        <module name="OneStatementPerLine"/>
+        <!-- Require that "catch" statements are not empty (must at least contain a comment) -->
+        <module name="EmptyCatchBlock"/>
     </module>
 </module>
