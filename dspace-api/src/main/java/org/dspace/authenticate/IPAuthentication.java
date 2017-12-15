@@ -257,7 +257,9 @@ public class IPAuthentication implements AuthenticationMethod {
             }
 
             log.debug(LogManager.getHeader(context, "authenticated",
-                                           "special_groups=" + gsb.toString()));
+                                           "special_groups=" + gsb.toString()
+                                           + " (by IP=" + addr + ", useProxies=" + useProxies.toString() + ")"
+                                          ));
         }
 
         return groups;
