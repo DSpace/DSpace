@@ -10,8 +10,6 @@ package org.dspace.app.rest.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletException;
-
 import org.dspace.app.rest.converter.SubmissionSectionConverter;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.SubmissionSectionRest;
@@ -20,7 +18,6 @@ import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.core.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -46,7 +43,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
 	}
 	
 	@Override
-	public SubmissionSectionRest findOne(Context context, String id) {
+	public SubmissionSectionRest findOne(String id) {
 		try {
 			SubmissionStepConfig step = submissionConfigReader.getStepConfig(id);
 			return converter.convert(step);
@@ -57,7 +54,7 @@ public class SubmissionPanelRestRepository extends DSpaceRestRepository<Submissi
 	}
 
 	@Override
-	public Page<SubmissionSectionRest> findAll(Context context, Pageable pageable) {
+	public Page<SubmissionSectionRest> findAll(Pageable pageable) {
 		List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
 		subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());
 		int total = 0;

@@ -40,10 +40,10 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 	}
 
 	@Override
-	public MetadataFieldRest findOne(Context context, Integer id) {
+	public MetadataFieldRest findOne(Integer id) {
 		MetadataField metadataField = null;
 		try {
-			metadataField = metaFieldService.find(context, id);
+			metadataField = metaFieldService.find(obtainContext(), id);
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -54,10 +54,10 @@ public class MetadataFieldRestRepository extends DSpaceRestRepository<MetadataFi
 	}
 
 	@Override
-	public Page<MetadataFieldRest> findAll(Context context, Pageable pageable) {
+	public Page<MetadataFieldRest> findAll(Pageable pageable) {
 		List<MetadataField> metadataField = null;
 		try {
-			metadataField = metaFieldService.findAll(context);
+			metadataField = metaFieldService.findAll(obtainContext());
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}

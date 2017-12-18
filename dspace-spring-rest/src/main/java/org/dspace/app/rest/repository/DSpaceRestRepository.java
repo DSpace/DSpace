@@ -11,7 +11,6 @@ import java.io.Serializable;
 
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.model.hateoas.DSpaceResource;
-import org.dspace.core.Context;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -42,18 +41,14 @@ extends AbstractDSpaceRestRepository
 	}
 
 	@Override
-	public T findOne(ID id) {
-		Context context = obtainContext();
-		return findOne(context, id);
-	}
-
-	public abstract T findOne(Context context, ID id);
-
-	@Override
 	public boolean exists(ID id) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public abstract T findOne(ID id);
+
+	public abstract Page<T> findAll(Pageable pageable);
 
 	@Override
 	public Iterable<T> findAll() {
@@ -99,14 +94,6 @@ extends AbstractDSpaceRestRepository
 	public Iterable<T> findAll(Sort sort) {
 		throw new RuntimeException("findAll MUST be paginated");
 	}
-
-	@Override
-	public Page<T> findAll(Pageable pageable) {
-		Context context = obtainContext();
-		return findAll(context, pageable);
-	}
-
-	public abstract Page<T> findAll(Context context, Pageable pageable);
 
 	public abstract Class<T> getDomainClass();
 

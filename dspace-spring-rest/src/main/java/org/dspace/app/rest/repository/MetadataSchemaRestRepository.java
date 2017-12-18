@@ -40,10 +40,10 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 	}
 
 	@Override
-	public MetadataSchemaRest findOne(Context context, Integer id) {
+	public MetadataSchemaRest findOne(Integer id) {
 		MetadataSchema metadataSchema = null;
 		try {
-			metadataSchema = metaScemaService.find(context, id);
+			metadataSchema = metaScemaService.find(obtainContext(), id);
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -54,10 +54,10 @@ public class MetadataSchemaRestRepository extends DSpaceRestRepository<MetadataS
 	}
 
 	@Override
-	public Page<MetadataSchemaRest> findAll(Context context, Pageable pageable) {
+	public Page<MetadataSchemaRest> findAll(Pageable pageable) {
 		List<MetadataSchema> metadataSchema = null;
 		try {
-			metadataSchema = metaScemaService.findAll(context);
+			metadataSchema = metaScemaService.findAll(obtainContext());
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
