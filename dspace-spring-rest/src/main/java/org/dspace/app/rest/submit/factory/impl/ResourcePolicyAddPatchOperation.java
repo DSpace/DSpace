@@ -68,6 +68,7 @@ public class ResourcePolicyAddPatchOperation extends AddPatchOperation<ResourceP
 					
 					List<ResourcePolicyRest> newAccessConditions = new ArrayList<ResourcePolicyRest>();
 					if (split.length == 3) {
+						authorizeService.removePoliciesActionFilter(context, b, Constants.READ);
 						newAccessConditions = evaluateArrayObject((LateObjectEvaluator) value);
 					} else if (split.length == 4) {
 						// contains "-", call index-based accessConditions it make not sense  
