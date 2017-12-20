@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.Normalizer;
 import java.util.List;
 import org.dspace.app.util.factory.UtilServiceFactory;
 import org.dspace.app.util.service.MetadataExposureService;
@@ -69,6 +70,10 @@ public class ItemUtils
             String name, String value)
     {
         Element.Field e = new Element.Field();
+        if (!Normalizer.isNormalized(value, Normalizer.Form.NFKC))
+        {
+            value = Normalizer.normalize(value, Normalizer.Form.NFKC);
+        }
         e.setValue(value);
         e.setName(name);
         return e;
