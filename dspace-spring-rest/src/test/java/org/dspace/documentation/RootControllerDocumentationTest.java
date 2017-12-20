@@ -41,7 +41,7 @@ public class RootControllerDocumentationTest extends AbstractControllerIntegrati
 
                         relaxedLinks(
                         linkWithRel("core:bitstreamformats").description("The <<bitstreamformats,Bitstream formats>> in this repository"),
-                        linkWithRel("core:bitstreams").description("Endpoint to retrieve all <<bitstreams.adoc#bitstreams,bitstreams>> in this repository"),
+                        linkWithRel("core:bitstreams").description("Endpoint to retrieve all <<bitstreams.adoc#bitstream-list,bitstreams>> in this repository"),
                         linkWithRel("core:items").description("Endpoint to retrieve all <<items.adoc#item-list,items>> in this repository"),
                         linkWithRel("discover:browses").description("Endpoint to <<browses,browse the content>> of this repository"),
                         linkWithRel("curies").description("Curies for documentation")
