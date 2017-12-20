@@ -19,6 +19,10 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.factory.EPersonServiceFactory;
+import org.dspace.eperson.service.EPersonService;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -81,13 +85,20 @@ public class BitstreamControllerDocumentationTest extends AbstractControllerInte
                         document("bitstream",
 
                                 relaxedLinks(
-                                        linkWithRel("core:format").description("Link to the format of the bitstream"),
-                                        linkWithRel("self").description("Link to <<bitstreams.adoc, this>> page"),
+                                        linkWithRel("core:format").description("Link to the <<formats.adoc#bitstreamformats,format>> of the bitstream"),
+                                        linkWithRel("self").description("Link to <<bitstreams.adoc#bitstream, this>> page"),
                                         linkWithRel("core:content").description("Link to the content of the bitstream"),
                                         linkWithRel("curies").description("Curies for documentation")
                                 ),
 
                                 relaxedResponseFields(
+                                        fieldWithPath("uuid").description("The UUID of the selected bitstream"),
+                                        fieldWithPath("name").description("The name of the selected bitstream"),
+                                        fieldWithPath("metadata").description("The metadata of the selected bitstream"),
+                                        fieldWithPath("sizeBytes").description("The size of this bitstream"),
+                                        fieldWithPath("checkSum").description("The checksum object for this bitstream"),
+                                        fieldWithPath("type").description("The type namely bitstream"),
+                                        fieldWithPath("_links").description("The links displayed in this bitstream endpoint"),
                                         fieldWithPath("_embedded").description("The embedded bitstream format for this bitstream")
                         )))
                 ;

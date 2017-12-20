@@ -83,11 +83,11 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 					}
 				}
 				
-				for (PropertyDescriptor pd : Introspector.getBeanInfo(data.getClass()).getPropertyDescriptors()) {
+ 				for (PropertyDescriptor pd : Introspector.getBeanInfo(data.getClass()).getPropertyDescriptors()) {
 					Method readMethod = pd.getReadMethod();
 					String name = pd.getName();
 					if (readMethod != null && !"class".equals(name)) {
-						LinkRest linkAnnotation = readMethod.getAnnotation(LinkRest.class);
+ 						LinkRest linkAnnotation = readMethod.getAnnotation(LinkRest.class);
 						
 						if (linkAnnotation != null) {
 							if (StringUtils.isNotBlank(linkAnnotation.name())) {
@@ -105,7 +105,7 @@ public abstract class DSpaceResource<T extends RestAddressableModel> extends HAL
 
 								}
 								else {
-									if (linkedObject instanceof List) {
+ 									if (linkedObject instanceof List) {
 										List<RestAddressableModel> linkedRMList = (List<RestAddressableModel>) linkedObject;
 										if (linkedRMList.size() > 0) {
 											

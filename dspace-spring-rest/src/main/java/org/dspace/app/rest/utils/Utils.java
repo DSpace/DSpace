@@ -80,7 +80,7 @@ public class Utils {
 
 	public Link linkToSubResource(RestAddressableModel data, String rel, String path) {
 		return linkTo(data.getController(), data.getCategory(), data.getTypePlural()).slash(data).slash(path)
-				.withRel(rel);
+				.withRel(this.getNamespacedRel(data, rel));
 	}
 
 	public DSpaceRestRepository getResourceRepository(String apiCategory, String modelPlural) {

@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.documentation.owningCollection;
+package org.dspace.documentation.item;
 
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
@@ -60,34 +60,28 @@ public class OwningCollectionDocumentationTest extends AbstractControllerIntegra
                 .build();
 
 
-//        //When we call the root endpoint
-//        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/owningCollection"))
-//                //The status has to be 200 OK
-//                .andExpect(status().isOk())
-//
-//                .andDo(document("item",
-//
-//                        relaxedLinks(
-//                                linkWithRel("core:bitstreams").description("Link to the <<bitstreams, bitstreams>> of this item"),
-//                                linkWithRel("core:owningCollection").description("Link to the <<owningCollectionOf, owning collection of>> this item"),
-//                                linkWithRel("core:templateItemOf").description("Link to the <<templateItemOf, template item of>> this item"),
-//                                linkWithRel("self").description("Link to <<item, this>> page"),
-//                                linkWithRel("curies").description("Curies for documentation")
-//                        ),
-//
-//                        relaxedResponseFields(
-//                                fieldWithPath("_links").description("The links that are displayed on this page namely bitstreams, owningCollection, templateItemOf, self and curies"),
-//                                fieldWithPath("uuid").description("The UUID of the selected item"),
-//                                fieldWithPath("name").description("The name of the selected item"),
-//                                fieldWithPath("handle").description("The handle of the selected item"),
-//                                fieldWithPath("metadata").description("The metadata of the selected item"),
-//                                fieldWithPath("inArchive").description("Indication of whether the item is in the archive or not"),
-//                                fieldWithPath("discoverable").description("Indication of whether the item is discoverable or not"),
-//                                fieldWithPath("withdrawn").description("Indication of whether the item is withdrawn or not"),
-//                                fieldWithPath("lastModified").description("The time of the last modification of the selected item"),
-//                                fieldWithPath("type").description("The type namely item"))
-//                ))
-//        ;
+        //When we call the root endpoint
+        getClient().perform(get("/api/core/items/" + publicItem1.getID() + "/owningCollection"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+
+                .andDo(document("owningcollection",
+
+                        relaxedLinks(
+                                linkWithRel("core:logo").description("Link to the logo of this collection"),
+                                linkWithRel("self").description("Link to <<owningCollection.adoc#collection,this>> page"),
+                                linkWithRel("curies").description("Curies for documentation")
+                        ),
+
+                        relaxedResponseFields(
+                                fieldWithPath("_links").description("The links that are displayed on this page namely logo, self and curies"),
+                                fieldWithPath("uuid").description("The UUID of the selected collection"),
+                                fieldWithPath("name").description("The name of the selected collection"),
+                                fieldWithPath("handle").description("The handle of the selected collection"),
+                                fieldWithPath("metadata").description("The metadata of the selected collection"),
+                                fieldWithPath("type").description("The type namely collection"))
+                ))
+        ;
     }
 
 }

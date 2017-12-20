@@ -1,0 +1,24 @@
+== DSpace Owning Collection REST endpoint
+
+
+[[collection]]
+=== Owning Collection REST endpoint
+
+The owning collection endpoint gives information about the collection that the item belongs to
+
+==== Response structure
+
+include::{snippets}/core/owningcollection/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/core/owningcollection/links.adoc[]
+
+==== Example request
+
+include::{snippets}/core/owningcollection/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/core/owningcollection/http-response.adoc[]

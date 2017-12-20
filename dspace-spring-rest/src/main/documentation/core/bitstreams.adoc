@@ -28,7 +28,7 @@ include::{snippets}/core/bitstream/http-response.adoc[]
 [[bitstream-list]]
 === Bitstream list REST endpoint
 
-The bitstreams endpoint lists all the items within the repository with pagination.
+The bitstreams endpoint lists all the bitstreams within the repository with pagination.
 
 ==== Response structure
 

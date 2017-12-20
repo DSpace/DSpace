@@ -80,13 +80,13 @@ public class ItemControllerDocumentationTest extends AbstractControllerIntegrati
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
 
-                .andDo(document("item",
+                    .andDo(document("item",
 
                         relaxedLinks(
-                                linkWithRel("core:bitstreams").description("Link to the <<bitstreams.adoc#bitstream-list, bitstreams>> of this item"),
-                                linkWithRel("core:owningCollection").description("Link to the <<owningCollectionOf, owning collection of>> this item"),
-                                linkWithRel("core:templateItemOf").description("Link to the <<templateItemOf, template item of>> this item"),
-                                linkWithRel("self").description("Link to <<items.adoc, this>> page"),
+                                linkWithRel("core:bitstreams").description("Link to the <<bitstreams.adoc#bitstream-list,bitstreams>> of this item"),
+                                linkWithRel("core:owningCollection").description("Link to the <<owningCollection.adoc#collection,owning collection of>> this item"),
+                                linkWithRel("core:templateItemOf").description("Link to the <<templateItemOf,template item of>> this item"),
+                                linkWithRel("self").description("Link to <<items.adoc#item,this>> page"),
                                 linkWithRel("curies").description("Curies for documentation")
                         ),
 
