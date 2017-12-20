@@ -1,0 +1,48 @@
+== DSpace Bitstream REST endpoint
+
+
+[[bitstream]]
+=== Bitstream REST endpoint
+
+The bitstream endpoint companied with a UUID gives information about the selected bitstream in the repository
+
+==== Response structure
+
+include::{snippets}/core/bitstream/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/core/bitstream/links.adoc[]
+
+==== Example request
+
+include::{snippets}/core/bitstream/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/core/bitstream/http-response.adoc[]
+
+
+
+[[bitstream-list]]
+=== Bitstream list REST endpoint
+
+The bitstreams endpoint lists all the items within the repository with pagination.
+
+==== Response structure
+
+include::{snippets}/core/bitstreams/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/core/bitstreams/links.adoc[]
+
+==== Example request
+
+include::{snippets}/core/bitstreams/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/core/bitstreams/http-response.adoc[]

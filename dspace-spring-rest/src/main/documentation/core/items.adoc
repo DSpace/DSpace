@@ -1,0 +1,48 @@
+== DSpace Item REST endpoint
+
+
+[[item]]
+=== Item REST endpoint
+
+The item endpoint companied with a UUID gives information about the selected item in the repository
+
+==== Response structure
+
+include::{snippets}/core/item/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/core/item/links.adoc[]
+
+==== Example request
+
+include::{snippets}/core/item/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/core/item/http-response.adoc[]
+
+
+
+[[item-list]]
+=== Item list REST endpoint
+
+The item endpoint lists all the items within the repository with pagination.
+
+==== Response structure
+
+include::{snippets}/core/items/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/core/items/links.adoc[]
+
+==== Example request
+
+include::{snippets}/core/items/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/core/items/http-response.adoc[]
