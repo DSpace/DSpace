@@ -145,6 +145,35 @@ function DSpaceChoiceLookup(url, field, formID, valueInput, authInput,
             $( "body" ).append(modal);
             modal.modal();
             var form = document.getElementById('aspect_general_ChoiceLookupTransformer_div_lookup');
+
+            // copy the value from the input form to the popup window
+            var of = $(window.document).find('#' + formID);
+
+            if (isName) {
+                $('*[name = text1]').val(
+                    of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val()
+                );
+                $('*[name = text2]').val(
+                    of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val()
+                );
+            } else {
+                $('*[name = text1]').val(
+                    of.find('*[name = ' + valueInput + ']').val()
+                );
+            }
+
+            // if this is a repeating input, clear the source value so that e.g.
+            // clicking "Next" on a submit-describe page will not *add* the proposed
+            // lookup text as a metadata value:
+            if (isRepeating) {
+                if (isName) {
+                    of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val('');
+                    of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val('');
+                }
+                else
+                    of.find('*[name = ' + valueInput + ']').val(null);
+            }
+
             DSpaceChoicesSetup(form);
             //In case of lookups for different fields, we get duplications of ids. So we just remove the modal.
             modal.on('hidden.bs.modal', function () {
@@ -173,52 +202,23 @@ function DSpaceChoicesSetup(form) {
 // the last start index to query for next set of results.
 function DSpaceChoicesLoad(form) {
     var field = $('*[name = paramField]').val();
-    var value = $('*[name = paramValue]').val();
-    if (!value)
-        value = '';
     var start = $('*[name = paramStart]').val();
     var limit = $('*[name = paramLimit]').val();
-    var formID = $('*[name = paramFormID]').val();
     var collID = $('*[name = paramCollection]').val();
     var isName = $('*[name = paramIsName]').val() == 'true';
-    var isRepeating = $('*[name = paramIsRepeating]').val() == 'true';
     var isClosed = $('*[name = paramIsClosed]').val() == 'true';
     var contextPath = $('*[name = contextPath]').val();
     var fail = $('*[name = paramFail]').val();
-    var valueInput = $('*[name = paramValueInput]').val();
     var nonAuthority = "";
     var pNAInput = $('*[name = paramNonAuthority]');
     if (pNAInput.length > 0)
         nonAuthority = pNAInput.val();
 
-    // get value from form inputs in opener if not explicitly supplied
-    if (value.length == 0) {
-        // This bit of javascript is accessing the form that opened the popup window,
-        // so that we can grab the value the user entered before pressing the "Lookup & Add" button
-        var of = $(window.document).find('#' + formID);
+    var value = '';
         if (isName)
-            value = makePersonName(of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val(),
-                    of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val());
+        value = makePersonName($('*[name = text1]').val(), $('*[name = text2]').val());
         else
-            value = of.find('*[name = ' + valueInput + ']').val();
-
-        // if this is a repeating input, clear the source value so that e.g.
-        // clicking "Next" on a submit-describe page will not *add* the proposed
-        // lookup text as a metadata value:
-        if (isRepeating) {
-            if (isName) {
-                of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val('');
-                of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val('');
-            }
-            else
-                of.find('*[name = ' + valueInput + ']').val(null);
-        }
-
-        // Save passed-in value to hidden 'paramValue' field in the popup window
-        // (This will allow the user to get "more results" for the same query,
-        // if results are on more than one page.)
-        $('*[name = paramValue]').val(value);
-    }
+        value = $('*[name = text1]').val();
 
     var select = $('select[name = chooser]:first');
     select.addClass('loading');
@@ -249,8 +249,8 @@ function DSpaceChoicesLoad(form) {
             var opts = Choices.find('Choice');
 
             // update range message and update 'more' button
-            var oldStart = 1 * Choices.attr('start');
-            var nextStart = oldStart + opts.length;
+            var start = 1 * Choices.attr('start');
+            var end = start + opts.length;
             var lastTotal = Choices.attr('total');
             var resultMore = Choices.attr('more');
             //if no more results to display, then disable the "more" button
@@ -258,8 +258,6 @@ function DSpaceChoicesLoad(form) {
                 $('*[name = more]').attr('disabled', 'true');
             else //otherwise, enable the "more" button
                 $('*[name = more]').removeAttr('disabled');
-            // save next starting index to hidden field
-            $('*[name = paramStart]').val(nextStart);
 
             if (select!= null) select.removeClass('loading');
 
@@ -312,11 +310,11 @@ function DSpaceChoicesLoad(form) {
 
 
             //If no results, make sure to display "0 to 0 of 0"
-            var startNum = (nextStart==0 ? 0 : oldStart+1);
+            var startNum = (end == 0 ? 0 : start + 1);
             //Fill out the counter values in the "Results x to y of z" line
             var legend = $('#aspect_general_ChoiceLookupTransformer_div_lookup :header:not(.page-header)');
             legend.html(dspace_formatMessage(legend.data('template'),
-                            startNum, nextStart, lastTotal, value));
+                            startNum, end, lastTotal, value));
         }
     });
 }
@@ -406,6 +404,11 @@ function DSpaceChoicesMoreOnClick() {
     //reload the window -- this should return the next results set
 //    location.reload();
     var form = document.getElementById('aspect_general_ChoiceLookupTransformer_div_lookup');
+
+    $('*[name = paramStart]').val(
+        1 * $('*[name = paramStart]').val() + 1 * $('*[name = paramLimit]').val()
+    );
+
     DSpaceChoicesSetup(form);
 }
 
