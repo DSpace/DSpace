@@ -563,6 +563,7 @@
                     </xsl:if>
                 </div>
             </div>
+            <xsl:call-template name="format-json-ld-metadata"/>
         </xsl:if>
         <!-- package metadata -->
         <div class="ds-static-div primary">
@@ -1250,6 +1251,12 @@
                 <td><xsl:value-of select="./@language"/></td>
             </tr>
         </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="format-json-ld-metadata">
+        <script type="application/ld+json">
+            <xsl:value-of select="$meta[@element='metadata'][@qualifier='json-ld']"/>
+        </script>
     </xsl:template>
 
     <xsl:template name="format-author-names">
