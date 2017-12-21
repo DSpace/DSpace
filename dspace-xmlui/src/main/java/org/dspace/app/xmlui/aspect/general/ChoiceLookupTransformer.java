@@ -142,7 +142,7 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
             throw new UIException("Missing a required parameter",e);
         }
 
-        Division idiv = body.addInteractiveDivision("lookup", "", "get", "popup");
+        Division idiv = body.addInteractiveDivision("lookup", "javascript:DSpaceChoicesLoad(this);", "get", "popup");
         if (isFieldMessage(field, "title"))
         {
             idiv.setHead(getFieldMessage(field, "title"));
