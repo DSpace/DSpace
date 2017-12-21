@@ -4,15 +4,21 @@ package org.datadryad.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.log4j.Logger;
 import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.dspace.JournalUtils;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.identifier.DOIIdentifierProvider;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -120,6 +126,16 @@ public class Package {
         return null;
     }
 
+    @JsonIgnore
+    public String getAbstract() {
+        try {
+            return dataPackage.getAbstract();
+        } catch (SQLException e) {
+            log.error("couldn't find abstract for item " + itemID);
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         ObjectMapper mapper = new ObjectMapper();
@@ -140,5 +156,27 @@ public class Package {
             }
         }
         return packageList;
+    }
+    public static class SchemaDotOrgSerializer extends JsonSerializer<Package> {
+        @Override
+        public void serialize(Package dataPackage, JsonGenerator jGen, SerializerProvider provider) throws IOException {
+            jGen.writeStartObject();
+            jGen.writeStringField("@context", "http://schema.org/");
+            jGen.writeStringField("@type", "Dataset");
+            jGen.writeStringField("@id", DOIIdentifierProvider.getFullDOIURL(dataPackage.getDryadDOI()));
+            jGen.writeStringField("name", dataPackage.getTitle());
+            jGen.writeObjectField("author", dataPackage.getAuthorList());
+            jGen.writeStringField("datePublished", dataPackage.getPublicationDate());
+            String version = DOIIdentifierProvider.getDOIVersion(dataPackage.getDryadDOI());
+            if (!"".equals(version)) {
+                jGen.writeStringField("version", version);
+            }
+            jGen.writeStringField("description", dataPackage.getAbstract());
+            if (dataPackage.getKeywords().size() > 0) {
+                jGen.writeObjectField("keywords", dataPackage.getKeywords());
+            }
+            jGen.writeStringField("citation", dataPackage.getPublicationDOI());
+            jGen.writeEndObject();
+        }
     }
 }

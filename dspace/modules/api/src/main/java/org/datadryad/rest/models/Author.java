@@ -4,11 +4,15 @@ package org.datadryad.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.content.DCValue;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
 import java.lang.String;
 import java.text.Normalizer;
 import java.util.regex.Matcher;
@@ -25,6 +29,8 @@ public class Author {
     private String givenNames;
     private String identifier;
     private String identifierType;
+
+    private static final String ORCID_TYPE = "ORCID";
     public Author() {}
 
     public Author(String familyName, String givenNames) {
@@ -38,7 +44,7 @@ public class Author {
             Matcher orcidpattern = Pattern.compile("orcid:(.+)$").matcher(authorMetadata.authority);
             if (orcidpattern.find()) {
                 setIdentifier(orcidpattern.group(1));
-                setIdentifierType("ORCID");
+                setIdentifierType(ORCID_TYPE);
             }
         }
     }
@@ -190,4 +196,17 @@ public class Author {
         return Normalizer.normalize(name, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
 
+    public static class SchemaDotOrgSerializer extends JsonSerializer<Author> {
+        @Override
+        public void serialize(Author author, JsonGenerator jGen, SerializerProvider provider) throws IOException {
+            jGen.writeStartObject();
+            jGen.writeStringField("@type", "Person");
+            if (author.getIdentifierType() != null && author.getIdentifierType().equals(ORCID_TYPE)) {
+                jGen.writeStringField("@id", "http://orcid.org/"+author.getIdentifier());
+            }
+            jGen.writeStringField("givenName", author.getGivenNames());
+            jGen.writeStringField("familyName", author.getFamilyName());
+            jGen.writeEndObject();
+        }
+    }
 }
