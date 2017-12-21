@@ -64,6 +64,7 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public Page<ItemRest> findAll(Pageable pageable) {
 		Context context = obtainContext();
 		Iterator<Item> it = null;

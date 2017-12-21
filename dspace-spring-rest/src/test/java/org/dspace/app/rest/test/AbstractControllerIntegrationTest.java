@@ -20,6 +20,7 @@ import javax.servlet.Filter;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.Application;
+import org.dspace.app.rest.security.MethodSecurityConfig;
 import org.dspace.app.rest.security.WebSecurityConfiguration;
 import org.dspace.app.rest.utils.ApplicationConfig;
 import org.junit.Assert;
@@ -51,7 +52,7 @@ import org.springframework.web.context.WebApplicationContext;
  * @author Tom Desair (tom dot desair at atmire dot com)
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class})
+@SpringBootTest(classes = {Application.class, ApplicationConfig.class, WebSecurityConfiguration.class, MethodSecurityConfig.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class})
 @DirtiesContext

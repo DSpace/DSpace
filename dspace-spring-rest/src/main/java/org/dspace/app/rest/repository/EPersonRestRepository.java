@@ -56,6 +56,7 @@ public class EPersonRestRepository extends DSpaceRestRepository<EPersonRest, UUI
 	}
 
 	@Override
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public Page<EPersonRest> findAll(Pageable pageable) {
 		List<EPerson> epersons = null;
 		Context context = obtainContext();

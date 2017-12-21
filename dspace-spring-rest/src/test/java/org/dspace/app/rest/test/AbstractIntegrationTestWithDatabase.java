@@ -7,6 +7,10 @@
  */
 package org.dspace.app.rest.test;
 
+import static org.junit.Assert.fail;
+
+import java.sql.SQLException;
+
 import org.apache.log4j.Logger;
 import org.dspace.app.rest.builder.AbstractBuilder;
 import org.dspace.authorize.AuthorizeException;
@@ -14,16 +18,14 @@ import org.dspace.content.Community;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.eperson.factory.EPersonServiceFactory;
 import org.dspace.eperson.service.EPersonService;
+import org.dspace.eperson.service.GroupService;
 import org.dspace.storage.rdbms.DatabaseUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
-import java.sql.SQLException;
-
-import static org.junit.Assert.fail;
 
 /**
  * Abstract Test class that will initialize the in-memory database
@@ -41,6 +43,11 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
      * EPerson mock object to use in the tests.
      */
     protected EPerson eperson;
+
+    /**
+     * Admin EPerson mock object to use in the tests.
+     */
+    protected EPerson admin;
 
     /**
      * The password of our test eperson
@@ -100,6 +107,7 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
 
             //Find our global test EPerson account. If it doesn't exist, create it.
             EPersonService ePersonService = EPersonServiceFactory.getInstance().getEPersonService();
+            GroupService groupService = EPersonServiceFactory.getInstance().getGroupService();
             eperson = ePersonService.findByEmail(context, "test@email.com");
             if(eperson == null)
             {
@@ -115,8 +123,35 @@ public class AbstractIntegrationTestWithDatabase extends AbstractDSpaceIntegrati
                 // actually save the eperson to unit testing DB
                 ePersonService.update(context, eperson);
             }
+
+            admin = ePersonService.findByEmail(context, "admin@email.com");
+            if(admin == null)
+            {
+                // This EPerson creation should only happen once (i.e. for first test run)
+                log.info("Creating initial Admin (email=admin@email.com) for Unit Tests");
+                admin = ePersonService.create(context);
+                admin.setFirstName(context, "first");
+                admin.setLastName(context, "last");
+                admin.setEmail("admin@email.com");
+                admin.setCanLogIn(true);
+                admin.setLanguage(context, I18nUtil.getDefaultLocale().getLanguage());
+                // Find administrator group
+                Group admins = groupService.findByName(context, Group.ADMIN);
+
+                if (admins == null)
+                {
+                    throw new IllegalStateException("Error, no admin group (group 1) found");
+                }
+
+                groupService.addMember(context, admins, admin);
+                ePersonService.setPassword(admin, password);
+
+                ePersonService.update(context, admin);
+                groupService.update(context, admins);
+                // actually save the eperson to unit testing DB
+            }
             // Set our global test EPerson as the current user in DSpace
-            context.setCurrentUser(eperson);
+            context.setCurrentUser(admin);
 
             // If our Anonymous/Administrator groups aren't initialized, initialize them as well
             EPersonServiceFactory.getInstance().getGroupService().initDefaultGroupNames(context);

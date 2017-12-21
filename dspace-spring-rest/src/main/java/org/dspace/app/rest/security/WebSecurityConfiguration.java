@@ -59,8 +59,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 //Tell Spring to not create Sessions
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                //Return the login URL when having an access denied error
-                .exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/api/authn/login")).and()
                 //Anonymous requests should have the "ANONYMOUS" security grant
                 .anonymous().authorities(ANONYMOUS_GRANT).and()
                 //Wire up the HttpServletRequest with the current SecurityContext values
