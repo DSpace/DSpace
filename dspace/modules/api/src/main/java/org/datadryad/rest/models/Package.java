@@ -176,6 +176,14 @@ public class Package {
                 jGen.writeObjectField("keywords", dataPackage.getKeywords());
             }
             jGen.writeStringField("citation", dataPackage.getPublicationDOI());
+
+            // write Dryad Digital Repository Organization object:
+            jGen.writeObjectFieldStart("publisher");
+            jGen.writeStringField("@type", "Organization");
+            jGen.writeStringField("name", "Dryad Digital Repository");
+            jGen.writeStringField("url", "https://datadryad.org");
+            jGen.writeEndObject();
+
             jGen.writeEndObject();
         }
     }
