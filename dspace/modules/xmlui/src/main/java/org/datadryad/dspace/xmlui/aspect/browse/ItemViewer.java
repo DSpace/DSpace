@@ -25,6 +25,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
+import org.datadryad.api.DryadDataPackage;
 import org.datadryad.api.DryadJournalConcept;
 import org.dspace.JournalUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -58,10 +59,8 @@ import org.dspace.utils.DSpace;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersionHistory;
 import org.dspace.versioning.VersioningService;
-import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
 import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
@@ -334,7 +333,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             // THIS IS A PACKAGE ITEM
 
             pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
-
+            pageMeta.addMetadata("metadata","json-ld").addContent(new DryadDataPackage(item).getSchemaDotOrgJSON());
             DCValue[] values;
 
             if ((values = item.getMetadata("prism.publicationName")).length != 0) {
