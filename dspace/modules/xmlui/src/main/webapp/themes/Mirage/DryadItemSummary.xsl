@@ -1254,9 +1254,11 @@
     </xsl:template>
 
     <xsl:template name="format-json-ld-metadata">
-        <script type="application/ld+json">
+        <xsl:if test="$meta[@element='metadata'][@qualifier='json-ld']">
+          <script type="application/ld+json">
             <xsl:value-of select="$meta[@element='metadata'][@qualifier='json-ld']"/>
-        </script>
+          </script>
+	</xsl:if>
     </xsl:template>
 
     <xsl:template name="format-author-names">
