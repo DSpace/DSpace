@@ -164,6 +164,7 @@ public class Package {
             jGen.writeStringField("@context", "http://schema.org/");
             jGen.writeStringField("@type", "Dataset");
             jGen.writeStringField("@id", DOIIdentifierProvider.getFullDOIURL(dataPackage.getDryadDOI()));
+            jGen.writeStringField("url", DOIIdentifierProvider.getFullDOIURL(dataPackage.getDryadDOI()));
             jGen.writeStringField("name", dataPackage.getTitle());
             jGen.writeObjectField("author", dataPackage.getAuthorList());
             jGen.writeStringField("datePublished", dataPackage.getPublicationDate());
