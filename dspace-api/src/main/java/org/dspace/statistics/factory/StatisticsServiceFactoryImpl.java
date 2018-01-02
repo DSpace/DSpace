@@ -8,7 +8,6 @@
 package org.dspace.statistics.factory;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.statistics.service.ElasticSearchLoggerService;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.SpiderDetectorService;
 
@@ -23,12 +22,6 @@ public class StatisticsServiceFactoryImpl extends StatisticsServiceFactory {
     public SolrLoggerService getSolrLoggerService() {
         // In order to lazy load, we cannot autowire it and instead load it by name
         return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("solrLoggerService", SolrLoggerService.class);
-    }
-
-    @Override
-    public ElasticSearchLoggerService getElasticSearchLoggerService() {
-        // In order to lazy load, we cannot autowire it and instead load it by name
-        return DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("elasticSearchLoggerService", ElasticSearchLoggerService.class);
     }
 
     @Override
