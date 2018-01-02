@@ -8,7 +8,6 @@
 package org.dspace.statistics.factory;
 
 import org.dspace.services.factory.DSpaceServicesFactory;
-import org.dspace.statistics.service.ElasticSearchLoggerService;
 import org.dspace.statistics.service.SolrLoggerService;
 import org.dspace.statistics.util.SpiderDetectorService;
 
@@ -20,8 +19,6 @@ import org.dspace.statistics.util.SpiderDetectorService;
 public abstract class StatisticsServiceFactory {
 
     public abstract SolrLoggerService getSolrLoggerService();
-
-    public abstract ElasticSearchLoggerService getElasticSearchLoggerService();
 
     public abstract SpiderDetectorService getSpiderDetectorService();
 

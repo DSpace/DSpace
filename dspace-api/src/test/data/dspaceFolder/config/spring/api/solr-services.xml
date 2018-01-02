@@ -26,7 +26,6 @@
     <!--<bean class="org.dspace.discovery.SolrServiceIndexOutputPlugin" id="solrServiceIndexOutputPlugin"/>-->
 
     <!-- Statistics services are both lazy loaded (by name), as you are likely just using ONE of them and not both -->
-    <bean id="elasticSearchLoggerService" class="org.dspace.statistics.ElasticSearchLoggerServiceImpl" lazy-init="true"/>
     <bean id="solrLoggerService" class="org.dspace.statistics.MockSolrLoggerServiceImpl" lazy-init="true"/>
 
 </beans>
