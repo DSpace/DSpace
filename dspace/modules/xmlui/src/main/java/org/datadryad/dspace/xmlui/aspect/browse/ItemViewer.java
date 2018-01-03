@@ -335,7 +335,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
             String jsonData = new DryadDataPackage(item).getSchemaDotOrgJSON();
             if (!jsonData.isEmpty()) {
-                pageMeta.addMetadata("metadata", "json-ld").addContent(new DryadDataPackage(item).getSchemaDotOrgJSON());
+                pageMeta.addMetadata("metadata", "json-ld").addContent(jsonData);
             }
             DCValue[] values;
 
