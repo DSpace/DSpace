@@ -997,7 +997,7 @@
   	</bean>
 	<bean name="scopusOutputGenerator" class="org.dspace.app.cris.batch.bte.ImpRecordOutputGenerator">
 		<property name="outputMap" ref="outputMap"/>
-		<property name="sourceIdMetadata" value="dc.identifier.eid" />		
+		<property name="sourceIdMetadata" value="dc.identifier.scopus" />
 		<property name="providerName" value="scopus" />		
 	</bean>
 	
