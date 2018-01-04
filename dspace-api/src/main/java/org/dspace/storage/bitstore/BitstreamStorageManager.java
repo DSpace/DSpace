@@ -192,18 +192,6 @@ public class BitstreamStorageManager
             log.warn("S3 BucketName is not configured, setting default: " + s3BucketName);
         }
 
-        try {
-            if (! s3Service.doesBucketExist(s3BucketName)) {
-                s3Service.createBucket(s3BucketName);
-                log.info("Creating new S3 Bucket: " + s3BucketName);
-            }
-        }
-        catch (Exception e)
-            {
-                log.error(e);
-                throw new IOException(e);
-            }
-
         // region
         if (awsRegionName != null && awsRegionName.length() > 0) {
             try {
@@ -214,6 +202,18 @@ public class BitstreamStorageManager
             } catch (IllegalArgumentException e) {
                 log.warn("Invalid aws_region: " + awsRegionName);
             }
+        }
+
+        try {
+            if (! s3Service.doesBucketExist(s3BucketName)) {
+                s3Service.createBucket(s3BucketName);
+                log.info("Creating new S3 Bucket: " + s3BucketName);
+            }
+        }
+        catch (Exception e)
+        {
+            log.error(e);
+            throw new IOException(e);
         }
 
         log.info("AWS S3 Assetstore ready to go! bucket:" + s3BucketName);
