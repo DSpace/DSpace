@@ -333,7 +333,10 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             // THIS IS A PACKAGE ITEM
 
             pageMeta.addMetadata("authors", "package").addContent(DryadWorkflowUtils.getAuthors(item));
-            pageMeta.addMetadata("metadata","json-ld").addContent(new DryadDataPackage(item).getSchemaDotOrgJSON());
+            String jsonData = new DryadDataPackage(item).getSchemaDotOrgJSON();
+            if (!jsonData.isEmpty()) {
+                pageMeta.addMetadata("metadata", "json-ld").addContent(jsonData);
+            }
             DCValue[] values;
 
             if ((values = item.getMetadata("prism.publicationName")).length != 0) {
