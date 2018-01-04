@@ -95,7 +95,11 @@ public class SubmissionLookupJSONRequest extends JSONRequest
                         && StringUtils.isNotBlank(parameterValue))
                 {
                     Set<String> set = new HashSet<String>();
-                    set.add(parameterValue);
+					String splitRegex = "(\\s*,\\s+|\\s*;\\s+|\\s*;+|\\s*,+|\\s+)";
+					for (String val : parameterValue.split(splitRegex)) {
+						val = StringUtils.trim(val);
+						set.add(val);
+					}                    
                     identifiers.put(
                             parameterName.substring("identifier_".length()),
                             set);
