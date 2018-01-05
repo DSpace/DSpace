@@ -296,3 +296,7 @@ footer .container {
 	margin-top:5px;
 	margin-bottom:5px;
 }
+
+.submit-identifier > .form-control{
+	width:50%;
+}

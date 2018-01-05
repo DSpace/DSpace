@@ -33,6 +33,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.lookup.DSpaceWorkspaceItemOutputGenerator;
 import org.dspace.submit.lookup.SubmissionItemDataLoader;
@@ -126,6 +127,8 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
         String uuidSubmission = request.getParameter("suuid");
         String uuidLookup = request.getParameter("iuuid");
         String fuuidLookup = request.getParameter("fuuid");
+        String uuid_batch = request.getParameter("iuuid_batch");
+        
         boolean forceEmpty = Util.getBoolParameter(request, "forceEmpty");
         
         ItemSubmissionLookupDTO itemLookup = null;
@@ -267,7 +270,20 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
                     e1.printStackTrace();
                 }
             }
-
+            
+            String[] uuids = StringUtils.split(uuid_batch, ";");
+            List<ItemSubmissionLookupDTO> b_dto = new ArrayList<ItemSubmissionLookupDTO>();
+            for(int i=0;i<uuids.length;i++){
+            	ItemSubmissionLookupDTO isld = submissionDTO.getLookupItem(uuids[i]);
+            	b_dto.add(isld);
+            }
+            if(!b_dto.isEmpty()){
+            	
+				Thread thread = new ThreadImporter(request, context.getCurrentUser().getID(), b_dto, id,inputSet);
+				thread.start();
+            	
+            }
+            
             if (result != null && result.size() > 0)
             {
                 // update Submission Information with this Workspace Item
@@ -315,4 +331,76 @@ public class StartSubmissionLookupStep extends AbstractProcessingStep
         // there is always just one page in the "select a collection" step!
         return 1;
     }
+    
+    class ThreadImporter extends Thread {
+    	private HttpServletRequest request;
+
+    	private int epersonid;
+
+    	private int col;
+    	
+    	DCInputSet inputset;
+
+    	private List<ItemSubmissionLookupDTO> dto;
+    	/** log4j logger */
+    	private Logger log = Logger.getLogger(ThreadImporter.class);
+
+    	public ThreadImporter(HttpServletRequest request, int epersonid, List<ItemSubmissionLookupDTO> dto, int col, DCInputSet inputset) {
+    		this.dto = dto;
+    		this.epersonid = epersonid;
+    		this.col = col;
+    		this.inputset =inputset;
+    		this.request = request;
+    	}
+
+    	public void run() {
+    		Context context = null;
+    		try {
+    			context = new Context();
+    			context.turnOffItemWrapper();
+    			EPerson eperson = EPerson.find(context, epersonid);
+    			context.setCurrentUser(eperson);
+    			SubmissionLookupService slService = new DSpace().getServiceManager().getServiceByName(
+    					SubmissionLookupService.class.getCanonicalName(), SubmissionLookupService.class);
+
+    			TransformationEngine transformationEngine = slService.getPhase2TransformationEngine();
+    			if (transformationEngine != null) {
+    				SubmissionItemDataLoader dataLoader = (SubmissionItemDataLoader) transformationEngine.getDataLoader();
+    				dataLoader.setDtoList(dto);
+    				// dataLoader.setProviders()
+
+    				DSpaceWorkspaceItemOutputGenerator outputGenerator = (DSpaceWorkspaceItemOutputGenerator) transformationEngine
+    						.getOutputGenerator();
+    				Collection collection = Collection.find(context, col);
+    				outputGenerator.setCollection(collection);
+    				outputGenerator.setContext(context);
+    				outputGenerator.setFormName(inputset.getFormName());
+    				outputGenerator.setDto(dto.get(0));
+
+    				try {
+    					transformationEngine.transform(new TransformationSpec());
+    					List<WorkspaceItem> witems = outputGenerator.getWitems();
+    					String uu = witems.get(0).getItem().getMetadata("dc.title");
+    					context.commit();
+    					context.complete();
+    				} catch (BadTransformationSpec e1) {
+    					log.error(e1.getMessage(), e1);
+    				} catch (MalformedSourceException e1) {
+    					log.error(e1.getMessage(), e1);
+    				}
+    			}
+    		} catch (Exception e) {
+    			try {
+    				log.error(e.getMessage(), e);
+    			} catch (Exception e1) {
+    				log.error(e1.getMessage(), e1);
+    			}
+    		} finally {
+    			if (context != null && context.isValid()) {
+    				context.abort();
+    			}
+    		}
+    	}
+    }
+    
 }
