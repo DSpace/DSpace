@@ -179,6 +179,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
                 .append(operators)
                 .toHashCode();
         }
+
         public static class Operator {
             private String operator;
 
