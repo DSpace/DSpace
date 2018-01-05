@@ -20,6 +20,7 @@ public class DiscoverySearchFilter {
     protected List<String> metadataFields;
     protected String type = DiscoveryConfigurationParameters.TYPE_TEXT;
     public static final String FILTER_TYPE_DEFAULT = "default";
+    protected boolean isOpenByDefault = false;
 
     public String getIndexFieldName() {
         return indexFieldName;
@@ -59,6 +60,14 @@ public class DiscoverySearchFilter {
 
     public String getFilterType() {
         return FILTER_TYPE_DEFAULT;
+    }
+
+    public boolean isOpenByDefault(){
+        return isOpenByDefault;
+    }
+
+    public void setIsOpenByDefault(boolean isOpenByDefault){
+        this.isOpenByDefault = isOpenByDefault;
     }
 
 }

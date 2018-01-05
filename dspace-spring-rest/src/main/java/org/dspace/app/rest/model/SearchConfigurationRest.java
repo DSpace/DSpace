@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.dspace.app.rest.DiscoveryRestController;
@@ -104,6 +105,9 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
 
     public static class Filter {
         private String filter;
+        private boolean hasFacets = false;
+        private String type;
+        private boolean isOpenByDefault = false;
         private List<Operator> operators = new LinkedList<>();
 
         public static final String OPERATOR_EQUALS = "equals";
@@ -113,6 +117,28 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
         public static final String OPERATOR_CONTAINS = "contains";
         public static final String OPERATOR_NOTCONTAINS = "notcontains";
 
+        public boolean isHasFacets(){
+            return hasFacets;
+        }
+        public void setHasFacets(boolean hasFacets){
+            this.hasFacets = hasFacets;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public boolean isOpenByDefault() {
+            return isOpenByDefault;
+        }
+
+        public void setOpenByDefault(boolean openByDefault) {
+            isOpenByDefault = openByDefault;
+        }
 
         public void setFilter(String filter) {
             this.filter = filter;
@@ -154,8 +180,7 @@ public class SearchConfigurationRest extends BaseObjectRest<String> {
                 .append(operators)
                 .toHashCode();
         }
-
-        public static class Operator {
+        public static class Operator{
             private String operator;
 
             public Operator(String operator) {
