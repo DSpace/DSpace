@@ -297,6 +297,11 @@ public class WorkflowItem implements InProgressSubmission {
     private boolean compareToManuscript(Manuscript manuscript, StringBuilder result) {
         boolean matched = false;
         Item item = getItem();
+        // make sure this isn't matching a former msid:
+        if (JournalUtils.manuscriptIsKnownFormerManuscriptNumber(item,manuscript)) {
+            log.error("manuscript number " + manuscript.getManuscriptId() + " matches a former msid");
+            return false;
+        }
         // check to see if this matches by msid:
         DCValue[] msids = item.getMetadata("dc", "identifier", "manuscriptNumber", Item.ANY);
         if (msids != null && msids.length > 0) {
