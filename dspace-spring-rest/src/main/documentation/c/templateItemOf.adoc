@@ -1,0 +1,24 @@
+== DSpace Template Item Of REST endpoint
+
+
+[[collection]]
+=== Template Item Of REST endpoint
+
+The template item of endpoint gives information about the collection that this is a template item of
+
+==== Response structure
+
+include::{snippets}/c/templateitemof/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/c/templateitemof/links.adoc[]
+
+==== Example request
+
+include::{snippets}/c/templateitemof/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/c/templateitemof/http-response.adoc[]

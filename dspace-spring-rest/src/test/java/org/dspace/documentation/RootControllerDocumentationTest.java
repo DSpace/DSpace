@@ -40,10 +40,10 @@ public class RootControllerDocumentationTest extends AbstractControllerIntegrati
                 .andDo(document("root",
 
                         relaxedLinks(
-                        linkWithRel("core:bitstreamformats").description("The <<bitstreamformats,Bitstream formats>> in this repository"),
-                        linkWithRel("core:bitstreams").description("Endpoint to retrieve all <<bitstreams.adoc#bitstream-list,bitstreams>> in this repository"),
-                        linkWithRel("core:items").description("Endpoint to retrieve all <<items.adoc#item-list,items>> in this repository"),
-                        linkWithRel("discover:browses").description("Endpoint to <<browses,browse the content>> of this repository"),
+                        linkWithRel("c:bitstreamformats").description("The <<bitstreamformats,Bitstream formats>> in this repository"),
+                        linkWithRel("c:bitstreams").description("Endpoint to retrieve all <<bitstreams.adoc#bitstream-list,bitstreams>> in this repository"),
+                        linkWithRel("c:items").description("Endpoint to retrieve all <<items.adoc#item-list,items>> in this repository"),
+                        linkWithRel("d:browses").description("Endpoint to <<browses,browse the content>> of this repository"),
                         linkWithRel("curies").description("Curies for documentation")
                         ),
 

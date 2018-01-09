@@ -129,7 +129,7 @@ public class RestResourceController implements InitializingBean {
 			// Link l = linkTo(this.getClass(), r).withRel(r);
 			String[] split = r.split("\\.", 2);
 			String plural = English.plural(split[1]);
-			Link l = new Link("/api/" + split[0] + "/" + plural, plural);
+			Link l = new Link("/api/" + split[0] + "/" + plural, utils.getNamespacedRel(split[0], plural));
 			links.add(l);
 			System.out.println(l.getRel() + " " + l.getHref());
 		}

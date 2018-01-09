@@ -1,0 +1,23 @@
+== DSpace Bitstreamformat REST endpoint
+
+[[bitstreamformat-list]]
+=== Bitstreamformats list REST endpoint
+
+The bitstreamformats endpoint lists all the bitstreamformats within the repository with pagination.
+
+==== Response structure
+
+include::{snippets}/c/bitstreamformats/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/c/bitstreamformats/links.adoc[]
+
+==== Example request
+
+include::{snippets}/c/bitstreamformats/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/c/bitstreamformats/http-response.adoc[]

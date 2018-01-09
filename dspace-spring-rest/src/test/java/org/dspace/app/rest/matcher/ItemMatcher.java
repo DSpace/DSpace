@@ -43,9 +43,9 @@ public class ItemMatcher {
     public static Matcher<? super Object> matchItemLinks(Item item) {
         return allOf(
                 hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.core:bitstreams.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.core:owningCollection.href", startsWith(REST_SERVER_URL)),
-                hasJsonPath("$._links.core:templateItemOf.href", startsWith(REST_SERVER_URL)),
+                hasJsonPath("$._links.c:bitstreams.href", startsWith(REST_SERVER_URL)),
+                hasJsonPath("$._links.c:owningCollection.href", startsWith(REST_SERVER_URL)),
+                hasJsonPath("$._links.c:templateItemOf.href", startsWith(REST_SERVER_URL)),
                 hasJsonPath("$._links.self.href", startsWith(REST_SERVER_URL))
         );
     }

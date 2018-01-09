@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.app.rest.model.RestModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.IanaRels;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Links;
@@ -29,7 +30,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DSpaceCurieProvider extends DefaultCurieProvider {
 
+    private static final String SEPERATOR = ":";
+
+    private static final String SELF = "self";
+
     private static final String DEFAULT_CURIE = "core";
+
+    @Value("#{${curiemapping}}")  private Map<String,String> curiemapping;
 
     public DSpaceCurieProvider() {
         super(new HashMap<>());
@@ -38,13 +45,32 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
     @Override
     public String getNamespacedRelFrom(Link link) {
         //Used for the links section
-        return getNameSpacedRel(link.getRel(), link.getHref());
+        return getNamespacedRelFor(link.getRel());
     }
 
-    @Override
     public String getNamespacedRelFor(String rel) {
-        //Used for the embedded section
-        return getNameSpacedRel(rel, null);
+        //TODO CLeanup
+        String category = extractPrefix(rel);
+        String coreRel = extractRel(rel);
+
+        String curie = getCurieForCategory(category);
+
+        return buildRel(curie, coreRel);
+    }
+
+    private String extractRel(String rel) {
+        if(StringUtils.containsNone(rel, SEPERATOR)){
+            return rel;
+        }
+        return rel.split(SEPERATOR)[1];
+    }
+
+    private String extractPrefix(String rel) {
+        //TODO Cleanup
+        if(StringUtils.containsNone(rel, SEPERATOR)){
+            return DEFAULT_CURIE;
+        }
+        return rel.split(SEPERATOR)[0];
     }
 
     @Override
@@ -52,7 +78,8 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
         Map<String, Curie> result = new TreeMap<>();
 
         for (Link link : links) {
-            String curieName = getCurie(link.getHref());
+            String category = extractPrefix(link.getRel());
+            String curieName = getCurieForCategory(category);
 
             if(!result.containsKey(curieName)) {
                 UriTemplate template = new UriTemplate("/documentation/" + curieName + "/{rel}.html");
@@ -64,8 +91,7 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
     }
 
     public String getNamespacedRelFor(String category, String rel) {
-        String curie = getCurieForCategory(category);
-        return getNameSpacedRelWithCurie(curie, rel);
+        return buildRel(category, rel);
     }
 
     public String getNamespacedRelFor(RestModel data, String rel) {
@@ -73,40 +99,14 @@ public class DSpaceCurieProvider extends DefaultCurieProvider {
     }
 
     public String getCurieForCategory(final String category) {
-        //TODO define a mapping in XML or a properties file
-        return category;
+        //TODO create mapping
+        return curiemapping.get(category);
     }
 
-    private String getNameSpacedRel(String rel, String href) {
-        String curie = getCurie(href);
-
-        return getNameSpacedRelWithCurie(curie, rel);
+    private String buildRel(String prefix, String rel) {
+        boolean prefixingNeeded = StringUtils.isNotBlank(prefix) && !IanaRels.isIanaRel(rel) && !rel.contains(":");
+        return prefixingNeeded ? String.format("%s"+SEPERATOR+"%s", prefix, rel) : rel;
     }
 
-    private String getNameSpacedRelWithCurie(String curie, String rel) {
-        boolean prefixingNeeded = StringUtils.isNotBlank(curie) && !IanaRels.isIanaRel(rel) && !rel.contains(":");
-        return prefixingNeeded ? String.format("%s:%s", curie, rel) : rel;
-    }
-
-    private String getCurie(String href) {
-        String category = extractRestCategory(href);
-
-        String curie;
-        if(StringUtils.isBlank(category)) {
-            curie = DEFAULT_CURIE;
-        } else {
-            curie = getCurieForCategory(category);
-        }
-
-        return curie;
-    }
-
-    private String extractRestCategory(String href) {
-        return StringUtils.substringBefore(
-                StringUtils.substringAfter(
-                        StringUtils.trimToNull(href),
-                        "/api/"),
-                "/");
-    }
 
 }

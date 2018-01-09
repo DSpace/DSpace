@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.documentation.bitstream;
+package org.dspace.documentation.bitstreamformat;
 
 import org.apache.commons.codec.CharEncoding;
 import org.apache.commons.io.IOUtils;
@@ -19,6 +19,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.InputStream;
@@ -51,11 +52,11 @@ public class BitstreamFormatControllerDocumentationTest extends AbstractControll
                 //The status has to be 200 OK
                 .andExpect(status().isOk())
 
-                .andDo(document("formats",
+                .andDo(document("bitstreamformats",
 
                         relaxedLinks(
                                 linkWithRel("first").description("Link to the first page of bitstreamformats"),
-                                linkWithRel("self").description("Link to <<formats.adoc#bitstreamformat-list, this>> page"),
+                                linkWithRel("self").description("Link to <<bitstreamformats.adoc#bitstreamformat-list, this>> page"),
                                 linkWithRel("next").description("Link to the next page"),
                                 linkWithRel("last").description("Link to the last page"),
                                 linkWithRel("curies").description("Curies for documentation")
@@ -69,4 +70,32 @@ public class BitstreamFormatControllerDocumentationTest extends AbstractControll
         ;
     }
 
+    @Test
+    @Ignore
+    public void findOneBitstreamFormatDocumentation() throws Exception {
+        context.turnOffAuthorisationSystem();
+
+        //When we call the root endpoint
+        getClient().perform(get("/api/core/bitstreamformats/1"))
+                //The status has to be 200 OK
+                .andExpect(status().isOk())
+
+                .andDo(document("bitstreamformat",
+
+                        relaxedLinks(
+                                linkWithRel("self").description("Link to <<bitstreamformats.adoc#bitstreamformat, this>> page")
+                        ),
+
+                        relaxedResponseFields(
+                                fieldWithPath("shortDescription").description("The short description of the bitstream format"),
+                                fieldWithPath("description").description("Full description of the bitstream format"),
+                                fieldWithPath("mimetype").description("The mimetype of the bitstream format"),
+                                fieldWithPath("supportLevel").description("The support level of the bitstream format"),
+                                fieldWithPath("internal").description("Indicates whether the bitstream format is internal or not"),
+                                fieldWithPath("extensions").description("Describes the extensions for this bitstream format"),
+                                fieldWithPath("type").description("The type of this object"),
+                                fieldWithPath("_links").description("The links that are displayed on this page, mostly with regards to pagination if applicable"))
+                ))
+        ;
+    }
 }

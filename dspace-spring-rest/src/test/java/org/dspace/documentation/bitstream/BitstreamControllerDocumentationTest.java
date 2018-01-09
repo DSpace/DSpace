@@ -85,9 +85,9 @@ public class BitstreamControllerDocumentationTest extends AbstractControllerInte
                         document("bitstream",
 
                                 relaxedLinks(
-                                        linkWithRel("core:format").description("Link to the <<formats.adoc#bitstreamformats,format>> of the bitstream"),
+                                        linkWithRel("c:format").description("Link to the <<bitstreamformats.adoc#bitstreamformats,format>> of the bitstream"),
                                         linkWithRel("self").description("Link to <<bitstreams.adoc#bitstream, this>> page"),
-                                        linkWithRel("core:content").description("Link to the content of the bitstream"),
+                                        linkWithRel("c:content").description("Link to the <<contents.adoc#content, content>> of the bitstream"),
                                         linkWithRel("curies").description("Curies for documentation")
                                 ),
 

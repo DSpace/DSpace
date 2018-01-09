@@ -7,17 +7,17 @@ The root endpoint lists all the main REST entrypoints and some details on the re
 
 ==== Response structure
 
-include::{snippets}/core/root/response-fields.adoc[]
+include::{snippets}/c/root/response-fields.adoc[]
 
 [[root-links]]
 ==== Links
 
-include::{snippets}/core/root/links.adoc[]
+include::{snippets}/c/root/links.adoc[]
 
 ==== Example request
 
-include::{snippets}/core/root/curl-request.adoc[]
+include::{snippets}/c/root/curl-request.adoc[]
 
 ==== Example response
 
-include::{snippets}/core/root/http-response.adoc[]
+include::{snippets}/c/root/http-response.adoc[]

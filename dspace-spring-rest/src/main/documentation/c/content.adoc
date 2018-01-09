@@ -1,0 +1,23 @@
+== DSpace bitstreamcontent REST endpoint
+
+[[content]]
+=== bitstreamcontent list REST endpoint
+
+The bitstreamcontent endpoint describes the content of the bitstream
+
+==== Response structure
+
+include::{snippets}/c/content/response-fields.adoc[]
+
+[[root-links]]
+==== Links
+
+include::{snippets}/c/content/links.adoc[]
+
+==== Example request
+
+include::{snippets}/c/content/curl-request.adoc[]
+
+==== Example response
+
+include::{snippets}/c/content/http-response.adoc[]

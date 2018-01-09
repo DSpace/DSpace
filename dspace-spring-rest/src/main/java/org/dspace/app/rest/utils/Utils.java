@@ -178,4 +178,8 @@ public class Utils {
 		return curieProvider.getNamespacedRelFor(data, name);
 	}
 
+	public String getNamespacedRel(String category, String name){
+		return curieProvider.getNamespacedRelFor(category, name);
+	}
+
 }

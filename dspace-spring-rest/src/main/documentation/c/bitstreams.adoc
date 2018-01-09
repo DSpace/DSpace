@@ -8,20 +8,20 @@ The bitstream endpoint companied with a UUID gives information about the selecte
 
 ==== Response structure
 
-include::{snippets}/core/bitstream/response-fields.adoc[]
+include::{snippets}/c/bitstream/response-fields.adoc[]
 
 [[root-links]]
 ==== Links
 
-include::{snippets}/core/bitstream/links.adoc[]
+include::{snippets}/c/bitstream/links.adoc[]
 
 ==== Example request
 
-include::{snippets}/core/bitstream/curl-request.adoc[]
+include::{snippets}/c/bitstream/curl-request.adoc[]
 
 ==== Example response
 
-include::{snippets}/core/bitstream/http-response.adoc[]
+include::{snippets}/c/bitstream/http-response.adoc[]
 
 
 
@@ -32,17 +32,17 @@ The bitstreams endpoint lists all the bitstreams within the repository with pagi
 
 ==== Response structure
 
-include::{snippets}/core/bitstreams/response-fields.adoc[]
+include::{snippets}/c/bitstreams/response-fields.adoc[]
 
 [[root-links]]
 ==== Links
 
-include::{snippets}/core/bitstreams/links.adoc[]
+include::{snippets}/c/bitstreams/links.adoc[]
 
 ==== Example request
 
-include::{snippets}/core/bitstreams/curl-request.adoc[]
+include::{snippets}/c/bitstreams/curl-request.adoc[]
 
 ==== Example response
 
-include::{snippets}/core/bitstreams/http-response.adoc[]
+include::{snippets}/c/bitstreams/http-response.adoc[]

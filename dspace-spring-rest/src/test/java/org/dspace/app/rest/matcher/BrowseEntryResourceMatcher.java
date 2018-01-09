@@ -33,7 +33,7 @@ public class BrowseEntryResourceMatcher {
     }
     public static Matcher<? super Object> matchItemLinks() {
         return allOf(
-                hasJsonPath("$._links.d:items.href", startsWith(REST_SERVER_URL))
+                hasJsonPath("$._links.c:items.href", startsWith(REST_SERVER_URL))
         );
     }
 }
