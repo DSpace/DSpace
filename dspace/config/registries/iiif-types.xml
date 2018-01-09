@@ -73,6 +73,14 @@
         			service</scope_note>
     </dc-type>
     
+     <dc-type>
+    	<schema>bundle</schema>
+        <element>iiif</element>
+        <qualifier>downloads</qualifier>
+        <scope_note>Metadata field used to store the ID of the bundle
+	containing the extra files to offer as download options</scope_note>
+    </dc-type>
+    
     <dc-type>
     	<schema>bitstream</schema>
         <element>iiif</element>
