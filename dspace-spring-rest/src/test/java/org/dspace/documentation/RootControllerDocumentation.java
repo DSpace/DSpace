@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * Documentation test for the {@link RootRestResourceController}
  */
-public class RootControllerDocumentationTest extends AbstractControllerIntegrationTest {
+public class RootControllerDocumentation extends AbstractControllerIntegrationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;

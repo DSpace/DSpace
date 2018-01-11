@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Documentation test for the {@link org.dspace.app.rest.repository.ItemRestRepository}
  */
-public class ItemControllerDocumentationTest extends AbstractControllerIntegrationTest {
+public class ItemControllerDocumentation extends AbstractControllerIntegrationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;

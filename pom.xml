@@ -34,6 +34,8 @@
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
+        <exclude.tests></exclude.tests>
+        <include.tests>**/Test*.java,**/*Test.java,**/*Tests.java,**/*TestCase.java,**/*Documentation.java</include.tests>
     </properties>
 
     <build>
@@ -144,7 +146,11 @@
                         <!-- tests whose name starts by Abstract will be ignored -->
                         <excludes>
                             <exclude>**/Abstract*</exclude>
+                            <exclude>${exclude.tests}</exclude>
                         </excludes>
+                        <includes>
+                            <include>${include.tests}</include>
+                        </includes>
                         <!-- Detailed logs in reportsDirectory/testName-output.txt instead of stdout -->
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <!--
@@ -491,6 +497,15 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+
+        <!-- Only run Documentation tests -->
+        <profile>
+            <id>only-rest-documentation</id>
+            <properties>
+                <exclude.tests>**/Test*.java,**/*Test.java,**/*Tests.java,**/*TestCase.java</exclude.tests>
+                <include.tests>**/*Documentation.java</include.tests>
+            </properties>
         </profile>
 
         <!--

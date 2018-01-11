@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Documentation test for the {@link org.dspace.app.rest.repository.BitstreamFormatRestRepository}
  */
-public class BitstreamFormatControllerDocumentationTest extends AbstractControllerIntegrationTest {
+public class BitstreamFormatControllerDocumentation extends AbstractControllerIntegrationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;

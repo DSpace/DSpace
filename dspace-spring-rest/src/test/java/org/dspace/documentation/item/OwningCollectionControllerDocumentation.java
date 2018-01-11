@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Documentation test for the Owning Collection link in items
  */
-public class OwningCollectionControllerDocumentationTest extends AbstractControllerIntegrationTest {
+public class OwningCollectionControllerDocumentation extends AbstractControllerIntegrationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;

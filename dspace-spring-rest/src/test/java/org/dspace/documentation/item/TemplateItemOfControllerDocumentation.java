@@ -5,48 +5,42 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.documentation.bitstreamcontent;
+package org.dspace.documentation.item;
 
-import org.apache.commons.codec.CharEncoding;
-import org.apache.commons.io.IOUtils;
-import org.dspace.app.rest.builder.BitstreamBuilder;
 import org.dspace.app.rest.builder.CollectionBuilder;
 import org.dspace.app.rest.builder.CommunityBuilder;
 import org.dspace.app.rest.builder.ItemBuilder;
 import org.dspace.app.rest.model.RestModel;
 import org.dspace.app.rest.test.AbstractControllerIntegrationTest;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
-import org.dspace.eperson.EPerson;
-import org.dspace.eperson.factory.EPersonServiceFactory;
-import org.junit.Ignore;
+import org.dspace.content.factory.ContentServiceFactory;
+import org.dspace.content.service.CollectionService;
+import org.dspace.services.factory.DSpaceServicesFactory;
 import org.junit.Test;
-
-import java.io.InputStream;
 
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.relaxedLinks;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 /**
- * Documentation test for the {@link org.dspace.app.rest.repository.BitstreamFormatRestRepository}
+ * Documentation test for the Template Item Of link in items
  */
-public class BitstreamContentControllerDocumentationTest extends AbstractControllerIntegrationTest {
+public class TemplateItemOfControllerDocumentation extends AbstractControllerIntegrationTest {
 
     protected String getRestCategory() {
         return RestModel.CORE;
     }
 
+
     @Test
-    public void findOneBitstreamContentDocumentation() throws Exception {
+    public void findOneItemTemplateItemOf() throws Exception {
         context.turnOffAuthorisationSystem();
 
         //** GIVEN **
@@ -68,36 +62,32 @@ public class BitstreamContentControllerDocumentationTest extends AbstractControl
                 .withSubject("ExtraEntry")
                 .build();
 
-        String bitstreamContent = "ThisIsSomeDummyText";
-        //Add a bitstream to an item
-        Bitstream bitstream = null;
-        try(InputStream is = IOUtils.toInputStream(bitstreamContent, CharEncoding.UTF_8)) {
-            bitstream = new BitstreamBuilder().
-                    createBitstream(context, publicItem1, is)
-                    .withName("Bitstream")
-                    .build();
-        }
+        CollectionService collectionService = DSpaceServicesFactory.getInstance().getServiceManager().getServiceByName("contentServiceFactory", ContentServiceFactory.class).getCollectionService();
+        collectionService.createTemplateItem(context, col1);
 
-        getClient().perform(get("/api/core/bitstreams/" + bitstream.getID()+"/content"))
+        Item templateItem = col1.getTemplateItem();
+        //When we call the root endpoint
+        getClient().perform(get("/api/core/items/" + templateItem.getID() + "/templateItemOf"))
+                //The status has to be 200 OK
                 .andExpect(status().isOk())
-                .andDo(
-                        document("content"
-                                ))
+
+                .andDo(document("templateitemof",
+
+                        relaxedLinks(
+                                linkWithRel("c:logo").description("Link to the logo of this collection"),
+                                linkWithRel("self").description("Link to <<templateItemOf.adoc#collection,this>> page"),
+                                linkWithRel("curies").description("Curies for documentation")
+                        ),
+
+                        relaxedResponseFields(
+                                fieldWithPath("_links").description("The links that are displayed on this page namely logo, self and curies"),
+                                fieldWithPath("uuid").description("The UUID of the collection that this is a template of"),
+                                fieldWithPath("name").description("The name of the collection that this is a template of"),
+                                fieldWithPath("handle").description("The handle of the collection that this is a template of"),
+                                fieldWithPath("metadata").description("The metadata of the collection that this is a template of"),
+                                fieldWithPath("type").description("The type namely collection"))
+                ))
         ;
-
-
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
