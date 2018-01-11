@@ -45,10 +45,10 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 	}
 
 	@Override
-	public SiteRest findOne(Context context, UUID id) {
+	public SiteRest findOne(UUID id) {
 		Site site = null;
 		try {
-			site = sitesv.find(context, id);
+			site = sitesv.find(obtainContext(), id);
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -59,11 +59,11 @@ public class SiteRestRepository extends DSpaceRestRepository<SiteRest, UUID> {
 	}
 
 	@Override
-	public Page<SiteRest> findAll(Context context, Pageable pageable) {
+	public Page<SiteRest> findAll(Pageable pageable) {
 		List<Site> sites = new ArrayList<Site>();
 		int total = 1;
 		try {
-			sites.add(sitesv.findSite(context));
+			sites.add(sitesv.findSite(obtainContext()));
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}

@@ -11,9 +11,11 @@ import org.dspace.services.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -32,6 +34,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     public static final String ADMIN_GRANT = "ADMIN";
@@ -56,8 +59,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 //Tell Spring to not create Sessions
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                //Return the login URL when having an access denied error
-                .exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/api/authn/login")).and()
                 //Anonymous requests should have the "ANONYMOUS" security grant
                 .anonymous().authorities(ANONYMOUS_GRANT).and()
                 //Wire up the HttpServletRequest with the current SecurityContext values
@@ -79,9 +80,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
                 //Configure the URL patterns with their authentication requirements
                 .authorizeRequests()
-                    //Allow GET and POST by anyone on the login endpoint
+//                    //Allow GET and POST by anyone on the login endpoint
                     .antMatchers( "/api/authn/login").permitAll()
-                    //Everyone can call GET on the status endpoint
+//                    //Everyone can call GET on the status endpoint
                     .antMatchers(HttpMethod.GET, "/api/authn/status").permitAll()
                 .and()
 
@@ -99,5 +100,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(ePersonRestAuthenticationProvider);
     }
+
+
 
 }

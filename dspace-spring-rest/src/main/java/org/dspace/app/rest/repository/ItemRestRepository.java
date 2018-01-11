@@ -19,10 +19,12 @@ import org.dspace.app.rest.model.hateoas.ItemResource;
 import org.dspace.content.Item;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Context;
+import org.dspace.core.ContextReadOnlyCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,10 +49,11 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	}
 
 	@Override
-	public ItemRest findOne(Context context, UUID id) {
+	@PreAuthorize("hasPermission(#id, 'ITEM', 'READ')")
+	public ItemRest findOne(UUID id) {
 		Item item = null;
 		try {
-			item = is.find(context, id);
+			item = is.find(obtainContext(), id);
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -61,7 +64,9 @@ public class ItemRestRepository extends DSpaceRestRepository<ItemRest, UUID> {
 	}
 
 	@Override
-	public Page<ItemRest> findAll(Context context, Pageable pageable) {
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public Page<ItemRest> findAll(Pageable pageable) {
+		Context context = obtainContext();
 		Iterator<Item> it = null;
 		List<Item> items = new ArrayList<Item>();
 		int total = 0;

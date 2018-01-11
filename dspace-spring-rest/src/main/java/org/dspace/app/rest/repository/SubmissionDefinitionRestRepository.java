@@ -12,23 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import javax.servlet.ServletException;
-
 import org.dspace.app.rest.SearchRestMethod;
 import org.dspace.app.rest.converter.SubmissionDefinitionConverter;
-import org.dspace.app.rest.model.CommunityRest;
-import org.dspace.app.rest.model.MetadataFieldRest;
 import org.dspace.app.rest.model.SubmissionDefinitionRest;
 import org.dspace.app.rest.model.hateoas.SubmissionDefinitionResource;
 import org.dspace.app.util.SubmissionConfig;
 import org.dspace.app.util.SubmissionConfigReader;
 import org.dspace.app.util.SubmissionConfigReaderException;
 import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.factory.ContentServiceFactory;
 import org.dspace.content.service.CollectionService;
-import org.dspace.core.Context;
-import org.dspace.handle.service.HandleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -56,7 +49,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
 	}
 
 	@Override
-	public SubmissionDefinitionRest findOne(Context context, String submitName) {
+	public SubmissionDefinitionRest findOne(String submitName) {
 		SubmissionConfig subConfig = submissionConfigReader.getSubmissionConfigByName(submitName);
 		if (subConfig == null) {
 			return null;
@@ -65,7 +58,7 @@ public class SubmissionDefinitionRestRepository extends DSpaceRestRepository<Sub
 	}
 
 	@Override
-	public Page<SubmissionDefinitionRest> findAll(Context context, Pageable pageable) {
+	public Page<SubmissionDefinitionRest> findAll(Pageable pageable) {
 		List<SubmissionConfig> subConfs = new ArrayList<SubmissionConfig>();
 		int total = submissionConfigReader.countSubmissionConfigs();
 		subConfs = submissionConfigReader.getAllSubmissionConfigs(pageable.getPageSize(), pageable.getOffset());

@@ -42,10 +42,10 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 	}
 
 	@Override
-	public BitstreamFormatRest findOne(Context context, Integer id) {
+	public BitstreamFormatRest findOne(Integer id) {
 		BitstreamFormat bit = null;
 		try {
-			bit = bfs.find(context, id);
+			bit = bfs.find(obtainContext(), id);
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
@@ -56,10 +56,10 @@ public class BitstreamFormatRestRepository extends DSpaceRestRepository<Bitstrea
 	}
 
 	@Override
-	public Page<BitstreamFormatRest> findAll(Context context, Pageable pageable) {
+	public Page<BitstreamFormatRest> findAll(Pageable pageable) {
 		List<BitstreamFormat> bit = null;
 		try {
-			bit = bfs.findAll(context);
+			bit = bfs.findAll(obtainContext());
 		} catch (SQLException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}

@@ -41,14 +41,14 @@ public class AuthorityRestRepository extends DSpaceRestRepository<AuthorityRest,
 	private AuthorityUtils authorityUtils;
 	
 	@Override
-	public AuthorityRest findOne(Context context, String name) {
+	public AuthorityRest findOne(String name) {
 		ChoiceAuthority source = cas.getChoiceAuthorityByAuthorityName(name);
 		AuthorityRest result = authorityUtils.convertAuthority(source, name);
 		return result;
 	}
 
 	@Override
-	public Page<AuthorityRest> findAll(Context context, Pageable pageable) {
+	public Page<AuthorityRest> findAll(Pageable pageable) {
 		Set<String> authoritiesName = cas.getChoiceAuthoritiesNames();
 		List<AuthorityRest> results = new ArrayList<AuthorityRest>();
 		for(String authorityName : authoritiesName) {
