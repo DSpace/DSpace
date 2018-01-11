@@ -1,0 +1,8 @@
+== DSpace Documentation Links
+
+The following documentation pages are available:
+
+* <<c/bitstreamformats.adoc#,Bitstream Formats>>
+* <<c/bitstreams.adoc#,Bitstreams>>
+* <<c/items.adoc#,Items>>
+* <<c/root.adoc#,Root API endpoint>>
