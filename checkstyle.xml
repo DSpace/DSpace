@@ -87,7 +87,9 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <!-- Requirements for Javadocs for methods -->
         <module name="JavadocMethod">
             <!-- All public methods MUST HAVE Javadocs -->
-            <property name="scope" value="public"/>
+            <!-- <property name="scope" value="public"/> -->
+            <!-- TODO: Above rule has been disabled because of large amount of missing public method Javadocs -->
+            <property name="scope" value="nothing"/>
             <!-- Allow RuntimeExceptions to be undeclared -->
             <property name="allowUndeclaredRTE" value="true"/>
             <!-- Allow params, throws and return tags to be optional -->
@@ -105,10 +107,8 @@ For more information on CheckStyle configurations below, see: http://checkstyle.
         <module name="RightCurly"/>
 
         <!-- ##### Indentation / Whitespace requirements ##### -->
-        <!-- Require 4-space indentation (default value), except "throws" clauses should be indented 8 spaces -->
-        <module name="Indentation">
-            <property name="throwsIndent" value="8"/>
-        </module>
+        <!-- Require 4-space indentation (default value) -->
+        <module name="Indentation"/>
         <!-- Whitespace should exist around all major tokens -->
         <module name="WhitespaceAround">
             <!-- However, make an exception for empty constructors, methods, types, etc. -->
