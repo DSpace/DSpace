@@ -92,6 +92,7 @@ public class BitstreamStorageManager
     /** Amazon S3 configuration */
     private static final String CSA = "MD5";
     private static final int S3_ASSETSTORE = 1;
+    private static final String MD5_TAG = "md5";
     private static boolean s3Enabled = false;
     private static String awsAccessKey;
     private static String awsSecretKey;
@@ -369,15 +370,19 @@ public class BitstreamStorageManager
             //Copy input stream to temp file, and send the file to S3 with some metadata
             File scratchFile = File.createTempFile(id, "s3bs");
             try {
-                FileUtils.copyInputStreamToFile(is, scratchFile);
-                Long contentLength = Long.valueOf(scratchFile.length());
-                PutObjectRequest putObjectRequest = new PutObjectRequest(s3BucketName, key, scratchFile);
+                FileUtils.copyInputStreamToFile(dis, scratchFile);
+                Long contentLength = scratchFile.length();
+                
+                String md5 = Utils.toHex(dis.getMessageDigest().digest());
+                ObjectMetadata objectMetadata = new ObjectMetadata();
+                objectMetadata.addUserMetadata(MD5_TAG, md5);
+
+                PutObjectRequest putObjectRequest = new PutObjectRequest(s3BucketName, key, scratchFile).withMetadata(objectMetadata);
                 PutObjectResult putObjectResult = s3Service.putObject(putObjectRequest);
 
-                bitstream.setColumn("checksum", putObjectResult.getETag());
+                bitstream.setColumn("checksum", md5);
                 bitstream.setColumn("checksum_algorithm", CSA);
                 bitstream.setColumn("size_bytes", contentLength);
-                scratchFile.delete();
                 storedLocation = "Amazon S3 " + getS3BucketName() + ":" + key;
             } catch(Exception e) {
                 log.error("Unable to store " + id + " in S3 bucket " + s3BucketName, e);
