@@ -407,12 +407,10 @@ public class BitstreamStorageManager
             fos.close();
             is.close();
 
-            if (dis != null) {
-                bitstream.setColumn("checksum", Utils.toHex(dis.getMessageDigest()
-                                                            .digest()));
-                bitstream.setColumn("checksum_algorithm", "MD5");
-                bitstream.setColumn("size_bytes", file.length());
-            }
+            bitstream.setColumn("checksum", Utils.toHex(dis.getMessageDigest()
+                                                        .digest()));
+            bitstream.setColumn("checksum_algorithm", "MD5");
+            bitstream.setColumn("size_bytes", file.length());
 
             storedLocation = file.getAbsolutePath();
         }
