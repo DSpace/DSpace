@@ -350,7 +350,20 @@ public class BitstreamStorageManager
         }
 
         String storedLocation;
-        
+
+        // Read through a digest input stream that will work out the MD5
+        DigestInputStream dis = null;
+        try {
+            dis = new DigestInputStream(is, MessageDigest.getInstance("MD5"));
+        } catch (NoSuchAlgorithmException nsae) {
+            // Should never happen
+            log.warn("Caught NoSuchAlgorithmException", nsae);
+        }
+
+        if (dis == null) {
+            throw new IOException("couldn't create DigestInputStream");
+        }
+
         if(incoming == S3_ASSETSTORE) {
             String key = getFullS3Key(id);
             //Copy input stream to temp file, and send the file to S3 with some metadata
@@ -389,16 +402,6 @@ public class BitstreamStorageManager
             // Create the corresponding file and open it
             file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file);
-
-            // Read through a digest input stream that will work out the MD5
-            DigestInputStream dis = null;
-
-            try {
-                dis = new DigestInputStream(is, MessageDigest.getInstance("MD5"));
-            } catch (NoSuchAlgorithmException nsae) {
-                // Should never happen
-                log.warn("Caught NoSuchAlgorithmException", nsae);
-            }
 
             Utils.bufferedCopy(dis, fos);
             fos.close();
