@@ -6,18 +6,17 @@
 # {3}  Reason for the rejection
 # {4}  Link to 'My DSpace' page
 #
-Subject: DSpace: Submission Rejected
+Subject: Предложенный Вами материал отклонен
 
-You submitted: {0}
-
-To collection: {1}
-
-Your submission has been rejected by {2}
-with the following explanation:
+Ваш материал - {0} , предложенный в коллекцию
+{1}, был отклонен {2} по
+причине:
 
 {3}
 
-Your submission has not been deleted.  You can access it from your
-"My DSpace" page: {4}
+Но Ваш материал не был удален.
+Вы можете получить к нему доступ на странице Мой архив ресурсов:
 
-DSpace
+{4}
+
+Библиотека СумГУ

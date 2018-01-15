@@ -4,18 +4,14 @@
 # {1}  Name of collection
 # {2}  handle 
 #
-Subject: DSpace: Submission Approved and Archived 
+Subject: Предложенный Вами материал утвержден и добавлен в архив eSSUIR
 
-You submitted: {0}
+Ваш материал - {0} , предложенный в коллекцию
+ {1}, был утвержден и добавлен в архив
+eSSUIR по ссылке - {2}
 
-To collection: {1}
+Пожалуйста, используйте эту ссылку для цитирования Вашего материала.
 
-Your submission has been accepted and archived in DSpace,
-and it has been assigned the following identifier:
-{2}
+Выражаем благодарность за использование eSSUIR
 
-Please use this identifier when citing your submission.
-
-Many thanks!
-
-DSpace
+Библиотека СумГУ
