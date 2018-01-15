@@ -47,7 +47,7 @@
   
 	<h1><fmt:message key="jsp.dspace-admin.workflow-list.heading"/><dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.site-admin\") + \"#workflow\"%>"><fmt:message key="jsp.help"/></dspace:popup></h1>   
 
-   <table class="table" align="center" summary="Table displaying list of currently active workflows">
+   <table class="table" align="center" summary="Table displaying list of currently active workflows" style="table-layout: fixed; width: 100%;">
        <tr>
            <th class="oddRowOddCol"> <strong>ID</strong></th>
            <th class="oddRowEvenCol"><strong><fmt:message key="jsp.dspace-admin.workflow-list.collection"/></strong></th>
@@ -68,7 +68,7 @@
             <td class="<%= row %>RowOddCol">
                     <%= WorkflowManager.getSubmitterName(workflows[i])   %>
             </td>
-            <td class="<%= row %>RowEvenCol">
+            <td class="<%= row %>RowEvenCol" style = "overflow: hidden;">
                     <%= Utils.addEntities(WorkflowManager.getItemTitle(workflows[i]))  %>
             </td>
             <td class="<%= row %>RowOddCol">
