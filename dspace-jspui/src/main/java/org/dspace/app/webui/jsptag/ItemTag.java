@@ -1238,20 +1238,7 @@ public class ItemTag extends TagSupport
 
         out.println("<div style=\"text-align: center;\">\n" +
                 "\t<div class=\"HeaderShareButtons\" style=\"display: inline-flex;\">");
-        // VK button
-        out.println("<div class=\"vk\">\n" +
-                "\t\t<!-- Put this script tag to the <head> of your page -->\n" +
-                "\t\t\t<script type=\"text/javascript\" src=\"//vk.com/js/api/openapi.js?116\"></script>\n" +
-                "\t\t\t<script type=\"text/javascript\">\n" +
-                "\t\t\t  VK.init({apiId: 4787414, onlyWidgets: true});\n" +
-                "\t\t\t</script>\n" +
-                "\t\t\t<!-- Put this div tag to the place, where the Like block will be -->\n" +
-                "\t\t\t<div id=\"vk_like\"></div>\n" +
-                "\t\t\t<script type=\"text/javascript\">\n" +
-                "\t\t\tVK.Widgets.Like(\"vk_like\", {type: \"button\"});\n" +
-                "\t\t\tlikes.getList();\n" +
-                "\t\t\t</script>\n" +
-                "\t\t</div>");
+
         // Facebook button
         out.print("<div class=\"facebook\" style=\"padding-top: 1px;\">\n" +
                 "\t\t\t<div id=\"fb-root\"></div>\n" +
