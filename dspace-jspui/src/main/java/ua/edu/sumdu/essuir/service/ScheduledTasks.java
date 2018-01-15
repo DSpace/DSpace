@@ -13,6 +13,7 @@ import ua.edu.sumdu.essuir.repository.GeneralStatisticsRepository;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Ivan on 13.05.2015.
@@ -26,6 +27,36 @@ public class ScheduledTasks {
 
     @Autowired
     private GeneralStatisticsRepository generalStatisticsRepository;
+
+    private Boolean isPreviousMonthStatistics(DateTime now, GeneralStatistics monthStatistics) {
+        int previousMonth = now.getMonthOfYear() - 1;
+        int previousYear = now.getYear();
+        if (now.getMonthOfYear() == 1) {
+            previousMonth = 12;
+            previousYear = now.getYear() - 1;
+        }
+
+        return (monthStatistics.getMonth().equals(previousMonth) && monthStatistics.getYear().equals(previousYear));
+    }
+
+    private Boolean isPreviousMonthStatisticsSavedToDatabase() {
+        DateTime today = DateTime.now();
+        List<GeneralStatistics> statistics = generalStatisticsRepository.findAll();
+        for (GeneralStatistics monthStatistics : statistics) {
+            if(isPreviousMonthStatistics(today, monthStatistics)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Boolean finalizeMonthStatistics() {
+        if (!isPreviousMonthStatisticsSavedToDatabase()) {
+            addNewEntityByMonth();
+            return true;
+        }
+        return false;
+    }
 
     // Fire at 00:00 on the first day of every month
     @Scheduled(cron = "0 0 0 1 * ?")
