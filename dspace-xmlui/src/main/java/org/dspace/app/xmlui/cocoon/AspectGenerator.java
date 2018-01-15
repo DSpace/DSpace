@@ -80,4 +80,5 @@ public class AspectGenerator extends FileGenerator implements
         // Use the standard FileGenerator to get the next Aspect.
         super.setup(resolver, objectModel, aspectPath, par);
     }
+
 }

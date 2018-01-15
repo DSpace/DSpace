@@ -188,6 +188,7 @@
                             logger="sitemap.reader.resource" pool-max="32">
                             <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
                     </map:reader>
+                    <map:reader name="ThemeResourceReader" src="org.dspace.app.xmlui.cocoon.ThemeResourceReader"/>
                     <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
                     <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
                     <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
@@ -620,10 +621,18 @@
                             </map:read>
                     </map:match>
 
+                    <!-- Redirect / block for DS-3094 (security issue) for custom themes -->
+                    <!-- This ensures any custom themes are not affected by DS-3094 by redirecting
+                         vulnerable URL paths to /error (which returns a 404 File Not Found).
+                         Custom themes may still be affected by this issue, if they have not
+                         been updated to use ThemeResourceReader in all <map:read> settings. -->
+                    <map:match pattern="themes/**:**">
+                        <map:redirect-to uri="{request:contextPath}/error" permanent="yes"/>
+                    </map:match>
 
                     <!-- handle common theme resources, such as dri2xhtml -->
                     <map:match pattern="themes/*">
-                        <map:read src="themes/{1}"/>
+                        <map:read type="ThemeResourceReader" src="themes/{1}"/>
                     </map:match>
 
                     <!-- handle theme specific resources static or dynamic -->

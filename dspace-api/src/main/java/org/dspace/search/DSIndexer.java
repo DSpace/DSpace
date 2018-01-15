@@ -392,7 +392,7 @@ public class DSIndexer
         {
             setBatchProcessingMode(true);
             Context context = new Context();
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
 
             String usage = "org.dspace.search.DSIndexer [-cbhof[r <item handle>]] or nothing to update/clean an existing index.";
             Options options = new Options();

@@ -26,6 +26,8 @@
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
+<%@ page import="org.dspace.license.CCLicense"%>
+<%@ page import="java.util.Collection"%>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -38,25 +40,11 @@
 	//get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 
-    String reqURL = request.getRequestURL().toString();
-    int firstIndex = reqURL.indexOf("://") + 3;
-    int secondIndex = reqURL.indexOf("/", firstIndex);
-    String baseURL = reqURL.substring(0, secondIndex) + request.getContextPath();
-    String ssURL = baseURL + "/submit/creative-commons.css";
-    String exitURL = baseURL + "/submit/cc-license.jsp?license_url=[license_url]";
     Boolean lExists = (Boolean)request.getAttribute("cclicense.exists");
     boolean licenseExists = (lExists == null ? false : lExists.booleanValue());
 
-    String jurisdiction = ConfigurationManager.getProperty("webui.submit.cc-jurisdiction");
-    if ((jurisdiction != null) && (!"".equals(jurisdiction)))
-    {
-        jurisdiction = "&amp;jurisdiction=" + jurisdiction.trim();
-    }
-    else
-    {
-        jurisdiction = "";
-    }
-
+    Collection<CCLicense> cclicenses = (Collection<CCLicense>)request.getAttribute("cclicense.licenses");
+    
     String licenseURL = "";
     if(licenseExists)
         licenseURL = CreativeCommons.getLicenseURL(subInfo.getSubmissionItem().getItem());
@@ -75,41 +63,37 @@
         <%-- <h1>Submit: Use a Creative Commons License</h1> --%>
 		<h1><fmt:message key="jsp.submit.creative-commons.heading"/></h1>
 
-<%
-        if (licenseExists)
-        {
-%>
-        <%-- <p>You have already chosen a Creative Commons license and added it to this item.
-        You may:</p> --%>
 		<p class="help-block"><fmt:message key="jsp.submit.creative-commons.info1"/></p>
-    <%-- <ul>
-            <li>Press the 'Next' button below to <em>keep</em> the license previously chosen.</li>
-            <li>Press the 'Skip Creative Commons' button below to <em>remove</em> the current choice, and forego a Creative Commons license.</li>
-            <li>Complete the selection process below to <em>replace</em> the current choice.</li>
-         </ul> --%>
-		 <ul class="alert alert-info">
-            <li><fmt:message key="jsp.submit.creative-commons.choice1"/></li>
-            <li><fmt:message key="jsp.submit.creative-commons.choice2"/></li>
-            <li><fmt:message key="jsp.submit.creative-commons.choice3"/></li>
-         </ul>
-<%
-        }
-        else
-        {
-%>
-        <%-- <p>To license your Item under Creative Commons, follow the instructions below. You will be given an opportunity to review your selection.
-        Follow the 'proceed' link to add the license. If you wish to omit a Creative Commons license, press the 'Skip Creative Commons' button.</p> --%>
-		<p><fmt:message key="jsp.submit.creative-commons.info2"/></p>
-<%
-        }
-%>  
 
-	<%-- <iframe src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540">Your browser must support IFrames to use this feature
-	</iframe> --%>
-	<iframe src="https://creativecommons.org/choose/?partner=dspace&amp;stylesheet=<%= java.net.URLEncoder.encode(ssURL, "UTF-8") %>&amp;exit_url=<%= java.net.URLEncoder.encode(exitURL, "UTF-8") %><%= jurisdiction %>" width="100%" height="540"><fmt:message key="jsp.submit.creative-commons.info3"/>
-	</iframe>
-
-    <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
+	<div class="row">
+		<label class="col-md-2"><fmt:message key="jsp.submit.creative-commons.license"/></label>
+		<span class="col-md-8">
+			<select name="licenseclass_chooser" id="licenseclass_chooser" class="form-control">
+					<option
+						value="webui.Submission.submit.CCLicenseStep.select_change"><fmt:message key="jsp.submit.creative-commons.select_change"/></option>
+					<% if(cclicenses!=null) { 
+							for(CCLicense cclicense : cclicenses) { %>
+								<option
+									value="<%= cclicense.getLicenseId()%>"><%= cclicense.getLicenseName()%></option>						
+					<% 		}
+						}%>
+					<option
+						value="webui.Submission.submit.CCLicenseStep.no_license"><fmt:message key="jsp.submit.creative-commons.no_license"/></option>
+			 </select>
+		</span>
+	</div>
+	<% if(licenseExists) { %>
+	<div class="row" id="current_creativecommons">		
+		<label class="col-md-2"><fmt:message key="jsp.submit.creative-commons.license.current"/></label>
+		<span class="col-md-8">
+			<a href="<%=licenseURL %>"><%=licenseURL %></a>
+		</span>		
+	</div>
+	<% } %>
+	<div style="display:none;" id="creativecommons_response">		
+	</div>
+	<br/>
+		<%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
     <%= SubmissionController.getSubmissionParameters(context, request) %>
 
 	<input type="hidden" name="cc_license_url" value="<%=licenseURL %>" />
@@ -126,15 +110,41 @@
                 <%  } %>
 
             <input class="btn btn-default col-md-<%= 12 / numButton %>" type="submit" name="<%=AbstractProcessingStep.CANCEL_BUTTON%>" value="<fmt:message key="jsp.submit.general.cancel-or-save.button"/>"/>
-			<input class="btn btn-warning col-md-<%= 12 / numButton %>" type="submit" name="submit_no_cc" value="<fmt:message key="jsp.submit.creative-commons.skip.button"/>"/>
-<%
-     if (licenseExists)
-     {
-%>
 			<input class="btn btn-primary col-md-<%= 12 / numButton %>" type="submit" name="<%=AbstractProcessingStep.NEXT_BUTTON%>" value="<fmt:message key="jsp.submit.general.next"/>" />
-<%
-     }
-%>
     </div>
     </form>
+    <script type="text/javascript">
+<!--
+jQuery("#licenseclass_chooser").change(function() {
+    var make_id = jQuery(this).find(":selected").val();
+    var request = jQuery.ajax({
+        type: 'GET',
+        url: '<%=request.getContextPath()%>/json/creativecommons?license=' + make_id
+    });
+    request.done(function(data){
+    	jQuery("#creativecommons_response").empty();
+    	var result = data.result;
+        for (var i = 0; i < result.length; i++) {
+            var id = result[i].id;            
+            var label = result[i].label;
+            var description = result[i].description;
+            var htmlCC = " <div class='form-group'><span class='help-block' title='"+description+"'>"+label+"&nbsp;<i class='glyphicon glyphicon-info-sign'></i></span>"
+            var typefield = result[i].type;
+            if(typefield=="enum") {            	
+            	jQuery.each(result[i].fieldEnum, function(key, value) {
+            		htmlCC += "<label class='radio-inline' for='"+id+"-"+key+"'>";
+            		htmlCC += "<input placeholder='"+value+"' type='radio' id='"+id+"-"+key+"' name='"+id+"_chooser' value='"+key+"' required/>"+value+ "</label>";
+            	});
+            }
+            htmlCC += "</div>";
+            jQuery("#creativecommons_response").append(htmlCC);                
+        }
+        
+        jQuery("#current_creativecommons").hide();
+        jQuery("#creativecommons_response").show();
+    });
+});
+
+//-->
+</script>
 </dspace:layout>

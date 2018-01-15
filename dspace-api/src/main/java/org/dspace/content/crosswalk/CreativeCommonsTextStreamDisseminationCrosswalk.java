@@ -27,7 +27,10 @@ import org.dspace.license.CreativeCommons;
  *
  * @author  Larry Stone
  * @version $Revision: 1.0 $
+ * 
+ * @deprecated to make uniforme JSPUI and XMLUI approach the bitstream with the license in the textual format it is no longer stored see https://jira.duraspace.org/browse/DS-2604 
  */
+@Deprecated
 public class CreativeCommonsTextStreamDisseminationCrosswalk
     implements StreamDisseminationCrosswalk
 {

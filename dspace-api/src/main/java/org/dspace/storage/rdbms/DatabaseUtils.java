@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Locale;
 import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -59,6 +60,11 @@ public class DatabaseUtils
                             File.separator + "search" +
                             File.separator + "conf" +
                             File.separator + "reindex.flag";
+
+    // Types of databases supported by DSpace. See getDbType()
+    public static final String DBMS_POSTGRES="postgres";
+    public static final String DBMS_ORACLE="oracle";
+    public static final String DBMS_H2="h2";
 
     /**
      * Commandline tools for managing database changes, etc.
@@ -1036,6 +1042,37 @@ public class DatabaseUtils
     }
 
     /**
+     * Determine the type of Database, based on the DB connection.
+     *
+     * @param connection current DB Connection
+     * @return a DB keyword/type (see DatabaseUtils.DBMS_* constants)
+     * @throws SQLException if database error
+     */
+    public static String getDbType(Connection connection)
+            throws SQLException
+    {
+        DatabaseMetaData meta = connection.getMetaData();
+        String prodName = meta.getDatabaseProductName();
+        String dbms_lc = prodName.toLowerCase(Locale.ROOT);
+        if (dbms_lc.contains("postgresql"))
+        {
+            return DBMS_POSTGRES;
+        }
+        else if (dbms_lc.contains("oracle"))
+        {
+            return DBMS_ORACLE;
+        }
+        else if (dbms_lc.contains("h2")) // Used for unit testing only
+        {
+            return DBMS_H2;
+        }
+        else
+        {
+            return dbms_lc;
+        }
+    }
+
+    /**
      * Internal class to actually perform re-indexing in a separate thread.
      * (See checkReindexDiscovery() method)>
      */
@@ -1069,7 +1106,7 @@ public class DatabaseUtils
                     try
                     {
                         context = new Context();
-
+                        context.turnOffAuthorisationSystem();
                         log.info("Post database migration, reindexing all content in Discovery search and browse engine");
 
                         // Reindex Discovery completely

@@ -28,7 +28,7 @@ public class NotFilter extends DSpaceFilter {
 
     @Override
     public SolrFilterResult buildSolrQuery() {
-        return new SolrFilterResult("NOT("+inFilter.buildSolrQuery().getQuery()+")");
+        return new SolrFilterResult("*:* AND NOT(" + inFilter.buildSolrQuery().getQuery() + ")");
     }
 
     @Override

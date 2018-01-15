@@ -7,18 +7,17 @@
  */
 package org.dspace.app.xmlui.utils;
 
-import java.sql.SQLException;
-import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Miscellaneous UI utility methods methods for managing DSpace context.
@@ -81,7 +80,7 @@ public class ContextUtil
      */
     public static Context obtainContext(HttpServletRequest request) throws SQLException
     {
-        Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+        Context context = retrieveContext(request);
 
         if (context == null)
         {
@@ -137,7 +136,7 @@ public class ContextUtil
      */
     public static void completeContext(HttpServletRequest request) throws ServletException
     {
-    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+        Context context = retrieveContext(request);
 
     	if (context != null && context.isValid())
     	{
@@ -154,12 +153,16 @@ public class ContextUtil
 
 	public static void abortContext(HttpServletRequest request)
 	{
-    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+        Context context = retrieveContext(request);
 
     	if (context != null && context.isValid())
     	{
    			context.abort();
     	}
+	}
+
+    private static Context retrieveContext(final HttpServletRequest request) {
+        return (Context) request.getAttribute(DSPACE_CONTEXT);
 	}
 
 }

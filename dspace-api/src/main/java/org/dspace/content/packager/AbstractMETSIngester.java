@@ -318,18 +318,18 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         }
         else
         {
-            ZipFile zip = new ZipFile(pkgFile);
+            try(ZipFile zip = new ZipFile(pkgFile))
+            {
+                // Retrieve the manifest file entry (named mets.xml)
+                ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
 
-            // Retrieve the manifest file entry (named mets.xml)
-            ZipEntry manifestEntry = zip.getEntry(METSManifest.MANIFEST_FILE);
-
-            // parse the manifest and sanity-check it.
-            manifest = METSManifest.create(zip.getInputStream(manifestEntry),
-                    validate, getConfigurationName());
-
-            // close the Zip file for now
-            // (we'll extract the other files from zip when we need them)
-            zip.close();
+                if(manifestEntry!=null)
+                {
+                    // parse the manifest and sanity-check it.
+                    manifest = METSManifest.create(zip.getInputStream(manifestEntry),
+                        validate, getConfigurationName());
+                }
+            }
         }
 
         // return our parsed out METS manifest

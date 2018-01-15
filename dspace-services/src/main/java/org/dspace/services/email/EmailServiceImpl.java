@@ -96,17 +96,6 @@ public class EmailServiceImpl
             {
                 props.put("mail.smtp.port", port);
             }
-
-            if (null == cfg.getProperty("mail.server.username"))
-            {
-                session = Session.getInstance(props);
-            }
-            else
-            {
-                props.put("mail.smtp.auth", "true");
-                session = Session.getInstance(props, this);
-            }
-
             // Set extra configuration properties
             String extras = cfg.getProperty("mail.extraproperties");
             if ((extras != null) && (!"".equals(extras.trim())))
@@ -120,6 +109,17 @@ public class EmailServiceImpl
                     props.put(key, value);
                 }
             }
+            if (null == cfg.getProperty("mail.server.username"))
+            {
+                session = Session.getInstance(props);
+            }
+            else
+            {
+                props.put("mail.smtp.auth", "true");
+                session = Session.getInstance(props, this);
+            }
+
+
         }
     }
 

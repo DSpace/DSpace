@@ -279,11 +279,11 @@ public class LDAPAuthentication
                         {
                             log.info(LogManager.getHeader(context,
                                     "type=ldap-login", "type=ldap_but_already_email"));
-                            context.setIgnoreAuthorization(true);
+                            context.turnOffAuthorisationSystem();
                             eperson.setNetid(netid.toLowerCase());
                             eperson.update();
                             context.commit();
-                            context.setIgnoreAuthorization(false);
+                            context.restoreAuthSystemState();
                             context.setCurrentUser(eperson);
 
                             // assign user to groups based on ldap dn
@@ -298,7 +298,7 @@ public class LDAPAuthentication
                                 // TEMPORARILY turn off authorisation
                                 try
                                 {
-                                    context.setIgnoreAuthorization(true);
+                                    context.turnOffAuthorisationSystem();
                                     eperson = EPerson.create(context);
                                     if (StringUtils.isNotEmpty(email))
                                     {
@@ -332,7 +332,7 @@ public class LDAPAuthentication
                                 }
                                 finally
                                 {
-                                    context.setIgnoreAuthorization(false);
+                                    context.restoreAuthSystemState();
                                 }
 
                                 log.info(LogManager.getHeader(context, "authenticate",
@@ -354,7 +354,7 @@ public class LDAPAuthentication
                     }
                     finally
                     {
-                        context.setIgnoreAuthorization(false);
+                        context.restoreAuthSystemState();
                     }
                 }
             }

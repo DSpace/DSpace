@@ -7,6 +7,8 @@ env:
 
 # Install prerequisites for building Mirage2 more rapidly
 before_install:
+  # Remove outdated settings.xml from Travis builds. Workaround for https://github.com/travis-ci/travis-ci/issues/4629
+  - rm ~/.m2/settings.xml
   # Install latest Node.js 0.10.x & print version info
   - nvm install 0.10
   - node --version
@@ -18,10 +20,10 @@ before_install:
   # Print ruby version info (should be installed)
   - ruby -v
   # Install Sass & print version info
-  - gem install sass
+  - gem install sass -v 3.3.14
   - sass -v
   # Install Compass & print version info
-  - gem install compass
+  - gem install compass -v 1.0.1
   - compass version
 
 # Skip install stage, as we'll do it below

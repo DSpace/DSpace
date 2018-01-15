@@ -64,7 +64,7 @@ public class BitstreamResource extends Resource
      * request is when the bitstream id does not exist. UNAUTHORIZED if the user
      * logged into the DSpace context does not have the permission to access the
      * bitstream. Server error when something went wrong.
-     * 
+     *
      * @param bitstreamId
      *            Id of bitstream in DSpace.
      * @param expand
@@ -129,7 +129,7 @@ public class BitstreamResource extends Resource
     /**
      * Return all bitstream resource policies from all bundles, in which
      * the bitstream is present.
-     * 
+     *
      * @param bitstreamId
      *            Id of bitstream in DSpace.
      * @param headers
@@ -182,7 +182,7 @@ public class BitstreamResource extends Resource
      * Read list of bitstreams. It throws WebApplicationException with response
      * code INTERNAL_SERVER_ERROR(500), if there was problem while reading
      * bitstreams from database.
-     * 
+     *
      * @param limit
      *            How many bitstreams will be in the list. Default value is 100.
      * @param offset
@@ -254,7 +254,7 @@ public class BitstreamResource extends Resource
         {
             processFinally(context);
         }
-        
+
         return bitstreams.toArray(new Bitstream[0]);
     }
 
@@ -264,7 +264,7 @@ public class BitstreamResource extends Resource
      * there was a problem with reading bitstream file. SQLException if there was
      * a problem while reading from database. And AuthorizeException if there was
      * a problem with authorization of user logged to DSpace context.
-     * 
+     *
      * @param bitstreamId
      *            Id of the bitstream, whose data will be read.
      * @param headers
@@ -291,6 +291,7 @@ public class BitstreamResource extends Resource
         org.dspace.core.Context context = null;
         InputStream inputStream = null;
         String type = null;
+        String name = null;
 
         try
         {
@@ -303,6 +304,7 @@ public class BitstreamResource extends Resource
             log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
             inputStream = dspaceBitstream.retrieve();
             type = dspaceBitstream.getFormat().getMIMEType();
+            name = dspaceBitstream.getName();
 
             context.complete();
         }
@@ -331,12 +333,14 @@ public class BitstreamResource extends Resource
             processFinally(context);
         }
 
-        return Response.ok(inputStream).type(type).build();
+        return Response.ok(inputStream).type(type)
+                .header("Content-Disposition", "attachment; filename=\"" + name + "\"")
+                .build();
     }
 
     /**
      * Add bitstream policy to all bundles containing the bitstream.
-     * 
+     *
      * @param bitstreamId
      *            Id of bitstream in DSpace.
      * @param policy
@@ -402,7 +406,7 @@ public class BitstreamResource extends Resource
      * May throw WebApplicationException caused by two exceptions:
      * SQLException, if there was a problem with the database. AuthorizeException if
      * there was a problem with the authorization to edit bitstream metadata.
-     * 
+     *
      * @param bitstreamId
      *            Id of bistream to be updated.
      * @param bitstream
@@ -504,7 +508,7 @@ public class BitstreamResource extends Resource
      * a problem editing or reading the database, IOException if there was
      * a problem with reading from InputStream, Exception if there was another
      * problem.
-     * 
+     *
      * @param bitstreamId
      *            Id of bistream to be updated.
      * @param is
@@ -591,7 +595,7 @@ public class BitstreamResource extends Resource
      * SQLException if there was a problem reading from database or removing
      * from database. AuthorizeException, if user doesn't have permission to delete
      * the bitstream or file. IOException, if there was a problem deleting the file.
-     * 
+     *
      * @param bitstreamId
      *            Id of bitstream to be deleted.
      * @param headers
@@ -655,14 +659,14 @@ public class BitstreamResource extends Resource
         {
             processFinally(context);
         }
-        
+
         log.info("Bitstream(id=" + bitstreamId + ") was successfully deleted.");
         return Response.ok().build();
     }
 
     /**
      * Delete policy.
-     * 
+     *
      * @param bitstreamId
      *            Id of the DSpace bitstream whose policy will be deleted.
      * @param policyId
@@ -726,13 +730,13 @@ public class BitstreamResource extends Resource
         {
             processFinally(context);
         }
-        
+
         return Response.status(Status.OK).build();
     }
 
     /**
      * Return the MIME type of the file, by file extension.
-     * 
+     *
      * @param name
      *            Name of file.
      * @return String filled with type of file in MIME style.
@@ -778,10 +782,10 @@ public class BitstreamResource extends Resource
     }
 
     /**
-     * Find bitstream from DSpace database. This encapsulatets the 
-     * org.dspace.content.Bitstream.find method with a check whether the item exists and 
+     * Find bitstream from DSpace database. This encapsulates the
+     * org.dspace.content.Bitstream.find method with a check whether the item exists and
      * whether the user logged into the context has permission to preform the requested action.
-     * 
+     *
      * @param context
      *            Context of actual logged user.
      * @param id

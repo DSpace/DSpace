@@ -60,6 +60,8 @@ public class InstallItem
             IOException, AuthorizeException
     {
         Item item = is.getItem();
+        Collection collection = is.getCollection();
+        
         IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
         try {
             if(suppliedHandle == null)
@@ -74,7 +76,15 @@ public class InstallItem
 
         populateMetadata(c, item);
 
-        return finishItem(c, item, is);
+        // Finish up / archive the item
+        item = finishItem(c, item, is);
+        
+        // As this is a BRAND NEW item, as a final step we need to remove the
+        // submitter item policies created during deposit and replace them with
+        // the default policies from the collection.
+        item.inheritCollectionDefaultPolicies(collection);
+        
+        return item;
     }
 
     /**
@@ -205,8 +215,18 @@ public class InstallItem
         item.addDC("description", "provenance", "en", provDescription);
     }
 
-    // final housekeeping when adding new Item to archive
-    // common between installing and "restoring" items.
+    /**
+     * Final housekeeping when adding a new Item into the archive.
+     * This method is used by *both* installItem() and restoreItem(),
+     * so all actions here will be run for a newly added item or a restored item.
+     *
+     * @param c DSpace Context
+     * @param item Item in question
+     * @param is InProgressSubmission object
+     * @return final "archived" Item
+     * @throws SQLException if database error
+     * @throws AuthorizeException if authorization error
+     */
     private static Item finishItem(Context c, Item item, InProgressSubmission is)
         throws SQLException, IOException, AuthorizeException
     {
@@ -228,10 +248,6 @@ public class InstallItem
 
         // remove in-progress submission
         is.deleteWrapper();
-
-        // remove the item's policies and replace them with
-        // the defaults from the collection
-        item.inheritCollectionDefaultPolicies(is.getCollection());
 
         // set embargo lift date and take away read access if indicated.
         EmbargoManager.setEmbargo(c, item);

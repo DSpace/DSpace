@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>5.5-SNAPSHOT</version>
+      <version>5.9-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -128,6 +128,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

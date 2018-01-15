@@ -296,6 +296,8 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 		this.errors = null;
 		this.message = null;
 		this.availableExports = null;
+		this.response = null;
+		this.request = null;
 		super.recycle();
 	}
 

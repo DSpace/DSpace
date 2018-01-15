@@ -7,6 +7,6 @@
     http://www.dspace.org/license/
 
 -->
-{{#each orig_filters}}
-    <label href="#" class="label label-primary" data-index="{{index}}">{{query}}&nbsp;&times;</label>
+{{#each filters}}
+    <label href="#" class="label label-primary" data-index="{{index}}">{{lookup ../i18n.filtertype type}}: {{query}}&nbsp;&times;</label>
 {{/each}}
