@@ -4,13 +4,14 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace Account Registration
-To complete registration for a DSpace account, please click the link
-below:
+Subject: Регистрация в eSSUIR
+
+Для завершения регистрации, пожалуйста, перейдите по
+указанной ниже ссылке:
 
   {0}
 
-If you need assistance with your account, please email
-dspace-help@myu.edu or call us at xxx-555-xxxx.
+Если Вам нужна помощь в регистрации, свяжитесь с нами по
+адресу info@library.sumdu.edu.ua
 
-The DSpace Team
+Библиотека СумГУ

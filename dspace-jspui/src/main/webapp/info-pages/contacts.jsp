@@ -25,7 +25,7 @@
                     Virtual reading room<br/>
                     2nd floor, room. 213</p>
 
-                <p>e-mail: <a href="mailto:library@sumdu.edu.ua">library@sumdu.edu.ua</a></p>
+                <p>e-mail: <a href="mailto:info@library.sumdu.edu.ua">library@sumdu.edu.ua</a></p>
 
                 <p>tel. 687-820</p>
                 <%
@@ -37,7 +37,7 @@
                     Виртуальный читальный зал<br/>
                     ІІ этаж, ком. 213</p>
 
-                <p>e-mail: <a href="mailto:library@sumdu.edu.ua">library@sumdu.edu.ua</a></p>
+                <p>e-mail: <a href="mailto:info@library.sumdu.edu.ua">library@sumdu.edu.ua</a></p>
 
                 <p>тел. 687-820</p>
                 <%
@@ -49,7 +49,7 @@
                     Віртуальна читальна зала<br/>
                     2 поверх, кім. 213</p>
 
-                <p>e-mail: <a href="mailto:library@sumdu.edu.ua">library@sumdu.edu.ua</a></p>
+                <p>e-mail: <a href="mailto:info@library.sumdu.edu.ua">library@sumdu.edu.ua</a></p>
 
                 <p>тел. 687-820</p>
                 <%
