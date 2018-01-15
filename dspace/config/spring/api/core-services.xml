@@ -17,7 +17,11 @@
 		<property name="acceptableFilenames">
 			<list>
 				<value>news-top.html</value>
+				<value>news-top_ru.html</value>
+				<value>news-top_uk.html</value>
 				<value>news-side.html</value>
+				<value>news-side_ru.html</value>
+				<value>news-side_uk.html</value>
 			</list>
 		</property>	
 	</bean>
