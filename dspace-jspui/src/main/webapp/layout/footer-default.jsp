@@ -58,7 +58,7 @@
             " часа, посетителей за 24 часа и за сегодня' "+
             "border='0' width='88' height='31'><\/a>")
     //--></script><!--/LiveInternet-->
-        <!--Кнопка тИЦ--><a href="http://yandex.ru/cy?base=0&amp;host=essuir.sumdu.edu.ua"><img src="http://www.yandex.ru/cycounter?essuir.sumdu.edu.ua" width="88" height="31" alt="Яндекс цитирования" border="0" /></a><!--/Кнопка тИЦ-->
+
         <%
             String[] fmts = feedData.substring(feedData.indexOf(':')+1).split(",");
             String icon = null;
