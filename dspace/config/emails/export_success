@@ -5,14 +5,11 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace - Item export requested is ready for download
-The item export you requested from the repository is now ready for download.
+Subject: Запрашиваемый Вами ресурс готов для скачивания
 
-You may download the compressed file using the following link:
-{0}
+Выбранный Вами ресурс был архивирован и готов для
+скачивания по ссылке: {0}
 
-This file will remain available for at least {1} hours.  
+Эта ссылка будет активна на протяжении 48 часов.
 
-
-The DSpace Team
-
+Библиотека СумГУ
