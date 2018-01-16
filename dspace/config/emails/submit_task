@@ -6,19 +6,18 @@
 # {3}  Description of task
 # {4}  link to 'my DSpace' page 
 #
-Subject: DSpace: You have a new task
+Subject: DSpace: Masz nowe zadanie
 
-A new item has been submitted:
+Zgłoszona została nowa pozycja:
 
-Title:        {0}
-Collection:   {1}
-Submitted by: {2}
+Tytuł:	   {0}
+Zbiór:	   {1}
+Zgłosił/a: {2}
 
 {3}
 
-To claim this task, please visit your "My DSpace"
-page:  {4}
+Aby zająć się tym zadaniem, odwiedź swoją stronę "Mój DSpace" tutaj: {4}
 
-Many thanks!
+Dziękujemy!
 
-DSpace
+Oprogramowanie DSpace

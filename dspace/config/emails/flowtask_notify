@@ -7,17 +7,16 @@
 # {4}  Task result
 # {5}  Workflow action taken
 #
-Subject: DSpace: Curation Task Report
+Subject: DSpace: Raport z zadania porządkowego
 
-Title:         {0}
-Collection:    {1}
-Submitted by:  {2}
+Tytuł:       {0}
+Zbiór:       {1}
+Przesłał/a:  {2}
 
-Curation task {3} has been performed
-with the following result:
+Zadanie porządkowania {3} zostało przeprowadzone z następującym rezultatem:
 
 {4}
 
-Action taken on the submission: {5}
+Podjęto następujące działania: {5}
 
 DSpace

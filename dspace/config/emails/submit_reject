@@ -6,18 +6,18 @@
 # {3}  Reason for the rejection
 # {4}  Link to 'My DSpace' page
 #
-Subject: DSpace: Submission Rejected
+Subject: DSpace: Zgłoszenie odrzucone
 
-You submitted: {0}
+Zgłosiłeś/aś: {0}
 
-To collection: {1}
+Do zbioru:    {1}
 
-Your submission has been rejected by {2}
-with the following explanation:
+Twoje zgłoszenie zostało odrzucone przez {2}
+z następującym wyjaśnieniem:
 
 {3}
 
-Your submission has not been deleted.  You can access it from your
-"My DSpace" page: {4}
+Twoje zgłoszenie nie zostało usunięte. Masz do niego dostęp przez stronę "Mój DSpace":
+{4}
 
-DSpace
+Ekipa DSpace

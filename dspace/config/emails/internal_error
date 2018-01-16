@@ -10,15 +10,15 @@
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
-Subject: DSpace: Internal Server Error
-An internal server error occurred on {0}:
+Subject: DSpace: Wewnętrzny błąd serwera
+Wystąpił wewnętrzny błąd serwera w {0}:
 
-Date:       {1}
-Session ID: {2}
-User:       {5}
-IP address: {6}
+Data:       {1}
+ID sesji:   {2}
+Użytkownik: {5}
+Adres IP:   {6}
 
 {3}
 
-Exception:
+Wyjątek:
 {4}
