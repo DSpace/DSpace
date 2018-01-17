@@ -292,7 +292,7 @@ null AS text_lang,
 FROM eperson where not language is null;
 
 
-alter table eperson  drop column firstname, drop column lastname, drop column phone, drop column language;
+--alter table eperson  drop column firstname, drop column lastname, drop column phone, drop column language;
 
 -- ---------
 -- dcvalue view

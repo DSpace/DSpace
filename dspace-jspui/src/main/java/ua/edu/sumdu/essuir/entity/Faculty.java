@@ -1,46 +1,46 @@
 package ua.edu.sumdu.essuir.entity;
 
-import org.json.JSONObject;
-import org.json.simple.JSONArray;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Faculty {
+    @JsonProperty("name")
     private String facultyName;
-    private HashMap<String, Chair> chairs = new HashMap<>();
+    @JsonIgnore
+    private HashMap<String, Chair> chairs;
 
     public Faculty(String facultyName) {
         this.facultyName = facultyName;
+        chairs = new HashMap<>();
     }
 
-    public void addChair(Chair chair) {
-        chairs.put(chair.getChairName(), chair);
+    public void addSubmission(String chair, String person, Integer submissionCount) {
+        if (!chairs.containsKey(chair)) {
+            chairs.put(chair, new Chair(chair));
+        }
+        chairs.get(chair).addSubmission(person, submissionCount);
     }
 
-    public void addPerson(Person person) {
-        if(!chairs.containsKey(person.getChairEntity())) {
-            addChair(new Chair(person.getChairEntity()));
-        }
-        chairs.get(person.getChairEntity()).addPerson(person);
+    @JsonIgnore
+    public String getFacultyName() {
+        return facultyName;
     }
 
-    public int getSubmissionCountByDate(Date from, Date to) {
-        int result = 0;
-        for(Chair chair : chairs.values()) {
-            result += chair.getSubmissionCountByDate(from, to);
-        }
-        return result;
+    @JsonProperty("data")
+    public List<Chair> getChairs() {
+        return new ArrayList<>(chairs.values());
     }
-    public JSONObject generateJSONbyDate(Date from, Date to) {
-        JSONObject result = new JSONObject();
-        result.put("name", facultyName);
-        result.put("submission_count", getSubmissionCountByDate(from, to));
-        JSONArray chairs = new JSONArray();
-        for (Chair chair : this.chairs.values()) {
-            chairs.add(chair.generateJSONbyDate(from, to));
+
+    @JsonProperty("submission_count")
+    public Integer getSubmissionCount() {
+        Integer result = 0;
+        for (Chair chair : chairs.values()) {
+            result += chair.getSubmissionCount();
         }
-        result.put("data", chairs);
         return result;
     }
 }
