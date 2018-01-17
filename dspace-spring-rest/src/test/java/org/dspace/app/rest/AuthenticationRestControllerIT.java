@@ -8,6 +8,7 @@
 package org.dspace.app.rest;
 
 import static java.lang.Thread.sleep;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
@@ -284,5 +285,12 @@ public class AuthenticationRestControllerIT extends AbstractControllerIntegratio
                 .andExpect(jsonPath("$.type", is("status")));
 
 
+    }
+
+    @Test
+    public void testLoginEmptyRequest() throws Exception {
+        getClient().perform(get("/api/authn/login"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(status().reason(containsString("Login failed")));
     }
 }
