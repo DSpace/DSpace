@@ -318,7 +318,7 @@
      {
         "integrated" : "Y",
         "hidden" : "N",
-        "submission" : "R",
+        "submission" : "D",
         "issn" : "0163-769X",
         "embargo" : "Y",
         "sponsor" : "$120",
@@ -327,7 +327,7 @@
      {
         "integrated" : "Y",
         "hidden" : "N",
-        "submission" : "R",
+        "submission" : "D",
         "issn" : "0013-7227",
         "embargo" : "Y",
         "sponsor" : "$120",
@@ -588,7 +588,7 @@
      {
         "integrated" : "Y",
         "hidden" : "N",
-        "submission" : "R",
+        "submission" : "D",
         "issn" : "0021-972X",
         "embargo" : "Y",
         "sponsor" : "$120",
@@ -732,7 +732,7 @@
      {
         "integrated" : "Y",
         "hidden" : "N",
-        "submission" : "R",
+        "submission" : "D",
         "issn" : "2472-1972",
         "embargo" : "Y",
         "sponsor" : "$120",
