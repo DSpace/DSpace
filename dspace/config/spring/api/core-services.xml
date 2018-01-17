@@ -22,6 +22,11 @@
 				<value>news-side.html</value>
 				<value>news-side_ru.html</value>
 				<value>news-side_uk.html</value>
+
+
+				<value>faq_uk.html</value>
+				<value>faq_ru.html</value>
+				<value>faq.html</value>
 			</list>
 		</property>	
 	</bean>
