@@ -169,6 +169,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 			<version>${spring-boot.version}</version>
+                        <exclusions>
+                                <exclusion>
+                                        <groupId>org.slf4j</groupId>
+                                        <artifactId>log4j-over-slf4j</artifactId>
+                                </exclusion>
+                        </exclusions>
 		</dependency>
 		<dependency>
             <groupId>org.springframework.boot</groupId>
