@@ -84,7 +84,7 @@
 		  {
 		%>
 			   <li class="divider"></li>  
-               <li><a href="<%= request.getContextPath() %>/dspace-admin"><fmt:message key="jsp.administer"/></a></li>
+               <li><a href="<%= request.getContextPath() %>/dspace-admin/"><fmt:message key="jsp.administer"/></a></li>
 		<%
 		  }
 		  if (user != null) {
