@@ -608,9 +608,9 @@ public class JournalUtils {
             Author itemAuthor = new Author(itemAuthors[j].value);
             for (Author msAuthor : manuscript.getAuthorList()) {
                 double score = JournalUtils.getHamrScore(Author.normalizeName(itemAuthors[j].value).toLowerCase(), msAuthor.getNormalizedFullName().toLowerCase());
-                result.append("author " + itemAuthors[j].value + " matched " + msAuthor.getUnicodeFullName() + " with a score of " + score + "\n");
+                result.append("item author " + itemAuthors[j].value + " matched ms author " + msAuthor.getUnicodeFullName() + " with a score of " + score + "\n");
                 if (itemAuthor.equals(msAuthor)) {
-                    result.append("  matched");
+                    result.append("  matched\n");
                     numMatched++;
                     break;
                 }
