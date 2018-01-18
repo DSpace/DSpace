@@ -406,17 +406,14 @@
                 <div id="recently_integrated_journals" class="ds-static-div primary">
                     <div class="container">
 
-                        <!-- Neurology -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aneurology%5C%7C%5C%7C%5C%7CNeurology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-neurology.png" alt="Neurology" /></a>
-
-                        <!-- Limnology and Oceanography Letters -->
-                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Alimnology%5C+and%5C+oceanography%5C+letters%5C%7C%5C%7C%5C%7CLimnology%5C+and%5C+Oceanography%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-LOL.png" alt="Limnology and Oceanography Letters" /></a>
-
-                        <!-- Evolution Letters -->
-		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aevolution%5C+letters%5C%7C%5C%7C%5C%7CEvolution%5C+Letters"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EVOL_LETTS.png" alt="Evolution Letters" /></a>
-
-                        <!-- Journal of the American Medical Informatics Association -->
-		        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+the%5C+american%5C+medical%5C+informatics%5C+association%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+the%5C+American%5C+Medical%5C+Informatics%5C+Association"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JAMIA.png" alt="Journal of the American Medical Informatics Association" /></a>
+                        <!-- Endocrine Reviews -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aendocrine%5C+reviews%5C%7C%5C%7C%5C%7CEndocrine%5C+Reviews"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-EDRV.png" alt="Endocrine Reviews" /></a>
+                        <!-- Endocrinology -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Aendocrinology%5C%7C%5C%7C%5C%7CEndocrinology"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-ENDO.png" alt="Endocrinology" /></a>
+                        <!-- Journal of Clinical Endocrinology & Metabolism -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+clinical%5C+endocrinology%5C+%26%5C+metabolism%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+Clinical%5C+Endocrinology%5C+%26%5C+Metabolism"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JCEM.png" alt="Journal of Clinical Endocrinology &amp; Metabolism" /></a>
+                        <!-- Journal of the Endocrine Society -->
+                        <a class="single-image-link" href="/discover?field=prism.publicationName_filter&amp;query=&amp;fq=prism.publicationName_filter%3Ajournal%5C+of%5C+the%5C+endocrine%5C+society%5C%7C%5C%7C%5C%7CJournal%5C+of%5C+the%5C+Endocrine%5C+Society"><img class="pub-cover" src="/themes/Mirage/images/recentlyIntegrated-JES.png" alt="Journal of the Endocrine Society" /></a>
 
                     </div>
                 </div>

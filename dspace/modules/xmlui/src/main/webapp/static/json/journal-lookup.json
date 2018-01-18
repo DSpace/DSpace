@@ -55,7 +55,7 @@
         "submission" : "R"
      },
      {
-        "integrated" : "N",
+        "integrated" : "Y",
         "embargo" : "N",
         "issn" : "2168-0450",
         "submission" : "A",
@@ -316,6 +316,24 @@
         "title" : "eLife"
      },
      {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "submission" : "D",
+        "issn" : "0163-769X",
+        "embargo" : "Y",
+        "sponsor" : "$120",
+        "title" : "Endocrine Reviews"
+     },
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "submission" : "D",
+        "issn" : "0013-7227",
+        "embargo" : "Y",
+        "sponsor" : "$120",
+        "title" : "Endocrinology"
+     },
+     {
         "sponsor" : "$120",
         "title" : "Environmental Entomology",
         "integrated" : "Y",
@@ -568,6 +586,15 @@
         "title" : "Journal of Cell Science"
      },
      {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "submission" : "D",
+        "issn" : "0021-972X",
+        "embargo" : "Y",
+        "sponsor" : "$120",
+        "title" : "Journal of Clinical Endocrinology & Metabolism"
+     },
+     {
         "sponsor" : "Journal of Consumer Research",
         "title" : "Journal of Consumer Research",
         "hidden" : "Y",
@@ -702,7 +729,15 @@
         "hidden" : "N",
         "integrated" : "Y"
      },
-
+     {
+        "integrated" : "Y",
+        "hidden" : "N",
+        "submission" : "D",
+        "issn" : "2472-1972",
+        "embargo" : "Y",
+        "sponsor" : "$120",
+        "title" : "Journal of the Endocrine Society"
+     },
      {
         "hidden" : "Y",
         "submission" : "A",
