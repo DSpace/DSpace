@@ -16,7 +16,6 @@ import org.dspace.content.Community;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import java.util.UUID;
 
@@ -40,14 +39,18 @@ public class CommunityRestRepositoryIT extends AbstractControllerIntegrationTest
         Community child1 = CommunityBuilder.createSubCommunity(context, parentCommunity)
                 .withName("Sub Community")
                 .build();
-        Collection col1 = CollectionBuilder.createCollection(context, child1).withName("Collection 1").build();
+
+        Collection col1 = CollectionBuilder.createCollection(context, child1)
+                .withName("Collection 1")
+                .withLogo("Test Logo")
+                .build();
 
         getClient().perform(get("/api/core/communities"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$._embedded.communities", Matchers.containsInAnyOrder(
                         CommunityMatcher.matchCommunityEntry(parentCommunity.getName(), parentCommunity.getID(), parentCommunity.getHandle()),
-                        CommunityMatcher.matchCommunityEntry(child1.getName(), child1.getID(), child1.getHandle())
+                        CommunityMatcher.matchCommunityWithCollectionEntry(child1.getName(), child1.getID(), child1.getHandle(), col1)
                 )))
                 .andExpect(jsonPath("$._links.self.href", Matchers.containsString("/api/core/communities")))
                 .andExpect(jsonPath("$.page.size", is(20)))
