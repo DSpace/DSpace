@@ -35,6 +35,20 @@ public class BitstreamMatcher {
         );
     }
 
+    public static Matcher<? super Object> matchBitstreamEntry(UUID uuid, long size) {
+        return allOf(
+                //Check ID and size
+                hasJsonPath("$.uuid", is(uuid.toString())),
+                hasJsonPath("$.sizeBytes", is((int) size)),
+                //Make sure we have a checksum
+                hasJsonPath("$.checkSum", matchChecksum()),
+                //Make sure we have a valid format
+                hasJsonPath("$._embedded.format", matchFormat()),
+                //Check links
+                matchBitstreamLinks(uuid)
+        );
+    }
+
     private static Matcher<? super Object> matchBitstreamLinks(UUID uuid) {
         return allOf(
                 hasJsonPath("$._links.format.href", containsString("/api/core/bitstreams/" + uuid + "/format")),
@@ -53,7 +67,8 @@ public class BitstreamMatcher {
     private static Matcher<? super Object> matchFormat(){
         return allOf(
                 hasJsonPath("$.mimetype", not(empty())),
-                hasJsonPath("$.type", is("bitstreamformat"))
+                hasJsonPath("$.type", is("bitstreamformat")),
+                hasJsonPath("$._links.self.href", not(empty()))
         );
     }
 

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.rest.model.hateoas.EmbeddedPage;
 import org.dspace.app.rest.model.hateoas.HALResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -59,6 +60,12 @@ public class HalLinkService {
                 }
             } else if(obj instanceof Map) {
                 for (Object subObj : ((Map) obj).values()) {
+                    if(subObj instanceof HALResource) {
+                        addLinks((HALResource) subObj);
+                    }
+                }
+            } else if(obj instanceof EmbeddedPage) {
+                for (Object subObj : ((EmbeddedPage) obj).getPageContent()) {
                     if(subObj instanceof HALResource) {
                         addLinks((HALResource) subObj);
                     }
