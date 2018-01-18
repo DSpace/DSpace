@@ -11,7 +11,10 @@ package org.dspace.core;
  * Interface to validate the current domain model against the database schema.
  */
 public interface DatabaseSchemaValidator {
-
+    /**
+     * Validate the model/schema mapping.
+     * @return description of the invalidity of the mapping, or the empty string if valid.
+     */
     String getDatabaseSchemaValidationError();
 
 }
