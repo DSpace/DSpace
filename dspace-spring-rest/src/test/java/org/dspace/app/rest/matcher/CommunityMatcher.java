@@ -7,6 +7,7 @@
  */
 package org.dspace.app.rest.matcher;
 
+import org.dspace.content.Collection;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
@@ -18,8 +19,16 @@ import static org.hamcrest.Matchers.is;
 
 public class CommunityMatcher {
 
-
     public static Matcher<? super Object> matchCommunityEntry(String name, UUID uuid, String handle) {
+        return allOf(
+                matchProperties(name, uuid, handle),
+                hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
+                hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
+                matchLinks(uuid)
+        );
+    }
+
+    public static Matcher<? super Object> matchProperties(String name, UUID uuid, String handle){
         return allOf(
                 hasJsonPath("$.uuid", is(uuid.toString())),
                 hasJsonPath("$.name", is(name)),
@@ -27,10 +36,7 @@ public class CommunityMatcher {
                 hasJsonPath("$.type", is("community")),
                 hasJsonPath("$.metadata", Matchers.contains(
                         CommunityMetadataMatcher.matchTitle(name)
-                )),
-                hasJsonPath("$._embedded.collections", Matchers.not(Matchers.empty())),
-                hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
-                matchLinks(uuid)
+                ))
         );
     }
 
@@ -41,4 +47,15 @@ public class CommunityMatcher {
                 hasJsonPath("$._links.self.href", Matchers.containsString("/api/core/communities/" + uuid.toString()))
         );
     }
+
+    public static Matcher<? super Object> matchCommunityWithCollectionEntry(String name, UUID uuid, String handle, Collection col) {
+        return allOf(
+                matchProperties(name, uuid, handle),
+                hasJsonPath("$._embedded.collections._embedded[0]",
+                        CollectionMatcher.matchCollectionEntry(col.getName(), col.getID(), col.getHandle(), col.getLogo())),
+                hasJsonPath("$._embedded.logo", Matchers.not(Matchers.empty())),
+                matchLinks(uuid)
+        );
+    }
+
 }
